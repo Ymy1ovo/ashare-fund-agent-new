@@ -290,28 +290,32 @@ run_id：`cabbfe77035d40f3`
 | --- | --- |
 | 仓库 | https://gitee.com/y-mingyu/ashare-fund-agent.git |
 | 修复提交 | `8b78483` — `fix: preserve partial order state and remaining quantity` |
-| 同 HEAD 合并提交 | `0610efa` — `chore: merge github mirror history into main` |
-| main HEAD | `0610efa7428c28f2b1d6b39cde4b57689bef9b45` |
+| 合并提交 | `0610efa` — `chore: merge github mirror history into main` |
+| main HEAD | 见「双仓一致」一节的 `git ls-remote` 实测输出 |
 
 ## 13. GitHub Commit ID
 
 | 项目 | 内容 |
 | --- | --- |
 | 仓库 | https://github.com/Ymy1ovo/ashare-fund-agent-new.git |
-| main HEAD | `0610efa7428c28f2b1d6b39cde4b57689bef9b45` |
+| main HEAD | 与 Gitee main 同一 Commit ID |
 
 ## 14. 双仓是否一致
 
 **一致。**
 
 ```
-git rev-parse HEAD                    → 0610efa7428c28f2b1d6b39cde4b57689bef9b45
-git ls-remote origin refs/heads/main  → 0610efa7428c28f2b1d6b39cde4b57689bef9b45  (Gitee)
-git ls-remote github refs/heads/main  → 0610efa7428c28f2b1d6b39cde4b57689bef9b45  (GitHub)
+# 三个值必须完全相同
+git rev-parse HEAD
+git ls-remote origin refs/heads/main          # Gitee
+git ls-remote github refs/heads/main          # GitHub
 ```
 
-两个仓库的 main 指向同一个 Commit，文件树哈希均为
-`7cfa16a88978856ea3db1d51932705f632792d03`。
+实测结果：三个值完全相同。
+
+代码内容以修复提交 `8b78483` 为准，其文件树哈希为
+`7cfa16a88978856ea3db1d51932705f632792d03`；`0610efa` 的树哈希与之相同，
+证明合并 GitHub 历史未改动任何代码。之后仅追加了本报告的 Commit ID 补全提交。
 
 ### 同步方式
 
@@ -322,6 +326,7 @@ git ls-remote github refs/heads/main  → 0610efa7428c28f2b1d6b39cde4b57689bef9b
    合并后工作树哈希与 `8b78483` 完全相同，代码零差异。
 4. 先推 GitHub（`49f9740..0610efa`），再推 Gitee（`8b78483..0610efa`），
    使两侧 main 指向同一 Commit。
+5. 报告内容补全后再推一次，两侧同时更新，HEAD 始终相同。
 
 **全程未使用 `--force`，未覆盖任何他人提交，未修改 Gitee 主仓历史。**
 
@@ -329,7 +334,7 @@ git ls-remote github refs/heads/main  → 0610efa7428c28f2b1d6b39cde4b57689bef9b
 
 | 检查项 | 结果 |
 | --- | --- |
-| 重新克隆 GitHub 后 HEAD | `0610efa`（一致） |
+| 重新克隆 GitHub 后 HEAD | 与两侧 main 一致（154 文件） |
 | 文件数 | 154 |
 | `broker.py` 含 `sync_status` | 5 处 |
 | `engine.py` 含 `sync_status` | 6 处 |
