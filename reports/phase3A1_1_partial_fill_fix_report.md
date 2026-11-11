@@ -286,15 +286,56 @@ run_id：`cabbfe77035d40f3`
 
 ## 12. Gitee Commit ID
 
-见第 14 节。
+| 项目 | 内容 |
+| --- | --- |
+| 仓库 | https://gitee.com/y-mingyu/ashare-fund-agent.git |
+| 修复提交 | `8b78483` — `fix: preserve partial order state and remaining quantity` |
+| 同 HEAD 合并提交 | `0610efa` — `chore: merge github mirror history into main` |
+| main HEAD | `0610efa7428c28f2b1d6b39cde4b57689bef9b45` |
 
 ## 13. GitHub Commit ID
 
-见第 14 节。
+| 项目 | 内容 |
+| --- | --- |
+| 仓库 | https://github.com/Ymy1ovo/ashare-fund-agent-new.git |
+| main HEAD | `0610efa7428c28f2b1d6b39cde4b57689bef9b45` |
 
 ## 14. 双仓是否一致
 
-见第 14 节（提交后填写）。
+**一致。**
+
+```
+git rev-parse HEAD                    → 0610efa7428c28f2b1d6b39cde4b57689bef9b45
+git ls-remote origin refs/heads/main  → 0610efa7428c28f2b1d6b39cde4b57689bef9b45  (Gitee)
+git ls-remote github refs/heads/main  → 0610efa7428c28f2b1d6b39cde4b57689bef9b45  (GitHub)
+```
+
+两个仓库的 main 指向同一个 Commit，文件树哈希均为
+`7cfa16a88978856ea3db1d51932705f632792d03`。
+
+### 同步方式
+
+1. 修复完成后先提交 `8b78483` 并推送到 Gitee（`9c60420..8b78483`）。
+2. GitHub 上存在上一轮镜像时引入的 `49f9740` 合并提交，直接推送被拒
+   （`rejected (fetch first)`，非快进）。
+3. 拉取 GitHub 历史，用 `git merge` 建立共同祖先（`0610efa`），
+   合并后工作树哈希与 `8b78483` 完全相同，代码零差异。
+4. 先推 GitHub（`49f9740..0610efa`），再推 Gitee（`8b78483..0610efa`），
+   使两侧 main 指向同一 Commit。
+
+**全程未使用 `--force`，未覆盖任何他人提交，未修改 Gitee 主仓历史。**
+
+### 交付校验
+
+| 检查项 | 结果 |
+| --- | --- |
+| 重新克隆 GitHub 后 HEAD | `0610efa`（一致） |
+| 文件数 | 154 |
+| `broker.py` 含 `sync_status` | 5 处 |
+| `engine.py` 含 `sync_status` | 6 处 |
+| 专项报告存在 | 是 |
+| 密钥扫描（154 文件） | 0 命中 |
+| `.db` / `.env` / `logs/` / `dist/` / `.venv` / `__pycache__` | 均无 |
 
 ---
 
