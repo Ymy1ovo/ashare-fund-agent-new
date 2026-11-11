@@ -1,0 +1,77 @@
+# ---- Python ----
+.venv/
+venv/
+env/
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+build/
+pip-build-tracker-*/
+pip-ephem-wheel-cache-*/
+pip-install-*/
+pip-unpack-*/
+
+# ---- 测试与检查缓存 ----
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+pytest-of-*/
+
+# ---- 密钥与本地配置（切勿提交）----
+.env
+.env.*
+!.env.example
+.streamlit/secrets.toml
+*.pem
+*.key
+credentials*.json
+.git-credentials
+
+# ---- 本地数据库（快照包单独交付，不进 Git）----
+data/*.db
+data/*.db-*
+data/*.sqlite
+data/*.sqlite3
+data/cache/
+data/backups/
+
+# ---- 运行产物与临时文件 ----
+logs/
+logs/*.log
+dist/
+*.zip
+*.tar.gz
+*.tmp
+*.bak
+*.swp
+*~
+*.log
+
+# ---- 回测/指标运行产物（JSON 结果，非源码）----
+data/backtest_summary_*.json
+data/sync_summary*.json
+data/ingest_summary.json
+data/adjustment_*.json
+data/data_quality_report.json
+data/data_source_test_results.json
+data/indicator_calculation_summary.json
+data/indicator_quality.json
+data/phase2*_comparison.json
+data/phase3a1_comparison.json
+data/etf_pool_realtime_verification.json
+data/etf_pool_validation.json
+data/raw_ohlc_before_1b1.json
+
+# ---- IDE / 操作系统 ----
+.vscode/
+.idea/
+*.code-workspace
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ---- 单次回测运行产物（可复现，不进 Git；阶段验收报告保留）----
+reports/backtest_*.md
