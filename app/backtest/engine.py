@@ -12,7 +12,7 @@ import pandas as pd
 
 from app.backtest.broker import Broker, FillResult, append_reason
 from app.backtest.config import BacktestConfig, InstrumentRule, rule_for
-from app.backtest.costs import round_lot
+from app.backtest.costs import round_lot, sell_quantity
 from app.backtest.data import BarData, load_bars, load_calendar, load_pool
 from app.backtest.execution import Quote
 from app.backtest.models import DailySnapshot, Order, Trade
@@ -283,7 +283,7 @@ class BacktestEngine:
                 )
             else:
                 available = portfolio.available(code, signal_date)
-                quantity = min(round_lot(raw_quantity, rule.lot_size, allow_odd=True), available)
+                quantity = sell_quantity(raw_quantity, available, rule.lot_size)
                 if quantity <= 0:
                     continue
                 seq += 1

@@ -10,7 +10,7 @@ from dataclasses import dataclass, field
 from datetime import date
 
 from app.backtest.config import BacktestConfig, InstrumentRule
-from app.backtest.costs import commission, round_lot, slippage_cost, taxes
+from app.backtest.costs import commission, round_lot, sell_quantity, slippage_cost, taxes
 from app.backtest.execution import Quote, available_date, fill_price
 from app.backtest.models import Order, Trade
 from app.backtest.portfolio import Portfolio
@@ -127,7 +127,8 @@ class Broker:
             # 卖出：可卖量不足时，按配置决定「部分成交」还是「整单拒绝」
             if remaining > available and not self.config.allow_partial_fill:
                 return self._terminate(order, 'insufficient_position', 'rejected')
-            quantity = round_lot(min(remaining, available), rule.lot_size, allow_odd=True)
+            # 卖出：整手申报；只有「可卖数量不足一手」时才整笔清掉零股
+            quantity = sell_quantity(min(remaining, available), available, rule.lot_size)
             if quantity <= 0:
                 return self._terminate(order, 'insufficient_position', 'rejected')
             if quantity < remaining:
@@ -144,6 +145,16 @@ class Broker:
         fee += stamp + transfer
         reference = quote.open if self.config.execution_price == 'open' else quote.close
         slip = slippage_cost(reference, price, quantity, order.side)
+
+        # 卖出净收入不足以覆盖费用且现金不够补差时，不制造负现金：
+        # 这是「卖出收入 < 最低佣金」的病态碎股情形，按拒单处理并记录原因，
+        # 而不是让账本抛异常中断整个回测。
+        if order.side == 'sell':
+            net_proceeds = gross - fee
+            if net_proceeds < 0 and portfolio.cash + net_proceeds < -1e-6:
+                return self._terminate(
+                    order, 'sell_proceeds_below_fee', 'rejected'
+                )
 
         if order.side == 'buy':
             portfolio.apply_buy(

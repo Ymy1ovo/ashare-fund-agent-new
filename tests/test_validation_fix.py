@@ -188,15 +188,18 @@ def test_regime_empty_series_still_raises() -> None:
 def _sample_rows() -> list[tuple]:
     """一行 = FIELD_LIST 对应字段。"""
     return [
-        ("510300", "2024-01-02", 10.0, 10.5, 9.5, 10.2, 100000.0, 1020000.0, 10.2, 1),
-        ("510300", "2024-01-03", 10.2, 10.8, 10.1, 10.6, 120000.0, 1272000.0, 10.6, 1),
-        ("510500", "2024-01-02", 20.0, 20.5, 19.5, 20.2, 50000.0, 1010000.0, 20.2, 1),
+        ("510300", "2024-01-02", 10.0, 10.5, 9.5, 10.2, 100000.0, 1020000.0, 10.2,
+         "qfq", 1, "2024-01-01", "2024-12-31"),
+        ("510300", "2024-01-03", 10.2, 10.8, 10.1, 10.6, 120000.0, 1272000.0, 10.6,
+         "qfq", 1, "2024-01-01", "2024-12-31"),
+        ("510500", "2024-01-02", 20.0, 20.5, 19.5, 20.2, 50000.0, 1010000.0, 20.2,
+         "qfq", 1, "2024-01-01", "2024-12-31"),
     ]
 
 
 def test_fingerprint_version_and_fields_declared() -> None:
     """指纹算法必须有版本号与字段清单。"""
-    assert FINGERPRINT_VERSION.startswith("market-fingerprint-v")
+    assert FINGERPRINT_VERSION == "market-fingerprint-v3"
     assert "close" in FIELD_LIST
     assert "adjusted_close" in FIELD_LIST
     assert "volume" in FIELD_LIST
@@ -255,16 +258,20 @@ def test_fingerprint_detects_snapshot_change() -> None:
 
 def test_fingerprint_null_encoding_stable() -> None:
     """None 与 NaN 编码一致，不产生分歧。"""
-    row_none = ("510300", "2024-01-02", 10.0, 10.5, 9.5, 10.2, 100000.0, 1020000.0, None, 1)
-    row_nan = ("510300", "2024-01-02", 10.0, 10.5, 9.5, 10.2, 100000.0, 1020000.0, float("nan"), 1)
+    row_none = ("510300", "2024-01-02", 10.0, 10.5, 9.5, 10.2, 100000.0, 1020000.0,
+                None, "qfq", 1, "2024-01-01", "2024-12-31")
+    row_nan = ("510300", "2024-01-02", 10.0, 10.5, 9.5, 10.2, 100000.0, 1020000.0,
+               float("nan"), "qfq", 1, "2024-01-01", "2024-12-31")
     assert serialize_row(row_none) == serialize_row(row_nan)
     assert fingerprint_from_rows([row_none])["sha256"] == fingerprint_from_rows([row_nan])["sha256"]
 
 
 def test_fingerprint_float_precision_normalized() -> None:
     """1.1 与 1.10000 视为同一值，不因浮点表示产生不同指纹。"""
-    a = ("510300", "2024-01-02", 10.1, 10.5, 9.5, 10.2, 100.0, 1000.0, 10.2, 1)
-    b = ("510300", "2024-01-02", 10.100000, 10.5, 9.5, 10.2, 100.00, 1000.0, 10.2, 1)
+    a = ("510300", "2024-01-02", 10.1, 10.5, 9.5, 10.2, 100.0, 1000.0, 10.2,
+         "qfq", 1, "2024-01-01", "2024-12-31")
+    b = ("510300", "2024-01-02", 10.100000, 10.5, 9.5, 10.2, 100.00, 1000.0, 10.2,
+         "qfq", 1, "2024-01-01", "2024-12-31")
     assert fingerprint_from_rows([a])["sha256"] == fingerprint_from_rows([b])["sha256"]
 
 

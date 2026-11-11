@@ -77,3 +77,11 @@ desktop.ini
 # ---- 单次回测运行产物（可复现，不进 Git；阶段验收报告保留）----
 reports/backtest_*.md
 reports/validation_*.md
+
+# ---- 压力测试临时副本与运行产物（绝不提交）----
+val_sparse_*/
+sparse_*/
+trace_*/
+chk_*/
+dbg_*/
+data/sparse_stress_result.json

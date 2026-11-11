@@ -482,11 +482,17 @@ def _build_regime_payload(
             code=config.regime_proxy_code,
             output_start=date.fromisoformat(split.oos_start),
         )
-        warmup_status = "ok" if warmup["days"] >= config.regime_ma_window else "partial"
+        required = config.regime_ma_window
+        valid = warmup["valid_prices"]
+        if valid >= required:
+            warmup_status = "ok"
+        elif valid > 0:
+            warmup_status = "partial"
+        else:
+            warmup_status = "unavailable"
         warmup_reason = (
-            f"预热 {warmup['days']} 个交易日（需求 {config.regime_ma_window}）"
-            if warmup_status == "ok"
-            else f"预热仅 {warmup['days']} 个交易日，不足 {config.regime_ma_window}"
+            f"有效价格 {valid} 个（需求 {required}），"
+            f"数据库记录 {warmup['db_rows']} 条，无效价格 {warmup['invalid_prices']} 条"
         )
     except Exception as exc:
         return {
@@ -529,8 +535,11 @@ def _build_regime_payload(
             "proxy_code": config.regime_proxy_code,
             "proxy_note": "数据库无独立指数表，使用沪深300ETF代理，含跟踪误差",
             "warmup": {
-                "days": warmup["days"],
-                "required": config.regime_ma_window,
+                "db_rows": warmup["db_rows"],
+                "valid_prices": warmup["valid_prices"],
+                "invalid_prices": warmup["invalid_prices"],
+                "days": warmup["valid_prices"],
+                "required": required,
                 "status": warmup_status,
                 "reason": warmup_reason,
                 "source": warmup["source"],
@@ -561,23 +570,56 @@ def _build_regime_payload(
 def _load_regime_warmup(code: str, oos_start: str, *, db_path=None) -> dict:
     """取 OOS 起点之前的全部历史收盘价，用于 MA 预热。
 
-    按 trade_date 倒序取「实际交易日」，不是自然日偏移。
+    严格按 trade_date 升序，且只取 trade_date < oos_start 的记录，
+    不会读到 OOS 之后的数据，也不向前填充价格。
+
+    统计口径区分三个量：
+    - db_rows：数据库记录数
+    - valid_prices：有效价格观测数（非 NaN、非 None、> 0）
+    - days：与 valid_prices 一致，用于判断是否满足 MA 需求
     """
     from app.database.db import get_connection
 
     with get_connection(db_path) as conn:
         rows = conn.execute(
-            "SELECT trade_date, COALESCE(adjusted_close, close) FROM etf_daily_prices "
+            "SELECT trade_date, adjusted_close, close FROM etf_daily_prices "
             "WHERE code=? AND trade_date < ? ORDER BY trade_date",
             (code, oos_start),
         ).fetchall()
+
     if not rows:
-        return {"days": 0, "close": pd.Series(dtype=float), "source": "etf_daily_prices"}
-    index = pd.DatetimeIndex([pd.Timestamp(str(row[0])) for row in rows])
-    values = [float(row[1]) if row[1] is not None else float("nan") for row in rows]
+        return {
+            "db_rows": 0,
+            "valid_prices": 0,
+            "days": 0,
+            "invalid_prices": 0,
+            "close": pd.Series(dtype=float),
+            "source": "etf_daily_prices",
+            "first": None,
+            "last": None,
+        }
+
+    index: list = []
+    values: list = []
+    invalid = 0
+    for trade_date, adjusted_close, close in rows:
+        price = adjusted_close if adjusted_close is not None else close
+        try:
+            number = float(price)
+        except (TypeError, ValueError):
+            number = float("nan")
+        if number != number or number <= 0:  # NaN 或 非正价格
+            invalid += 1
+            continue
+        index.append(pd.Timestamp(str(trade_date)))
+        values.append(number)
+
     return {
-        "days": len(rows),
-        "close": pd.Series(values, index=index, dtype=float),
+        "db_rows": len(rows),
+        "valid_prices": len(values),
+        "days": len(values),
+        "invalid_prices": invalid,
+        "close": pd.Series(values, index=pd.DatetimeIndex(index), dtype=float),
         "source": "etf_daily_prices",
         "first": str(rows[0][0]),
         "last": str(rows[-1][0]),

@@ -91,3 +91,31 @@ def round_lot(quantity: float, lot_size: int, allow_odd: bool = False) -> int:
     if allow_odd:
         return int(math.floor(quantity))
     return int(math.floor(quantity / lot_size) * lot_size)
+
+
+def sell_quantity(raw_quantity: float, available: int, lot_size: int) -> int:
+    """卖单申报数量：整手优先，清仓时才允许一次性卖出剩余碎股。
+
+    ETF 规则：
+    - 卖出通常以整手（默认 100 份）为申报单位；
+    - 若账户持仓不足整手（除权、送股、此前部分成交留下的零股），
+      允许一次性全部卖出，不留零股。
+
+    因此这里只在「可卖数量本身就是最终可卖全部」时才允许非整手，
+    避免策略每次算出 130399.7 就申报 130399、留 1 股碎股。
+    """
+    if raw_quantity <= 0 or available <= 0:
+        return 0
+    if lot_size <= 0:
+        raise ValueError("lot_size 必须为正")
+
+    want = int(math.floor(min(raw_quantity, available)))
+    if want <= 0:
+        return 0
+
+    lots = int(want // lot_size) * lot_size
+    if lots > 0:
+        # 整手部分足够 → 按整手申报
+        return lots
+    # 可卖数量不足一手 → 只能整笔卖出剩余零股
+    return min(want, available)

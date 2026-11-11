@@ -12,7 +12,12 @@ import math
 from decimal import Decimal
 from typing import Any, Iterable
 
-FINGERPRINT_VERSION = "market-fingerprint-v2"
+FINGERPRINT_VERSION = "market-fingerprint-v3"
+
+# v2（阶段3A.2.1）覆盖 10 个价格字段；
+# v3（阶段3A.2.1.1）追加 adjustment_type 等复权口径字段，
+# 旧 v2 指纹仍可识别，不会误读为 v3（哈希输入含版本号前缀）。
+LEGACY_FINGERPRINT_VERSIONS = ("market-fingerprint-v2",)
 
 # 参与指纹的列；顺序固定，变更必须升版本号
 FIELD_LIST: tuple[str, ...] = (
@@ -25,7 +30,10 @@ FIELD_LIST: tuple[str, ...] = (
     "volume",
     "amount",
     "adjusted_close",
+    "adjustment_type",
     "adjustment_snapshot_id",
+    "adjustment_coverage_start",
+    "adjustment_coverage_end",
 )
 
 # 价格类字段保留的小数位；不足补零，避免 1.1 与 1.10 产生不同结果
@@ -49,12 +57,13 @@ def _normalize(value: Any, field: str) -> str:
         return "null"
     if isinstance(value, float) and math.isnan(value):
         return "null"
-    if field == "trade_date":
+    if field in ("trade_date", "adjustment_coverage_start", "adjustment_coverage_end"):
         try:
-            return str(value)[:10]
+            text = str(value).strip()
         except Exception:  # noqa: BLE001
             return "null"
-    if field in ("code", "adjustment_snapshot_id"):
+        return text[:10] if text else "null"
+    if field in ("code", "adjustment_type", "adjustment_snapshot_id"):
         text = str(value).strip()
         return text if text else "null"
     if isinstance(value, bool):

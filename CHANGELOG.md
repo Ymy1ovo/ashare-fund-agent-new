@@ -1,5 +1,22 @@
 # 变更日志
 
+## 2026-11-11 — 阶段3A.2.1.1 全池压力测试阻塞修复
+
+- **碎股卖出根因**：卖单数量使用 `round_lot(..., allow_odd=True)`，等价 `floor()`，
+  持仓 130,400 股时申报 130,399，卖出后剩 1 股；后续卖出 1 股成交额 0.3738 元 < 最低佣金 5 元，
+  现金转负触发账本异常。
+- 新增 `sell_quantity()`：整手优先，只有可卖不足一手时才允许整笔清零股；
+  engine 与 broker 统一调用。
+- broker 新增卖出净收入不足防护：收入<费用且现金不够时拒单（`sell_proceeds_below_fee`），
+  不制造负现金。
+- 指纹升级 v3：新增 `adjustment_type`、`adjustment_coverage_start/end`；
+  `LEGACY_FINGERPRINT_VERSIONS` 保留 v2 兼容；空值编码统一。
+- `_load_regime_warmup()` 改为按**有效价格**计数：`db_rows` / `valid_prices` / `invalid_prices` 三量分离；
+  预热状态按 `valid_prices >= 250` 判定 ok / partial / unavailable。
+- 全池 sparse_data 实测通过：41 只、2,004 订单、1,235 成交、负现金 0 天、指纹前后一致。
+- 新增 `tests/test_validation_fix_2.py` 27 项测试，全量 249 → 276 项，全部通过。
+- 无数据库迁移；历史 validation、行情、指标、复权快照、历史回测全部保留。
+
 ## 2026-11-11 — 阶段3A.2.1 验证体系缺陷整改
 
 - 修复市场环境分类缺少 OOS 前预热数据：额外加载 OOS 前全部历史交易日（实测 3,064 天）

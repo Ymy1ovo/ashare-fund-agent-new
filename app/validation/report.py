@@ -166,8 +166,11 @@ def render_validation_report(result) -> str:
         warmup = regime.get("warmup") or {}
         if warmup:
             lines.append(
-                f"预热数据：{warmup.get('days')} 个交易日"
-                f"（需求 {warmup.get('required')}），状态 `{warmup.get('status')}`"
+                f"预热数据：有效价格 {warmup.get('valid_prices', warmup.get('days'))} 个"
+                f"（需求 {warmup.get('required')}），"
+                f"数据库记录 {warmup.get('db_rows', '-')} 条，"
+                f"无效价格 {warmup.get('invalid_prices', '-')} 条，"
+                f"状态 `{warmup.get('status')}`"
             )
             lines.append("")
         output_range = regime.get("output_range") or {}
@@ -303,12 +306,19 @@ def render_validation_report(result) -> str:
                 f"| {row['name']} | {row['status']} | {row.get('reason') or '-'} |"
             )
             if evaluation:
-                lines.append(
-                    f"| | | 交易日 {evaluation.get('trading_days')} / "
-                    f"有效收益 {evaluation.get('valid_return_days')} / "
-                    f"缺口 {evaluation.get('gap_days_excluded')} / "
-                    f"NaN {evaluation.get('nan_days')} |"
-                )
+                parts = []
+                for key, label in (
+                    ("daily_rows", "快照"),
+                    ("trading_days", "交易日"),
+                    ("valid_return_days", "有效收益"),
+                    ("gap_days_excluded", "缺口"),
+                    ("nan_days", "NaN"),
+                ):
+                    value = evaluation.get(key)
+                    if value is not None:
+                        parts.append(f"{label} {value}")
+                if parts:
+                    lines.append(f"| | | {' / '.join(parts)} |")
         lines.append("")
         lines.append(
             "数据类场景在独立 SQLite 副本上执行，源数据库行数与指纹前后一致。"
