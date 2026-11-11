@@ -57,6 +57,14 @@ def render_validation_report(result) -> str:
     lines.append(f"| 执行价格 | 次日{'开盘' if config.execution_price == 'open' else '收盘'} |")
     lines.append(f"| 指标版本 | `{config.indicator_version}` |")
     lines.append(f"| 参数网格 | MA {', '.join(str(x) for x in config.ma_window_grid)} |")
+    fingerprint = getattr(result, "data_fingerprint", None) or {}
+    if fingerprint:
+        lines.append(
+            f"| 数据指纹算法 | `{fingerprint.get('algorithm')}` |"
+        )
+        lines.append(
+            f"| 数据指纹 SHA256 | `{fingerprint.get('sha256')}`（{fingerprint.get('rows')} 行） |"
+        )
     lines.append("")
 
     if result.excluded:
@@ -155,20 +163,50 @@ def render_validation_report(result) -> str:
         lines.append("分类规则：收盘价相对 MA250 偏离 > +5% 为牛市，< -5% 为熊市，"
                      "其余为震荡市；MA250 样本不足时标记 unclassified，不强行归类。")
         lines.append("")
+        warmup = regime.get("warmup") or {}
+        if warmup:
+            lines.append(
+                f"预热数据：{warmup.get('days')} 个交易日"
+                f"（需求 {warmup.get('required')}），状态 `{warmup.get('status')}`"
+            )
+            lines.append("")
+        output_range = regime.get("output_range") or {}
+        if output_range:
+            lines.append(
+                f"输出区间：{output_range.get('start')} ~ {output_range.get('end')}"
+                f"（OOS {output_range.get('oos_start')} ~ {output_range.get('oos_end')}）"
+            )
+            lines.append("")
         summary = regime.get("summary", {})
-        lines.append(f"分类天数：{summary.get('counts', {})}")
+        lines.append(
+            f"分类天数：{summary.get('counts', {})}；"
+            f"预热 {summary.get('warmup_days')} 天不计入输出"
+        )
         lines.append("")
-        lines.append("| 环境 | 样本日 | 状态 | 累计收益 | 胜率 | 年化波动率 |")
-        lines.append("| --- | ---: | --- | ---: | ---: | ---: |")
+        diagnostics = regime.get("oos_return_diagnostics") or {}
+        if diagnostics:
+            lines.append(
+                f"OOS 日收益诊断：快照 {diagnostics.get('nav_days')} 天，"
+                f"有效日收益 {diagnostics.get('valid_return_days')} 天，"
+                f"持仓缺价排除 {diagnostics.get('gap_days_excluded')} 天；"
+                f"NaN 保留在原始交易日索引上，未压缩缺失日。"
+            )
+            lines.append("")
+        lines.append("| 环境 | 区间交易日 | 有效日收益 | 缺失日 | 状态 | 累计收益 | 胜率 | 年化波动率 |")
+        lines.append("| --- | ---: | ---: | ---: | --- | ---: | ---: | ---: |")
         for label in ("bull", "bear", "range", "unclassified"):
             entry = regime.get("stats", {}).get(label, {})
             if not entry:
                 continue
             lines.append(
-                f"| {label} | {_int(entry.get('samples'))} | {entry.get('status')} | "
+                f"| {label} | {_int(entry.get('total_days'))} | "
+                f"{_int(entry.get('valid_days'))} | {_int(entry.get('missing_days'))} | "
+                f"{entry.get('status')} | "
                 f"{_pct(entry.get('cumulative_return'))} | {_pct(entry.get('win_rate'))} | "
                 f"{_pct(entry.get('annualized_volatility'))} |"
             )
+        lines.append("")
+        lines.append("累计收益只按有效日收益复利，缺失日不计入，不代表连续交易日收益。")
         for note in summary.get("notes", []):
             lines.append("")
             lines.append(f"- {note}")
@@ -250,6 +288,32 @@ def render_validation_report(result) -> str:
     lines.append("")
     lines.append("所有成本与滑点变化均为模拟假设，未修改任何历史行情。")
     lines.append("")
+    data_scenarios = [
+        row for row in result.stress
+        if (row.get("config") or {}).get("kind") == "data"
+    ]
+    if data_scenarios:
+        lines.append("### 数据类压力场景")
+        lines.append("")
+        lines.append("| 场景 | 状态 | 结果说明 |")
+        lines.append("| --- | --- | --- |")
+        for row in data_scenarios:
+            evaluation = row.get("evaluation") or {}
+            lines.append(
+                f"| {row['name']} | {row['status']} | {row.get('reason') or '-'} |"
+            )
+            if evaluation:
+                lines.append(
+                    f"| | | 交易日 {evaluation.get('trading_days')} / "
+                    f"有效收益 {evaluation.get('valid_return_days')} / "
+                    f"缺口 {evaluation.get('gap_days_excluded')} / "
+                    f"NaN {evaluation.get('nan_days')} |"
+                )
+        lines.append("")
+        lines.append(
+            "数据类场景在独立 SQLite 副本上执行，源数据库行数与指纹前后一致。"
+        )
+        lines.append("")
 
     lines.append("## 10. 过拟合风险评估")
     lines.append("")

@@ -19,6 +19,7 @@ import hashlib
 import json
 import uuid
 from dataclasses import dataclass, field
+from pathlib import Path
 from datetime import date, datetime
 from typing import Any
 
@@ -136,6 +137,7 @@ class ValidationResult:
     notes: list[str] = field(default_factory=list)
     status: str = "success"
     error: str | None = None
+    data_fingerprint: dict = field(default_factory=dict)
 
 
 def _metrics_payload(performance, result) -> dict:
@@ -177,21 +179,25 @@ def _run_backtest(
 
 
 def _data_fingerprint(db_path=None) -> dict:
-    """行情指纹：用于证明压力测试没有改动历史数据。"""
-    with get_connection(db_path) as conn:
-        rows = conn.execute(
-            "SELECT COUNT(*), COALESCE(SUM(close), 0), COALESCE(SUM(volume), 0) "
-            "FROM etf_daily_prices"
-        ).fetchone()
-    return {"rows": int(rows[0]), "close_sum": round(float(rows[1]), 4),
-            "volume_sum": round(float(rows[2]), 4)}
+    """全字段行情指纹（v2），用于证明数据未被修改。
+
+    覆盖 code/trade_date/open/high/low/close/volume/amount/adjusted_close/
+    adjustment_snapshot_id，按 (code, trade_date) 排序后 SHA256。
+    算法版本见 app.validation.fingerprint.FINGERPRINT_VERSION。
+    """
+    from app.validation.fingerprint import fingerprint_from_db
+
+    return fingerprint_from_db(db_path=db_path)
 
 
 def _input_hash(config: ValidationConfig, codes: list[str], fingerprint: dict) -> str:
+    from app.validation.fingerprint import FINGERPRINT_VERSION
+
     payload = {
         "config": config.as_dict(),
         "codes": sorted(codes),
         "data": fingerprint,
+        "fingerprint_version": FINGERPRINT_VERSION,
     }
     text = json.dumps(payload, ensure_ascii=False, sort_keys=True, default=str)
     return hashlib.sha256(text.encode("utf-8")).hexdigest()[:16]
@@ -403,6 +409,7 @@ def run_validation(
             conclusion=conclusion,
             conclusion_reasons=reasons,
             notes=notes,
+            data_fingerprint=fingerprint_before,
         )
 
         summary = {
@@ -414,6 +421,7 @@ def run_validation(
             "window_count": len(window_rows),
             "window_success": sum(1 for row in window_rows if row["status"] == "success"),
             "data_fingerprint": fingerprint_before,
+            "fingerprint_after": fingerprint_after,
         }
         record.status = "success"
         record.conclusion = conclusion
@@ -436,7 +444,11 @@ def run_validation(
 def _build_regime_payload(
     config: ValidationConfig, split, oos_cfg, oos_strategy, codes, db_path
 ) -> dict:
-    """市场环境分类与分组统计。"""
+    """市场环境分类与分组统计。
+
+    关键：加载 OOS 之前的预热数据用于 MA250 初始化。
+    预热数据只参与 MA 计算，不进入 labels，也不进入 OOS 绩效。
+    """
     from app.backtest.metrics import risk_return_series
 
     try:
@@ -444,31 +456,132 @@ def _build_regime_payload(
             config.regime_proxy_code, split.oos_start, split.oos_end,
             indicator_version=None, db_path=db_path,
         )
-        close = proxy.adjusted_close.fillna(proxy.frame["close"])
-        regime_series = build_regime_series(close, code=config.regime_proxy_code)
+        naive_close = proxy.adjusted_close.fillna(proxy.frame["close"])
+        naive = build_regime_series(naive_close, code=config.regime_proxy_code)
+        warmup_days = sum(1 for label in naive.labels.values()
+                          if label == REGIME_UNCLASSIFIED)
+    except Exception as exc:
+        return {"labels_available": False, "error": str(exc)[:200]}
 
-        _, oos_perf, _ = _run_backtest(
-            oos_cfg, oos_strategy, codes, config.indicator_version, db_path
+    # 预热：额外取 OOS 起点之前的历史数据，按真实交易日计数
+    try:
+        warmup = _load_regime_warmup(
+            config.regime_proxy_code, split.oos_start, db_path=db_path
         )
+        # 两段索引必须统一为 DatetimeIndex，否则 Timestamp 与 date 无法比较
+        warm_series = warmup["close"].copy()
+        if not isinstance(warm_series.index, pd.DatetimeIndex):
+            warm_series.index = pd.DatetimeIndex([pd.Timestamp(d) for d in warm_series.index])
+        naive_series = naive_close.copy()
+        if not isinstance(naive_series.index, pd.DatetimeIndex):
+            naive_series.index = pd.DatetimeIndex([pd.Timestamp(d) for d in naive_series.index])
+        combined = pd.concat([warm_series, naive_series]).sort_index()
+        combined = combined[~combined.index.duplicated(keep="last")]
+        regime_series = build_regime_series(
+            combined,
+            code=config.regime_proxy_code,
+            output_start=date.fromisoformat(split.oos_start),
+        )
+        warmup_status = "ok" if warmup["days"] >= config.regime_ma_window else "partial"
+        warmup_reason = (
+            f"预热 {warmup['days']} 个交易日（需求 {config.regime_ma_window}）"
+            if warmup_status == "ok"
+            else f"预热仅 {warmup['days']} 个交易日，不足 {config.regime_ma_window}"
+        )
+    except Exception as exc:
+        return {
+            "labels_available": False,
+            "error": f"预热加载失败：{str(exc)[:180]}",
+            "proxy_code": config.regime_proxy_code,
+        }
+
+    try:
         engine = BacktestEngine(oos_cfg, oos_strategy, db_path=db_path)
         oos_result = engine.run(codes, indicator_version=config.indicator_version)
-        _, oos_returns, _ = risk_return_series(oos_result.daily)
-        returns_by_day = {
-            stamp.date(): float(value) for stamp, value in oos_returns.items()
+        oos_nav, oos_returns, oos_statuses = risk_return_series(oos_result.daily)
+
+        # 构建带原始交易日索引的日收益序列：缺失日保留 NaN，绝不 dropna 后再统计
+        index = pd.DatetimeIndex([pd.Timestamp(item.trade_date) for item in oos_result.daily])
+        return_series = pd.Series(
+            [
+                float(item["raw_return"]) if item["raw_return"] is not None else float("nan")
+                for item in oos_statuses
+            ],
+            index=index,
+            dtype=float,
+        )
+        for position, item in enumerate(oos_statuses):
+            if item["return_status"] in ("held_price_gap", "prior_day_price_gap"):
+                return_series.iloc[position] = float("nan")
+
+        label_map = {
+            pd.Timestamp(day).date(): label
+            for day, label in regime_series.labels.items()
         }
-        stats = regime_stats(
-            returns_by_day,
-            {day: regime_series.label_at(day) for day in returns_by_day},
+        stats = regime_stats(return_series, label_map)
+
+        gap_days = sum(
+            1 for item in oos_statuses
+            if item["return_status"] in ("held_price_gap", "prior_day_price_gap")
         )
         return {
             "labels_available": True,
             "proxy_code": config.regime_proxy_code,
             "proxy_note": "数据库无独立指数表，使用沪深300ETF代理，含跟踪误差",
+            "warmup": {
+                "days": warmup["days"],
+                "required": config.regime_ma_window,
+                "status": warmup_status,
+                "reason": warmup_reason,
+                "source": warmup["source"],
+            },
+            "output_range": {
+                "start": regime_series.first_day.isoformat() if regime_series.first_day else None,
+                "end": regime_series.last_day.isoformat() if regime_series.last_day else None,
+                "oos_start": split.oos_start,
+                "oos_end": split.oos_end,
+            },
             "summary": regime_series.summary(),
             "stats": stats,
+            "oos_return_diagnostics": {
+                "nav_days": len(oos_result.daily),
+                "valid_return_days": int(return_series.notna().sum()),
+                "gap_days_excluded": gap_days,
+                "NaN 保留在原始交易日索引上，未压缩缺失日": True,
+            },
         }
     except Exception as exc:
-        return {"labels_available": False, "error": str(exc)[:200]}
+        return {
+            "labels_available": False,
+            "error": str(exc)[:200],
+            "proxy_code": config.regime_proxy_code,
+        }
+
+
+def _load_regime_warmup(code: str, oos_start: str, *, db_path=None) -> dict:
+    """取 OOS 起点之前的全部历史收盘价，用于 MA 预热。
+
+    按 trade_date 倒序取「实际交易日」，不是自然日偏移。
+    """
+    from app.database.db import get_connection
+
+    with get_connection(db_path) as conn:
+        rows = conn.execute(
+            "SELECT trade_date, COALESCE(adjusted_close, close) FROM etf_daily_prices "
+            "WHERE code=? AND trade_date < ? ORDER BY trade_date",
+            (code, oos_start),
+        ).fetchall()
+    if not rows:
+        return {"days": 0, "close": pd.Series(dtype=float), "source": "etf_daily_prices"}
+    index = pd.DatetimeIndex([pd.Timestamp(str(row[0])) for row in rows])
+    values = [float(row[1]) if row[1] is not None else float("nan") for row in rows]
+    return {
+        "days": len(rows),
+        "close": pd.Series(values, index=index, dtype=float),
+        "source": "etf_daily_prices",
+        "first": str(rows[0][0]),
+        "last": str(rows[-1][0]),
+    }
 
 
 def _build_benchmarks_rows(
@@ -530,17 +643,16 @@ def _build_benchmarks_rows(
 def _build_stress_rows(
     config: ValidationConfig, split, codes, best_window, stress_keys, db_path
 ) -> list[dict]:
-    """压力测试：只改成本参数，不改历史数据。"""
+    """压力测试：成本类只改配置，数据类在独立副本上执行。
+
+    数据类场景不修改真实行情；执行完立即核对指纹。
+    """
     rows: list[dict] = []
     for scenario in build_scenarios(stress_keys):
         if scenario.kind == "data":
-            rows.append({
-                "key": scenario.key, "name": scenario.name,
-                "is_hypothetical": scenario.is_hypothetical,
-                "status": "skipped",
-                "reason": "数据类场景由覆盖过滤与区间校验体现，本次不重复回测",
-                "config": scenario.as_dict(),
-            })
+            rows.append(_run_data_stress(
+                scenario, config, split, codes, best_window, db_path
+            ))
             continue
         overrides = scenario.apply(config)
         try:
@@ -566,6 +678,140 @@ def _build_stress_rows(
                 "config": {**scenario.as_dict(), "overrides": overrides},
             })
     return rows
+
+
+def _run_data_stress(
+    scenario, config: ValidationConfig, split, codes, best_window, db_path
+) -> dict:
+    """执行数据类压力场景（sparse_data / insufficient）。"""
+    import tempfile
+    from datetime import date as _date
+
+    from app.backtest.metrics import risk_return_series
+    from app.validation.stress import (
+        INSUFFICIENT_SCENARIO_KEY,
+        evaluate_insufficient_result,
+        evaluate_sparse_result,
+    )
+
+    from app.config import settings
+
+    resolved_db = db_path or settings.database_path
+    base = {
+        "key": scenario.key,
+        "name": scenario.name,
+        "is_hypothetical": scenario.is_hypothetical,
+        "config": scenario.as_dict(),
+    }
+
+    if scenario.key == "sparse_data":
+        try:
+            from app.validation.stress import build_sparse_copy
+
+            workdir = tempfile.mkdtemp(prefix="val_sparse_")
+            copy_info = build_sparse_copy(
+                resolved_db, workdir,
+                start_date=split.oos_start, end_date=split.oos_end,
+            )
+            copy_db = Path(copy_info["copy_path"])  # get_connection 需要 pathlib.Path
+            cfg = config.build_backtest_config(split.oos_start, split.oos_end)
+            result, performance, metrics = _run_backtest(
+                cfg, MovingAverageTrendStrategy(ma_window=best_window),
+                codes, config.indicator_version, copy_db,
+            )
+            _, returns, statuses = risk_return_series(result.daily)
+            gap_days = sum(
+                1 for item in statuses
+                if item["return_status"] in ("held_price_gap", "prior_day_price_gap")
+            )
+            evaluation = evaluate_sparse_result(
+                daily_rows=len(result.daily),
+                valid_return_days=int(len(returns)),
+                gap_days_excluded=gap_days,
+            )
+            return {
+                **base,
+                "status": evaluation["status"],
+                "metrics": metrics,
+                "data_copy": copy_info,
+                "evaluation": evaluation,
+                "reason": (
+                    f"独立副本 {copy_info['copy_path']}；"
+                    f"删除零散 {copy_info['removed_scattered']} 行、"
+                    f"连续缺失 {copy_info['removed_blocks']} 行；"
+                    f"有效收益日 {evaluation['valid_return_days']}、"
+                    f"缺口日 {evaluation['gap_days_excluded']}"
+                ),
+            }
+        except Exception as exc:
+            return {**base, "status": "failed", "reason": f"sparse 执行失败：{str(exc)[:180]}"}
+
+    if scenario.key == "insufficient":
+        try:
+            # 人为缩短到约 40 个交易日，远低于最小样本阈值
+            calendar = load_calendar(
+                config.is_start, config.oos_end, db_path=db_path
+            )
+            short_start = next(
+                (day for day in calendar if day >= _date.fromisoformat("2025-01-02")),
+                calendar[0],
+            ) if calendar else None
+            index = calendar.index(short_start) if short_start in calendar else 0
+            short_end = calendar[min(index + 40, len(calendar) - 1)]
+
+            cfg = config.build_backtest_config(
+                short_start.isoformat(), short_end.isoformat()
+            )
+            trading_days = index_span = len(
+                [d for d in calendar if short_start <= d <= short_end]
+            )
+            metrics: dict = {}
+            run_error = None
+            try:
+                result, performance, metrics = _run_backtest(
+                    cfg, MovingAverageTrendStrategy(ma_window=best_window),
+                    codes, config.indicator_version, db_path,
+                )
+                trading_days = len(result.daily)
+            except Exception as exc:  # 数据不足时回测本身可能无法完成
+                run_error = str(exc)[:180]
+
+            # 样本不足时不得对外呈现 Sharpe/CAGR：先记录原始值用于判定，
+            # 判定完成后把 metrics 清空，避免被当作正常绩效指标读取
+            raw_sharpe = metrics.get("sharpe_ratio")
+            raw_cagr = metrics.get("cagr")
+            evaluation = evaluate_insufficient_result(
+                trading_days=trading_days,
+                min_required=config.min_validation_days,
+                sharpe=raw_sharpe,
+                cagr=raw_cagr,
+            )
+            if raw_sharpe is not None or raw_cagr is not None:
+                evaluation["raw_metrics_withheld"] = {
+                    "sharpe_ratio": raw_sharpe,
+                    "cagr": raw_cagr,
+                    "note": "样本不足，指标已隐藏，不作为验证结论依据",
+                }
+            metrics = {}
+            if run_error:
+                evaluation["run_error"] = run_error
+                evaluation["reason"] = (
+                    evaluation["reason"] + f"；回测因样本不足未能完成：{run_error}"
+                )
+            return {
+                **base,
+                # 数据不足是场景的预期结论，标记为 insufficient 而非 failed
+                "status": evaluation["status"],
+                "metrics": {},
+                "evaluation": evaluation,
+                "reason": evaluation["reason"],
+                "range": f"{short_start}~{short_end}",
+                "expected_outcome": True,
+            }
+        except Exception as exc:
+            return {**base, "status": "failed", "reason": f"insufficient 执行失败：{str(exc)[:180]}"}
+
+    return {**base, "status": "skipped", "reason": f"未实现的数据场景：{scenario.key}"}
 
 
 def decide_conclusion(
@@ -642,7 +888,10 @@ def decide_conclusion(
     else:
         blockers.append("市场环境分类不可用")
 
-    failed_stress = [row for row in stress if row.get("status") == "failed"]
+    failed_stress = [
+        row for row in stress
+        if row.get("status") == "failed" and not row.get("expected_outcome")
+    ]
     if failed_stress:
         blockers.append(f"{len(failed_stress)} 个压力场景执行失败")
     if oos_dd is not None and oos_dd < -0.30:

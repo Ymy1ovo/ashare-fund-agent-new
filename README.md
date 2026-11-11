@@ -1,6 +1,6 @@
 # A股基金量化分析 Agent
 
-面向中国 A 股 ETF / 指数基金的个人量化研究项目。当前完成 **阶段1A（环境、数据源、观察池）**、**阶段1B（历史行情持久化、增量同步、行情 API、数据看板）**、**阶段1B.1（完整前复权刷新与调整快照一致性）**、**阶段2（统一价格口径与量化指标引擎）**、**阶段2.1（CAGR交易日口径与EMA/MACD断点修复）**、**阶段2.2（区间风险统计缺失交易日修复）**、**阶段3A（A股ETF历史回测引擎 V1.0）** 和 **阶段3A.1（风险口径与部分成交修复）** 、**阶段3A.1.1（部分成交状态逻辑专项修复）** 和 **阶段3A.2（策略可信度验证体系）**。
+面向中国 A 股 ETF / 指数基金的个人量化研究项目。当前完成 **阶段1A（环境、数据源、观察池）**、**阶段1B（历史行情持久化、增量同步、行情 API、数据看板）**、**阶段1B.1（完整前复权刷新与调整快照一致性）**、**阶段2（统一价格口径与量化指标引擎）**、**阶段2.1（CAGR交易日口径与EMA/MACD断点修复）**、**阶段2.2（区间风险统计缺失交易日修复）**、**阶段3A（A股ETF历史回测引擎 V1.0）** 和 **阶段3A.1（风险口径与部分成交修复）** 、**阶段3A.1.1（部分成交状态逻辑专项修复）**、**阶段3A.2（策略可信度验证体系）** 和 **阶段3A.2.1（验证体系缺陷整改）**。
 
 > 仅用于研究，不构成投资建议；不接入券商交易接口，不自动实盘交易。
 
@@ -24,7 +24,7 @@
 - 行情摘要 API、按代码行情查询 API（日期范围、limit/offset）
 - 调整快照一致性检查与数据质量报告
 - 历史回测引擎：T+1 撮合、FIFO 账本、交易成本、绩效报告
-- 离线单元/集成测试 209 项（含55项策略验证测试）
+- 离线单元/集成测试 249 项（含95项策略验证测试）
 - 不含 `.venv`、缓存和 `.env` 的交付 ZIP
 
 ## 2. 环境与依赖
@@ -625,10 +625,12 @@ Order.slippage_cost == Σ Trade.slippage_cost
 
 ```powershell
 # 完整验证（默认代表性池，约 4 分钟）
-python scriptsun_validation.py
+python scripts
+un_validation.py
 
 # 指定区间
-python scriptsun_validation.py --is-start 2021-01-01 --is-end 2024-12-31   --oos-start 2025-01-01 --oos-end 2026-11-09
+python scripts
+un_validation.py --is-start 2021-01-01 --is-end 2024-12-31   --oos-start 2025-01-01 --oos-end 2026-11-09
 
 # API 冒烟
 python scripts\smoke_validation_api.py
@@ -663,3 +665,45 @@ python scripts\smoke_validation_api.py
 
 报告：`reports/phase3A2_report.md`、`reports/phase3A2_design.md`、
 `reports/phase3A2_test_report.md`
+
+## 22. 阶段3A.2.1 验证体系缺陷整改
+
+### 整改内容
+
+| 问题 | 整改 |
+| --- | --- |
+| 市场环境缺 OOS 预热 | 加载 OOS 前全部历史交易日（实测 3,064 天）做 MA250 预热，预热不进输出、不计绩效 |
+| 行情指纹过弱 | 新增 `market-fingerprint-v2`，覆盖 10 个字段的 SHA256，算法版本纳入 `input_hash` |
+| `sparse_data` 被跳过 | 在 SQLite 独立副本上实跑，源库零写入 |
+| `insufficient` 被跳过 | 截短区间实跑，指标隐藏，状态 `insufficient` |
+| 环境统计可能压缩缺失日 | `regime_stats()` 改为保留 NaN 的原始交易日序列，统计 `total_days` / `valid_days` / `missing_days` |
+
+### 数据指纹
+
+```text
+算法：market-fingerprint-v2
+字段：code, trade_date, open, high, low, close,
+      volume, amount, adjusted_close, adjustment_snapshot_id
+规范化：None/NaN → "null"；价格 6 位定点；成交量 3 位定点
+排序：(code, trade_date)
+摘要：逐行 SHA256
+```
+
+当前全库指纹：`394024221c09d310f520e3e39cdd83faca944b7f5f89e3eec0a2c0835b92084a`（116,609 行）
+
+### 实测结果
+
+| 项目 | 整改前 | 整改后 |
+| --- | ---: | ---: |
+| OOS `unclassified` 天数 | 246 | **0** |
+| `sparse_data` 状态 | skipped | **success** |
+| `insufficient` 状态 | skipped | **insufficient** |
+| 测试数 | 209 | **249** |
+
+### 关键结论
+
+工程整改通过，但**策略结论不变**：`ma_trend` 仍未通过稳健性验证。
+样本外等权买入持有（31.97%、Sharpe 0.8805）依旧优于 MA250 趋势（30.71%、Sharpe 0.7637）。
+
+报告：`reports/phase3A2_1_design.md`、`reports/phase3A2_1_test_report.md`、
+`reports/phase3A2_1_validation_report.md`

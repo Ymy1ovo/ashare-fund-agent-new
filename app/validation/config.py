@@ -70,6 +70,10 @@ class ValidationConfig:
     test_months: int = DEFAULT_TEST_MONTHS
     step_months: int = DEFAULT_STEP_MONTHS
     regime_proxy_code: str = REGIME_PROXY_CODE
+    # 市场环境 MA 窗口与预热需求天数一致
+    regime_ma_window: int = REGIME_MA_WINDOW
+    # 验证最小样本：低于该交易日数视为数据不足，不生成正常绩效指标
+    min_validation_days: int = MIN_VALIDATION_TRADING_DAYS
     exclude_insufficient: bool = True
     min_coverage_ratio: float = 0.95
     notes: list[str] = field(default_factory=list)
@@ -91,6 +95,8 @@ class ValidationConfig:
             raise ValidationConfigError("ma_window 必须 >= 2")
         if self.pool_mode not in ("all", "representative"):
             raise ValidationConfigError("pool_mode 只能是 all 或 representative")
+        if self.regime_ma_window < 2:
+            raise ValidationConfigError("regime_ma_window 必须 >= 2")
         if not self.wf_grid:
             raise ValidationConfigError("wf_grid 不能为空")
         if any(window < 2 for window in self.wf_grid):

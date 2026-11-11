@@ -1,5 +1,25 @@
 # 变更日志
 
+## 2026-11-11 — 阶段3A.2.1 验证体系缺陷整改
+
+- 修复市场环境分类缺少 OOS 前预热数据：额外加载 OOS 前全部历史交易日（实测 3,064 天）
+  做 MA250 预热，预热数据不进入输出、不计入 OOS 绩效。OOS `unclassified` 从 246 天降到 0 天。
+- 新增 `app/validation/fingerprint.py`：`market-fingerprint-v2`，覆盖
+  code / trade_date / open / high / low / close / volume / amount / adjusted_close /
+  adjustment_snapshot_id 十个字段，按 (code, trade_date) 排序后 SHA256，
+  算法版本纳入 `input_hash`。
+- 数据类压力测试落到实跑：
+  - `sparse_data`：SQLite backup 生成独立副本，删除零散 4,047 行 + 连续缺失 32 行，
+    源库零写入；447 天中 270 天有效日收益、176 天缺口，状态 success。
+  - `insufficient`：截取 41 个交易日（低于 120 阈值），引擎算出的 Sharpe/CAGR 被隐藏，
+    状态 insufficient，不再标记 skipped。
+- `regime_stats()` 重写：输入改为保留 NaN 的原始交易日序列，逐环境统计
+  total_days / valid_days / missing_days，不再有压缩跨缺口收益的空间。
+- 新增 `tests/test_validation_fix.py` 40 项测试，全量 209 → 249 项，全部通过。
+- 新增 `regime_ma_window`、`min_validation_days` 配置项。
+- 无数据库迁移；历史 validation 记录、行情、指标、复权快照、历史回测全部保留。
+- 新增报告：`phase3A2_1_design.md`、`phase3A2_1_test_report.md`、`phase3A2_1_validation_report.md`。
+
 ## 2026-11-11 — 阶段3A.2 策略可信度验证体系
 
 - 新增 `app/validation/`：配置、切分、Walk-Forward、市场环境、参数敏感性、基准、压力、存储、报告、调度共 11 个模块。
