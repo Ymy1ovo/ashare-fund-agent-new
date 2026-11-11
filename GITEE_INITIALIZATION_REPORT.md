@@ -111,11 +111,11 @@ PYTHONUTF8=1 .venv\Scripts\python.exe -m pytest -q
 | 项目 | 内容 |
 | --- | --- |
 | 分支 | `main` |
-| Commit ID | `90e9fee54b82397995572d9f4cf4fb3cf8f160a8` |
-| Commit 信息 | `chore: initialize ashare fund agent repository` |
+| 初始化 Commit | `90e9fee54b82397995572d9f4cf4fb3cf8f160a8` — `chore: initialize ashare fund agent repository` |
+| 文档 Commit | `477239d5233cd4763bd035abda85d4b7f137fd0a` — `docs: add gitee initialization report and collaboration guide` |
 | 远程地址 | https://gitee.com/y-mingyu/ashare-fund-agent.git |
 | 推送状态 | 已推送成功 |
-| 远程 main HEAD | `90e9fee54b82397995572d9f4cf4fb3cf8f160a8` |
+| 远程 main HEAD | `477239d5233cd4763bd035abda85d4b7f137fd0a` |
 | 本地/远程一致 | 是 |
 | 工作区状态 | 干净 |
 
