@@ -6,7 +6,9 @@ from datetime import date
 from typing import Any, Literal
 
 Side = Literal["buy", "sell"]
-OrderStatus = Literal["pending", "filled", "partial", "rejected", "expired", "cancelled"]
+OrderStatus = Literal[
+    "pending", "filled", "partial", "rejected", "expired", "cancelled", "unfilled"
+]
 
 
 @dataclass
@@ -41,6 +43,28 @@ class Order:
     def remaining_quantity(self) -> int:
         """未成交剩余数量，永不为负。"""
         return max(0, int(self.quantity) - int(self.filled_quantity))
+
+    @property
+    def has_fill(self) -> bool:
+        """是否已经产生过真实成交。"""
+        return int(self.filled_quantity) > 0
+
+    def sync_status(self, terminal: str | None = None) -> str:
+        """按统一规则收敛订单状态，Engine 与 Broker 共用。
+
+        - 累计成交量达到原始委托量 → filled
+        - 已有成交但未满 → 永远 partial（终态原因写进 reason，不覆盖状态）
+        - 完全没有成交 → 才允许 pending / rejected / expired / cancelled / unfilled
+        """
+        quantity = int(self.quantity)
+        filled = int(self.filled_quantity)
+        if filled >= quantity:
+            self.status = "filled"
+        elif filled > 0:
+            self.status = "partial"
+        elif terminal:
+            self.status = terminal
+        return self.status
 
     def as_dict(self) -> dict[str, Any]:
         payload = asdict(self)

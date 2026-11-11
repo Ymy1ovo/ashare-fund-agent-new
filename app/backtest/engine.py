@@ -10,7 +10,7 @@ from typing import Any
 
 import pandas as pd
 
-from app.backtest.broker import Broker, FillResult
+from app.backtest.broker import Broker, FillResult, append_reason
 from app.backtest.config import BacktestConfig, InstrumentRule, rule_for
 from app.backtest.costs import round_lot
 from app.backtest.data import BarData, load_bars, load_calendar, load_pool
@@ -356,8 +356,12 @@ class BacktestEngine:
                     if data is not None else None
                 )
                 if quote is None:
-                    order.reason = "missing_quote"
                     order.deferred_days += 1
+                    if order.has_fill:
+                        order.reason = append_reason(order.reason, "missing_quote")
+                    else:
+                        order.reason = "missing_quote"
+                    order.sync_status()
                     still_pending.append(order)
                     continue
                 result: FillResult = broker.execute(
@@ -370,28 +374,20 @@ class BacktestEngine:
                         if self.config.max_defer_days > 0:
                             still_pending.append(order)
                         else:
-                            order.status = "partial"
-                            order.reason = (
-                                (order.reason + ";remainder_cancelled")
-                                if order.reason and "remainder_cancelled" not in order.reason
-                                else "remainder_cancelled"
-                            )
+                            order.sync_status()
+                            order.reason = append_reason(order.reason, "remainder_cancelled")
                 elif result.deferred and order.deferred_days <= self.config.max_defer_days:
                     still_pending.append(order)
                 elif result.deferred:
                     # 已经部分成交的订单过期时保留 partial，不降级为完全未成交
-                    order.status = "partial" if order.filled_quantity > 0 else "expired"
-                    order.reason = order.reason or "max_defer_exceeded"
-                elif order.status not in ("rejected",):
-                    # 有成交的订单被拒绝时，只拒绝剩余部分，状态保持 partial
-                    order.status = "partial" if order.filled_quantity > 0 else "rejected"
-                    if order.status == "partial":
-                        suffix = "remainder_rejected"
-                        order.reason = (
-                            f"{order.reason};{suffix}"
-                            if order.reason and suffix not in order.reason
-                            else suffix
-                        )
+                    if order.has_fill:
+                        order.reason = append_reason(order.reason, "max_defer_exceeded")
+                    order.sync_status(terminal="expired")
+                else:
+                    # 剩余部分被拒绝：有成交的订单只拒绝剩余，状态保持 partial
+                    if order.has_fill:
+                        order.reason = append_reason(order.reason, "remainder_rejected")
+                    order.sync_status(terminal="rejected")
             # 已处理的订单移出待撮合队列；orders 里保留同一对象的引用，不重复追加。
             pending = still_pending
 
@@ -448,10 +444,12 @@ class BacktestEngine:
 
         # 收盘后仍未成交的订单标记为未成交；部分成交的保留 partial
         for order in pending:
-            if order.status == "pending":
-                order.status = "unfilled"
-            elif order.status == "partial" and order.filled_quantity < int(order.quantity):
-                order.reason = order.reason or "partial_not_completed"
+            if order.has_fill:
+                if order.remaining_quantity > 0:
+                    order.reason = append_reason(order.reason, "partial_not_completed")
+                order.sync_status()
+            else:
+                order.sync_status(terminal="unfilled")
 
         input_hash = _input_hash(
             self.config, self.strategy, self.codes, indicator_version, snapshot_ids,

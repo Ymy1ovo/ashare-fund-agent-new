@@ -1,4 +1,9 @@
-"""模拟撮合：成交、拒单、延期、按整手缩减。"""
+"""模拟撮合：成交、拒单、延期、按整手缩减。
+
+状态管理统一交给 Order.sync_status：
+- 有成交就只能是 filled / partial；
+- rejected / expired / cancelled / unfilled 只对「完全没有成交」的订单生效。
+"""
 from __future__ import annotations
 
 from dataclasses import dataclass, field
@@ -9,6 +14,15 @@ from app.backtest.costs import commission, round_lot, slippage_cost, taxes
 from app.backtest.execution import Quote, available_date, fill_price
 from app.backtest.models import Order, Trade
 from app.backtest.portfolio import Portfolio
+
+
+def append_reason(current: str | None, suffix: str) -> str:
+    """在既有原因后追加分段标记，已存在时不重复追加。"""
+    if not current:
+        return suffix
+    if suffix in current.split(';'):
+        return current
+    return current + ';' + suffix
 
 
 @dataclass
@@ -51,6 +65,19 @@ class Broker:
             candidate -= rule.lot_size
         return 0
 
+    def _defer(self, order: Order, reason: str) -> FillResult:
+        """不可成交：延期一次，状态不因延期而倒退。"""
+        order.deferred_days += 1
+        order.reason = append_reason(order.reason, reason) if order.has_fill else reason
+        order.sync_status()
+        return FillResult(filled=False, order=order, reason=reason, deferred=True)
+
+    def _terminate(self, order: Order, reason: str, terminal: str) -> FillResult:
+        """终态：只有完全未成交时才落到 terminal，已有成交一律保留 partial。"""
+        order.reason = append_reason(order.reason, reason) if order.has_fill else reason
+        order.sync_status(terminal=terminal)
+        return FillResult(filled=False, order=order, reason=reason)
+
     def execute(
         self,
         order: Order,
@@ -61,76 +88,64 @@ class Broker:
     ) -> FillResult:
         """尝试撮合一笔订单。
 
-        优先级：可交易性 → 涨跌停 → 数量规则 → 资金/持仓约束 → 成交。
-        任何一步不满足都不虚构成交，只记录原因并延期或拒绝。
+        优先级：已完成检查 → 可交易性 → 涨跌停 → 数量规则 → 资金/持仓约束 → 成交。
+        任何一步不满足都不虚构成交，只记录原因并延期或进入终态。
         """
+        # 0) 已完成订单禁止重复撮合：不新增成交、不改数量、不重复收费
+        if order.remaining_quantity <= 0:
+            order.sync_status()
+            return FillResult(filled=False, order=order, reason='already_fully_filled')
+
+        # 1) 可交易性
         ok, reason = quote.tradable()
         if not ok:
-            order.status = "pending"
-            order.reason = reason
-            order.deferred_days += 1
-            return FillResult(filled=False, order=order, reason=reason, deferred=True)
+            return self._defer(order, reason)
 
         price, blocked = fill_price(quote, order.side, rule, self.config)
         if blocked:
-            order.status = "pending"
-            order.reason = blocked
-            order.deferred_days += 1
-            return FillResult(filled=False, order=order, reason=blocked, deferred=True)
+            return self._defer(order, blocked)
 
-        quantity = int(order.quantity)
-        if order.side == "buy":
-            want = round_lot(quantity, rule.lot_size)
+        # 2) 数量：只对「剩余未成交数量」撮合，绝不重复成交已成交部分
+        remaining = order.remaining_quantity
+        quantity = remaining
+        if order.side == 'buy':
+            want = round_lot(remaining, rule.lot_size)
+            if want <= 0:
+                return self._terminate(order, 'zero_quantity', 'rejected')
             affordable = self._max_affordable(portfolio, price, rule)
             if affordable < want:
-                if self.config.cash_shortfall_policy == "reject" or affordable <= 0:
-                    order.status = "rejected"
-                    order.reason = "insufficient_cash"
-                    return FillResult(filled=False, order=order, reason="insufficient_cash")
-                want = affordable
-                order.reason = "reduced_by_cash"
-            quantity = want
+                if self.config.cash_shortfall_policy == 'reject' or affordable <= 0:
+                    return self._terminate(order, 'insufficient_cash', 'rejected')
+                quantity = affordable
+                order.reason = append_reason(order.reason, 'reduced_by_cash')
+            else:
+                quantity = want
         else:
             available = portfolio.available(order.code, trade_date)
             if available <= 0:
-                order.status = "rejected"
-                order.reason = "no_available_position"
-                return FillResult(filled=False, order=order, reason="no_available_position")
+                return self._terminate(order, 'no_available_position', 'rejected')
             # 卖出：可卖量不足时，按配置决定「部分成交」还是「整单拒绝」
-            if quantity > available and not self.config.allow_partial_fill:
-                order.status = "rejected"
-                order.reason = "insufficient_position"
-                return FillResult(filled=False, order=order, reason="insufficient_position")
-            capped = min(quantity, available)
-            quantity = round_lot(capped, rule.lot_size, allow_odd=True)
+            if remaining > available and not self.config.allow_partial_fill:
+                return self._terminate(order, 'insufficient_position', 'rejected')
+            quantity = round_lot(min(remaining, available), rule.lot_size, allow_odd=True)
             if quantity <= 0:
-                order.status = "rejected"
-                order.reason = "insufficient_position"
-                return FillResult(filled=False, order=order, reason="insufficient_position")
-            if quantity < int(order.quantity):
-                order.reason = order.reason or "partial_by_available"
+                return self._terminate(order, 'insufficient_position', 'rejected')
+            if quantity < remaining:
+                order.reason = append_reason(order.reason, 'partial_by_available')
 
-        # 累计成交数量不得超过原始订单数量：在动账本之前先夹紧
-        remaining_before = int(order.quantity) - int(order.filled_quantity)
-        if remaining_before <= 0:
-            order.status = "filled"
-            order.reason = "already_fully_filled"
-            return FillResult(filled=False, order=order, reason="already_fully_filled")
-        if quantity > remaining_before:
-            quantity = remaining_before
+        # 3) 兜底夹紧：累计成交永不超过原始委托量，且不出现负数
+        quantity = min(int(quantity), order.remaining_quantity)
         if quantity <= 0:
-            order.status = "rejected"
-            order.reason = order.reason or "zero_quantity"
-            return FillResult(filled=False, order=order, reason=order.reason)
+            return self._terminate(order, 'zero_quantity', 'rejected')
 
         gross = quantity * price
         fee = commission(gross, self.config.costs)
         stamp, transfer = taxes(gross, self.config.costs)
         fee += stamp + transfer
-        reference = quote.open if self.config.execution_price == "open" else quote.close
+        reference = quote.open if self.config.execution_price == 'open' else quote.close
         slip = slippage_cost(reference, price, quantity, order.side)
 
-        if order.side == "buy":
+        if order.side == 'buy':
             portfolio.apply_buy(
                 code=order.code,
                 quantity=quantity,
@@ -176,8 +191,8 @@ class Broker:
         order.fill_price = price
         order.fee += fee
         order.slippage_cost += slip
-        # 只有「累计成交量 == 原始订单量」才算完全成交；否则严格保留 partial
-        order.status = "filled" if order.filled_quantity >= int(order.quantity) else "partial"
-        if order.status == "partial":
-            order.reason = order.reason or "partially_filled"
+        # 只有累计成交量达到原始委托量才算 filled，否则严格保留 partial
+        order.sync_status()
+        if order.status == 'partial':
+            order.reason = order.reason or 'partially_filled'
         return FillResult(filled=True, order=order, trade=trade)

@@ -1,6 +1,6 @@
 # A股基金量化分析 Agent
 
-面向中国 A 股 ETF / 指数基金的个人量化研究项目。当前完成 **阶段1A（环境、数据源、观察池）**、**阶段1B（历史行情持久化、增量同步、行情 API、数据看板）**、**阶段1B.1（完整前复权刷新与调整快照一致性）**、**阶段2（统一价格口径与量化指标引擎）**、**阶段2.1（CAGR交易日口径与EMA/MACD断点修复）**、**阶段2.2（区间风险统计缺失交易日修复）**、**阶段3A（A股ETF历史回测引擎 V1.0）** 和 **阶段3A.1（风险口径与部分成交修复，已完成开发、待项目负责人验收）**。
+面向中国 A 股 ETF / 指数基金的个人量化研究项目。当前完成 **阶段1A（环境、数据源、观察池）**、**阶段1B（历史行情持久化、增量同步、行情 API、数据看板）**、**阶段1B.1（完整前复权刷新与调整快照一致性）**、**阶段2（统一价格口径与量化指标引擎）**、**阶段2.1（CAGR交易日口径与EMA/MACD断点修复）**、**阶段2.2（区间风险统计缺失交易日修复）**、**阶段3A（A股ETF历史回测引擎 V1.0）** 和 **阶段3A.1（风险口径与部分成交修复）** 和 **阶段3A.1.1（部分成交状态逻辑专项修复）**。
 
 > 仅用于研究，不构成投资建议；不接入券商交易接口，不自动实盘交易。
 
@@ -24,7 +24,7 @@
 - 行情摘要 API、按代码行情查询 API（日期范围、limit/offset）
 - 调整快照一致性检查与数据质量报告
 - 历史回测引擎：T+1 撮合、FIFO 账本、交易成本、绩效报告
-- 离线单元/集成测试 144 项（含48项回测测试）
+- 离线单元/集成测试 154 项（含58项回测测试）
 - 不含 `.venv`、缓存和 `.env` 的交付 ZIP
 
 ## 2. 环境与依赖
@@ -580,3 +580,41 @@ git tag                       # 查看全部标签
 - `.env` 永远不提交；密钥只通过环境变量或本机配置文件提供。
 - `.gitignore` 已排除数据库、日志、缓存、密钥文件。
 - 提交前可执行密钥扫描，确认无 Token 进入仓库。
+
+## 20. 阶段3A.1.1 部分成交状态专项修复
+
+### 统一状态规则
+
+以 `Order.sync_status()` 为唯一收敛入口，Broker 与 Engine 不再各自覆盖状态：
+
+```text
+filled_quantity >= quantity        → filled
+filled_quantity >  0               → partial（无论剩余被拒/取消/延期/回测结束）
+filled_quantity == 0               → 才允许 pending / rejected / expired / unfilled / cancelled
+```
+
+### 修复内容
+
+- `app/backtest/models.py`：新增 `has_fill` 属性与 `sync_status(terminal=None)`。
+- `app/backtest/broker.py`：新增 `append_reason()`、`_defer()`、`_terminate()`；
+  已完成订单在 `execute()` 入口返回 `already_fully_filled`，不产生成交、不动账本、不收费。
+- `app/backtest/engine.py`：移除 `order.status not in ("rejected",)` 的跳过逻辑；
+  回测结束按有无成交分别收敛为 `partial` / `unfilled`。
+
+### 数量与费用不变量
+
+```text
+0 <= filled_quantity <= quantity
+remaining_quantity = quantity - filled_quantity
+Order.fee == Σ Trade.commission
+Order.slippage_cost == Σ Trade.slippage_cost
+```
+
+### 验证结果
+
+- 全量测试：154 passed，0 failed（原 144 项无回退，新增 10 项）
+- 真实数据回测 `cabbfe77035d40f3`：941 笔订单中 151 笔 partial，
+  「有成交却标 rejected/unfilled/expired」0 笔，「有成交有剩余却标 filled」0 笔，账本核对通过
+- 修复前同一策略回测 `dbf4bc0e46104b23`：partial 0 笔，错误标 filled 222 笔
+
+报告：`reports/phase3A1_1_partial_fill_fix_report.md`

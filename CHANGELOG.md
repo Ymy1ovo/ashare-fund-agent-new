@@ -1,5 +1,18 @@
 # 变更日志
 
+## 2026-11-11 — 阶段3A.1.1 部分成交状态专项修复
+
+- 新增 `Order.sync_status()` 作为唯一状态收敛入口：有成交只能是 `filled` / `partial`，
+  `rejected` / `expired` / `unfilled` / `cancelled` 只对零成交订单生效。
+- 修复 Broker 已把剩余部分设为 `rejected` 后，Engine 因 `status not in ("rejected",)`
+  跳过修正、导致「有成交却标 rejected」的问题。
+- Broker 新增 `_defer()` / `_terminate()`，已完成订单在 `execute()` 入口直接拦截，
+  不重复成交、不重复扣费。
+- Engine 撮合后状态收敛统一走 `sync_status()`；缺失行情分支保留已有成交的 `partial`。
+- 修正 2 个原有测试的错误断言，新增 10 项部分成交专项测试，`test_backtest_partial_fill.py` 由 8 项增至 18 项。
+- 全量测试 144 → 154 项，全部通过。
+- 新增专项报告 `reports/phase3A1_1_partial_fill_fix_report.md`。
+
 ## 2026-11-10 — 阶段3A.1 回测验收问题修复
 
 - Sharpe/Sortino 改用日均超额收益年化，CAGR 独立计算。
