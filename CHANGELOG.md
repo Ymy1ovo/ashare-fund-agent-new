@@ -1,5 +1,21 @@
 # 变更日志
 
+## 2026-11-11 — 阶段3A.2 策略可信度验证体系
+
+- 新增 `app/validation/`：配置、切分、Walk-Forward、市场环境、参数敏感性、基准、压力、存储、报告、调度共 11 个模块。
+- 新增 `migrations/phase3a2_validation.sql`：`validation_runs`、`validation_windows`、`validation_grid`、`validation_stress` 四张表，全部 `CREATE TABLE IF NOT EXISTS`。
+- 新增 `scripts/run_validation.py`、`scripts/smoke_validation_api.py`。
+- 新增 `dashboard/pages/4_策略验证.py` 看板页。
+- 新增 `/api/validations`、`/api/validations/{id}` 两个接口。
+- 新增 `tests/test_validation.py` 55 项测试，全量 154 → 209 项，全部通过。
+- 实际运行代表性池（6 只）与全池（41 只）两次验证：
+  - 代表性池 `5ec77faf42d64162`：结论「不通过」，样本内 0/7 组合正收益。
+  - 全池 `e725034e46ff47e5`：结论「有条件通过」，样本外 Sharpe 0.7637、收益 30.71%。
+- 关键发现：样本外等权买入持有（31.97%、Sharpe 0.8805）优于 MA250 趋势（30.71%、Sharpe 0.7637），
+  趋势择时未创造超额收益。
+- 新增报告：`phase3A2_design.md`、`phase3A2_report.md`、`phase3A2_test_report.md`。
+- 未修改 `app/backtest/`、`app/quant/`、`app/data/`，历史行情/指标/快照/回测记录一行未动。
+
 ## 2026-11-11 — 阶段3A.1.1 部分成交状态专项修复
 
 - 新增 `Order.sync_status()` 作为唯一状态收敛入口：有成交只能是 `filled` / `partial`，

@@ -52,6 +52,7 @@ dist/
 
 # ---- 回测/指标运行产物（JSON 结果，非源码）----
 data/backtest_summary_*.json
+data/validation_summary_*.json
 data/sync_summary*.json
 data/ingest_summary.json
 data/adjustment_*.json
@@ -75,3 +76,4 @@ desktop.ini
 
 # ---- 单次回测运行产物（可复现，不进 Git；阶段验收报告保留）----
 reports/backtest_*.md
+reports/validation_*.md

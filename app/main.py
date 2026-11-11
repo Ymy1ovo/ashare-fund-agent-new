@@ -374,3 +374,30 @@ def backtest_positions(
     if not get_run(run_id):
         raise HTTPException(status_code=404, detail="回测记录不存在")
     return {"run_id": run_id, "items": get_positions(run_id, trade_date)}
+
+
+@app.get("/api/validations")
+def validation_list(limit: int = Query(default=20, ge=1, le=200)) -> dict[str, Any]:
+    from app.validation.storage import list_validations
+
+    return {"items": list_validations(limit=limit)}
+
+
+@app.get("/api/validations/{validation_id}")
+def validation_detail(validation_id: str) -> dict[str, Any]:
+    from app.validation.storage import get_validation
+
+    payload = get_validation(validation_id)
+    if not payload:
+        raise HTTPException(status_code=404, detail="验证记录不存在")
+    for key in ("windows", "grid", "stress"):
+        for item in payload.get(key, []):
+            for field in ("train_metrics_json", "test_metrics_json", "metrics_json"):
+                if isinstance(item.get(field), str):
+                    import json as _json
+
+                    try:
+                        item[field] = _json.loads(item[field])
+                    except _json.JSONDecodeError:
+                        pass
+    return payload
