@@ -241,25 +241,84 @@ def delete_signal_adjacent(
     conn: sqlite3.Connection, codes: list[str], start: str, end: str,
     ratio: float, seed: int, signal_dates: dict[str, list[str]] | None = None,
 ) -> tuple[int, dict]:
-    """D. 信号附近删除：在给定信号日（含次日）删除行情。"""
+    """D. 信号附近删除：按 ratio 从「可删除的信号日期」中抽样删除行情。
+
+    比例语义（阶段3A.2.1.2.1 修正）：
+        本次删除数量 = floor(该 ETF 可删除信号日期数 × ratio)
+
+    旧实现忽略 ratio，把全部信号日都删掉，导致 1%/20% 得到相同结果。
+    现按固定种子抽样，确保同一 (seed, ratio) 可复现、不同 ratio 结果不同。
+
+    首尾保护：区间首 3 个与末 3 个交易日不删。
+    若 ratio > 0 但该 ETF 没有可删除信号日，记入 skipped 而不伪造删除。
+    """
     deleted = 0
     detail: dict[str, dict] = {}
+    skipped: list[dict] = []
     signal_dates = signal_dates or {}
-    # 保护区间首尾各 3 个交易日：起始估值日被删空会让回测无法启动，
-    # 那是「区间缺失」而不是「信号附近缺失」，会掩盖本场景要考察的问题
+    rng = random.Random(seed)
+
     for code in codes:
-        days = [d for d in (signal_dates.get(code) or []) if start <= d <= end]
-        protected = set(sorted(days)[:3]) | set(sorted(days)[-3:]) if len(days) > 6 else set(days)
-        picked = sorted({d for d in days if d not in protected})
-        if not picked:
+        all_signals = sorted({
+            d for d in (signal_dates.get(code) or []) if start <= d <= end
+        })
+        if not all_signals:
+            skipped.append({"code": code, "reason": "no_signal_dates"})
             continue
+
+        # 首尾保护：区间首 3 个与末 3 个交易日
+        protected = set(sorted(all_signals)[:3]) | set(sorted(all_signals)[-3:])             if len(all_signals) > 6 else set(all_signals)
+        candidates = [d for d in all_signals if d not in protected]
+        if not candidates:
+            skipped.append({
+                "code": code, "reason": "all_signals_in_protected_range",
+                "signal_count": len(all_signals),
+            })
+            detail[code] = {
+                "signal_count": len(all_signals),
+                "eligible": 0,
+                "deleted": 0,
+                "actual_ratio": 0.0,
+            }
+            continue
+
+        # ratio == 0 不删除；ratio > 0 时四舍五入取整且至少删 1 个，
+        # 否则信号数少时 1%/3% 都会得 0，无法体现比例差异。
+        # 实际删除比例单独记录，不掩饰取整误差。
+        if ratio <= 0:
+            detail[code] = {
+                "signal_count": len(all_signals),
+                "eligible": len(candidates),
+                "deleted": 0,
+                "actual_ratio": 0.0,
+            }
+            continue
+        raw_take = int(round(len(candidates) * ratio))
+        take = min(max(raw_take, 1), len(candidates))
+
+        picked = sorted(rng.sample(candidates, min(take, len(candidates))))
         conn.executemany(
             "DELETE FROM etf_daily_prices WHERE code=? AND trade_date=?",
             [(code, day) for day in picked],
         )
         deleted += len(picked)
-        detail[code] = {"deleted": len(picked), "dates": picked[:5]}
-    return deleted, {"signal": detail}
+        detail[code] = {
+            "signal_count": len(all_signals),
+            "eligible": len(candidates),
+            "deleted": len(picked),
+            "actual_ratio": round(len(picked) / len(candidates), 4),
+            "dates": picked[:5],
+        }
+
+    return deleted, {
+        "signal": detail,
+        "skipped": skipped,
+        "ratio": ratio,
+        "seed": seed,
+        "total_signal_dates": sum(v["signal_count"] for v in detail.values()),
+        "total_eligible": sum(v["eligible"] for v in detail.values()),
+        "total_deleted": deleted,
+    }
 
 
 def delete_then_recovery(
@@ -303,14 +362,32 @@ def missing_trading_day_count(
 
 
 def source_fingerprint(db_path) -> str:
-    """源库稳定指纹，用于证明压力测试未污染。"""
-    with sqlite3.connect(f"file:{db_path}?mode=ro", uri=True) as conn:
-        rows = conn.execute(
-            "SELECT COUNT(*), COALESCE(SUM(close), 0), COALESCE(SUM(volume), 0), "
-            "COALESCE(SUM(adjusted_close), 0) FROM etf_daily_prices"
-        ).fetchone()
-    text = f"{rows[0]}|{rows[1]:.6f}|{rows[2]:.6f}|{rows[3]:.6f}"
-    return hashlib.sha256(text.encode("utf-8")).hexdigest()[:32]
+    """源库完整内容指纹，优先复用 market-fingerprint-v3。
+
+    v2→v3 前本函数只用行数与字段求和，无法发现「行数不变但某字段被改」。
+    现改为调用 `app.validation.fingerprint.fingerprint_from_db()`，
+    按 (code, trade_date) 排序对 13 个字段做 SHA256。
+    若该模块不可用，退化为逐行序列化全表内容哈希（仍能发现单行修改）。
+    """
+    try:
+        from app.validation.fingerprint import fingerprint_from_db
+
+        payload = fingerprint_from_db(db_path=db_path)
+        return f"{payload['algorithm']}:{payload['sha256']}"
+    except Exception:  # noqa: BLE001 兜底路径仍必须能发现内容变化
+        digest = hashlib.sha256()
+        columns = (
+            "code, trade_date, open, high, low, close, volume, amount, "
+            "adjusted_close, adjustment_type, adjustment_snapshot_id, "
+            "adjustment_coverage_start, adjustment_coverage_end"
+        )
+        with sqlite3.connect(f"file:{db_path}?mode=ro", uri=True) as conn:
+            for row in conn.execute(
+                f"SELECT {columns} FROM etf_daily_prices ORDER BY code, trade_date"
+            ):
+                digest.update(repr(row).encode("utf-8"))
+                digest.update(bytes([10]))
+        return f"fallback-row-hash:{digest.hexdigest()}"
 
 
 def run_single_scenario(

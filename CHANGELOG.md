@@ -1,5 +1,27 @@
 # 变更日志
 
+## 2026-11-12 — 阶段3A.2.1.2.1 最终验收缺陷修复
+
+- **信号附近删除比例失效**：`delete_signal_adjacent()` 原忽略 `ratio`，
+  1%/20% 得到相同结果。现按 `round(可删信号数 × ratio)` 抽样（至少 1 个），
+  记录 signal_count / eligible / deleted / actual_ratio，无信号日记 skipped。
+  六档实测：0 → 11 → 30 → 52 → 101 → 204 行，严格递增。
+- **CLI 不可复现**：`run_sensitivity_scan.py` 未传 `holding_dates` / `signal_dates`，
+  持仓期间与信号附近两种模式无法真实执行。现在先跑基准回测提取两组日期再传入，
+  并输出 `deleted_rows_by_mode`。CLI 五模式实跑通过。
+- **并发模型**：从「计算并行 + 写入串行」改为**全流程串行排队**
+  （`execution_model=full-pipeline-serial`，`compute_parallel=False`）。
+  锁文件固定在正式库同目录 `data/.validation_write.lock`。
+  修复 Windows 空文件区域锁不可靠、多进程首建锁文件 PermissionError 两个缺陷。
+  实测 2 线程 434s / 4 线程 1312s / 2 独立进程 557s，事件严格串行，exitcode 均 0。
+- **源库指纹**：`source_fingerprint()` 从行数求和升级为复用 `market-fingerprint-v3`
+  完整内容哈希；新增单测验证「改一行但行数不变」指纹必须变化。
+- **报告措辞修正**：回撤改为「相对完整数据基准的变化」，不判定高估/低估；
+  历史 74 笔按护栏分界为「护栏前 72 笔（分支不存在）+ 护栏后 2 笔（现金充足）」，
+  修正原「均因现金充足」的错误归因；并发报告删除计算并行结论。
+- 新增 `tests/test_final_acceptance.py` 14 项，全量 351 → **365 项**，全部通过。
+- 行情指纹 `market-fingerprint-v3:d54727c0...ac49` 前后一致，历史记录完整。
+
 ## 2026-11-12 — 阶段3A.2.1.2 验证体系工程收尾
 
 - 新增 `app/validation/sensitivity_scan.py`：6 删除比例 × 5 缺失模式的敏感性扫描，

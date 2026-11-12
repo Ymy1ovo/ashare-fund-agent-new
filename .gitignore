@@ -95,3 +95,14 @@ data/sparse_regression.json
 rg_all_*/
 rg_representative_*/
 sp_*/
+
+# ---- 阶段3A.2.1.2.1 运行产物 ----
+data/cli_five_modes.json
+data/cli_all_pool.json
+data/concurrency_final.json
+data/concurrency_multiprocess.json
+data/concurrency_failure.json
+.tmp_p7/
+sens_all_*/
+sens_representative_*/
+data/.validation_write.lock

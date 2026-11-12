@@ -23,10 +23,22 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any, Callable
 
-# 进程内写锁：保证同一进程的验证写入串行
+# 进程内写锁：保证同一进程的验证任务串行
 _WRITE_LOCK = threading.Lock()
-# 跨进程文件锁（多个 Python 进程共享同一个 DB 时使用）
+# 跨进程文件锁：基于正式数据库路径生成，文件位置稳定
 _LOCK_FILE_NAME = ".validation_write.lock"
+
+
+def shared_lock_path(db_path=None) -> Path:
+    """返回与正式数据库同目录的稳定锁文件路径。
+
+    不能用「每次调用独立的临时目录」——那样跨进程拿到的不是同一把锁。
+    """
+    if db_path is None:
+        from app.config import settings
+
+        db_path = settings.database_path
+    return Path(db_path).resolve().parent / _LOCK_FILE_NAME
 
 
 class ConcurrencyError(RuntimeError):
@@ -74,50 +86,91 @@ def _now() -> str:
     return datetime.now().isoformat(timespec="milliseconds")
 
 
+def _ensure_lock_file_byte(lock_path: Path, attempts: int = 20) -> None:
+    """确保锁文件存在且至少有 1 字节（Windows 区域锁的前提）。
+
+    多进程同时首建时，写字节可能撞 PermissionError / OSError；
+    此时说明别的进程正在创建同一个文件，稍后重试即可。
+    """
+    for _ in range(attempts):
+        try:
+            if lock_path.exists() and lock_path.stat().st_size > 0:
+                return
+            with open(lock_path, "ab") as handle:
+                handle.seek(0, os.SEEK_END)
+                if handle.tell() == 0:
+                    handle.write(bytes([0]))
+                    handle.flush()
+            if lock_path.stat().st_size > 0:
+                return
+        except (PermissionError, OSError):
+            pass
+        time.sleep(0.05)
+    # 最终仍未就绪：不阻塞，交给后续加锁逻辑决定（可能超时）
+    return
+
+
+
 def run_with_write_lock(func: Callable, *args, lock_dir: Path | None = None,
-                        timeout: float = 120.0, **kwargs):
-    """带进程内锁 + 跨进程文件锁执行写操作。"""
+                        timeout: float = 3600.0, db_path=None, **kwargs):
+    """在全流程串行锁内执行 func（阶段3A.2.1.2.1 修正模型）。
+
+    模型说明：**不是「计算并行 + 写入串行」，而是整个验证任务串行排队。**
+    理由：验证流程全程读同一份行情、写同一个 SQLite，串行最安全，
+    且没有证据表明并行计算能带来可观测收益（实测 4 任务串行 840 秒可完成）。
+
+    - 锁文件位置：优先 db_path 同目录的 `.validation_write.lock`（跨进程稳定）；
+      lock_dir 仅用于临时库测试，正式库场景不得使用随机临时目录。
+    - 超时抛 ConcurrencyError，由调用方记录为 failed，不伪装成功。
+    - 异常路径通过 finally 释放锁。
+    """
     with _WRITE_LOCK:
-        if lock_dir is not None:
-            lock_path = Path(lock_dir) / _LOCK_FILE_NAME
-            lock_path.parent.mkdir(parents=True, exist_ok=True)
-            deadline = time.time() + timeout
-            handle = open(lock_path, "a+b")
-            try:
-                locked = False
-                while time.time() < deadline:
-                    try:
-                        if os.name == "nt":
-                            import msvcrt
-                            handle.seek(0)
-                            msvcrt.locking(handle.fileno(), msvcrt.LK_NBLCK, 1)
-                        else:
-                            import fcntl
-                            fcntl.flock(handle.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
-                        locked = True
-                        break
-                    except OSError:
-                        time.sleep(0.05)
-                if not locked:
-                    raise ConcurrencyError(
-                        f"获取文件锁超时（{timeout}s）：{lock_path}"
-                    )
+        lock_path = (
+            Path(lock_dir) / _LOCK_FILE_NAME
+            if lock_dir is not None
+            else shared_lock_path(db_path)
+        )
+        lock_path.parent.mkdir(parents=True, exist_ok=True)
+        deadline = time.time() + timeout
+        # 必须保证锁文件至少有 1 字节：Windows msvcrt.locking 是对
+        # 「从当前位置开始的 N 字节」做区域锁，空文件上的区域锁不可靠。
+        # 多进程同时首建时可能撞写冲突，用独立句柄重试，失败即视为他人已建好。
+        _ensure_lock_file_byte(lock_path)
+        handle = open(lock_path, "r+b")
+        try:
+            locked = False
+            while time.time() < deadline:
                 try:
-                    return func(*args, **kwargs)
-                finally:
-                    try:
-                        if os.name == "nt":
-                            import msvcrt
-                            handle.seek(0)
-                            msvcrt.locking(handle.fileno(), msvcrt.LK_UNLCK, 1)
-                        else:
-                            import fcntl
-                            fcntl.flock(handle.fileno(), fcntl.LOCK_UN)
-                    except OSError:
-                        pass
+                    if os.name == "nt":
+                        import msvcrt
+                        handle.seek(0)
+                        msvcrt.locking(handle.fileno(), msvcrt.LK_NBLCK, 1)
+                    else:
+                        import fcntl
+                        fcntl.flock(handle.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
+                    locked = True
+                    break
+                except OSError:
+                    time.sleep(0.05)
+            if not locked:
+                raise ConcurrencyError(
+                    f"获取验证锁超时（{timeout}s）：{lock_path}"
+                )
+            try:
+                return func(*args, **kwargs)
             finally:
-                handle.close()
-        return func(*args, **kwargs)
+                try:
+                    if os.name == "nt":
+                        import msvcrt
+                        handle.seek(0)
+                        msvcrt.locking(handle.fileno(), msvcrt.LK_UNLCK, 1)
+                    else:
+                        import fcntl
+                        fcntl.flock(handle.fileno(), fcntl.LOCK_UN)
+                except OSError:
+                    pass
+        finally:
+            handle.close()
 
 
 def _make_single_task(
@@ -191,8 +244,11 @@ def run_concurrent_tasks(
 
     root = Path(workdir or tempfile.mkdtemp(prefix="concurrency_"))
     root.mkdir(parents=True, exist_ok=True)
-    lock_dir = root / "locks"
-    lock_dir.mkdir(parents=True, exist_ok=True)
+    # 正式库场景使用「正式数据库同目录」的稳定锁文件；
+    # 只有临时库测试才通过 lock_dir 覆盖
+    lock_dir = root / "locks" if workdir is not None else None
+    if lock_dir is not None:
+        lock_dir.mkdir(parents=True, exist_ok=True)
 
     tasks: list[ConcurrentTask] = []
     runners: list[Callable] = []
@@ -253,7 +309,13 @@ def run_concurrent_tasks(
         "validation_ids": ids,
         "hash_consistency": hash_consistency,
         "serialized_writes": True,
-        "write_model": "process-internal thread lock + cross-process file lock",
+        "execution_model": "full-pipeline-serial",
+        "write_model": (
+            "整个验证任务串行排队：进程内 threading.Lock + "
+            "正式库同目录 .validation_write.lock 文件锁"
+        ),
+        "compute_parallel": False,
+        "lock_path": str(shared_lock_path()),
         "tasks": [
             task.as_dict() for task in sorted(results, key=lambda t: t.task_id)
         ],

@@ -128,7 +128,8 @@ SQLite  ：busy_timeout=5000，单写者
 | `app/validation/concurrency.py` | **新增** | 并发调度、写锁、哈希校验 |
 | `app/validation/sell_probe.py` | **新增** | 受控库构造与完整链路执行 |
 | `scripts/run_sensitivity_scan.py` | **新增** | 敏感性扫描 CLI |
-| `tests/test_reliability.py` | **新增** | 20 项专项测试 |
+| `tests/test_reliability.py` | **新增** | 14 项专项测试（阶段3A.2.1.2） |
+| `tests/test_final_acceptance.py` | **新增** | 14 项专项测试（阶段3A.2.1.2.1） |
 | `reports/phase3A2_1_2_*.md` | **新增** | 6 份报告 |
 
 **未修改**：`app/backtest/*`、`app/quant/*`、`app/data/*`、数据库结构、历史记录。
@@ -159,3 +160,17 @@ SQLite  ：busy_timeout=5000，单写者
 
 没有脱敏交割单，本轮不伪造、不模拟成真实对账结果。
 `per_order` 佣金模型、最低佣金规则、T+0/T+1 判定仍属模拟假设。
+
+## 9. 阶段3A.2.1.2.1 验收缺陷整改
+
+| # | 缺陷 | 整改 |
+| ---: | --- | --- |
+| 1 | `delete_signal_adjacent()` 接收 ratio 但忽略 | 按 `round(可删信号数 × ratio)` 抽样，至少 1 个；记录四类计数 |
+| 2 | CLI 未传 holding_dates / signal_dates | 先跑基准回测提取两组日期，再传入矩阵 |
+| 3 | 并发模型声称「计算并行 + 写入串行」 | 改为**全流程串行排队**，`compute_parallel=False` |
+| 4 | 跨进程锁目录随机 | 锁文件固定在正式库同目录 `.validation_write.lock` |
+| 5 | `source_fingerprint()` 只用行数求和 | 复用 `market-fingerprint-v3` 完整内容哈希 |
+| 6 | 报告把「回撤被高估」当结论 | 改为「相对完整数据基准的变化」，不判定净效应 |
+| 7 | 报告把 74 笔笼统归因于现金充足 | 按护栏分界：护栏前 72 笔(分支不存在) + 护栏后 2 笔(现金充足) |
+
+新增测试：`tests/test_final_acceptance.py` 14 项；全量 351 → **365 项**。
