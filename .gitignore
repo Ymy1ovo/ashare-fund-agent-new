@@ -109,3 +109,6 @@ data/.validation_write.lock
 
 # ---- 阶段3A.2.1.2.2 入口锁运行产物 ----
 data/entry_lock_*.json
+
+# ---- 阶段3A.3.1 研究运行产物 ----
+data/research_3a3_1*.json
