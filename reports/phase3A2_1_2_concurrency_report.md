@@ -164,6 +164,7 @@ after release: ok
 | 2 线程 | **安全排队** | 434.3s，ids 唯一，hash 一致 |
 | 4 线程 | **安全排队** | 1311.6s，ids 唯一，hash 一致 |
 | 2 独立进程 | **安全排队** | 556.7s，事件严格串行，exitcode 均 0 |
+| 2 临时库任务（3A.2.1.2.3） | **安全排队** | 579.1s，273.6s + 577.7s，hash 一致 |
 
 **当前推荐安全并发规模：4 个任务（线程或进程），全流程串行排队。**
 
@@ -181,6 +182,80 @@ after release: ok
 | 新增 validation | 19 条（2 线程 2 + 4 线程 4 + 多进程 2 + 失败隔离 1 + 其他） |
 | 重复 validation_id | **0** |
 
+## 5.5 阶段3A.2.1.2.3：临时库路径的嵌套加锁缺陷与修复
+
+### 缺陷（真实存在，非推测）
+
+`concurrency._make_single_task()` 的临时库分支写成：
+
+```python
+result = run_with_write_lock(run_validation, cfg, lock_dir=lock_dir)
+```
+
+而 `run_validation()` 自 3A.2.1.2.2 起内部也会 `_acquire_and_run()` 加锁。
+于是在**同一线程**内出现两次加锁：
+
+| 层次 | 拿到的锁 |
+| --- | --- |
+| 外层 `run_with_write_lock(..., lock_dir=lock_dir)` | `<临时目录>/.validation_write.lock` + `_WRITE_LOCK` |
+| 内层 `run_validation()` → `_acquire_and_run()` | `<数据库目录>/.validation_write.lock` + `_WRITE_LOCK` |
+
+`threading.Lock` 不可重入。第二次 `acquire()` 在**已持有该锁的同一线程**里
+无限等待，表现为任务无声挂死——不报错、不超时、不释放。
+
+实测复现（修复前的等价调用路径）：
+
+```text
+alive_after_20s: True    ← 20 秒后线程仍在阻塞
+```
+
+### 修复
+
+| 项 | 修改前 | 修改后 |
+| --- | --- | --- |
+| 加锁点 | 外层 + 入口共 2 次 | **仅公开入口 1 次** |
+| 临时库调用 | `run_with_write_lock(run_validation, cfg, lock_dir=…)` | `run_validation(cfg, db_path=…, lock_dir=…)` |
+| 锁文件位置 | 外层临时目录、内层数据库目录（两把不同锁） | 统一跟随被写的数据库目录 |
+| 持锁标记置位 | 进入 `_acquire_and_run` 前 | **真正拿到锁之后**（`_locked()` 闭包内） |
+| 同线程重复获取 | 永久挂死 | 立刻抛 `ConcurrencyError` |
+| 进程内锁等待 | `with _WRITE_LOCK`（无限等待） | `acquire(timeout=…)`，超时抛 `ConcurrencyError` |
+
+修复后同一路径：
+
+```text
+alive_after_20s: False   elapsed: 0.0
+outcome: ConcurrencyError: 重复获取验证锁：同一线程已在锁内又发起一次加锁
+```
+
+**注意**：这里没有把锁改成 `threading.RLock`。`RLock` 只会让嵌套加锁
+「看起来能跑」，但两把锁（临时目录锁 vs 数据库目录锁）仍然不是同一把，
+跨进程语义依旧错乱。正确做法是收敛到**唯一加锁点**。
+
+### 修复后的真实运行验证
+
+| 验证 | 结果 |
+| --- | --- |
+| 单个临时库任务（`_make_single_task` + `db_path`） | status `success`，253.2s，`validation_id=87328a95ea394e76` |
+| 该任务 `input_hash` | `dc5137ab80c92d71`，与临时库 `validation_runs` 中记录**完全一致** |
+| 执行期间其他线程探测拿锁 | 拿不到（`lock_held_during_execution=true`） |
+| 执行结束持锁标记 | `false` |
+| 锁文件位置 | 临时库同目录 `.validation_write.lock` ✅ |
+| 两个临时库任务并发调度 | **579.1s**，两任务均 success，`hash_consistency=true`，ids 唯一 |
+| 耗时形态 | `273.6s` + `577.7s`，**严格串行** |
+
+### 顺带修掉的第二处缺陷
+
+同一轮发现 `_make_single_task()` 读 `input_hash` 时写的是
+`get_validation(result.validation_id)`——**不传 `db_path`**。
+临时库场景下这会去读**正式库**，必然读不到记录：
+
+- `input_hash` 变成 `None`；
+- `_check_hash_consistency()` 跳过空值 → 「一致性检查」退化为永远通过。
+
+已改为 `get_validation(result.validation_id, db_path=db_path)`。
+修复前真实运行实测 `input_hash: null`，修复后同一路径得到
+`dc5137ab80c92d71` 且与临时库记录一致。
+
 ## 6. 限制
 
 1. 只测到 4 并发；8 及以上未验证
@@ -188,6 +263,7 @@ after release: ok
 3. 未做小时级长时压测
 4. 串行意味着总耗时随任务数线性增长（4 任务 1311 秒），
    这是正确性优先的代价，不是性能优化目标
+5. 临时库路径的复测只跑了 2 个任务；临时库 4 并发、临时库多进程均未验证
 
 ## 7. 公开入口自动加锁（阶段3A.2.1.2.2）
 
@@ -263,3 +339,21 @@ return _acquire_and_run(...)               # 未持锁，先加锁
 | 结束后持锁标记 | 两进程均为 `False`（无残留） |
 
 **两个独立进程通过公开入口的共享文件锁安全排队，未实测到跨进程失败。**
+
+### 7.6 阶段3A.2.1.2.3 之后的入口锁形态
+
+`run_concurrent_tasks()` 在正式库与临时库路径上**都**只调用公开入口，
+加锁点唯一：
+
+```python
+# concurrency._make_single_task()
+result = run_validation(cfg, db_path=db_path, lock_dir=lock_dir)
+```
+
+| 参数 | 作用 |
+| --- | --- |
+| `db_path` | 要写的数据库；锁文件默认跟随它所在目录 |
+| `lock_dir` | 仅测试显式覆盖锁目录，正式库不传 |
+
+原来的 `lock_dir = root / "locks" if workdir is not None else None` 分支已删除：
+它让「临时工作目录」和「被写的数据库目录」分属两处，正是嵌套加锁的温床。

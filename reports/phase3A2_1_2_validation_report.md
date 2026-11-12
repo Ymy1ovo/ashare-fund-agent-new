@@ -168,9 +168,12 @@ task.input_hash = result.data_fingerprint["sha256"]
 
 | 项目 | 数量 |
 | --- | ---: |
-| 本轮新增（`test_reliability.py`） | **14** |
-| 全量收集 | **351** |
-| 通过 | **351** |
+| 阶段3A.2.1.2 新增（`test_reliability.py`） | 14 |
+| 阶段3A.2.1.2.1 新增 | 14 |
+| 阶段3A.2.1.2.2 新增 | 4 |
+| 阶段3A.2.1.2.3 净增 | 4 |
+| **全量收集** | **373** |
+| **通过** | **373** |
 | 失败 | **0** |
 | 跳过 | **0** |
 | 未执行 | **0** |
@@ -236,7 +239,7 @@ task.input_hash = result.data_fingerprint["sha256"]
 | 无虚假成交/费用 | 拒单链路验证 | ✅ |
 | 原有 337 项保留通过 | 337/337 | ✅ |
 | 新增测试全部通过 | 14/14 | ✅ |
-| 全量测试通过 | 351/351 | ✅ |
+| 全量测试通过 | 373/373 | ✅ |
 | API 与 Streamlit 回归 | 全部通过 | ✅ |
 
 **全部满足，本轮通过。**
@@ -253,7 +256,21 @@ task.input_hash = result.data_fingerprint["sha256"]
 | 6 | 报告断言回撤「被高估」 | 改为「相对基准变化」 | 不判定净效应 |
 | 7 | 把 74 笔笼统归因现金充足 | 按护栏分界 72 + 2 | 逐 run 明细表 |
 
-**新增测试 18 项**（`tests/test_final_acceptance.py`：3A.2.1.2.1 的 14 项 + 3A.2.1.2.2 的 4 项），全量 337 → 351 → 365 → **369 项**。
+**新增测试 22 项**（`tests/test_final_acceptance.py`：3A.2.1.2.1 的 14 项 + 3A.2.1.2.2 的 4 项 + 3A.2.1.2.3 的 4 项），全量 337 → 351 → 365 → 369 → **373 项**。
+
+### 阶段3A.2.1.2.3 缺陷修复
+
+| # | 缺陷 | 整改 | 验证 |
+| ---: | --- | --- | --- |
+| 1 | 临时库路径 `run_with_write_lock(run_validation, …)` 嵌套加锁，同线程重入非重入锁会永久挂死 | 加锁点收敛到公开入口，`_make_single_task` 只调 `run_validation(cfg, db_path=…)` | 真实临时库任务 253.2s 完成；两任务并发 579.1s 严格串行 |
+| 2 | 持锁标记在拿锁**之前**置位，等待期间会被误判为「已持锁」 | `_LOCK_DEPTH` 只在 `_locked()` 闭包内（真正拿到锁后）置位，`finally` 复位 | 超时测试验证流程未被执行；异常后标记为 False |
+| 3 | 进程内锁 `with _WRITE_LOCK` 无限等待，嵌套时无声挂死 | 改 `acquire(timeout=…)`，超时抛 `ConcurrencyError`；同线程重复获取立刻报错 | `test_nested_lock_raises_instead_of_hanging` 5 秒内失败 |
+| 4 | 临时库场景读 `input_hash` 未传 `db_path`，读到正式库必为空，hash 一致性检查退化为恒真 | `get_validation(vid, db_path=db_path)` | 修复前 `input_hash=null`，修复后 `dc5137ab80c92d71` 且与临时库一致 |
+| 5 | 入口锁测试依赖 `inspect.getsource()` 字符串匹配，改实现不改行为也能通过 | 全部改为行为断言（持锁状态、锁能否被他人获得、超时抛错、异常释放） | 7 项行为测试全通过 |
+
+**未使用 `threading.RLock` 掩盖问题**：`RLock` 只让嵌套「看起来能跑」，
+两把不同的锁（临时目录锁 vs 数据库目录锁）跨进程语义仍然错乱。
+`_run_validation_unlocked()` 仍是内部函数，未升格为对外入口。
 
 ### 关键实测数据
 
@@ -295,7 +312,7 @@ task.input_hash = result.data_fingerprint["sha256"]
 | 报告 | 校准内容 |
 | --- | --- |
 | design | 测试数量与 test_report 一致；新增缺陷整改表 |
-| test_report | 数量统一为 337 → 351 → 365 → 369 |
+| test_report | 数量统一为 337 → 351 → 365 → 369 → 373 |
 | sparse_sensitivity | 回撤改为「相对 0% 基准加深 1.45~2.45 pp」，删除高估/低估断言 |
 | concurrency | 全流程串行；新增入口锁章节与两线程/两进程实测 |
 | sell_proceeds | 74 笔按护栏分界为 72 + 2，删除「均因现金充足」 |

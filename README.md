@@ -1047,3 +1047,93 @@ runner.py
 | 原有 365 项 | 全部保留通过 |
 | 新增 4 项 | 全部通过 |
 | 行情完整指纹 | 前后一致 |
+
+## 30. 阶段3A.2.1.2.3 临时库嵌套加锁缺陷修复
+
+### 缺陷
+
+`concurrency._make_single_task()` 的临时库分支写成了：
+
+```python
+result = run_with_write_lock(run_validation, cfg, lock_dir=lock_dir)
+```
+
+而 `run_validation()` 自 3A.2.1.2.2 起自身也会加锁，于是**同一线程**内两次
+获取 `threading.Lock`。该锁不可重入，第二次 `acquire()` 永久阻塞：任务无声
+挂死，不报错、不超时、不释放。两层锁目标还不同（外层临时目录、内层数据库
+目录），本就不是同一把锁，跨进程互斥也不成立。
+
+### 修复
+
+| 项 | 修改前 | 修改后 |
+| --- | --- | --- |
+| 加锁点 | 外层 + 入口共 2 次 | **仅公开入口 1 次** |
+| 临时库调用 | `run_with_write_lock(run_validation, cfg, lock_dir=…)` | `run_validation(cfg, db_path=…, lock_dir=…)` |
+| 锁文件位置 | 外层临时目录、内层数据库目录 | 统一跟随被写的数据库目录 |
+| 持锁标记置位 | 拿锁**之前** | 真正拿到锁之后（`_locked()` 闭包内），`finally` 复位 |
+| 同线程重复获取 | 永久挂死 | 立刻抛 `ConcurrencyError` |
+| 进程内锁等待 | `with _WRITE_LOCK`（无限） | `acquire(timeout=…)`，超时抛 `ConcurrencyError` |
+
+**不使用 `threading.RLock`**：它只让嵌套「看起来能跑」，两把不同的锁跨进程
+语义仍然错乱。正确做法是把加锁点收敛为一处。
+`_run_validation_unlocked()` 仍是内部函数，未成为对外入口。
+
+### 顺带修掉的第二个缺陷
+
+临时库场景读 `input_hash` 时未传 `db_path`，读到的是**正式库**，必然为空：
+
+```python
+task.input_hash = record.get("input_hash")   # record = get_validation(vid) → None（临时库场景）
+```
+
+`input_hash=None` 会让 `_check_hash_consistency()` 跳过空值，
+「一致性检查」退化成永远通过。已改为 `get_validation(vid, db_path=db_path)`。
+
+### 测试改写（不再用 `inspect.getsource()`）
+
+| 测试 | 断言的真实行为 |
+| --- | --- |
+| `test_run_validation_public_entry_acquires_lock` | 执行期间持锁标记 True 且其他线程拿不到锁；返回后 False |
+| `test_locked_context_does_not_reacquire` | 持锁期间重入不重复加锁、不死锁、深度为 2 |
+| `test_run_concurrent_tasks_does_not_double_lock` | 临时库任务跑通、`input_hash` 非空、锁文件落在临时库目录 |
+| `test_temp_db_two_threads_no_deadlock` | 两个临时库任务并行调度均完成 |
+| `test_public_entry_timeout_raises_concurrency_error` | 外部持锁 → `ConcurrencyError` 且流程未执行；释放后可重新获取 |
+| `test_public_entry_releases_lock_on_exception` | 异常后标记复位、锁可被他人获取、后续调用成功 |
+| `test_nested_lock_raises_instead_of_hanging` | 同线程嵌套加锁 5 秒内报错；报错后锁完全释放 |
+
+### 真实运行证据（非单测）
+
+| 项 | 结果 |
+| --- | --- |
+| 单临时库任务（`_make_single_task`） | `success`，253.2s，`validation_id=87328a95ea394e76` |
+| 该任务 `input_hash` | `dc5137ab80c92d71`，与临时库 `validation_runs` 记录一致 |
+| 执行期间其他线程探测拿锁 | 拿不到 |
+| 结束后持锁标记 | `false` |
+| 两临时库任务并发调度 | 579.1s，273.6s + 577.7s 严格串行，`hash_consistency=true`，ids 唯一 |
+
+### 验证
+
+| 项目 | 结果 |
+| --- | ---: |
+| 全量测试 | **373 passed**，0 failed / 0 skipped |
+| 原有 369 项 | 全部保留通过（未删除、未跳过、未弱化） |
+| 本轮净增 | 4 项 |
+| 行情完整指纹 | `market-fingerprint-v3:d54727c0...ac49`，前后一致 |
+| 历史 validation 记录 | 原有 13 条完整保留 |
+| 数据库 `integrity_check` | ok |
+
+### 报告校准
+
+| 报告 | 校准内容 |
+| --- | --- |
+| design | 新增第 11 节（缺陷、修复设计、三处配套修正、未验证项）；文件清单补 3A.2.1.2.3 |
+| test_report | 数量统一为 373；新增缺陷修复与真实运行证据章节；修正「多进程未执行」的过期表述 |
+| concurrency | 新增 5.5 节（复现、修复对照、真实运行）与 7.6 节（唯一加锁点形态） |
+| validation | 新增缺陷整改表；数量统一为 373 |
+| sparse / sell_proceeds | 结论与数据不变（本轮未触碰这两块逻辑） |
+
+### 未验证（不宣称通过）
+
+- 临时库 4 并发、临时库多进程调度
+- 8 及以上并发、跨机器共享数据库、小时级长压测
+- 真实券商交割单核验仍为 `deferred_external_evidence`

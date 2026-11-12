@@ -1,5 +1,37 @@
 # 变更日志
 
+## 2026-11-12 — 阶段3A.2.1.2.3 临时库嵌套加锁缺陷修复
+
+- **嵌套加锁死锁**：`concurrency._make_single_task()` 临时库分支写成
+  `run_with_write_lock(run_validation, cfg, lock_dir=lock_dir)`，而
+  `run_validation()` 自 3A.2.1.2.2 起自身也加锁。同一线程两次获取不可重入的
+  `threading.Lock`，第二次永久阻塞——任务无声挂死，不报错、不超时、不释放。
+  两层的锁目标还不同（外层临时目录、内层数据库目录），跨进程互斥不成立。
+  现把加锁点收敛到**公开入口一处**：`_make_single_task()` 只调
+  `run_validation(cfg, db_path=…, lock_dir=…)`。未使用 `RLock` 掩盖问题，
+  `_run_validation_unlocked()` 仍是内部函数。
+- **持锁标记置位时机**：`_LOCK_DEPTH` 原本在拿锁**之前**置位，等待锁期间会被
+  误判为「已持锁」而绕过排队。现下沉到 `_locked()` 闭包内（真正拿到锁之后），
+  `finally` 复位。
+- **进程内锁无限等待**：`run_with_write_lock()` 由 `with _WRITE_LOCK` 改为
+  `acquire(timeout=…)`，超时抛 `ConcurrencyError`；同一线程重复获取立刻报错。
+  修复前等价路径实测 20 秒仍在阻塞，修复后 0.0 秒即抛出明确错误。
+- **`input_hash` 读错库**：临时库场景调用 `get_validation(vid)` 未传 `db_path`，
+  读到正式库必然为空，`input_hash=None` 让 `_check_hash_consistency()` 跳过空值，
+  一致性检查退化为恒真。现传 `db_path`。真实运行验证：修复前 `null`，
+  修复后 `dc5137ab80c92d71` 且与临时库记录一致。
+- **测试改为行为验证**：原 4 项入口锁测试依赖 `inspect.getsource()` 字符串匹配，
+  改实现不改行为也能通过。现全部改为行为断言（执行期间持锁且他人拿不到锁、
+  超时抛错且流程未执行、异常后锁被释放、嵌套加锁快速失败），净增 4 项。
+- **真实运行证据**：单临时库任务 253.2s `success`，执行期间外部探测拿不到锁，
+  结束后持锁标记 `false`，锁文件落在临时库目录；两临时库任务并发调度 579.1s
+  完成（273.6s + 577.7s，严格串行），`hash_consistency=true`，ids 唯一。
+- 全量测试 369 → **373 项**，全部通过，0 failed / 0 skipped。
+- 六份报告重新校准（删除过期结论而非追加）：数量统一为 373，
+  「多进程未执行」「351/351」等过期表述已删除。
+- 行情完整指纹 `market-fingerprint-v3:d54727c0...ac49` 前后一致，
+  历史 13 条 validation 记录完整保留，`integrity_check` ok。
+
 ## 2026-11-12 — 阶段3A.2.1.2.2 统一入口锁与报告校准
 
 - **统一入口锁**：`runner.py` 拆为 `_run_validation_unlocked()`（不加锁内部实现）

@@ -25,6 +25,9 @@ from typing import Any, Callable
 
 # 进程内写锁：保证同一进程的验证任务串行
 _WRITE_LOCK = threading.Lock()
+# 线程级持锁标记：用于识别「同一线程重复获取同一把非重入锁」的嵌套死锁。
+# 这不是把锁改成可重入（RLock），而是把「永久挂死」变成「立刻报错」。
+_LOCK_OWNER = threading.local()
 # 跨进程文件锁：基于正式数据库路径生成，文件位置稳定
 _LOCK_FILE_NAME = ".validation_write.lock"
 
@@ -125,7 +128,22 @@ def run_with_write_lock(func: Callable, *args, lock_dir: Path | None = None,
     - 超时抛 ConcurrencyError，由调用方记录为 failed，不伪装成功。
     - 异常路径通过 finally 释放锁。
     """
-    with _WRITE_LOCK:
+    # 进程内锁也必须带超时：旧实现用 with _WRITE_LOCK 无限等待，
+    # 一旦调用方在外层重复加锁（嵌套获取），就变成永久挂死而不是报错。
+    # 阶段3A.2.1.2.3 起：拿不到进程内锁同样抛 ConcurrencyError。
+    if getattr(_LOCK_OWNER, "held", False):
+        # 同一线程在已持锁状态下再次获取：threading.Lock 不可重入，
+        # 继续等只会挂死，必须立刻报错暴露调用方的重复加锁。
+        raise ConcurrencyError(
+            "重复获取验证锁：同一线程已在锁内又发起一次加锁"
+            "（调用方不得在 run_validation 外层再套 run_with_write_lock）"
+        )
+    if not _WRITE_LOCK.acquire(timeout=max(0.0, float(timeout))):
+        raise ConcurrencyError(
+            f"获取验证锁超时（{timeout}s）：进程内 threading.Lock"
+        )
+    _LOCK_OWNER.held = True
+    try:
         # lock 目标库优先用 db_path_lock（避免与传给 func 的 db_path 语义混淆）
         lock_target = db_path_lock if db_path_lock is not None else db_path
         lock_path = (
@@ -174,16 +192,24 @@ def run_with_write_lock(func: Callable, *args, lock_dir: Path | None = None,
                     pass
         finally:
             handle.close()
+    finally:
+        _LOCK_OWNER.held = False
+        _WRITE_LOCK.release()
 
 
 def _make_single_task(
     task_id: str,
     overrides: dict,
     *,
-    lock_dir: Path,
+    lock_dir: Path | None = None,
+    db_path=None,
     serializer: Callable | None = None,
 ) -> tuple[ConcurrentTask, Callable]:
-    """构造一个任务的执行函数（延迟执行）。"""
+    """构造一个任务的执行函数（延迟执行）。
+
+    加锁完全交给 `run_validation()` 公开入口（只加一次）：
+    传入 `db_path` 时锁文件自动跟随该库目录，传 `lock_dir` 仅用于测试显式指定。
+    """
     task = ConcurrentTask(task_id=task_id, params=dict(overrides))
 
     def execute() -> ConcurrentTask:
@@ -197,22 +223,23 @@ def _make_single_task(
             cfg = ValidationConfig(**overrides)
             cfg.validate()
             if serializer is not None:
+                # 外部自定义串行器：由调用方负责加锁，这里只调用
                 result = serializer(cfg)
-            elif lock_dir is not None:
-                # 临时库测试：显式指定锁目录
-                result = run_with_write_lock(
-                    run_validation, cfg, lock_dir=lock_dir,
-                )
             else:
-                # 正式库：公开入口自带锁，不再重复加锁
-                result = run_validation(cfg)
+                # 阶段3A.2.1.2.3 修正：公开入口是**唯一加锁点**。
+                # 旧实现在临时库场景外层再套 run_with_write_lock(run_validation)
+                # ——外层拿临时目录锁、内层又去拿正式库锁，形成嵌套获取；
+                # 两把锁不是同一把，排队语义错乱且可能死锁。
+                # 现在只把 db_path / lock_dir 透传给公开入口，由它加**一次**锁。
+                result = run_validation(cfg, db_path=db_path, lock_dir=lock_dir)
             task.validation_id = result.validation_id
             task.strategy_version = cfg.strategy_version
             # 必须取「验证记录里的 input_hash」——它包含 config + ETF 池 + 数据指纹，
             # 而不是单独的市场数据指纹（后者同一份行情下必然相同，不能区分参数）
             from app.validation.storage import get_validation
-
-            record = get_validation(result.validation_id) or {}
+            # 必须读「本次被写的那个库」：临时库场景下读正式库会拿不到记录，
+            # input_hash 变 None，hash 一致性检查就退化成永远通过。
+            record = get_validation(result.validation_id, db_path=db_path) or {}
             task.input_hash = record.get("input_hash")
             task.data_fingerprint = getattr(result, "data_fingerprint", {}).get("sha256")
             task.status = result.status
@@ -251,17 +278,15 @@ def run_concurrent_tasks(
 
     root = Path(workdir or tempfile.mkdtemp(prefix="concurrency_"))
     root.mkdir(parents=True, exist_ok=True)
-    # 正式库场景使用「正式数据库同目录」的稳定锁文件；
-    # 只有临时库测试才通过 lock_dir 覆盖
-    lock_dir = root / "locks" if workdir is not None else None
-    if lock_dir is not None:
-        lock_dir.mkdir(parents=True, exist_ok=True)
 
     tasks: list[ConcurrentTask] = []
     runners: list[Callable] = []
     for spec in task_specs:
+        # 锁必须跟随被写的数据库：不传 db_path 时锁落在正式库同目录；
+        # spec 里给了 db_path（临时库场景）则由公开入口据此定位锁文件。
         task, execute = _make_single_task(
-            spec["task_id"], spec.get("overrides", {}), lock_dir=lock_dir,
+            spec["task_id"], spec.get("overrides", {}),
+            db_path=spec.get("db_path"),
         )
         tasks.append(task)
         runners.append(execute)

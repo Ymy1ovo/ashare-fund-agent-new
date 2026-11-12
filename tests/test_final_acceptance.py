@@ -346,65 +346,148 @@ def test_lock_file_created_in_stable_location(tmp_path) -> None:
 
 # ==================================================== 二、公开入口锁
 
-def test_run_validation_public_entry_acquires_lock() -> None:
-    """公开 run_validation() 必须自动加锁，调用方无需自己加锁。"""
-    import inspect
+def _fake_result(vid="vid000000000001", status="ok"):
+    from types import SimpleNamespace
 
-    from app.validation.runner import (
-        _run_validation_unlocked,
-        run_validation,
-        validation_lock_held,
+    return SimpleNamespace(
+        validation_id=vid,
+        status=status,
+        conclusion="ok",
+        codes=["510300"],
+        split={"is_days": 1, "oos_days": 1},
+        data_fingerprint={"sha256": "deadbeef"},
     )
 
-    source = inspect.getsource(run_validation)
-    assert "validation_lock_held" in source, "公开入口未检查持锁标记"
-    assert "_acquire_and_run" in source, "公开入口未走加锁路径"
-    # 内部实现本身不负责加锁（只在 docstring 中提示），源码里不应出现加锁调用
-    internal_source = inspect.getsource(_run_validation_unlocked)
-    body_after_doc = internal_source.split('"""')[-1]
-    assert "run_with_write_lock(" not in body_after_doc, "内部实现不应自己加锁"
-    assert validation_lock_held() is False
+
+def test_run_validation_public_entry_acquires_lock(tmp_path, monkeypatch) -> None:
+    """公开入口必须在执行期间真正持锁（行为验证，不看源码字符串）。"""
+    from app.validation import runner as runner_mod
+    from app.validation.concurrency import ConcurrencyError, run_with_write_lock
+
+    observed = {}
+
+    def fake_unlocked(config=None, **kwargs):
+        observed["held"] = runner_mod.validation_lock_held()
+
+        def probe():
+            try:
+                run_with_write_lock(lambda: None, lock_dir=tmp_path, timeout=0.2)
+                observed["lock_free"] = True
+            except ConcurrencyError:
+                observed["lock_free"] = False
+
+        prober = threading.Thread(target=probe)
+        prober.start()
+        prober.join(10)
+        return _fake_result()
+
+    monkeypatch.setattr(runner_mod, "_run_validation_unlocked", fake_unlocked)
+    result = runner_mod.run_validation(lock_dir=tmp_path)
+
+    assert result.validation_id == "vid000000000001"
+    assert observed["held"] is True, "执行期间未持锁"
+    assert observed["lock_free"] is False, "执行期间锁可被他人获得"
+    assert runner_mod.validation_lock_held() is False, "返回后持锁标记未复位"
 
 
-def test_locked_context_does_not_reacquire() -> None:
-    """已持锁上下文中再次调用公开入口，不应重复加锁（避免自锁死）。"""
-    from app.validation.runner import (
-        _LOCK_DEPTH,
-        run_validation,
-        validation_lock_held,
+def test_locked_context_does_not_reacquire(tmp_path, monkeypatch) -> None:
+    """持锁执行期间再次走公开入口，必须直接执行而不重复加锁（否则自锁死）。"""
+    from app.validation import runner as runner_mod
+
+    depth = {"n": 0}
+    nested = {}
+
+    def fake_unlocked(config=None, **kwargs):
+        depth["n"] += 1
+        if depth["n"] == 1:
+            # 真实场景：验证流程内部再次调用公开入口（压力测试、嵌套验证）
+            nested["held"] = runner_mod.validation_lock_held()
+            nested["result"] = runner_mod.run_validation(lock_dir=tmp_path)
+        return _fake_result()
+
+    monkeypatch.setattr(runner_mod, "_run_validation_unlocked", fake_unlocked)
+
+    box = []
+    worker = threading.Thread(
+        target=lambda: box.append(runner_mod.run_validation(lock_dir=tmp_path)),
+        daemon=True,
     )
-    from app.validation.concurrency import run_with_write_lock
-    from app.validation.config import ValidationConfig
-    import tempfile
+    worker.start()
+    worker.join(20)
 
-    captured = {}
-
-    def inner() -> None:
-        captured["held_inside"] = validation_lock_held()
-        token = _LOCK_DEPTH.set(_LOCK_DEPTH.get() + 1)
-        try:
-            # 模拟内部已持锁：公开入口应直接走内部实现
-            captured["is_reentry_safe"] = True
-        finally:
-            _LOCK_DEPTH.reset(token)
-
-    with tempfile.TemporaryDirectory() as tmp:
-        run_with_write_lock(inner, lock_dir=Path(tmp))
-
-    assert captured["held_inside"] is False, "外层锁不应污染 contextvars"
-    assert captured["is_reentry_safe"] is True
+    assert not worker.is_alive(), "重入时重复加锁导致死锁"
+    assert nested["held"] is True, "持锁期间未标记持锁"
+    assert nested["result"].validation_id == "vid000000000001"
+    assert depth["n"] == 2, "重入未走内部实现"
+    assert runner_mod.validation_lock_held() is False, "返回后持锁标记未复位"
 
 
-def test_run_concurrent_tasks_does_not_double_lock() -> None:
-    """并发调度使用公开入口时不得自己再包一层锁。"""
-    import inspect
-
+def test_run_concurrent_tasks_does_not_double_lock(tmp_path, monkeypatch) -> None:
+    """临时库路径不得嵌套加锁：旧实现在同一线程重复获取 threading.Lock 会永久挂死。"""
+    from app.validation import runner as runner_mod
     from app.validation.concurrency import _make_single_task
 
-    source = inspect.getsource(_make_single_task)
-    assert "run_validation(cfg)" in source or "run_validation(" in source
-    # 正式库路径不应再套 run_with_write_lock
-    assert 'lock_dir is not None' in source, "应只在临时库路径显式加锁"
+    seen = []
+
+    def fake_unlocked(config=None, **kwargs):
+        seen.append(runner_mod.validation_lock_held())
+        time.sleep(0.05)
+        return _fake_result()
+
+    monkeypatch.setattr(runner_mod, "_run_validation_unlocked", fake_unlocked)
+    monkeypatch.setattr(
+        "app.validation.storage.get_validation",
+        lambda vid=None, db_path=None: {"input_hash": "hash-1"},
+    )
+
+    db = tmp_path / "temp_agent.db"
+    db.write_bytes(b"")
+    task, execute = _make_single_task("t1", {}, db_path=db)
+    box = []
+    worker = threading.Thread(target=lambda: box.append(execute()), daemon=True)
+    worker.start()
+    worker.join(30)
+
+    assert not worker.is_alive(), "临时库路径嵌套加锁导致死锁"
+    assert box and box[0].status == "ok", f"任务未成功：{box[0].error_message if box else None}"
+    assert box[0].input_hash == "hash-1"
+    assert seen == [True], "任务执行期间未持锁"
+    # 锁文件必须落在临时库自己所在目录，不是项目正式库目录
+    assert (tmp_path / ".validation_write.lock").exists(), "锁文件未跟随临时库目录"
+
+
+def test_temp_db_two_threads_no_deadlock(tmp_path, monkeypatch) -> None:
+    """两个临时库任务并行调度：必须都完成，不得互相卡死。"""
+    from app.validation import runner as runner_mod
+    from app.validation.concurrency import _make_single_task
+
+    def fake_unlocked(config=None, **kwargs):
+        time.sleep(0.2)
+        return _fake_result()
+
+    monkeypatch.setattr(runner_mod, "_run_validation_unlocked", fake_unlocked)
+    monkeypatch.setattr(
+        "app.validation.storage.get_validation",
+        lambda vid=None, db_path=None: {"input_hash": "hash-1"},
+    )
+
+    db = tmp_path / "temp_agent.db"
+    db.write_bytes(b"")
+    tasks = [_make_single_task(f"t{i}", {}, db_path=db) for i in (1, 2)]
+    box = []
+
+    def run(execute):
+        box.append(execute())
+
+    threads = [threading.Thread(target=run, args=(ex,), daemon=True) for _, ex in tasks]
+    for thread in threads:
+        thread.start()
+    for thread in threads:
+        thread.join(30)
+
+    assert not any(thread.is_alive() for thread in threads), "临时库并发调度死锁"
+    assert [t.status for t in box] == ["ok", "ok"]
+    assert runner_mod.validation_lock_held() is False
 
 
 def test_entry_lock_path_follows_db_dir(tmp_path) -> None:
@@ -416,3 +499,94 @@ def test_entry_lock_path_follows_db_dir(tmp_path) -> None:
     lock = shared_lock_path(db)
     assert lock.parent == tmp_path.resolve()
     assert lock.name == ".validation_write.lock"
+
+
+def test_public_entry_timeout_raises_concurrency_error(tmp_path, monkeypatch) -> None:
+    """外部已持锁且超过等待上限时，公开入口必须抛 ConcurrencyError 而非静默执行。"""
+    from app.validation import runner as runner_mod
+    from app.validation.concurrency import ConcurrencyError, run_with_write_lock
+
+    ran = []
+
+    def fake_unlocked(config=None, **kwargs):
+        ran.append(1)
+        return _fake_result()
+
+    monkeypatch.setattr(runner_mod, "_run_validation_unlocked", fake_unlocked)
+
+    acquired = threading.Event()
+    release = threading.Event()
+
+    def hold():
+        def inner():
+            acquired.set()
+            release.wait(20)
+
+        run_with_write_lock(inner, lock_dir=tmp_path, timeout=30.0)
+
+    holder = threading.Thread(target=hold, daemon=True)
+    holder.start()
+    assert acquired.wait(10), "外部锁未持有"
+
+    try:
+        with pytest.raises(ConcurrencyError):
+            runner_mod.run_validation(lock_dir=tmp_path, lock_timeout=0.5)
+        assert ran == [], "超时后仍执行了验证流程"
+        assert runner_mod.validation_lock_held() is False
+    finally:
+        release.set()
+        holder.join(10)
+
+    # 锁释放后必须能重新获取并成功执行
+    assert runner_mod.run_validation(lock_dir=tmp_path, lock_timeout=10.0).status == "ok"
+    assert ran == [1]
+    assert runner_mod.validation_lock_held() is False
+
+
+def test_public_entry_releases_lock_on_exception(tmp_path, monkeypatch) -> None:
+    """验证流程抛异常时锁必须释放、持锁标记复位，后续调用可正常加锁。"""
+    from app.validation import runner as runner_mod
+    from app.validation.concurrency import run_with_write_lock
+
+    state = {"fail": True}
+
+    def fake_unlocked(config=None, **kwargs):
+        if state["fail"]:
+            raise RuntimeError("boom")
+        return _fake_result()
+
+    monkeypatch.setattr(runner_mod, "_run_validation_unlocked", fake_unlocked)
+
+    with pytest.raises(RuntimeError):
+        runner_mod.run_validation(lock_dir=tmp_path)
+    assert runner_mod.validation_lock_held() is False, "异常后持锁标记未复位"
+
+    # 锁确实被释放：另一线程能立刻拿到
+    got = []
+    worker = threading.Thread(
+        target=lambda: got.append(run_with_write_lock(lambda: "ok", lock_dir=tmp_path, timeout=5.0)),
+        daemon=True,
+    )
+    worker.start()
+    worker.join(10)
+    assert got == ["ok"], "异常后锁未释放"
+
+    state["fail"] = False
+    assert runner_mod.run_validation(lock_dir=tmp_path).status == "ok"
+    assert runner_mod.validation_lock_held() is False
+
+
+def test_nested_lock_raises_instead_of_hanging(tmp_path) -> None:
+    """同一线程重复加锁必须立刻报错，不能挂死（旧实现会永久阻塞）。"""
+    from app.validation.concurrency import ConcurrencyError, run_with_write_lock
+
+    def outer():
+        run_with_write_lock(lambda: None, lock_dir=tmp_path, timeout=5.0)
+
+    started = time.time()
+    with pytest.raises(ConcurrencyError):
+        run_with_write_lock(outer, lock_dir=tmp_path, timeout=5.0)
+    assert time.time() - started < 5.0, "嵌套加锁未快速失败"
+
+    # 报错后锁必须完全释放，后续调用正常
+    assert run_with_write_lock(lambda: "ok", lock_dir=tmp_path, timeout=5.0) == "ok"

@@ -213,9 +213,9 @@ def _run_validation_unlocked(
 ) -> ValidationResult:
     """内部实现：执行完整验证流程，**不加锁**。
 
-    只允许两个调用方使用：
-    1. 公开入口 `run_validation()`（它负责加锁）
-    2. 已经持有同一把锁的 `concurrency.run_with_write_lock()`
+    唯一允许的调用方是公开入口 `run_validation()`（它负责加锁）。
+    阶段3A.2.1.2.3 起不再允许外部先套 `run_with_write_lock()` 再调用本函数：
+    加锁点必须只有一处，否则会出现「临时锁 + 数据库锁」的嵌套获取。
 
     直接调用本函数会绕过并发保护，仅供内部使用。
     """
@@ -973,6 +973,9 @@ def decide_conclusion(
 # 内部持锁标记：通过 contextvars 传递，不依赖全局布尔变量。
 # 作用：允许「已持锁的内部调用」再次进入公开入口时不重复加锁，
 # 同时不会影响其他线程（每个执行上下文独立）。
+# 锁等待上限：与 concurrency.run_with_write_lock 的默认值保持一致
+DEFAULT_LOCK_TIMEOUT: float = 3600.0
+
 _LOCK_DEPTH: "contextvars.ContextVar[int]" = contextvars.ContextVar(
     "validation_lock_depth", default=0
 )
@@ -983,22 +986,41 @@ def validation_lock_held() -> bool:
     return _LOCK_DEPTH.get() > 0
 
 
-def _acquire_and_run(config, *, db_path, validation_id, stress_keys):
-    """真正加锁并执行的内部函数。"""
+def _acquire_and_run(
+    config,
+    *,
+    db_path,
+    validation_id,
+    stress_keys,
+    lock_dir=None,
+    lock_timeout: float = DEFAULT_LOCK_TIMEOUT,
+):
+    """真正加锁并执行的内部函数（阶段3A.2.1.2.3 修正）。
+
+    持锁标记只在**真正拿到锁之后**才置位，并由 finally 复位：
+    等待锁期间标记保持 False，避免把「正在排队」误判成「已持锁」。
+    """
     from app.validation.concurrency import run_with_write_lock
 
-    token = _LOCK_DEPTH.set(_LOCK_DEPTH.get() + 1)
-    try:
-        return run_with_write_lock(
-            _run_validation_unlocked,
-            config,
-            db_path=db_path,
-            validation_id=validation_id,
-            stress_keys=stress_keys,
-            db_path_lock=db_path,
-        )
-    finally:
-        _LOCK_DEPTH.reset(token)
+    def _locked():
+        token = _LOCK_DEPTH.set(_LOCK_DEPTH.get() + 1)
+        try:
+            return _run_validation_unlocked(
+                config,
+                db_path=db_path,
+                validation_id=validation_id,
+                stress_keys=stress_keys,
+            )
+        finally:
+            _LOCK_DEPTH.reset(token)
+
+    return run_with_write_lock(
+        _locked,
+        db_path=db_path,
+        db_path_lock=db_path,
+        lock_dir=lock_dir,
+        timeout=lock_timeout,
+    )
 
 
 def run_validation(
@@ -1007,6 +1029,8 @@ def run_validation(
     db_path=None,
     validation_id: str | None = None,
     stress_keys: list[str] | None = None,
+    lock_dir=None,
+    lock_timeout: float = DEFAULT_LOCK_TIMEOUT,
 ) -> ValidationResult:
     """统一验证入口：**自动经过全流程串行锁**。
 
@@ -1016,6 +1040,11 @@ def run_validation(
       （临时库则跟随临时库目录，保持测试可配置）；
     - 若当前执行上下文已经持锁（内部调用），直接执行不再加锁，避免自锁死；
     - 锁超时抛 ConcurrencyError，调用方记录 failed，不伪装成功。
+
+    阶段3A.2.1.2.3 修正：`lock_dir` 只服务于「临时数据库」场景，由调用方
+    显式传入临时库目录；**本函数是唯一加锁点**，调用方不得在外层再套
+    `run_with_write_lock`，否则会形成「临时锁 + 正式库锁」的双重获取。
+    正式库禁止传 `lock_dir`，锁文件固定跟随数据库所在目录。
 
     绕过方式只有 `_run_validation_unlocked()`，它是内部函数，不对外承诺。
     """
@@ -1027,5 +1056,5 @@ def run_validation(
         )
     return _acquire_and_run(
         config, db_path=db_path, validation_id=validation_id,
-        stress_keys=stress_keys,
+        stress_keys=stress_keys, lock_dir=lock_dir, lock_timeout=lock_timeout,
     )

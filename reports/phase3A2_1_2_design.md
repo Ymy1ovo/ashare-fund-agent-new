@@ -129,10 +129,20 @@ SQLite  ：busy_timeout=5000，单写者
 | `app/validation/sell_probe.py` | **新增** | 受控库构造与完整链路执行 |
 | `scripts/run_sensitivity_scan.py` | **新增** | 敏感性扫描 CLI |
 | `tests/test_reliability.py` | **新增** | 14 项专项测试（阶段3A.2.1.2） |
-| `tests/test_final_acceptance.py` | **新增** | 18 项专项测试（3A.2.1.2.1 的 14 项 + 3A.2.1.2.2 的 4 项） |
+| `tests/test_final_acceptance.py` | **新增** | 22 项专项测试（3A.2.1.2.1 的 14 + 3A.2.1.2.2 的 4 + 3A.2.1.2.3 的 4） |
 | `reports/phase3A2_1_2_*.md` | **新增** | 6 份报告 |
 
-**未修改**：`app/backtest/*`、`app/quant/*`、`app/data/*`、数据库结构、历史记录。
+**阶段3A.2.1.2.3 修改的文件**：
+
+| 文件 | 类型 | 说明 |
+| --- | --- | --- |
+| `app/validation/runner.py` | **修改** | `lock_dir` / `lock_timeout` 参数；持锁标记下沉到真正拿锁之后 |
+| `app/validation/concurrency.py` | **修改** | 去掉外层重复加锁；进程内锁加超时；同线程重入立刻报错；`input_hash` 读对库 |
+| `tests/test_final_acceptance.py` | **修改** | 4 项源码字符串测试改写为行为断言，净增 4 项 |
+| `reports/phase3A2_1_2_*.md` | **修改** | 六份报告重新校准（删除过期结论而非追加） |
+
+**未修改**：`app/backtest/*`、`app/quant/*`、`app/data/*`、数据库结构、历史记录、
+策略逻辑、历史行情、指标、回测与验证记录。
 
 ## 6. 数据安全设计
 
@@ -175,7 +185,7 @@ SQLite  ：busy_timeout=5000，单写者
 
 新增测试：`tests/test_final_acceptance.py` 14 项（3A.2.1.2.1）
 + 4 项（3A.2.1.2.2 入口锁）；
-全量 337 → 351 → 365 → **369 项**。
+全量 337 → 351 → 365 → **369 项**（3A.2.1.2.2 结束时的状态）。
 
 ## 10. 阶段3A.2.1.2.2 统一入口锁
 
@@ -217,7 +227,7 @@ def validation_lock_held() -> bool:
 | 临时库（测试） | `<tmp_db_dir>/.validation_write.lock` |
 | 显式 lock_dir | 该目录下同名文件 |
 
-### 新增测试（4 项）
+### 新增测试（4 项，阶段3A.2.1.2.2）
 
 | 测试 | 覆盖 |
 | --- | --- |
@@ -225,3 +235,83 @@ def validation_lock_held() -> bool:
 | `test_locked_context_does_not_reacquire` | 已持锁不重复加锁 |
 | `test_run_concurrent_tasks_does_not_double_lock` | 并发调度不双重加锁 |
 | `test_entry_lock_path_follows_db_dir` | 锁路径跟随数据库目录 |
+
+## 11. 阶段3A.2.1.2.3 临时库嵌套加锁缺陷修复
+
+### 缺陷
+
+`concurrency._make_single_task()` 的临时库分支：
+
+```python
+result = run_with_write_lock(run_validation, cfg, lock_dir=lock_dir)
+```
+
+`run_validation()` 自身也会 `_acquire_and_run()` 加锁，于是同一线程内两次
+获取 `threading.Lock`。该锁**不可重入**，第二次 `acquire()` 会永久阻塞：
+任务无声挂死，既不报错也不超时。
+
+此外两层的锁目标不同（外层临时目录、内层数据库目录），本就不是同一把锁，
+排队语义错乱；跨进程也无法互斥。
+
+### 修复设计
+
+| 原则 | 做法 |
+| --- | --- |
+| 唯一加锁点 | 加锁只在 `run_validation()` 公开入口内部 |
+| 参数传递 | `_make_single_task()` 只传 `db_path`（要写的库）与可选 `lock_dir`（测试覆盖） |
+| 锁文件位置 | 跟随被写的数据库目录，跨进程稳定 |
+| 不做的事 | 不引入 `RLock`；不把 `_run_validation_unlocked()` 变成对外入口 |
+
+### 三个配套修正
+
+| # | 问题 | 修正 |
+| ---: | --- | --- |
+| 1 | 持锁标记在**拿锁之前**置位，等待锁期间会被误判为「已持锁」而绕过排队 | 标记下沉到 `_locked()` 闭包内（真正拿到锁之后），`finally` 复位 |
+| 2 | 进程内锁 `with _WRITE_LOCK` 无限等待，嵌套时无声挂死 | 改 `acquire(timeout=…)`；同线程重复获取立刻抛 `ConcurrencyError` |
+| 3 | 临时库场景读 `input_hash` 未传 `db_path`，读到正式库 → `None`，hash 一致性检查退化为恒真 | `get_validation(vid, db_path=db_path)` |
+
+### 异常与超时语义（保持）
+
+| 场景 | 行为 |
+| --- | --- |
+| 锁等待超时 | 抛 `ConcurrencyError`，不执行验证流程，不伪装成功 |
+| 验证流程抛异常 | `finally` 复位持锁标记并释放锁，后续调用可立即获取 |
+| 已持锁上下文中重入公开入口 | 直接走内部实现，不重复加锁（`contextvars` 判定） |
+
+### 测试（改为行为验证）
+
+原 4 项测试依赖 `inspect.getsource()` 做字符串匹配，改实现不影响行为也能通过。
+本轮全部改写为行为断言，并新增 3 项（净增 4 项）：
+
+| 测试 | 断言的行为 |
+| --- | --- |
+| `test_run_validation_public_entry_acquires_lock` | 执行期间持锁标记为 True 且其他线程拿不到锁；返回后为 False |
+| `test_locked_context_does_not_reacquire` | 持锁期间重入公开入口不重复加锁，不死锁，深度为 2 |
+| `test_run_concurrent_tasks_does_not_double_lock` | 临时库任务真实跑通、`input_hash` 非空、锁文件落在临时库目录 |
+| `test_temp_db_two_threads_no_deadlock` | 两个临时库任务并行调度均完成 |
+| `test_public_entry_timeout_raises_concurrency_error` | 外部持锁 → `ConcurrencyError` 且流程未执行；释放后可重新获取 |
+| `test_public_entry_releases_lock_on_exception` | 异常后标记复位、锁可被他人获取、后续调用成功 |
+| `test_nested_lock_raises_instead_of_hanging` | 同线程嵌套加锁 5 秒内报错；报错后锁完全释放 |
+
+全量测试：337 → 351 → 365 → 369 → **373 项**。
+
+### 真实运行证据（非单测）
+
+| 项 | 结果 |
+| --- | --- |
+| 单临时库任务（`_make_single_task`） | `success`，253.2s，`validation_id=87328a95ea394e76` |
+| `input_hash` | `dc5137ab80c92d71`，与临时库 `validation_runs` 记录一致 |
+| 执行期间探测 | 其他线程拿不到锁（`lock_held_during_execution=true`） |
+| 结束后持锁标记 | `false` |
+| 两临时库任务并发 | 579.1s，273.6s + 577.7s 严格串行，`hash_consistency=true` |
+
+### 未验证
+
+- 临时库 4 并发、临时库多进程调度
+- 8 及以上并发、跨机器共享库、小时级长压测
+- 以上均不宣称通过。
+
+## 12. 外部证据
+
+**真实券商交割单核验：`deferred_external_evidence`。** 本轮未获得任何脱敏
+交割单，`per_order` 佣金模型与最低佣金规则仍属模拟假设，不做对账结论。
