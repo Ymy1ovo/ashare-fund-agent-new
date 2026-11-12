@@ -1,5 +1,23 @@
 # 变更日志
 
+## 2026-11-12 — 阶段3A.2.1.2 验证体系工程收尾
+
+- 新增 `app/validation/sensitivity_scan.py`：6 删除比例 × 5 缺失模式的敏感性扫描，
+  独立 SQLite 副本、固定随机种子、保护区间首尾估值日。
+  实跑代表性池 30 场景 + 全池 12 场景，共 **42 场景**，负现金天数全部 0。
+- 新增 `app/validation/concurrency.py`：进程内线程锁 + 跨进程文件锁串行写入，
+  明确声明 SQLite 不支持多写并发。实测 2 任务 / 4 任务并发，
+  validation_id 唯一、integrity ok、失败任务不影响其他任务。
+  修复了 `input_hash` 误用数据指纹作为隔离判据的问题。
+- 新增 `app/validation/sell_probe.py`：受控副本跑完整 Engine 流程验证
+  `sell_proceeds_below_fee`。历史真实数据从未自然触发（74 笔「成交额<费用」
+  均因现金充足未拒单），受控场景两档（现金不足/充足）+ 阈值扫描全部正确。
+- 新增 `scripts/run_sensitivity_scan.py` 与 `tests/test_reliability.py` 14 项测试。
+- 全量测试 337 → **351 项**，全部通过。
+- 历史 13 条 validation 记录完整保留，新增 9 条；行情指纹前后一致。
+- 新增 6 份报告：design / test / sparse_sensitivity / concurrency / sell_proceeds / validation。
+- 真实券商交割单核验仍标记为 `deferred_external_evidence`。
+
 ## 2026-11-12 — 阶段3A.2.1.1.2.1.1 绩效总成本漏计税费修复
 
 - **根因**：上一阶段把 `Trade.commission` 收窄为纯佣金后，

@@ -85,3 +85,13 @@ trace_*/
 chk_*/
 dbg_*/
 data/sparse_stress_result.json
+
+# ---- 阶段3A.2.1.2 敏感性/并发/卖出探针运行产物 ----
+data/sensitivity_*.json
+data/concurrency_*.json
+data/sell_probe_result.json
+data/sparse_regression.json
+.tmp_scan/
+rg_all_*/
+rg_representative_*/
+sp_*/
