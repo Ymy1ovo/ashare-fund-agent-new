@@ -189,6 +189,10 @@ SQLite  ：busy_timeout=5000，单写者
 
 ## 10. 阶段3A.2.1.2.2 统一入口锁
 
+> **本节描述的是 3A.2.1.2.2 结束时的形态，已被第 11 节取代。**
+> 当时的 `_make_single_task()` 在临时库分支仍会自己套一层
+> `run_with_write_lock()`；第 11 节把加锁点收敛为公开入口一处。
+
 ### 问题
 
 此前锁只在 `concurrency.run_with_write_lock()`，`scripts/run_validation.py`
@@ -204,6 +208,7 @@ runner.py
 
 concurrency.py
 └─ _make_single_task()          正式库路径直接调公开入口，不重复加锁
+                               （临时库路径此时仍会套外层锁 → 第 11 节修复）
 ```
 
 ### 重入保护
@@ -229,12 +234,12 @@ def validation_lock_held() -> bool:
 
 ### 新增测试（4 项，阶段3A.2.1.2.2）
 
-| 测试 | 覆盖 |
-| --- | --- |
-| `test_run_validation_public_entry_acquires_lock` | 公开入口走加锁路径 |
-| `test_locked_context_does_not_reacquire` | 已持锁不重复加锁 |
-| `test_run_concurrent_tasks_does_not_double_lock` | 并发调度不双重加锁 |
-| `test_entry_lock_path_follows_db_dir` | 锁路径跟随数据库目录 |
+| 测试 | 覆盖 | 3A.2.1.2.3 后续状态 |
+| --- | --- | --- |
+| `test_run_validation_public_entry_acquires_lock` | 公开入口走加锁路径 | **已改写为行为验证** |
+| `test_locked_context_does_not_reacquire` | 已持锁不重复加锁 | **已改写为行为验证** |
+| `test_run_concurrent_tasks_does_not_double_lock` | 并发调度不双重加锁 | **已改写为行为验证** |
+| `test_entry_lock_path_follows_db_dir` | 锁路径跟随数据库目录 | 保留（本就是行为验证） |
 
 ## 11. 阶段3A.2.1.2.3 临时库嵌套加锁缺陷修复
 
