@@ -53,8 +53,12 @@ def render_report(result: BacktestResult, performance: Performance) -> str:
         f"| 成交笔数 | {performance.trade_count} |",
         f"| 清仓笔数 | {performance.closed_trade_count} |",
         f"| 换手率 | {_num(performance.turnover)} |",
-        f"| 总费用 | {performance.total_commission:,.2f} |",
-        f"| 总滑点成本 | {performance.total_slippage:,.2f} |",
+        f"| 佣金合计 | {performance.total_commission:,.2f} |",
+        f"| 印花税合计 | {performance.total_stamp_tax:,.2f} |",
+        f"| 过户费合计 | {performance.total_transfer_fee:,.2f} |",
+        f"| 交易费用合计（佣金+税费） | {performance.total_trade_fees:,.2f} |",
+        f"| 滑点成本合计 | {performance.total_slippage:,.2f} |",
+        f"| **总成本（费用+滑点）** | **{performance.total_cost:,.2f}** |",
         f"| 平均持仓天数 | {_num(performance.average_holding_days, 1)} |",
         f"| 资金使用率 | {_pct(performance.capital_utilization)} |",
         f"| 交易日数 | {performance.trading_days} |",
@@ -70,14 +74,18 @@ def render_report(result: BacktestResult, performance: Performance) -> str:
     lines += ["", "## 4. 交易明细", ""]
     if result.trades:
         lines += [
-            "| # | 日期 | 代码 | 方向 | 数量 | 价格 | 金额 | 费用 | 滑点 | 已实现盈亏 |",
-            "| ---: | --- | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: |",
+            "| # | 日期 | 代码 | 方向 | 数量 | 价格 | 金额 | 佣金 | 印花税 | 过户费 | "
+            "费用合计 | 滑点 | 已实现盈亏 |",
+            "| ---: | --- | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | "
+            "---: | ---: | ---: |",
         ]
         for trade in result.trades:
             lines.append(
                 f"| {trade.trade_id} | {trade.trade_date} | {trade.code} | {trade.side} | "
                 f"{trade.quantity} | {trade.price:.4f} | {trade.gross_amount:,.2f} | "
-                f"{trade.commission:.2f} | {trade.slippage_cost:.2f} | {trade.realized_pnl:,.2f} |"
+                f"{trade.commission:.2f} | {trade.stamp_tax:.2f} | {trade.transfer_fee:.2f} | "
+                f"{trade.total_fees:.2f} | {trade.slippage_cost:.2f} | "
+                f"{trade.realized_pnl:,.2f} |"
             )
     else:
         lines.append("- 无成交")

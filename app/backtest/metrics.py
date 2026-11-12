@@ -179,9 +179,12 @@ class Performance:
     trade_count: int = 0
     closed_trade_count: int = 0
     turnover: float | None = None
-    total_cost: float = 0.0
-    total_commission: float = 0.0
-    total_slippage: float = 0.0
+    total_cost: float = 0.0            # 佣金 + 印花税 + 过户费 + 滑点
+    total_commission: float = 0.0      # 只含佣金
+    total_slippage: float = 0.0        # 只含滑点
+    total_stamp_tax: float = 0.0       # 只含印花税
+    total_transfer_fee: float = 0.0    # 只含过户费
+    total_trade_fees: float = 0.0      # 佣金 + 印花税 + 过户费（不含滑点）
     average_holding_days: float | None = None
     capital_utilization: float | None = None
     annual_returns: dict[int, float] = field(default_factory=dict)
@@ -305,9 +308,17 @@ def compute_performance(
         if holding:
             result.average_holding_days = _finite(float(np.mean(holding)))
 
+    # 成本口径（阶段3A.2.1.1.2.1.1 修正）：
+    #   total_commission —— 只统计佣金
+    #   total_slippage   —— 只统计滑点
+    #   total_cost       —— 佣金 + 印花税 + 过户费 + 滑点
+    # Trade.commission 自 3A.2.1.1.2.1 起只含佣金，不能再当「全部费用」用。
     result.total_commission = float(sum(trade.commission for trade in trades))
+    result.total_stamp_tax = float(sum(trade.stamp_tax for trade in trades))
+    result.total_transfer_fee = float(sum(trade.transfer_fee for trade in trades))
     result.total_slippage = float(sum(trade.slippage_cost for trade in trades))
-    result.total_cost = result.total_commission + result.total_slippage
+    result.total_trade_fees = float(sum(trade.total_fees for trade in trades))
+    result.total_cost = result.total_trade_fees + result.total_slippage
 
     traded_notional = float(sum(trade.gross_amount for trade in trades))
     average_assets = float(np.mean([item.total_assets for item in daily])) if daily else 0.0

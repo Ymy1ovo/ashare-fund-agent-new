@@ -92,3 +92,35 @@ def get_cash(run_id: str, db_path=None) -> list[dict[str, Any]]:
             (run_id,),
         ).fetchall()
     return [dict(row) for row in rows]
+
+# 成本语义版本标记：
+#   cost_semantics = "commission+taxes+slippage"  → 新记录（阶段3A.2.1.1.2.1.1 起）
+#   历史记录缺少该字段 → 旧语义 total_cost = commission + slippage
+COST_SEMANTICS = "commission+taxes+slippage"
+
+
+def cost_semantics_of(summary: dict | None) -> str:
+    """判断一条回测记录的成本口径版本。"""
+    if not summary:
+        return "legacy"
+    value = summary.get("cost_semantics")
+    return value if isinstance(value, str) and value else "legacy"
+
+
+def describe_cost_semantics(summary: dict | None) -> dict:
+    """给 API 返回可读的口径说明，避免新旧记录被无差别混算。"""
+    version = cost_semantics_of(summary)
+    if version == "legacy":
+        return {
+            "version": "legacy",
+            "includes_taxes": False,
+            "note": (
+                "历史记录：当时 stamp_duty_rate 与 transfer_fee_rate 均为 0，"
+                "total_cost = 佣金 + 滑点，与实际总成本数值一致"
+            ),
+        }
+    return {
+        "version": version,
+        "includes_taxes": True,
+        "note": "total_cost = 佣金 + 印花税 + 过户费 + 滑点",
+    }

@@ -23,6 +23,8 @@ def save_result(
     """写入回测记录；同一 run_id 重跑会覆盖该 run 的行，不覆盖历史 run。"""
     created = datetime.now().isoformat(timespec="seconds")
     check = reconcile(result.daily, result.trades, result.initial_cash)
+    from app.backtest.api import COST_SEMANTICS
+
     summary = {
         "performance": performance.as_dict(),
         "reconciliation": check,
@@ -30,6 +32,8 @@ def save_result(
         "snapshot_ids": result.snapshot_ids,
         "rules": {code: rule.__dict__ for code, rule in result.rules.items()},
         "notes": result.notes,
+        # 成本口径版本：新记录 total_cost 含佣金+印花税+过户费+滑点
+        "cost_semantics": COST_SEMANTICS,
     }
     with get_connection(db_path) as conn:
         conn.execute(

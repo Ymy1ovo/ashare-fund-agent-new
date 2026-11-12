@@ -1,5 +1,20 @@
 # 变更日志
 
+## 2026-11-12 — 阶段3A.2.1.1.2.1.1 绩效总成本漏计税费修复
+
+- **根因**：上一阶段把 `Trade.commission` 收窄为纯佣金后，
+  `metrics.compute_performance()` 的 `total_cost = total_commission + total_slippage`
+  未同步，漏掉印花税与过户费。实测 264 笔成交漏计 51,041.98 元（41.4%）。
+- `total_cost` 改为 `total_trade_fees + total_slippage`。
+- `Performance` 新增 `total_stamp_tax`、`total_transfer_fee`、`total_trade_fees`。
+- 报告绩效表改为分项列示（佣金/印花税/过户费/费用合计/滑点/总成本）；
+  交易明细表增加四列。
+- 新增 `COST_SEMANTICS` 常量与 `cost_semantics_of()` / `describe_cost_semantics()`，
+  新回测写入 `summary_json.cost_semantics`；历史记录标记为 `legacy`，
+  **不补造历史税费、不重算历史结果**。
+- 新增 `tests/test_cost_aggregation.py` 15 项，全量 322 → 337 项，全部通过。
+- 数据库结构无变更，无需迁移与快照。
+
 ## 2026-11-12 — 阶段3A.2.1.1.2.1 佣金与交易税费累计混用修复
 
 - **根因**：`broker.py` 把 `order.fee`（含印花税+过户费）当作「已收佣金」传给
