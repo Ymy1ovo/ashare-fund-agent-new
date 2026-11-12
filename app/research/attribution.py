@@ -641,8 +641,21 @@ def contamination_estimate(daily: list, breaks: list[dict], *, initial_cash: flo
                 base_price = prev.prices.get(item["code"])
                 if base_price is None:
                     continue
-                # 断点日原始收益相对复权收益多出（或少掉）的比例
-                extra = item["implied_ratio"] - 1
+                # 2026-11 修正：不能用 (implied_ratio - 1) 乘前一日市值。
+                # 正确关系（同一标的、同一日）：
+                #   原始收益 r_raw = (p1/p0 - 1)，复权收益 r_adj = (a1/a0 - 1)
+                #   混合因子隐含比 implied = (1+r_raw)/(1+r_adj)
+                # 被虚构的市值 = 持仓数量 x p0 x [(1+r_raw) - (1+r_adj)]
+                #              = 持仓数量 x p0 x (1+r_adj) x (implied - 1)
+                # 旧式漏掉了 (1+r_adj) 这一项，对小比例事件偏差很小，
+                # 但方法本身不严谨（对分红事件完全失效）。此处按正确式重算，
+                # 同时明确标记为「近似」，不作为正式修正绩效。
+                raw_ret = item.get("raw_return")
+                adj_ret = item.get("adjusted_return")
+                if raw_ret is None or adj_ret is None:
+                    extra = item["implied_ratio"] - 1
+                else:
+                    extra = float(raw_ret) - float(adj_ret)
                 fake += qty * float(base_price) * float(extra)
         cumulative += fake
         levels.append({
@@ -690,8 +703,11 @@ def contamination_estimate(daily: list, breaks: list[dict], *, initial_cash: flo
         "observed": _stats(nav),
         "estimated": _stats(corrected),
         "detail": affected,
+        "method": "nav-difference-v2（r_raw - r_adj 口径，替代旧 implied_ratio-1）",
+        "deprecated_previous_method": "implied_ratio - 1 直接乘前一日市值（3A.3.1 使用，已废弃）",
         "note": (
             "estimated 为部分均衡近似（未回放后续调仓反馈），"
-            "只能用于评估污染量级，不能作为修正后的正式绩效"
+            "只能用于评估污染量级，**不能作为修正后的正式绩效**。"
+            "正式结果见 reports/phase3A3_2_backtest_replay_report.md（完整回测重放）"
         ),
     }

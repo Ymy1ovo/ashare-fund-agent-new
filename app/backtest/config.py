@@ -134,6 +134,12 @@ class BacktestConfig:
     allow_partial_fill: bool = False
     rebalance_tolerance: float = 0.02       # 权重偏离小于该值不调仓
     cash_shortfall_policy: str = "reduce"  # reduce / reject
+    # 阶段3A.3.2：是否应用已确认的公司行为（拆分/合并/现金分红）。
+    # 关闭时退化为修复前的旧口径，用于回归对照；默认必须是 True。
+    apply_corporate_actions: bool = True
+    # 是否在 event 日立即把现金分红计入现金（True，默认）
+    # 若为 False 则只调整份额、不记分红现金（不得在生产回测中关闭）
+    apply_cash_distributions: bool = True
     costs: CostConfig = field(default_factory=CostConfig)
     instrument_overrides: dict[str, dict[str, Any]] = field(default_factory=dict)
     strategy_params: dict[str, Any] = field(default_factory=dict)

@@ -146,6 +146,56 @@ class Portfolio:
         self._assert_sane()
         return realized
 
+    # ---------- 公司行为 ----------
+    def apply_corporate_action(
+        self,
+        code: str,
+        new_quantity: int,
+        cash_delta: float,
+    ) -> None:
+        """按事件调整持仓数量与现金。
+
+        只在 Engine 已经算好目标数量与现金增量后调用；
+        本方法不判断事件合法性（由 corporate_actions 负责），只保证：
+        - 数量按比例缩放后，各批次同步缩放，成本基准随之反比调整，
+          使「持仓成本总额」在事件前后保持不变（经济价值连续）；
+        - 现金增量直接入账；
+        - 账本不变量在之后仍成立。
+        """
+        if new_quantity < 0:
+            raise PortfolioError(f"{code} 调整后数量不能为负：{new_quantity}")
+        position = self.positions.get(code)
+        if position is None:
+            if cash_delta:
+                self.cash += cash_delta
+            self._assert_sane()
+            return
+        old_quantity = position.quantity
+        if old_quantity <= 0:
+            if position.quantity == 0:
+                self.positions.pop(code, None)
+            if cash_delta:
+                self.cash += cash_delta
+            self._assert_sane()
+            return
+        if new_quantity > 0:
+            ratio = new_quantity / old_quantity
+            for lot in position.lots:
+                lot.quantity = int(round(lot.quantity * ratio))
+                if lot.price > 0:
+                    # 价格反比调整，保证 cost_basis × quantity 守恒
+                    lot.price = lot.price / ratio
+            # 舍入可能让批次总数与新数量有 1~2 份差异，用最后一笔补齐
+            diff = new_quantity - position.quantity
+            if diff and position.lots:
+                position.lots[-1].quantity += diff
+            position.lots = [lot for lot in position.lots if lot.quantity > 0]
+        else:
+            self.positions.pop(code, None)
+        if cash_delta:
+            self.cash += cash_delta
+        self._assert_sane()
+
     def _assert_sane(self) -> None:
         if self.cash < -1e-6:
             raise PortfolioError(f"现金为负：{self.cash:.2f}")

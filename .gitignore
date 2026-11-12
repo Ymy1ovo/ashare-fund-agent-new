@@ -112,3 +112,10 @@ data/entry_lock_*.json
 
 # ---- 阶段3A.3.1 研究运行产物 ----
 data/research_3a3_1*.json
+
+# 阶段3A.3.2 运行产物（可由 scripts/ 重建）
+data/corporate_action_*.json
+data/ca_*.json
+data/replay_3a3_2.json
+data/replay_validation_3a3_2.json
+data/backups/

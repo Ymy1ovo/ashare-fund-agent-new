@@ -73,8 +73,13 @@ def _input_hash(
     indicator_version: str | None,
     snapshot_ids: dict[str, int],
     data_hash: str,
+    *,
+    corporate_action_version: str | None = None,
 ) -> str:
-    """输入哈希：参数 + 策略 + ETF池 + 指标版本 + 快照 + 行情指纹。"""
+    """输入哈希：参数 + 策略 + ETF池 + 指标版本 + 快照 + 行情指纹 + 公司行为版本。
+
+    公司行为口径变化必须改变 input_hash，否则修复前后的结果无法区分。
+    """
     payload = {
         "config": config.as_dict(),
         "strategy": [strategy.name, strategy.version],
@@ -82,6 +87,9 @@ def _input_hash(
         "indicator_version": indicator_version,
         "snapshot_ids": dict(sorted(snapshot_ids.items())),
         "data": data_hash,
+        "corporate_action_version": (
+            corporate_action_version if config.apply_corporate_actions else "disabled"
+        ),
     }
     text = json.dumps(payload, ensure_ascii=False, sort_keys=True, default=str)
     return hashlib.sha256(text.encode("utf-8")).hexdigest()[:16]
@@ -129,6 +137,97 @@ class BacktestEngine:
         if not self.calendar:
             raise BacktestError("回测区间内没有交易日")
         self.notes: list[str] = []
+        # 阶段3A.3.2：公司行为应用日志与 run_id（run 开始时写入）
+        self.corporate_action_log: list[dict] = []
+        self._run_id_for_actions: str | None = None
+
+    def _load_corporate_actions(self, codes: list[str]) -> list:
+        """加载区间内已确认的公司行为事件；未确认事件不参与回测。
+
+        只读：不写数据库、不修改事件本身。
+        """
+        if not getattr(self.config, "apply_corporate_actions", True):
+            self.notes.append("公司行为：配置显式关闭（apply_corporate_actions=False）")
+            return []
+        from app.backtest.corporate_actions import load_actions
+
+        try:
+            actions = load_actions(
+                start=self.config.start_date,
+                end=self.config.end_date,
+                codes=list(codes),
+                db_path=self.db_path,
+            )
+        except Exception as exc:  # noqa: BLE001 事件表缺失时不应阻断回测
+            self.notes.append(f"公司行为：事件表不可用（{type(exc).__name__}），按旧口径回测")
+            return []
+        confirmed = [item for item in actions if item.is_confirmed]
+        unverified = [item for item in actions if not item.is_confirmed]
+        if unverified:
+            self.notes.append(
+                f"公司行为：{len(unverified)} 条未确认事件未应用（unverified_corporate_action）"
+            )
+        if confirmed:
+            self.notes.append(f"公司行为：已应用 {len(confirmed)} 条确认事件")
+        return confirmed
+
+    def _apply_corporate_actions(
+        self,
+        trade_date: date,
+        action_index: dict,
+        portfolio: Portfolio,
+        bars: dict[str, BarData],
+        rules: dict[str, InstrumentRule],
+    ) -> None:
+        """在 trade_date 应用当日生效的公司行为。
+
+        - 份额调整：新数量 = floor(旧数量 × 比例)，零碎部分按当日原始价折现金；
+        - 现金分红：现金 += 持仓 × 每份分红；
+        - 未确认 / other 类型：直接跳过并在 notes 中留痕；
+        - 同一事件对同一 run 只应用一次（由 record_application 唯一约束保证）。
+        """
+        actions = action_index.get(trade_date)
+        if not actions:
+            return
+        from app.backtest import corporate_actions as ca
+
+        for action in actions:
+            data = bars.get(action.code)
+            price = None
+            if data is not None and trade_date in data.frame.index:
+                close = data.frame.loc[trade_date, "close"]
+                if pd.notna(close) and float(close) > 0:
+                    price = float(close)
+            if price is None and data is not None:
+                history = data.frame.loc[data.frame.index <= trade_date, "close"].dropna()
+                if not history.empty:
+                    price = float(history.iloc[-1])
+
+            holding = portfolio.quantity(action.code)
+            if action.action_type == ca.ACTION_CASH_DISTRIBUTION and not getattr(
+                self.config, "apply_cash_distributions", True
+            ):
+                self.notes.append(
+                    f"公司行为：{action.code} {action.effective_date} 分红被配置关闭"
+                )
+                continue
+            try:
+                impact = ca.compute_impact(action, holding=holding, price=price)
+            except ca.CorporateActionError as exc:
+                self.notes.append(f"公司行为跳过 {action.code} {action.effective_date}：{exc}")
+                continue
+            if impact.shares_after == impact.shares_before and abs(impact.cash_delta) < 1e-12:
+                continue
+            portfolio.apply_corporate_action(
+                action.code, impact.shares_after, impact.cash_delta
+            )
+            if self._run_id_for_actions:
+                ca.record_application(
+                    run_id=self._run_id_for_actions,
+                    impact=impact,
+                    db_path=self.db_path,
+                )
+            self.corporate_action_log.append(impact.as_dict())
 
     def _load(self, codes: list[str]) -> dict[str, BarData]:
         bars: dict[str, BarData] = {}
@@ -337,6 +436,15 @@ class BacktestEngine:
                 raise BacktestError(f"多个 ETF 使用了不同指标版本：{sorted(resolved)}")
             indicator_version = resolved.pop() if resolved else indicator_version
 
+        # 阶段3A.3.2：加载本区间内的公司行为事件（只取已确认的）
+        actions = self._load_corporate_actions(self.codes)
+        from app.backtest.corporate_actions import DATA_VERSION as ca_version
+        resolved_run_id = run_id or uuid.uuid4().hex[:16]
+        self._run_id_for_actions = resolved_run_id
+        action_index: dict[date, list] = {}
+        for action in actions:
+            action_index.setdefault(action.effective_date, []).append(action)
+
         portfolio = Portfolio(initial_cash=self.config.initial_cash)
         broker = Broker(config=self.config, calendar=self.calendar)
         orders: list[Order] = []
@@ -348,6 +456,13 @@ class BacktestEngine:
         previous_nav: float | None = None
 
         for trade_date in self.calendar:
+            # 0) 公司行为：在开盘撮合之前调整持仓数量与现金。
+            #    净值在事件日自然连续：拆分后价格除以比例、数量乘回比例；
+            #    分红时价格除息下跌、现金等额补回。
+            self._apply_corporate_actions(
+                trade_date, action_index, portfolio, bars, rules
+            )
+
             # 1) 开盘撮合：只撮合 signal_date < trade_date 的订单
             executable = sorted(
                 [order for order in pending if order.signal_date < trade_date],
@@ -459,6 +574,7 @@ class BacktestEngine:
         input_hash = _input_hash(
             self.config, self.strategy, self.codes, indicator_version, snapshot_ids,
             _frame_hash(bars),
+            corporate_action_version=ca_version,
         )
         return BacktestResult(
             run_id=run_id or uuid.uuid4().hex[:16],

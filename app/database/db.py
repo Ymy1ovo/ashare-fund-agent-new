@@ -322,6 +322,53 @@ CREATE INDEX IF NOT EXISTS idx_bt_positions_run ON backtest_positions_daily(run_
 CREATE INDEX IF NOT EXISTS idx_bt_orders_status ON backtest_orders(run_id, status);
 """
 
+CORPORATE_ACTION_SCHEMA = """
+CREATE TABLE IF NOT EXISTS corporate_actions (
+    action_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    code TEXT NOT NULL,
+    action_type TEXT NOT NULL,
+    ex_date TEXT NOT NULL,
+    effective_date TEXT NOT NULL,
+    share_ratio REAL,
+    cash_per_share REAL,
+    record_date TEXT,
+    pay_date TEXT,
+    source TEXT NOT NULL,
+    evidence TEXT,
+    status TEXT NOT NULL DEFAULT 'unverified',
+    data_version TEXT NOT NULL DEFAULT 'ca-v1',
+    notes TEXT,
+    created_at TEXT NOT NULL,
+    updated_at TEXT NOT NULL,
+    UNIQUE(code, action_type, ex_date)
+);
+"""
+
+CORPORATE_ACTION_APPLICATIONS_SCHEMA = """
+CREATE TABLE IF NOT EXISTS corporate_action_applications (
+    application_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    run_id TEXT NOT NULL,
+    action_id INTEGER NOT NULL,
+    code TEXT NOT NULL,
+    effective_date TEXT NOT NULL,
+    action_type TEXT NOT NULL,
+    shares_before INTEGER NOT NULL,
+    shares_after INTEGER NOT NULL,
+    cash_delta REAL NOT NULL DEFAULT 0,
+    fractional_cash REAL NOT NULL DEFAULT 0,
+    applied_at TEXT NOT NULL,
+    UNIQUE(run_id, action_id)
+);
+"""
+
+CORPORATE_ACTION_INDEXES = """
+CREATE INDEX IF NOT EXISTS idx_ca_code_effective
+    ON corporate_actions(code, effective_date);
+CREATE INDEX IF NOT EXISTS idx_ca_status ON corporate_actions(status);
+CREATE INDEX IF NOT EXISTS idx_caa_run ON corporate_action_applications(run_id);
+CREATE INDEX IF NOT EXISTS idx_caa_action ON corporate_action_applications(action_id);
+"""
+
 UPSERT_PRICE_SQL = """
 INSERT INTO etf_daily_prices
     (code, trade_date, open, high, low, close, volume, amount,
@@ -444,6 +491,9 @@ def _migrate(conn: sqlite3.Connection) -> None:
 def init_db(db_path: Path | None = None) -> None:
     with get_connection(db_path) as conn:
         conn.executescript(SCHEMA)
+        conn.executescript(CORPORATE_ACTION_SCHEMA)
+        conn.executescript(CORPORATE_ACTION_APPLICATIONS_SCHEMA)
+        conn.executescript(CORPORATE_ACTION_INDEXES)
         _migrate(conn)
 
 
