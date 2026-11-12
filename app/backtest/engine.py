@@ -283,7 +283,11 @@ class BacktestEngine:
                 )
             else:
                 available = portfolio.available(code, signal_date)
-                quantity = sell_quantity(raw_quantity, available, rule.lot_size)
+                # 目标权重为 0 表示明确清仓：整手与零股合并成一笔申报
+                liquidate = target <= 1e-9
+                quantity = sell_quantity(
+                    raw_quantity, available, rule.lot_size, liquidate=liquidate
+                )
                 if quantity <= 0:
                     continue
                 seq += 1
@@ -299,6 +303,7 @@ class BacktestEngine:
                         reference_price=price,
                         seq=seq,
                         strategy=self.strategy.name,
+                        liquidate=liquidate,
                     )
                 )
         return orders

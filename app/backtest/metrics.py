@@ -106,6 +106,63 @@ def risk_return_series(
     return nav, usable.dropna(), statuses
 
 
+def return_sample_stats(daily: list["DailySnapshot"]) -> dict:
+    """统一的收益率样本统计口径。
+
+    全项目只有这一处定义，报告与压力测试都必须调用它，避免出现
+    「有效收益 256 / 269」这类互相矛盾的数字。
+
+    定义（互斥且可加总）：
+
+    - nav_days：每日快照总数
+    - first_day：首个交易日没有前值，不产生日收益
+    - held_price_gap：持仓 ETF 缺有效报价导致估值不完整
+    - prior_day_price_gap：前一交易日估值不完整，本日收益不可信
+    - missing_nav：净值缺失或前值为 0
+    - valid_return_days：可用日收益数量
+
+    恒等式：nav_days == first_day + held_price_gap + prior_day_price_gap
+                       + missing_nav + valid_return_days
+    """
+    if not daily:
+        return {
+            "nav_days": 0,
+            "first_day": 0,
+            "held_price_gap": 0,
+            "prior_day_price_gap": 0,
+            "missing_nav": 0,
+            "valid_return_days": 0,
+            "excluded_days": 0,
+            "identity_holds": True,
+            "definition": "return-sample-stats-v1",
+        }
+
+    _, _, statuses = risk_return_series(daily)
+    counts: dict[str, int] = {}
+    for item in statuses:
+        counts[item["return_status"]] = counts.get(item["return_status"], 0) + 1
+
+    nav_days = len(statuses)
+    first_day = counts.get("first_day", 0)
+    held_gap = counts.get("held_price_gap", 0)
+    prior_gap = counts.get("prior_day_price_gap", 0)
+    missing_nav = counts.get("missing_nav", 0)
+    valid = counts.get("ok", 0)
+    excluded = held_gap + prior_gap + missing_nav
+
+    return {
+        "nav_days": nav_days,
+        "first_day": first_day,
+        "held_price_gap": held_gap,
+        "prior_day_price_gap": prior_gap,
+        "missing_nav": missing_nav,
+        "valid_return_days": valid,
+        "excluded_days": excluded,
+        "identity_holds": nav_days == first_day + excluded + valid,
+        "definition": "return-sample-stats-v1",
+    }
+
+
 @dataclass
 class Performance:
     """回测绩效汇总。"""

@@ -505,6 +505,9 @@ def _build_regime_payload(
         engine = BacktestEngine(oos_cfg, oos_strategy, db_path=db_path)
         oos_result = engine.run(codes, indicator_version=config.indicator_version)
         oos_nav, oos_returns, oos_statuses = risk_return_series(oos_result.daily)
+        from app.backtest.metrics import return_sample_stats
+
+        oos_stats = return_sample_stats(oos_result.daily)
 
         # 构建带原始交易日索引的日收益序列：缺失日保留 NaN，绝不 dropna 后再统计
         index = pd.DatetimeIndex([pd.Timestamp(item.trade_date) for item in oos_result.daily])
@@ -553,10 +556,16 @@ def _build_regime_payload(
             "summary": regime_series.summary(),
             "stats": stats,
             "oos_return_diagnostics": {
-                "nav_days": len(oos_result.daily),
-                "valid_return_days": int(return_series.notna().sum()),
-                "gap_days_excluded": gap_days,
-                "NaN 保留在原始交易日索引上，未压缩缺失日": True,
+                "nav_days": oos_stats["nav_days"],
+                "first_day": oos_stats["first_day"],
+                "valid_return_days": oos_stats["valid_return_days"],
+                "gap_days_excluded": (
+                    oos_stats["held_price_gap"] + oos_stats["prior_day_price_gap"]
+                ),
+                "missing_nav": oos_stats["missing_nav"],
+                "identity_holds": oos_stats["identity_holds"],
+                "definition": oos_stats["definition"],
+                "presentation": "NaN 保留在原始交易日索引上，未压缩缺失日",
             },
         }
     except Exception as exc:
@@ -761,16 +770,21 @@ def _run_data_stress(
                 cfg, MovingAverageTrendStrategy(ma_window=best_window),
                 codes, config.indicator_version, copy_db,
             )
-            _, returns, statuses = risk_return_series(result.daily)
-            gap_days = sum(
-                1 for item in statuses
-                if item["return_status"] in ("held_price_gap", "prior_day_price_gap")
-            )
+            # 统一口径：所有计数来自 return_sample_stats()
+            from app.backtest.metrics import return_sample_stats
+
+            stats_counts = return_sample_stats(result.daily)
             evaluation = evaluate_sparse_result(
-                daily_rows=len(result.daily),
-                valid_return_days=int(len(returns)),
-                gap_days_excluded=gap_days,
+                daily_rows=stats_counts["nav_days"],
+                valid_return_days=stats_counts["valid_return_days"],
+                gap_days_excluded=(
+                    stats_counts["held_price_gap"]
+                    + stats_counts["prior_day_price_gap"]
+                ),
+                first_day_skipped=stats_counts["first_day"],
+                missing_nav_days=stats_counts["missing_nav"],
             )
+            evaluation["return_sample_stats"] = stats_counts
             return {
                 **base,
                 "status": evaluation["status"],
@@ -781,8 +795,11 @@ def _run_data_stress(
                     f"独立副本 {copy_info['copy_path']}；"
                     f"删除零散 {copy_info['removed_scattered']} 行、"
                     f"连续缺失 {copy_info['removed_blocks']} 行；"
-                    f"有效收益日 {evaluation['valid_return_days']}、"
-                    f"缺口日 {evaluation['gap_days_excluded']}"
+                    f"快照 {evaluation['daily_rows']} 天 = "
+                    f"首日 {evaluation['first_day_skipped']} + "
+                    f"缺口 {evaluation['gap_days_excluded']} + "
+                    f"缺净值 {evaluation['missing_nav_days']} + "
+                    f"有效 {evaluation['valid_return_days']}"
                 ),
             }
         except Exception as exc:

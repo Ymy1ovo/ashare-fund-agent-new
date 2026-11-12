@@ -219,23 +219,37 @@ def sparse_expectations() -> dict:
 
 
 def evaluate_sparse_result(
-    *, daily_rows: int, valid_return_days: int, gap_days_excluded: int
+    *,
+    daily_rows: int,
+    valid_return_days: int,
+    gap_days_excluded: int,
+    first_day_skipped: int = 1,
+    missing_nav_days: int = 0,
 ) -> dict:
-    """判定 sparse 场景结果是否符合约束。"""
+    """判定 sparse 场景结果是否符合约束。
+
+    所有计数来自 metrics.return_sample_stats() 的单一口径，
+    并在此处校验恒等式：
+        daily_rows == first_day + gap + missing_nav + valid
+    """
     problems: list[str] = []
     if daily_rows <= 0:
         problems.append("没有每日快照")
-    if valid_return_days > daily_rows:
-        problems.append("有效收益日数超过快照天数")
-    if valid_return_days + gap_days_excluded > daily_rows:
-        problems.append("有效收益日与缺口日之和超过快照天数")
+    total = first_day_skipped + gap_days_excluded + missing_nav_days + valid_return_days
+    if total != daily_rows:
+        problems.append(
+            f"样本口径不可加总：{first_day_skipped} + {gap_days_excluded} + "
+            f"{missing_nav_days} + {valid_return_days} = {total} != {daily_rows}"
+        )
     return {
         "status": "success" if not problems else "failed",
         "daily_rows": daily_rows,
+        "first_day_skipped": first_day_skipped,
         "valid_return_days": valid_return_days,
         "gap_days_excluded": gap_days_excluded,
-        "nan_days": daily_rows - valid_return_days - gap_days_excluded,
+        "missing_nav_days": missing_nav_days,
         "problems": problems,
+        "definition": "return-sample-stats-v1",
     }
 
 

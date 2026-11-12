@@ -29,10 +29,50 @@ class CostBreakdown:
 
 
 def commission(gross_amount: float, config: CostConfig) -> float:
-    """佣金 = max(成交金额 × 费率, 最低佣金)；成交金额为 0 时不计。"""
+    """单笔佣金 = max(成交金额 × 费率, 最低佣金)；成交金额为 0 时不计。
+
+    这是「按笔」模型，仅在 min_commission_model="per_fill" 时直接使用。
+    默认模型是 per_order，见 incremental_commission()。
+    """
     if gross_amount <= 0:
         return 0.0
     return max(gross_amount * config.commission_rate, config.min_commission)
+
+
+def order_commission(cumulative_gross: float, config: CostConfig) -> float:
+    """按「委托订单累计成交金额」计算的应收佣金总额。
+
+    本项目默认模型（min_commission_model="per_order"）：
+        订单累计应收佣金 = max(累计成交金额 × 费率, 最低佣金)
+    同一 order_id 的多次分笔成交共用这一份额度。
+    """
+    if cumulative_gross <= 0:
+        return 0.0
+    return max(cumulative_gross * config.commission_rate, config.min_commission)
+
+
+def incremental_commission(
+    cumulative_gross: float,
+    already_charged: float,
+    config: CostConfig,
+    *,
+    fill_gross: float,
+    model: str | None = None,
+) -> float:
+    """本次成交应当新增收取的佣金。
+
+    model:
+      - "per_order"（默认）：按订单累计金额算应收总额，扣除已收部分
+      - "per_fill"：每笔成交独立计算 max(金额×费率, 最低佣金)
+    """
+    resolved = model or getattr(config, "min_commission_model", "per_order")
+    if resolved == "per_fill":
+        return commission(fill_gross, config)
+    if resolved != "per_order":
+        raise ValueError(f"未知的 min_commission_model：{resolved}")
+    due = order_commission(cumulative_gross, config)
+    # 浮点误差保护：增量不为负
+    return max(0.0, due - float(already_charged))
 
 
 def slippage_price(base_price: float, side: str, config: CostConfig) -> float:
@@ -93,29 +133,41 @@ def round_lot(quantity: float, lot_size: int, allow_odd: bool = False) -> int:
     return int(math.floor(quantity / lot_size) * lot_size)
 
 
-def sell_quantity(raw_quantity: float, available: int, lot_size: int) -> int:
-    """卖单申报数量：整手优先，清仓时才允许一次性卖出剩余碎股。
+def sell_quantity(
+    raw_quantity: float,
+    available: int,
+    lot_size: int,
+    *,
+    liquidate: bool = False,
+) -> int:
+    """卖单申报数量。
 
-    ETF 规则：
-    - 卖出通常以整手（默认 100 份）为申报单位；
-    - 若账户持仓不足整手（除权、送股、此前部分成交留下的零股），
-      允许一次性全部卖出，不留零股。
+    两条规则必须分开判断，不能只看「是否超过 100 份」：
 
-    因此这里只在「可卖数量本身就是最终可卖全部」时才允许非整手，
-    避免策略每次算出 130399.7 就申报 130399、留 1 股碎股。
+    - 全部清仓（liquidate=True）：申报全部可卖数量，整手与零股合并成**一笔**，
+      零股不得单独拆单。这样 130400 份持仓在策略算出 130399.7 时也是
+      「一次卖掉 130400」，不会残留 1 份。
+    - 部分减仓（liquidate=False）：按整手向下取整；只有当可卖数量本身
+      不足一手时，才允许整笔卖出该零股。
+
+    任何分支都保证返回值 <= available。
     """
     if raw_quantity <= 0 or available <= 0:
         return 0
     if lot_size <= 0:
         raise ValueError("lot_size 必须为正")
 
-    want = int(math.floor(min(raw_quantity, available)))
+    available = int(available)
+    if liquidate:
+        # 清仓：整手 + 零股合并申报，一次卖完
+        return available
+
+    want = int(math.floor(min(float(raw_quantity), available)))
     if want <= 0:
         return 0
 
     lots = int(want // lot_size) * lot_size
     if lots > 0:
-        # 整手部分足够 → 按整手申报
         return lots
-    # 可卖数量不足一手 → 只能整笔卖出剩余零股
+    # 可卖数量不足一手 → 整笔卖掉这份零股
     return min(want, available)

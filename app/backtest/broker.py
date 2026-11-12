@@ -10,7 +10,13 @@ from dataclasses import dataclass, field
 from datetime import date
 
 from app.backtest.config import BacktestConfig, InstrumentRule
-from app.backtest.costs import commission, round_lot, sell_quantity, slippage_cost, taxes
+from app.backtest.costs import (
+    incremental_commission,
+    round_lot,
+    sell_quantity,
+    slippage_cost,
+    taxes,
+)
 from app.backtest.execution import Quote, available_date, fill_price
 from app.backtest.models import Order, Trade
 from app.backtest.portfolio import Portfolio
@@ -51,15 +57,33 @@ class Broker:
         self._trade_seq += 1
         return self._trade_seq
 
-    def _max_affordable(self, portfolio: Portfolio, price: float, rule: InstrumentRule) -> int:
-        """按含佣金后的现金上限反推最大可买股数，再按整手取整。"""
+    def _max_affordable(
+        self,
+        portfolio: Portfolio,
+        price: float,
+        rule: InstrumentRule,
+        order: Order | None = None,
+    ) -> int:
+        """按含佣金后的现金上限反推最大可买股数，再按整手取整。
+
+        佣金按订单累计模型计算：若该订单已有成交，本次只需补收
+        「累计应收 - 已收」，不能用全额最低佣金重复判断，否则会低估可买量。
+        """
         if price <= 0:
             return 0
-        candidate = int(portfolio.cash // (price * (1 + self.config.costs.commission_rate)))
+        already_charged = float(order.fee) if order is not None else 0.0
+        prior_gross = float(order.gross_amount) if order is not None else 0.0
+        commission_rate = self.config.costs.commission_rate
+        candidate = int(portfolio.cash // (price * (1 + commission_rate)))
         candidate = round_lot(candidate, rule.lot_size)
         while candidate > 0:
             gross = candidate * price
-            fee = commission(gross, self.config.costs)
+            fee = incremental_commission(
+                prior_gross + gross,
+                already_charged,
+                self.config.costs,
+                fill_gross=gross,
+            )
             if gross + fee <= portfolio.cash + 1e-6:
                 return candidate
             candidate -= rule.lot_size
@@ -112,7 +136,7 @@ class Broker:
             want = round_lot(remaining, rule.lot_size)
             if want <= 0:
                 return self._terminate(order, 'zero_quantity', 'rejected')
-            affordable = self._max_affordable(portfolio, price, rule)
+            affordable = self._max_affordable(portfolio, price, rule, order)
             if affordable < want:
                 if self.config.cash_shortfall_policy == 'reject' or affordable <= 0:
                     return self._terminate(order, 'insufficient_cash', 'rejected')
@@ -127,8 +151,11 @@ class Broker:
             # 卖出：可卖量不足时，按配置决定「部分成交」还是「整单拒绝」
             if remaining > available and not self.config.allow_partial_fill:
                 return self._terminate(order, 'insufficient_position', 'rejected')
-            # 卖出：整手申报；只有「可卖数量不足一手」时才整笔清掉零股
-            quantity = sell_quantity(min(remaining, available), available, rule.lot_size)
+            # 卖出：清仓单整手+零股合并申报；部分减仓按整手
+            quantity = sell_quantity(
+                min(remaining, available), available, rule.lot_size,
+                liquidate=bool(order.liquidate),
+            )
             if quantity <= 0:
                 return self._terminate(order, 'insufficient_position', 'rejected')
             if quantity < remaining:
@@ -140,7 +167,14 @@ class Broker:
             return self._terminate(order, 'zero_quantity', 'rejected')
 
         gross = quantity * price
-        fee = commission(gross, self.config.costs)
+        # 佣金按订单累计模型计算：同一 order_id 的多次成交共用最低佣金额度
+        cumulative_gross = float(order.gross_amount) + gross
+        fee = incremental_commission(
+            cumulative_gross,
+            order.fee,
+            self.config.costs,
+            fill_gross=gross,
+        )
         stamp, transfer = taxes(gross, self.config.costs)
         fee += stamp + transfer
         reference = quote.open if self.config.execution_price == 'open' else quote.close
@@ -200,6 +234,7 @@ class Broker:
         order.filled_quantity += quantity
         order.fill_date = trade_date
         order.fill_price = price
+        order.gross_amount += gross
         order.fee += fee
         order.slippage_cost += slip
         # 只有累计成交量达到原始委托量才算 filled，否则严格保留 partial

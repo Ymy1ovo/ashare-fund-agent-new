@@ -189,10 +189,14 @@ def render_validation_report(result) -> str:
         diagnostics = regime.get("oos_return_diagnostics") or {}
         if diagnostics:
             lines.append(
-                f"OOS 日收益诊断：快照 {diagnostics.get('nav_days')} 天，"
-                f"有效日收益 {diagnostics.get('valid_return_days')} 天，"
-                f"持仓缺价排除 {diagnostics.get('gap_days_excluded')} 天；"
-                f"NaN 保留在原始交易日索引上，未压缩缺失日。"
+                f"OOS 日收益诊断（口径 `{diagnostics.get('definition')}`）："
+                f"快照 {diagnostics.get('nav_days')} 天 = "
+                f"首日 {diagnostics.get('first_day')} + "
+                f"缺口 {diagnostics.get('gap_days_excluded')} + "
+                f"缺净值 {diagnostics.get('missing_nav')} + "
+                f"有效 {diagnostics.get('valid_return_days')}"
+                f"（可加总：{diagnostics.get('identity_holds')}）。"
+                f"缺失日保留 NaN，未压缩。"
             )
             lines.append("")
         lines.append("| 环境 | 区间交易日 | 有效日收益 | 缺失日 | 状态 | 累计收益 | 胜率 | 年化波动率 |")
@@ -310,9 +314,10 @@ def render_validation_report(result) -> str:
                 for key, label in (
                     ("daily_rows", "快照"),
                     ("trading_days", "交易日"),
-                    ("valid_return_days", "有效收益"),
+                    ("first_day_skipped", "首日"),
                     ("gap_days_excluded", "缺口"),
-                    ("nan_days", "NaN"),
+                    ("missing_nav_days", "缺净值"),
+                    ("valid_return_days", "有效收益"),
                 ):
                     value = evaluation.get(key)
                     if value is not None:

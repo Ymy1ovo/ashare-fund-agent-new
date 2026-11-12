@@ -388,14 +388,23 @@ def test_sparse_copy_actually_removes_rows(temp_db) -> None:
 
 
 def test_sparse_evaluation_flags_bad_counts() -> None:
+    """口径必须可加总：首日 + 缺口 + 缺净值 + 有效 == 快照天数。"""
     from app.validation.stress import evaluate_sparse_result
 
-    ok = evaluate_sparse_result(daily_rows=100, valid_return_days=80, gap_days_excluded=10)
+    # 100 = 首日 1 + 缺口 10 + 缺净值 9 + 有效 80
+    ok = evaluate_sparse_result(
+        daily_rows=100, valid_return_days=80, gap_days_excluded=10,
+        first_day_skipped=1, missing_nav_days=9,
+    )
     assert ok["status"] == "success"
 
-    bad = evaluate_sparse_result(daily_rows=10, valid_return_days=100, gap_days_excluded=0)
+    # 不可加总 → 判失败
+    bad = evaluate_sparse_result(
+        daily_rows=10, valid_return_days=100, gap_days_excluded=0,
+        first_day_skipped=1, missing_nav_days=0,
+    )
     assert bad["status"] == "failed"
-    assert any("超过" in problem for problem in bad["problems"])
+    assert any("不可加总" in problem for problem in bad["problems"])
 
 
 def test_insufficient_evaluation_requires_low_sample() -> None:

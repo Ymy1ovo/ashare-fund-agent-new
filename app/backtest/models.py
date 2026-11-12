@@ -34,10 +34,13 @@ class Order:
     fill_price: float | None = None
     fee: float = 0.0
     slippage_cost: float = 0.0
+    gross_amount: float = 0.0
     reason: str | None = None
     deferred_days: int = 0
     seq: int = 0
     strategy: str | None = None
+    # 是否整笔清仓：为 True 时整手与零股合并成一笔申报，不拆零股
+    liquidate: bool = False
 
     @property
     def remaining_quantity(self) -> int:
@@ -48,6 +51,16 @@ class Order:
     def has_fill(self) -> bool:
         """是否已经产生过真实成交。"""
         return int(self.filled_quantity) > 0
+
+    @property
+    def filled_gross_amount(self) -> float:
+        """订单累计成交金额（用于按订单计算佣金）。"""
+        return float(self.gross_amount)
+
+    @property
+    def remaining_quantity_after_liquidation(self) -> int:
+        """清仓意图下应为 0；仅用于测试断言可读性。"""
+        return self.remaining_quantity
 
     def sync_status(self, terminal: str | None = None) -> str:
         """按统一规则收敛订单状态，Engine 与 Broker 共用。

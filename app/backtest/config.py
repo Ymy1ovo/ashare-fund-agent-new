@@ -30,6 +30,11 @@ class CostConfig:
     slippage_fixed: float = 0.0
     stamp_duty_rate: float = 0.0
     transfer_fee_rate: float = 0.0
+    # 最低佣金模型：
+    #   per_order（默认）：同一订单多次成交共用一份最低佣金额度，
+    #                      按订单累计成交金额计算应收佣金
+    #   per_fill：每笔成交独立收取 max(金额×费率, 最低佣金)
+    min_commission_model: str = "per_order"
 
     def validate(self) -> None:
         if self.commission_rate < 0:
@@ -44,6 +49,10 @@ class CostConfig:
             raise BacktestConfigError("stamp_duty_rate 超出合理范围")
         if not 0 <= self.transfer_fee_rate < 0.01:
             raise BacktestConfigError("transfer_fee_rate 超出合理范围")
+        if self.min_commission_model not in ("per_order", "per_fill"):
+            raise BacktestConfigError(
+                "min_commission_model 只能是 per_order 或 per_fill"
+            )
 
 
 @dataclass(frozen=True)
