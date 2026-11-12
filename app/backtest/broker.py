@@ -71,7 +71,8 @@ class Broker:
         """
         if price <= 0:
             return 0
-        already_charged = float(order.fee) if order is not None else 0.0
+        # 只把「已收佣金」作为基数，税费不计入
+        already_charged = float(order.commission) if order is not None else 0.0
         prior_gross = float(order.gross_amount) if order is not None else 0.0
         commission_rate = self.config.costs.commission_rate
         candidate = int(portfolio.cash // (price * (1 + commission_rate)))
@@ -84,7 +85,9 @@ class Broker:
                 self.config.costs,
                 fill_gross=gross,
             )
-            if gross + fee <= portfolio.cash + 1e-6:
+            # 买入也要付过户费（印花税通常为 0），必须一并计入现金约束
+            stamp, transfer = taxes(gross, self.config.costs)
+            if gross + fee + stamp + transfer <= portfolio.cash + 1e-6:
                 return candidate
             candidate -= rule.lot_size
         return 0
@@ -167,16 +170,18 @@ class Broker:
             return self._terminate(order, 'zero_quantity', 'rejected')
 
         gross = quantity * price
-        # 佣金按订单累计模型计算：同一 order_id 的多次成交共用最低佣金额度
+        # 佣金按订单累计模型计算，且只用「此前已收佣金」做基数，
+        # 绝不把印花税/过户费混入 previously_paid_commission。
         cumulative_gross = float(order.gross_amount) + gross
-        fee = incremental_commission(
+        commission_delta = incremental_commission(
             cumulative_gross,
-            order.fee,
+            order.commission,
             self.config.costs,
             fill_gross=gross,
         )
+        # 税费按本次成交金额独立计算，不参与最低佣金取 max
         stamp, transfer = taxes(gross, self.config.costs)
-        fee += stamp + transfer
+        fee = commission_delta + stamp + transfer
         reference = quote.open if self.config.execution_price == 'open' else quote.close
         slip = slippage_cost(reference, price, quantity, order.side)
 
@@ -224,8 +229,10 @@ class Broker:
             quantity=quantity,
             price=price,
             gross_amount=gross,
-            commission=fee,
+            commission=commission_delta,
             slippage_cost=slip,
+            stamp_tax=stamp,
+            transfer_fee=transfer,
             realized_pnl=realized,
             holding_days=holding_days,
             cash_after=portfolio.cash,
@@ -235,7 +242,11 @@ class Broker:
         order.fill_date = trade_date
         order.fill_price = price
         order.gross_amount += gross
-        order.fee += fee
+        order.commission += commission_delta
+        order.stamp_tax += stamp
+        order.transfer_fee += transfer
+        # fee 保持「累计全部交易费用」语义，按分项累加，避免浮点漂移
+        order.fee = order.total_fees
         order.slippage_cost += slip
         # 只有累计成交量达到原始委托量才算 filled，否则严格保留 partial
         order.sync_status()

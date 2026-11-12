@@ -110,8 +110,9 @@ def save_result(
             INSERT INTO backtest_orders
                 (run_id, order_id, code, side, signal_date, order_date, fill_date,
                  quantity, filled_quantity, remaining_quantity, fill_price, status, reason,
-                 deferred_days, fee, slippage_cost, reference_price, target_weight, strategy, created_at)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                 deferred_days, commission, stamp_tax, transfer_fee, fee, slippage_cost,
+                 reference_price, target_weight, strategy, created_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """,
             [
                 (
@@ -120,6 +121,7 @@ def save_result(
                     order.fill_date.isoformat() if order.fill_date else None,
                     order.quantity, order.filled_quantity, order.remaining_quantity,
                     order.fill_price, order.status, order.reason, order.deferred_days,
+                    order.commission, order.stamp_tax, order.transfer_fee,
                     order.fee, order.slippage_cost, order.reference_price,
                     order.target_weight, order.strategy, created,
                 )
@@ -130,15 +132,16 @@ def save_result(
             """
             INSERT INTO backtest_trades
                 (run_id, trade_id, order_id, code, side, trade_date, quantity,
-                 price, gross_amount, commission, slippage_cost, realized_pnl,
-                 holding_days, cash_after, created_at)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                 price, gross_amount, commission, stamp_tax, transfer_fee,
+                 slippage_cost, realized_pnl, holding_days, cash_after, created_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """,
             [
                 (
                     result.run_id, trade.trade_id, trade.order_id, trade.code,
                     trade.side, trade.trade_date.isoformat(), trade.quantity,
                     trade.price, trade.gross_amount, trade.commission,
+                    trade.stamp_tax, trade.transfer_fee,
                     trade.slippage_cost, trade.realized_pnl, trade.holding_days,
                     trade.cash_after, created,
                 )

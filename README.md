@@ -1,6 +1,6 @@
 # A股基金量化分析 Agent
 
-面向中国 A 股 ETF / 指数基金的个人量化研究项目。当前完成 **阶段1A（环境、数据源、观察池）**、**阶段1B（历史行情持久化、增量同步、行情 API、数据看板）**、**阶段1B.1（完整前复权刷新与调整快照一致性）**、**阶段2（统一价格口径与量化指标引擎）**、**阶段2.1（CAGR交易日口径与EMA/MACD断点修复）**、**阶段2.2（区间风险统计缺失交易日修复）**、**阶段3A（A股ETF历史回测引擎 V1.0）** 和 **阶段3A.1（风险口径与部分成交修复）** 、**阶段3A.1.1（部分成交状态逻辑专项修复）**、**阶段3A.2（策略可信度验证体系）**、**阶段3A.2.1（验证体系缺陷整改）**、**阶段3A.2.1.1（全池压力测试阻塞修复）** 和 **阶段3A.2.1.1.2（佣金累计模型与零碎股清仓修复）**。
+面向中国 A 股 ETF / 指数基金的个人量化研究项目。当前完成 **阶段1A（环境、数据源、观察池）**、**阶段1B（历史行情持久化、增量同步、行情 API、数据看板）**、**阶段1B.1（完整前复权刷新与调整快照一致性）**、**阶段2（统一价格口径与量化指标引擎）**、**阶段2.1（CAGR交易日口径与EMA/MACD断点修复）**、**阶段2.2（区间风险统计缺失交易日修复）**、**阶段3A（A股ETF历史回测引擎 V1.0）** 和 **阶段3A.1（风险口径与部分成交修复）** 、**阶段3A.1.1（部分成交状态逻辑专项修复）**、**阶段3A.2（策略可信度验证体系）**、**阶段3A.2.1（验证体系缺陷整改）**、**阶段3A.2.1.1（全池压力测试阻塞修复）**、**阶段3A.2.1.1.2（佣金累计模型与零碎股清仓修复）** 和 **阶段3A.2.1.1.2.1（佣金与税费累计混用修复）**。
 
 > 仅用于研究，不构成投资建议；不接入券商交易接口，不自动实盘交易。
 
@@ -24,7 +24,7 @@
 - 行情摘要 API、按代码行情查询 API（日期范围、limit/offset）
 - 调整快照一致性检查与数据质量报告
 - 历史回测引擎：T+1 撮合、FIFO 账本、交易成本、绩效报告
-- 离线单元/集成测试 310 项（含156项策略验证测试）
+- 离线单元/集成测试 322 项（含168项策略验证测试）
 - 不含 `.venv`、缓存和 `.env` 的交付 ZIP
 
 ## 2. 环境与依赖
@@ -795,3 +795,58 @@ nav_days = first_day + held_price_gap + prior_day_price_gap + missing_nav + vali
 
 报告：`reports/phase3A2_1_1_2_design.md`、`reports/phase3A2_1_1_2_test_report.md`、
 `reports/phase3A2_1_1_2_validation_report.md`
+
+## 25. 阶段3A.2.1.1.2.1 佣金与交易税费分离
+
+### 修复的问题
+
+`broker.py` 曾把 `order.fee`（含税费）当作「已收佣金」传给 `incremental_commission()`，
+导致部分成交时少收佣金。
+
+| 成交 | 累计金额 | 应收佣金 | 传入已收 | 实际增量 | 应收增量 |
+| ---: | ---: | ---: | ---: | ---: | ---: |
+| 1 | 10,000 | 5.00 | 0 | 5.00 | 5.00 |
+| 2 | 20,000 | 6.00 | 10.10 | **0.00** | **1.00** |
+
+### 字段语义
+
+| 层级 | 字段 | 含义 |
+| --- | --- | --- |
+| Order | `commission` | 累计佣金（不含税费） |
+| Order | `stamp_tax` / `transfer_fee` | 累计印花税 / 过户费 |
+| Order | `fee` | 累计全部费用 = 三项之和 |
+| Trade | `commission` | **只含佣金** |
+| Trade | `stamp_tax` / `transfer_fee` / `total_fees` | 税费与总费用 |
+
+### 佣金公式
+
+```python
+commission_due   = max(order.gross_amount + gross) × rate, min_commission)
+commission_delta = max(0, commission_due - order.commission)
+stamp            = gross × stamp_rate
+transfer         = gross × transfer_fee_rate
+fee              = commission_delta + stamp + transfer
+```
+
+### 数据库
+
+新增 5 列（`migrations/phase3a2_1_1_2_1_fee_split.sql`）：
+`backtest_orders.commission/stamp_tax/transfer_fee`、
+`backtest_trades.stamp_tax/transfer_fee`。
+
+历史订单 `commission` 回填为 `fee`（前提：旧 `stamp_duty_rate` 与
+`transfer_fee_rate` 均为 0，已逐条实测确认）。旧列全部保留。
+
+### 验证
+
+| 项目 | 结果 |
+| --- | ---: |
+| 全量测试 | **322 passed** |
+| 原有 310 项 | 全部保留通过 |
+| 新增 12 项 | 全部通过 |
+| 真实数据对账 | 264 笔成交四项全部一致 |
+| `reconcile` 期末现金 | 修复前差 51,041.98 → 修复后 True |
+| 行情指纹 | 前后一致 |
+
+报告：`reports/phase3A2_1_1_2_1_design.md`、`reports/phase3A2_1_1_2_1_test_report.md`、
+`reports/phase3A2_1_1_2_1_validation_report.md`

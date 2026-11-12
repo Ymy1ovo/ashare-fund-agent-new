@@ -375,7 +375,8 @@ def reconcile(
         cash_flow = 0.0
         for trade in trades:
             sign = -1 if trade.side == "buy" else 1
-            cash_flow += sign * trade.gross_amount - trade.commission
+            # 现金变动 = 成交金额 - 全部交易费用（佣金 + 印花税 + 过户费）
+            cash_flow += sign * trade.gross_amount - trade.total_fees
         expected_cash = initial_cash + cash_flow
         if abs(expected_cash - daily[-1].cash) > 1e-4:
             errors.append(
@@ -386,4 +387,6 @@ def reconcile(
             errors.append(f"成交数量非正：trade={trade.trade_id}")
         if trade.commission < 0 or trade.slippage_cost < 0:
             errors.append(f"成交成本为负：trade={trade.trade_id}")
+        if trade.stamp_tax < 0 or trade.transfer_fee < 0:
+            errors.append(f"交易税费为负：trade={trade.trade_id}")
     return {"ok": not errors, "errors": errors}

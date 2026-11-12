@@ -265,6 +265,9 @@ CREATE TABLE IF NOT EXISTS backtest_orders (
     status TEXT NOT NULL,
     reason TEXT,
     deferred_days INTEGER NOT NULL DEFAULT 0,
+    commission REAL NOT NULL DEFAULT 0,
+    stamp_tax REAL NOT NULL DEFAULT 0,
+    transfer_fee REAL NOT NULL DEFAULT 0,
     fee REAL NOT NULL DEFAULT 0,
     slippage_cost REAL NOT NULL DEFAULT 0,
     reference_price REAL,
@@ -285,6 +288,8 @@ CREATE TABLE IF NOT EXISTS backtest_trades (
     price REAL NOT NULL,
     gross_amount REAL NOT NULL,
     commission REAL NOT NULL,
+    stamp_tax REAL NOT NULL DEFAULT 0,
+    transfer_fee REAL NOT NULL DEFAULT 0,
     slippage_cost REAL NOT NULL,
     realized_pnl REAL NOT NULL DEFAULT 0,
     holding_days REAL,
@@ -421,6 +426,18 @@ def _migrate(conn: sqlite3.Connection) -> None:
     _add_column_if_missing(conn, "etf_indicator_daily", "adjusted_close", "REAL")
     # 阶段3A.1：订单剩余未成交数量（独立迁移 migrations/phase3a1_backtest_partial_fill.sql）
     _add_column_if_missing(conn, "backtest_orders", "remaining_quantity", "INTEGER")
+    # 阶段3A.2.1.1.2.1：佣金与税费分离
+    # （独立迁移 migrations/phase3a2_1_1_2_1_fee_split.sql）
+    for table in ("backtest_orders", "backtest_trades"):
+        _add_column_if_missing(conn, table, "stamp_tax", "REAL NOT NULL DEFAULT 0")
+        _add_column_if_missing(conn, table, "transfer_fee", "REAL NOT NULL DEFAULT 0")
+    _add_column_if_missing(conn, "backtest_orders", "commission", "REAL NOT NULL DEFAULT 0")
+    # 历史订单的 fee 语义等于佣金（当时 stamp_duty_rate 与 transfer_fee_rate 均为 0），
+    # 因此 commission 回填为 fee。仅对「commission 尚未写入」的旧行生效。
+    conn.execute(
+        "UPDATE backtest_orders SET commission = fee "
+        "WHERE commission = 0 AND fee > 0"
+    )
     conn.executescript(INDEXES)
 
 

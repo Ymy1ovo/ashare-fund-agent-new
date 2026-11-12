@@ -1,5 +1,21 @@
 # 变更日志
 
+## 2026-11-12 — 阶段3A.2.1.1.2.1 佣金与交易税费累计混用修复
+
+- **根因**：`broker.py` 把 `order.fee`（含印花税+过户费）当作「已收佣金」传给
+  `incremental_commission()`，税费被当成佣金，导致后续部分成交少收佣金。
+  实例：10000+10000 两笔成交，第二笔应补收 1.00 元佣金，实际收 0。
+- 隐藏原因：11 次历史回测的 `stamp_duty_rate` 与 `transfer_fee_rate` 均为 0，
+  `order.fee` 恰等于佣金，缺陷未暴露。
+- `Order` 新增 `commission`、`stamp_tax`、`transfer_fee` 与 `total_fees` property。
+- `Trade` 的 `commission` 语义收敛为**只含佣金**，新增 `stamp_tax`、`transfer_fee`、`total_fees`。
+- `_max_affordable()` 佣金基数改用 `order.commission`，并把税费纳入现金约束。
+- `reconcile()` 期末现金推演改用 `trade.total_fees`；真实回测差值 51,041.98 元问题消除。
+- 新增迁移 `migrations/phase3a2_1_1_2_1_fee_split.sql`，加列不删列，历史订单
+  `commission` 回填为 `fee`（前提：旧税率均为 0，已实测确认）。
+- 新增 `tests/test_fee_split.py` 12 项（场景 A–H），全量 310 → 322 项，全部通过。
+- 交付新 data-snapshot；行情指纹 `d54727c0...ac49` 前后一致，历史记录全部保留。
+
 ## 2026-11-12 — 阶段3A.2.1.1.2 佣金累计模型与零碎股清仓修复
 
 - **最低佣金按订单累计**：新增 `CostConfig.min_commission_model`（默认 `per_order`）。

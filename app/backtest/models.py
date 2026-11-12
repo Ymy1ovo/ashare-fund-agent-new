@@ -32,6 +32,14 @@ class Order:
     filled_quantity: int = 0
     fill_date: date | None = None
     fill_price: float | None = None
+    # 费用字段语义（阶段3A.2.1.1.2.1 起严格分离）：
+    #   commission    累计佣金（含最低佣金规则，不含税费）
+    #   stamp_tax     累计印花税
+    #   transfer_fee  累计过户费
+    #   fee           累计全部交易费用 = commission + stamp_tax + transfer_fee
+    commission: float = 0.0
+    stamp_tax: float = 0.0
+    transfer_fee: float = 0.0
     fee: float = 0.0
     slippage_cost: float = 0.0
     gross_amount: float = 0.0
@@ -51,6 +59,11 @@ class Order:
     def has_fill(self) -> bool:
         """是否已经产生过真实成交。"""
         return int(self.filled_quantity) > 0
+
+    @property
+    def total_fees(self) -> float:
+        """订单累计全部交易费用（佣金 + 印花税 + 过户费）。"""
+        return float(self.commission) + float(self.stamp_tax) + float(self.transfer_fee)
 
     @property
     def filled_gross_amount(self) -> float:
@@ -107,10 +120,18 @@ class Trade:
     holding_days: float = 0.0
     cash_after: float = 0.0
     reason: str | None = None
+    stamp_tax: float = 0.0
+    transfer_fee: float = 0.0
+
+    @property
+    def total_fees(self) -> float:
+        """本笔成交的全部交易费用（佣金 + 印花税 + 过户费）。"""
+        return float(self.commission) + float(self.stamp_tax) + float(self.transfer_fee)
 
     def as_dict(self) -> dict[str, Any]:
         payload = asdict(self)
         payload["trade_date"] = self.trade_date.isoformat()
+        payload["total_fees"] = self.total_fees
         return payload
 
 
