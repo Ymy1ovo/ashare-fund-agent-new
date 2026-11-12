@@ -106,3 +106,6 @@ data/concurrency_failure.json
 sens_all_*/
 sens_representative_*/
 data/.validation_write.lock
+
+# ---- 阶段3A.2.1.2.2 入口锁运行产物 ----
+data/entry_lock_*.json

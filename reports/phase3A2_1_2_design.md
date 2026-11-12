@@ -129,7 +129,7 @@ SQLite  ：busy_timeout=5000，单写者
 | `app/validation/sell_probe.py` | **新增** | 受控库构造与完整链路执行 |
 | `scripts/run_sensitivity_scan.py` | **新增** | 敏感性扫描 CLI |
 | `tests/test_reliability.py` | **新增** | 14 项专项测试（阶段3A.2.1.2） |
-| `tests/test_final_acceptance.py` | **新增** | 14 项专项测试（阶段3A.2.1.2.1） |
+| `tests/test_final_acceptance.py` | **新增** | 18 项专项测试（3A.2.1.2.1 的 14 项 + 3A.2.1.2.2 的 4 项） |
 | `reports/phase3A2_1_2_*.md` | **新增** | 6 份报告 |
 
 **未修改**：`app/backtest/*`、`app/quant/*`、`app/data/*`、数据库结构、历史记录。
@@ -173,4 +173,55 @@ SQLite  ：busy_timeout=5000，单写者
 | 6 | 报告把「回撤被高估」当结论 | 改为「相对完整数据基准的变化」，不判定净效应 |
 | 7 | 报告把 74 笔笼统归因于现金充足 | 按护栏分界：护栏前 72 笔(分支不存在) + 护栏后 2 笔(现金充足) |
 
-新增测试：`tests/test_final_acceptance.py` 14 项；全量 351 → **365 项**。
+新增测试：`tests/test_final_acceptance.py` 14 项（3A.2.1.2.1）
++ 4 项（3A.2.1.2.2 入口锁）；
+全量 337 → 351 → 365 → **369 项**。
+
+## 10. 阶段3A.2.1.2.2 统一入口锁
+
+### 问题
+
+此前锁只在 `concurrency.run_with_write_lock()`，`scripts/run_validation.py`
+直接调用 `runner.run_validation()` 会绕过锁——保护依赖调用路径而非系统。
+
+### 方案
+
+```text
+runner.py
+├─ _run_validation_unlocked()   内部实现，不加锁
+├─ _acquire_and_run()           加锁并执行
+└─ run_validation()             公开入口：已持锁→直通；未持锁→加锁
+
+concurrency.py
+└─ _make_single_task()          正式库路径直接调公开入口，不重复加锁
+```
+
+### 重入保护
+
+用 `contextvars.ContextVar` 而非全局布尔：
+
+```python
+_LOCK_DEPTH = contextvars.ContextVar("validation_lock_depth", default=0)
+def validation_lock_held() -> bool:
+    return _LOCK_DEPTH.get() > 0
+```
+
+全局布尔会误判：A 线程持锁时，B 线程会被误认为「已持锁」而绕过锁。
+`ContextVar` 的语义是**每个执行上下文独立**，线程/协程互不干扰。
+
+### 锁文件路径
+
+| 场景 | 锁文件位置 |
+| --- | --- |
+| 正式库 | `<db_dir>/.validation_write.lock` |
+| 临时库（测试） | `<tmp_db_dir>/.validation_write.lock` |
+| 显式 lock_dir | 该目录下同名文件 |
+
+### 新增测试（4 项）
+
+| 测试 | 覆盖 |
+| --- | --- |
+| `test_run_validation_public_entry_acquires_lock` | 公开入口走加锁路径 |
+| `test_locked_context_does_not_reacquire` | 已持锁不重复加锁 |
+| `test_run_concurrent_tasks_does_not_double_lock` | 并发调度不双重加锁 |
+| `test_entry_lock_path_follows_db_dir` | 锁路径跟随数据库目录 |

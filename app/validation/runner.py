@@ -15,6 +15,7 @@
 """
 from __future__ import annotations
 
+import contextvars
 import hashlib
 import json
 import uuid
@@ -203,14 +204,21 @@ def _input_hash(config: ValidationConfig, codes: list[str], fingerprint: dict) -
     return hashlib.sha256(text.encode("utf-8")).hexdigest()[:16]
 
 
-def run_validation(
+def _run_validation_unlocked(
     config: ValidationConfig | None = None,
     *,
     db_path=None,
     validation_id: str | None = None,
     stress_keys: list[str] | None = None,
 ) -> ValidationResult:
-    """执行完整验证流程。"""
+    """内部实现：执行完整验证流程，**不加锁**。
+
+    只允许两个调用方使用：
+    1. 公开入口 `run_validation()`（它负责加锁）
+    2. 已经持有同一把锁的 `concurrency.run_with_write_lock()`
+
+    直接调用本函数会绕过并发保护，仅供内部使用。
+    """
     config = config or ValidationConfig()
     config.validate()
     vid = validation_id or uuid.uuid4().hex[:16]
@@ -961,3 +969,63 @@ def decide_conclusion(
     if len(supports) >= 2 and len(blockers) <= 2:
         return "有条件通过", supports + [f"限制：{item}" for item in blockers]
     return "不通过", [f"限制：{item}" for item in blockers[:8]] + supports
+
+# 内部持锁标记：通过 contextvars 传递，不依赖全局布尔变量。
+# 作用：允许「已持锁的内部调用」再次进入公开入口时不重复加锁，
+# 同时不会影响其他线程（每个执行上下文独立）。
+_LOCK_DEPTH: "contextvars.ContextVar[int]" = contextvars.ContextVar(
+    "validation_lock_depth", default=0
+)
+
+
+def validation_lock_held() -> bool:
+    """当前执行上下文是否已经持有验证锁。"""
+    return _LOCK_DEPTH.get() > 0
+
+
+def _acquire_and_run(config, *, db_path, validation_id, stress_keys):
+    """真正加锁并执行的内部函数。"""
+    from app.validation.concurrency import run_with_write_lock
+
+    token = _LOCK_DEPTH.set(_LOCK_DEPTH.get() + 1)
+    try:
+        return run_with_write_lock(
+            _run_validation_unlocked,
+            config,
+            db_path=db_path,
+            validation_id=validation_id,
+            stress_keys=stress_keys,
+            db_path_lock=db_path,
+        )
+    finally:
+        _LOCK_DEPTH.reset(token)
+
+
+def run_validation(
+    config: ValidationConfig | None = None,
+    *,
+    db_path=None,
+    validation_id: str | None = None,
+    stress_keys: list[str] | None = None,
+) -> ValidationResult:
+    """统一验证入口：**自动经过全流程串行锁**。
+
+    设计（阶段3A.2.1.2.2）：
+    - 所有正式数据库调用都走这里，调用方不需要自己加锁；
+    - 锁文件固定为数据库同目录的 `.validation_write.lock`
+      （临时库则跟随临时库目录，保持测试可配置）；
+    - 若当前执行上下文已经持锁（内部调用），直接执行不再加锁，避免自锁死；
+    - 锁超时抛 ConcurrencyError，调用方记录 failed，不伪装成功。
+
+    绕过方式只有 `_run_validation_unlocked()`，它是内部函数，不对外承诺。
+    """
+    if validation_lock_held():
+        # 已持锁的内部调用：不再重复加锁
+        return _run_validation_unlocked(
+            config, db_path=db_path, validation_id=validation_id,
+            stress_keys=stress_keys,
+        )
+    return _acquire_and_run(
+        config, db_path=db_path, validation_id=validation_id,
+        stress_keys=stress_keys,
+    )

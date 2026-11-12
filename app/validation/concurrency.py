@@ -112,7 +112,8 @@ def _ensure_lock_file_byte(lock_path: Path, attempts: int = 20) -> None:
 
 
 def run_with_write_lock(func: Callable, *args, lock_dir: Path | None = None,
-                        timeout: float = 3600.0, db_path=None, **kwargs):
+                        timeout: float = 3600.0, db_path=None,
+                        db_path_lock=None, **kwargs):
     """在全流程串行锁内执行 func（阶段3A.2.1.2.1 修正模型）。
 
     模型说明：**不是「计算并行 + 写入串行」，而是整个验证任务串行排队。**
@@ -125,10 +126,12 @@ def run_with_write_lock(func: Callable, *args, lock_dir: Path | None = None,
     - 异常路径通过 finally 释放锁。
     """
     with _WRITE_LOCK:
+        # lock 目标库优先用 db_path_lock（避免与传给 func 的 db_path 语义混淆）
+        lock_target = db_path_lock if db_path_lock is not None else db_path
         lock_path = (
             Path(lock_dir) / _LOCK_FILE_NAME
             if lock_dir is not None
-            else shared_lock_path(db_path)
+            else shared_lock_path(lock_target)
         )
         lock_path.parent.mkdir(parents=True, exist_ok=True)
         deadline = time.time() + timeout
@@ -195,10 +198,14 @@ def _make_single_task(
             cfg.validate()
             if serializer is not None:
                 result = serializer(cfg)
-            else:
+            elif lock_dir is not None:
+                # 临时库测试：显式指定锁目录
                 result = run_with_write_lock(
                     run_validation, cfg, lock_dir=lock_dir,
                 )
+            else:
+                # 正式库：公开入口自带锁，不再重复加锁
+                result = run_validation(cfg)
             task.validation_id = result.validation_id
             task.strategy_version = cfg.strategy_version
             # 必须取「验证记录里的 input_hash」——它包含 config + ETF 池 + 数据指纹，

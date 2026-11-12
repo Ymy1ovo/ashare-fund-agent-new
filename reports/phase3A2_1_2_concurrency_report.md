@@ -188,3 +188,78 @@ after release: ok
 3. 未做小时级长时压测
 4. 串行意味着总耗时随任务数线性增长（4 任务 1311 秒），
    这是正确性优先的代价，不是性能优化目标
+
+## 7. 公开入口自动加锁（阶段3A.2.1.2.2）
+
+### 7.1 问题
+
+此前锁保护只在 `concurrency.run_with_write_lock()` 里，直接调用
+`scripts/run_validation.py` → `runner.run_validation()` 会**绕过锁**（这是整改前的问题，现已修复）。
+
+### 7.2 整改
+
+`app/validation/runner.py` 拆成两层：
+
+| 函数 | 职责 |
+| --- | --- |
+| `_run_validation_unlocked()` | 内部实现，**不加锁**，仅供内部使用 |
+| `run_validation()` | **公开入口，自动经过全流程串行锁** |
+
+递归保护用 `contextvars.ContextVar` 记录「当前执行上下文持锁深度」，
+不使用全局布尔变量（那样会误判其他线程）：
+
+```python
+if validation_lock_held():
+    return _run_validation_unlocked(...)   # 已持锁，直接执行
+return _acquire_and_run(...)               # 未持锁，先加锁
+```
+
+`run_concurrent_tasks()` 在正式库路径上改为直接调用公开入口，
+不再自己套锁，避免重复加锁。
+
+### 7.3 全部正式调用入口检查
+
+| 入口 | 是否经过锁 | 说明 |
+| --- | --- | --- |
+| `scripts/run_validation.py` | **是** | 调用 `runner.run_validation()`，自动加锁 |
+| `concurrency.run_concurrent_tasks()` | **是** | 内部调用公开入口 |
+| `sensitivity_scan.run_sensitivity_matrix()` | 不适用 | 只跑回测，不写 validation 记录 |
+| 测试代码 `temp_db` 路径 | 是（可配置） | 锁文件跟随临时库目录 |
+
+### 7.4 入口级实测：两线程直接调用公开入口
+
+未加任何外层锁，两个线程**直接调用 `run_validation()`**：
+
+| 事件 | 说明 |
+| --- | --- |
+| `T1-start` | T1 进入入口 |
+| `T2-start` | T2 进入入口（被锁阻塞） |
+| `T1-end` | T1 完成，242.7 秒 |
+| `T2-end` | T2 完成，累计 484.5 秒 |
+
+| task | status | validation_id | 耗时 |
+| --- | --- | --- | ---: |
+| T1 | success | `05b9af375c4e4ee5` | 242.7s |
+| T2 | success | `4b37c111e6ab4403` | 484.5s |
+
+**总耗时 484.5 秒 ≈ 单任务的 2 倍**，证明入口锁生效、两任务串行排队。
+
+### 7.5 入口级实测：两独立进程直接调用公开入口
+
+| 事件 | 说明 |
+| --- | --- |
+| `P1-start` / `P2-start` | 两进程同时进入入口 |
+| `P1-ok:e18525b7d5244d9f:248.4` | P1 完成 |
+| `P1-held_after:False` | P1 结束后持锁标记已复位 |
+| `P1-end` | |
+| `P2-ok:e3507c7defa34229:494.8` | P2 累计 494.8 秒完成 |
+| `P2-end` | |
+
+| 项 | 结果 |
+| --- | --- |
+| 总耗时 | 496.7 秒 |
+| 进程退出码 | `[0, 0]` |
+| validation_id | 两个不同 |
+| 结束后持锁标记 | 两进程均为 `False`（无残留） |
+
+**两个独立进程通过公开入口的共享文件锁安全排队，未实测到跨进程失败。**

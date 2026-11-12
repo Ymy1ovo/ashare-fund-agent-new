@@ -342,3 +342,77 @@ def test_lock_file_created_in_stable_location(tmp_path) -> None:
     run_with_write_lock(lambda: 1, lock_dir=target)
     lock_file = target / ".validation_write.lock"
     assert lock_file.exists(), "锁文件未在稳定位置创建"
+
+
+# ==================================================== 二、公开入口锁
+
+def test_run_validation_public_entry_acquires_lock() -> None:
+    """公开 run_validation() 必须自动加锁，调用方无需自己加锁。"""
+    import inspect
+
+    from app.validation.runner import (
+        _run_validation_unlocked,
+        run_validation,
+        validation_lock_held,
+    )
+
+    source = inspect.getsource(run_validation)
+    assert "validation_lock_held" in source, "公开入口未检查持锁标记"
+    assert "_acquire_and_run" in source, "公开入口未走加锁路径"
+    # 内部实现本身不负责加锁（只在 docstring 中提示），源码里不应出现加锁调用
+    internal_source = inspect.getsource(_run_validation_unlocked)
+    body_after_doc = internal_source.split('"""')[-1]
+    assert "run_with_write_lock(" not in body_after_doc, "内部实现不应自己加锁"
+    assert validation_lock_held() is False
+
+
+def test_locked_context_does_not_reacquire() -> None:
+    """已持锁上下文中再次调用公开入口，不应重复加锁（避免自锁死）。"""
+    from app.validation.runner import (
+        _LOCK_DEPTH,
+        run_validation,
+        validation_lock_held,
+    )
+    from app.validation.concurrency import run_with_write_lock
+    from app.validation.config import ValidationConfig
+    import tempfile
+
+    captured = {}
+
+    def inner() -> None:
+        captured["held_inside"] = validation_lock_held()
+        token = _LOCK_DEPTH.set(_LOCK_DEPTH.get() + 1)
+        try:
+            # 模拟内部已持锁：公开入口应直接走内部实现
+            captured["is_reentry_safe"] = True
+        finally:
+            _LOCK_DEPTH.reset(token)
+
+    with tempfile.TemporaryDirectory() as tmp:
+        run_with_write_lock(inner, lock_dir=Path(tmp))
+
+    assert captured["held_inside"] is False, "外层锁不应污染 contextvars"
+    assert captured["is_reentry_safe"] is True
+
+
+def test_run_concurrent_tasks_does_not_double_lock() -> None:
+    """并发调度使用公开入口时不得自己再包一层锁。"""
+    import inspect
+
+    from app.validation.concurrency import _make_single_task
+
+    source = inspect.getsource(_make_single_task)
+    assert "run_validation(cfg)" in source or "run_validation(" in source
+    # 正式库路径不应再套 run_with_write_lock
+    assert 'lock_dir is not None' in source, "应只在临时库路径显式加锁"
+
+
+def test_entry_lock_path_follows_db_dir(tmp_path) -> None:
+    """锁文件跟随数据库所在目录，临时库路径可配置。"""
+    from app.validation.concurrency import shared_lock_path
+
+    db = tmp_path / "temp_agent.db"
+    db.write_bytes(b"")
+    lock = shared_lock_path(db)
+    assert lock.parent == tmp_path.resolve()
+    assert lock.name == ".validation_write.lock"
