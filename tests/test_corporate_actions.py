@@ -406,16 +406,33 @@ def test_same_action_applied_twice_raises(temp_db):
 
 # ---------------------------------------------------------------- 附加检查
 
-def test_load_actions_filters_by_range_and_codes(temp_db):
+def test_load_actions_filters_by_window_date(temp_db):
+    """区间筛选按事件类型使用实际应用日期：分红用 ex_date，拆分用 effective_date。"""
     _seed(temp_db, {"510300": [10.0] * 6, "510500": [20.0] * 6})
+    # 拆分：effective_date = 2024-01-04
     _insert_action(temp_db, code="510300", action_type=ACTION_SPLIT,
                    ex_date="2024-01-03", effective_date="2024-01-04", share_ratio=2.0)
+    # 分红：ex_date = 2024-01-03（生效日也是 01-04，但区间判定用 ex_date）
     _insert_action(temp_db, code="510500", action_type=ACTION_CASH_DISTRIBUTION,
                    ex_date="2024-01-03", effective_date="2024-01-04", cash_per_share=0.1)
+
     only_300 = load_actions(codes=["510300"], db_path=temp_db)
     assert len(only_300) == 1 and only_300[0].code == "510300"
-    in_range = load_actions(start="2024-01-04", end="2024-01-04", db_path=temp_db)
-    assert len(in_range) == 2
+
+    # 区间 [01-04, 01-04]：只有拆分的 effective_date 落在里面
+    split_only = load_actions(start="2024-01-04", end="2024-01-04", db_path=temp_db)
+    assert len(split_only) == 1
+    assert split_only[0].action_type == ACTION_SPLIT
+
+    # 区间 [01-03, 01-03]：只有分红的 ex_date 落在里面
+    div_only = load_actions(start="2024-01-03", end="2024-01-03", db_path=temp_db)
+    assert len(div_only) == 1
+    assert div_only[0].action_type == ACTION_CASH_DISTRIBUTION
+
+    # 区间 [01-03, 01-04]：两条都在
+    both = load_actions(start="2024-01-03", end="2024-01-04", db_path=temp_db)
+    assert len(both) == 2
+
     assert load_actions(start="2024-02-01", db_path=temp_db) == []
 
 
@@ -669,3 +686,365 @@ def test_multi_lot_split_keeps_lot_sum(temp_db):
         assert item.total_assets == pytest.approx(
             item.cash + item.market_value + item.dividend_receivable, abs=1e-6)
         assert item.cash >= -1e-6
+
+
+# ---------------------------------------------------------------- 3A.3.2.2 新增
+
+def _portfolio_with_lots(lots):
+    p = Portfolio(initial_cash=10_000_000)
+    for i, (q, px) in enumerate(lots):
+        p.apply_buy("510300", q, px, fee=0.0,
+                    trade_date=date(2024, 1, 2 + i), available_date=date(2024, 1, 3 + i))
+    return p
+
+
+def test_integer_split_cost_basis_unchanged():
+    p = _portfolio_with_lots([(400, 10.0), (300, 12.0), (300, 14.0)])
+    before = p.cost_basis("510300")
+    ledger = p.apply_corporate_action("510300", 2000, 0.0, official_ratio=2.0,
+                                      fractional_policy="truncate")
+    assert p.quantity("510300") == 2000
+    assert ledger["cost_basis_after"] == pytest.approx(before)
+    assert ledger["disposed_cost_basis"] == pytest.approx(0.0)
+    assert ledger["realized_pnl"] == pytest.approx(0.0)
+
+
+def test_integer_reverse_split_cost_basis_unchanged():
+    p = _portfolio_with_lots([(400, 10.0), (300, 12.0), (300, 14.0)])
+    before = p.cost_basis("510300")
+    ledger = p.apply_corporate_action("510300", 100, 0.0, official_ratio=0.1,
+                                      fractional_policy="truncate")
+    assert p.quantity("510300") == 100
+    assert ledger["cost_basis_after"] == pytest.approx(before)
+    assert ledger["disposed_cost_basis"] == pytest.approx(0.0)
+
+
+def test_fractional_split_disposes_cost_and_records_pnl():
+    """1:1.145 拆分 100 份 → 114 份 + 0.5 份现金补偿。"""
+    p = _portfolio_with_lots([(100, 100.0)])
+    before = p.cost_basis("510300")
+    price_after = 100.0 / 1.145
+    raw = 100 * 1.145
+    new = int(raw // 1)
+    cash = (raw - new) * price_after
+    ledger = p.apply_corporate_action("510300", new, cash, official_ratio=1.145,
+                                      compensation_price=price_after,
+                                      fractional_policy="cash_compensation")
+    expect_disposed = before * ((raw - new) / raw)
+    assert ledger["disposed_cost_basis"] == pytest.approx(expect_disposed, rel=1e-9)
+    assert ledger["cost_basis_after"] == pytest.approx(before - expect_disposed, rel=1e-9)
+    assert ledger["compensation_cash"] == pytest.approx(cash)
+    assert ledger["realized_pnl"] == pytest.approx(cash - expect_disposed, abs=1e-9)
+    assert ledger["fractional_shares"] == pytest.approx(raw - new)
+    # 价值连续：市值 + 补偿 == 拆分前市值
+    assert p.quantity("510300") * price_after + cash == pytest.approx(100 * 100.0, rel=1e-9)
+
+
+def test_fractional_reverse_split_disposes_cost_and_records_pnl():
+    """1:0.36555 合并 1000 份 → 365 份 + 0.55 份现金补偿。"""
+    p = _portfolio_with_lots([(333, 10.0), (333, 12.0), (334, 14.0)])
+    before = p.cost_basis("510300")
+    ratio = 0.36555
+    raw = 1000 * ratio
+    new = int(raw // 1)
+    price_after = 10.0
+    cash = (raw - new) * price_after
+    ledger = p.apply_corporate_action("510300", new, cash, official_ratio=ratio,
+                                      compensation_price=price_after,
+                                      fractional_policy="cash_compensation")
+    expect_disposed = before * ((raw - new) / raw)
+    assert ledger["disposed_cost_basis"] == pytest.approx(expect_disposed, rel=1e-9)
+    assert ledger["cost_basis_after"] == pytest.approx(before - expect_disposed, rel=1e-9)
+
+
+def test_multi_lot_fractional_disposal_uses_portfolio_level_cost():
+    """多个 lot 同时发生非整数折算：成本转出按组合层面计算，不按单批余数。"""
+    p = _portfolio_with_lots([(333, 10.0), (333, 12.0), (334, 14.0)])
+    before = p.cost_basis("510300")
+    ratio = 0.36555
+    raw = 1000 * ratio
+    new = int(raw // 1)
+    ledger = p.apply_corporate_action("510300", new, 0.0, official_ratio=ratio,
+                                      fractional_policy="truncate")
+    assert sum(lot.quantity for lot in p.positions["510300"].lots) == new
+    assert p.quantity("510300") == new
+    expect_disposed = before * ((raw - new) / raw)
+    assert ledger["disposed_cost_basis"] == pytest.approx(expect_disposed, rel=1e-9)
+
+
+def test_truncate_policy_records_loss_not_cash():
+    p = _portfolio_with_lots([(100, 100.0)])
+    before = p.cost_basis("510300")
+    ledger = p.apply_corporate_action("510300", 114, 0.0, official_ratio=1.145,
+                                      fractional_policy="truncate")
+    assert ledger["compensation_cash"] == pytest.approx(0.0)
+    assert ledger["realized_pnl"] == pytest.approx(-ledger["disposed_cost_basis"])
+    assert ledger["cost_basis_before"] - ledger["cost_basis_after"] == pytest.approx(
+        ledger["disposed_cost_basis"], rel=1e-9)
+
+
+def test_round_up_policy_adds_share_without_cost():
+    p = _portfolio_with_lots([(100, 100.0)])
+    before = p.cost_basis("510300")
+    ledger = p.apply_corporate_action("510300", 115, 0.0, official_ratio=1.145,
+                                      fractional_policy="round_up")
+    assert p.quantity("510300") == 115
+    assert ledger["disposed_cost_basis"] == pytest.approx(0.0)
+    assert ledger["cost_basis_after"] == pytest.approx(before)
+
+
+def test_consecutive_actions_do_not_double_charge_cost():
+    p = _portfolio_with_lots([(1000, 10.0)])
+    before = p.cost_basis("510300")
+    p.apply_corporate_action("510300", 2000, 0.0, official_ratio=2.0,
+                             fractional_policy="truncate")
+    ledger = p.apply_corporate_action("510300", 1000, 0.0, official_ratio=0.5,
+                                      fractional_policy="truncate")
+    assert ledger["cost_basis_after"] == pytest.approx(before)
+
+
+def test_no_position_action_records_nothing():
+    p = Portfolio(initial_cash=100_000)
+    ledger = p.apply_corporate_action("510300", 0, 0.0, official_ratio=2.0)
+    assert ledger["cost_basis_after"] == pytest.approx(0.0)
+    assert ledger["realized_pnl"] == pytest.approx(0.0)
+    assert ledger["compensation_cash"] == pytest.approx(0.0)
+    assert p.cash == pytest.approx(100_000)
+
+
+def test_window_boundary_ex_date_equals_start(temp_db):
+    """ex_date == start_date 的分红必须能读到。"""
+    dates = _seed(temp_db, {"510300": [10.0] * 6})
+    _insert_action(temp_db, code="510300", action_type=ACTION_CASH_DISTRIBUTION,
+                   ex_date=dates[0], effective_date=dates[1], cash_per_share=0.1,
+                   record_date=dates[0], pay_date=dates[2])
+    loaded = load_actions(start=dates[0], end=dates[-1], db_path=temp_db)
+    assert len(loaded) == 1
+    assert loaded[0].action_type == ACTION_CASH_DISTRIBUTION
+
+
+def test_window_boundary_ex_date_equals_end_effective_after(temp_db):
+    """ex_date == end_date、effective_date/pay_date 在结束日之后：仍须读到。"""
+    dates = _seed(temp_db, {"510300": [10.0] * 6})
+    last = dates[-1]
+    _insert_action(temp_db, code="510300", action_type=ACTION_CASH_DISTRIBUTION,
+                   ex_date=last, effective_date=last, cash_per_share=0.5,
+                   record_date=dates[-2], pay_date=last)
+    loaded = load_actions(start=dates[0], end=last, db_path=temp_db)
+    assert len(loaded) == 1
+    assert loaded[0].pay_date == date.fromisoformat(last)
+
+
+def test_window_boundary_split_effective_equals_end(temp_db):
+    dates = _seed(temp_db, {"510300": [10.0] * 6})
+    _insert_action(temp_db, code="510300", action_type=ACTION_SPLIT,
+                   ex_date=dates[-2], effective_date=dates[-1], share_ratio=2.0)
+    loaded = load_actions(start=dates[0], end=dates[-1], db_path=temp_db)
+    assert len(loaded) == 1
+    assert loaded[0].effective_date == date.fromisoformat(dates[-1])
+
+
+def test_window_boundary_split_effective_after_end_excluded(temp_db):
+    """拆分 effective_date 在结束日之后：不应进入本次回测。"""
+    dates = _seed(temp_db, {"510300": [10.0] * 8})
+    _insert_action(temp_db, code="510300", action_type=ACTION_SPLIT,
+                   ex_date=dates[5], effective_date=dates[6], share_ratio=2.0)
+    loaded = load_actions(start=dates[0], end=dates[5], db_path=temp_db)
+    assert loaded == []
+
+
+def test_window_excludes_events_before_start(temp_db):
+    dates = _seed(temp_db, {"510300": [10.0] * 6})
+    _insert_action(temp_db, code="510300", action_type=ACTION_SPLIT,
+                   ex_date="2023-06-01", effective_date="2023-06-02", share_ratio=2.0)
+    _insert_action(temp_db, code="510300", action_type=ACTION_CASH_DISTRIBUTION,
+                   ex_date="2023-06-05", effective_date="2023-06-06", cash_per_share=0.1,
+                   record_date="2023-06-02", pay_date="2023-06-08")
+    loaded = load_actions(start=dates[0], end=dates[-1], db_path=temp_db)
+    assert loaded == []
+
+
+def test_end_of_backtest_unsettled_dividend_counted_in_assets(temp_db):
+    """回测结束日尚未到账的应收分红，必须计入最终净资产。"""
+    dates = _seed(temp_db, {"510300": [10.0] * 6})
+    last = dates[-1]
+    _insert_action(temp_db, code="510300", action_type=ACTION_CASH_DISTRIBUTION,
+                   ex_date=last, effective_date=last, cash_per_share=1.0,
+                   record_date=dates[-2], pay_date="2099-01-01")
+    plan = {dates[0]: [TargetWeight("510300", 0.9)]}
+    result, engine = _run(temp_db, dates, ["510300"], plan=plan)
+    final = result.daily[-1]
+    assert final.dividend_receivable > 0
+    assert final.total_assets == pytest.approx(
+        final.cash + final.market_value + final.dividend_receivable, abs=1e-6)
+
+
+def test_same_event_not_loaded_twice_across_adjacent_ranges(temp_db):
+    """跨两个相邻区间各读一次，单次回测内不重复。"""
+    dates = _seed(temp_db, {"510300": [10.0] * 8})
+    _insert_action(temp_db, code="510300", action_type=ACTION_SPLIT,
+                   ex_date=dates[3], effective_date=dates[4], share_ratio=2.0)
+    first = load_actions(start=dates[0], end=dates[3], db_path=temp_db)
+    second = load_actions(start=dates[3], end=dates[-1], db_path=temp_db)
+    assert first == []            # effective_date 在第二区间
+    assert len(second) == 1
+
+
+def test_announcement_url_changes_fingerprint():
+    from app.backtest.corporate_actions import compute_event_fingerprint
+    base = dict(code="510300", action_type=ACTION_SPLIT, ex_date="2021-01-08",
+                effective_date="2021-01-11", share_ratio=10.0,
+                status=STATUS_CONFIRMED, evidence_status=EVIDENCE_OFFICIAL,
+                source="t")
+    a = build_action(**base, announcement_url="https://a")
+    b = build_action(**base, announcement_url="https://b")
+    assert compute_event_fingerprint(a) != compute_event_fingerprint(b)
+
+
+def test_announcement_title_changes_fingerprint():
+    from app.backtest.corporate_actions import compute_event_fingerprint
+    base = dict(code="510300", action_type=ACTION_SPLIT, ex_date="2021-01-08",
+                effective_date="2021-01-11", share_ratio=10.0,
+                status=STATUS_CONFIRMED, evidence_status=EVIDENCE_OFFICIAL,
+                source="t")
+    a = build_action(**base, announcement_title="拆分公告")
+    b = build_action(**base, announcement_title="合并公告")
+    assert compute_event_fingerprint(a) != compute_event_fingerprint(b)
+
+
+def test_announcement_date_changes_fingerprint():
+    from app.backtest.corporate_actions import compute_event_fingerprint
+    base = dict(code="510300", action_type=ACTION_SPLIT, ex_date="2021-01-08",
+                effective_date="2021-01-11", share_ratio=10.0,
+                status=STATUS_CONFIRMED, evidence_status=EVIDENCE_OFFICIAL,
+                source="t")
+    a = build_action(**base, announcement_date="2021-01-05")
+    b = build_action(**base, announcement_date="2021-01-06")
+    assert compute_event_fingerprint(a) != compute_event_fingerprint(b)
+
+
+def test_manager_name_changes_fingerprint():
+    from app.backtest.corporate_actions import compute_event_fingerprint
+    base = dict(code="510300", action_type=ACTION_SPLIT, ex_date="2021-01-08",
+                effective_date="2021-01-11", share_ratio=10.0,
+                status=STATUS_CONFIRMED, evidence_status=EVIDENCE_OFFICIAL,
+                source="t")
+    a = build_action(**base, manager_name="甲公司")
+    b = build_action(**base, manager_name="乙公司")
+    assert compute_event_fingerprint(a) != compute_event_fingerprint(b)
+
+
+def test_evidence_text_changes_fingerprint():
+    from app.backtest.corporate_actions import compute_event_fingerprint
+    base = dict(code="510300", action_type=ACTION_SPLIT, ex_date="2021-01-08",
+                effective_date="2021-01-11", share_ratio=10.0,
+                status=STATUS_CONFIRMED, evidence_status=EVIDENCE_OFFICIAL,
+                source="t")
+    a = build_action(**base, evidence="1:10 拆分")
+    b = build_action(**base, evidence="1:10 拆分，尾差入基金")
+    assert compute_event_fingerprint(a) != compute_event_fingerprint(b)
+
+
+def test_evidence_status_changes_fingerprint():
+    from app.backtest.corporate_actions import compute_event_fingerprint
+    base = dict(code="510300", action_type=ACTION_SPLIT, ex_date="2021-01-08",
+                effective_date="2021-01-11", share_ratio=10.0,
+                status=STATUS_CONFIRMED, source="t")
+    a = build_action(**base, evidence_status=EVIDENCE_OFFICIAL)
+    b = build_action(**base, evidence_status=EVIDENCE_SECONDARY)
+    assert compute_event_fingerprint(a) != compute_event_fingerprint(b)
+
+
+def test_unrelated_field_does_not_change_fingerprint():
+    """notes 等展示字段不影响指纹。"""
+    from app.backtest.corporate_actions import compute_event_fingerprint
+    base = dict(code="510300", action_type=ACTION_SPLIT, ex_date="2021-01-08",
+                effective_date="2021-01-11", share_ratio=10.0,
+                status=STATUS_CONFIRMED, evidence_status=EVIDENCE_OFFICIAL,
+                source="t")
+    a = build_action(**base)
+    b = build_action(**base, notes="备注A")
+    assert compute_event_fingerprint(a) == compute_event_fingerprint(b)
+
+
+def test_same_metadata_repeat_gives_same_fingerprint():
+    from app.backtest.corporate_actions import compute_event_fingerprint
+    base = dict(code="510300", action_type=ACTION_SPLIT, ex_date="2021-01-08",
+                effective_date="2021-01-11", share_ratio=10.0,
+                status=STATUS_CONFIRMED, evidence_status=EVIDENCE_OFFICIAL,
+                source="t", announcement_url="https://a",
+                announcement_title="公告", announcement_date="2021-01-05",
+                manager_name="甲公司", evidence="1:10")
+    a = build_action(**base)
+    b = build_action(**base)
+    assert compute_event_fingerprint(a) == compute_event_fingerprint(b)
+
+
+def test_events_digest_order_independent(temp_db):
+    """集合指纹与输入顺序无关。"""
+    _seed(temp_db, {"510300": [10.0] * 3, "510500": [20.0] * 3})
+    from app.backtest.corporate_actions import compute_events_digest
+    _insert_action(temp_db, code="510300", action_type=ACTION_SPLIT,
+                   ex_date="2024-01-03", effective_date="2024-01-04", share_ratio=2.0)
+    _insert_action(temp_db, code="510500", action_type=ACTION_SPLIT,
+                   ex_date="2024-03-01", effective_date="2024-03-04", share_ratio=3.0)
+    items = load_actions(db_path=temp_db)
+    assert compute_events_digest(items) == compute_events_digest(list(reversed(items)))
+
+
+def test_events_digest_ignores_unrelated_events(temp_db):
+    """未参与回测的事件不影响指纹。"""
+    from app.backtest.corporate_actions import compute_events_digest
+    _seed(temp_db, {"510300": [10.0] * 3})
+    _insert_action(temp_db, code="510300", action_type=ACTION_SPLIT,
+                   ex_date="2024-01-03", effective_date="2024-01-04", share_ratio=2.0)
+    inside = load_actions(start="2024-01-01", end="2024-01-31", db_path=temp_db)
+    # 区间外再插一条
+    _insert_action(temp_db, code="510300", action_type=ACTION_SPLIT,
+                   ex_date="2024-06-03", effective_date="2024-06-04", share_ratio=5.0)
+    still_inside = load_actions(start="2024-01-01", end="2024-01-31", db_path=temp_db)
+    assert compute_events_digest(inside) == compute_events_digest(still_inside)
+
+
+def test_engine_records_fractional_ledger(temp_db):
+    """完整 Engine 流程：账本留痕反映成本转出与已实现盈亏。"""
+    dates = _seed(temp_db, {"510300": [10.0] * 6})
+    _insert_action(temp_db, code="510300", action_type=ACTION_SPLIT,
+                   ex_date=dates[3], effective_date=dates[4], share_ratio=1.145,
+                   fractional_policy="truncate")
+    plan = {dates[0]: [TargetWeight("510300", 1.0)]}
+    result, engine = _run(temp_db, dates, ["510300"], plan=plan)
+    assert engine.corporate_action_ledger
+    ledger = engine.corporate_action_ledger[0]
+    assert ledger["official_ratio"] == pytest.approx(1.145)
+    assert ledger["ratio_source"] == "official"
+    assert ledger["cost_basis_before"] - ledger["cost_basis_after"] == pytest.approx(
+        ledger["disposed_cost_basis"], rel=1e-9)
+
+
+def test_engine_fractional_event_keeps_assets_identity(temp_db):
+    """非整数折算后，逐日总资产恒等式仍成立。"""
+    dates = _seed(temp_db, {"510300": [10.0] * 6})
+    _insert_action(temp_db, code="510300", action_type=ACTION_REVERSE_SPLIT,
+                   ex_date=dates[3], effective_date=dates[4], share_ratio=0.36555,
+                   fractional_policy="truncate")
+    plan = {dates[0]: [TargetWeight("510300", 1.0)]}
+    result, engine = _run(temp_db, dates, ["510300"], plan=plan)
+    for item in result.daily:
+        assert item.total_assets == pytest.approx(
+            item.cash + item.market_value + item.dividend_receivable, abs=1e-6)
+        assert item.cash >= -1e-6
+
+
+def test_round_up_policy_through_engine(temp_db):
+    """进位口径：份额 +1，成本不变。"""
+    dates = _seed(temp_db, {"510300": [10.0] * 6})
+    _insert_action(temp_db, code="510300", action_type=ACTION_SPLIT,
+                   ex_date=dates[3], effective_date=dates[4], share_ratio=1.145,
+                   fractional_policy="round_up")
+    plan = {dates[0]: [TargetWeight("510300", 1.0)]}
+    result, engine = _run(temp_db, dates, ["510300"], plan=plan)
+    ledger = engine.corporate_action_ledger[0]
+    assert ledger["disposed_cost_basis"] == pytest.approx(0.0)
+    assert ledger["cost_basis_after"] == pytest.approx(ledger["cost_basis_before"])
+    assert ledger["fractional_policy"] == "round_up"

@@ -7,6 +7,15 @@ from datetime import date
 from app.backtest.models import DailySnapshot, Lot, Position
 
 
+# 份额比例允许的浮点误差；小于该值视为无零碎份额
+RATIO_EPS = 1e-9
+
+
+def position_cost_basis(position: Position) -> float:
+    """一个持仓的总成本基准（各批次数量 × 批次单位成本）。"""
+    return sum(lot.quantity * lot.cost_basis for lot in position.lots)
+
+
 class PortfolioError(RuntimeError):
     """账本不变量被破坏。"""
 
@@ -33,6 +42,8 @@ class Portfolio:
     closed_holding_days: list[float] = field(default_factory=list)
     # 阶段3A.3.2.1：已确认但尚未到账的现金分红（应收，不计入可用现金）
     receivables: list[dict] = field(default_factory=list)
+    # 阶段3A.3.2.2：公司行为产生的已实现盈亏（与成交平仓分开记录）
+    corporate_action_realized: list[float] = field(default_factory=list)
 
     def __post_init__(self) -> None:
         if self.cash == 0.0:
@@ -158,45 +169,114 @@ class Portfolio:
         self,
         code: str,
         new_quantity: int,
-        cash_delta: float,
-    ) -> None:
-        """按事件调整持仓数量与现金。
+        cash_delta: float = 0.0,
+        *,
+        official_ratio: float | None = None,
+        compensation_price: float | None = None,
+        fractional_policy: str = "truncate",
+        action_id: int = 0,
+        action_type: str = "",
+    ) -> dict:
+        """按事件调整持仓数量与现金，并返回本次调整的完整账本留痕。
 
-        只在 Engine 已经算好目标数量与现金增量后调用；
-        本方法只保证账本自洽，不判断事件合法性（由 corporate_actions 负责）：
+        成本基准规则（阶段3A.3.2.2 修正）：
 
-        1. 各批次按比例缩放后，用「最大余数法」分配舍入误差，
-           保证 `sum(lot.quantity) == position.quantity == new_quantity`；
-        2. 每批次成本基准按 1/比例 反比调整，使成本总额在事件前后守恒；
-        3. 可卖日期（`available_date`）保持不变，份额调整不得把 T+1 变成 T+0；
-        4. 现金增量直接入账，负数会触发现金为负的不变量检查。
+        1. **用官方折算比例** `official_ratio` 缩放份额，不用
+           `new_quantity / old_quantity`。后者已被整数取整污染，
+           用它折成本会把零碎份额的成本错误地摊到剩余份额上。
+        2. 零碎份额按 `fractional_policy` 处置：
+           - `cash_compensation`：按 `compensation_price` 现金补偿，
+             对应成本基准从持仓中转出，差额计入已实现盈亏；
+           - `truncate`：按公告「尾差计入基金财产」舍去，无现金，
+             对应成本作为损失转出；
+           - `round_up`：按公告「小数点后份额进位」补足，无现金，
+             新增份额不增加成本（成本单价被动稀释）。
+        3. 每个 FIFO lot 独立计算处置成本：批次内被处置份额占比 × 该批次成本，
+           保证多批次场景下成本按各自单价转出。
+        4. 事件不增加 `trade_count`、不写入 `closed_trade_pnls`：
+           公司行为不是成交，必须与交易统计分离。
+        5. 可卖日期 `available_date` 保持不变，T+1 不因份额调整提前。
         """
+        result: dict = {
+            "action_id": action_id,
+            "action_type": action_type,
+            "code": code,
+            "fractional_policy": fractional_policy,
+            "shares_before": 0,
+            "shares_after": 0,
+            "official_ratio": official_ratio,
+            "ratio_source": "official" if official_ratio else "implied",
+            "fractional_shares": 0.0,
+            "compensation_cash": 0.0,
+            "disposed_cost_basis": 0.0,
+            "realized_pnl": 0.0,
+            "cost_basis_before": 0.0,
+            "cost_basis_after": 0.0,
+            "compensation_price": compensation_price,
+        }
+
         if new_quantity < 0:
             raise PortfolioError(f"{code} 调整后数量不能为负：{new_quantity}")
+
         position = self.positions.get(code)
         if position is None or position.quantity <= 0:
             self.positions.pop(code, None)
             if cash_delta:
                 self.cash += cash_delta
             self._assert_sane()
-            return
+            return result
 
         old_quantity = position.quantity
-        if new_quantity <= 0:
-            self.positions.pop(code, None)
-            if cash_delta:
-                self.cash += cash_delta
-            self._assert_sane()
-            return
+        result["shares_before"] = old_quantity
+        result["cost_basis_before"] = position_cost_basis(position)
 
-        ratio = new_quantity / old_quantity
+        if new_quantity <= 0:
+            # 整个持仓被清零：全部成本转为处置成本
+            disposed = result["cost_basis_before"]
+            self.positions.pop(code, None)
+            self.cash += cash_delta
+            self.realized_pnl += cash_delta - disposed
+            self.corporate_action_realized.append(cash_delta - disposed)
+            result.update({
+                "shares_after": 0,
+                "compensation_cash": cash_delta,
+                "disposed_cost_basis": disposed,
+                "realized_pnl": cash_delta - disposed,
+                "cost_basis_after": 0.0,
+            })
+            self._assert_sane()
+            return result
+
+        # ---- 1) 确定缩放比例与理论零碎份额 ----
+        if official_ratio is not None and official_ratio > 0:
+            ratio = float(official_ratio)
+        else:
+            # 未提供官方比例：退化为整数比例（等价于「没有零碎份额」）
+            ratio = new_quantity / old_quantity
+        raw_total = old_quantity * ratio
+        expected_new = int(raw_total // 1)
+        if fractional_policy == "round_up" and raw_total - expected_new > RATIO_EPS:
+            expected_new = int(raw_total // 1) + 1
+        if abs(new_quantity - expected_new) > 0:
+            raise PortfolioError(
+                f"{code} 目标份额 {new_quantity} 与官方比例 {ratio} 推算的 "
+                f"{expected_new} 不一致（理论 {raw_total}）"
+            )
+        fractional_shares = abs(raw_total - expected_new)
+        if fractional_policy == "round_up":
+            # 进位补足不属于「零碎处置」，不记处置份额
+            fractional_shares = 0.0
+
+        # ---- 2) 逐批次按比例缩放 + 最大余数法分配整数份额 ----
         lots = position.lots
-        # 1) 逐批取整，记录余数
         scaled = [lot.quantity * ratio for lot in lots]
         floors = [int(value // 1) for value in scaled]
-        remainders = [value - floor for value, floor in zip(scaled, floors)]
+        if fractional_policy == "round_up":
+            floors = [int(value // 1) + (1 if value - int(value // 1) > RATIO_EPS else 0)
+                      for value in scaled]
+        remainders = [value - base for value, base in
+                      zip(scaled, [int(v // 1) for v in scaled])]
         shortfall = new_quantity - sum(floors)
-        # 2) 最大余数法补齐：按小数部分从大到小依次 +1
         order = sorted(range(len(lots)), key=lambda i: remainders[i], reverse=True)
         index = 0
         while shortfall > 0 and order:
@@ -204,30 +284,71 @@ class Portfolio:
             shortfall -= 1
             index += 1
         while shortfall < 0:
-            # 极少数情况下取整会超出，从余数最小的批次扣回
+            removed = False
             for i in reversed(order):
                 if floors[i] > 0:
                     floors[i] -= 1
                     shortfall += 1
+                    removed = True
                     break
-            else:
+            if not removed:
                 break
 
-        for lot, quantity in zip(lots, floors):
-            lot.quantity = quantity
-            if lot.price > 0:
-                # 成本基准守恒：数量 ×N 则单价 ÷N
-                lot.price = lot.price / ratio
+        # ---- 3) 转出零碎份额对应成本 ----
+        # 零碎份额是**组合层面**的经济事件，不是逐批次的记账差异：
+        # 最大余数法把整数份额分配给不同批次，只是账本拆分方式，
+        # 不代表某个批次多处置或少处置了份额。
+        #
+        # 因此按「整个持仓」计算应转出的成本，再按各批次成本占比分摊：
+        #   total_disposed = 总成本 × (零碎份额 / 理论总份额)
+        # round_up 口径下零碎份额由基金管理人补足，不转出任何成本。
+        cost_before_total = sum(lot.quantity * lot.cost_basis for lot in lots)
+        if fractional_policy == "round_up" or raw_total <= 0:
+            disposed_total = 0.0
+        else:
+            disposed_total = cost_before_total * (fractional_shares / raw_total)
+
+        for lot, allocated in zip(lots, floors):
+            lot_cost_before = lot.quantity * lot.cost_basis
+            if cost_before_total > 0:
+                share = lot_cost_before / cost_before_total
+            else:
+                share = 0.0
+            lot_remaining = lot_cost_before - disposed_total * share
+            if allocated > 0:
+                per_share_after = lot_remaining / allocated
+                if lot.price > 0 and per_share_after > 0:
+                    scale = per_share_after / lot.cost_basis
+                    lot.price = lot.price * scale
+                    lot.fee_per_share = lot.fee_per_share * scale
+                else:
+                    lot.price = per_share_after
+                    lot.fee_per_share = 0.0
+            lot.quantity = allocated
         position.lots = [lot for lot in lots if lot.quantity > 0]
-        if cash_delta:
-            self.cash += cash_delta
-        # 3) 强制不变量：批次总和必须等于目标数量
+
+        # ---- 4) 现金补偿、已实现盈亏与账本落账 ----
+        compensation = float(cash_delta)
+        realized = compensation - disposed_total
+        self.cash += compensation
+        self.realized_pnl += realized
+        self.corporate_action_realized.append(realized)
+
         actual = position.quantity
         if actual != new_quantity:
             raise PortfolioError(
                 f"{code} 份额调整后批次之和 {actual} != 目标 {new_quantity}"
             )
+        result.update({
+            "shares_after": actual,
+            "fractional_shares": fractional_shares,
+            "compensation_cash": compensation,
+            "disposed_cost_basis": disposed_total,
+            "realized_pnl": realized,
+            "cost_basis_after": position_cost_basis(position),
+        })
         self._assert_sane()
+        return result
 
     # ---------- 现金分红应收 / 到账 ----------
     def confirm_dividend_receivable(

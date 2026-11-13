@@ -151,6 +151,8 @@ class BacktestEngine:
         self.dividend_settlements: list[dict] = []
         self._pending_receivable: dict[int, float] = {}
         self.excluded_actions: list[dict] = []
+        # 阶段3A.3.2.2：份额调整的完整账本留痕（成本转出 / 已实现盈亏）
+        self.corporate_action_ledger: list[dict] = []
         # 权益登记日锁定的分红份额（action_id -> 份额）
         self._dividend_locked_shares: dict[int, int] = {}
         self._run_id_for_actions: str | None = None
@@ -264,6 +266,7 @@ class BacktestEngine:
                 continue
             if impact.shares_after == impact.shares_before and abs(impact.cash_delta) < 1e-12:
                 continue
+            ledger: dict = {}
             if action.action_type == ca.ACTION_CASH_DISTRIBUTION:
                 # 只确认应收，不动现金
                 portfolio.confirm_dividend_receivable(
@@ -276,24 +279,35 @@ class BacktestEngine:
                     shares=impact.shares_before,
                 )
             else:
-                portfolio.apply_corporate_action(
-                    action.code, impact.shares_after, impact.cash_delta
+                ledger = portfolio.apply_corporate_action(
+                    action.code,
+                    impact.shares_after,
+                    impact.cash_delta,
+                    official_ratio=impact.official_ratio,
+                    compensation_price=impact.compensation_price,
+                    fractional_policy=impact.fractional_policy,
+                    action_id=action.action_id,
+                    action_type=action.action_type,
                 )
-            if self._run_id_for_actions:
+                self.corporate_action_ledger.append(ledger)
+            # 只有显式给了 db_path 才持久化；测试/纯内存回测不写任何数据库
+            if self._run_id_for_actions and self.db_path is not None:
                 ca.record_application(
                     run_id=self._run_id_for_actions,
                     impact=impact,
+                    ledger=ledger,
                     db_path=self.db_path,
                 )
                 if action.action_type == ca.ACTION_CASH_DISTRIBUTION:
                     self._pending_receivable[action.action_id] = impact.cash_delta
-                    ca.save_receivable(
-                        run_id=self._run_id_for_actions,
-                        action=action,
-                        shares=impact.shares_before,
-                        amount=impact.cash_delta,
-                        db_path=self.db_path,
-                    )
+                    if self.db_path is not None:
+                        ca.save_receivable(
+                            run_id=self._run_id_for_actions,
+                            action=action,
+                            shares=impact.shares_before,
+                            amount=impact.cash_delta,
+                            db_path=self.db_path,
+                        )
             self.corporate_action_log.append(impact.as_dict())
 
     def _load(self, codes: list[str]) -> dict[str, BarData]:
@@ -545,7 +559,7 @@ class BacktestEngine:
             from app.backtest import corporate_actions as ca
             settled = portfolio.settle_dividend_receivable(trade_date)
             for item in settled:
-                if self._run_id_for_actions:
+                if self._run_id_for_actions and self.db_path is not None:
                     ca.settle_receivable(
                         run_id=self._run_id_for_actions,
                         action_id=int(item["action_id"]),

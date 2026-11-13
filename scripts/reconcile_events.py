@@ -19,6 +19,30 @@ OOS_START, OOS_END = "2025-01-02", "2026-11-09"
 TYPES = ("split", "reverse_split", "cash_distribution", "other")
 EVIDENCE = ("official_confirmed", "secondary_confirmed", "unverified", "rejected")
 
+# 经济权益日期：现金分红按 ex_date，份额调整按 effective_date。
+# 这是**正式回测口径**；纯 effective_date 口径只用于原始字段统计对照。
+ECON_DATE = (
+    "((action_type='cash_distribution' AND ex_date BETWEEN ? AND ?) OR "
+    "(action_type!='cash_distribution' AND effective_date BETWEEN ? AND ?))"
+)
+
+
+def econ_count(conn, lo: str, hi: str, codes=None) -> int:
+    sql = f"SELECT COUNT(*) FROM corporate_actions WHERE {ECON_DATE}"
+    params = [lo, hi, lo, hi]
+    if codes:
+        sql += f" AND code IN ({','.join('?' * len(codes))})"
+        params += list(codes)
+    return conn.execute(sql, params).fetchone()[0]
+
+
+def raw_field_count(conn, field: str, lo: str, hi: str) -> int:
+    """原始字段统计：只按单个字段，不做类型区分。"""
+    return conn.execute(
+        f"SELECT COUNT(*) FROM corporate_actions WHERE {field} BETWEEN ? AND ?",
+        (lo, hi),
+    ).fetchone()[0]
+
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="事件数量对账")
@@ -52,16 +76,10 @@ def main() -> int:
         checks.append(("原始抓取 == 去重后", raw_splits + raw_divs == total,
                        f"{raw_splits + raw_divs} vs {total}"))
 
-    # 3-6. 区间
-    in_win = conn.execute(
-        "SELECT COUNT(*) FROM corporate_actions WHERE effective_date BETWEEN ? AND ?",
-        (IS_START, OOS_END)).fetchone()[0]
-    is_cnt = conn.execute(
-        "SELECT COUNT(*) FROM corporate_actions WHERE effective_date BETWEEN ? AND ?",
-        (IS_START, IS_END)).fetchone()[0]
-    oos_cnt = conn.execute(
-        "SELECT COUNT(*) FROM corporate_actions WHERE effective_date BETWEEN ? AND ?",
-        (OOS_START, OOS_END)).fetchone()[0]
+    # 3-6. 区间（**经济权益日口径**：分红 ex_date / 拆分 effective_date）
+    in_win = econ_count(conn, IS_START, OOS_END)
+    is_cnt = econ_count(conn, IS_START, IS_END)
+    oos_cnt = econ_count(conn, OOS_START, OOS_END)
     out_cnt = total - in_win
     print(f"3. 回测区间内事件总数: {in_win}")
     print(f"4. 样本内事件总数: {is_cnt}")
@@ -77,12 +95,23 @@ def main() -> int:
     for action_type in TYPES:
         row = conn.execute(
             "SELECT "
-            " SUM(CASE WHEN effective_date BETWEEN ? AND ? THEN 1 ELSE 0 END), "
-            " SUM(CASE WHEN effective_date BETWEEN ? AND ? THEN 1 ELSE 0 END), "
-            " SUM(CASE WHEN effective_date < ? OR effective_date > ? THEN 1 ELSE 0 END), "
+            " SUM(CASE WHEN (action_type='cash_distribution' AND ex_date BETWEEN ? AND ?) "
+            "      OR (action_type!='cash_distribution' AND effective_date BETWEEN ? AND ?) "
+            "      THEN 1 ELSE 0 END), "
+            " SUM(CASE WHEN (action_type='cash_distribution' AND ex_date BETWEEN ? AND ?) "
+            "      OR (action_type!='cash_distribution' AND effective_date BETWEEN ? AND ?) "
+            "      THEN 1 ELSE 0 END), "
+            " SUM(CASE WHEN (action_type='cash_distribution' "
+            "      AND (ex_date < ? OR ex_date > ?)) "
+            "      OR (action_type!='cash_distribution' "
+            "      AND (effective_date < ? OR effective_date > ?)) "
+            "      THEN 1 ELSE 0 END), "
             " COUNT(*) "
             "FROM corporate_actions WHERE action_type=?",
-            (IS_START, IS_END, OOS_START, OOS_END, IS_START, OOS_END, action_type),
+            (IS_START, IS_END, IS_START, IS_END,
+             OOS_START, OOS_END, OOS_START, OOS_END,
+             IS_START, OOS_END, IS_START, OOS_END,
+             action_type),
         ).fetchone()
         a, b, c, n = (row[0] or 0, row[1] or 0, row[2] or 0, row[3] or 0)
         type_total += n
@@ -99,12 +128,23 @@ def main() -> int:
     for status in EVIDENCE:
         row = conn.execute(
             "SELECT "
-            " SUM(CASE WHEN effective_date BETWEEN ? AND ? THEN 1 ELSE 0 END), "
-            " SUM(CASE WHEN effective_date BETWEEN ? AND ? THEN 1 ELSE 0 END), "
-            " SUM(CASE WHEN effective_date < ? OR effective_date > ? THEN 1 ELSE 0 END), "
+            " SUM(CASE WHEN (action_type='cash_distribution' AND ex_date BETWEEN ? AND ?) "
+            "      OR (action_type!='cash_distribution' AND effective_date BETWEEN ? AND ?) "
+            "      THEN 1 ELSE 0 END), "
+            " SUM(CASE WHEN (action_type='cash_distribution' AND ex_date BETWEEN ? AND ?) "
+            "      OR (action_type!='cash_distribution' AND effective_date BETWEEN ? AND ?) "
+            "      THEN 1 ELSE 0 END), "
+            " SUM(CASE WHEN (action_type='cash_distribution' "
+            "      AND (ex_date < ? OR ex_date > ?)) "
+            "      OR (action_type!='cash_distribution' "
+            "      AND (effective_date < ? OR effective_date > ?)) "
+            "      THEN 1 ELSE 0 END), "
             " COUNT(*) "
             "FROM corporate_actions WHERE evidence_status=?",
-            (IS_START, IS_END, OOS_START, OOS_END, IS_START, OOS_END, status),
+            (IS_START, IS_END, IS_START, IS_END,
+             OOS_START, OOS_END, OOS_START, OOS_END,
+             IS_START, OOS_END, IS_START, OOS_END,
+             status),
         ).fetchone()
         a, b, c, n = (row[0] or 0, row[1] or 0, row[2] or 0, row[3] or 0)
         evidence_total += n
@@ -119,9 +159,9 @@ def main() -> int:
     applied_events = conn.execute(
         "SELECT COUNT(DISTINCT action_id) FROM corporate_action_applications").fetchone()[0]
     usable_in_win = conn.execute(
-        "SELECT COUNT(*) FROM corporate_actions WHERE effective_date BETWEEN ? AND ? "
+        f"SELECT COUNT(*) FROM corporate_actions WHERE {ECON_DATE} "
         "AND evidence_status IN ('official_confirmed','secondary_confirmed')",
-        (IS_START, OOS_END)).fetchone()[0]
+        (IS_START, OOS_END, IS_START, OOS_END)).fetchone()[0]
     print()
     print(f"14. 实际应用：事件 {applied_events} 条 / 应用行 {applied_rows} 行")
     print(f"    区间内可应用事件: {usable_in_win}")

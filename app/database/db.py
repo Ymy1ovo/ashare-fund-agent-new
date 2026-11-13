@@ -549,6 +549,16 @@ def _migrate(conn: sqlite3.Connection) -> None:
     _add_column_if_missing(conn, "corporate_actions", "manager_name", "TEXT")
     _add_column_if_missing(conn, "corporate_actions", "event_fingerprint", "TEXT")
     _add_column_if_missing(conn, "corporate_actions", "version_no", "INTEGER NOT NULL DEFAULT 1")
+    # 阶段3A.3.2.2：零碎份额处置口径
+    _add_column_if_missing(conn, "corporate_actions", "fractional_policy",
+                           "TEXT NOT NULL DEFAULT 'truncate'")
+    _add_column_if_missing(conn, "corporate_action_applications", "fractional_shares",
+                           "REAL NOT NULL DEFAULT 0")
+    _add_column_if_missing(conn, "corporate_action_applications", "disposed_cost_basis",
+                           "REAL NOT NULL DEFAULT 0")
+    _add_column_if_missing(conn, "corporate_action_applications", "realized_pnl",
+                           "REAL NOT NULL DEFAULT 0")
+    _add_column_if_missing(conn, "corporate_action_applications", "official_ratio", "REAL")
     # 现金分红的应收/到账拆分
     _add_column_if_missing(conn, "corporate_action_applications", "receivable_amount", "REAL NOT NULL DEFAULT 0")
     _add_column_if_missing(conn, "corporate_action_applications", "cash_paid_amount", "REAL NOT NULL DEFAULT 0")

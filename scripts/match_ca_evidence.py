@@ -112,7 +112,11 @@ def classify(event: dict, pool: list[dict]) -> dict:
                 "checks": best_checks, "evidence_status": EVIDENCE_UNVERIFIED}
 
     matched_keys = sum(1 for value in best_checks.values() if value)
-    if best_score >= MIN_OFFICIAL_SCORE and matched_keys >= 2:
+    total_keys = len(best_checks)
+    # official_confirmed 要求**全部**核对项通过：
+    # 只要有一项（除息日 / 金额 / 比例 / 登记日 / 发放日）对不上，
+    # 就说明公告内容无法完整核对，必须降为 secondary_confirmed。
+    if total_keys > 0 and matched_keys == total_keys and best_score >= MIN_OFFICIAL_SCORE:
         status = EVIDENCE_OFFICIAL
     elif matched_keys >= 1:
         status = EVIDENCE_SECONDARY

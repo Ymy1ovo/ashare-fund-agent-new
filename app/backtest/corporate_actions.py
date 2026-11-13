@@ -21,6 +21,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import math
 from dataclasses import dataclass
 from datetime import date, datetime
 from typing import Any
@@ -41,6 +42,15 @@ EVIDENCE_OFFICIAL = "official_confirmed"
 EVIDENCE_SECONDARY = "secondary_confirmed"
 EVIDENCE_UNVERIFIED = "unverified"
 EVIDENCE_REJECTED = "rejected"
+
+# 零碎份额处置口径（必须与官方公告一致，不得统一套用估值）
+FRACTION_CASH_COMPENSATION = "cash_compensation"   # 按公告价现金补偿
+FRACTION_TRUNCATE = "truncate"                     # 尾差计入基金财产（舍去）
+FRACTION_ROUND_UP = "round_up"                     # 小数点后进位补足
+
+FRACTION_POLICIES = (FRACTION_CASH_COMPENSATION, FRACTION_TRUNCATE, FRACTION_ROUND_UP)
+# 默认口径：公告未明说时按舍去处理（不虚构现金收入）
+DEFAULT_FRACTION_POLICY = FRACTION_TRUNCATE
 
 EVIDENCE_LEVELS = (
     EVIDENCE_OFFICIAL, EVIDENCE_SECONDARY, EVIDENCE_UNVERIFIED, EVIDENCE_REJECTED,
@@ -86,6 +96,8 @@ class CorporateAction:
     manager_name: str | None = None
     event_fingerprint: str | None = None
     version_no: int = 1
+    # 零碎份额处置口径（来自官方公告）
+    fractional_policy: str = DEFAULT_FRACTION_POLICY
 
     def __post_init__(self) -> None:
         if self.action_type not in ACTION_TYPES:
@@ -117,6 +129,10 @@ class CorporateAction:
         if self.evidence_status not in EVIDENCE_LEVELS:
             raise CorporateActionError(
                 f"未知的证据等级：{self.evidence_status}"
+            )
+        if self.fractional_policy not in FRACTION_POLICIES:
+            raise CorporateActionError(
+                f"未知的零碎份额处置口径：{self.fractional_policy}"
             )
         # 现金分红必须有发放日，否则无法区分「应收」与「可用现金」
         if self.action_type == ACTION_CASH_DISTRIBUTION and self.pay_date is None:
@@ -172,6 +188,7 @@ class CorporateAction:
             "manager_name": self.manager_name,
             "event_fingerprint": self.event_fingerprint,
             "version_no": self.version_no,
+            "fractional_policy": self.fractional_policy,
         }
 
 
@@ -210,6 +227,7 @@ def action_from_row(row) -> CorporateAction:
         manager_name=_opt("manager_name"),
         event_fingerprint=_opt("event_fingerprint"),
         version_no=int(_opt("version_no") or 1),
+        fractional_policy=str(_opt("fractional_policy") or DEFAULT_FRACTION_POLICY),
     )
 
 
@@ -233,6 +251,10 @@ class ActionImpact:
     fractional_cash: float
     pay_date: date | None = None
     confirm_date: date | None = None
+    # 阶段3A.3.2.2：官方折算比例与零碎份额处置口径
+    official_ratio: float | None = None
+    fractional_policy: str = "truncate"
+    compensation_price: float | None = None
 
     @property
     def value_before(self) -> float:
@@ -250,6 +272,9 @@ class ActionImpact:
             "fractional_cash": round(self.fractional_cash, 6),
             "pay_date": self.pay_date.isoformat() if self.pay_date else None,
             "confirm_date": self.confirm_date.isoformat() if self.confirm_date else None,
+            "official_ratio": self.official_ratio,
+            "fractional_policy": self.fractional_policy,
+            "compensation_price": self.compensation_price,
         }
 
 
@@ -278,12 +303,23 @@ def compute_impact(
         )
 
     if action.is_share_adjustment:
-        raw = holding * float(action.share_ratio)
-        new_shares = int(raw // 1)
-        fractional = raw - new_shares
-        fractional_cash = 0.0
-        if fractional > RATIO_TOLERANCE and price is not None and price > 0:
-            fractional_cash = fractional * float(price)
+        ratio = float(action.share_ratio)
+        raw = holding * ratio
+        policy = action.fractional_policy
+        if policy == FRACTION_ROUND_UP:
+            new_shares = int(math.ceil(raw - RATIO_TOLERANCE))
+            fractional_cash = 0.0
+        elif policy == FRACTION_CASH_COMPENSATION:
+            new_shares = int(raw // 1)
+            fractional = raw - new_shares
+            fractional_cash = 0.0
+            if fractional > RATIO_TOLERANCE and price is not None and price > 0:
+                fractional_cash = fractional * float(price)
+        else:
+            # truncate：尾差计入基金财产，无现金补偿
+            new_shares = int(raw // 1)
+            fractional_cash = 0.0
+        fractional = raw - int(raw // 1)
         return ActionImpact(
             action_id=action.action_id,
             code=action.code,
@@ -294,6 +330,9 @@ def compute_impact(
             cash_delta=fractional_cash,
             fractional_cash=fractional_cash,
             confirm_date=action.effective_date,
+            official_ratio=ratio,
+            fractional_policy=policy,
+            compensation_price=price if policy == FRACTION_CASH_COMPENSATION else None,
         )
 
     if action.action_type == ACTION_CASH_DISTRIBUTION:
@@ -336,6 +375,7 @@ def build_action(
     announcement_date: str | None = None,
     announcement_url: str | None = None,
     manager_name: str | None = None,
+    fractional_policy: str = DEFAULT_FRACTION_POLICY,
 ) -> CorporateAction:
     """构造事件（字符串日期自动转换）。"""
     def _d(value):
@@ -362,6 +402,7 @@ def build_action(
         announcement_date=announcement_date,
         announcement_url=announcement_url,
         manager_name=manager_name,
+        fractional_policy=fractional_policy,
     )
 
 
@@ -371,32 +412,62 @@ def now_stamp() -> str:
 
 # ---------------------------------------------------------------- 数据库读写
 
+# 各事件类型的「区间筛选日期」：
+# 现金分红的经济权益在除息日确定，拆分/合并在生效交易日调整份额。
+WINDOW_DATE_FIELD = {
+    ACTION_CASH_DISTRIBUTION: "ex_date",
+    ACTION_SPLIT: "effective_date",
+    ACTION_REVERSE_SPLIT: "effective_date",
+    ACTION_OTHER: "effective_date",
+}
+
+
+def window_date(action: CorporateAction) -> date:
+    """事件在回测区间里的判定日期（经济权益日）。"""
+    return action.ex_date if action.action_type == ACTION_CASH_DISTRIBUTION         else action.effective_date
+
+
 def load_actions(
     *, start: str | None = None, end: str | None = None,
     codes: list[str] | None = None, db_path=None,
 ) -> list[CorporateAction]:
-    """读取公司行为事件（按生效日升序）。"""
+    """读取公司行为事件。
+
+    **按事件类型分别使用实际应用日期筛选**（阶段3A.3.2.2 修正）：
+
+    - 现金分红 → `ex_date`（除息日确认应收，必须在区间内）
+    - 拆分 / 合并 → `effective_date`（实际调整份额的交易日）
+
+    旧实现统一按 `effective_date` 筛，会漏掉「除息日在区间最后一天、
+    生效日在区间之后」的分红，导致回测结束时应收凭空消失。
+    """
     from app.database.db import get_connection
 
     sql = (
         "SELECT action_id, code, action_type, ex_date, effective_date, share_ratio, "
         "cash_per_share, record_date, pay_date, source, evidence, status, "
         "data_version, notes, evidence_status, announcement_title, announcement_date, "
-        "announcement_url, manager_name, event_fingerprint, version_no "
+        "announcement_url, manager_name, event_fingerprint, version_no, fractional_policy "
         "FROM corporate_actions WHERE 1=1"
     )
     params: list[Any] = []
     if start:
-        sql += " AND effective_date >= ?"
-        params.append(start)
+        # 分红的 ex_date >= start；拆分/合并的 effective_date >= start
+        sql += (" AND ("
+                "(action_type = 'cash_distribution' AND ex_date >= ?) OR "
+                "(action_type != 'cash_distribution' AND effective_date >= ?))")
+        params.extend([start, start])
     if end:
-        sql += " AND effective_date <= ?"
-        params.append(end)
+        sql += (" AND ("
+                "(action_type = 'cash_distribution' AND ex_date <= ?) OR "
+                "(action_type != 'cash_distribution' AND effective_date <= ?))")
+        params.extend([end, end])
     if codes:
         placeholders = ",".join("?" for _ in codes)
         sql += f" AND code IN ({placeholders})"
         params.extend(codes)
-    sql += " ORDER BY effective_date, code, action_id"
+    # 分红可能生效日晚于区间末尾，但仍须按 ex_date 顺序读到
+    sql += " ORDER BY ex_date, effective_date, code, action_id"
     with get_connection(db_path) as conn:
         rows = conn.execute(sql, params).fetchall()
     return [action_from_row(row) for row in rows]
@@ -410,9 +481,21 @@ def event_key(action: CorporateAction) -> str:
 def compute_event_fingerprint(action: CorporateAction) -> str:
     """单个事件的确定性 SHA256。
 
-    覆盖任务书要求的全部字段，任何一项变化都会改变指纹。
+    覆盖三组字段，任何一项变化都会改变指纹：
+
+    1. **经济要素**：code / action_type / ex_date / effective_date /
+       share_ratio / cash_per_share / record_date / pay_date / fractional_policy
+       —— 决定账本怎么记
+    2. **证据元数据**：evidence_status / source / announcement_title /
+       announcement_date / announcement_url / manager_name / evidence
+       —— 决定这条事件凭什么可信（阶段3A.3.2.2 新增）
+    3. **数据版本**：data_version
+
+    不含 `notes`、`version_no`、`action_id`、`event_fingerprint` 本身：
+    这些是实现细节或派生字段，改动它们不应改变指纹。
     """
     payload = {
+        # ---- 经济要素 ----
         "code": action.code,
         "action_type": action.action_type,
         "ex_date": action.ex_date.isoformat(),
@@ -422,8 +505,16 @@ def compute_event_fingerprint(action: CorporateAction) -> str:
                            else round(float(action.cash_per_share), 10)),
         "record_date": action.record_date.isoformat() if action.record_date else None,
         "pay_date": action.pay_date.isoformat() if action.pay_date else None,
+        "fractional_policy": action.fractional_policy,
+        # ---- 证据元数据（阶段3A.3.2.2 新增）----
         "evidence_status": action.evidence_status,
         "source": action.source,
+        "announcement_title": action.announcement_title,
+        "announcement_date": action.announcement_date,
+        "announcement_url": action.announcement_url,
+        "manager_name": action.manager_name,
+        "evidence": action.evidence,
+        # ---- 数据版本 ----
         "data_version": action.data_version,
     }
     text = json.dumps(payload, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
@@ -498,7 +589,9 @@ def save_action(
 
     with get_connection(db_path) as conn:
         existing = conn.execute(
-            "SELECT action_id, version_no, event_fingerprint FROM corporate_actions "
+            "SELECT action_id, version_no, event_fingerprint, fractional_policy, "
+            "evidence_status, share_ratio, cash_per_share, effective_date, record_date, "
+            "pay_date FROM corporate_actions "
             "WHERE code=? AND action_type=? AND ex_date=?",
             (action.code, action.action_type, action.ex_date.isoformat()),
         ).fetchone()
@@ -506,8 +599,16 @@ def save_action(
         if existing:
             action_id = int(existing["action_id"])
             old_fp = existing["event_fingerprint"]
-            # 指纹相同则完全不写，保证幂等
-            if old_fp == fingerprint:
+            # 指纹相同**且**关键列确实一致才早退。
+            # 只比指纹会漏掉「库内 fingerprint 已更新但其它列没落库」的脏状态，
+            # 那样 subsequent 写入会被永久跳过。
+            same_row = (
+                old_fp == fingerprint
+                and str(existing["fractional_policy"] or "") == action.fractional_policy
+                and str(existing["evidence_status"] or "") == action.evidence_status
+                and str(existing["effective_date"]) == action.effective_date.isoformat()
+            )
+            if same_row:
                 return action_id
             old_version = int(existing["version_no"] or 1)
             # 先把旧版本快照写入版本表（只写一次）
@@ -518,8 +619,8 @@ def save_action(
                 "cash_per_share=?, record_date=?, pay_date=?, source=?, evidence=?, "
                 "status=?, data_version=?, notes=?, evidence_status=?, "
                 "announcement_title=?, announcement_date=?, announcement_url=?, "
-                "manager_name=?, event_fingerprint=?, version_no=?, updated_at=? "
-                "WHERE action_id=?",
+                "manager_name=?, fractional_policy=?, event_fingerprint=?, "
+                "version_no=?, updated_at=? WHERE action_id=?",
                 (
                     action.effective_date.isoformat(), action.share_ratio,
                     action.cash_per_share,
@@ -529,7 +630,7 @@ def save_action(
                     action.data_version, action.notes, action.evidence_status,
                     action.announcement_title, action.announcement_date,
                     action.announcement_url, action.manager_name,
-                    fingerprint, new_version, stamp, action_id,
+                    action.fractional_policy, fingerprint, new_version, stamp, action_id,
                 ),
             )
             _write_version(conn, key, new_version, action_id, action,
@@ -542,7 +643,8 @@ def save_action(
             " record_date, pay_date, source, evidence, status, data_version, notes, "
             " created_at, updated_at, evidence_status, announcement_title, "
             " announcement_date, announcement_url, manager_name, event_fingerprint, "
-            " version_no) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+            " version_no, fractional_policy) "
+            "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
             (
                 action.code, action.action_type, action.ex_date.isoformat(),
                 action.effective_date.isoformat(), action.share_ratio,
@@ -553,7 +655,7 @@ def save_action(
                 action.data_version, action.notes, stamp, stamp,
                 action.evidence_status, action.announcement_title,
                 action.announcement_date, action.announcement_url,
-                action.manager_name, fingerprint, 1,
+                action.manager_name, fingerprint, 1, action.fractional_policy,
             ),
         )
         action_id = int(cur.lastrowid)
@@ -618,25 +720,32 @@ def event_versions(action_key: str, *, db_path=None) -> list[dict]:
 
 
 def record_application(
-    *, run_id: str, impact: ActionImpact, db_path=None,
+    *, run_id: str, impact: ActionImpact, ledger: dict | None = None, db_path=None,
 ) -> None:
     """记录一次事件应用；同一 run 同一事件重复应用会抛错。"""
     import sqlite3
 
     from app.database.db import get_connection
 
+    ledger = ledger or {}
+
     try:
         with get_connection(db_path) as conn:
             conn.execute(
                 "INSERT INTO corporate_action_applications "
                 "(run_id, action_id, code, effective_date, action_type, shares_before, "
-                " shares_after, cash_delta, fractional_cash, applied_at) "
-                "VALUES (?,?,?,?,?,?,?,?,?,?)",
+                " shares_after, cash_delta, fractional_cash, applied_at, "
+                " fractional_shares, disposed_cost_basis, realized_pnl, official_ratio) "
+                "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
                 (
                     run_id, impact.action_id, impact.code,
                     impact.effective_date.isoformat(), impact.action_type,
                     impact.shares_before, impact.shares_after,
                     impact.cash_delta, impact.fractional_cash, now_stamp(),
+                    float(ledger.get("fractional_shares") or 0.0),
+                    float(ledger.get("disposed_cost_basis") or 0.0),
+                    float(ledger.get("realized_pnl") or 0.0),
+                    impact.official_ratio,
                 ),
             )
     except sqlite3.IntegrityError as exc:
