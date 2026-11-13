@@ -344,6 +344,57 @@ CREATE TABLE IF NOT EXISTS corporate_actions (
 );
 """
 
+# 阶段3A.3.2.1：证据等级、应收分红、事件版本、月度批次表
+CORPORATE_ACTION_V2_SCHEMA = """
+CREATE TABLE IF NOT EXISTS corporate_action_versions (
+    version_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    action_key TEXT NOT NULL,
+    version_no INTEGER NOT NULL,
+    code TEXT NOT NULL,
+    action_type TEXT NOT NULL,
+    ex_date TEXT NOT NULL,
+    effective_date TEXT NOT NULL,
+    share_ratio REAL,
+    cash_per_share REAL,
+    record_date TEXT,
+    pay_date TEXT,
+    source TEXT NOT NULL,
+    evidence_status TEXT NOT NULL,
+    data_version TEXT NOT NULL,
+    change_reason TEXT,
+    snapshot_json TEXT NOT NULL,
+    created_at TEXT NOT NULL,
+    UNIQUE(action_key, version_no)
+);
+"""
+
+CORPORATE_ACTION_DIVIDEND_RECEIVABLES_SCHEMA = """
+CREATE TABLE IF NOT EXISTS dividend_receivables (
+    receivable_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    run_id TEXT NOT NULL,
+    action_id INTEGER NOT NULL,
+    code TEXT NOT NULL,
+    record_date TEXT,
+    ex_date TEXT NOT NULL,
+    pay_date TEXT NOT NULL,
+    shares_at_ex INTEGER NOT NULL,
+    cash_per_share REAL NOT NULL,
+    amount REAL NOT NULL,
+    status TEXT NOT NULL DEFAULT 'pending',
+    created_at TEXT NOT NULL,
+    settled_at TEXT,
+    UNIQUE(run_id, action_id)
+);
+"""
+
+CORPORATE_ACTION_V2_INDEXES = """
+CREATE INDEX IF NOT EXISTS idx_cav_action ON corporate_action_versions(action_key, version_no);
+CREATE INDEX IF NOT EXISTS idx_cav_code ON corporate_action_versions(code);
+CREATE INDEX IF NOT EXISTS idx_dr_run ON dividend_receivables(run_id);
+CREATE INDEX IF NOT EXISTS idx_dr_status ON dividend_receivables(status);
+CREATE INDEX IF NOT EXISTS idx_ca_evidence ON corporate_actions(evidence_status);
+"""
+
 CORPORATE_ACTION_APPLICATIONS_SCHEMA = """
 CREATE TABLE IF NOT EXISTS corporate_action_applications (
     application_id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -449,7 +500,18 @@ def _columns(conn: sqlite3.Connection, table: str) -> set[str]:
     return {str(row[1]) for row in conn.execute(f"PRAGMA table_info({table})")}
 
 
+def _table_exists(conn: sqlite3.Connection, table: str) -> bool:
+    row = conn.execute(
+        "SELECT 1 FROM sqlite_master WHERE type='table' AND name=?", (table,)
+    ).fetchone()
+    return row is not None
+
+
 def _add_column_if_missing(conn: sqlite3.Connection, table: str, column: str, ddl: str) -> None:
+    # 表可能由其它模块（如 validation/storage.py）随后创建；
+    # 此处跳过而不是报错，保证 init_db 可以单独调用。
+    if not _table_exists(conn, table):
+        return
     if column not in _columns(conn, table):
         conn.execute(f"ALTER TABLE {table} ADD COLUMN {column} {ddl}")
 
@@ -479,6 +541,22 @@ def _migrate(conn: sqlite3.Connection) -> None:
         _add_column_if_missing(conn, table, "stamp_tax", "REAL NOT NULL DEFAULT 0")
         _add_column_if_missing(conn, table, "transfer_fee", "REAL NOT NULL DEFAULT 0")
     _add_column_if_missing(conn, "backtest_orders", "commission", "REAL NOT NULL DEFAULT 0")
+    # 阶段3A.3.2.1：证据等级、公告元数据、事件指纹
+    _add_column_if_missing(conn, "corporate_actions", "evidence_status", "TEXT NOT NULL DEFAULT 'unverified'")
+    _add_column_if_missing(conn, "corporate_actions", "announcement_title", "TEXT")
+    _add_column_if_missing(conn, "corporate_actions", "announcement_date", "TEXT")
+    _add_column_if_missing(conn, "corporate_actions", "announcement_url", "TEXT")
+    _add_column_if_missing(conn, "corporate_actions", "manager_name", "TEXT")
+    _add_column_if_missing(conn, "corporate_actions", "event_fingerprint", "TEXT")
+    _add_column_if_missing(conn, "corporate_actions", "version_no", "INTEGER NOT NULL DEFAULT 1")
+    # 现金分红的应收/到账拆分
+    _add_column_if_missing(conn, "corporate_action_applications", "receivable_amount", "REAL NOT NULL DEFAULT 0")
+    _add_column_if_missing(conn, "corporate_action_applications", "cash_paid_amount", "REAL NOT NULL DEFAULT 0")
+    # 历史回测的记录状态
+    _add_column_if_missing(conn, "backtest_runs", "accounting_version", "TEXT")
+    _add_column_if_missing(conn, "backtest_runs", "evidence_version", "TEXT")
+    _add_column_if_missing(conn, "validation_runs", "accounting_version", "TEXT")
+    _add_column_if_missing(conn, "validation_runs", "legacy_flag", "TEXT")
     # 历史订单的 fee 语义等于佣金（当时 stamp_duty_rate 与 transfer_fee_rate 均为 0），
     # 因此 commission 回填为 fee。仅对「commission 尚未写入」的旧行生效。
     conn.execute(
@@ -494,7 +572,11 @@ def init_db(db_path: Path | None = None) -> None:
         conn.executescript(CORPORATE_ACTION_SCHEMA)
         conn.executescript(CORPORATE_ACTION_APPLICATIONS_SCHEMA)
         conn.executescript(CORPORATE_ACTION_INDEXES)
+        conn.executescript(CORPORATE_ACTION_V2_SCHEMA)
+        conn.executescript(CORPORATE_ACTION_DIVIDEND_RECEIVABLES_SCHEMA)
+        # 先加列（证据等级等），再建依赖这些列的索引
         _migrate(conn)
+        conn.executescript(CORPORATE_ACTION_V2_INDEXES)
 
 
 def save_interface_test(record: dict[str, Any], db_path: Path | None = None) -> None:

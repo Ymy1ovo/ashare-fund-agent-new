@@ -31,6 +31,8 @@ class Portfolio:
     trade_count: int = 0
     closed_trade_pnls: list[float] = field(default_factory=list)
     closed_holding_days: list[float] = field(default_factory=list)
+    # 阶段3A.3.2.1：已确认但尚未到账的现金分红（应收，不计入可用现金）
+    receivables: list[dict] = field(default_factory=list)
 
     def __post_init__(self) -> None:
         if self.cash == 0.0:
@@ -61,7 +63,12 @@ class Portfolio:
         return total
 
     def total_assets(self, prices: dict[str, float]) -> float:
-        return self.cash + self.market_value(prices)
+        """总资产 = 可用现金 + 持仓市值 + 已确认应收分红。
+
+        应收分红在除息日即计入总资产（经济权益已确定），
+        但不能用于下单，因此不计入 cash。
+        """
+        return self.cash + self.market_value(prices) + self.dividend_receivable
 
     def cost_basis(self, code: str) -> float:
         position = self.positions.get(code)
@@ -156,45 +163,124 @@ class Portfolio:
         """按事件调整持仓数量与现金。
 
         只在 Engine 已经算好目标数量与现金增量后调用；
-        本方法不判断事件合法性（由 corporate_actions 负责），只保证：
-        - 数量按比例缩放后，各批次同步缩放，成本基准随之反比调整，
-          使「持仓成本总额」在事件前后保持不变（经济价值连续）；
-        - 现金增量直接入账；
-        - 账本不变量在之后仍成立。
+        本方法只保证账本自洽，不判断事件合法性（由 corporate_actions 负责）：
+
+        1. 各批次按比例缩放后，用「最大余数法」分配舍入误差，
+           保证 `sum(lot.quantity) == position.quantity == new_quantity`；
+        2. 每批次成本基准按 1/比例 反比调整，使成本总额在事件前后守恒；
+        3. 可卖日期（`available_date`）保持不变，份额调整不得把 T+1 变成 T+0；
+        4. 现金增量直接入账，负数会触发现金为负的不变量检查。
         """
         if new_quantity < 0:
             raise PortfolioError(f"{code} 调整后数量不能为负：{new_quantity}")
         position = self.positions.get(code)
-        if position is None:
-            if cash_delta:
-                self.cash += cash_delta
-            self._assert_sane()
-            return
-        old_quantity = position.quantity
-        if old_quantity <= 0:
-            if position.quantity == 0:
-                self.positions.pop(code, None)
-            if cash_delta:
-                self.cash += cash_delta
-            self._assert_sane()
-            return
-        if new_quantity > 0:
-            ratio = new_quantity / old_quantity
-            for lot in position.lots:
-                lot.quantity = int(round(lot.quantity * ratio))
-                if lot.price > 0:
-                    # 价格反比调整，保证 cost_basis × quantity 守恒
-                    lot.price = lot.price / ratio
-            # 舍入可能让批次总数与新数量有 1~2 份差异，用最后一笔补齐
-            diff = new_quantity - position.quantity
-            if diff and position.lots:
-                position.lots[-1].quantity += diff
-            position.lots = [lot for lot in position.lots if lot.quantity > 0]
-        else:
+        if position is None or position.quantity <= 0:
             self.positions.pop(code, None)
+            if cash_delta:
+                self.cash += cash_delta
+            self._assert_sane()
+            return
+
+        old_quantity = position.quantity
+        if new_quantity <= 0:
+            self.positions.pop(code, None)
+            if cash_delta:
+                self.cash += cash_delta
+            self._assert_sane()
+            return
+
+        ratio = new_quantity / old_quantity
+        lots = position.lots
+        # 1) 逐批取整，记录余数
+        scaled = [lot.quantity * ratio for lot in lots]
+        floors = [int(value // 1) for value in scaled]
+        remainders = [value - floor for value, floor in zip(scaled, floors)]
+        shortfall = new_quantity - sum(floors)
+        # 2) 最大余数法补齐：按小数部分从大到小依次 +1
+        order = sorted(range(len(lots)), key=lambda i: remainders[i], reverse=True)
+        index = 0
+        while shortfall > 0 and order:
+            floors[order[index % len(order)]] += 1
+            shortfall -= 1
+            index += 1
+        while shortfall < 0:
+            # 极少数情况下取整会超出，从余数最小的批次扣回
+            for i in reversed(order):
+                if floors[i] > 0:
+                    floors[i] -= 1
+                    shortfall += 1
+                    break
+            else:
+                break
+
+        for lot, quantity in zip(lots, floors):
+            lot.quantity = quantity
+            if lot.price > 0:
+                # 成本基准守恒：数量 ×N 则单价 ÷N
+                lot.price = lot.price / ratio
+        position.lots = [lot for lot in lots if lot.quantity > 0]
         if cash_delta:
             self.cash += cash_delta
+        # 3) 强制不变量：批次总和必须等于目标数量
+        actual = position.quantity
+        if actual != new_quantity:
+            raise PortfolioError(
+                f"{code} 份额调整后批次之和 {actual} != 目标 {new_quantity}"
+            )
         self._assert_sane()
+
+    # ---------- 现金分红应收 / 到账 ----------
+    def confirm_dividend_receivable(
+        self,
+        code: str,
+        amount: float,
+        *,
+        action_id: int = 0,
+        ex_date: date | None = None,
+        pay_date: date | None = None,
+        record_date: date | None = None,
+        shares: int = 0,
+    ) -> None:
+        """在除息日确认一笔应收分红：经济权益已确定，但现金不可交易。"""
+        if amount < 0:
+            raise PortfolioError(f"{code} 应收分红为负：{amount}")
+        if amount == 0:
+            return
+        self.receivables.append({
+            "action_id": action_id,
+            "code": code,
+            "amount": amount,
+            "record_date": record_date,
+            "ex_date": ex_date,
+            "pay_date": pay_date,
+            "shares": shares,
+        })
+        self._assert_sane()
+
+    def settle_dividend_receivable(self, on_date: date) -> list[dict]:
+        """在发放日把已到期应收分红转入可用现金，返回本次结转明细。"""
+        settled: list[dict] = []
+        remaining: list[dict] = []
+        for item in self.receivables:
+            pay = item.get("pay_date")
+            if pay is not None and pay <= on_date:
+                self.cash += float(item["amount"])
+                settled.append({**item, "settled_on": on_date})
+            else:
+                remaining.append(item)
+        self.receivables = remaining
+        if settled:
+            self._assert_sane()
+        return settled
+
+    @property
+    def dividend_receivable(self) -> float:
+        """当前未到账的应收分红合计。"""
+        return sum(float(item["amount"]) for item in self.receivables)
+
+    def receivable_of(self, action_id: int) -> float:
+        return sum(float(item["amount"]) for item in self.receivables
+                   if int(item.get("action_id") or 0) == action_id)
 
     def _assert_sane(self) -> None:
         if self.cash < -1e-6:
@@ -215,7 +301,8 @@ class Portfolio:
         price_status: dict[str, str] | None = None,
     ) -> DailySnapshot:
         market_value = self.market_value(prices)
-        total = self.cash + market_value
+        receivable = self.dividend_receivable
+        total = self.cash + market_value + receivable
         nav = total / nav_base if nav_base else 0.0
         daily_return = None if previous_nav in (None, 0) else nav / previous_nav - 1
         return DailySnapshot(
@@ -233,4 +320,5 @@ class Portfolio:
             prices=prices,
             price_status=price_status or {},
             fees_paid_cumulative=self.total_fees,
+            dividend_receivable=receivable,
         )

@@ -119,3 +119,6 @@ data/ca_*.json
 data/replay_3a3_2.json
 data/replay_validation_3a3_2.json
 data/backups/
+data/ca_announcements.json
+data/ca_ann_match.json
+data/replay_3a3_2_1.json

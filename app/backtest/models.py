@@ -202,6 +202,8 @@ class DailySnapshot:
     prices: dict[str, float] = field(default_factory=dict)
     price_status: dict[str, str] = field(default_factory=dict)
     fees_paid_cumulative: float = 0.0
+    # 阶段3A.3.2.1：已确认但尚未到账的现金分红（不计入可用现金）
+    dividend_receivable: float = 0.0
 
     def as_dict(self) -> dict[str, Any]:
         return {
@@ -215,4 +217,5 @@ class DailySnapshot:
             "prices": self.prices,
             "price_status": self.price_status,
             "fees_paid_cumulative": self.fees_paid_cumulative,
+            "dividend_receivable": self.dividend_receivable,
         }

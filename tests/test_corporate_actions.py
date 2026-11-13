@@ -15,6 +15,9 @@ from app.backtest.corporate_actions import (
     ACTION_CASH_DISTRIBUTION,
     ACTION_REVERSE_SPLIT,
     ACTION_SPLIT,
+    EVIDENCE_OFFICIAL,
+    EVIDENCE_SECONDARY,
+    EVIDENCE_UNVERIFIED,
     CorporateActionError,
     STATUS_CONFIRMED,
     STATUS_UNVERIFIED,
@@ -92,7 +95,18 @@ class _Fixed:
 
 
 def _insert_action(db_path, **kwargs):
-    action = build_action(status=STATUS_CONFIRMED, source="test", **kwargs)
+    kwargs.setdefault("status", STATUS_CONFIRMED)
+    kwargs.setdefault("source", "test")
+    kwargs.setdefault("evidence_status", EVIDENCE_OFFICIAL)
+    # 现金分红必须给出官方发放日；登记日默认取除息日的前一个工作日，
+    # 与真实公告一致（否则登记日与除息日同日，买在除息日就得不到分红）
+    if kwargs.get("action_type") == ACTION_CASH_DISTRIBUTION:
+        kwargs.setdefault("pay_date", kwargs.get("ex_date"))
+        if "record_date" not in kwargs and kwargs.get("ex_date"):
+            day = pd.Timestamp(kwargs["ex_date"])
+            prev = (day - pd.tseries.offsets.BDay(1)).strftime("%Y-%m-%d")
+            kwargs.setdefault("record_date", prev)
+    action = build_action(**kwargs)
     return save_action(action, db_path=db_path)
 
 
@@ -153,44 +167,54 @@ def test_fractional_split_produces_fractional_cash(temp_db):
 # ---------------------------------------------------------------- 4. 现金分红
 
 def test_cash_distribution_increases_cash(temp_db):
-    dates = _seed(temp_db, {"510300": [10.0] * 4})
-    _insert_action(temp_db, code="510300", action_type=ACTION_CASH_DISTRIBUTION,
-                   ex_date=dates[1], effective_date=dates[2], cash_per_share=0.5)
+    """除息日确认应收（不进现金），发放日转入可用现金。"""
+    dates = _seed(temp_db, {"510300": [10.0] * 6})
+    # 买在 dates[1]，登记日 dates[2]，除息日 dates[3]，发放日 dates[4]
+    _insert_action(
+        temp_db, code="510300", action_type=ACTION_CASH_DISTRIBUTION,
+        ex_date=dates[3], effective_date=dates[3], cash_per_share=0.5,
+        record_date=dates[2], pay_date=dates[4],
+    )
     plan = {dates[0]: [TargetWeight("510300", 1.0)]}
     result, engine = _run(temp_db, dates, ["510300"], plan=plan)
     log = engine.corporate_action_log[0]
-    expected_cash = log["shares_before"] * 0.5
-    # 分红按「事件日持仓数量 × 每份金额」入账，与现金余额无关
-    assert log["cash_delta"] == pytest.approx(expected_cash)
-    assert log["shares_before"] > 0
-    # 现金余额在事件日必然包含这笔分红（当日还可能有其他成交，
-    # 因此只断言「流入 >= 分红金额」与账面恒等式）
-    after = next(d for d in result.daily if d.trade_date.isoformat() == dates[2])
-    # 该日现金 = 前一日现金 + 分红 − 当日买入支出
-    before = next(d for d in result.daily if d.trade_date.isoformat() == dates[1])
-    buys = [t for t in result.trades if t.trade_date.isoformat() == dates[2] and t.side == "buy"]
-    spent = sum(t.gross_amount + t.total_fees for t in buys)
-    assert after.cash == pytest.approx(before.cash + expected_cash - spent, abs=1e-6)
-    assert expected_cash > 0
+    expected = log["shares_before"] * 0.5
+    assert log["cash_delta"] == pytest.approx(expected)
+    assert log["confirm_date"] == dates[3]
+    assert log["pay_date"] == dates[4]
+
+    ex_day = next(d for d in result.daily if d.trade_date.isoformat() == dates[3])
+    before_pay = next(d for d in result.daily if d.trade_date.isoformat() == dates[3])
+    pay_day = next(d for d in result.daily if d.trade_date.isoformat() == dates[4])
+    # 除息日只确认应收，现金未增加
+    assert ex_day.dividend_receivable == pytest.approx(expected)
+    assert before_pay.dividend_receivable == pytest.approx(expected)
+    # 发放日应收清零，现金增加
+    assert pay_day.dividend_receivable == pytest.approx(0.0)
+    assert pay_day.cash - before_pay.cash == pytest.approx(expected, abs=1e-6)
     for item in result.daily:
-        assert item.total_assets == pytest.approx(item.cash + item.market_value)
+        assert item.total_assets == pytest.approx(
+            item.cash + item.market_value + item.dividend_receivable)
 
 
 # ---------------------------------------------------------------- 5. 同日拆分+分红
 
 def test_split_and_distribution_same_day(temp_db):
-    dates = _seed(temp_db, {"510300": [10.0] * 4})
+    dates = _seed(temp_db, {"510300": [10.0] * 6})
+    # 登记日 dates[2] 收盘锁定份额 → 除息/拆分日 dates[3] 同时生效
     _insert_action(temp_db, code="510300", action_type=ACTION_SPLIT,
-                   ex_date=dates[1], effective_date=dates[2], share_ratio=2.0)
+                   ex_date=dates[2], effective_date=dates[3], share_ratio=2.0)
     _insert_action(temp_db, code="510300", action_type=ACTION_CASH_DISTRIBUTION,
-                   ex_date=dates[1], effective_date=dates[2], cash_per_share=0.2)
+                   ex_date=dates[3], effective_date=dates[3], cash_per_share=0.2,
+                   record_date=dates[2], pay_date=dates[4])
     plan = {dates[0]: [TargetWeight("510300", 1.0)]}
     result, engine = _run(temp_db, dates, ["510300"], plan=plan)
     assert len(engine.corporate_action_log) == 2
     kinds = {item["action_type"] for item in engine.corporate_action_log}
     assert kinds == {ACTION_SPLIT, ACTION_CASH_DISTRIBUTION}
     for item in result.daily:
-        assert item.total_assets == pytest.approx(item.cash + item.market_value)
+        assert item.total_assets == pytest.approx(
+            item.cash + item.market_value + item.dividend_receivable)
 
 
 def test_duplicate_event_import_is_idempotent(temp_db):
@@ -283,7 +307,8 @@ def test_fractional_shares_converted_to_cash(temp_db):
 def test_leveraged_position_does_not_break_cash(temp_db):
     dates = _seed(temp_db, {"510300": [10.0] * 4})
     _insert_action(temp_db, code="510300", action_type=ACTION_CASH_DISTRIBUTION,
-                   ex_date=dates[1], effective_date=dates[2], cash_per_share=5.0)
+                   ex_date=dates[2], effective_date=dates[2], cash_per_share=5.0,
+                   record_date=dates[1], pay_date=dates[3])
     plan = {dates[0]: [TargetWeight("510300", 0.98)]}
     result, _ = _run(temp_db, dates, ["510300"], plan=plan, initial_cash=10000.0)
     for item in result.daily:
@@ -329,12 +354,13 @@ def test_daily_return_identity_after_split(temp_db):
 # ---------------------------------------------------------------- 16. 缺失行情重叠
 
 def test_event_day_with_missing_quote_uses_last_price(temp_db):
-    dates = _seed(temp_db, {"510300": [10.0] * 4})
+    dates = _seed(temp_db, {"510300": [10.0] * 5})
     with get_connection(temp_db) as conn:
         conn.execute("DELETE FROM etf_daily_prices WHERE code='510300' AND trade_date=?",
-                     (dates[2],))
+                     (dates[3],))
     _insert_action(temp_db, code="510300", action_type=ACTION_CASH_DISTRIBUTION,
-                   ex_date=dates[1], effective_date=dates[2], cash_per_share=0.1)
+                   ex_date=dates[3], effective_date=dates[3], cash_per_share=0.1,
+                   record_date=dates[2], pay_date=dates[4])
     plan = {dates[0]: [TargetWeight("510300", 1.0)]}
     result, engine = _run(temp_db, dates, ["510300"], plan=plan)
     assert len(engine.corporate_action_log) == 1
@@ -346,7 +372,8 @@ def test_unverified_action_not_applied(temp_db):
     dates = _seed(temp_db, {"510300": [10.0] * 4})
     apply_ = build_action(code="510300", action_type=ACTION_SPLIT,
                           ex_date=dates[1], effective_date=dates[2],
-                          share_ratio=2.0, status=STATUS_UNVERIFIED, source="test")
+                          share_ratio=2.0, status=STATUS_UNVERIFIED, source="test",
+                          evidence_status=EVIDENCE_UNVERIFIED)
     save_action(apply_, db_path=temp_db)
     plan = {dates[0]: [TargetWeight("510300", 1.0)]}
     result, engine = _run(temp_db, dates, ["510300"], plan=plan)
@@ -357,7 +384,8 @@ def test_unverified_action_not_applied(temp_db):
 def test_compute_impact_rejects_unverified():
     action = build_action(code="510300", action_type=ACTION_SPLIT,
                           ex_date="2024-01-03", effective_date="2024-01-04",
-                          share_ratio=2.0, status=STATUS_UNVERIFIED, source="test")
+                          share_ratio=2.0, status=STATUS_UNVERIFIED, source="test",
+                          evidence_status=EVIDENCE_UNVERIFIED)
     with pytest.raises(CorporateActionError):
         compute_impact(action, holding=1000, price=10.0)
 
@@ -399,6 +427,7 @@ def test_unverified_actions_listed_separately(temp_db):
         code="510300", action_type=ACTION_SPLIT,
         ex_date="2024-01-04", effective_date="2024-01-05",
         share_ratio=3.0, status=STATUS_UNVERIFIED, source="test",
+        evidence_status=EVIDENCE_UNVERIFIED,
     ), db_path=temp_db)
     pending = unverified_actions(db_path=temp_db)
     assert len(pending) == 1
@@ -431,3 +460,212 @@ def test_portfolio_rejects_negative_new_quantity():
     portfolio = Portfolio(initial_cash=100000)
     with pytest.raises(Exception):
         portfolio.apply_corporate_action("510300", new_quantity=-1, cash_delta=0.0)
+
+
+# ---------------------------------------------------------------- 3A.3.2.1 新增
+
+def test_dividend_receivable_not_available_cash(temp_db):
+    """除息日只确认应收，现金不能用于下单。"""
+    dates = _seed(temp_db, {"510300": [10.0] * 6})
+    _insert_action(temp_db, code="510300", action_type=ACTION_CASH_DISTRIBUTION,
+                   ex_date=dates[3], effective_date=dates[3], cash_per_share=2.0,
+                   record_date=dates[2], pay_date=dates[5])
+    plan = {dates[0]: [TargetWeight("510300", 0.99)]}
+    result, engine = _run(temp_db, dates, ["510300"], plan=plan)
+    ex_day = next(d for d in result.daily if d.trade_date.isoformat() == dates[3])
+    assert ex_day.dividend_receivable > 0
+    # 应收不在 cash 里
+    assert ex_day.cash + ex_day.market_value + ex_day.dividend_receivable == pytest.approx(
+        ex_day.total_assets)
+    assert ex_day.total_assets > ex_day.cash + ex_day.market_value
+
+
+def test_order_after_ex_date_cannot_use_unsettled_dividend(temp_db):
+    """除息日收盘后生成的订单，不能使用尚未到账的分红现金。"""
+    dates = _seed(temp_db, {"510300": [10.0] * 6, "510500": [10.0] * 6})
+    _insert_action(temp_db, code="510300", action_type=ACTION_CASH_DISTRIBUTION,
+                   ex_date=dates[2], effective_date=dates[2], cash_per_share=50.0,
+                   record_date=dates[1], pay_date=dates[5])
+    # 初始资金几乎全仓 510300，除息日收盘后想把 510500 加满
+    plan = {
+        dates[0]: [TargetWeight("510300", 0.99)],
+        dates[2]: [TargetWeight("510300", 0.5), TargetWeight("510500", 0.49)],
+    }
+    result, engine = _run(temp_db, dates, ["510300", "510500"], plan=plan,
+                          initial_cash=100000.0)
+    # 分红金额巨大，若被当作可用现金，510500 会被买满 0.49；实际不应买成
+    buys = [t for t in result.trades if t.code == "510500"]
+    if buys:
+        assert sum(t.gross_amount for t in buys) <= 100000.0 * 0.49 + 1e-6
+    # 全程现金不为负，且应收直到发放日才清零
+    for item in result.daily:
+        assert item.cash >= -1e-6
+
+
+def test_dividend_across_weekend_pay_date(temp_db):
+    """除息日与发放日跨越周末：应收在中间几天保持，发放日到账。"""
+    dates = _seed(temp_db, {"510300": [10.0] * 7})
+    # dates 是工作日序列；把发放日设到后一个工作日，等价于跨周末
+    _insert_action(temp_db, code="510300", action_type=ACTION_CASH_DISTRIBUTION,
+                   ex_date=dates[2], effective_date=dates[2], cash_per_share=1.0,
+                   record_date=dates[1], pay_date=dates[5])
+    plan = {dates[0]: [TargetWeight("510300", 1.0)]}
+    result, engine = _run(temp_db, dates, ["510300"], plan=plan)
+    pending_days = [d.trade_date.isoformat() for d in result.daily
+                    if d.dividend_receivable > 0]
+    assert pending_days == [dates[2], dates[3], dates[4]]
+    assert next(d for d in result.daily
+                if d.trade_date.isoformat() == dates[5]).dividend_receivable == 0
+
+
+def test_trades_between_ex_and_pay_do_not_change_receivable(temp_db):
+    """除息日与发放日之间发生买卖，不改变已确认的应收金额。"""
+    dates = _seed(temp_db, {"510300": [10.0] * 7, "510500": [10.0] * 7})
+    _insert_action(temp_db, code="510300", action_type=ACTION_CASH_DISTRIBUTION,
+                   ex_date=dates[2], effective_date=dates[2], cash_per_share=1.0,
+                   record_date=dates[1], pay_date=dates[5])
+    plan = {
+        dates[0]: [TargetWeight("510300", 0.99)],
+        dates[2]: [TargetWeight("510300", 0.2), TargetWeight("510500", 0.79)],
+    }
+    result, engine = _run(temp_db, dates, ["510300", "510500"], plan=plan,
+                          initial_cash=100000.0)
+    recv = [round(d.dividend_receivable, 6) for d in result.daily]
+    # 应收金额在确认后保持不变（除息日到发放日前）
+    confirmed = [r for d, r in zip(result.daily, recv)
+                 if dates[2] <= d.trade_date.isoformat() < dates[5]]
+    assert len(confirmed) >= 2
+    assert len(set(confirmed)) == 1
+
+
+def test_no_position_no_dividend(temp_db):
+    dates = _seed(temp_db, {"510300": [10.0] * 6})
+    _insert_action(temp_db, code="510300", action_type=ACTION_CASH_DISTRIBUTION,
+                   ex_date=dates[2], effective_date=dates[2], cash_per_share=1.0,
+                   record_date=dates[1], pay_date=dates[4])
+    result, engine = _run(temp_db, dates, ["510300"], plan={})
+    assert engine.corporate_action_log == []
+    for item in result.daily:
+        assert item.dividend_receivable == 0
+        assert item.total_assets == pytest.approx(100000.0)
+
+
+def test_receivable_cash_total_identity(temp_db):
+    """应收 + 现金 + 市值 == 总资产，逐日成立。"""
+    dates = _seed(temp_db, {"510300": [10.0, 10.2, 9.8, 10.4, 10.1, 10.3]})
+    _insert_action(temp_db, code="510300", action_type=ACTION_CASH_DISTRIBUTION,
+                   ex_date=dates[2], effective_date=dates[2], cash_per_share=0.3,
+                   record_date=dates[1], pay_date=dates[4])
+    plan = {dates[0]: [TargetWeight("510300", 0.9)]}
+    result, engine = _run(temp_db, dates, ["510300"], plan=plan)
+    for item in result.daily:
+        assert item.total_assets == pytest.approx(
+            item.cash + item.market_value + item.dividend_receivable, abs=1e-6)
+
+
+def test_dividend_requires_pay_date():
+    """缺发放日的分红事件必须被拒，不能默认当除息日。"""
+    with pytest.raises(CorporateActionError):
+        build_action(code="510300", action_type=ACTION_CASH_DISTRIBUTION,
+                     ex_date="2024-01-03", effective_date="2024-01-04",
+                     cash_per_share=0.1, status=STATUS_CONFIRMED,
+                     evidence_status=EVIDENCE_OFFICIAL, source="test")
+
+
+def test_evidence_status_controls_application(temp_db):
+    """secondary 可应用，unverified 不可应用。"""
+    dates = _seed(temp_db, {"510300": [10.0] * 4})
+    save_action(build_action(
+        code="510300", action_type=ACTION_SPLIT, ex_date=dates[1],
+        effective_date=dates[2], share_ratio=2.0, status=STATUS_CONFIRMED,
+        evidence_status=EVIDENCE_SECONDARY, source="test",
+    ), db_path=temp_db)
+    save_action(build_action(
+        code="510300", action_type=ACTION_CASH_DISTRIBUTION, ex_date=dates[3],
+        effective_date=dates[3], cash_per_share=0.1, record_date=dates[2],
+        pay_date=dates[3], status=STATUS_UNVERIFIED,
+        evidence_status=EVIDENCE_UNVERIFIED, source="test",
+    ), db_path=temp_db)
+    actions = load_actions(db_path=temp_db)
+    by_type = {a.action_type: a for a in actions}
+    assert by_type[ACTION_SPLIT].is_confirmed
+    assert not by_type[ACTION_CASH_DISTRIBUTION].is_confirmed
+
+
+def test_event_fingerprint_deterministic(temp_db):
+    _seed(temp_db, {"510300": [10.0] * 3})
+    from app.backtest.corporate_actions import compute_event_fingerprint
+    a = build_action(code="510300", action_type=ACTION_SPLIT, ex_date="2024-01-03",
+                     effective_date="2024-01-04", share_ratio=2.0,
+                     status=STATUS_CONFIRMED, evidence_status=EVIDENCE_OFFICIAL,
+                     source="test")
+    b = build_action(code="510300", action_type=ACTION_SPLIT, ex_date="2024-01-03",
+                     effective_date="2024-01-04", share_ratio=2.0,
+                     status=STATUS_CONFIRMED, evidence_status=EVIDENCE_OFFICIAL,
+                     source="test")
+    assert compute_event_fingerprint(a) == compute_event_fingerprint(b)
+    c = build_action(code="510300", action_type=ACTION_SPLIT, ex_date="2024-01-03",
+                     effective_date="2024-01-04", share_ratio=2.0000001,
+                     status=STATUS_CONFIRMED, evidence_status=EVIDENCE_OFFICIAL,
+                     source="test")
+    assert compute_event_fingerprint(a) != compute_event_fingerprint(c)
+
+
+def test_events_digest_only_covers_given_events(temp_db):
+    _seed(temp_db, {"510300": [10.0] * 3, "510500": [20.0] * 3})
+    from app.backtest.corporate_actions import compute_events_digest
+    a = load_actions(db_path=temp_db)
+    _insert_action(temp_db, code="510300", action_type=ACTION_SPLIT,
+                   ex_date="2024-01-03", effective_date="2024-01-04", share_ratio=2.0)
+    b = load_actions(db_path=temp_db)
+    assert compute_events_digest(a) != compute_events_digest(b)
+    assert compute_events_digest(b) == compute_events_digest(load_actions(db_path=temp_db))
+
+
+def test_event_version_history_preserved(temp_db):
+    _seed(temp_db, {"510300": [10.0] * 3})
+    from app.backtest.corporate_actions import event_key, event_versions
+    _insert_action(temp_db, code="510300", action_type=ACTION_SPLIT,
+                   ex_date="2024-01-03", effective_date="2024-01-04", share_ratio=2.0)
+    _insert_action(temp_db, code="510300", action_type=ACTION_SPLIT,
+                   ex_date="2024-01-03", effective_date="2024-01-04", share_ratio=2.5)
+    key = event_key(build_action(code="510300", action_type=ACTION_SPLIT,
+                                 ex_date="2024-01-03", effective_date="2024-01-04",
+                                 share_ratio=2.0))
+    versions = event_versions(key, db_path=temp_db)
+    assert len(versions) >= 2
+    with get_connection(temp_db) as conn:
+        row = conn.execute(
+            "SELECT share_ratio, version_no FROM corporate_actions WHERE code='510300'"
+        ).fetchone()
+    assert row["share_ratio"] == pytest.approx(2.5)
+    assert row["version_no"] >= 2
+
+
+def test_input_hash_changes_with_event_content(temp_db):
+    """事件内容变化必须导致 input_hash 变化（即使版本号不变）。"""
+    dates = _seed(temp_db, {"510300": [10.0] * 4})
+    _insert_action(temp_db, code="510300", action_type=ACTION_SPLIT,
+                   ex_date=dates[1], effective_date=dates[2], share_ratio=2.0)
+    plan = {dates[0]: [TargetWeight("510300", 1.0)]}
+    first, _ = _run(temp_db, dates, ["510300"], plan=plan)
+    _insert_action(temp_db, code="510300", action_type=ACTION_SPLIT,
+                   ex_date=dates[1], effective_date=dates[2], share_ratio=3.0)
+    second, _ = _run(temp_db, dates, ["510300"], plan=plan)
+    assert first.input_hash != second.input_hash
+
+
+def test_multi_lot_split_keeps_lot_sum(temp_db):
+    """多批次持仓按非整数比例调整后，批次之和 == 总持仓。"""
+    dates = _seed(temp_db, {"510300": [10.0] * 6})
+    plan = {dates[0]: [TargetWeight("510300", 0.4)],
+            dates[1]: [TargetWeight("510300", 0.7)],
+            dates[2]: [TargetWeight("510300", 1.0)]}
+    _insert_action(temp_db, code="510300", action_type=ACTION_REVERSE_SPLIT,
+                   ex_date=dates[3], effective_date=dates[4], share_ratio=0.36555)
+    result, engine = _run(temp_db, dates, ["510300"], plan=plan)
+    assert engine.corporate_action_log
+    for item in result.daily:
+        assert item.total_assets == pytest.approx(
+            item.cash + item.market_value + item.dividend_receivable, abs=1e-6)
+        assert item.cash >= -1e-6

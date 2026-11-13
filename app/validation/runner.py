@@ -191,17 +191,45 @@ def _data_fingerprint(db_path=None) -> dict:
     return fingerprint_from_db(db_path=db_path)
 
 
-def _input_hash(config: ValidationConfig, codes: list[str], fingerprint: dict) -> str:
+def _input_hash(
+    config: ValidationConfig,
+    codes: list[str],
+    fingerprint: dict,
+    corporate_action_digest: str | None = None,
+) -> str:
+    """验证输入哈希：参数 + ETF 池 + 行情指纹 + 公司行为事件指纹。
+
+    阶段3A.3.2.1 起纳入**本次实际参与的事件数据 SHA256**，
+    因此同一参数在不同事件数据下也会得到不同输入指纹。
+    """
     from app.validation.fingerprint import FINGERPRINT_VERSION
+
+    from app.backtest.corporate_actions import DATA_VERSION
 
     payload = {
         "config": config.as_dict(),
         "codes": sorted(codes),
         "data": fingerprint,
         "fingerprint_version": FINGERPRINT_VERSION,
+        "corporate_action_version": DATA_VERSION,
+        "corporate_action_digest": corporate_action_digest or "none",
     }
     text = json.dumps(payload, ensure_ascii=False, sort_keys=True, default=str)
     return hashlib.sha256(text.encode("utf-8")).hexdigest()[:16]
+
+
+def _events_digest_for(config: ValidationConfig, codes: list[str], db_path=None) -> str:
+    """预计算本次验证将用到的事件指纹（区间内、可应用证据等级）。"""
+    from app.backtest import corporate_actions as ca
+
+    try:
+        actions = ca.load_actions(
+            start=config.is_start, end=config.oos_end, codes=list(codes), db_path=db_path
+        )
+    except Exception:
+        return "unavailable"
+    usable = [item for item in actions if item.is_confirmed]
+    return ca.compute_events_digest(usable)
 
 
 def _run_validation_unlocked(
@@ -271,7 +299,8 @@ def _run_validation_unlocked(
     split = split_time_range(calendar, config)
 
     fingerprint_before = _data_fingerprint(db_path)
-    input_hash = _input_hash(config, codes, fingerprint_before)
+    events_digest = _events_digest_for(config, codes, db_path=db_path)
+    input_hash = _input_hash(config, codes, fingerprint_before, events_digest)
 
     record = ValidationRecord(
         validation_id=vid,

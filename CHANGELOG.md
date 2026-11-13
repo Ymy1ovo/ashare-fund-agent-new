@@ -1,5 +1,48 @@
 # 变更日志
 
+## 2026-11-13 — 阶段3A.3.2.1 公司行为账本关键缺陷整改
+
+- **修复现金分红入账时点**：上一阶段把分红和拆分套用同一条「次一交易日」规则，
+  导致除息日价格已跌、现金次一日才到，制造虚假日亏损（`510300` 2021-01-19
+  当日收益 −1.343%，修复后 −0.054%），且除息日收盘后的订单会动用不存在的现金。
+  本阶段改为**除息日确认应收、发放日转入可用现金**两段式，
+  新增 `dividend_receivable` 字段与 `dividend_receivables` 表，
+  总资产恒等式变为 `cash + market_value + receivable`。
+- **权益登记日锁定份额**：分红金额按登记日收盘持仓计算，不再用除息日持仓，
+  避免登记日与除息日之间的买卖算错金额。
+- **拆分/合并继续按官方 `effective_date`**，没有套用分红规则。
+- **证据等级整改**：上一阶段把 166 条事件全部标 `confirmed` 属于过度声称。
+  本阶段新增 `evidence_status`（`official_confirmed` / `secondary_confirmed` /
+  `unverified` / `rejected`），逐条抓取基金管理人公告原文（34 只标的 343 条公告），
+  核对除息日、比例、金额、发放日：
+  **144 条 official + 12 条 secondary + 10 条 unverified**。
+  `unverified` 事件引擎完全不应用；回测区间内 81 条 100% 为 official。
+- **事件数量全量对账**：`scripts/reconcile_events.py` 输出 14 项校验全部通过。
+  澄清上一阶段的 80/166/1,071 三个数字的口径差异：区间内 81（按 `effective_date`）、
+  全量 166、应用行数 2,788（不是事件数）。
+- **事件数据指纹**：`compute_event_fingerprint` 覆盖 11 个字段，
+  `compute_events_digest` 按稳定顺序聚合，同时纳入回测层与验证层的 `input_hash`。
+  即使版本号不变，事件内容变化必然改变输入指纹。
+- **事件版本管理**：`save_action()` 不再静默覆盖，改用
+  `corporate_actions`（当前）+ `corporate_action_versions`（历史快照）双表，
+  记录 `change_reason`；本阶段 166 条事件全部产生 version 2，共 338 个版本。
+- **份额调整批次守恒**：`apply_corporate_action()` 改用最大余数法分配舍入误差，
+  保证 `sum(lot.quantity) == position.quantity == new_quantity`，
+  已用 3~13 批次、8 种比例验证；可卖日期不前移，T+1 保持。
+- **历史记录口径标记**：11 条 backtest + 39 条 validation 标记为
+  `legacy_corporate_action_accounting`，禁止作为新口径评价依据。
+- **新增测试 13 项**（分红应收/到账、证据等级、指纹、版本、多批次），
+  全量 412 → **425 项**，全部通过。
+- **重放结果**（新记录 `6e310be0193643c1`，事件指纹已纳入 `input_hash`）：
+  - 样本外总收益 +20.24% → **+20.11%**，Sharpe 0.7290 → **0.7208**，
+    回撤 −18.11% → **−18.29%**
+  - 样本内总收益 +10.87% → **+13.68%**，Sharpe 0.1776 → **0.2522**
+  - MA250 vs 等权持有：收益 +0.80 pp（优势不显著）、波动率与回撤略优、
+    成本仍高 **13.6 倍**
+- 新增七份报告：event_reconciliation / dividend_accounting_fix /
+  evidence_quality / fingerprint_version / backtest_replay / test / data_snapshot。
+- 数据库：新增 2 张表、7 个列，迁移幂等，历史记录一条未删；行情指纹未变。
+
 ## 2026-11-12 — 阶段3A.3.2 价格口径与基金份额变动处理
 
 - **先核查后修复**：从数据库重新提取全部价格异常（8% 阈值命中 342 处，
