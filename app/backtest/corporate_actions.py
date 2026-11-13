@@ -143,6 +143,25 @@ class CorporateAction:
                 raise CorporateActionError(
                     f"{self.code} 现金分红缺少有效的每份分红金额"
                 )
+            # 分红资格由权益登记日决定，不能用除息日冒充登记日；
+            # 现金流时点由发放日决定，不能用 T+1 估计。
+            if self.record_date is None:
+                raise CorporateActionError(
+                    f"{self.code} {self.ex_date} 现金分红缺少权益登记日（record_date），"
+                    "不得用除息日替代"
+                )
+            if self.pay_date is None:
+                raise CorporateActionError(
+                    f"{self.code} {self.ex_date} 现金分红缺少现金发放日（pay_date）"
+                )
+            if self.record_date > self.ex_date:
+                raise CorporateActionError(
+                    f"{self.code} 权益登记日 {self.record_date} 晚于除息日 {self.ex_date}"
+                )
+            if self.pay_date < self.ex_date:
+                raise CorporateActionError(
+                    f"{self.code} 现金发放日 {self.pay_date} 早于除息日 {self.ex_date}"
+                )
         if self.evidence_status not in EVIDENCE_LEVELS:
             raise CorporateActionError(
                 f"未知的证据等级：{self.evidence_status}"

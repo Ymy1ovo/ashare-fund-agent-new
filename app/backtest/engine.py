@@ -24,6 +24,14 @@ class BacktestError(RuntimeError):
     """回测无法继续。"""
 
 
+class CorporateActionLoadError(BacktestError):
+    """公司行为事件加载失败：表缺失、迁移未完成、查询异常、反序列化异常等。
+
+    这种失败意味着账本可能漏记或记错公司行为，
+    产出的净值不再代表正式会计口径，必须中止而不是降级继续。
+    """
+
+
 @dataclass
 class BacktestResult:
     """一次回测的完整产出。"""
@@ -42,6 +50,9 @@ class BacktestResult:
     initial_cash: float
     input_hash: str
     notes: list[str] = field(default_factory=list)
+    # 阶段3A.3.2.2.2：口径标记，非正式口径不得进入正式策略评价
+    accounting_basis: str = "formal_receivable"
+    formal_valuation: bool = True
 
     def nav_series(self) -> pd.Series:
         if not self.daily:
@@ -59,6 +70,8 @@ class BacktestResult:
             "snapshot_ids": self.snapshot_ids,
             "initial_cash": self.initial_cash,
             "input_hash": self.input_hash,
+            "accounting_basis": self.accounting_basis,
+            "formal_valuation": self.formal_valuation,
             "start_date": self.config.start_date,
             "end_date": self.config.end_date,
             "execution_price": self.config.execution_price,
@@ -162,6 +175,11 @@ class BacktestEngine:
         self.corporate_action_ledger: list[dict] = []
         # 阶段3A.3.2.2.1：因证据/资格不足被阻断的事件
         self.blocked_actions: list[dict] = []
+        # 阶段3A.3.2.2.2：会计口径与正式性标记
+        self.accounting_basis: str = "formal_receivable"
+        self.formal_valuation: bool = True
+        # 登记日 == 除息日、需推迟到收盘后处理的分红
+        self._deferred_dividends: list = []
         # 权益登记日锁定的分红份额（action_id -> 份额）
         self._dividend_locked_shares: dict[int, int] = {}
         self._run_id_for_actions: str | None = None
@@ -172,7 +190,13 @@ class BacktestEngine:
         只读：不写数据库、不修改事件本身。
         """
         if not getattr(self.config, "apply_corporate_actions", True):
-            self.notes.append("公司行为：配置显式关闭（apply_corporate_actions=False）")
+            # 显式关闭：允许跑，但结果只能作研究参考，不得进入正式策略评价
+            self.notes.append(
+                "公司行为：配置显式关闭（apply_corporate_actions=False），"
+                "本次结果使用非正式会计口径，不得作为正式策略评价依据"
+            )
+            self.accounting_basis = "disabled_non_official"
+            self.formal_valuation = False
             return []
         from app.backtest.corporate_actions import load_actions
 
@@ -183,9 +207,15 @@ class BacktestEngine:
                 codes=list(codes),
                 db_path=self.db_path,
             )
-        except Exception as exc:  # noqa: BLE001 事件表缺失时不应阻断回测
-            self.notes.append(f"公司行为：事件表不可用（{type(exc).__name__}），按旧口径回测")
-            return []
+        except Exception as exc:  # noqa: BLE001 转成专用异常并中止
+            raise CorporateActionLoadError(
+                f"公司行为事件加载失败（{type(exc).__name__}: {exc}）。"
+                "apply_corporate_actions=True 时不允许静默降级为旧会计口径；"
+                "请检查事件表是否存在、迁移是否完成，或显式设置 "
+                "apply_corporate_actions=False 后重跑（该结果不得用于正式评价）。"
+            ) from exc
+
+        self._validate_loaded_actions(actions)
         confirmed = [item for item in actions if item.is_confirmed]
         excluded = [item for item in actions if not item.is_confirmed]
         if excluded:
@@ -203,6 +233,169 @@ class BacktestEngine:
                 f"（official_confirmed {official} / secondary_confirmed {secondary}）"
             )
         return confirmed
+
+    def _record_holding_block_reason(self, record, start) -> tuple[str, str]:
+        """区分分红被阻断的具体原因。"""
+        if record is None:
+            return "分红事件缺少权益登记日", "missing_record_date"
+        if not self.calendar_has(record):
+            return (f"登记日 {record} 不是回测交易日历中的交易日，"
+                    "无法确定当日收盘持仓"), "invalid_record_date"
+        if record < start:
+            return (f"登记日 {record} 早于回测起点 {start}，未取得持仓快照",
+                    "missing_record_date_holding")
+        return (f"登记日 {record} 未执行日终快照（回测区间内缺失）",
+                "missing_record_date_holding")
+
+    def calendar_has(self, value) -> bool:
+        """该日期是否出现在本次回测的交易日历中。"""
+        cache = getattr(self, "_calendar_set", None)
+        if cache is None:
+            cache = set(self.calendar)
+            self._calendar_set = cache
+        return value in cache
+
+    def _validate_loaded_actions(self, actions: list) -> None:
+        """校验事件结构；任何不合法事件都中止回测，不静默过滤。"""
+        from datetime import date as _date
+
+        for item in actions:
+            if not isinstance(item.code, str) or not item.code:
+                raise CorporateActionLoadError(
+                    f"公司行为事件缺少合法基金代码：{item!r}"
+                )
+            if not isinstance(item.action_type, str) or not item.action_type:
+                raise CorporateActionLoadError(
+                    f"{item.code} 事件缺少合法类型"
+                )
+            for field_name in ("ex_date", "effective_date"):
+                value = getattr(item, field_name, None)
+                if not isinstance(value, _date):
+                    raise CorporateActionLoadError(
+                        f"{item.code} 事件 {field_name} 不是合法日期：{value!r}"
+                    )
+            if item.action_type in ("split", "reverse_split"):
+                if item.share_ratio is None or float(item.share_ratio) <= 0:
+                    raise CorporateActionLoadError(
+                        f"{item.code} {item.action_type} 缺少合法比例：{item.share_ratio!r}"
+                    )
+            if item.action_type == "cash_distribution":
+                if item.cash_per_share is None or float(item.cash_per_share) <= 0:
+                    raise CorporateActionLoadError(
+                        f"{item.code} 分红缺少合法每份金额：{item.cash_per_share!r}"
+                    )
+
+    def _confirm_receivable(self, action, impact, portfolio) -> None:
+        """确认一笔现金分红应收（不动可用现金），并做幂等保护。"""
+        from app.backtest import corporate_actions as ca
+
+        if action.action_id in self._pending_receivable:
+            self.notes.append(
+                f"公司行为：{action.code} {action.ex_date} 应收已确认，跳过重复确认"
+            )
+            return
+        portfolio.confirm_dividend_receivable(
+            action.code,
+            impact.cash_delta,
+            action_id=action.action_id,
+            ex_date=action.ex_date,
+            pay_date=action.pay_date,
+            record_date=action.record_date,
+            shares=impact.shares_before,
+        )
+        self._pending_receivable[action.action_id] = impact.cash_delta
+        if self._run_id_for_actions and self.db_path is not None:
+            ca.record_application(
+                run_id=self._run_id_for_actions,
+                impact=impact,
+                db_path=self.db_path,
+            )
+            ca.save_receivable(
+                run_id=self._run_id_for_actions,
+                action=action,
+                shares=impact.shares_before,
+                amount=impact.cash_delta,
+                db_path=self.db_path,
+            )
+
+    def _settle_dividends_on(self, trade_date, portfolio) -> None:
+        """在 pay_date 把应收转入可用现金，并留痕。"""
+        from app.backtest import corporate_actions as ca
+
+        settled = portfolio.settle_dividend_receivable(trade_date)
+        for item in settled:
+            if self._run_id_for_actions and self.db_path is not None:
+                ca.settle_receivable(
+                    run_id=self._run_id_for_actions,
+                    action_id=int(item["action_id"]),
+                    db_path=self.db_path,
+                )
+            self.dividend_settlements.append({
+                "code": item["code"],
+                "action_id": item["action_id"],
+                "amount": round(float(item["amount"]), 6),
+                "pay_date": item["pay_date"].isoformat() if item.get("pay_date") else None,
+                "settled_on": trade_date.isoformat(),
+            })
+
+    def _confirm_same_day_dividends(
+        self, trade_date, portfolio, bars, rules
+    ) -> None:
+        """登记日 == 除息日：先按当日收盘后持仓锁定份额，再确认应收。
+
+        必须在当日全部成交完成、日终持仓定稿之后调用。
+        """
+        if not self._deferred_dividends:
+            return
+        from app.backtest import corporate_actions as ca
+
+        still: list = []
+        for action in self._deferred_dividends:
+            if action.ex_date != trade_date:
+                still.append(action)
+                continue
+            # 当日收盘后持仓就是登记在册份额
+            self._dividend_locked_shares[action.action_id] = portfolio.quantity(
+                action.code
+            )
+            if not getattr(self.config, "apply_cash_distributions", True):
+                self.notes.append(
+                    f"公司行为：{action.code} {action.effective_date} 分红被配置关闭"
+                )
+                continue
+            holding = self._dividend_locked_shares[action.action_id]
+            data = bars.get(action.code)
+            price = None
+            if data is not None and trade_date in data.frame.index:
+                close = data.frame.loc[trade_date, "close"]
+                if pd.notna(close) and float(close) > 0:
+                    price = float(close)
+            try:
+                impact = ca.compute_impact(action, holding=holding, price=price)
+            except ca.CorporateActionError as exc:
+                self.notes.append(
+                    f"公司行为跳过 {action.code} {action.effective_date}：{exc}"
+                )
+                self.blocked_actions.append({
+                    "action_id": action.action_id,
+                    "code": action.code,
+                    "action_type": action.action_type,
+                    "ex_date": action.ex_date.isoformat(),
+                    "effective_date": action.effective_date.isoformat(),
+                    "reason": str(exc),
+                    "reason_code": "corporate_action_error",
+                })
+                continue
+            if abs(impact.cash_delta) < 1e-12:
+                self.notes.append(
+                    f"公司行为：{action.code} {action.ex_date} 分红份额为 0，不计入应收"
+                )
+                continue
+            self._confirm_receivable(action, impact, portfolio)
+            # pay_date 与 ex_date 同一天：当日收盘即可到账
+            if action.pay_date == trade_date:
+                self._settle_dividends_on(trade_date, portfolio)
+        self._deferred_dividends = still
 
     def _capture_dividend_shares(self, trade_date, record_index, portfolio) -> None:
         """在权益登记日收盘锁定每笔分红对应的持仓份额。
@@ -249,18 +442,19 @@ class BacktestEngine:
                     price = float(history.iloc[-1])
 
             if action.action_type == ca.ACTION_CASH_DISTRIBUTION:
+                # 登记日与除息日是同一天：当日成交尚未发生，
+                # 此刻锁定或确认都会用错持仓。推迟到收盘后再处理。
+                if action.record_date == action.ex_date:
+                    self._deferred_dividends.append(action)
+                    continue
                 # 权益登记日锁定的份额是分红金额的唯一合法依据。
                 # 未锁定说明登记日不在回测区间内（或登记日无交易日数据），
                 # 此时**不得**退回除息日持仓——那会让回测开始后才买入的份额
                 # 凭空获得分红资格。直接阻断该事件并留痕。
-                record = action.record_date or action.ex_date
+                record = action.record_date
                 if action.action_id not in self._dividend_locked_shares:
                     start = _as_date(self.config.start_date)
-                    reason = (
-                        f"登记日 {record} 早于回测起点 {start}，未取得持仓快照"
-                        if record < start
-                        else f"登记日 {record} 无交易数据或未执行日终快照"
-                    )
+                    reason, code = self._record_holding_block_reason(record, start)
                     self.notes.append(
                         f"公司行为阻断：{action.code} {action.ex_date} 分红（{reason}），"
                         "无合法登记日持仓，不计入应收"
@@ -272,7 +466,7 @@ class BacktestEngine:
                         "ex_date": action.ex_date.isoformat(),
                         "record_date": record.isoformat(),
                         "reason": reason,
-                        "reason_code": "missing_record_date_holding",
+                        "reason_code": code,
                     })
                     continue
                 holding = self._dividend_locked_shares[action.action_id]
@@ -308,15 +502,7 @@ class BacktestEngine:
             ledger: dict = {}
             if action.action_type == ca.ACTION_CASH_DISTRIBUTION:
                 # 只确认应收，不动现金
-                portfolio.confirm_dividend_receivable(
-                    action.code,
-                    impact.cash_delta,
-                    action_id=action.action_id,
-                    ex_date=action.ex_date,
-                    pay_date=action.pay_date or action.effective_date,
-                    record_date=action.record_date,
-                    shares=impact.shares_before,
-                )
+                self._confirm_receivable(action, impact, portfolio)
             else:
                 ledger = portfolio.apply_corporate_action(
                     action.code,
@@ -329,24 +515,16 @@ class BacktestEngine:
                     action_type=action.action_type,
                 )
                 self.corporate_action_ledger.append(ledger)
-            # 只有显式给了 db_path 才持久化；测试/纯内存回测不写任何数据库
-            if self._run_id_for_actions and self.db_path is not None:
+            # 份额调整的持久化在这里；现金分红的持久化在 _confirm_receivable 内完成，
+            # 避免同一事件被 record_application 写两次。
+            if (action.action_type != ca.ACTION_CASH_DISTRIBUTION
+                    and self._run_id_for_actions and self.db_path is not None):
                 ca.record_application(
                     run_id=self._run_id_for_actions,
                     impact=impact,
                     ledger=ledger,
                     db_path=self.db_path,
                 )
-                if action.action_type == ca.ACTION_CASH_DISTRIBUTION:
-                    self._pending_receivable[action.action_id] = impact.cash_delta
-                    if self.db_path is not None:
-                        ca.save_receivable(
-                            run_id=self._run_id_for_actions,
-                            action=action,
-                            shares=impact.shares_before,
-                            amount=impact.cash_delta,
-                            db_path=self.db_path,
-                        )
             self.corporate_action_log.append(impact.as_dict())
 
     def _load(self, codes: list[str]) -> dict[str, BarData]:
@@ -570,8 +748,9 @@ class BacktestEngine:
         for action in actions:
             if action.action_type == "cash_distribution":
                 action_index.setdefault(action.ex_date, []).append(action)
-                lock_day = action.record_date or action.ex_date
-                record_index.setdefault(lock_day, []).append(action)
+                # 权益登记日必须真实存在；构造阶段已强制校验，
+                # 这里不再用除息日兜底。
+                record_index.setdefault(action.record_date, []).append(action)
             else:
                 action_index.setdefault(action.effective_date, []).append(action)
 
@@ -594,23 +773,9 @@ class BacktestEngine:
             )
             # 发放日到账：把已到期的应收分红转入可用现金（在开盘撮合之前完成，
             # 因为这笔钱在当日开盘前就已到账，可以用于当天交易）
-            self._capture_dividend_shares(trade_date, record_index, portfolio)
-            from app.backtest import corporate_actions as ca
-            settled = portfolio.settle_dividend_receivable(trade_date)
-            for item in settled:
-                if self._run_id_for_actions and self.db_path is not None:
-                    ca.settle_receivable(
-                        run_id=self._run_id_for_actions,
-                        action_id=int(item["action_id"]),
-                        db_path=self.db_path,
-                    )
-                self.dividend_settlements.append({
-                    "code": item["code"],
-                    "action_id": item["action_id"],
-                    "amount": round(float(item["amount"]), 6),
-                    "pay_date": item["pay_date"].isoformat() if item.get("pay_date") else None,
-                    "settled_on": trade_date.isoformat(),
-                })
+            # 到账只处理「登记日在更早交易日的分红」；登记日 == 除息日的
+            # 分红要到当日收盘后才确认应收，其到账由收盘阶段处理。
+            self._settle_dividends_on(trade_date, portfolio)
 
             # 1) 开盘撮合：只撮合 signal_date < trade_date 的订单
             executable = sorted(
@@ -683,6 +848,8 @@ class BacktestEngine:
             # 权益登记日的份额在「当日成交完成后、收盘估值前」锁定：
             # 登记在册的份额以当日收盘后的登记结果为准。
             self._capture_dividend_shares(trade_date, record_index, portfolio)
+            # 登记日 == 除息日的分红：此刻份额已定稿，可以确认应收
+            self._confirm_same_day_dividends(trade_date, portfolio, bars, rules)
             total = portfolio.total_assets(prices)
             snapshot = portfolio.snapshot(
                 trade_date=trade_date,
@@ -746,4 +913,6 @@ class BacktestEngine:
             initial_cash=self.config.initial_cash,
             input_hash=input_hash,
             notes=self.notes,
+            accounting_basis=self.accounting_basis,
+            formal_valuation=self.formal_valuation,
         )

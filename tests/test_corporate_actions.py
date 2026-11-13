@@ -1177,17 +1177,16 @@ def test_compensation_price_changes_fingerprint():
 
 def test_dividend_requires_record_date_in_range(temp_db):
     """登记日早于回测起点：必须阻断，不得用除息日持仓替代。"""
-    dates = _seed(temp_db, {"510300": [10.0] * 6})
-    _insert_action(temp_db, code="510300", action_type=ACTION_CASH_DISTRIBUTION,
-                   ex_date=dates[3], effective_date=dates[3], cash_per_share=1.0,
-                   record_date="2020-06-01", pay_date=dates[4])
-    plan = {dates[0]: [TargetWeight("510300", 0.9)]}
-    result, engine = _run(temp_db, dates, ["510300"], plan=plan)
-    assert engine.corporate_action_log == []
-    assert engine.blocked_actions
-    assert engine.blocked_actions[0]["reason_code"] == "missing_record_date_holding"
-    for item in result.daily:
-        assert item.dividend_receivable == pytest.approx(0.0)
+    from app.backtest.corporate_actions import (
+        ACTION_CASH_DISTRIBUTION, EVIDENCE_OFFICIAL, STATUS_CONFIRMED,
+        CorporateActionError, build_action,
+    )
+    with pytest.raises(CorporateActionError, match="缺少权益登记日"):
+        build_action(code="510300", action_type=ACTION_CASH_DISTRIBUTION,
+                     ex_date="2024-01-05", effective_date="2024-01-05",
+                     cash_per_share=1.0, record_date=None, pay_date="2024-01-08",
+                     status=STATUS_CONFIRMED, evidence_status=EVIDENCE_OFFICIAL,
+                     source="t")
 
 
 def test_dividend_after_record_date_buy_gets_nothing(temp_db):
@@ -1274,14 +1273,258 @@ def test_event_version_history_complete(temp_db):
 
 
 def test_secondary_dividend_with_unverified_record_date_not_applied(temp_db):
-    """登记日缺失的 secondary 分红不得进入正式回测。"""
+    """登记日缺失的 secondary 分红在构造阶段即被拒绝。"""
+    from app.backtest.corporate_actions import (
+        ACTION_CASH_DISTRIBUTION, EVIDENCE_SECONDARY, STATUS_CONFIRMED,
+        CorporateActionError, build_action,
+    )
+    with pytest.raises(CorporateActionError, match="缺少权益登记日"):
+        build_action(code="510300", action_type=ACTION_CASH_DISTRIBUTION,
+                     ex_date="2024-01-08", effective_date="2024-01-08",
+                     cash_per_share=1.0, record_date=None, pay_date="2024-01-09",
+                     status=STATUS_CONFIRMED, evidence_status=EVIDENCE_SECONDARY,
+                     source="t")
+
+
+# ------------------------------------------------ 3A.3.2.2.2 问题1
+
+def test_missing_action_table_raises(temp_db):
+    """事件表不存在时必须抛错中止，不得静默返回空列表。"""
+    import sqlite3
+    from app.backtest.engine import BacktestEngine, BacktestConfig, CorporateActionLoadError
+    from tests.test_corporate_actions import _Fixed, TargetWeight
+
+    _seed(temp_db, {"510300": [10.0] * 4})
+    conn = sqlite3.connect(temp_db)
+    conn.execute("DROP TABLE corporate_actions")
+    conn.commit()
+    conn.close()
+
+    cfg = BacktestConfig(start_date="2024-01-02", end_date="2024-01-05",
+                         initial_cash=100000.0)
+    engine = BacktestEngine(cfg, _Fixed({}), db_path=temp_db)
+    with pytest.raises(CorporateActionLoadError, match="公司行为事件加载失败"):
+        engine.run(["510300"], indicator_version=None)
+
+
+def test_broken_action_row_raises(temp_db):
+    """事件表结构被破坏（缺列）时同样抛错。"""
+    import sqlite3
+    from app.backtest.engine import BacktestEngine, BacktestConfig, CorporateActionLoadError
+    from tests.test_corporate_actions import _Fixed
+
+    _seed(temp_db, {"510300": [10.0] * 4})
+    conn = sqlite3.connect(temp_db)
+    conn.execute("ALTER TABLE corporate_actions DROP COLUMN share_ratio")
+    conn.commit()
+    conn.close()
+
+    cfg = BacktestConfig(start_date="2024-01-02", end_date="2024-01-05",
+                         initial_cash=100000.0)
+    engine = BacktestEngine(cfg, _Fixed({}), db_path=temp_db)
+    with pytest.raises(CorporateActionLoadError):
+        engine.run(["510300"], indicator_version=None)
+
+
+def test_disable_flag_marks_non_formal(temp_db):
+    """显式关闭公司行为时，结果必须标记为非正式口径。"""
+    dates = _seed(temp_db, {"510300": [10.0] * 4})
+    _insert_action(temp_db, code="510300", action_type=ACTION_SPLIT,
+                   ex_date=dates[1], effective_date=dates[2], share_ratio=2.0,
+                   fractional_policy="truncate")
+    plan = {dates[0]: [TargetWeight("510300", 0.5)]}
+    result, engine = _run(temp_db, dates, ["510300"], plan=plan,
+                          apply_corporate_actions=False)
+    assert result.formal_valuation is False
+    assert result.accounting_basis == "disabled_non_official"
+    assert any("不得作为正式策略评价依据" in n for n in result.notes)
+
+
+def test_formal_run_keeps_formal_basis(temp_db):
+    dates = _seed(temp_db, {"510300": [10.0] * 4})
+    plan = {dates[0]: [TargetWeight("510300", 0.5)]}
+    result, engine = _run(temp_db, dates, ["510300"], plan=plan)
+    assert result.formal_valuation is True
+    assert result.accounting_basis == "formal_receivable"
+
+
+def test_invalid_action_structure_raises(temp_db):
+    """库里存在结构不合法的事件（比例缺失）时中止。
+
+    绕过 build_action 直接写坏行：模拟「历史遗留脏数据」，
+    验证加载层会拒绝而不是静默过滤。
+    """
+    import sqlite3
+    dates = _seed(temp_db, {"510300": [10.0] * 4})
+    conn = sqlite3.connect(temp_db)
+    conn.execute(
+        "INSERT INTO corporate_actions "
+        "(code, action_type, ex_date, effective_date, share_ratio, source, status, "
+        " data_version, created_at, updated_at, evidence_status, fractional_policy) "
+        "VALUES (?,?,?,?,?,?,?,?,?,?,?,?)",
+        ("510300", "split", dates[1], dates[2], None, "test", "confirmed",
+         "ca-v1", "x", "x", "official_confirmed", "truncate"),
+    )
+    conn.commit()
+    conn.close()
+    plan = {dates[0]: [TargetWeight("510300", 0.5)]}
+    from app.backtest.engine import CorporateActionLoadError
+    with pytest.raises(CorporateActionLoadError, match="份额比例"):
+        _run(temp_db, dates, ["510300"], plan=plan)
+
+
+# ------------------------------------------------ 3A.3.2.2.2 问题2
+
+def test_cash_distribution_requires_pay_date():
+    from app.backtest.corporate_actions import (
+        ACTION_CASH_DISTRIBUTION, EVIDENCE_OFFICIAL, STATUS_CONFIRMED,
+        CorporateActionError, build_action,
+    )
+    with pytest.raises(CorporateActionError, match="缺少现金发放日"):
+        build_action(code="510300", action_type=ACTION_CASH_DISTRIBUTION,
+                     ex_date="2024-01-05", effective_date="2024-01-05",
+                     cash_per_share=1.0, record_date="2024-01-04", pay_date=None,
+                     status=STATUS_CONFIRMED, evidence_status=EVIDENCE_OFFICIAL,
+                     source="t")
+
+
+def test_cash_distribution_requires_cash_per_share():
+    from app.backtest.corporate_actions import (
+        ACTION_CASH_DISTRIBUTION, EVIDENCE_OFFICIAL, STATUS_CONFIRMED,
+        CorporateActionError, build_action,
+    )
+    with pytest.raises(CorporateActionError, match="每份分红金额"):
+        build_action(code="510300", action_type=ACTION_CASH_DISTRIBUTION,
+                     ex_date="2024-01-05", effective_date="2024-01-05",
+                     cash_per_share=None, record_date="2024-01-04",
+                     pay_date="2024-01-08", status=STATUS_CONFIRMED,
+                     evidence_status=EVIDENCE_OFFICIAL, source="t")
+
+
+def test_record_date_after_ex_date_rejected():
+    from app.backtest.corporate_actions import (
+        ACTION_CASH_DISTRIBUTION, EVIDENCE_OFFICIAL, STATUS_CONFIRMED,
+        CorporateActionError, build_action,
+    )
+    with pytest.raises(CorporateActionError, match="晚于除息日"):
+        build_action(code="510300", action_type=ACTION_CASH_DISTRIBUTION,
+                     ex_date="2024-01-05", effective_date="2024-01-05",
+                     cash_per_share=1.0, record_date="2024-01-09",
+                     pay_date="2024-01-10", status=STATUS_CONFIRMED,
+                     evidence_status=EVIDENCE_OFFICIAL, source="t")
+
+
+def test_pay_date_before_ex_date_rejected():
+    from app.backtest.corporate_actions import (
+        ACTION_CASH_DISTRIBUTION, EVIDENCE_OFFICIAL, STATUS_CONFIRMED,
+        CorporateActionError, build_action,
+    )
+    with pytest.raises(CorporateActionError, match="早于除息日"):
+        build_action(code="510300", action_type=ACTION_CASH_DISTRIBUTION,
+                     ex_date="2024-01-05", effective_date="2024-01-05",
+                     cash_per_share=1.0, record_date="2024-01-04",
+                     pay_date="2024-01-03", status=STATUS_CONFIRMED,
+                     evidence_status=EVIDENCE_OFFICIAL, source="t")
+
+
+def test_blocked_reason_missing_record_date_holding(temp_db):
+    """登记日在区间内但不在交易日历 → 细分原因。"""
+    from app.backtest.engine import BacktestEngine, BacktestConfig
+    from tests.test_corporate_actions import _Fixed
+
+    # 只给 6 个交易日，登记日取一个区间内但不是交易日的日期
+    dates = _seed(temp_db, {"510300": [10.0] * 6})
+    _insert_action(temp_db, code="510300", action_type=ACTION_CASH_DISTRIBUTION,
+                   ex_date=dates[4], effective_date=dates[4], cash_per_share=1.0,
+                   record_date="2024-01-06", pay_date=dates[5])
+    plan = {dates[0]: [TargetWeight("510300", 0.9)]}
+    result, engine = _run(temp_db, dates, ["510300"], plan=plan)
+    assert engine.blocked_actions
+    codes = {item["reason_code"] for item in engine.blocked_actions}
+    assert "invalid_record_date" in codes
+    for item in result.daily:
+        assert item.dividend_receivable == pytest.approx(0.0)
+
+
+# ------------------------------------------------ 3A.3.2.2.2 问题3
+
+def test_same_day_record_and_ex_date_buying_today_gets_dividend(temp_db):
+    """record_date == ex_date：当日买入的份额应当享有分红（收盘后定稿）。"""
+    dates = _seed(temp_db, {"510300": [10.0] * 8})
+    _insert_action(temp_db, code="510300", action_type=ACTION_CASH_DISTRIBUTION,
+                   ex_date=dates[2], effective_date=dates[2], cash_per_share=1.0,
+                   record_date=dates[2], pay_date=dates[4])
+    # dates[1] 下单 → dates[2]（登记日兼除息日）开盘成交
+    plan = {dates[0]: [TargetWeight("510300", 0.0)],
+            dates[1]: [TargetWeight("510300", 0.9)]}
+    result, engine = _run(temp_db, dates, ["510300"], plan=plan)
+    ex_day = next(d for d in result.daily if d.trade_date.isoformat() == dates[2])
+    assert ex_day.positions.get("510300")
+    assert ex_day.dividend_receivable > 0
+    assert ex_day.dividend_receivable == pytest.approx(
+        ex_day.positions["510300"] * 1.0, rel=1e-6)
+
+
+def test_same_day_record_and_ex_date_selling_today_reduces_dividend(temp_db):
+    """record_date == ex_date：当日卖出的份额不再享有分红。
+
+    T+1：dates[0] 下单 → dates[1] 买入成交；dates[3] 下单 → dates[4]
+    （登记日兼除息日）开盘卖出成交，收盘持仓为 0。
+    """
     dates = _seed(temp_db, {"510300": [10.0] * 8})
     _insert_action(temp_db, code="510300", action_type=ACTION_CASH_DISTRIBUTION,
                    ex_date=dates[4], effective_date=dates[4], cash_per_share=1.0,
-                   record_date=None, pay_date=dates[5],
-                   evidence_status=EVIDENCE_SECONDARY)
+                   record_date=dates[4], pay_date=dates[6])
+    plan = {dates[0]: [TargetWeight("510300", 0.9)],
+            dates[3]: [TargetWeight("510300", 0.0)]}
+    result, engine = _run(temp_db, dates, ["510300"], plan=plan)
+    ex_day = next(d for d in result.daily if d.trade_date.isoformat() == dates[4])
+    assert not ex_day.positions.get("510300")
+    assert ex_day.dividend_receivable == pytest.approx(0.0)
+
+
+def test_same_day_dividend_not_locked_before_fills(temp_db):
+    """同日分红必须在成交之后锁定，不能沿用开盘前旧持仓。"""
+    dates = _seed(temp_db, {"510300": [10.0] * 8})
+    _insert_action(temp_db, code="510300", action_type=ACTION_CASH_DISTRIBUTION,
+                   ex_date=dates[2], effective_date=dates[2], cash_per_share=1.0,
+                   record_date=dates[2], pay_date=dates[6])
+    plan = {dates[0]: [TargetWeight("510300", 0.3)],
+            dates[1]: [TargetWeight("510300", 0.9)]}
+    result, engine = _run(temp_db, dates, ["510300"], plan=plan)
+    ex_day = next(d for d in result.daily if d.trade_date.isoformat() == dates[2])
+    locked = list(engine._dividend_locked_shares.values())[0]
+    assert locked == ex_day.positions["510300"]
+    assert locked != result.daily[1].positions.get("510300", 0)
+
+
+def test_same_day_dividend_settles_on_pay_date(temp_db):
+    """同日确认的应收，发放日才转为可用现金。"""
+    dates = _seed(temp_db, {"510300": [10.0] * 8})
+    _insert_action(temp_db, code="510300", action_type=ACTION_CASH_DISTRIBUTION,
+                   ex_date=dates[2], effective_date=dates[2], cash_per_share=1.0,
+                   record_date=dates[2], pay_date=dates[5])
     plan = {dates[0]: [TargetWeight("510300", 0.9)]}
     result, engine = _run(temp_db, dates, ["510300"], plan=plan)
-    assert engine.corporate_action_log == []
-    for item in result.daily:
-        assert item.dividend_receivable == pytest.approx(0.0)
+    ex_day = next(d for d in result.daily if d.trade_date.isoformat() == dates[2])
+    assert ex_day.dividend_receivable > 0
+    assert all(item.dividend_receivable == pytest.approx(0.0)
+               for item in result.daily
+               if item.trade_date.isoformat() >= dates[5])
+    assert engine.dividend_settlements
+
+
+def test_same_day_dividend_not_double_confirmed(temp_db):
+    """同一事件不得重复确认应收。"""
+    dates = _seed(temp_db, {"510300": [10.0] * 8})
+    _insert_action(temp_db, code="510300", action_type=ACTION_CASH_DISTRIBUTION,
+                   ex_date=dates[2], effective_date=dates[2], cash_per_share=1.0,
+                   record_date=dates[2], pay_date=dates[5])
+    plan = {dates[0]: [TargetWeight("510300", 0.9)]}
+    result, engine = _run(temp_db, dates, ["510300"], plan=plan)
+    settled = [item for item in engine.dividend_settlements]
+    assert len(settled) == 1
+    assert settled[0]["amount"] == pytest.approx(9000.0)
+    # 应收只确认一次：除息日峰值等于一次分红金额
+    peak = max(item.dividend_receivable for item in result.daily)
+    assert peak == pytest.approx(9000.0)

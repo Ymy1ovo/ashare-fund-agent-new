@@ -1,5 +1,40 @@
 # 变更日志
 
+## 2026-11-13 — 阶段3A.3.2.2.2 公司行为安全边界最终修复
+
+- **加载失败不再静默降级**：`_load_corporate_actions()` 原来 `except Exception`
+  吞掉一切错误并 `return []`，于是事件表缺失 / 迁移未完成 / SQL 失败 /
+  反序列化失败都会让引擎按旧口径跑完，产出一条 `status=success`、
+  账面正常但漏记全部公司行为的回测记录。
+  新增 `CorporateActionLoadError`，上述情况一律抛错中止，不产出任何结果。
+  另加 `_validate_loaded_actions()` 逐条校验事件结构（代码/类型/日期/比例/金额），
+  脏数据不再静默过滤。
+  `apply_corporate_actions=False` 是唯一允许的关闭方式，
+  且结果必须标记 `accounting_basis=disabled_non_official` +
+  `formal_valuation=False`，不得进入正式策略评价。
+- **现金分红强制真实登记日**：删除 `record_date or ex_date` 的全部回退，
+  `__post_init__` 强制 `record_date` / `ex_date` / `pay_date` / `cash_per_share`
+  齐全，且 `record_date <= ex_date`、`pay_date >= ex_date`。
+  阻断原因细分为 `missing_record_date` / `missing_record_date_holding` /
+  `invalid_record_date` / `missing_pay_date`。
+  全库 grep `record_date or` → 0 处。
+- **同日登记日与除息日的时序**：原来分红在开盘前应用，此时当日成交尚未发生，
+  同日事件（`record_date == ex_date`）会拿旧持仓或直接阻断。
+  改为两段：开盘前只处理份额调整与登记日已过去的现金分红，
+  同日分红进入 `_deferred_dividends`；收盘后（成交完成、持仓定稿）
+  再由 `_confirm_same_day_dividends()` 锁定份额并确认应收。
+  新增 `_confirm_receivable()` 做幂等保护，并消除 `record_application` 的重复写入。
+- **本库实际影响**：4 条同日分红事件全在 2021 年前（`159901` 2007、
+  `511220` 2015 两条、`159920` 2018），区间内 0 条；
+  0 条缺 `record_date`，0 条缺 `pay_date`。
+  所以三处修复**不改变任何样本内外指标**——
+  安全加固不该改变数字，这是预期结果。
+- **新增测试 15 项**，全量 469 → **484 项**，全部通过。
+  另有 2 项测试从「引擎阻断」升级为「构造阶段拒绝」（断言更严）。
+- 新增 `reports/phase3A3_2_2_2_final_fix_report.md`，
+  更新 test_report / data_snapshot 两份报告。
+- 数据库：**无 schema 变更**，历史记录一条未删，行情指纹未变。
+
 ## 2026-11-13 — 阶段3A.3.2.2.1 会计口径收尾
 
 - **零碎规则不再默认 truncate**：上一版本把 21 条「公告未载明」+ 10 条「无公告正文」
