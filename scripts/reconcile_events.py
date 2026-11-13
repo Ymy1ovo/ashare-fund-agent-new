@@ -168,6 +168,33 @@ def main() -> int:
     checks.append(("应用事件数<=可应用事件数", applied_events <= usable_in_win,
                    f"{applied_events} vs {usable_in_win}"))
 
+    # 14b. 零碎份额口径
+    print()
+    print(f"{'零碎处置口径':22s} {'样本内':>7s} {'样本外':>7s} {'区间外':>7s} {'合计':>7s}")
+    for policy in ("truncate", "round_up", "cash_compensation", "unknown"):
+        row = conn.execute(
+            "SELECT "
+            " SUM(CASE WHEN (action_type='cash_distribution' AND ex_date BETWEEN ? AND ?) "
+            "      OR (action_type!='cash_distribution' AND effective_date BETWEEN ? AND ?) "
+            "      THEN 1 ELSE 0 END), "
+            " SUM(CASE WHEN (action_type='cash_distribution' AND ex_date BETWEEN ? AND ?) "
+            "      OR (action_type!='cash_distribution' AND effective_date BETWEEN ? AND ?) "
+            "      THEN 1 ELSE 0 END), "
+            " SUM(CASE WHEN (action_type='cash_distribution' "
+            "      AND (ex_date < ? OR ex_date > ?)) "
+            "      OR (action_type!='cash_distribution' "
+            "      AND (effective_date < ? OR effective_date > ?)) "
+            "      THEN 1 ELSE 0 END), "
+            " COUNT(*) FROM corporate_actions "
+            "WHERE fractional_policy=? AND action_type IN ('split','reverse_split')",
+            (IS_START, IS_END, IS_START, IS_END,
+             OOS_START, OOS_END, OOS_START, OOS_END,
+             IS_START, OOS_END, IS_START, OOS_END, policy),
+        ).fetchone()
+        a, b, c_, n = (row[0] or 0, row[1] or 0, row[2] or 0, row[3] or 0)
+        if n:
+            print(f"{policy:22s} {a:7d} {b:7d} {c_:7d} {n:7d}")
+
     # 15. 零变化
     zero_rows = conn.execute(
         "SELECT COUNT(*) FROM corporate_action_applications "

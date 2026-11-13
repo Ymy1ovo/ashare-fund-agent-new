@@ -24,6 +24,7 @@ from app.backtest.corporate_actions import (  # noqa: E402
     FRACTION_CASH_COMPENSATION,
     FRACTION_ROUND_UP,
     FRACTION_TRUNCATE,
+    FRACTION_UNKNOWN,
     build_action,
     load_actions,
     save_action,
@@ -38,14 +39,16 @@ CASH_PATTERNS = ("现金补偿", "以现金方式补偿", "折为现金", "现�
 def classify(text: str) -> tuple[str, str]:
     """从公告正文判定零碎份额处置口径。"""
     if not text:
-        return DEFAULT_FRACTION_POLICY, "无公告正文"
+        return FRACTION_UNKNOWN, "无公告正文"
     if any(p in text for p in CASH_PATTERNS):
         return FRACTION_CASH_COMPENSATION, "公告明示现金补偿"
     if any(p in text for p in ROUND_UP_PATTERNS):
         return FRACTION_ROUND_UP, "公告明示进位"
     if any(p in text for p in TRUNCATE_PATTERNS):
         return FRACTION_TRUNCATE, "公告明示舍去/尾差入基金"
-    return DEFAULT_FRACTION_POLICY, "公告未明说，按默认舍去"
+    # 公告正文没有载明零碎份额处置方式：只能记 unknown，
+    # 绝不能把「没有证据」包装成「默认按舍去处理」
+    return FRACTION_UNKNOWN, "公告未载明零碎处置方式"
 
 
 def main() -> int:

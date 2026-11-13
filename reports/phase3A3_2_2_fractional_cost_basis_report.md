@@ -114,20 +114,39 @@ for lot, allocated in zip(lots, floors):
 
 ### 2.5 逐条判定口径（不是统一估值）
 
-`scripts/set_fractional_policy.py` 从公告正文判定：
+`scripts/set_fractional_policy.py` 从公告正文判定（**阶段3A.3.2.2.1 已收紧**）：
 
 | 判据 | 口径 | 条数 |
 | --- | --- | ---: |
 | 「上进位」/「进位为 1 份」 | `round_up` | **5** |
-| 「尾差计入基金」/「舍去」 | `truncate` | 9 |
+| 「尾差计入基金」/「舍去」 | `truncate` | **9** |
 | 「现金补偿」 | `cash_compensation` | **0** |
-| 公告未明说 | 默认 `truncate` | 21 |
-| 无公告正文（unverified） | 默认 `truncate` | 10 |
+| 公告未载明零碎处置方式 | `unknown` | **21** |
+| 无公告正文（unverified） | `unknown` | **10** |
+
+**上一版本把这 31 条默认成 `truncate` 并把默认值写进报告当作规则，
+这是把没有证据包装成有证据。本阶段改为 `unknown`，并按实际持仓逐条判定：
+19 条区间内 unknown 事件的官方比例都是整数，实际持仓折算零碎份额恒为 0，
+所以「零碎处置方式」在这些事件上根本不成立，可以正常应用。
+一旦将来产生零碎份额，引擎 fail closed 阻断（见 3.5 节）。
 
 **实测结果**：本库 166 条事件中，
-**没有一条公告规定「按现金补偿」**——全部是「舍去」或「进位」。
+**没有一条公告规定「按现金补偿」**——明示的只有「舍去」和「进位」，
+其余 31 条公告根本没提零碎怎么处理。
 这意味着 3A.3.2.1 中「按收盘价折现金补偿」的处理方式
 **根本不符合任何一条真实公告**。
+
+### 2.6 cash_compensation 的强制约束（阶段3A.3.2.2.1 新增）
+
+| 约束 | 实现 |
+| --- | --- |
+| 必须有官方补偿价格 | `compensation_price` 字段 |
+| 必须有价格依据 | `compensation_price_source` 字段 |
+| 缺依据时构造即抛错 | `__post_init__` 校验 |
+| 缺依据时计算即抛错 | `compute_impact` 校验 |
+| 不得用收盘价代替 | 只读 `action.compensation_price`，不碰 `price` |
+
+两项都纳入事件指纹。
 
 5 条 `round_up`：
 
@@ -225,7 +244,9 @@ for lot, allocated in zip(lots, floors):
 | 5 | 多批次统一规则 | 组合层面 + 按成本占比分摊 | `test_multi_lot_...` |
 | 6 | 整数份额分配不改变经济权益 | 成本转出与批次分配解耦 | `test_multi_lot_...`、`test_consecutive_actions_do_not_double_charge_cost` |
 | 7 | 现金补偿与盈亏可追溯 | ledger 返回 + DB 新列 | `test_truncate_policy_records_loss_not_cash` |
-| 附 | 按公告实际规则，不套统一估值 | `fractional_policy` 三值 + 逐条判定 | `test_round_up_policy_adds_share_without_cost` |
+| 附 | 按公告实际规则，不套统一估值 | `fractional_policy` 四值（含 `unknown`）+ 逐条判定 | `test_round_up_policy_adds_share_without_cost` |
+| 附 | 规则未知且产生零碎时必须阻断 | `compute_impact` fail closed | `test_unknown_policy_with_fraction_is_blocked` |
+| 附 | 现金补偿缺官方价格必须阻断 | `compensation_price_source` 校验 | `test_cash_compensation_without_official_price_fails_closed` |
 
 ## 6. 边界情况
 

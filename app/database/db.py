@@ -551,7 +551,12 @@ def _migrate(conn: sqlite3.Connection) -> None:
     _add_column_if_missing(conn, "corporate_actions", "version_no", "INTEGER NOT NULL DEFAULT 1")
     # 阶段3A.3.2.2：零碎份额处置口径
     _add_column_if_missing(conn, "corporate_actions", "fractional_policy",
-                           "TEXT NOT NULL DEFAULT 'truncate'")
+                           "TEXT NOT NULL DEFAULT 'unknown'")
+    _add_column_if_missing(conn, "corporate_actions", "compensation_price", "REAL")
+    _add_column_if_missing(conn, "corporate_actions", "compensation_price_source", "TEXT")
+    _add_column_if_missing(conn, "corporate_action_versions", "fractional_policy", "TEXT")
+    _add_column_if_missing(conn, "corporate_action_versions", "compensation_price", "REAL")
+    _add_column_if_missing(conn, "corporate_action_versions", "compensation_price_source", "TEXT")
     _add_column_if_missing(conn, "corporate_action_applications", "fractional_shares",
                            "REAL NOT NULL DEFAULT 0")
     _add_column_if_missing(conn, "corporate_action_applications", "disposed_cost_basis",

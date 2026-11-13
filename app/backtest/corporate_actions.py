@@ -47,10 +47,23 @@ EVIDENCE_REJECTED = "rejected"
 FRACTION_CASH_COMPENSATION = "cash_compensation"   # 按公告价现金补偿
 FRACTION_TRUNCATE = "truncate"                     # 尾差计入基金财产（舍去）
 FRACTION_ROUND_UP = "round_up"                     # 小数点后进位补足
+# 公告未载明零碎份额处置方式：不得当作任何一种已确认规则
+FRACTION_UNKNOWN = "unknown"
 
-FRACTION_POLICIES = (FRACTION_CASH_COMPENSATION, FRACTION_TRUNCATE, FRACTION_ROUND_UP)
-# 默认口径：公告未明说时按舍去处理（不虚构现金收入）
-DEFAULT_FRACTION_POLICY = FRACTION_TRUNCATE
+FRACTION_POLICIES = (
+    FRACTION_CASH_COMPENSATION,
+    FRACTION_TRUNCATE,
+    FRACTION_ROUND_UP,
+    FRACTION_UNKNOWN,
+)
+# 已确认的处置口径（其余视为未证实）
+CONFIRMED_FRACTION_POLICIES = (
+    FRACTION_CASH_COMPENSATION,
+    FRACTION_TRUNCATE,
+    FRACTION_ROUND_UP,
+)
+# 默认值：没有证据时一律 unknown，不得默认成任何一种规则
+DEFAULT_FRACTION_POLICY = FRACTION_UNKNOWN
 
 EVIDENCE_LEVELS = (
     EVIDENCE_OFFICIAL, EVIDENCE_SECONDARY, EVIDENCE_UNVERIFIED, EVIDENCE_REJECTED,
@@ -98,6 +111,10 @@ class CorporateAction:
     version_no: int = 1
     # 零碎份额处置口径（来自官方公告）
     fractional_policy: str = DEFAULT_FRACTION_POLICY
+    # 官方现金补偿价格（仅在 cash_compensation 口径下有效）
+    compensation_price: float | None = None
+    # 补偿价格的官方依据（公告条款原文 / 计算公式），没有依据不得现金补偿
+    compensation_price_source: str | None = None
 
     def __post_init__(self) -> None:
         if self.action_type not in ACTION_TYPES:
@@ -133,6 +150,13 @@ class CorporateAction:
         if self.fractional_policy not in FRACTION_POLICIES:
             raise CorporateActionError(
                 f"未知的零碎份额处置口径：{self.fractional_policy}"
+            )
+        # 现金补偿必须有官方补偿价格依据，否则不得声明该口径
+        if (self.fractional_policy == FRACTION_CASH_COMPENSATION
+                and self.compensation_price_source is None):
+            raise CorporateActionError(
+                f"{self.code} {self.ex_date} 声明 cash_compensation "
+                "但缺少官方补偿价格依据（compensation_price_source）"
             )
         # 现金分红必须有发放日，否则无法区分「应收」与「可用现金」
         if self.action_type == ACTION_CASH_DISTRIBUTION and self.pay_date is None:
@@ -189,6 +213,8 @@ class CorporateAction:
             "event_fingerprint": self.event_fingerprint,
             "version_no": self.version_no,
             "fractional_policy": self.fractional_policy,
+            "compensation_price": self.compensation_price,
+            "compensation_price_source": self.compensation_price_source,
         }
 
 
@@ -204,6 +230,12 @@ def action_from_row(row) -> CorporateAction:
             return row[key]
         except (IndexError, KeyError):
             return None
+
+    def _num(key):
+        value = _opt(key)
+        if value in (None, ""):
+            return None
+        return float(value)
 
     return CorporateAction(
         action_id=int(row["action_id"]),
@@ -228,6 +260,8 @@ def action_from_row(row) -> CorporateAction:
         event_fingerprint=_opt("event_fingerprint"),
         version_no=int(_opt("version_no") or 1),
         fractional_policy=str(_opt("fractional_policy") or DEFAULT_FRACTION_POLICY),
+        compensation_price=_num("compensation_price"),
+        compensation_price_source=_opt("compensation_price_source"),
     )
 
 
@@ -306,20 +340,37 @@ def compute_impact(
         ratio = float(action.share_ratio)
         raw = holding * ratio
         policy = action.fractional_policy
-        if policy == FRACTION_ROUND_UP:
+        fractional = raw - (raw // 1)
+
+        if policy == FRACTION_UNKNOWN:
+            # 规则未证实：只有「实际不产生零碎份额」时才可安全应用。
+            # 一旦产生零碎份额，任何处置方式都是猜测，必须 fail closed。
+            if fractional > RATIO_TOLERANCE:
+                raise CorporateActionError(
+                    f"{action.code} {action.ex_date} 零碎份额处置口径未证实"
+                    f"（{policy}），但持仓 {holding} × 比例 {ratio} "
+                    f"产生零碎份额 {fractional:.6f}，不得自行猜测处置方式"
+                )
+            new_shares = int(raw // 1)
+            fractional_cash = 0.0
+        elif policy == FRACTION_ROUND_UP:
             new_shares = int(math.ceil(raw - RATIO_TOLERANCE))
             fractional_cash = 0.0
         elif policy == FRACTION_CASH_COMPENSATION:
+            # 现金补偿必须使用官方补偿价格，不得用事件日收盘价冒充
+            if action.compensation_price is None or action.compensation_price_source is None:
+                raise CorporateActionError(
+                    f"{action.code} {action.ex_date} cash_compensation 缺少官方补偿价格依据，"
+                    "不得使用普通收盘价替代"
+                )
             new_shares = int(raw // 1)
-            fractional = raw - new_shares
             fractional_cash = 0.0
-            if fractional > RATIO_TOLERANCE and price is not None and price > 0:
-                fractional_cash = fractional * float(price)
+            if fractional > RATIO_TOLERANCE:
+                fractional_cash = fractional * float(action.compensation_price)
         else:
             # truncate：尾差计入基金财产，无现金补偿
             new_shares = int(raw // 1)
             fractional_cash = 0.0
-        fractional = raw - int(raw // 1)
         return ActionImpact(
             action_id=action.action_id,
             code=action.code,
@@ -332,7 +383,8 @@ def compute_impact(
             confirm_date=action.effective_date,
             official_ratio=ratio,
             fractional_policy=policy,
-            compensation_price=price if policy == FRACTION_CASH_COMPENSATION else None,
+            compensation_price=(action.compensation_price
+                                if policy == FRACTION_CASH_COMPENSATION else None),
         )
 
     if action.action_type == ACTION_CASH_DISTRIBUTION:
@@ -376,6 +428,8 @@ def build_action(
     announcement_url: str | None = None,
     manager_name: str | None = None,
     fractional_policy: str = DEFAULT_FRACTION_POLICY,
+    compensation_price: float | None = None,
+    compensation_price_source: str | None = None,
 ) -> CorporateAction:
     """构造事件（字符串日期自动转换）。"""
     def _d(value):
@@ -403,6 +457,8 @@ def build_action(
         announcement_url=announcement_url,
         manager_name=manager_name,
         fractional_policy=fractional_policy,
+        compensation_price=compensation_price,
+        compensation_price_source=compensation_price_source,
     )
 
 
@@ -447,7 +503,8 @@ def load_actions(
         "SELECT action_id, code, action_type, ex_date, effective_date, share_ratio, "
         "cash_per_share, record_date, pay_date, source, evidence, status, "
         "data_version, notes, evidence_status, announcement_title, announcement_date, "
-        "announcement_url, manager_name, event_fingerprint, version_no, fractional_policy "
+        "announcement_url, manager_name, event_fingerprint, version_no, fractional_policy, "
+        "compensation_price, compensation_price_source "
         "FROM corporate_actions WHERE 1=1"
     )
     params: list[Any] = []
@@ -506,6 +563,9 @@ def compute_event_fingerprint(action: CorporateAction) -> str:
         "record_date": action.record_date.isoformat() if action.record_date else None,
         "pay_date": action.pay_date.isoformat() if action.pay_date else None,
         "fractional_policy": action.fractional_policy,
+        "compensation_price": (None if action.compensation_price is None
+                              else round(float(action.compensation_price), 10)),
+        "compensation_price_source": action.compensation_price_source,
         # ---- 证据元数据（阶段3A.3.2.2 新增）----
         "evidence_status": action.evidence_status,
         "source": action.source,
@@ -619,7 +679,8 @@ def save_action(
                 "cash_per_share=?, record_date=?, pay_date=?, source=?, evidence=?, "
                 "status=?, data_version=?, notes=?, evidence_status=?, "
                 "announcement_title=?, announcement_date=?, announcement_url=?, "
-                "manager_name=?, fractional_policy=?, event_fingerprint=?, "
+                "manager_name=?, fractional_policy=?, compensation_price=?, "
+                "compensation_price_source=?, event_fingerprint=?, "
                 "version_no=?, updated_at=? WHERE action_id=?",
                 (
                     action.effective_date.isoformat(), action.share_ratio,
@@ -630,7 +691,9 @@ def save_action(
                     action.data_version, action.notes, action.evidence_status,
                     action.announcement_title, action.announcement_date,
                     action.announcement_url, action.manager_name,
-                    action.fractional_policy, fingerprint, new_version, stamp, action_id,
+                    action.fractional_policy, action.compensation_price,
+                    action.compensation_price_source, fingerprint, new_version,
+                    stamp, action_id,
                 ),
             )
             _write_version(conn, key, new_version, action_id, action,
@@ -643,8 +706,9 @@ def save_action(
             " record_date, pay_date, source, evidence, status, data_version, notes, "
             " created_at, updated_at, evidence_status, announcement_title, "
             " announcement_date, announcement_url, manager_name, event_fingerprint, "
-            " version_no, fractional_policy) "
-            "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+            " version_no, fractional_policy, compensation_price, "
+            " compensation_price_source) "
+            "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
             (
                 action.code, action.action_type, action.ex_date.isoformat(),
                 action.effective_date.isoformat(), action.share_ratio,
@@ -656,6 +720,7 @@ def save_action(
                 action.evidence_status, action.announcement_title,
                 action.announcement_date, action.announcement_url,
                 action.manager_name, fingerprint, 1, action.fractional_policy,
+                action.compensation_price, action.compensation_price_source,
             ),
         )
         action_id = int(cur.lastrowid)
@@ -674,8 +739,9 @@ def _write_version(conn, key: str, version_no: int, action_id: int,
         "INSERT OR REPLACE INTO corporate_action_versions "
         "(action_key, version_no, code, action_type, ex_date, effective_date, "
         " share_ratio, cash_per_share, record_date, pay_date, source, evidence_status, "
-        " data_version, change_reason, snapshot_json, created_at) "
-        "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+        " data_version, change_reason, snapshot_json, created_at, fractional_policy, "
+        " compensation_price, compensation_price_source) "
+        "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
         (
             key, version_no, action.code, action.action_type,
             action.ex_date.isoformat(), action.effective_date.isoformat(),
@@ -683,7 +749,8 @@ def _write_version(conn, key: str, version_no: int, action_id: int,
             action.record_date.isoformat() if action.record_date else None,
             action.pay_date.isoformat() if action.pay_date else None,
             action.source, action.evidence_status, action.data_version,
-            reason, _snapshot_payload(action), stamp,
+            reason, _snapshot_payload(action), stamp, action.fractional_policy,
+            action.compensation_price, action.compensation_price_source,
         ),
     )
 

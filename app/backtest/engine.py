@@ -117,6 +117,13 @@ def _frame_hash(bars: dict[str, BarData]) -> str:
     return digest.hexdigest()[:16]
 
 
+def _as_date(value) -> date:
+    """把配置里的字符串日期或 date 统一成 date。"""
+    if isinstance(value, date):
+        return value
+    return date.fromisoformat(str(value)[:10])
+
+
 class BacktestEngine:
     """严格 T+1 的回测引擎。
 
@@ -153,6 +160,8 @@ class BacktestEngine:
         self.excluded_actions: list[dict] = []
         # 阶段3A.3.2.2：份额调整的完整账本留痕（成本转出 / 已实现盈亏）
         self.corporate_action_ledger: list[dict] = []
+        # 阶段3A.3.2.2.1：因证据/资格不足被阻断的事件
+        self.blocked_actions: list[dict] = []
         # 权益登记日锁定的分红份额（action_id -> 份额）
         self._dividend_locked_shares: dict[int, int] = {}
         self._run_id_for_actions: str | None = None
@@ -240,16 +249,33 @@ class BacktestEngine:
                     price = float(history.iloc[-1])
 
             if action.action_type == ca.ACTION_CASH_DISTRIBUTION:
-                # 优先用权益登记日锁定的份额；未锁定（登记日在回测区间之前或
-                # 非交易日）时退回当日持仓，并在 notes 留痕
-                if action.action_id in self._dividend_locked_shares:
-                    holding = self._dividend_locked_shares[action.action_id]
-                else:
-                    holding = portfolio.quantity(action.code)
-                    self.notes.append(
-                        f"公司行为：{action.code} {action.ex_date} 分红未取得登记日份额，"
-                        f"按除息日持仓 {holding} 计算"
+                # 权益登记日锁定的份额是分红金额的唯一合法依据。
+                # 未锁定说明登记日不在回测区间内（或登记日无交易日数据），
+                # 此时**不得**退回除息日持仓——那会让回测开始后才买入的份额
+                # 凭空获得分红资格。直接阻断该事件并留痕。
+                record = action.record_date or action.ex_date
+                if action.action_id not in self._dividend_locked_shares:
+                    start = _as_date(self.config.start_date)
+                    reason = (
+                        f"登记日 {record} 早于回测起点 {start}，未取得持仓快照"
+                        if record < start
+                        else f"登记日 {record} 无交易数据或未执行日终快照"
                     )
+                    self.notes.append(
+                        f"公司行为阻断：{action.code} {action.ex_date} 分红（{reason}），"
+                        "无合法登记日持仓，不计入应收"
+                    )
+                    self.blocked_actions.append({
+                        "action_id": action.action_id,
+                        "code": action.code,
+                        "action_type": action.action_type,
+                        "ex_date": action.ex_date.isoformat(),
+                        "record_date": record.isoformat(),
+                        "reason": reason,
+                        "reason_code": "missing_record_date_holding",
+                    })
+                    continue
+                holding = self._dividend_locked_shares[action.action_id]
             else:
                 holding = portfolio.quantity(action.code)
             if action.action_type == ca.ACTION_CASH_DISTRIBUTION and not getattr(
@@ -263,6 +289,19 @@ class BacktestEngine:
                 impact = ca.compute_impact(action, holding=holding, price=price)
             except ca.CorporateActionError as exc:
                 self.notes.append(f"公司行为跳过 {action.code} {action.effective_date}：{exc}")
+                self.blocked_actions.append({
+                    "action_id": action.action_id,
+                    "code": action.code,
+                    "action_type": action.action_type,
+                    "ex_date": action.ex_date.isoformat(),
+                    "effective_date": action.effective_date.isoformat(),
+                    "reason": str(exc),
+                    "reason_code": ("unknown_fraction_policy"
+                                    if "零碎份额处置口径未证实" in str(exc)
+                                    else "missing_compensation_price"
+                                    if "补偿价格依据" in str(exc)
+                                    else "corporate_action_error"),
+                })
                 continue
             if impact.shares_after == impact.shares_before and abs(impact.cash_delta) < 1e-12:
                 continue

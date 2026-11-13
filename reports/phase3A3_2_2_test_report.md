@@ -1,94 +1,72 @@
-# 阶段3A.3.2.2 测试报告
+# 阶段3A.3.2.2 测试报告（含 3A.3.2.2.1 收尾）
 
 - 生成时间：2026-11-13
+- 涵盖阶段：3A.3.2.2 + 3A.3.2.2.1
 - 环境：Python 3.11.2 / pytest / Windows
-- 命令：`PYTHONUTF8=1 .venv/Scripts/python.exe -m pytest -q`
 
 ## 1. 总数拆分
 
-| 类别 | 数量 | 通过 | 失败 | 跳过 |
-| --- | ---: | ---: | ---: | ---: |
-| **原有测试**（1A ~ 3A.3.2.1） | **425** | **425** | 0 | 0 |
-| **本阶段新增** | **29** | **29** | 0 | 0 |
-| **合计** | **454** | **454** | **0** | **0** |
+| 类别 | 数量 | 通过 | 失败 | 跳过 | xfail |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| **历史测试**（1A ~ 3A.3.2.1，含 3A.3.2.2 前的 387 + 公司行为 38） | **425** | 425 | 0 | 0 | 0 |
+| **3A.3.2.2 新增** | **29** | 29 | 0 | 0 | 0 |
+| **3A.3.2.2.1 新增** | **15** | 15 | 0 | 0 | 0 |
+| **合计** | **469** | **469** | **0** | **0** | **0** |
 
-`--collect-only`：**454 tests collected**
-`tests/test_corporate_actions.py`：**67 passed**
+`--collect-only`：**469 tests collected**
+`tests/test_corporate_actions.py`：**82 passed**
+其他测试：**387 passed**
 
-## 2. 本阶段新增的 29 项
+## 2. 3A.3.2.2.1 新增的 15 项
 
-### 2.1 零碎份额成本基准（10 项）
+### 2.1 零碎规则（4 项）
 
-| # | 测试函数 | 覆盖要求 |
+| # | 测试 | 覆盖 |
 | ---: | --- | --- |
-| 1 | `test_integer_split_cost_basis_unchanged` | 整数比例拆分，成本基准正确 |
-| 2 | `test_integer_reverse_split_cost_basis_unchanged` | 整数比例合并，成本基准正确 |
-| 3 | `test_fractional_split_disposes_cost_and_records_pnl` | 非整数拆分，零碎现金补偿 |
-| 4 | `test_fractional_reverse_split_disposes_cost_and_records_pnl` | 非整数合并，零碎现金补偿 |
-| 5 | `test_multi_lot_fractional_disposal_uses_portfolio_level_cost` | 多批次同时非整数折算 |
-| 6 | `test_truncate_policy_records_loss_not_cash` | 舍去口径记损失不记现金 |
-| 7 | `test_round_up_policy_adds_share_without_cost` | 进位口径不增加成本 |
-| 8 | `test_consecutive_actions_do_not_double_charge_cost` | 连续事件不重复计成本 |
-| 9 | `test_no_position_action_records_nothing` | 无持仓不产生成本或盈亏 |
-| 10 | `test_engine_records_fractional_ledger` | **完整 Engine 流程**留痕 |
+| 1 | `test_unknown_policy_without_fraction_applies` | unknown 但无零碎 → 可应用 |
+| 2 | `test_unknown_policy_with_fraction_is_blocked` | unknown 且有零碎 → 阻断 |
+| 3 | `test_unknown_policy_blocked_via_compute_impact` | 直接调函数阻断 + 无零碎可过 |
+| 4 | `test_explicit_truncate_still_applies` | 明确 truncate 正常执行 |
+| 5 | `test_explicit_round_up_still_applies` | 明确 round_up 正常执行 |
 
-多个 lot 分配后总份额准确：测试 5 断言
-`sum(lot.quantity) == position.quantity == new_quantity`。
+### 2.2 现金补偿（3 项）
 
-事件前后总经济价值核对：测试 3 断言
-`市值 + 补偿 == 拆分前市值`。
-
-### 2.2 事件日期边界（8 项）
-
-| # | 测试函数 | 覆盖要求 |
+| # | 测试 | 覆盖 |
 | ---: | --- | --- |
-| 11 | `test_window_boundary_ex_date_equals_start` | `ex_date == start_date` |
-| 12 | `test_window_boundary_ex_date_equals_end_effective_after` | `ex_date == end_date` 且 pay 在结束日之后 |
-| 13 | `test_window_boundary_split_effective_equals_end` | 拆分 `effective_date == end_date` |
-| 14 | `test_window_boundary_split_effective_after_end_excluded` | 拆分 `effective_date > end_date` |
-| 15 | `test_window_excludes_events_before_start` | 开始日期前已发生的事件 |
-| 16 | `test_end_of_backtest_unsettled_dividend_counted_in_assets` | 期末未到账分红计入净资产 |
-| 17 | `test_same_event_not_loaded_twice_across_adjacent_ranges` | 跨相邻区间不重复 |
-| 18 | `test_load_actions_filters_by_window_date` | 按类型分别筛（改造既有测试） |
+| 6 | `test_cash_compensation_without_official_price_fails_closed` | 缺依据 → 构造即抛错 |
+| 7 | `test_cash_compensation_with_official_price_uses_that_price` | 用官方价不用收盘价 |
+| 8 | `test_compensation_price_changes_fingerprint` | 补偿价进指纹 |
 
-### 2.3 事件指纹（9 项）
+### 2.3 登记日资格（6 项）
 
-| # | 测试函数 | 覆盖要求 |
+| # | 测试 | 覆盖 |
 | ---: | --- | --- |
-| 19 | `test_announcement_url_changes_fingerprint` | 公告 URL 改变 |
-| 20 | `test_announcement_title_changes_fingerprint` | 公告标题改变 |
-| 21 | `test_announcement_date_changes_fingerprint` | 公告日期改变 |
-| 22 | `test_manager_name_changes_fingerprint` | 基金管理人改变 |
-| 23 | `test_evidence_text_changes_fingerprint` | 证据内容改变 |
-| 24 | `test_evidence_status_changes_fingerprint` | 证据等级改变 |
-| 25 | `test_unrelated_field_does_not_change_fingerprint` | 无关字段**不**改变 |
-| 26 | `test_same_metadata_repeat_gives_same_fingerprint` | 重复运行指纹一致 |
-| 27 | `test_events_digest_order_independent` | 事件顺序变化集合指纹不变 |
-| 28 | `test_events_digest_ignores_unrelated_events` | 未参与事件不污染指纹 |
+| 9 | `test_dividend_requires_record_date_in_range` | 登记日早于区间 → 阻断 |
+| 10 | `test_dividend_after_record_date_buy_gets_nothing` | 登记日后买入 → 无分红 |
+| 11 | `test_dividend_held_from_record_date_is_entitled` | 登记日持有 → 有分红 |
+| 12 | `test_dividend_uses_close_after_record_date_trades` | 登记日当天成交 → 用收盘持仓 |
+| 13 | `test_dividend_sell_after_record_date_keeps_receivable` | 登记日后卖出 → 应收不变 |
+| 14 | `test_secondary_dividend_with_unverified_record_date_not_applied` | secondary 无登记日 → 不应用 |
 
-### 2.4 引擎级（2 项）
+### 2.4 版本与证据（1 项）
 
-| # | 测试函数 | 覆盖要求 |
+| # | 测试 | 覆盖 |
 | ---: | --- | --- |
-| 29 | `test_engine_fractional_event_keeps_assets_identity` | 非整数折算后逐日资产恒等式 |
-| 30 | `test_round_up_policy_through_engine` | 进位口径走完整引擎 |
+| 15 | `test_event_version_history_complete` | 三次变更产生三个版本 |
 
-> 注：上表编号累计 30，其中 `test_load_actions_filters_by_window_date`
-> 是**改造既有测试**（不是新增），故新增实为 **29 项**。
+## 3. 修改但未新增的测试
 
-## 3. 原 425 项全部保留
-
-无一项被删除。唯一改动是 `test_load_actions_filters_by_range_and_codes`
-→ `test_load_actions_filters_by_window_date`：
-
-| 项 | 旧断言 | 新断言 |
+| 测试 | 改动 | 说明 |
 | --- | --- | --- |
-| `load_actions(start=01-04, end=01-04)` | `len == 2` | **`len == 1`（仅拆分）** |
-| 新增 | — | `load_actions(start=01-03, end=01-03)` → 仅分红 |
-| 新增 | — | `load_actions(start=01-03, end=01-04)` → 2 条 |
+| `test_fractional_shares_converted_to_cash` | 补 `fractional_policy="truncate"` | 语义是「按规定处置」，必须显式声明规则 |
+| `test_multi_lot_split_keeps_lot_sum` | 补 `fractional_policy="truncate"` | 同上 |
+| `test_dividend_held_from_record_date_is_entitled` | 重排时序（8 个交易日） | T+1 语义：信号日下单、次日成交 |
+| `test_dividend_after_record_date_buy_gets_nothing` | 重排时序 | 同上 |
+| `test_dividend_uses_close_after_record_date_trades` | 重排时序 | 同上 |
+| `test_dividend_sell_after_record_date_keeps_receivable` | 重排时序 | 同上 |
+| `test_load_actions_filters_by_window_date` | 3A.3.2.2 重写 | 按类型分别验证 |
 
-**断言更严，不是更松**：旧断言 `len == 2` 建立在「统一按 effective_date 筛」
-的错误口径上，新断言按事件类型分别验证。
+**没有任何一项被删除或跳过，断言强度没有降低。**
 
 ## 4. 其他验证
 
@@ -97,7 +75,7 @@
 | 请求 | 结果 |
 | --- | --- |
 | `GET /api/validations` | 200 |
-| `GET /api/validations/06600b4faac146c5` | 200（windows=8 grid=8 stress=7 有条件通过） |
+| `GET /api/validations/e8b052dd2db542f9` | 200（8 窗口、8 参数、7 压力、有条件通过） |
 | `GET /api/validations/not_exist` | 404 |
 
 `SMOKE_FAILED: 无`
@@ -115,68 +93,65 @@
 PRAGMA integrity_check -> ok
 ```
 
-### 4.4 事件数量对账
+### 4.4 数据迁移幂等性
+
+在备份副本上连续执行 `init_db()` 两次：
+
+| 表 | 前 | 后 |
+| --- | ---: | ---: |
+| `etf_daily_prices` | 116,609 | 116,609 |
+| `corporate_actions` | 166 | 166 |
+| `corporate_action_versions` | 704 | 704 |
+| `validation_runs` | 43 | 43 |
+| `integtest_check` | — | ok |
+
+新增列：`compensation_price` / `compensation_price_source`（两表各一组）。
+
+### 4.5 事件对账脚本
 
 `python scripts/reconcile_events.py`：
 
 **校验项 14，失败 0**
 
-口径已改为**经济权益日**（分红 `ex_date` / 拆分 `effective_date`）：
+新增「零碎处置口径」统计块：
 
-| 校验项 | 结果 |
-| --- | :---: |
-| 原始抓取 == 去重后（166） | OK |
-| 样本内+样本外==区间内（49+32=81） | OK |
-| 区间内+区间外==总数（81+85=166） | OK |
-| split 分区间之和==合计（14+6+3=23） | OK |
-| reverse_split 分区间之和==合计（1+3+18=22） | OK |
-| cash_distribution 分区间之和==合计（34+23+64=121） | OK |
-| 类型合计==去重总数（166） | OK |
-| official_confirmed 分区间之和（49+27+61=137） | OK |
-| secondary_confirmed 分区间之和（0+5+14=19） | OK |
-| unverified 分区间之和（0+0+10=10） | OK |
-| rejected 分区间之和（0） | OK |
-| 证据等级合计==去重总数（166） | OK |
-| 应用事件数<=可应用事件数（79 ≤ 81） | OK |
+| 口径 | 样本内 | 样本外 | 区间外 | 合计 |
+| --- | ---: | ---: | ---: | ---: |
+| `truncate` | 0 | 0 | 9 | 9 |
+| `round_up` | 2 | 3 | 0 | 5 |
+| `unknown` | 13 | 6 | 12 | 31 |
 
-### 4.5 行情指纹
+### 4.6 行情指纹
 
 | 项 | 值 |
 | --- | --- |
 | 算法 | `market-fingerprint-v3` |
 | 行数 | 116,609 |
 | SHA256 | `d54727c0a76a1b09531accd04b3d66ff4ea2374592b1d4a8cb8381602cbbac49` |
-| 本阶段是否改变 | **否**（连续第四阶段不变） |
+| 本阶段是否改变 | **否**（连续第五阶段不变） |
 
-### 4.6 事件指纹
+### 4.7 事件指纹
 
-| 区间 | 事件数 | 指纹（新字段集） |
+| 区间 | 事件数 | 指纹 |
 | --- | ---: | --- |
-| 样本内 | 49 | `27e331cfbbae…` |
-| 样本外（41 只池） | 31 | `2b4b24e468cb…` |
+| 样本内 | 29（应用集） | `855dc11a43a889…` |
+| 样本外 | 30（应用集） | `d87fb1e3c9261b…` |
 
-## 5. 加载/指纹/应用三者一致性
+字段集已再扩展（加 `compensation_price` / `compensation_price_source`）。
 
-| 环节 | 样本内 | 样本外 |
-| --- | ---: | ---: |
-| 数据库（41 只池，经济权益日） | 49 | 31 |
-| `load_actions()` 加载 | **49** | **31** |
-| 可应用（is_confirmed） | **49** | **31** |
-| 引擎实际应用（去重） | 79（区间内合计，含两区间） | |
+### 4.8 完整验证重放
 
-三者完全一致，不存在口径分叉。
+| 项 | 值 |
+| --- | --- |
+| validation_id | **`e8b052dd2db542f9`** |
+| input_hash | `6da51a1c462b7c65` |
+| 耗时 | 1,436.3 秒 |
+| 池 | 41 只 |
+| 样本内选出参数 | MA250 |
+| 结论 | 有条件通过 |
+| 行情是否变化 | 否 |
 
-## 6. 未验证项
-
-| # | 项 | 原因 |
-| ---: | --- | --- |
-| 1 | 39 条历史验证记录重放 | 单次约 24 分钟，全量约 16 小时 |
-| 2 | 跨界事件（ex 在区间内、eff 在区间外）的真实数据验证 | 本库无此类数据 |
-| 3 | 非空初始持仓的分红处理 | 未实现 |
-| 4 | 真实券商对账单核对 | 无对账单 |
-| 5 | 21 条公告未明说零碎口径的核实 | 公告正文确无相关表述 |
-
-## 7. 失败与跳过
+## 5. 失败与跳过
 
 | 项 | 数量 |
 | --- | ---: |
@@ -184,9 +159,9 @@ PRAGMA integrity_check -> ok
 | 错误 | **0** |
 | 跳过 | **0** |
 | xfail | **0** |
-| 警告 | 1（Starlette `httpx` 弃用，与本次改动无关） |
+| 警告 | 1（Starlette `httpx` 弃用，与改动无关） |
 
-## 8. 复现命令
+## 6. 复现命令
 
 ```bash
 cd D:\ymy\jj-agent
@@ -195,13 +170,16 @@ PYTHONUTF8=1 .venv/Scripts/python.exe -m pytest -q
 PYTHONUTF8=1 .venv/Scripts/python.exe -m pytest tests/test_corporate_actions.py -q
 PYTHONUTF8=1 .venv/Scripts/python.exe scripts/reconcile_events.py
 PYTHONUTF8=1 .venv/Scripts/python.exe scripts/set_fractional_policy.py --dry-run
+PYTHONUTF8=1 .venv/Scripts/python.exe scripts/fix_secondary_dividend_dates.py --dry-run
 PYTHONUTF8=1 .venv/Scripts/python.exe scripts/smoke_validation_api.py
-PYTHONUTF8=1 .venv/Scripts/python.exe scripts/replay_3a3_2.py --out data/replay_3a3_2_2.json
+PYTHONUTF8=1 .venv/Scripts/python.exe scripts/replay_3a3_2.py --out data/replay_3a3_2_2_1.json
 ```
 
-## 9. 测试局限
+## 7. 测试局限
 
-1. 行情用构造数据（`pd.bdate_range` + 人工收盘价），不覆盖真实停牌/跳空
+1. 行情用构造数据（`pd.bdate_range` + 人工收盘），不覆盖真实停牌/跳空
 2. 分红发放日用构造日期，不验证真实 T+3~T+7 分布
-3. 零碎份额测试用单一日期的多批次，不覆盖跨日建仓的复杂 FIFO
-4. 未做性能与并发测试
+3. `cash_compensation` 路径只有单元测试，本库无真实案例
+4. 登记日 fail closed 只有构造测试，本库 0 条触发
+5. 未做性能与并发测试
+6. 本报告的测试结果是 DSH 会话内本地执行结果，**不是外部独立测试**

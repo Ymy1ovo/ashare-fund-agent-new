@@ -37,7 +37,9 @@ payload = {
     # ---- 经济要素 ----
     "code", "action_type", "ex_date", "effective_date",
     "share_ratio", "cash_per_share", "record_date", "pay_date",
-    "fractional_policy",            # ← 本阶段新增（零碎处置口径影响账本）
+    "fractional_policy",            # ← 3A.3.2.2 新增（零碎处置口径影响账本）
+    "compensation_price",           # ← 3A.3.2.2.1 新增（官方补偿价格）
+    "compensation_price_source",    # ← 3A.3.2.2.1 新增（价格依据）
 
     # ---- 证据元数据 ----
     "evidence_status",              # 证据等级
@@ -53,7 +55,7 @@ payload = {
 }
 ```
 
-共 **16 个字段**（上一阶段 11 个）。
+共 **18 个字段**（3A.3.2.1 为 11 个，3A.3.2.2 为 16 个）。
 
 ### 2.1 明确排除的字段
 
@@ -211,7 +213,8 @@ if same_row:
 
 | # | 局限 | 影响 |
 | ---: | --- | --- |
-| 1 | 常量名 `ca-events-v2` 与字段集不完全对应 | 已有说明，旧值不受影响 |
+| 1 | 常量名 `ca-events-v2` 已两次扩容字段集 | 未改名，旧 `input_hash` 值不受影响 |
 | 2 | 未实现「按 input_hash 反查当时事件集」 | 只能人工比对 |
 | 3 | `notes` 未纳入指纹 | 有意排除，但若备注含实质信息会丢失 |
+| 5 | 本阶段新增补偿价字段未经真实事件验证 | 本库无 `cash_compensation` 事件 |
 | 4 | 版本表无唯一约束防重复 | 依赖 `_archive_version` 逻辑 |

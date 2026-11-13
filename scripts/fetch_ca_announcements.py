@@ -120,6 +120,11 @@ def _num(text: str) -> float:
     return float(re.sub(r"\s+", "", text))
 
 
+def _has_dual_field(text: str) -> bool:
+    """公告是否把同一字段拆成「（场内）...（场外）」两段。"""
+    return "（场内）" in text and "（场外）" in text
+
+
 def _date_any(label: str, text: str) -> str | None:
     return _date_after(label, text)
 
@@ -163,6 +168,8 @@ def parse_dividend(text: str) -> dict:
     if per_share is not None:
         result["cash_per_share"] = round(per_share, 8)
 
+    if _has_dual_field(flat):
+        result["dual_date_layout"] = True
     result["record_date"] = _date_any("权益登记日", flat)
     result["ex_date"] = _date_any("除息日", flat) or _date_any("除权除息日", flat)
     result["pay_date"] = (_date_any("现金红利发放日", flat)
