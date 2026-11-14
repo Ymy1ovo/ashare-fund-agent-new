@@ -2225,3 +2225,68 @@ python scripts/replay_validation_3a3_2.py --pending --dry-run
 4. `config_hash` 反证依赖当时的字段集；未来 `ValidationConfig` 再增字段时
    需同步新增变体
 5. 测试结果是 DSH 会话内本地执行结果，不是外部独立测试
+
+## 40. 阶段3A.3.2.3.2 重放失败闸门修复
+
+### 40.1 缺陷一：validation 闸门三值短路
+
+```python
+row = conn.execute("SELECT input_hash, accounting_version ...").fetchone()
+replay_acct = str(row[1]) if row and row[1] else None
+
+if replay_acct and replay_acct != CURRENT_ACCOUNTING:   # ← 为 None 时短路
+    ... FAILED
+# 落到 STATUS_SUCCESS
+```
+
+| 新记录实况 | 修复前 | 修复后 |
+| --- | --- | --- |
+| 记录不存在 | **success** | failed |
+| `accounting_version = None` | **success** | failed |
+| `accounting_version = ''` | **success** | failed |
+| `legacy` / 未知版本 | failed | failed |
+
+修复后：
+
+```python
+if row is None:
+    ... FAILED
+replay_acct = row[1]
+if not isinstance(replay_acct, str) or replay_acct != CURRENT_ACCOUNTING:
+    ... FAILED
+```
+
+### 40.2 缺陷二：backtest 闸门真值判断
+
+```python
+if result.accounting_basis != ACCOUNTING_FORMAL or not result.formal_valuation:
+```
+
+`not 1` 为 `False`，`formal_valuation=1` 能穿过并调用 `save_result`。
+
+修复为与 `_require_formal()` 同一语义：
+
+```python
+basis = getattr(result, "accounting_basis", None)
+formal = getattr(result, "formal_valuation", None)
+if (basis != ACCOUNTING_FORMAL
+        or not isinstance(formal, bool) or formal is not True):
+    raise ReplayError(...)
+```
+
+### 40.3 可测缝隙
+
+抽出 `_fetch_validation_record()`。原实现把回查内联在 `replay_validation()` 里，
+「查不到记录」这条失败路径无法在不替换整个数据库连接时测试；
+第一版测试用了替换 `get_connection` 的方式，反而把建表初始化一起挡掉了。
+
+### 40.4 验证
+
+| 项 | 结果 |
+| --- | ---: |
+| 全量测试 | **564 passed**，0 failed / 0 skipped / 0 xfail |
+| 基线 538 项 | 全部保留通过 |
+| 本轮新增 | 26 项 |
+| 前置条件复检 | 六项全通过 |
+
+新增测试的每条都核实数据库最终状态，而不只断言抛异常。

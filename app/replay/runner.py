@@ -203,10 +203,15 @@ def replay_backtest(
         engine = BacktestEngine(config, strategy, db_path=db_path)
         result = engine.run(list(source["etf_codes"]),
                             indicator_version=source["indicator_version"])
-        if result.accounting_basis != ACCOUNTING_FORMAL or not result.formal_valuation:
+        # 严格白名单：两个字段必须同时精确命中，不做真值转换。
+        # `1 == True` 但 `1 is not True`，非布尔真值一律拒绝。
+        basis = getattr(result, "accounting_basis", None)
+        formal = getattr(result, "formal_valuation", None)
+        if (basis != ACCOUNTING_FORMAL
+                or not isinstance(formal, bool) or formal is not True):
             raise ReplayError(
-                f"重放结果不是正式口径（accounting_basis={result.accounting_basis}，"
-                f"formal_valuation={result.formal_valuation}）"
+                f"重放结果不是正式口径（accounting_basis={basis!r}，"
+                f"formal_valuation={formal!r}）"
             )
         performance = compute_performance(
             result.daily, result.trades, result.orders, result.initial_cash,
@@ -242,8 +247,20 @@ def replay_backtest(
     )
 
 
-def replay_validation(
-    source_id: str,
+def _fetch_validation_record(validation_id: str, *, db_path=None):
+    """回查重放落库后的 (input_hash, accounting_version)。查不到返回 None。
+
+    单独抽成函数，既让「查不到」与「版本异常」两条失败路径可被独立测试，
+    也避免测试为了造一个 None 而整体替换数据库连接。
+    """
+    with get_connection(db_path) as conn:
+        return conn.execute(
+            "SELECT input_hash, accounting_version FROM validation_runs "
+            "WHERE validation_id=?", (validation_id,)
+        ).fetchone()
+
+
+def replay_validation(    source_id: str,
     *,
     force: bool = False,
     db_path=None,
@@ -283,22 +300,37 @@ def replay_validation(
         return ReplayOutcome(source_id=source_id, status=STATUS_FAILED,
                              reason=f"{type(exc).__name__}: {exc}", attempt_id=attempt)
 
-    with get_connection(db_path) as conn:
-        row = conn.execute(
-            "SELECT input_hash, accounting_version FROM validation_runs "
-            "WHERE validation_id=?", (result.validation_id,)
-        ).fetchone()
-    replay_hash = str(row[0]) if row else None
-    replay_acct = str(row[1]) if row and row[1] else None
+    row = _fetch_validation_record(result.validation_id, db_path=db_path)
 
-    if replay_acct and replay_acct != CURRENT_ACCOUNTING:  # 验证记录用 ca-v2 版本号
+    # 阶段3A.3.2.3.2：三处原本会被短路放行的情况必须失败
+    #   1) 落库记录查不到（row is None）
+    #   2) accounting_version 为 None / 空串
+    #   3) accounting_version 非 str 或不是 ca-v2-receivable
+    # 旧实现 `if replay_acct and replay_acct != CURRENT` 在 (1)(2) 时
+    # `replay_acct` 为 None，短路后直接落到成功分支。
+    if row is None:
         finish_attempt(attempt, STATUS_FAILED,
                        replay_record_id=result.validation_id,
-                       reason=f"重放记录会计版本异常：{replay_acct}", db_path=db_path)
+                       reason=f"重放后查不到新 validation 记录：{result.validation_id}",
+                       db_path=db_path)
+        return ReplayOutcome(
+            source_id=source_id, status=STATUS_FAILED,
+            replay_id=result.validation_id,
+            reason=f"重放后查不到新 validation 记录：{result.validation_id}",
+            attempt_id=attempt,
+        )
+
+    replay_acct = row[1]
+    if not isinstance(replay_acct, str) or replay_acct != CURRENT_ACCOUNTING:
+        finish_attempt(attempt, STATUS_FAILED,
+                       replay_record_id=result.validation_id,
+                       reason=f"重放记录会计版本异常：{replay_acct!r}", db_path=db_path)
         return ReplayOutcome(source_id=source_id, status=STATUS_FAILED,
                              replay_id=result.validation_id,
-                             reason=f"重放记录会计版本异常：{replay_acct}",
+                             reason=f"重放记录会计版本异常：{replay_acct!r}",
                              attempt_id=attempt)
+
+    replay_hash = str(row[0]) if row[0] else None
 
     finish_attempt(
         attempt, STATUS_SUCCESS,

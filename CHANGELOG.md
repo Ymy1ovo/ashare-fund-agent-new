@@ -1,5 +1,26 @@
 # 变更日志
 
+## 2026-11-14 — 阶段3A.3.2.3.2 重放失败闸门修复
+
+- **validation 闸门三值短路**：`replay_validation()` 原用
+  `if replay_acct and replay_acct != CURRENT`，`replay_acct` 为 `None` 时
+  短路直接落到成功分支。于是「新记录不存在」「accounting_version=None」
+  「accounting_version=''」三种情形全被登记为 success。
+  改为显式判断 `row is None` 与
+  `not isinstance(replay_acct, str) or replay_acct != CURRENT_ACCOUNTING`。
+- **backtest 闸门真值判断**：`replay_backtest()` 原用
+  `not result.formal_valuation`，`formal_valuation=1` 能穿过并调用
+  `save_result`。改为 `isinstance(formal, bool) and formal is True`，
+  与 3A.3.2.2.4 的 `_require_formal()` 同一语义。
+  这是两处独立实现，当时只修了验证层。
+- **可测缝隙**：抽出 `_fetch_validation_record()`，让「查不到记录」
+  这条失败路径能被单点 monkeypatch 覆盖，不必替换整个数据库连接。
+- **测试**：基线 538 → **564**，新增 26 项，全部核实数据库最终状态
+  （而非只断言抛异常）。Old 538 未删未跳未弱化。
+- 未执行任何历史重放；未改动公司行为会计规则、撮合逻辑、策略算法。
+- 新增报告：`phase3A3_2_3_2_replay_gate_fix.md`。
+
+
 ## 2026-11-14 — 阶段3A.3.2.3.1 历史回测与验证记录重放体系
 
 - **全量盘点**：`scripts/audit_replay_history.py` 逐条读取
