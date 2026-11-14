@@ -1,5 +1,41 @@
 # 变更日志
 
+## 2026-11-14 — 阶段3A.3.2.3.1 历史回测与验证记录重放体系
+
+- **全量盘点**：`scripts/audit_replay_history.py` 逐条读取
+  `backtest_runs`（12 条）与 `validation_runs`（44 条）的实际字段，
+  按 `current_formal` / `replayed` / `legacy` / `unknown_legacy` /
+  `non_replayable` 五类归档，每条附独立理由。分类合计恒等于总数。
+- **参数忠实性靠反证，不靠猜**：`validation_runs` 只存区间/池/网格，
+  资金、佣金、滑点、执行价、指标版本全在一列 `config_hash` 里。
+  新模块 `app/replay/manifest.py` 用两套字段集（当前 28 字段 / 历史 26 字段）
+  × 两种池模式 × 日期候选（存储值、该月 1 日），把候选参数代入
+  `params_hash()`；**只有完全命中才算参数被证明**，未命中即不可重放。
+- **backtest 的真问题**：11 条历史记录的 `strategy_params` 恒为 `{}`，
+  `ma_trend` 的 `ma_window` 从未落库，导致 9 条永久不可重放。
+  没有用默认 20 兜底，也没有从 `input_hash` 或报告数字反推。
+- **重放工具支持指定源记录**：`--source <id>`、`--pending`、`--force`、
+  `--dry-run`。旧的 `--legacy-comparison` 保留（内存回测、不落库）。
+- **对应关系新表** `replay_attempts`：记录 source/replay 两个 ID、
+  两个 input_hash、两个 accounting_version、参数快照、状态、时间戳。
+  只追加，不改任何历史表。
+- **幂等与断点恢复**：已成功的源记录重复执行返回 `skipped` 且不写新行；
+  `--force` 才新建；单条失败记 `failed` + 原因不影响同批其他条；
+  中断后重跑同一命令即可继续。
+- **本轮实际重放 1 条**：`ac8f4cc7cf234d7e` → `355948ec40224eb5`
+  （buy_and_hold，5 只），新记录 `accounting_basis=formal_receivable`、
+  `formal_valuation=True`、`accounting_version=ca-v2-receivable`。
+- **测试**：基线 518 → **538**，新增 20 项，全部通过，0 失败 / 0 跳过 / 0 xfail。
+- **数据库**：新增 1 张表 + 2 个索引；`backtest_runs` +1 行（重放记录）、
+  `backtest_daily_nav` +689 行；其余表零变化。行情指纹未变。`integrity_check` ok。
+- 新增报告 6 份：`phase3A3_2_3_1_backtest_inventory.md`、
+  `phase3A3_2_3_1_validation_inventory.md`、`phase3A3_2_3_1_replay_design.md`、
+  `phase3A3_2_3_1_replay_checklist.md`、`phase3A3_2_3_1_test_report.md`、
+  `phase3A3_2_3_1_data_snapshot.md`。
+- **未执行全量批量重放**：38 条待重放清单与预估耗时已列出，
+  由后续轮次按 P0→P4 顺序执行。
+
+
 ## 2026-11-14 — 阶段3A.3.2.2.4 正式口径验证闸门一致性修复
 
 - **缺陷**：`_require_formal()` 只判断 `formal_valuation` 的真值，

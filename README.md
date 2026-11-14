@@ -2094,3 +2094,134 @@ if not isinstance(formal, bool) or formal is not True:
    这是内存对象的防御性校验，只有构造测试能覆盖，属纵深防御而非已观测缺陷
 2. `formal_valuation` 存于 `summary_json`，无独立列，无法用 SQL 快速筛选
 3. 测试结果是 DSH 会话内本地执行结果，不是外部独立测试
+
+## 39. 阶段3A.3.2.3.1 历史记录重放体系
+
+### 39.1 问题：历史记录里混着旧会计口径，且无法判断哪些能重放
+
+`backtest_runs` 11 条、`validation_runs` 44 条，其中绝大多数写在公司行为
+整改之前。要判断「哪些是当前正式口径、哪些需要重放、哪些根本重放不了」，
+之前只能靠报告里的说法，没有可复算的依据。
+
+### 39.2 盘点：五类归档，每条都有理由
+
+```bash
+python scripts/audit_replay_history.py
+```
+
+| 分类 | 判定 |
+| --- | --- |
+| `current_formal` | `accounting_version == 'ca-v2-receivable'` |
+| `replayed` | `replay_attempts` 里有该源的 `success` 行 |
+| `legacy` | legacy 会计版本 + 全部关键参数可读 |
+| `unknown_legacy` | `accounting_version` 为空或未知 |
+| `non_replayable` | 缺关键参数，或源记录本身失败 |
+
+实测（本轮）：
+
+| 类别 | backtest | validation |
+| --- | ---: | ---: |
+| 总数 | 12 | 44 |
+| `current_formal` | 1 | 5 |
+| `replayed` | 1 | 0 |
+| `legacy`（待重放） | 1 | 37 |
+| `non_replayable` | 9 | 2 |
+
+### 39.3 参数忠实性：反证，不是重建
+
+`validation_runs` 只有区间、池、网格几列；资金、佣金、最低佣金、滑点、
+执行价、指标版本、Walk-Forward 网格、池模式全都没有独立列，
+只体现为一列 `config_hash`。
+
+```python
+for 字段集 in (当前 28 字段, 历史 26 字段):
+  for pool_mode in ("all", "representative"):
+    for dates in 日期候选:          # 存储值 / 该月 1 日
+      if params_hash(候选参数) == 存库的 config_hash:
+          return 参数              # 命中即全部证明
+return None                        # 不可证明，判 non_replayable
+```
+
+日期候选是必需的：库里存的是「请求日对齐到下一交易日」后的日期，
+请求 2021-01-01 存成 2021-01-04。
+
+### 39.4 backtest 的真实缺陷
+
+11 条历史回测的 `config_json.strategy_params` 恒为 `{}`。
+`ma_trend` 唯一的真实参数是 `ma_window`，它当时是命令行参数、
+从未落库。没有 `ma_window` 就无法复现同一批信号。
+
+**9 条因此永久不可重放。** 没有用默认 20 兜底，没有从 `input_hash`
+或报告数字反推——那三种做法都会产出一条「看起来一样、其实不知道是不是
+同一次回测」的记录。
+
+### 39.5 对应关系表 `replay_attempts`
+
+```sql
+CREATE TABLE replay_attempts (
+    attempt_id, record_kind, source_record_id, replay_record_id,
+    source_input_hash, replay_input_hash,
+    source_accounting_version, replay_accounting_version,
+    source_config_hash, replay_params_json,
+    status, reason, started_at, finished_at, replay_timestamp
+);
+```
+
+为什么用独立表而不是给历史表加列：加列意味着 UPDATE 历史行。
+独立表只追加。
+
+### 39.6 幂等与恢复
+
+| 场景 | 行为 |
+| --- | --- |
+| 重复执行同一源 | `skipped`，不写新行、不建新记录 |
+| `--force` | 新建记录，旧 attempt 保留 |
+| 单条失败 | 记 `failed` + 原因，同批其他条继续 |
+| 中断后 | 重跑同一命令，已成功的自动跳过 |
+
+幂等**不是靠改历史行**实现的，是靠查 `replay_attempts` 里有没有 success。
+
+### 39.7 命令
+
+```bash
+python scripts/audit_replay_history.py --pending-only
+python scripts/replay_3a3_2.py --source ac8f4cc7cf234d7e
+python scripts/replay_validation_3a3_2.py --source 32aead3291734f91
+python scripts/replay_validation_3a3_2.py --pending --dry-run
+```
+
+### 39.8 本轮真实重放
+
+`ac8f4cc7cf234d7e` → `355948ec40224eb5`（buy_and_hold，5 只）：
+
+| 项 | 源 | 新 |
+| --- | --- | --- |
+| accounting_version | `legacy_corporate_action_accounting` | `ca-v2-receivable` |
+| input_hash | `783858ffd0a628c5` | `9a107ccaff142b43` |
+
+新记录 `accounting_basis=formal_receivable`、`formal_valuation=True`。
+行情指纹前后一致。
+
+### 39.9 验证
+
+| 项 | 结果 |
+| --- | ---: |
+| 全量测试 | **538 passed**，0 failed / 0 skipped / 0 xfail |
+| 基线 518 项 | 全部保留通过 |
+| 本轮新增 | 20 项 |
+| API 冒烟 | 通过 |
+| Streamlit AppTest | 2 页无异常 |
+| `integrity_check` | ok |
+| 迁移幂等 | 连续两次一致 |
+| 行情指纹 | 未变（116,609 行） |
+| 事件对账 | 14 项，失败 0 |
+
+### 39.10 局限
+
+1. **未执行全量批量重放**：38 条待重放（1 backtest + 37 validation），
+   预估 13~15 小时，清单见 `reports/phase3A3_2_3_1_replay_checklist.md`
+2. 9 条 backtest 因 `ma_window` 从未落库而永久不可重放
+3. 2 条 validation 因 `config_hash` 无法反证且源记录本身失败而不可重放
+4. `config_hash` 反证依赖当时的字段集；未来 `ValidationConfig` 再增字段时
+   需同步新增变体
+5. 测试结果是 DSH 会话内本地执行结果，不是外部独立测试

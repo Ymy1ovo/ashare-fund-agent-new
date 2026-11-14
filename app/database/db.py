@@ -412,6 +412,30 @@ CREATE TABLE IF NOT EXISTS corporate_action_applications (
 );
 """
 
+# 阶段3A.3.2.3.1：重放登记表。只新增，不改任何历史表。
+REPLAY_SCHEMA = """
+CREATE TABLE IF NOT EXISTS replay_attempts (
+    attempt_id TEXT PRIMARY KEY,
+    record_kind TEXT NOT NULL,
+    source_record_id TEXT NOT NULL,
+    replay_record_id TEXT,
+    source_input_hash TEXT,
+    replay_input_hash TEXT,
+    source_accounting_version TEXT,
+    replay_accounting_version TEXT,
+    source_config_hash TEXT,
+    replay_params_json TEXT,
+    status TEXT NOT NULL,
+    reason TEXT,
+    started_at TEXT NOT NULL,
+    finished_at TEXT,
+    replay_timestamp TEXT
+);
+CREATE INDEX IF NOT EXISTS idx_replay_source
+    ON replay_attempts(record_kind, source_record_id);
+CREATE INDEX IF NOT EXISTS idx_replay_status ON replay_attempts(status);
+"""
+
 CORPORATE_ACTION_INDEXES = """
 CREATE INDEX IF NOT EXISTS idx_ca_code_effective
     ON corporate_actions(code, effective_date);
@@ -572,6 +596,7 @@ def _migrate(conn: sqlite3.Connection) -> None:
     _add_column_if_missing(conn, "backtest_runs", "evidence_version", "TEXT")
     _add_column_if_missing(conn, "validation_runs", "accounting_version", "TEXT")
     _add_column_if_missing(conn, "validation_runs", "legacy_flag", "TEXT")
+    conn.executescript(REPLAY_SCHEMA)
     # 历史订单的 fee 语义等于佣金（当时 stamp_duty_rate 与 transfer_fee_rate 均为 0），
     # 因此 commission 回填为 fee。仅对「commission 尚未写入」的旧行生效。
     conn.execute(
@@ -592,6 +617,7 @@ def init_db(db_path: Path | None = None) -> None:
         # 先加列（证据等级等），再建依赖这些列的索引
         _migrate(conn)
         conn.executescript(CORPORATE_ACTION_V2_INDEXES)
+        conn.executescript(REPLAY_SCHEMA)
 
 
 def save_interface_test(record: dict[str, Any], db_path: Path | None = None) -> None:
