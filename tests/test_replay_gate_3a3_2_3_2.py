@@ -516,3 +516,86 @@ def test_history_untouched_after_failed_replay(temp_db, monkeypatch):
             "SELECT * FROM validation_runs WHERE validation_id='src_val'"
         ).fetchone())
     assert before == after
+
+
+# ---------------------------------------------------------------- 口径标记与降级
+
+def test_replay_stamps_accounting_version_on_new_record(temp_db, monkeypatch):
+    """重放成功后新记录必须带 ca-v2-receivable 标记。
+
+    `save_validation_run()` 的 INSERT 不含该列；不补标记，新记录天生为
+    NULL，重放永远过不了闸门——3A.3.2.3.3 第一次真实重放就是这样失败的。
+    """
+    _seed_validation(temp_db)
+
+    import app.replay.runner as runner_mod
+    import app.validation.runner as vrunner
+    from app.validation.storage import save_validation_run, init_validation_schema
+    from app.validation.storage import ValidationRecord
+
+    init_validation_schema(temp_db)
+
+    def _run(cfg, **kwargs):
+        rec = ValidationRecord(
+            validation_id="realnew01",
+            strategy_name="ma_trend", strategy_version="1.0.0",
+            config_hash="h", eth_codes=["510300"], ma_window_grid=[5],
+            is_start="2024-01-02", is_end="2024-01-05",
+            oos_start="2024-01-08", oos_end="2024-01-12",
+            status="success", conclusion="不通过", input_hash="ih",
+        )
+        save_validation_run(rec, db_path=temp_db)
+        return SimpleNamespace(validation_id="realnew01", status="success",
+                               conclusion="不通过", codes=["510300"])
+
+    monkeypatch.setattr(vrunner, "run_validation", _run)
+    outcome = replay_validation("src_val", db_path=temp_db)
+    assert outcome.status == STATUS_SUCCESS
+    with get_connection(temp_db) as conn:
+        acct = conn.execute(
+            "SELECT accounting_version FROM validation_runs WHERE validation_id='realnew01'"
+        ).fetchone()[0]
+    assert acct == "ca-v2-receivable"
+    assert find_success(VALIDATION, "src_val", db_path=temp_db) == "realnew01"
+
+
+def test_failed_gate_downgrades_orphan_record(temp_db, monkeypatch):
+    """闸门失败时，刚建出来的记录必须被降级为 failed，不能留假 success。"""
+    _seed_validation(temp_db)
+
+    import app.replay.runner as runner_mod
+    import app.validation.runner as vrunner
+    from app.validation.storage import init_validation_schema, save_validation_run
+    from app.validation.storage import ValidationRecord
+
+    init_validation_schema(temp_db)
+
+    def _run(cfg, **kwargs):
+        rec = ValidationRecord(
+            validation_id="orphan01",
+            strategy_name="ma_trend", strategy_version="1.0.0",
+            config_hash="h", eth_codes=["510300"], ma_window_grid=[5],
+            is_start="2024-01-02", is_end="2024-01-05",
+            oos_start="2024-01-08", oos_end="2024-01-12",
+            status="success", conclusion="通过", input_hash="ih",
+        )
+        save_validation_run(rec, db_path=temp_db)
+        return SimpleNamespace(validation_id="orphan01", status="success",
+                               conclusion="通过", codes=["510300"])
+
+    monkeypatch.setattr(vrunner, "run_validation", _run)
+    # 让回查拿到 None，模拟「记录没落库」
+    monkeypatch.setattr(runner_mod, "_fetch_validation_record",
+                        lambda vid, *, db_path=None: None)
+    # 但降级需要真实库，故只伪造回查不伪造标记写入
+    outcome = replay_validation("src_val", db_path=temp_db)
+    assert outcome.status == STATUS_FAILED
+    with get_connection(temp_db) as conn:
+        row = conn.execute(
+            "SELECT status, accounting_version FROM validation_runs "
+            "WHERE validation_id='orphan01'"
+        ).fetchone()
+    assert row is not None
+    assert row[0] == "failed"
+    assert row[1] == "ca-v2-receivable"
+    assert find_success(VALIDATION, "src_val", db_path=temp_db) is None

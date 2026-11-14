@@ -58,6 +58,33 @@ def _print_outcome(outcome) -> None:
     print(line, flush=True)
 
 
+def _print_dry_run(item: dict) -> None:
+    """dry-run：展示全部核心参数，不写任何记录。"""
+    print(f"源记录            : {item['source_id']}")
+    print(f"分类              : {item['classification']}")
+    print(f"分类理由          : {item['classification_reason']}")
+    print(f"参数证明          : {item['params_proof']}")
+    print(f"可重放            : {item['replayable']}")
+    print(f"预计新记录类型    : validation_runs（新 validation_id，源记录不动）")
+    print(f"当前会计版本      : ca-v2-receivable（重放强制使用）")
+    print(f"源会计版本        : {item['accounting_version']}")
+    print(f"策略              : {item['strategy_name']} v{item['strategy_version']}")
+    print(f"样本内            : {item['is_start']} ~ {item['is_end']}")
+    print(f"样本外            : {item['oos_start']} ~ {item['oos_end']}")
+    print(f"ETF 池            : {item['etf_count']} 只")
+    print(f"参数网格          : {item['ma_window_grid']}")
+    print(f"config_hash       : {item['config_hash']}")
+    print(f"源 input_hash     : {item['input_hash']}")
+    params = item.get("resolved_params") or {}
+    print("准备使用的全部参数：")
+    for key in sorted(params):
+        if key == "validation_id":
+            continue
+        print(f"  {key:24} = {params[key]!r}")
+    print(f"缺失参数          : {item['missing_params'] or '无'}")
+    print("本命令为 dry-run：不写 validation_runs / replay_attempts，不改源记录。")
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="历史验证重放（可指定源 validation_id）")
     parser.add_argument("--source", default=None, help="源 validation_id")
@@ -83,9 +110,7 @@ def main() -> int:
             print(f"源验证记录不存在：{args.source}")
             return 2
         if args.dry_run:
-            print(f"{args.source}：{item['classification']}（{item['classification_reason']}）")
-            print(f"  参数证明：{item['params_proof']}")
-            print(f"  可重放：{item['replayable']}")
+            _print_dry_run(item)
             return 0 if item["replayable"] else 1
         try:
             outcome = replay_validation(args.source, force=args.force)

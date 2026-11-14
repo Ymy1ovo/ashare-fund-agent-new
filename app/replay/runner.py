@@ -247,6 +247,37 @@ def replay_backtest(
     )
 
 
+def _stamp_replay_validation(validation_id: str, *, db_path=None) -> None:
+    """给**本次新建**的 validation 记录打上当前会计版本标记。
+
+    `save_validation_run()` 的 INSERT 不含 `accounting_version` 列——历史记录
+    该列是 `mark_legacy_records.py` / `finalize_replay_records.py` 事后 UPDATE
+    上去的。不补这一步，任何新验证记录的该列天生为 NULL，重放永远过不了闸门。
+
+    只写刚创建的 validation_id，不触碰任何历史行。
+    """
+    with get_connection(db_path) as conn:
+        conn.execute(
+            "UPDATE validation_runs SET accounting_version=?, legacy_flag=NULL "
+            "WHERE validation_id=?",
+            (CURRENT_ACCOUNTING, validation_id),
+        )
+
+
+def _reject_replay_record(validation_id: str, reason: str, *, db_path=None) -> None:
+    """闸门失败时把刚建出来的记录降级，避免留下「假 success 的孤立记录」。
+
+    不删除：删除等于抹掉审计痕迹。降级为 `failed` 并写明原因，
+    使该行既不能被读成成功，也能被追溯为何失败。
+    """
+    with get_connection(db_path) as conn:
+        conn.execute(
+            "UPDATE validation_runs SET status='failed', error_message=? "
+            "WHERE validation_id=? AND status != 'failed'",
+            (reason[:500], validation_id),
+        )
+
+
 def _fetch_validation_record(validation_id: str, *, db_path=None):
     """回查重放落库后的 (input_hash, accounting_version)。查不到返回 None。
 
@@ -300,6 +331,19 @@ def replay_validation(    source_id: str,
         return ReplayOutcome(source_id=source_id, status=STATUS_FAILED,
                              reason=f"{type(exc).__name__}: {exc}", attempt_id=attempt)
 
+    # 先补口径标记，再回查；回查失败时把新记录降级，绝不留假 success
+    try:
+        _stamp_replay_validation(result.validation_id, db_path=db_path)
+    except Exception as exc:  # noqa: BLE001 标记失败本身也要失败
+        reason = f"无法写入会计版本标记：{type(exc).__name__}: {exc}"
+        _reject_replay_record(result.validation_id, reason, db_path=db_path)
+        finish_attempt(attempt, STATUS_FAILED,
+                       replay_record_id=result.validation_id, reason=reason,
+                       db_path=db_path)
+        return ReplayOutcome(source_id=source_id, status=STATUS_FAILED,
+                             replay_id=result.validation_id, reason=reason,
+                             attempt_id=attempt)
+
     row = _fetch_validation_record(result.validation_id, db_path=db_path)
 
     # 阶段3A.3.2.3.2：三处原本会被短路放行的情况必须失败
@@ -309,9 +353,12 @@ def replay_validation(    source_id: str,
     # 旧实现 `if replay_acct and replay_acct != CURRENT` 在 (1)(2) 时
     # `replay_acct` 为 None，短路后直接落到成功分支。
     if row is None:
+        reason = f"重放后查不到新 validation 记录：{result.validation_id}"
+        # 记录若真的存在，也必须降级——不能让「查不到」变成「留个 success」
+        _reject_replay_record(result.validation_id, reason, db_path=db_path)
         finish_attempt(attempt, STATUS_FAILED,
                        replay_record_id=result.validation_id,
-                       reason=f"重放后查不到新 validation 记录：{result.validation_id}",
+                       reason=reason,
                        db_path=db_path)
         return ReplayOutcome(
             source_id=source_id, status=STATUS_FAILED,
@@ -322,9 +369,11 @@ def replay_validation(    source_id: str,
 
     replay_acct = row[1]
     if not isinstance(replay_acct, str) or replay_acct != CURRENT_ACCOUNTING:
+        reason = f"重放记录会计版本异常：{replay_acct!r}"
+        _reject_replay_record(result.validation_id, reason, db_path=db_path)
         finish_attempt(attempt, STATUS_FAILED,
                        replay_record_id=result.validation_id,
-                       reason=f"重放记录会计版本异常：{replay_acct!r}", db_path=db_path)
+                       reason=reason, db_path=db_path)
         return ReplayOutcome(source_id=source_id, status=STATUS_FAILED,
                              replay_id=result.validation_id,
                              reason=f"重放记录会计版本异常：{replay_acct!r}",
