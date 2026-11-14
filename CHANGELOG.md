@@ -1,5 +1,34 @@
 # 变更日志
 
+## 2026-11-14 — 阶段3A.3.2.2.3 非正式口径持久化与异常测试补齐
+
+- **口径标记落盘**：`BacktestResult` 从 3A.3.2.2.2 起带 `accounting_basis` /
+  `formal_valuation`，但 `save_result()` 构造 `summary_json` 时没写这两个字段，
+  于是「引擎有标记 → 落盘丢失 → 读取端无法区分正式与非正式」。
+  现在两者必须显式落盘，且**默认值全部朝向「不正式」**：
+  缺字段 → `unknown_legacy` + `False`，不再默认成 `formal_receivable` + `True`。
+  口径非正式时 `formal_valuation` 强制为 `False`，即使对象上被置为 `True`。
+- **读取端展示**：`get_run()` / `list_runs()` 把两字段提到顶层返回；
+  新增 `accounting_basis_of()` / `formal_valuation_of()` / `is_formal_run()`
+  三个 fail-closed 判定函数；Streamlit 回测页对非正式记录追加后缀并给出提示。
+- **验证层堵漏洞**：
+  - `_events_digest_for()` 原来 `except Exception: return "unavailable"`，
+    事件加载失败时输入指纹退化成常量、验证照跑；改为抛 `ValidationError`。
+  - `_run_backtest()` 新增 `_require_formal()` 检查，覆盖样本内网格、样本外、
+    Walk-Forward、基准、压力测试、稀疏副本全部回测入口；
+    `_build_regime_payload()` 里的直接引擎调用同样纳入。
+  - 三处 `except Exception` 前置 `except ValidationError: raise`，
+    防止校验异常被「单格失败不终止整体」吞成一行 `status=failed`。
+- **测试**：基线 484 → **496**，新增 12 项，全部通过，0 失败 / 0 跳过 / 0 xfail。
+  新增 `tests/test_phase3a3_2_2_3.py`。旧测试未删除、未跳过、未弱化。
+- **数据库零变化**：无 schema 变更、无行数变化、无字段改写。
+  11 条历史回测记录读取为 `unknown_legacy` + 非正式，**不做回填**。
+- **样本外重放**与 3A.3.2.2.2 完全一致（+20.1146% / Sharpe 0.7210 /
+  回撤 −18.2881% / 419 笔）——本轮不动会计逻辑，指标不应变化。
+- 新增报告：`phase3A3_2_2_3_final_fix_report.md`、
+  `phase3A3_2_2_3_test_report.md`、`phase3A3_2_2_3_data_snapshot.md`。
+
+
 ## 2026-11-13 — 阶段3A.3.2.2.2 公司行为安全边界最终修复
 
 - **加载失败不再静默降级**：`_load_corporate_actions()` 原来 `except Exception`

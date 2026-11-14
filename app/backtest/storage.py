@@ -25,6 +25,16 @@ def save_result(
     check = reconcile(result.daily, result.trades, result.initial_cash)
     from app.backtest.api import COST_SEMANTICS
 
+    # 阶段3A.3.2.2.3：口径标记一律显式落盘。缺字段的历史结果按
+    # formal_receivable/True 处理会伪造正式性，因此这里不允许缺省为正式。
+    accounting_basis = getattr(result, "accounting_basis", None)
+    if not isinstance(accounting_basis, str) or not accounting_basis:
+        accounting_basis = "unknown_legacy"
+    formal = getattr(result, "formal_valuation", None)
+    formal = bool(formal) if isinstance(formal, bool) else False
+    if accounting_basis != "formal_receivable":
+        formal = False
+
     summary = {
         "performance": performance.as_dict(),
         "reconciliation": check,
@@ -34,6 +44,10 @@ def save_result(
         "notes": result.notes,
         # 成本口径版本：新记录 total_cost 含佣金+印花税+过户费+滑点
         "cost_semantics": COST_SEMANTICS,
+        # 阶段3A.3.2.2.3：会计口径标记必须落盘，否则读取端无法区分
+        # 正式回测与 apply_corporate_actions=False 的非正式结果
+        "accounting_basis": accounting_basis,
+        "formal_valuation": formal,
     }
     with get_connection(db_path) as conn:
         conn.execute(
@@ -152,4 +166,12 @@ def save_result(
                 for trade in result.trades
             ],
         )
-    return {"run_id": result.run_id, "daily": len(result.daily), "orders": len(result.orders), "trades": len(result.trades), "reconciliation": check}
+    return {
+        "run_id": result.run_id,
+        "daily": len(result.daily),
+        "orders": len(result.orders),
+        "trades": len(result.trades),
+        "reconciliation": check,
+        "accounting_basis": accounting_basis,
+        "formal_valuation": formal,
+    }

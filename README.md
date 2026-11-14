@@ -1908,3 +1908,107 @@ except Exception as exc:
 2. 加载失败测试用 DROP/ALTER TABLE 模拟，未覆盖磁盘损坏
 3. 39 条历史验证记录未重放
 4. 测试结果是 DSH 会话内本地执行结果，不是外部独立测试
+
+## 37. 阶段3A.3.2.2.3 非正式口径持久化
+
+### 37.1 问题：标记在内存里有，落盘就没了
+
+`BacktestResult` 自 3A.3.2.2.2 起携带：
+
+| 字段 | 正式回测 | `apply_corporate_actions=False` |
+| --- | --- | --- |
+| `accounting_basis` | `formal_receivable` | `disabled_non_official` |
+| `formal_valuation` | `True` | `False` |
+
+但 `save_result()` 写 `summary_json` 时没带上它们。结果：
+
+```
+引擎内存有标记 → save_result 丢掉 → 库里只有净值
+              → API / Streamlit 读回来无从判断
+              → 非正式结果与正式结果在读取端完全同形
+```
+
+### 37.2 修复：默认值一律朝向「不正式」
+
+```python
+accounting_basis = getattr(result, "accounting_basis", None)
+if not isinstance(accounting_basis, str) or not accounting_basis:
+    accounting_basis = "unknown_legacy"
+formal = getattr(result, "formal_valuation", None)
+formal = bool(formal) if isinstance(formal, bool) else False
+if accounting_basis != "formal_receivable":
+    formal = False
+```
+
+方向很重要：旧逻辑「缺字段即正式」等于把无法证明的口径当成已证明。
+
+读取端新增三个判定函数：
+
+| 函数 | 语义 |
+| --- | --- |
+| `accounting_basis_of(summary)` | 缺失 → `unknown_legacy` |
+| `formal_valuation_of(summary)` | 缺失 → `False` |
+| `is_formal_run(summary)` | 两字段**同时**满足才为 `True` |
+
+`get_run()` / `list_runs()` 把两字段提到顶层返回。
+
+### 37.3 验证层的两个绕过口
+
+| 位置 | 原行为 | 后果 |
+| --- | --- | --- |
+| `_events_digest_for()` | `except Exception: return "unavailable"` | 加载失败时指纹退化成常量，验证照跑 |
+| `_run_backtest()` | 不看口径，只取 daily/trades/orders | 非正式指标直接进结论 |
+
+后者是关键：`_run_backtest()` 是样本内、样本外、Walk-Forward、基准、
+压力测试的唯一回测入口。
+
+修复：
+
+- `_events_digest_for()` 改为抛 `ValidationError`
+- 新增 `_require_formal(result, where)`，在 `_run_backtest()` 与
+  `_build_regime_payload()` 内的直接引擎调用处检查
+- 三处 `except Exception` 前置 `except ValidationError: raise`，
+  否则 `ValidationError` 会被「单格失败不终止整体」转成一行
+  `status=failed` 记录，非正式结果仍会以部分形式留在结论里
+
+### 37.4 边界
+
+```
+apply_corporate_actions=True（默认）
+  ├─ 加载失败 → CorporateActionLoadError → 中止，不产生记录
+  └─ 正常     → formal_receivable + True → 可进验证
+
+apply_corporate_actions=False（唯一关闭入口）
+  └─ 事件集为空 → disabled_non_official + False
+                → 落盘标记强制非正式
+                → 验证层抛 ValidationError，进不去
+```
+
+历史 11 条 `backtest_runs` 读取为 `unknown_legacy` + `False`。
+**不回填**——回填等于给旧记录补造一个当时的会计口径证据。
+
+### 37.5 验证
+
+| 项 | 结果 |
+| --- | ---: |
+| 全量测试 | **496 passed**，0 failed / 0 skipped / 0 xfail |
+| 基线 484 项 | 全部保留通过 |
+| 本轮新增 | 12 项 |
+| 事件对账校验 | 14 项，失败 0 |
+| API 冒烟 | 通过 |
+| Streamlit AppTest | 2 页无异常 |
+| 行情指纹 | 未变（116,609 行） |
+| `integrity_check` | ok |
+| 迁移幂等 | 连续两次一致 |
+| schema 变更 | **无** |
+| 数据库行数变化 | **0** |
+
+样本外重放与 3A.3.2.2.2 完全一致：+20.1146% / Sharpe 0.7210 /
+回撤 −18.2881% / 419 笔。本轮不动会计逻辑，指标本就不该变。
+
+### 37.6 局限
+
+1. 39 条历史验证记录仍未重放
+2. 11 条历史回测读取为非正式；要恢复正式身份必须重跑，不能回填字段
+3. 两字段存于 `summary_json`，无独立列，无法用 SQL 索引快速筛选
+4. 测试结果是 DSH 会话内本地执行结果，不是外部独立测试

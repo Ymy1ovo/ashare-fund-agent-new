@@ -163,6 +163,16 @@ def _metrics_payload(performance, result) -> dict:
     }
 
 
+def _require_formal(result, where: str) -> None:
+    """非正式会计口径的回测结果不得参与正式验证的任何环节。"""
+    if not getattr(result, "formal_valuation", False):
+        raise ValidationError(
+            f"{where}：回测使用了非正式会计口径（accounting_basis="
+            f"{getattr(result, 'accounting_basis', 'unknown')}），"
+            "不得作为正式策略验证结果。"
+        )
+
+
 def _run_backtest(
     config: BacktestConfig,
     strategy,
@@ -172,6 +182,9 @@ def _run_backtest(
 ) -> tuple[Any, Any, dict]:
     engine = BacktestEngine(config, strategy, db_path=db_path)
     result = engine.run(codes, indicator_version=indicator_version)
+    # 阶段3A.3.2.2.3：非正式会计口径的结果不得进入正式验证结论。
+    # 这里 fail closed，而不是把 metrics 混进验证结果里。
+    _require_formal(result, "样本回测")
     performance = compute_performance(
         result.daily, result.trades, result.orders, result.initial_cash,
         annualization=config.annualization, risk_free_rate=config.risk_free_rate,
@@ -219,15 +232,23 @@ def _input_hash(
 
 
 def _events_digest_for(config: ValidationConfig, codes: list[str], db_path=None) -> str:
-    """预计算本次验证将用到的事件指纹（区间内、可应用证据等级）。"""
+    """预计算本次验证将用到的事件指纹（区间内、可应用证据等级）。
+
+    阶段3A.3.2.2.3：这里原本 `except Exception: return "unavailable"`，
+    等于给「事件加载失败」开了一个绕过口——输入指纹会退化成常量，
+    验证流程仍然继续。改为直接抛错，与引擎侧 fail closed 保持一致。
+    """
     from app.backtest import corporate_actions as ca
 
     try:
         actions = ca.load_actions(
             start=config.is_start, end=config.oos_end, codes=list(codes), db_path=db_path
         )
-    except Exception:
-        return "unavailable"
+    except Exception as exc:  # noqa: BLE001 转成验证错误并中止
+        raise ValidationError(
+            f"公司行为事件加载失败（{type(exc).__name__}: {exc}），"
+            "无法计算本次验证的事件指纹，验证中止。"
+        ) from exc
     usable = [item for item in actions if item.is_confirmed]
     return ca.compute_events_digest(usable)
 
@@ -531,6 +552,8 @@ def _build_regime_payload(
             f"有效价格 {valid} 个（需求 {required}），"
             f"数据库记录 {warmup['db_rows']} 条，无效价格 {warmup['invalid_prices']} 条"
         )
+    except ValidationError:
+        raise
     except Exception as exc:
         return {
             "labels_available": False,
@@ -541,6 +564,7 @@ def _build_regime_payload(
     try:
         engine = BacktestEngine(oos_cfg, oos_strategy, db_path=db_path)
         oos_result = engine.run(codes, indicator_version=config.indicator_version)
+        _require_formal(oos_result, "市场环境分组回测")
         oos_nav, oos_returns, oos_statuses = risk_return_series(oos_result.daily)
         from app.backtest.metrics import return_sample_stats
 
@@ -720,6 +744,8 @@ def _build_benchmarks_rows(
                 "key": spec.key, "name": spec.name, "status": "success",
                 "range": f"{start}~{end}", "metrics": metrics, "spec": spec.as_dict(),
             })
+        except ValidationError:
+            raise
         except Exception as exc:
             rows.append({
                 "key": spec.key, "name": spec.name, "status": "failed",
@@ -758,6 +784,8 @@ def _build_stress_rows(
                 "config": {**scenario.as_dict(), "overrides": overrides},
                 "metrics": metrics,
             })
+        except ValidationError:
+            raise
         except Exception as exc:
             rows.append({
                 "key": scenario.key, "name": scenario.name,

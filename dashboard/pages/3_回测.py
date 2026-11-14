@@ -33,7 +33,8 @@ if not runs:
 
 labels = {
     f"{row['run_id']} | {row['strategy_name']} v{row['strategy_version']} | "
-    f"{row['start_date']}~{row['end_date']}": row["run_id"]
+    f"{row['start_date']}~{row['end_date']}"
+    + (" | 非正式口径" if not row.get("formal_valuation") else ""): row["run_id"]
     for row in runs
 }
 selected = st.selectbox("回测记录", list(labels))
@@ -49,6 +50,14 @@ cols[1].metric("总收益", f"{perf.get('total_return', 0):.2%}" if perf.get("to
 cols[2].metric("CAGR", f"{perf.get('cagr', 0):.2%}" if perf.get("cagr") is not None else "不可计算")
 cols[3].metric("最大回撤", f"{perf.get('max_drawdown', 0):.2%}" if perf.get("max_drawdown") is not None else "不可计算")
 cols[4].metric("账本核对", "通过" if check.get("ok") else "失败")
+basis = run.get("accounting_basis", "unknown_legacy")
+if run.get("formal_valuation"):
+    st.caption(f"会计口径 {basis}（正式）")
+else:
+    st.warning(
+        f"会计口径 {basis}：**非正式结果**，公司行为未按正式应收口径处理，"
+        "不得作为正式策略评价依据。"
+    )
 st.caption(
     f"区间 {run.get('start_date')} ~ {run.get('end_date')}；"
     f"指标版本 {run.get('indicator_version') or '-'}；输入哈希 {run.get('input_hash')}"
