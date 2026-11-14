@@ -2012,3 +2012,85 @@ apply_corporate_actions=False（唯一关闭入口）
 2. 11 条历史回测读取为非正式；要恢复正式身份必须重跑，不能回填字段
 3. 两字段存于 `summary_json`，无独立列，无法用 SQL 索引快速筛选
 4. 测试结果是 DSH 会话内本地执行结果，不是外部独立测试
+
+## 38. 阶段3A.3.2.2.4 正式口径闸门一致性
+
+### 38.1 缺陷：闸门只看一个字段
+
+3A.3.2.2.3 引入的 `_require_formal()` 只做了这一件事：
+
+```python
+if not getattr(result, "formal_valuation", False):
+    raise ValidationError(...)
+```
+
+`accounting_basis` 虽然出现在错误信息里，却**没有参与判断**。
+于是这三类记录能穿过闸门：
+
+| 记录 | `formal_valuation` | `accounting_basis` | 旧闸门 |
+| --- | --- | --- | --- |
+| 自相矛盾 | `True` | `disabled_non_official` | **放行** |
+| 自相矛盾 | `True` | `unknown_legacy` | **放行** |
+| 类型污染 | `1` / `"yes"` / `[1]` / `{"a":1}` | 任意 | **放行** |
+
+第一行最危险：3A.3.2.2.3 只在 `save_result()` 落盘时强制纠正
+（口径非正式 → 布尔强制 `False`），**内存对象没有这层保护**，
+而验证流程拿的正是内存对象。
+
+第三行是同一问题的另一面：`not getattr(...)` 对 `1`、`"yes"`、`[1]`、
+非空字典都判为「真」，把一个不是 `True` 的值当成了正式布尔标记。
+
+根因：正式性由两个字段共同定义，只检查其中一个的实现必然有绕过口。
+
+### 38.2 修复：严格白名单
+
+```python
+FORMAL_ACCOUNTING_BASIS = "formal_receivable"
+
+basis = getattr(result, "accounting_basis", None)
+formal = getattr(result, "formal_valuation", None)
+
+problems = []
+if not isinstance(basis, str) or basis != FORMAL_ACCOUNTING_BASIS:
+    problems.append(f"accounting_basis={basis!r}")
+if not isinstance(formal, bool) or formal is not True:
+    problems.append(f"formal_valuation={formal!r}")
+```
+
+三处刻意严格：
+
+| 检查 | 拒绝的例子 | 理由 |
+| --- | --- | --- |
+| `isinstance(basis, str)` | `["formal_receivable"]` | 口径只能是字符串 |
+| `basis != FORMAL_ACCOUNTING_BASIS` | `"FORMAL_RECEIVABLE"`、`"formal"` | 精确等值，不做归一与前缀匹配 |
+| `formal is not True` | `1`、`1.0`、`"yes"`、`[1]` | `1 == True` 但 `1 is not True` |
+
+### 38.3 覆盖范围
+
+`_require_formal()` 的调用点未变，因此自动覆盖全部验证环节：
+
+| 调用点 | 覆盖 |
+| --- | --- |
+| `_run_backtest()` | 样本内网格、样本外、Walk-Forward、基准、压力测试、稀疏副本 |
+| `_build_regime_payload()` | 市场环境分组统计 |
+
+### 38.4 验证
+
+| 项 | 结果 |
+| --- | ---: |
+| 全量测试 | **518 passed**，0 failed / 0 skipped / 0 xfail |
+| 基线 496 项 | 全部保留通过 |
+| 本轮新增 | 22 项 |
+| API 冒烟 | 通过 |
+| Streamlit AppTest | 2 页无异常 |
+| `integrity_check` | ok |
+| schema 变更 | **无** |
+| 数据库行数变化 | **0** |
+| 公司行为核心逻辑 | 未修改 |
+
+### 38.5 局限
+
+1. 「两字段矛盾」在真实数据中不会自然出现——`save_result()` 会强制纠正落盘值。
+   这是内存对象的防御性校验，只有构造测试能覆盖，属纵深防御而非已观测缺陷
+2. `formal_valuation` 存于 `summary_json`，无独立列，无法用 SQL 快速筛选
+3. 测试结果是 DSH 会话内本地执行结果，不是外部独立测试

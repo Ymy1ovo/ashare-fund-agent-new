@@ -163,14 +163,41 @@ def _metrics_payload(performance, result) -> dict:
     }
 
 
+FORMAL_ACCOUNTING_BASIS = "formal_receivable"
+
+
 def _require_formal(result, where: str) -> None:
-    """非正式会计口径的回测结果不得参与正式验证的任何环节。"""
-    if not getattr(result, "formal_valuation", False):
-        raise ValidationError(
-            f"{where}：回测使用了非正式会计口径（accounting_basis="
-            f"{getattr(result, 'accounting_basis', 'unknown')}），"
-            "不得作为正式策略验证结果。"
-        )
+    """正式口径闸门：两个字段必须**同时**命中白名单，否则一律拒绝。
+
+    阶段3A.3.2.2.4 修复：原实现只看 `formal_valuation` 的真值，
+    `accounting_basis` 完全不参与判断，于是
+    「disabled_non_official + True」「unknown_legacy + True」这类
+    自相矛盾的记录能穿过闸门；非布尔真值（1 / "yes" / [1]）同样能穿过。
+
+    这里改为严格白名单，不做真值转换：
+
+    - `accounting_basis` 必须是 str 且等于 `formal_receivable`
+    - `formal_valuation` 必须是 bool 且 `is True`
+
+    缺字段、类型错、未知口径、两字段矛盾，全部抛 ValidationError。
+    """
+    basis = getattr(result, "accounting_basis", None)
+    formal = getattr(result, "formal_valuation", None)
+
+    problems: list[str] = []
+    if not isinstance(basis, str) or basis != FORMAL_ACCOUNTING_BASIS:
+        problems.append(f"accounting_basis={basis!r}")
+    # 必须用 `is True`：`1 == True`、`"yes"` 为真值，但它们不是正式标记
+    if not isinstance(formal, bool) or formal is not True:
+        problems.append(f"formal_valuation={formal!r}")
+    if not problems:
+        return
+    raise ValidationError(
+        f"{where}：回测结果非正式会计口径，不满足正式验证条件"
+        f"（{'；'.join(problems)}），不得作为正式策略验证结果。"
+        f"正式口径要求 accounting_basis={FORMAL_ACCOUNTING_BASIS!r} 且 "
+        "formal_valuation=True。"
+    )
 
 
 def _run_backtest(
