@@ -40,6 +40,7 @@ from app.validation.benchmark import (
 )
 from app.validation.config import ValidationConfig
 from app.validation.regime import (
+    MIN_REGIME_SAMPLES,
     REGIME_BEAR,
     REGIME_BULL,
     REGIME_RANGE,
@@ -57,6 +58,7 @@ from app.validation.split import (
     split_time_range,
     warmup_note,
 )
+from app.validation import audit
 from app.validation.storage import (
     ValidationRecord,
     save_grid,
@@ -206,17 +208,53 @@ def _run_backtest(
     codes: list[str],
     indicator_version: str | None,
     db_path=None,
+    *,
+    role: str | None = None,
+    scenario_key: str | None = None,
+    audit_db_path=None,
+    audit_detail_db_path=None,
+    audit_note: str | None = None,
 ) -> tuple[Any, Any, dict]:
-    engine = BacktestEngine(config, strategy, db_path=db_path)
+    # 阶段3A.3.2.3.4：db_path 为 None 时引擎不写公司行为明细
+    # （engine 内部有 `if self.db_path is not None` 守卫），
+    # 导致 validation 内部回测的 run 在明细表里查不到。
+    # 这里解析成真实库路径，让明细与审计登记落在同一个库上。
+    from app.config import settings as _settings
+
+    detail_db = db_path if db_path is not None else _settings.database_path
+    engine = BacktestEngine(config, strategy, db_path=detail_db)
     result = engine.run(codes, indicator_version=indicator_version)
     # 阶段3A.3.2.2.3：非正式会计口径的结果不得进入正式验证结论。
     # 这里 fail closed，而不是把 metrics 混进验证结果里。
     _require_formal(result, "样本回测")
+    # 阶段3A.3.2.3.4：登记到 validation 审计链路。
+    # role 缺省时从上下文取；上下文也没有则登记会抛错（不允许静默跳过）。
+    audit.register_backtest(
+        result,
+        role=role or _audit_role(),
+        scenario_key=scenario_key,
+        # sparse 场景回测跑在独立副本库上；明细留在副本，审计登记写主库，
+        # 并用 audit_note 说明「主库不可追溯明细」，不伪装成可追溯。
+        db_path=audit_db_path if audit_db_path is not None else detail_db,
+        detail_db_path=(
+            audit_detail_db_path if audit_detail_db_path is not None else detail_db
+        ),
+        reason=audit_note,
+    )
     performance = compute_performance(
         result.daily, result.trades, result.orders, result.initial_cash,
         annualization=config.annualization, risk_free_rate=config.risk_free_rate,
     )
     return result, performance, _metrics_payload(performance, result)
+
+
+def _audit_role() -> str:
+    """取当前审计上下文的角色；无上下文时退回 out_of_sample 会伪造角色，
+    因此这里直接要求上下文存在。"""
+    ctx = audit.current_context()
+    if ctx is None:
+        raise audit.AuditError("内部回测缺少审计上下文，拒绝以猜测角色登记")
+    return ctx.role
 
 
 def _data_fingerprint(db_path=None) -> dict:
@@ -366,6 +404,8 @@ def _run_validation_unlocked(
         excluded_codes=excluded,
     )
     save_validation_run(record, db_path=db_path)
+    audit.init_audit_schema(db_path)
+    _audit_ctx, _audit_token = audit.bind(vid)
 
     notes: list[str] = []
     try:
@@ -376,9 +416,10 @@ def _run_validation_unlocked(
             try:
                 cfg = config.build_backtest_config(split.is_start, split.is_end)
                 strategy = MovingAverageTrendStrategy(ma_window=window)
-                _, _, metrics = _run_backtest(
-                    cfg, strategy, codes, config.indicator_version, db_path
-                )
+                with audit.audit_scope(audit.ROLE_IN_SAMPLE, f"ma{window}"):
+                    _, _, metrics = _run_backtest(
+                        cfg, strategy, codes, config.indicator_version, db_path
+                    )
                 cells.append(GridCell(window, "success", metrics))
                 _progress(f"  样本内 MA{window} 完成：Sharpe={metrics.get('sharpe_ratio')}")
             except Exception as exc:  # noqa: BLE001 单格失败不终止整体
@@ -393,9 +434,10 @@ def _run_validation_unlocked(
         _progress(f"样本内选参完成：MA{best_window}")
         oos_cfg = config.build_backtest_config(split.oos_start, split.oos_end)
         oos_strategy = MovingAverageTrendStrategy(ma_window=best_window)
-        _, oos_perf, oos_metrics = _run_backtest(
-            oos_cfg, oos_strategy, codes, config.indicator_version, db_path
-        )
+        with audit.audit_scope(audit.ROLE_OOS, f"ma{best_window}"):
+            _, oos_perf, oos_metrics = _run_backtest(
+                oos_cfg, oos_strategy, codes, config.indicator_version, db_path
+            )
         oos_cell = GridCell(best_window, "success", oos_metrics)
         attach_oos(analysis, oos_cell)
 
@@ -424,10 +466,13 @@ def _run_validation_unlocked(
                     cfg = config.build_backtest_config(
                         window.train_start.isoformat(), window.train_end.isoformat()
                     )
-                    _, _, metrics = _run_backtest(
-                        cfg, MovingAverageTrendStrategy(ma_window=candidate),
-                        codes, config.indicator_version, db_path,
-                    )
+                    with audit.audit_scope(
+                        audit.ROLE_WF_TRAIN, f"w{window.index}-ma{candidate}"
+                    ):
+                        _, _, metrics = _run_backtest(
+                            cfg, MovingAverageTrendStrategy(ma_window=candidate),
+                            codes, config.indicator_version, db_path,
+                        )
                     train_results[candidate] = {"status": "success", **metrics}
                 except Exception as exc:
                     train_results[candidate] = {"status": "failed", "reason": str(exc)[:200]}
@@ -444,10 +489,13 @@ def _run_validation_unlocked(
                 cfg = config.build_backtest_config(
                     window.test_start.isoformat(), window.test_end.isoformat()
                 )
-                _, _, test_metrics = _run_backtest(
-                    cfg, MovingAverageTrendStrategy(ma_window=selected),
-                    codes, config.indicator_version, db_path,
-                )
+                with audit.audit_scope(
+                    audit.ROLE_WF_TEST, f"w{window.index}-ma{selected}"
+                ):
+                    _, _, test_metrics = _run_backtest(
+                        cfg, MovingAverageTrendStrategy(ma_window=selected),
+                        codes, config.indicator_version, db_path,
+                    )
                 window.test_metrics = test_metrics
                 window.status = "success"
             except Exception as exc:
@@ -517,6 +565,14 @@ def _run_validation_unlocked(
         save_grid(vid, "in_sample", [cell.as_dict() for cell in cells], db_path=db_path)
         save_grid(vid, "out_of_sample", [oos_cell.as_dict()], db_path=db_path)
         save_stress(vid, stress_rows, db_path=db_path)
+        # 阶段3A.3.2.3.4：把已经算好的 regime 分组统计落库（不重算）
+        try:
+            audit.save_regime_stats(vid, regime_payload, db_path=db_path)
+        except Exception as exc:  # noqa: BLE001 审计写入失败必须记录，不吞
+            notes.append(f"审计：regime 分组统计落库失败（{type(exc).__name__}: {exc}）")
+            record.summary = {**summary,
+                              "audit_warning": f"regime 落库失败：{exc}"}
+            save_validation_run(record, db_path=db_path)
         return result
 
     except Exception as exc:
@@ -524,6 +580,10 @@ def _run_validation_unlocked(
         record.error_message = str(exc)[:500]
         save_validation_run(record, db_path=db_path)
         raise ValidationError(str(exc)) from exc
+    finally:
+        # 无论成功失败都解绑：失败时已登记的内部回测痕迹保留在
+        # validation_backtest_runs，供 audit_trace() 判定 incomplete
+        audit.reset(_audit_token)
 
 
 def _build_regime_payload(
@@ -592,6 +652,10 @@ def _build_regime_payload(
         engine = BacktestEngine(oos_cfg, oos_strategy, db_path=db_path)
         oos_result = engine.run(codes, indicator_version=config.indicator_version)
         _require_formal(oos_result, "市场环境分组回测")
+        audit.register_backtest(
+            oos_result, role=audit.ROLE_REGIME,
+            scenario_key=config.regime_proxy_code, db_path=db_path,
+        )
         oos_nav, oos_returns, oos_statuses = risk_return_series(oos_result.daily)
         from app.backtest.metrics import return_sample_stats
 
@@ -643,6 +707,7 @@ def _build_regime_payload(
             },
             "summary": regime_series.summary(),
             "stats": stats,
+            "min_samples": MIN_REGIME_SAMPLES,
             "oos_return_diagnostics": {
                 "nav_days": oos_stats["nav_days"],
                 "first_day": oos_stats["first_day"],
@@ -764,9 +829,10 @@ def _build_benchmarks_rows(
                 BuyAndHoldStrategy() if spec.kind == "buy_and_hold"
                 else MovingAverageTrendStrategy(ma_window=spec.ma_window or 20)
             )
-            _, _, metrics = _run_backtest(
-                cfg, strategy, spec.codes, config.indicator_version, db_path
-            )
+            with audit.audit_scope(audit.ROLE_BENCHMARK, spec.key):
+                _, _, metrics = _run_backtest(
+                    cfg, strategy, spec.codes, config.indicator_version, db_path
+                )
             rows.append({
                 "key": spec.key, "name": spec.name, "status": "success",
                 "range": f"{start}~{end}", "metrics": metrics, "spec": spec.as_dict(),
@@ -800,10 +866,11 @@ def _build_stress_rows(
             cfg = config.build_backtest_config(
                 split.oos_start, split.oos_end, **overrides
             )
-            _, _, metrics = _run_backtest(
-                cfg, MovingAverageTrendStrategy(ma_window=best_window),
-                codes, config.indicator_version, db_path,
-            )
+            with audit.audit_scope(audit.ROLE_STRESS_COST, scenario.key):
+                _, _, metrics = _run_backtest(
+                    cfg, MovingAverageTrendStrategy(ma_window=best_window),
+                    codes, config.indicator_version, db_path,
+                )
             rows.append({
                 "key": scenario.key, "name": scenario.name,
                 "is_hypothetical": scenario.is_hypothetical,
@@ -858,10 +925,19 @@ def _run_data_stress(
             )
             copy_db = Path(copy_info["copy_path"])  # get_connection 需要 pathlib.Path
             cfg = config.build_backtest_config(split.oos_start, split.oos_end)
-            result, performance, metrics = _run_backtest(
-                cfg, MovingAverageTrendStrategy(ma_window=best_window),
-                codes, config.indicator_version, copy_db,
-            )
+            with audit.audit_scope(audit.ROLE_STRESS_SPARSE, scenario.key):
+                result, performance, metrics = _run_backtest(
+                    cfg, MovingAverageTrendStrategy(ma_window=best_window),
+                    codes, config.indicator_version, copy_db,
+                    # 审计登记必须落主库：db_path 为 None 时要先解析成真实主库路径，
+                    # 否则会跟着 copy_db 写进副本库，主库侧查不到任何痕迹。
+                    audit_db_path=resolved_db,
+                    audit_detail_db_path=copy_db,
+                    audit_note=(
+                        "公司行为明细与净值写入稀疏副本库 "
+                        f"{copy_info['copy_path']}，主库无法追溯该 run 的明细"
+                    ),
+                )
             # 统一口径：所有计数来自 return_sample_stats()
             from app.backtest.metrics import return_sample_stats
 
@@ -919,10 +995,11 @@ def _run_data_stress(
             metrics: dict = {}
             run_error = None
             try:
-                result, performance, metrics = _run_backtest(
-                    cfg, MovingAverageTrendStrategy(ma_window=best_window),
-                    codes, config.indicator_version, db_path,
-                )
+                with audit.audit_scope(audit.ROLE_STRESS_INSUFFICIENT, scenario.key):
+                    result, performance, metrics = _run_backtest(
+                        cfg, MovingAverageTrendStrategy(ma_window=best_window),
+                        codes, config.indicator_version, db_path,
+                    )
                 trading_days = len(result.daily)
             except Exception as exc:  # 数据不足时回测本身可能无法完成
                 run_error = str(exc)[:180]

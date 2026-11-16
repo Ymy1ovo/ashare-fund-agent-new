@@ -401,3 +401,39 @@ def validation_detail(validation_id: str) -> dict[str, Any]:
                     except _json.JSONDecodeError:
                         pass
     return payload
+
+
+# ---------------- 阶段3A.3.2.3.4：validation 审计追溯 ----------------
+@app.get("/api/validations/{validation_id}/audit")
+def validation_audit(validation_id: str) -> dict[str, Any]:
+    """从 validation_id 一路追到内部回测与公司行为明细。"""
+    from app.validation.audit import audit_trace
+
+    payload = audit_trace(validation_id)
+    if not payload.get("found"):
+        raise HTTPException(status_code=404, detail="验证记录不存在")
+    return payload
+
+
+@app.get("/api/validations/{validation_id}/backtest-runs")
+def validation_backtest_runs(validation_id: str) -> dict[str, Any]:
+    """该 validation 内部登记的全部回测运行。"""
+    from app.validation.audit import list_backtest_runs
+    from app.validation.storage import get_validation
+
+    if not get_validation(validation_id):
+        raise HTTPException(status_code=404, detail="验证记录不存在")
+    return {"validation_id": validation_id,
+            "items": list_backtest_runs(validation_id)}
+
+
+@app.get("/api/validations/{validation_id}/regime")
+def validation_regime(validation_id: str) -> dict[str, Any]:
+    """该 validation 的市场环境分组统计。"""
+    from app.validation.audit import list_regime_stats
+    from app.validation.storage import get_validation
+
+    if not get_validation(validation_id):
+        raise HTTPException(status_code=404, detail="验证记录不存在")
+    return {"validation_id": validation_id,
+            "items": list_regime_stats(validation_id)}

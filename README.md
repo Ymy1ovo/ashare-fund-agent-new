@@ -2424,8 +2424,111 @@ if (basis != ACCOUNTING_FORMAL
 | 3A.3.2.2.4 | 正式口径闸门一致性（双字段白名单） | 518 | `phase3A3_2_2_4_*.md` |
 | 3A.3.2.3.1 | 历史记录重放体系（盘点 / 反证 / 幂等登记） | 538 | `phase3A3_2_3_1_*.md` |
 | 3A.3.2.3.2 | 重放失败闸门（三值短路 / 非布尔真值） | 564 | `phase3A3_2_3_2_*.md` |
-| 3A.3.2.3.3 | P0 两条历史验证记录受控重放 | **568** | `phase3A3_2_3_3_*.md` |
+| 3A.3.2.3.3 | P0 两条历史验证记录受控重放 | 568 | `phase3A3_2_3_3_*.md` |
+| 3A.3.2.3.4 | 验证内部回测与公司行为审计追溯 | **618** | `phase3A3_2_3_4_*.md` |
 
 当前正式会计版本：`ca-v2-receivable`；正式会计基础：`formal_receivable`；正式估值标记：`formal_valuation=True`。
 
 行情指纹 `market-fingerprint-v3` / 116,609 行 / `d54727c0a76a1b09531accd04b3d66ff4ea2374592b1d4a8cb8381602cbbac49`，自 3A.3.2 起连续六个阶段未变。
+
+## 43. 阶段3A.3.2.3.4 验证内部回测与公司行为审计追溯
+
+### 43.1 解决的问题
+
+此前 `validation_runs` 与内部各次 BacktestEngine 运行**完全断链**：
+明细表按 `run_id` 存 264 个不同 run，从 `validation_id` 查不到任何一条。
+审查中还发现两个真实缺陷：
+
+1. `BacktestEngine.run()` 返回的 `run_id` 与写明细用的 `_run_id_for_actions`
+   不是同一个 UUID —— 结果与明细关联错位。
+2. `_run_backtest()` 未解析 `db_path`，传 `None` 时引擎走
+   `if self.db_path is not None` 守卫，**validation 内部回测根本不写明细**。
+
+### 43.2 新增结构
+
+| 表 | 主键约束 | 用途 |
+| --- | --- | --- |
+| `validation_backtest_runs` | `UNIQUE(validation_id, backtest_run_id)` | validation → 内部回测 |
+| `validation_regime_stats` | `UNIQUE(validation_id, regime_label)` | 市场环境分组 |
+
+九类内部回测全部登记：`in_sample_grid` / `out_of_sample` /
+`walkforward_train` / `walkforward_test` / `regime_grouping` / `benchmark` /
+`stress_cost_slippage` / `stress_sparse_data` / `stress_insufficient`。
+
+### 43.3 追溯链路
+
+```
+validation_id
+  → validation_backtest_runs（52 条，九类角色全覆盖）
+  → corporate_action_applications / dividend_receivables（按 run_id）
+  → corporate_actions / corporate_action_versions（事件与版本）
+```
+
+三个查询端点：`/api/validations/{id}/audit`、`/backtest-runs`、`/regime`。
+dashboard「策略验证」页新增「审计追溯」tab。
+
+### 43.4 新 validation 的实测数据
+
+| 项 | 值 |
+| --- | ---: |
+| validation_id | `aad7935a2bac4cc4` |
+| 内部回测 | 52 |
+| 应用事件 | 818 |
+| 应收 / 到账 | 650 笔 / 585,663.95 元 |
+| 未到账 | 0 笔 / 0.00 元 |
+| 事件去重 | 78 条（分红 56 / 拆分 18 / 反向拆分 4） |
+| 完整性校验 | complete，problems = [] |
+
+样本外一次回测：区间内池内 31 条可应用事件，应用 30 条，
+应收 23 笔 12,821.78 元、全部到账——与 3A.3.2.1 报告一致。
+未应用的 1 条是 `515880` 的 1:3 拆分（2026-02-03 生效），当期未持仓。
+
+### 43.5 市场环境分组（已落库）
+
+| 环境 | 状态 | 总日 | 有效 | 缺失 | 累计 | Sharpe | Sortino | 回撤 |
+| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| bull | ok | 324 | 321 | 3 | +53.24% | 2.1879 | 3.3656 | −7.46% |
+| bear | ok | 26 | 24 | 2 | −4.81% | −5.6095 | −5.9579 | −4.99% |
+| range | ok | 97 | 97 | 0 | −17.16% | −2.2385 | −2.5833 | −18.39% |
+| unclassified | insufficient_sample | 0 | 0 | 0 | — | — | — | — |
+
+`unclassified` 有效样本 0 < 20，标 `insufficient_sample` 并写明原因，
+不填 0、不并入 range。分组总日数 324+26+97 = 447 = OOS 交易日总数，
+缺失日单独记在 `missing_days`，没有 dropna。
+
+### 43.6 跨库明细的标注
+
+`stress_sparse_data` 的 23 笔 12,728.18 元写在稀疏副本库，不在主库。
+审计结果按登记表实际计数呈现，并带 `detail_location="external_copy_db"`
+与 `detail_note`。既不显示为 0，也不假装在主库。
+
+### 43.7 旧记录兼容
+
+| 记录 | audit_status |
+| --- | --- |
+| `32aead3291734f91` / `c46fa37b932944c2` | `unavailable_legacy` |
+| `03410886d1f64fa7` / `321caeb581e54d3b` | `unavailable_legacy` |
+
+生成时未记录 run_id，明细表里也查不到对应 run（当时根本不写），
+无从恢复。**不猜测补齐、不改原始绩效、不伪造审计记录。**
+
+### 43.8 完整性校验会抓住什么
+
+`audit_completeness()` 按库内可推出的期望值核对：网格档位数、
+WF 窗口数、压力场景数、基准数逐项比对，并逐个核对网格档位与场景键。
+
+实测案例：某次试跑的 MA5 因 `database is locked` 失败，系统正确报出
+「in_sample_grid 登记 6 条，期望 7 条」+「样本内 MA5 未登记」，
+没有把它当成完整审计成功。
+
+### 43.9 验证
+
+| 项 | 结果 |
+| --- | ---: |
+| 全量测试 | **618 passed**，0 failed / 0 skipped / 0 xfail |
+| 耗时 | 161.82 秒 |
+| 新增测试 | 50 项（43 审计 + 7 API） |
+| 行情指纹 | `d54727c0…` 未变 |
+| `integrity_check` | ok |
+| 四条历史记录 | 全字段逐字段相等 |
+| 两次重放绩效 | 逐位相同 |

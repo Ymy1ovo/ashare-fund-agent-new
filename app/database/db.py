@@ -436,6 +436,69 @@ CREATE INDEX IF NOT EXISTS idx_replay_source
 CREATE INDEX IF NOT EXISTS idx_replay_status ON replay_attempts(status);
 """
 
+# 阶段3A.3.2.3.4：validation 内部回测审计链路。只新增，不改历史表。
+VALIDATION_AUDIT_SCHEMA = """
+CREATE TABLE IF NOT EXISTS validation_backtest_runs (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    validation_id TEXT NOT NULL,
+    backtest_run_id TEXT NOT NULL,
+    run_role TEXT NOT NULL,
+    scenario_key TEXT,
+    strategy_name TEXT,
+    strategy_version TEXT,
+    strategy_params_json TEXT,
+    start_date TEXT,
+    end_date TEXT,
+    indicator_version TEXT,
+    initial_cash REAL,
+    codes_json TEXT,
+    accounting_basis TEXT,
+    formal_valuation INTEGER,
+    input_hash TEXT,
+    corporate_action_digest TEXT,
+    applied_action_count INTEGER,
+    receivable_count INTEGER,
+    receivable_amount REAL,
+    settled_count INTEGER,
+    settled_amount REAL,
+    status TEXT NOT NULL,
+    reason TEXT,
+    created_at TEXT NOT NULL,
+    UNIQUE(validation_id, backtest_run_id)
+);
+CREATE INDEX IF NOT EXISTS idx_vbr_validation
+    ON validation_backtest_runs(validation_id);
+CREATE INDEX IF NOT EXISTS idx_vbr_run ON validation_backtest_runs(backtest_run_id);
+CREATE INDEX IF NOT EXISTS idx_vbr_role ON validation_backtest_runs(run_role);
+
+CREATE TABLE IF NOT EXISTS validation_regime_stats (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    validation_id TEXT NOT NULL,
+    regime_label TEXT NOT NULL,
+    proxy_code TEXT,
+    status TEXT NOT NULL,
+    total_days INTEGER,
+    valid_days INTEGER,
+    missing_days INTEGER,
+    samples INTEGER,
+    cumulative_return REAL,
+    mean_daily_return REAL,
+    annualized_volatility REAL,
+    win_rate REAL,
+    sharpe_ratio REAL,
+    sortino_ratio REAL,
+    cagr REAL,
+    max_drawdown REAL,
+    trade_count INTEGER,
+    min_samples INTEGER,
+    reason TEXT,
+    created_at TEXT NOT NULL,
+    UNIQUE(validation_id, regime_label)
+);
+CREATE INDEX IF NOT EXISTS idx_vrs_validation
+    ON validation_regime_stats(validation_id);
+"""
+
 CORPORATE_ACTION_INDEXES = """
 CREATE INDEX IF NOT EXISTS idx_ca_code_effective
     ON corporate_actions(code, effective_date);
@@ -618,6 +681,11 @@ def init_db(db_path: Path | None = None) -> None:
         _migrate(conn)
         conn.executescript(CORPORATE_ACTION_V2_INDEXES)
         conn.executescript(REPLAY_SCHEMA)
+        conn.executescript(VALIDATION_AUDIT_SCHEMA)
+        # 阶段3A.3.2.3.4：审计表后续补的结算列（只加列，不删数据）
+        _add_column_if_missing(conn, "validation_backtest_runs", "settled_count", "INTEGER")
+        _add_column_if_missing(conn, "validation_backtest_runs", "settled_amount", "REAL")
+        conn.executescript(VALIDATION_AUDIT_SCHEMA)
 
 
 def save_interface_test(record: dict[str, Any], db_path: Path | None = None) -> None:

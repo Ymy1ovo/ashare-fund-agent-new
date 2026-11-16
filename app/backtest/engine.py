@@ -899,7 +899,7 @@ class BacktestEngine:
             corporate_action_digest=actions_digest,
         )
         return BacktestResult(
-            run_id=run_id or uuid.uuid4().hex[:16],
+            run_id=resolved_run_id,
             config=self.config,
             strategy_name=self.strategy.name,
             strategy_version=self.strategy.version,

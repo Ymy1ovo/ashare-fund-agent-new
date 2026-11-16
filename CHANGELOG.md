@@ -1,5 +1,45 @@
 # 变更日志
 
+## 2026-11-16 — 阶段3A.3.2.3.4 验证内部回测与公司行为审计追溯
+
+新增（只加不改）：
+
+- **`validation_backtest_runs`**：validation → 内部 BacktestEngine 运行的关联表。
+  `UNIQUE(validation_id, backtest_run_id)` 防重复登记；记录 `run_role`
+  （9 类角色）、`scenario_key`、会计口径、`input_hash`、事件 digest、
+  应用/应收/到账计数与状态。同一 validation 可关联多次，同一 run 可挂不同
+  validation。
+- **`validation_regime_stats`**：市场环境分组统计落库。
+  bull / bear / range / unclassified 各自记录总日数、有效、缺失、累计收益、
+  CAGR、Sharpe、Sortino、最大回撤、年化波动、是否满足最小样本、原因。
+  `UNIQUE(validation_id, regime_label)` 保证重复写幂等。
+- **`app/validation/audit.py`**：上下文（contextvar）、登记、查询、完整性校验。
+  - `audit_scope()` 让嵌套的每次回测自动登记，不靠调用点手动传参
+  - `register_backtest()` 强制校验正式口径，不符即抛错，不写半条
+  - `audit_trace()` 从 validation_id 一路追到事件与版本
+  - `audit_completeness()` 按库内可推出的期望值核对数量，缺档位即判不完整
+- **3 个查询 API**：`/api/validations/{id}/audit`、`/backtest-runs`、`/regime`
+- **dashboard 新增「审计追溯」tab**
+
+修复（本次审查发现的真实缺陷）：
+
+- **`BacktestEngine.run()` 返回的 `run_id` 与写明细用的
+  `_run_id_for_actions` 不是同一个 UUID**，导致结果与公司行为明细关联错位。
+  改为统一使用 `resolved_run_id`。
+- **`_run_backtest()` 未解析 `db_path`**，传 `None` 时引擎走
+  `if self.db_path is not None` 守卫，validation 内部回测根本不写公司行为明细。
+  改为解析成真实库路径。
+- **sparse 场景审计登记会跟着副本库走**，主库查不到痕迹。
+  改为登记写主库、明细读副本库，并标注 `detail_location=external_copy_db`。
+
+补充：
+
+- `regime_stats()` 补齐 Sharpe / Sortino / CAGR / 最大回撤四个指标，
+  口径与 `compute_performance()` 一致，只把样本限定在本环境内；
+  未改分类算法、未压缩缺失日、未把 unclassified 并入 range。
+- 测试 568 → **618**（新增 50 项审计与 API 测试）。
+
+
 ## 2026-11-16 — 阶段3A.3.2.3.3 复核补充
 
 - **补齐 validation 链路的事件失败测试**：原 §8-4 只覆盖了 backtest 一侧，

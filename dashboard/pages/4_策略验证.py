@@ -63,8 +63,8 @@ col4.metric("状态", payload.get("status"))
 
 st.divider()
 
-tab1, tab2, tab3, tab4, tab5 = st.tabs(
-    ["样本内/外", "Walk-Forward", "参数敏感性", "基准与压力", "数据质量"]
+tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs(
+    ["样本内/外", "Walk-Forward", "参数敏感性", "基准与压力", "数据质量", "审计追溯"]
 )
 
 with tab1:
@@ -182,3 +182,79 @@ with tab5:
         "回测为价格收益口径，无分红/拆分数据；基准使用 ETF 代理而非真实指数；"
         "样本外区间仅覆盖单一市场阶段。"
     )
+
+with tab6:
+    st.subheader("审计追溯（阶段3A.3.2.3.4）")
+    from app.validation.audit import audit_trace, audit_coverage
+
+    trace = audit_trace(validation_id)
+    status = trace.get("audit_status")
+    if status == "unavailable_legacy":
+        st.warning(
+            f"审计明细不可用（{status}）：{trace.get('reason')}。"
+            "该记录生成于审计体系之前，内部回测 run_id 未留存，无法补齐。"
+        )
+    elif status == "validation_not_found":
+        st.error("验证记录不存在，无法追溯。")
+    else:
+        if status == "incomplete":
+            st.warning("审计状态：不完整——存在非 success 的内部回测。")
+        else:
+            st.success("审计状态：完整")
+        coverage = audit_coverage(validation_id)
+        c1, c2, c3 = st.columns(3)
+        c1.metric("内部回测数", trace.get("backtest_run_count"))
+        c2.metric("登记角色数", len(trace.get("role_counts") or {}))
+        c3.metric("缺失角色数", len(coverage.get("roles_absent") or []))
+        roles = trace.get("role_counts") or {}
+        if roles:
+            st.dataframe(
+                [{"角色": k, "次数": v} for k, v in sorted(roles.items())],
+                use_container_width=True, hide_index=True,
+            )
+        absent = coverage.get("roles_absent") or []
+        if absent:
+            st.caption("本次验证未出现的角色：" + "、".join(absent))
+
+        links = trace.get("links") or []
+        if links:
+            st.write("内部回测明细")
+            st.dataframe(
+                [
+                    {
+                        "run_id": link["backtest_run_id"],
+                        "角色": link["run_role"],
+                        "场景": link["scenario_key"],
+                        "状态": link["status"],
+                        "应用事件": link["application_count"],
+                        "应收笔数": link["receivable_count"],
+                        "应收金额": _fmt(link["receivable_amount"]),
+                        "已到账": link["settled_amount"],
+                        "未到账": link["unsettled_amount"],
+                    }
+                    for link in links
+                ],
+                use_container_width=True, hide_index=True,
+            )
+
+    regime = trace.get("regime") or []
+    if regime:
+        st.write("市场环境分组统计")
+        st.dataframe(
+            [
+                {
+                    "环境": row["regime_label"],
+                    "状态": row["status"],
+                    "总日数": row["total_days"],
+                    "有效": row["valid_days"],
+                    "缺失": row["missing_days"],
+                    "累计收益": _fmt(row["cumulative_return"], "pct"),
+                    "年化波动": _fmt(row["annualized_volatility"], "pct"),
+                    "原因": row["reason"],
+                }
+                for row in regime
+            ],
+            use_container_width=True, hide_index=True,
+        )
+    elif status not in ("unavailable_legacy", "validation_not_found"):
+        st.info("该验证未落库 market 环境分组统计。")

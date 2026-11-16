@@ -8,6 +8,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from datetime import date
 
+import numpy as np
 import pandas as pd
 
 from app.validation.config import (
@@ -190,20 +191,48 @@ def regime_stats(
         series_values = pd.Series(values)
         mean = float(series_values.mean())
         std = float(series_values.std(ddof=1)) if len(values) > 1 else float("nan")
+        cumulative = float((1 + series_values).prod() - 1)
+        # 阶段3A.3.2.3.4：补齐可持久化的风险指标。
+        # 口径与 compute_performance() 完全一致，只是把样本限定在本环境内：
+        #   Sharpe = mean(r) * ann / (std(ddof=1) * sqrt(ann))
+        #   Sortino 用同一分子、下行标准差（min(r,0) 的均方根）做分母
+        #   CAGR 用该环境有效收益个数作为间隔数
+        #   max_drawdown 用本环境收益复合出的净值序列
+        # 不改变 labels、不改分类算法、不压缩缺失日。
         entry.update(
             {
                 "status": "ok",
                 "mean_daily_return": mean,
-                "cumulative_return": float((1 + series_values).prod() - 1),
+                "cumulative_return": cumulative,
                 "annualized_volatility": (
                     std * (252 ** 0.5) if std == std else None
                 ),
                 "win_rate": float((series_values > 0).mean()),
+                "sharpe_ratio": (
+                    mean * 252 / (std * (252 ** 0.5))
+                    if std == std and std > 0 else None
+                ),
+                "sortino_ratio": None,
+                "cagr": (
+                    (1 + cumulative) ** (252 / len(values)) - 1
+                    if len(values) > 0 and cumulative > -1 else None
+                ),
+                "max_drawdown": None,
                 "note": (
                     "累计收益按有效日收益复合，缺失日不计入；"
                     "不代表连续交易日收益"
                 ),
             }
         )
+        if len(values) > 1:
+            downside = np.minimum(series_values.to_numpy(dtype=float), 0.0)
+            downside_dev = float(
+                np.sqrt(np.mean(np.square(downside))) * (252 ** 0.5)
+            )
+            if downside_dev > 0:
+                entry["sortino_ratio"] = mean * 252 / downside_dev
+        nav = (1 + series_values).cumprod()
+        peak = nav.cummax()
+        entry["max_drawdown"] = float((nav / peak - 1).min())
         payload[label] = entry
     return payload
