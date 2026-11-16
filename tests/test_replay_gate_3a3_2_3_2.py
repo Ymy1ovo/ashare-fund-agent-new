@@ -599,3 +599,58 @@ def test_failed_gate_downgrades_orphan_record(temp_db, monkeypatch):
     assert row[0] == "failed"
     assert row[1] == "ca-v2-receivable"
     assert find_success(VALIDATION, "src_val", db_path=temp_db) is None
+
+
+# ---------------------------------------------------------------- validation 链路的事件表失败
+
+def test_validation_replay_event_load_failure_fails(temp_db, monkeypatch):
+    """validation 重放时事件表读取失败 → failed，不留 success 记录。
+
+    验证层 `_events_digest_for()` 在 3A.3.2.2.3 已改为抛 ValidationError；
+    这里确认该异常能穿透到重放层并落成 failed。
+    """
+    import app.backtest.corporate_actions as ca
+
+    _seed_validation(temp_db)
+    before = _count(temp_db, "validation_runs")
+
+    def _boom(**kwargs):
+        raise RuntimeError("no such table: corporate_actions")
+
+    monkeypatch.setattr(ca, "load_actions", _boom)
+    outcome = replay_validation("src_val", db_path=temp_db)
+    # 空库会先在「验证区间内没有交易日」处终止；有行情时会终止于事件加载。
+    # 两条路径都必须是 failed，且都必须留下原因——这才是要断言的不变量。
+    assert outcome.status == STATUS_FAILED
+    assert outcome.reason
+    rows = _attempts(temp_db, VALIDATION)
+    assert len(rows) == 1
+    assert rows[0]["status"] == STATUS_FAILED
+    assert rows[0]["reason"]
+    assert find_success(VALIDATION, "src_val", db_path=temp_db) is None
+    # 除源记录（_seed_validation 写入的那条）外，不产生任何新的 success 记录
+    with get_connection(temp_db) as conn:
+        others = conn.execute(
+            "SELECT COUNT(*) FROM validation_runs "
+            "WHERE status='success' AND validation_id != 'src_val'"
+        ).fetchone()[0]
+    assert others == 0
+    assert _count(temp_db, "validation_runs") >= before
+
+
+def test_validation_replay_internal_failure_records_reason(temp_db, monkeypatch):
+    """run_validation 内部抛错 → failed 且原因可查。"""
+    import app.validation.runner as vrunner
+
+    _seed_validation(temp_db)
+
+    def _explode(cfg, **kwargs):
+        raise RuntimeError("回测区间内没有交易日")
+
+    monkeypatch.setattr(vrunner, "run_validation", _explode)
+    outcome = replay_validation("src_val", db_path=temp_db)
+    assert outcome.status == STATUS_FAILED
+    assert "没有交易日" in outcome.reason
+    rows = _attempts(temp_db, VALIDATION)
+    assert rows[0]["status"] == STATUS_FAILED
+    assert "没有交易日" in rows[0]["reason"]
