@@ -1008,9 +1008,35 @@ def _run_data_stress(
                 db_path=resolved_db,
             )
             # 对账与落库全部成功后才允许删除临时副本
-            audit.remove_sparse_copy(copy_db)
-            copy_info = {**copy_info, "removed": True,
-                         "audit_detail": "audit_sparse_applications"},
+            # 阶段3A.3.2.3.4.1.1：此处曾因尾随逗号把 copy_info 变成 tuple，
+            # 后续 copy_info["copy_path"] 会抛 TypeError，成功路径直接崩。
+            cleanup_error = None
+            try:
+                audit.remove_sparse_copy(copy_db)
+            except Exception as exc:  # noqa: BLE001 副本删不掉不能当成功
+                cleanup_error = f"{type(exc).__name__}: {exc}"
+                audit.mark_sparse_detail_location(
+                    persist_validation_id, result.run_id,
+                    location=audit.DETAIL_SPARSE_TABLE,
+                    note=(
+                        f"逐笔明细已复制到主库审计区并完成对账，但临时副本删除失败："
+                        f"{cleanup_error}；副本残留 {copy_db}"
+                    ),
+                    applied=persist["application_count"],
+                    receivable_count=persist["receivable_count"],
+                    receivable_amount=persist["receivable_amount"],
+                    settled_count=persist["settled_count"],
+                    settled_amount=persist["settled_amount"],
+                    db_path=resolved_db,
+                )
+                raise audit.AuditError(
+                    f"sparse 临时副本清理失败：{cleanup_error}"
+                ) from exc
+            copy_info = {
+                **copy_info,
+                "removed": True,
+                "audit_detail": "audit_sparse_applications",
+            }
             return {
                 **base,
                 "status": evaluation["status"],
@@ -1030,7 +1056,22 @@ def _run_data_stress(
                 ),
             }
         except Exception as exc:
-            return {**base, "status": "failed", "reason": f"sparse 执行失败：{str(exc)[:180]}"}
+            reason = f"sparse 执行失败：{str(exc)[:400]}"
+            # 关联行必须降级：不能让一条 success 的登记配上缺失的明细。
+            failed_vid = validation_id or (
+                audit.current_context().validation_id
+                if audit.current_context() else None
+            )
+            failed_run = locals().get("result")
+            failed_run_id = getattr(failed_run, "run_id", None)
+            if failed_vid and failed_run_id:
+                try:
+                    audit.mark_backtest_failed(
+                        failed_vid, failed_run_id, reason, db_path=resolved_db,
+                    )
+                except Exception:  # noqa: BLE001 降级失败也要留下原始原因
+                    reason += "（审计行降级失败）"
+            return {**base, "status": "failed", "reason": reason}
 
     if scenario.key == "insufficient":
         try:

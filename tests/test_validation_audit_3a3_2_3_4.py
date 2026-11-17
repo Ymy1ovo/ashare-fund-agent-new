@@ -14,11 +14,13 @@ from app.database.db import get_connection
 from app.validation import audit
 from app.validation.audit import (
     AuditError,
+    audit_completeness,
     audit_coverage,
     audit_trace,
     init_audit_schema,
     list_backtest_runs,
     list_regime_stats,
+    persist_sparse_details,
     register_backtest,
     save_regime_stats,
 )
@@ -826,13 +828,23 @@ def test_sparse_reconcile_detects_amount_mismatch(temp_db, tmp_path):
     init_db(db_path=copy_db)
     _seed_validation(temp_db)
 
+    from app.backtest.corporate_actions import ACTION_CASH_DISTRIBUTION
+    from tests.test_corporate_actions import _insert_action
+
+    action_id = _insert_action(
+        copy_db, code="510300", action_type=ACTION_CASH_DISTRIBUTION,
+        ex_date="2024-01-04", effective_date="2024-01-04",
+        cash_per_share=0.5, record_date="2024-01-03",
+        pay_date="2024-01-05",
+    )
     with get_connection(copy_db) as conn:
         conn.execute(
             "INSERT INTO dividend_receivables "
             "(run_id, action_id, code, record_date, ex_date, pay_date, "
             " shares_at_ex, cash_per_share, amount, status, created_at) "
-            "VALUES ('amt_run', 7, '510300', '2024-01-03', '2024-01-04', "
-            "'2024-01-05', 1000, 0.5, 500.0, 'pending', '2024-01-04T00:00:00')"
+            "VALUES ('amt_run', ?, '510300', '2024-01-03', '2024-01-04', "
+            "'2024-01-05', 1000, 0.5, 500.0, 'pending', '2024-01-04T00:00:00')",
+            (action_id,),
         )
     # 先正常复制一次
     first = audit.persist_sparse_details("val_audit", "amt_run", copy_db,
@@ -857,6 +869,14 @@ def test_sparse_detail_copy_idempotent(temp_db, tmp_path):
     init_db(db_path=copy_db)
     _seed_validation(temp_db)
 
+    from app.backtest.corporate_actions import ACTION_SPLIT
+    from tests.test_corporate_actions import _insert_action
+
+    action_id = _insert_action(
+        copy_db, code="510300", action_type=ACTION_SPLIT,
+        ex_date="2024-01-04", effective_date="2024-01-04",
+        share_ratio=2.0, fractional_policy="truncate",
+    )
     with get_connection(copy_db) as conn:
         conn.execute(
             "INSERT INTO corporate_action_applications "
@@ -864,9 +884,10 @@ def test_sparse_detail_copy_idempotent(temp_db, tmp_path):
             " shares_before, shares_after, cash_delta, fractional_cash, "
             " applied_at, receivable_amount, cash_paid_amount, "
             " fractional_shares, disposed_cost_basis, realized_pnl, official_ratio) "
-            "VALUES ('idem_run', 9, '510300', '2024-01-04', 'split', "
+            "VALUES ('idem_run', ?, '510300', '2024-01-04', 'split', "
             " 1000, 2000, 0.0, 0.0, '2024-01-04T00:00:00', 0.0, 0.0, "
-            " 0.0, 0.0, 0.0, 2.0)"
+            " 0.0, 0.0, 0.0, 2.0)",
+            (action_id,),
         )
     for _ in range(3):
         audit.persist_sparse_details("val_audit", "idem_run", copy_db,
@@ -939,3 +960,524 @@ def test_audit_completeness_does_not_recurse(temp_db):
     source = inspect.getsource(audit.audit_completeness)
     body = source.split('"""')[2] if source.count('"""') >= 2 else source
     assert "audit_trace(" not in body, "audit_completeness 不得调用 audit_trace"
+
+
+# ================================================================
+# 阶段3A.3.2.3.4.1.1：原子事务 / 逐字段对账 / WF / 压力 / 版本
+# ================================================================
+
+def _make_sparse_copy(tmp_path, name, *, run_id, action_type, **action_kwargs):
+    """在稀疏副本库里造一条公司行为事件。返回 (copy_db, action_id)。"""
+    from app.database.db import init_db as _init
+    from tests.test_corporate_actions import _insert_action
+
+    workdir = tmp_path / name
+    workdir.mkdir(parents=True, exist_ok=True)
+    copy_db = workdir / "sparse_market.db"
+    _init(db_path=copy_db)
+    action_id = _insert_action(copy_db, code="510300",
+                               action_type=action_type, **action_kwargs)
+    return copy_db, action_id
+
+
+def _insert_app(copy_db, run_id, action_id, **overrides):
+    fields = {
+        "run_id": run_id, "action_id": action_id, "code": "510300",
+        "effective_date": "2024-01-04", "action_type": "split",
+        "shares_before": 1000, "shares_after": 2000, "cash_delta": 0.0,
+        "fractional_cash": 0.0, "applied_at": "2024-01-04T00:00:00",
+        "receivable_amount": 0.0, "cash_paid_amount": 0.0,
+        "fractional_shares": 0.0, "disposed_cost_basis": 0.0,
+        "realized_pnl": 0.0, "official_ratio": 2.0,
+    }
+    fields.update(overrides)
+    with get_connection(copy_db) as conn:
+        cols = ", ".join(fields)
+        marks = ", ".join("?" for _ in fields)
+        conn.execute(
+            f"INSERT INTO corporate_action_applications ({cols}) "
+            f"VALUES ({marks})", list(fields.values()))
+
+
+def _insert_recv(copy_db, run_id, action_id, **overrides):
+    fields = {
+        "run_id": run_id, "action_id": action_id, "code": "510300",
+        "record_date": "2024-01-03", "ex_date": "2024-01-04",
+        "pay_date": "2024-01-05", "shares_at_ex": 1000,
+        "cash_per_share": 0.5, "amount": 500.0, "status": "pending",
+        "created_at": "2024-01-04T00:00:00",
+    }
+    fields.update(overrides)
+    with get_connection(copy_db) as conn:
+        cols = ", ".join(fields)
+        marks = ", ".join("?" for _ in fields)
+        conn.execute(
+            f"INSERT INTO dividend_receivables ({cols}) VALUES ({marks})",
+            list(fields.values()))
+
+
+def _sparse_rows(temp_db, vid, run_id):
+    with get_connection(temp_db) as conn:
+        apps = conn.execute(
+            "SELECT * FROM audit_sparse_applications "
+            "WHERE validation_id=? AND run_id=?", (vid, run_id)).fetchall()
+        recvs = conn.execute(
+            "SELECT * FROM audit_sparse_receivables "
+            "WHERE validation_id=? AND run_id=?", (vid, run_id)).fetchall()
+    return [dict(r) for r in apps], [dict(r) for r in recvs]
+
+
+def test_sparse_success_path_returns_dict(temp_db, tmp_path):
+    """成功路径的 data_copy 必须是 dict（上一轮尾随逗号导致 tuple）。"""
+    from app.validation.runner import _run_data_stress
+    from app.validation.stress import build_scenarios
+
+    _seed_validation(temp_db)
+    vid = "val_audit"
+    scenario = next(s for s in build_scenarios(["sparse_data"])
+                    if s.key == "sparse_data")
+    config = ValidationConfig(is_start="2024-01-02", is_end="2024-01-05",
+                              oos_start="2024-01-08", oos_end="2024-01-12",
+                              ma_window_grid=(5,), pool_mode="representative")
+    split = type("S", (), {"oos_start": "2024-01-08",
+                           "oos_end": "2024-01-12"})()
+
+    row = _run_data_stress(scenario, config, split, ["510300"], 5, temp_db,
+                           validation_id=vid)
+    assert isinstance(row, dict), "返回值必须是 dict"
+    assert "status" in row
+    if row.get("status") == "success":
+        assert isinstance(row["data_copy"], dict)
+        assert "copy_path" in row["data_copy"]
+
+
+@pytest.mark.parametrize("field,value", [
+    ("code", "159999"),
+    ("shares_before", 999),
+    ("shares_after", 2001),
+    ("cash_delta", 1.5),
+    ("fractional_cash", 0.25),
+    ("applied_at", "2024-01-05T00:00:00"),
+    ("receivable_amount", 88.0),
+    ("cash_paid_amount", 77.0),
+    ("fractional_shares", 0.5),
+    ("disposed_cost_basis", 12.0),
+    ("realized_pnl", 3.0),
+    ("official_ratio", 3.0),
+    ("action_type", "reverse_split"),
+    ("effective_date", "2024-01-09"),
+])
+def test_application_field_tamper_detected(temp_db, tmp_path, field, value):
+    """应用明细任一日志字段被篡改，对账必须失败并整体回滚。"""
+    from app.backtest.corporate_actions import ACTION_SPLIT
+
+    _seed_validation(temp_db)
+    vid = "val_audit"
+    copy_db, action_id = _make_sparse_copy(
+        tmp_path, "val_sparse_tamper", run_id="tamper_run",
+        action_type=ACTION_SPLIT, ex_date="2024-01-04",
+        effective_date="2024-01-04", share_ratio=2.0,
+        fractional_policy="truncate")
+    _insert_app(copy_db, "tamper_run", action_id)
+
+    # 先正常复制一次
+    persist_sparse_details(vid, "tamper_run", copy_db, db_path=temp_db)
+    apps, _ = _sparse_rows(temp_db, vid, "tamper_run")
+    assert len(apps) == 1
+
+    # 篡改主库该字段
+    with get_connection(temp_db) as conn:
+        conn.execute(
+            f"UPDATE audit_sparse_applications SET {field}=? "
+            "WHERE validation_id=? AND run_id=?",
+            (value, vid, "tamper_run"))
+
+    with pytest.raises(AuditError, match=field):
+        persist_sparse_details(vid, "tamper_run", copy_db, db_path=temp_db)
+
+    # 回滚后主库仍是篡改前的值（本次插入没有改动它）
+    apps_after, _ = _sparse_rows(temp_db, vid, "tamper_run")
+    assert len(apps_after) == 1
+    assert apps_after[0][field] == value
+
+
+@pytest.mark.parametrize("field,value", [
+    ("code", "159999"),
+    ("record_date", "2024-01-02"),
+    ("ex_date", "2024-01-03"),
+    ("pay_date", "2024-01-08"),
+    ("shares_at_ex", 999),
+    ("cash_per_share", 0.6),
+    ("amount", 600.0),
+    ("status", "settled"),
+    ("settled_at", "2024-01-05T00:00:00"),
+])
+def test_receivable_field_tamper_detected(temp_db, tmp_path, field, value):
+    """应收明细任一字段被篡改，对账必须失败。"""
+    from app.backtest.corporate_actions import ACTION_CASH_DISTRIBUTION
+
+    _seed_validation(temp_db)
+    vid = "val_audit"
+    copy_db, action_id = _make_sparse_copy(
+        tmp_path, "val_sparse_recv", run_id="recv_run",
+        action_type=ACTION_CASH_DISTRIBUTION, ex_date="2024-01-04",
+        effective_date="2024-01-04", cash_per_share=0.5,
+        record_date="2024-01-03", pay_date="2024-01-05")
+    _insert_recv(copy_db, "recv_run", action_id)
+
+    persist_sparse_details(vid, "recv_run", copy_db, db_path=temp_db)
+    _, recvs = _sparse_rows(temp_db, vid, "recv_run")
+    assert len(recvs) == 1
+
+    with get_connection(temp_db) as conn:
+        conn.execute(
+            f"UPDATE audit_sparse_receivables SET {field}=? "
+            "WHERE validation_id=? AND run_id=?", (value, vid, "recv_run"))
+
+    with pytest.raises(AuditError, match=field):
+        persist_sparse_details(vid, "recv_run", copy_db, db_path=temp_db)
+
+
+def test_reconcile_failure_rolls_back_whole_transaction(temp_db, tmp_path):
+    """对账失败时本次插入整体回滚，主库不留半条新行。"""
+    from app.backtest.corporate_actions import ACTION_CASH_DISTRIBUTION
+
+    _seed_validation(temp_db)
+    vid = "val_audit"
+    copy_db, action_id = _make_sparse_copy(
+        tmp_path, "val_sparse_rb", run_id="rb_run",
+        action_type=ACTION_CASH_DISTRIBUTION, ex_date="2024-01-04",
+        effective_date="2024-01-04", cash_per_share=0.5,
+        record_date="2024-01-03", pay_date="2024-01-05")
+    _insert_recv(copy_db, "rb_run", action_id)
+
+    # 人为让主库已有一行金额错误（模拟历史脏数据）
+    persist_sparse_details(vid, "rb_run", copy_db, db_path=temp_db)
+    with get_connection(temp_db) as conn:
+        conn.execute(
+            "UPDATE audit_sparse_receivables SET amount=999.0 "
+            "WHERE validation_id=? AND run_id=?", (vid, "rb_run"))
+
+    # 再追加一条新应收到副本，然后重试：插入新行 + 对账失败 → 整体回滚
+    _insert_recv(copy_db, "rb_run", action_id + 1, amount=700.0,
+                 cash_per_share=0.7)
+    with get_connection(copy_db) as conn:
+        conn.execute(
+            "UPDATE corporate_actions SET action_id=? WHERE action_id=?",
+            (action_id + 1, action_id))
+    # 上面这步只是让事件表能对应到新 action_id，实际构造见下
+    with pytest.raises(AuditError):
+        persist_sparse_details(vid, "rb_run", copy_db, db_path=temp_db)
+
+    _, recvs = _sparse_rows(temp_db, vid, "rb_run")
+    assert len(recvs) == 1, "失败后不得留下新增行"
+    assert recvs[0]["amount"] == pytest.approx(999.0)
+
+
+def test_sparse_persist_idempotent_three_times(temp_db, tmp_path):
+    """同一明细连跑三次，行数恒为 1。"""
+    from app.backtest.corporate_actions import ACTION_SPLIT
+
+    _seed_validation(temp_db)
+    vid = "val_audit"
+    copy_db, action_id = _make_sparse_copy(
+        tmp_path, "val_sparse_idem2", run_id="idem2_run",
+        action_type=ACTION_SPLIT, ex_date="2024-01-04",
+        effective_date="2024-01-04", share_ratio=2.0,
+        fractional_policy="truncate")
+    _insert_app(copy_db, "idem2_run", action_id)
+
+    for _ in range(3):
+        persist_sparse_details(vid, "idem2_run", copy_db, db_path=temp_db)
+    apps, _ = _sparse_rows(temp_db, vid, "idem2_run")
+    assert len(apps) == 1
+
+
+def test_sparse_detail_keeps_version_and_fingerprint(temp_db, tmp_path):
+    """sparse 明细必须保留事件版本号与 event_fingerprint。"""
+    from app.backtest.corporate_actions import ACTION_CASH_DISTRIBUTION
+
+    _seed_validation(temp_db)
+    vid = "val_audit"
+    copy_db, action_id = _make_sparse_copy(
+        tmp_path, "val_sparse_ver", run_id="ver_run",
+        action_type=ACTION_CASH_DISTRIBUTION, ex_date="2024-01-04",
+        effective_date="2024-01-04", cash_per_share=0.5,
+        record_date="2024-01-03", pay_date="2024-01-05")
+    _insert_recv(copy_db, "ver_run", action_id)
+
+    with get_connection(copy_db) as conn:
+        expect = conn.execute(
+            "SELECT version_no, event_fingerprint FROM corporate_actions "
+            "WHERE action_id=?", (action_id,)).fetchone()
+
+    persist_sparse_details(vid, "ver_run", copy_db, db_path=temp_db)
+    _, recvs = _sparse_rows(temp_db, vid, "ver_run")
+    assert recvs[0]["version_no"] == expect["version_no"]
+    assert recvs[0]["event_fingerprint"] == expect["event_fingerprint"]
+
+
+def test_sparse_persist_requires_event_row(temp_db, tmp_path):
+    """副本里查不到事件行 → 版本不可追溯 → 对账失败，不留行。"""
+    from app.database.db import init_db as _init
+
+    _seed_validation(temp_db)
+    vid = "val_audit"
+    workdir = tmp_path / "val_sparse_noev"
+    workdir.mkdir(parents=True, exist_ok=True)
+    copy_db = workdir / "sparse_market.db"
+    _init(db_path=copy_db)
+
+    with get_connection(copy_db) as conn:
+        conn.execute(
+            "INSERT INTO corporate_action_applications "
+            "(run_id, action_id, code, effective_date, action_type, "
+            " shares_before, shares_after, cash_delta, fractional_cash, "
+            " applied_at, receivable_amount, cash_paid_amount, "
+            " fractional_shares, disposed_cost_basis, realized_pnl, official_ratio) "
+            "VALUES ('noev_run', 999, '510300', '2024-01-04', 'split', "
+            " 1000, 2000, 0.0, 0.0, '2024-01-04T00:00:00', 0.0, 0.0, "
+            " 0.0, 0.0, 0.0, 2.0)")
+
+    with pytest.raises(AuditError, match="版本不可追溯"):
+        persist_sparse_details(vid, "noev_run", copy_db, db_path=temp_db)
+    apps, _ = _sparse_rows(temp_db, vid, "noev_run")
+    assert apps == []
+
+
+# ---------------------------------------------------------------- 版本严格匹配
+
+def test_version_exact_match_no_fallback(temp_db):
+    """最新版本存在但历史版本不存在时，不得回退到最新版本。"""
+    from app.backtest.corporate_actions import (
+        ACTION_CASH_DISTRIBUTION, load_actions, save_receivable,
+    )
+    from tests.test_corporate_actions import _insert_action
+
+    _seed_validation(temp_db)
+    _insert_action(temp_db, code="510300",
+                   action_type=ACTION_CASH_DISTRIBUTION,
+                   ex_date="2024-01-04", effective_date="2024-01-04",
+                   cash_per_share=0.5, record_date="2024-01-03",
+                   pay_date="2024-01-05")
+    built = load_actions(start="2024-01-01", end="2024-12-31",
+                         db_path=temp_db)[0]
+    save_receivable(run_id="vfb_run", action=built, shares=1000,
+                    amount=500.0, db_path=temp_db)
+    _evidence(temp_db, "vfb_run")
+    audit.register_backtest(_result("vfb_run"), role=audit.ROLE_OOS,
+                            validation_id="val_audit", db_path=temp_db)
+
+    # 删掉该事件的精确版本行，只留另一个版本号
+    with get_connection(temp_db) as conn:
+        key = f"{built.code}|{built.action_type}|{built.ex_date}"
+        conn.execute(
+            "DELETE FROM corporate_action_versions WHERE action_key=?",
+            (key,))
+        conn.execute(
+            "INSERT INTO corporate_action_versions "
+            "(action_key, version_no, code, action_type, ex_date, "
+            " effective_date, source, evidence_status, data_version, "
+            " snapshot_json, created_at) "
+            "VALUES (?, 99, ?, ?, ?, ?, 'test', 'official_confirmed', 'ca-v1', "
+            "'{}', '2024-01-04T00:00:00')",
+            (key, built.code, built.action_type, built.ex_date,
+             built.effective_date.isoformat()))
+
+    payload = audit_trace("val_audit", db_path=temp_db)
+    link = payload["links"][0]
+    item = link["events"][0]
+    assert item["version_status"] == "version_unavailable", \
+        "精确版本缺失时必须标 version_unavailable，不得回退到版本 99"
+    assert item.get("version") is None
+    assert built.action_id in link["versions_unavailable"]
+    assert payload["audit_status"] != "complete"
+
+
+def test_version_number_none_marked_unavailable(temp_db):
+    """事件 version_no 为空时不得视为有版本。"""
+    conn = get_connection
+    assert audit._version_of(
+        type("C", (), {"execute": lambda self, *a, **k: type(
+            "R", (), {"fetchone": lambda self: None})()})(),
+        {"version_no": None, "code": "510300",
+         "action_type": "split", "ex_date": "2024-01-04"},
+    ) is None
+
+
+# ---------------------------------------------------------------- WF 完整性
+
+def test_wf_missing_train_window_incomplete(temp_db):
+    """缺训练窗口 → 不完整。"""
+    _seed_validation(temp_db)
+    vid = "val_audit"
+    with get_connection(temp_db) as conn:
+        conn.execute(
+            "INSERT INTO validation_windows (validation_id, window_index, "
+            "train_start, train_end, test_start, test_end, train_days, "
+            "test_days, selected_param, status, created_at) "
+            "VALUES (?, 0, '2023-01-02', '2023-12-29', '2024-01-02', "
+            "'2024-06-28', 240, 120, 20, 'success', '2024-01-01T00:00:00')",
+            (vid,))
+        conn.execute(
+            "UPDATE validation_runs SET walkforward_config=? "
+            "WHERE validation_id=?", (json.dumps({"wf_grid": [5, 20, 60]}), vid))
+
+    _evidence(temp_db, "w0_ma20")
+    audit.register_backtest(_result("w0_ma20"), role=audit.ROLE_WF_TEST,
+                            scenario_key="w0-ma20",
+                            validation_id=vid, db_path=temp_db)
+
+    result = audit_completeness(vid, db_path=temp_db)
+    assert result["complete"] is False
+    assert any("训练窗口 w0" in p for p in result["problems"])
+
+
+def test_wf_missing_test_window_incomplete(temp_db):
+    """缺测试窗口 → 不完整。"""
+    _seed_validation(temp_db)
+    vid = "val_audit"
+    with get_connection(temp_db) as conn:
+        conn.execute(
+            "INSERT INTO validation_windows (validation_id, window_index, "
+            "train_start, train_end, test_start, test_end, train_days, "
+            "test_days, selected_param, status, created_at) "
+            "VALUES (?, 0, '2023-01-02', '2023-12-29', '2024-01-02', "
+            "'2024-06-28', 240, 120, 20, 'success', '2024-01-01T00:00:00')",
+            (vid,))
+        conn.execute(
+            "UPDATE validation_runs SET walkforward_config=? "
+            "WHERE validation_id=?", (json.dumps({"wf_grid": [20]}), vid))
+
+    _evidence(temp_db, "w0_train_ma20")
+    audit.register_backtest(_result("w0_train_ma20"),
+                            role=audit.ROLE_WF_TRAIN, scenario_key="w0-ma20",
+                            validation_id=vid, db_path=temp_db)
+
+    result = audit_completeness(vid, db_path=temp_db)
+    assert result["complete"] is False
+    assert any("测试窗口 w0" in p for p in result["problems"])
+
+
+def test_wf_failed_train_window_incomplete(temp_db):
+    """训练窗口执行失败 → 不完整，并给出原因。"""
+    _seed_validation(temp_db)
+    vid = "val_audit"
+    with get_connection(temp_db) as conn:
+        conn.execute(
+            "INSERT INTO validation_windows (validation_id, window_index, "
+            "train_start, train_end, test_start, test_end, train_days, "
+            "test_days, selected_param, status, created_at) "
+            "VALUES (?, 0, '2023-01-02', '2023-12-29', '2024-01-02', "
+            "'2024-06-28', 240, 120, 20, 'success', '2024-01-01T00:00:00')",
+            (vid,))
+        conn.execute(
+            "UPDATE validation_runs SET walkforward_config=? "
+            "WHERE validation_id=?", (json.dumps({"wf_grid": [20]}), vid))
+
+    _evidence(temp_db, "wt_fail")
+    audit.register_backtest(_result("wt_fail"), role=audit.ROLE_WF_TRAIN,
+                            scenario_key="w0-ma20", validation_id=vid,
+                            status="failed", reason="样本不足",
+                            db_path=temp_db)
+    _evidence(temp_db, "w0_test")
+    audit.register_backtest(_result("w0_test"), role=audit.ROLE_WF_TEST,
+                            scenario_key="w0-ma20", validation_id=vid,
+                            db_path=temp_db)
+
+    result = audit_completeness(vid, db_path=temp_db)
+    assert result["complete"] is False
+    assert any("样本不足" in p for p in result["problems"])
+
+
+def test_wf_insufficient_window_incomplete(temp_db):
+    """窗口数据不足未执行 → 不完整。"""
+    _seed_validation(temp_db)
+    vid = "val_audit"
+    with get_connection(temp_db) as conn:
+        conn.execute(
+            "INSERT INTO validation_windows (validation_id, window_index, "
+            "train_start, train_end, test_start, test_end, train_days, "
+            "test_days, selected_param, status, created_at) "
+            "VALUES (?, 0, '2023-01-02', '2023-01-10', '2024-01-02', "
+            "'2024-01-05', 7, 4, NULL, 'insufficient_data', "
+            "'2024-01-01T00:00:00')", (vid,))
+    _evidence(temp_db, "any_run")
+    audit.register_backtest(_result("any_run"), role=audit.ROLE_OOS,
+                            validation_id=vid, db_path=temp_db)
+    result = audit_completeness(vid, db_path=temp_db)
+    assert result["complete"] is False
+    joined = "；".join(result["problems"])
+    assert ("数据不足" in joined or "窗口 w0" in joined), joined
+
+
+# ---------------------------------------------------------------- 压力状态
+
+def _seed_stress(temp_db, vid, key, status, reason=None):
+    with get_connection(temp_db) as conn:
+        conn.execute(
+            "INSERT INTO validation_stress (validation_id, scenario_key, "
+            "scenario_name, is_hypothetical, status, reason, created_at) "
+            "VALUES (?,?,?,0,?,?,'2024-01-01T00:00:00')",
+            (vid, key, key, status, reason))
+
+
+def test_stress_success_but_execution_failed_incomplete(temp_db):
+    """场景登记 success 但回测执行 failed → 不完整。"""
+    _seed_validation(temp_db)
+    vid = "val_audit"
+    _seed_stress(temp_db, vid, "base", "success")
+    _evidence(temp_db, "st_run")
+    audit.register_backtest(_result("st_run"), role=audit.ROLE_STRESS_COST,
+                            scenario_key="base", validation_id=vid,
+                            status="failed", reason="回测崩溃",
+                            db_path=temp_db)
+    result = audit_completeness(vid, db_path=temp_db)
+    assert result["complete"] is False
+    assert any("回测执行状态为 failed" in p for p in result["problems"])
+
+
+def test_stress_scenario_without_run_incomplete(temp_db):
+    """场景未登记关联回测 → 不完整。"""
+    _seed_validation(temp_db)
+    vid = "val_audit"
+    _seed_stress(temp_db, vid, "slippage_x2", "success")
+    _evidence(temp_db, "other_run")
+    audit.register_backtest(_result("other_run"), role=audit.ROLE_OOS,
+                            validation_id=vid, db_path=temp_db)
+    result = audit_completeness(vid, db_path=temp_db)
+    assert result["complete"] is False
+    assert any("slippage_x2" in p and "未登记" in p
+               for p in result["problems"])
+
+
+def test_stress_insufficient_not_treated_as_failure(temp_db):
+    """insufficient 是「执行成功但样本不足」，不是执行失败。"""
+    _seed_validation(temp_db)
+    vid = "val_audit"
+    _seed_stress(temp_db, vid, "insufficient", "insufficient")
+    _evidence(temp_db, "ins_run")
+    audit.register_backtest(_result("ins_run"),
+                            role=audit.ROLE_STRESS_INSUFFICIENT,
+                            scenario_key="insufficient", validation_id=vid,
+                            db_path=temp_db)
+    result = audit_completeness(vid, db_path=temp_db)
+    # 不该报「执行状态为 failed」
+    assert not any("回测执行状态为 failed" in p for p in result["problems"])
+    # 但仍因其他缺失项不完整
+    assert result["complete"] is False
+
+
+def test_stress_insufficient_on_wrong_scenario_incomplete(temp_db):
+    """只有样本量类场景允许 insufficient。"""
+    _seed_validation(temp_db)
+    vid = "val_audit"
+    _seed_stress(temp_db, vid, "cost_plus_50", "insufficient")
+    _evidence(temp_db, "wrong_ins")
+    audit.register_backtest(_result("wrong_ins"),
+                            role=audit.ROLE_STRESS_COST,
+                            scenario_key="cost_plus_50", validation_id=vid,
+                            db_path=temp_db)
+    result = audit_completeness(vid, db_path=temp_db)
+    assert result["complete"] is False
+    assert any("只有样本量类场景允许该状态" in p for p in result["problems"])

@@ -2426,7 +2426,8 @@ if (basis != ACCOUNTING_FORMAL
 | 3A.3.2.3.2 | 重放失败闸门（三值短路 / 非布尔真值） | 564 | `phase3A3_2_3_2_*.md` |
 | 3A.3.2.3.3 | P0 两条历史验证记录受控重放 | 568 | `phase3A3_2_3_3_*.md` |
 | 3A.3.2.3.4 | 验证内部回测与公司行为审计追溯 | 618 | `phase3A3_2_3_4_*.md` |
-| 3A.3.2.3.4.1 | 审计完整性闸门与明细持久化整改 | **632** | `phase3A3_2_3_4_1_*.md` |
+| 3A.3.2.3.4.1 | 审计完整性闸门与明细持久化整改 | 632 | `phase3A3_2_3_4_1_audit*.md` |
+| 3A.3.2.3.4.1.1 | 审计完整性与 Sparse 明细原子化 | **670** | `phase3A3_2_3_4_1_1_*.md` |
 
 当前正式会计版本：`ca-v2-receivable`；正式会计基础：`formal_receivable`；正式估值标记：`formal_valuation=True`。
 
@@ -2608,3 +2609,76 @@ WF 窗口数、压力场景数、基准数逐项比对，并逐个核对网格�
 - 存量 7 条永久 `unavailable_legacy_evidence`，补写凭证等于伪造，不做
 - `aad7935a2bac4cc4` 的 sparse 逐笔明细永久不可恢复
 - 版本回退策略（精确未命中取末版）与精确命中的语义不同
+
+## 45. 阶段3A.3.2.3.4.1.1 审计完整性与 Sparse 明细持久化整改
+
+### 45.1 修掉的 6 个缺陷
+
+| # | 缺陷 | 后果 |
+| ---: | --- | --- |
+| 1 | `copy_info = {...},` 尾随逗号 | dict 变 tuple，`copy_info["copy_path"]` 抛 TypeError |
+| 2 | 插入与对账不在同一事务 | 对账失败留半条 |
+| 3 | 只比计数与合计 | 单条单字段错误查不出 |
+| 4 | WF 只查 `walkforward_test` | 缺训练窗口仍判 complete |
+| 5 | 压力测试只看场景是否登记 | 登记了但执行失败也通过 |
+| 6 | `_version_of()` 回退最新版 | 掩盖历史版本缺失 |
+
+### 45.2 事务与对账
+
+`persist_sparse_details()` 现在是单事务：插入 + 逐字段对账在同一个
+`with get_connection()` 块内，对账不通过就块内 raise，整体 rollback。
+
+| 明细 | 参与对账的字段数 |
+| --- | ---: |
+| `audit_sparse_applications` | 15 |
+| `audit_sparse_receivables` | 10 |
+
+精度规则：数值字段绝对误差 `<= 1e-6`（与库内 `round(...,6)` 对齐），
+整数与文本严格相等。失败信息精确到 `action_id + 字段名 + 双方值`。
+
+### 45.3 Walk-Forward 完整性
+
+逐窗口核对，不再只看总数：
+
+1. 每个已执行窗口 × `wf_grid` 每个候选，必须有 `walkforward_train` 记录
+2. 训练记录数 = 已执行窗口数 × 候选数
+3. 每个窗口必须有 `walkforward_test` 记录
+4. 训练/测试记录状态必须 `success`
+5. `insufficient_data` 窗口单列一条 problem
+
+### 45.4 压力测试三态
+
+| 状态组合 | 判定 |
+| --- | --- |
+| 场景 `insufficient` + 回测 `success` | 执行成功但样本不足，不报执行失败 |
+| 场景 `insufficient` + 回测 `failed` | 报「回测执行状态为 failed」 |
+| `insufficient` 挂在非样本量场景 | 报「只有样本量类场景允许该状态」 |
+
+### 45.5 版本严格匹配
+
+`_version_of()` 只按 `(action_key, version_no)` 精确查，查不到返回 None，
+**不再回退到最新版本**。`version_no` 为空也返回 None。
+
+Sparse 明细表新增 `version_no` 与 `event_fingerprint` 两列保留版本证据。
+
+### 45.6 验证
+
+| 项 | 结果 |
+| --- | ---: |
+| 全量测试 | **670 passed**，0 failed / 0 skipped / 0 xfail |
+| 耗时 | 234.00 秒 |
+| 新增测试 | +38 |
+| 字段篡改测试 | 23 项（应用 14 + 应收 9） |
+| `audit_trace` 与 `audit_completeness` 不一致 | 0 / 54 |
+| `integrity_check` | ok |
+| 行情指纹 | `d54727c0…` 未变 |
+| 历史记录数据变化 | 0（只有两张 sparse 表加了两列） |
+
+### 45.7 尚未解决
+
+- **真实 sparse 端到端未跑**：本轮禁止重跑内部回测，tuple 修复与事务原子性
+  只在单元测试层面验证（测试里造了真实副本库、真实事件行、真实明细行）。
+  下次真实跑带 sparse 的 validation 才能确认端到端。
+- 存量 7 条永久 `unavailable_legacy_evidence`，补写凭证等于伪造
+- `aad7935a2bac4cc4` 的 sparse 逐笔明细永久不可恢复
+- 事务原子性依赖 SQLite 隐式事务，高并发下有锁等待风险（失败会整体回滚）

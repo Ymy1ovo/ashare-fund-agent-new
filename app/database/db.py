@@ -625,6 +625,9 @@ def _migrate_audit_columns(conn: sqlite3.Connection) -> None:
         ("detail_note", "TEXT"),
     ):
         _add_column_if_missing(conn, "validation_backtest_runs", column, ddl)
+    for table in ("audit_sparse_applications", "audit_sparse_receivables"):
+        _add_column_if_missing(conn, table, "version_no", "INTEGER")
+        _add_column_if_missing(conn, table, "event_fingerprint", "TEXT")
     # 内部回测与用户回测分开：默认 standalone，审计登记时写 validation_internal
     _add_column_if_missing(
         conn, "backtest_runs", "run_scope",

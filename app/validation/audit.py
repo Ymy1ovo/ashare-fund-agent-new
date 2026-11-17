@@ -419,20 +419,87 @@ _RECEIVABLE_FIELDS = (
     "cash_per_share", "amount", "status", "settled_at",
 )
 
+# 数值字段比较规则：REAL 一律按绝对误差 <= 1e-6 比较，与库内 round(...,6)
+# 的写入精度一致；整数与文本字段严格相等。不用更大容差掩盖真实差异。
+NUMERIC_FIELDS = frozenset({
+    "cash_delta", "fractional_cash", "receivable_amount", "cash_paid_amount",
+    "fractional_shares", "disposed_cost_basis", "realized_pnl", "official_ratio",
+    "cash_per_share", "amount",
+})
+NUMERIC_TOLERANCE = 1e-6
+
+
+def _normalize(field: str, value):
+    """把复制前后的值归一化到同一形态，避免类型差异被当成数据差异。"""
+    if field in NUMERIC_FIELDS:
+        if value is None:
+            return None
+        try:
+            return round(float(value), 6)
+        except (TypeError, ValueError):
+            return value
+    if value is None:
+        return None
+    return str(value)
+
+
+def _values_equal(field: str, left, right) -> bool:
+    a = _normalize(field, left)
+    b = _normalize(field, right)
+    if a is None or b is None:
+        return a is None and b is None
+    if field in NUMERIC_FIELDS:
+        try:
+            return abs(float(a) - float(b)) <= NUMERIC_TOLERANCE
+        except (TypeError, ValueError):
+            return a == b
+    return a == b
+
+
+def _reconcile_rows(kind: str, fields, src_rows, dst_rows) -> list[str]:
+    """逐条逐字段对账。返回问题列表（空表示一致）。"""
+    problems: list[str] = []
+    src_by_key = {int(row["action_id"]): row for row in src_rows}
+    dst_by_key = {int(row["action_id"]): row for row in dst_rows}
+
+    only_src = sorted(set(src_by_key) - set(dst_by_key))
+    only_dst = sorted(set(dst_by_key) - set(src_by_key))
+    if only_src:
+        problems.append(f"{kind} 主库缺少 action_id={only_src}")
+    if only_dst:
+        problems.append(f"{kind} 主库多出 action_id={only_dst}")
+
+    for key in sorted(set(src_by_key) & set(dst_by_key)):
+        for field in fields:
+            if field == "action_id":
+                continue
+            left = src_by_key[key][field] if field in src_by_key[key].keys() else None
+            right = dst_by_key[key][field] if field in dst_by_key[key].keys() else None
+            if not _values_equal(field, left, right):
+                problems.append(
+                    f"{kind} action_id={key} 字段 {field} 不一致："
+                    f"副本={_normalize(field, left)!r} 主库={_normalize(field, right)!r}"
+                )
+    return problems
+
 
 def persist_sparse_details(validation_id: str, run_id: str, source_db, *,
                            db_path=None) -> dict:
-    """把 sparse 副本库的逐笔明细复制到主库审计区，并逐条对账。
+    """把 sparse 副本库的逐笔明细复制到主库审计区，并逐条逐字段对账。
 
-    - 复制使用 `INSERT ... ON CONFLICT DO NOTHING`，重复执行幂等；
-    - 对账项：应用条数、应收条数、应收金额、已到账条数与金额、action_id 集合；
-    - 任一项不一致 → 抛 `AuditError`（事务回滚，不留半条），副本不删。
+    原子性：插入与对账**在同一个连接事务内**完成。任一步失败（SQL 异常、
+    条数不符、任一字段不一致）都在 `with get_connection()` 内 raise，
+    由连接管理器整体 rollback，主库不留半条。
+
+    幂等：`ON CONFLICT DO NOTHING`，已存在的历史行不被覆盖、不被删除；
+    若已有行与副本不一致，对账会报出具体字段差异并整体回滚本次插入。
     """
     src = Path(source_db)
     if not src.exists():
         raise AuditError(f"sparse 副本库不存在：{src}")
 
     init_audit_schema(db_path)
+
     with get_connection(src) as src_conn:
         apps = src_conn.execute(
             "SELECT * FROM corporate_action_applications WHERE run_id=? "
@@ -442,74 +509,101 @@ def persist_sparse_details(validation_id: str, run_id: str, source_db, *,
             "SELECT * FROM dividend_receivables WHERE run_id=? ORDER BY action_id",
             (run_id,),
         ).fetchall()
+        action_ids = sorted({int(r["action_id"]) for r in apps}
+                            | {int(r["action_id"]) for r in recvs})
+        versions: dict[int, tuple] = {}
+        if action_ids:
+            marks = ",".join("?" for _ in action_ids)
+            for row in src_conn.execute(
+                "SELECT action_id, version_no, event_fingerprint "
+                f"FROM corporate_actions WHERE action_id IN ({marks})",
+                action_ids,
+            ):
+                versions[int(row["action_id"])] = (
+                    row["version_no"], row["event_fingerprint"])
 
-    src_app_ids = {int(row["action_id"]) for row in apps}
-    src_recv_ids = {int(row["action_id"]) for row in recvs}
-    src_recv_amount = round(sum(float(row["amount"] or 0.0) for row in recvs), 6)
-    src_settled = [row for row in recvs if row["settled_at"]]
+    src_recv_amount = round(sum(float(r["amount"] or 0.0) for r in recvs), 6)
+    src_settled = [r for r in recvs if r["settled_at"]]
     src_settled_amount = round(
-        sum(float(row["amount"] or 0.0) for row in src_settled), 6)
+        sum(float(r["amount"] or 0.0) for r in src_settled), 6)
 
+    # ---------------- 单个事务：插入 + 逐字段对账 ----------------
     with get_connection(db_path) as conn:
         for row in apps:
+            version = versions.get(int(row["action_id"]), (None, None))
             conn.execute(
                 "INSERT INTO audit_sparse_applications "
                 "(validation_id, run_id, action_id, code, effective_date, "
                 " action_type, shares_before, shares_after, cash_delta, "
                 " fractional_cash, applied_at, receivable_amount, "
                 " cash_paid_amount, fractional_shares, disposed_cost_basis, "
-                " realized_pnl, official_ratio, source_db, created_at) "
-                "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) "
+                " realized_pnl, official_ratio, version_no, event_fingerprint, "
+                " source_db, created_at) "
+                "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) "
                 "ON CONFLICT(validation_id, run_id, action_id) DO NOTHING",
                 (validation_id, run_id,
                  *(row[name] for name in _APPLICATION_FIELDS),
-                 str(src), _now()),
+                 version[0], version[1], str(src), _now()),
             )
         for row in recvs:
+            version = versions.get(int(row["action_id"]), (None, None))
             conn.execute(
                 "INSERT INTO audit_sparse_receivables "
                 "(validation_id, run_id, action_id, code, record_date, ex_date, "
                 " pay_date, shares_at_ex, cash_per_share, amount, status, "
-                " settled_at, source_db, created_at) "
-                "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?) "
+                " settled_at, version_no, event_fingerprint, source_db, created_at) "
+                "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) "
                 "ON CONFLICT(validation_id, run_id, action_id) DO NOTHING",
                 (validation_id, run_id,
                  *(row[name] for name in _RECEIVABLE_FIELDS),
-                 str(src), _now()),
+                 version[0], version[1], str(src), _now()),
             )
 
         dst_apps = conn.execute(
-            "SELECT action_id FROM audit_sparse_applications "
+            "SELECT * FROM audit_sparse_applications "
             "WHERE validation_id=? AND run_id=?", (validation_id, run_id)
         ).fetchall()
         dst_recvs = conn.execute(
-            "SELECT action_id, amount, settled_at FROM audit_sparse_receivables "
+            "SELECT * FROM audit_sparse_receivables "
             "WHERE validation_id=? AND run_id=?", (validation_id, run_id)
         ).fetchall()
 
-    dst_app_ids = {int(row["action_id"]) for row in dst_apps}
-    dst_recv_ids = {int(row["action_id"]) for row in dst_recvs}
-    dst_recv_amount = round(sum(float(row["amount"] or 0.0) for row in dst_recvs), 6)
-    dst_settled = [row for row in dst_recvs if row["settled_at"]]
-    dst_settled_amount = round(
-        sum(float(row["amount"] or 0.0) for row in dst_settled), 6)
+        problems: list[str] = []
+        if len(apps) != len(dst_apps):
+            problems.append(
+                f"application_count 副本={len(apps)} 主库={len(dst_apps)}")
+        if len(recvs) != len(dst_recvs):
+            problems.append(
+                f"receivable_count 副本={len(recvs)} 主库={len(dst_recvs)}")
 
-    checks = {
-        "application_count": (len(apps), len(dst_apps)),
-        "receivable_count": (len(recvs), len(dst_recvs)),
-        "receivable_amount": (src_recv_amount, dst_recv_amount),
-        "settled_count": (len(src_settled), len(dst_settled)),
-        "settled_amount": (src_settled_amount, dst_settled_amount),
-        "application_action_ids": (sorted(src_app_ids), sorted(dst_app_ids)),
-        "receivable_action_ids": (sorted(src_recv_ids), sorted(dst_recv_ids)),
-    }
-    problems = [
-        f"{name} 副本={src_val!r} 主库={dst_val!r}"
-        for name, (src_val, dst_val) in checks.items()
-        if src_val != dst_val
-    ]
-    if problems:
-        raise AuditError("sparse 明细复制对账失败：" + "；".join(problems))
+        problems.extend(_reconcile_rows(
+            "应用", _APPLICATION_FIELDS, apps, dst_apps))
+        problems.extend(_reconcile_rows(
+            "应收", _RECEIVABLE_FIELDS, recvs, dst_recvs))
+
+        dst_recv_amount = round(
+            sum(float(r["amount"] or 0.0) for r in dst_recvs), 6)
+        dst_settled = [r for r in dst_recvs if r["settled_at"]]
+        dst_settled_amount = round(
+            sum(float(r["amount"] or 0.0) for r in dst_settled), 6)
+        if abs(src_recv_amount - dst_recv_amount) > NUMERIC_TOLERANCE:
+            problems.append(
+                f"receivable_amount 副本={src_recv_amount} 主库={dst_recv_amount}")
+        if len(src_settled) != len(dst_settled):
+            problems.append(
+                f"settled_count 副本={len(src_settled)} 主库={len(dst_settled)}")
+        if abs(src_settled_amount - dst_settled_amount) > NUMERIC_TOLERANCE:
+            problems.append(
+                f"settled_amount 副本={src_settled_amount} 主库={dst_settled_amount}")
+
+        for row in list(apps) + list(recvs):
+            key = int(row["action_id"])
+            if key not in versions:
+                problems.append(f"action_id={key} 在副本事件表中查不到，版本不可追溯")
+
+        if problems:
+            # 在 with 块内 raise → 连接管理器 rollback，本次插入全部回退
+            raise AuditError("sparse 明细复制对账失败：" + "；".join(problems))
 
     return {
         "ok": True,
@@ -519,9 +613,16 @@ def persist_sparse_details(validation_id: str, run_id: str, source_db, *,
         "receivable_amount": src_recv_amount,
         "settled_count": len(src_settled),
         "settled_amount": src_settled_amount,
-        "action_ids": sorted(src_app_ids | src_recv_ids),
+        "action_ids": sorted({int(r["action_id"]) for r in apps}
+                             | {int(r["action_id"]) for r in recvs}),
         "source_db": str(src),
+        "reconciled_fields": {
+            "application": list(_APPLICATION_FIELDS),
+            "receivable": list(_RECEIVABLE_FIELDS),
+            "numeric_tolerance": NUMERIC_TOLERANCE,
+        },
     }
+
 
 
 def mark_sparse_detail_location(validation_id: str, run_id: str, *,
@@ -555,6 +656,23 @@ def mark_sparse_detail_location(validation_id: str, run_id: str, *,
             f"UPDATE validation_backtest_runs SET {', '.join(fields)} "
             "WHERE validation_id=? AND backtest_run_id=?", params
         )
+
+
+def mark_backtest_failed(validation_id: str, run_id: str, reason: str, *,
+                         db_path=None) -> None:
+    """把已登记的关联行降级为 failed 并写明原因。
+
+    用于「回测本身跑完了、但审计持久化/对账失败」的场景：
+    关联行必须保留（它确实发生过），但状态不能是 success。
+    """
+    init_audit_schema(db_path)
+    with get_connection(db_path) as conn:
+        conn.execute(
+            "UPDATE validation_backtest_runs SET status=?, reason=? "
+            "WHERE validation_id=? AND backtest_run_id=?",
+            (STATUS_FAILED, reason[:500], validation_id, run_id),
+        )
+
 
 
 def remove_sparse_copy(source_db) -> None:
@@ -813,6 +931,7 @@ def audit_completeness(validation_id: str, *, db_path=None) -> dict:
     expected: dict[str, int | None] = {
         ROLE_IN_SAMPLE: len(grid) if grid else None,
         ROLE_WF_TEST: window_count or None,
+        ROLE_WF_TRAIN: None,   # 逐窗口 × wf_grid 核对，不能只看总数
         ROLE_BENCHMARK: len(bench) if bench else None,
         ROLE_OOS: 1,
         ROLE_REGIME: 1,
@@ -826,11 +945,123 @@ def audit_completeness(validation_id: str, *, db_path=None) -> dict:
         if got != want:
             problems.append(f"{role} 登记 {got} 条，期望 {want} 条")
 
-    registered_keys = {run["scenario_key"] for run in runs
-                       if run["run_role"].startswith("stress")}
-    for key in stress_keys:
-        if key not in registered_keys:
+    # ---------------- Walk-Forward：训练与测试逐窗口核对 ----------------
+    with get_connection(db_path) as conn:
+        window_rows = conn.execute(
+            "SELECT window_index, status, selected_param, train_days, test_days "
+            "FROM validation_windows WHERE validation_id=? ORDER BY window_index",
+            (validation_id,),
+        ).fetchall()
+        wf_raw = conn.execute(
+            "SELECT walkforward_config FROM validation_runs WHERE validation_id=?",
+            (validation_id,),
+        ).fetchone()
+
+    wf_grid: list = []
+    if wf_raw is not None and wf_raw["walkforward_config"]:
+        try:
+            parsed = json.loads(wf_raw["walkforward_config"])
+        except (json.JSONDecodeError, TypeError):
+            parsed = None
+        if isinstance(parsed, dict):
+            wf_grid = list(parsed.get("wf_grid") or [])
+        elif isinstance(parsed, list):
+            wf_grid = list(parsed)
+
+    wf_train_runs = by_role.get(ROLE_WF_TRAIN, [])
+    wf_test_runs = by_role.get(ROLE_WF_TEST, [])
+    train_by_scen = {run["scenario_key"]: run for run in wf_train_runs}
+    test_by_scen = {run["scenario_key"]: run for run in wf_test_runs}
+
+    executed_windows = [r for r in window_rows
+                        if r["status"] != "insufficient_data"]
+    skipped_windows = [r for r in window_rows
+                       if r["status"] == "insufficient_data"]
+
+    if not window_rows:
+        problems.append("Walk-Forward 窗口记录缺失（validation_windows 为空）")
+
+    for row in executed_windows:
+        idx = int(row["window_index"])
+        if wf_grid:
+            missing_train = [c for c in wf_grid
+                             if f"w{idx}-ma{c}" not in train_by_scen]
+            if missing_train:
+                problems.append(
+                    f"Walk-Forward 训练窗口 w{idx} 缺少候选 "
+                    f"{missing_train} 的执行记录")
+        elif not any(k and k.startswith(f"w{idx}-") for k in train_by_scen):
+            problems.append(f"Walk-Forward 训练窗口 w{idx} 没有任何执行记录")
+
+        test_scen = f"w{idx}-ma{row['selected_param']}"
+        if test_scen not in test_by_scen:
+            problems.append(
+                f"Walk-Forward 测试窗口 w{idx}"
+                f"（选中 MA{row['selected_param']}）缺少执行记录")
+
+        for scen, run in train_by_scen.items():
+            if (scen and scen.startswith(f"w{idx}-")
+                    and run["status"] != STATUS_SUCCESS):
+                problems.append(
+                    f"Walk-Forward 训练窗口 {scen} 状态 {run['status']}："
+                    f"{run['reason'] or '无原因'}")
+        test_run = test_by_scen.get(test_scen)
+        if test_run is not None and test_run["status"] != STATUS_SUCCESS:
+            problems.append(
+                f"Walk-Forward 测试窗口 {test_scen} 状态 {test_run['status']}："
+                f"{test_run['reason'] or '无原因'}")
+
+        if row["status"] != STATUS_SUCCESS:
+            problems.append(
+                f"Walk-Forward 窗口 w{idx} 状态 {row['status']}："
+                "该窗口未能完成训练+测试")
+
+    for row in skipped_windows:
+        problems.append(
+            f"Walk-Forward 窗口 w{row['window_index']} 数据不足"
+            f"（train {row['train_days']} 天 / test {row['test_days']} 天），"
+            "该窗口未执行，审计不完整")
+
+    if executed_windows and wf_grid:
+        want_train = len(executed_windows) * len(wf_grid)
+        if len(wf_train_runs) != want_train:
+            problems.append(
+                f"walkforward_train 登记 {len(wf_train_runs)} 条，"
+                f"期望 {want_train} 条（{len(executed_windows)} 窗口 × "
+                f"{len(wf_grid)} 候选）")
+
+    # ---------------- 压力测试：场景必须关联到真实且成功的回测 ----------------
+    with get_connection(db_path) as conn:
+        stress_rows = conn.execute(
+            "SELECT scenario_key, status, reason FROM validation_stress "
+            "WHERE validation_id=?", (validation_id,),
+        ).fetchall()
+    stress_by_key = {run["scenario_key"]: run for run in runs
+                     if run["run_role"].startswith("stress")}
+    for row in stress_rows:
+        key = row["scenario_key"]
+        run = stress_by_key.get(key)
+        if run is None:
             problems.append(f"压力场景 {key} 未登记内部回测")
+            continue
+        stress_status = row["status"]
+        exec_status = run["status"]
+        if stress_status in ("success", "insufficient"):
+            # insufficient = 执行成功但样本不足，不是执行失败；
+            # 但它也不能被当作正式成功绩效，两者必须能区分。
+            if exec_status != STATUS_SUCCESS:
+                problems.append(
+                    f"压力场景 {key} 登记为 {stress_status}，"
+                    f"但回测执行状态为 {exec_status}："
+                    f"{run['reason'] or '无原因'}")
+            if stress_status == "insufficient" and key != "insufficient":
+                problems.append(
+                    f"压力场景 {key} 标记 insufficient，"
+                    "但只有样本量类场景允许该状态")
+        else:
+            problems.append(
+                f"压力场景 {key} 状态 {stress_status}："
+                f"{row['reason'] or '无原因'}")
 
     if grid:
         seen = {run["scenario_key"] for run in by_role.get(ROLE_IN_SAMPLE, [])}
@@ -888,26 +1119,25 @@ def audit_coverage(validation_id: str, db_path=None) -> dict:
 # ---------------------------------------------------------------- 追溯
 
 def _version_of(conn, event) -> dict | None:
-    """按 (code|action_type|ex_date) + version_no 取事件版本快照。"""
+    """按 (code|action_type|ex_date) + version_no **精确**取事件版本快照。
+
+    阶段3A.3.2.3.4.1.1：移除了「精确未命中就回退最新版本」的分支。
+    回退会让一个历史版本已被删除的事件看起来仍有版本，从而掩盖缺失。
+    精确匹配不到就返回 None，由调用方标记 `version_unavailable`。
+    """
+    version_no = event.get("version_no")
+    if version_no is None:
+        return None
     key = f"{event['code']}|{event['action_type']}|{event['ex_date']}"
     row = conn.execute(
         "SELECT version_id, action_key, version_no, share_ratio, cash_per_share, "
         "record_date, pay_date, evidence_status, data_version, change_reason, "
         "fractional_policy, compensation_price, created_at "
         "FROM corporate_action_versions WHERE action_key=? AND version_no=?",
-        (key, event["version_no"]),
+        (key, version_no),
     ).fetchone()
-    if row is not None:
-        return dict(row)
-    fallback = conn.execute(
-        "SELECT version_id, action_key, version_no, share_ratio, cash_per_share, "
-        "record_date, pay_date, evidence_status, data_version, change_reason, "
-        "fractional_policy, compensation_price, created_at "
-        "FROM corporate_action_versions WHERE action_key=? "
-        "ORDER BY version_no DESC LIMIT 1",
-        (key,),
-    ).fetchone()
-    return dict(fallback) if fallback is not None else None
+    return dict(row) if row is not None else None
+
 
 
 def audit_trace(validation_id: str, *, db_path=None) -> dict:

@@ -94,6 +94,8 @@ CREATE TABLE IF NOT EXISTS audit_sparse_applications (
     disposed_cost_basis REAL,
     realized_pnl REAL,
     official_ratio REAL,
+    version_no INTEGER,
+    event_fingerprint TEXT,
     source_db TEXT,
     created_at TEXT NOT NULL,
     UNIQUE(validation_id, run_id, action_id)
@@ -116,6 +118,8 @@ CREATE TABLE IF NOT EXISTS audit_sparse_receivables (
     amount REAL,
     status TEXT,
     settled_at TEXT,
+    version_no INTEGER,
+    event_fingerprint TEXT,
     source_db TEXT,
     created_at TEXT NOT NULL,
     UNIQUE(validation_id, run_id, action_id)

@@ -1,5 +1,41 @@
 # 变更日志
 
+## 2026-11-17 — 阶段3A.3.2.3.4.1.1 审计完整性与 Sparse 明细持久化整改
+
+修复 6 个已知缺陷，未重跑任何内部回测，未改策略/会计/绩效算法。
+
+**P0-1 tuple 缺陷**：sparse 成功路径 `copy_info = {...},` 尾随逗号让
+dict 变成 tuple，下一行 `copy_info["copy_path"]` 必抛 TypeError。
+已修，并补副本清理失败处理（关联行写明残留路径后整条场景标 failed）。
+
+**P0-2 事务原子性**：`persist_sparse_details()` 重写为单个
+`with get_connection()` 块内完成「插入 + 对账」，对账不通过就块内 raise，
+由连接管理器统一 rollback。历史行 `ON CONFLICT DO NOTHING` 不删不改。
+
+**P0-3 逐字段对账**：应用明细 15 字段、应收明细 10 字段全部参与比对。
+精度规则写死：数值字段绝对误差 `<= 1e-6`（与库内 `round(...,6)` 对齐），
+整数与文本严格相等。失败信息精确到 `action_id + 字段名 + 双方值`。
+
+**P0-4 Walk-Forward 完整性**：新增逐窗口核对——每个已执行窗口的
+每个候选参数都必须有 `walkforward_train` 记录，每个窗口必须有
+`walkforward_test` 记录，两者状态都必须 `success`；
+`insufficient_data` 窗口单列一条 problem。
+
+**P0-5 压力测试执行状态**：不再「登记了就算过」。三重核对：场景能关联到
+内部回测、回测 `status == success`、场景自身状态在允许集合内。
+`insufficient` 三态区分：执行成功但样本不足 / 执行失败 / 误用在非样本量场景。
+
+**P0-6 版本严格匹配**：`_version_of()` 删除「精确未命中回退最新版」分支。
+精确查不到即 `version_unavailable`，进 problems，不判 complete。
+Sparse 明细表新增 `version_no` 与 `event_fingerprint` 两列保留版本证据。
+
+**新增 `mark_backtest_failed()`**：回测跑完但审计持久化失败时把关联行
+降级为 failed（行保留，状态不伪装成功）。
+
+**测试**：632 → **670**（+38）。含 23 个字段篡改测试、
+事务回滚测试、4 项 WF 测试、4 项压力测试、2 项版本严格匹配测试。
+
+
 ## 2026-11-17 — 阶段3A.3.2.3.4.1 审计完整性闸门与明细持久化整改
 
 修复 3A.3.2.3.4 验收发现的问题，未重跑任何内部回测，未改策略与会计算法。
