@@ -851,6 +851,16 @@ def audit_completeness(validation_id: str, *, db_path=None) -> dict:
             "SELECT scenario_key FROM validation_stress WHERE validation_id=?",
             (validation_id,),
         )]
+        stress_cfg_raw = conn.execute(
+            "SELECT stress_config FROM validation_runs WHERE validation_id=?",
+            (validation_id,),
+        ).fetchone()
+        stress_config = None
+        if stress_cfg_raw is not None and stress_cfg_raw["stress_config"]:
+            try:
+                stress_config = json.loads(stress_cfg_raw["stress_config"])
+            except (json.JSONDecodeError, TypeError):
+                stress_config = None
         regime_rows = conn.execute(
             "SELECT COUNT(*) FROM validation_regime_stats WHERE validation_id=?",
             (validation_id,),
@@ -1030,7 +1040,7 @@ def audit_completeness(validation_id: str, *, db_path=None) -> dict:
                 f"期望 {want_train} 条（{len(executed_windows)} 窗口 × "
                 f"{len(wf_grid)} 候选）")
 
-    # ---------------- 压力测试：场景必须关联到真实且成功的回测 ----------------
+    # ---------------- 压力测试：预期场景 vs 实际执行 ----------------
     with get_connection(db_path) as conn:
         stress_rows = conn.execute(
             "SELECT scenario_key, status, reason FROM validation_stress "
@@ -1038,6 +1048,35 @@ def audit_completeness(validation_id: str, *, db_path=None) -> dict:
         ).fetchall()
     stress_by_key = {run["scenario_key"]: run for run in runs
                      if run["run_role"].startswith("stress")}
+    actual_keys = [row["scenario_key"] for row in stress_rows]
+
+    # 预期场景集合必须来自本次验证真实保存的配置，不能猜、不能当成空。
+    expected_keys: list[str] = []
+    config_source = None
+    if isinstance(stress_config, dict):
+        expected_keys = list(stress_config.get("expected_keys") or [])
+        config_source = stress_config.get("source") or "stress_config"
+    if not expected_keys:
+        # 配置缺失时 fail closed：不猜、不把空列表当成「没有要求」。
+        problems.append(
+            "压力测试预期场景无法确定：validation_runs.stress_config 缺失"
+            "或为空，不能据此判定完整（该记录可能生成于配置落库之前）")
+    else:
+        missing = [k for k in expected_keys if k not in actual_keys]
+        if missing:
+            problems.append(
+                f"压力测试缺少预期场景 {missing}"
+                f"（配置来源 {config_source}，预期 {expected_keys}，"
+                f"实际 {actual_keys}）")
+        unexpected = [k for k in actual_keys if k not in expected_keys]
+        if unexpected:
+            problems.append(
+                f"压力测试出现不属于本次配置的场景 {unexpected}"
+                f"（预期 {expected_keys}）")
+        dupes = sorted({k for k in actual_keys if actual_keys.count(k) > 1})
+        if dupes:
+            problems.append(f"压力测试场景重复登记 {dupes}")
+
     for row in stress_rows:
         key = row["scenario_key"]
         run = stress_by_key.get(key)

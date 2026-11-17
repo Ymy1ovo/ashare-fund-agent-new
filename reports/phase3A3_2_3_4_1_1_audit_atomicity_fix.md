@@ -237,21 +237,21 @@ Sparse 审计明细新增两列保留版本证据：
 ## 5. 全量测试结果
 
 ```
-670 passed, 1 warning in 234.00s (0:03:53)
+681 passed, 1 warning in 267.71s (0:04:27)
 ```
 
 | 项 | 数量 |
 | --- | ---: |
-| 总数 | **670** |
-| 通过 | **670** |
+| 总数 | **681** |
+| 通过 | **681** |
 | 失败 | **0** |
 | 跳过 | **0** |
 | xfail | **0** |
-| 耗时 | 234.00 秒 |
+| 耗时 | 267.71 秒 |
 
 唯一 warning 是 `StarletteDeprecationWarning`（httpx 弃用），与业务无关。
 
-基线 632 → 670，**+38**，全部对应本轮修复点。
+基线 632 → 681，**+49**（原 38 项 + 本次验收补充 11 项）。
 
 ### 5.1 未删除 / 未弱化
 
@@ -342,6 +342,133 @@ PRAGMA integrity_check -> ok
 
 ---
 
+## 8A. 验收补充（本轮追加，2026-11-17）
+
+ChatGPT 静态审查指出两个剩余验收缺口，本轮补齐。
+
+### 8A.1 缺口一：sparse 成功路径测试是弱断言
+
+**原状**：`test_sparse_success_path_returns_dict` 里写的是
+
+```python
+if row.get("status") == "success":
+    assert isinstance(row["data_copy"], dict)
+```
+
+但构造的临时库里既没有指标行、也没有公司行为事件，
+`_run_data_stress()` 实际返回 `status="failed"`，
+`if` 分支从未进入——测试恒绿，什么都没验证。
+
+**根因**：MA 策略读 `context.indicators`，没有 `etf_indicator_daily`
+行时 `indicators` 为空 → 策略返回空仓 → 不产生交易 → 没有持仓 →
+分红事件不会应用。三个必要条件缺一不可：
+
+1. 行情（有）
+2. 指标行（缺，MA 策略要用）
+3. 公司行为事件 + 持仓（缺，要有分红才产生凭证）
+
+**修复**：新增 `_sparse_market_fixture()` 构造完整可跑的市场库：
+80 个交易日单调上涨、每行都补 `etf_indicator_daily`（ma5/ma20/ma60
+均低于现价，保证策略持仓）、在 OOS 区间内插一次现金分红事件。
+
+测试改为 `test_sparse_success_path_end_to_end`，**强制断言成功**：
+
+| 断言 | 说明 |
+| --- | --- |
+| `row["status"] == "success"` | 不接受命名的失败 |
+| `isinstance(row["data_copy"], dict)` | tuple 缺陷的直接回归 |
+| `row["data_copy"]["removed"] is True` | 副本确实被标记删除 |
+| `not Path(copy_path).exists()` | 副本文件真的没了 |
+| `not Path(copy_path).parent.exists()` | 副本目录也删了 |
+| `row["audit_persist"]["ok"] is True` | 持久化成功 |
+| `application_count >= 1` / `receivable_count >= 1` | 真的产生了明细 |
+| 主库 `audit_sparse_applications` / `audit_sparse_receivables` 行数 = 登记值 | 明细真的落库 |
+| 每条明细 `version_no` 非空、`event_fingerprint` 64 位 | 版本与指纹完整 |
+| 应收金额合计与 `persist["receivable_amount"]` 差 ≤ 1e-6 | 逐字段对账一致 |
+| 审计登记行 `status == success`、`detail_location == audit_sparse_tables` | 登记状态正确 |
+| 登记行的 applied/receivable/settled 计数与 persist 一致 | 计数未漂移 |
+| `audit_completeness()` 的 problems 里没有 sparse 相关项 | 不误报缺失 |
+
+实测输出（本地执行）：
+
+```
+status: success
+apps: 1  recv: 1  amount: 16580.0  settled: 1
+主库应用: [(1, 1, 'dff3ff1977517e71…', 82900, 82900)]
+主库应收: [(1, 1, 'dff3ff1977517e71…', 16580.0, '2026-11-17T13:14:04')]
+审计登记: ('stress_sparse_data', 'success', 'audit_sparse_tables', 1, 1, 16580.0, …)
+removed: True
+```
+
+这是**真实跑通**：真实行情、真实指标、真实分红事件、真实 MA 策略、
+真实 BacktestEngine、真实副本库、真实持久化与对账。
+
+**没有**重跑任何历史内部回测，也没有碰正式库——全程在 `tmp_path` 下
+的独立 `market.db` 与 `val_sparse_*` 临时副本。
+
+### 8A.2 缺口二：压力测试只查已登记场景，没查「应有场景」
+
+**原状**：`audit_completeness()` 只遍历 `validation_stress` 里已有的行，
+检查它们是否关联真实回测。如果某次验证按配置应该跑 7 个场景、
+实际只跑了 2 个，剩下 5 个连行都没有——旧逻辑看不见这个缺口。
+
+**修复**：
+
+1. `runner.py` 在成功收尾时把本次**真实使用的**场景集合落库：
+
+```python
+record.stress_config = {
+    "expected_keys": [row["key"] for row in stress_rows],
+    "requested_keys": list(stress_keys) if stress_keys else None,
+    "source": "actual_stress_rows",
+}
+record.walkforward_config = {"wf_grid": list(config.wf_grid),
+                             "window_count": len(window_rows)}
+```
+
+来源是 `stress_rows`——本次真的构建出来的场景，不是事后推断。
+
+2. `audit_completeness()` 比对三件事：
+
+| 检查 | 失败表现 |
+| --- | --- |
+| 预期场景是否都实际登记 | `压力测试缺少预期场景 [...]` |
+| 是否出现不属于配置的场景 | `压力测试出现不属于本次配置的场景 [...]` |
+| 场景是否有重复 | `压力测试场景重复登记 [...]` |
+
+3. **配置缺失时 fail closed**：`stress_config` 为空或缺失时，
+报「压力测试预期场景无法确定」，**不把空列表当成「没有要求」**。
+
+4. `insufficient_data` 继续与执行失败区分：场景 `insufficient` +
+回测 `success` 不报执行失败；挂在非样本量场景上才报错。
+
+### 8A.3 新增测试（681 − 670 = +11）
+
+（详见 §5 更新后的数字）
+
+| 测试 | 覆盖 |
+| --- | --- |
+| `test_sparse_success_path_end_to_end` | 真实成功路径全链路 13 项断言 |
+| `test_sparse_persist_failure_does_not_return_success` | 持久化失败 → failed + 登记行降级 |
+| `test_sparse_cleanup_failure_marks_failed` | 清理失败 → failed |
+| `test_stress_all_expected_present_no_stress_problem` | 全齐 → 压力无 problem |
+| `test_stress_missing_one_expected_scenario` | 缺 1 个 → 指出是哪个 |
+| `test_stress_missing_multiple_expected_scenarios` | 缺多个 → 全部列出 |
+| `test_stress_unexpected_scenario_reported` | 多出场景 → 报告异常 |
+| `test_stress_expected_without_backtest_run` | 有场景无回测 → incomplete |
+| `test_stress_config_missing_fails_closed` | 配置缺失 → fail closed |
+| `test_stress_config_empty_dict_fails_closed` | 空 dict → fail closed |
+| `test_stress_duplicate_scenario_blocked_by_constraint` | 重复被唯一约束挡住 |
+| `test_stress_insufficient_kept_separate` | insufficient 保持独立状态 |
+
+### 8A.4 存量记录的影响
+
+54 条存量记录的 `stress_config` 全部为空 `{}`（生成于配置落库之前）。
+按 fail closed 原则，它们的压力部分现在会报
+「预期场景无法确定」——但它们本来就已经是
+`unavailable_legacy` / `unavailable_legacy_evidence`，
+不构成额外放行风险。**不猜测补齐。**
+
 ## 9. 尚未解决的问题及其影响
 
 1. **本轮没有用真实 sparse 场景端到端验证整条链路。**
@@ -426,7 +553,7 @@ PRAGMA integrity_check -> ok
 | 快照 SHA256 | `c61cb3bf87b34cc31303df59fceec3eebdd53a89aec6b369524c1df75389e14e` |
 | ZIP | `dist/jj-agent-phase3A3_2_3_4_1_1-src.zip` |
 | ZIP 文件数 | 303 |
-| ZIP 大小 | 1,656,867 字节 |
-| ZIP SHA256 | `9ee07adc8e6ebcac729569e801bc8498106ec27e08a75a89a2f5ba7101dac442` |
+| ZIP 大小 | 1,664,351 字节 |
+| ZIP SHA256 | `9abac692a6c605ba7f07dd94a881f2565babff0fe02e4ff2a5b411cbd82828f6` |
 | SHA 清单 | `dist/SHA256SUMS_3a3_2_3_4_1_1.txt` |
 | ZIP 内容检查 | 无 `.db` / `.venv` / `__pycache__` / `.log` / `tmp*` |

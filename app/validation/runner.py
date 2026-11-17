@@ -571,6 +571,19 @@ def _run_validation_unlocked(
         record.conclusion = conclusion
         record.summary = summary
         record.notes = notes
+        # 阶段3A.3.2.3.4.1.1：把本次实际使用的压力场景集合与 WF 候选落库，
+        # 供 audit_completeness() 核对「应有场景是否都真的执行过」。
+        # 这是本次验证的真实配置，不是事后推断。
+        expected_stress = [row["key"] for row in stress_rows]
+        record.stress_config = {
+            "expected_keys": expected_stress,
+            "requested_keys": list(stress_keys) if stress_keys else None,
+            "source": "actual_stress_rows",
+        }
+        record.walkforward_config = {
+            "wf_grid": list(config.wf_grid),
+            "window_count": len(window_rows),
+        }
         save_validation_run(record, db_path=db_path)
         save_windows(vid, window_rows, db_path=db_path)
         save_grid(vid, "in_sample", [cell.as_dict() for cell in cells], db_path=db_path)

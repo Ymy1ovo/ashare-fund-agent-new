@@ -1027,28 +1027,210 @@ def _sparse_rows(temp_db, vid, run_id):
     return [dict(r) for r in apps], [dict(r) for r in recvs]
 
 
-def test_sparse_success_path_returns_dict(temp_db, tmp_path):
-    """成功路径的 data_copy 必须是 dict（上一轮尾随逗号导致 tuple）。"""
+def _sparse_market_fixture(tmp_path, *, n_days=80, with_dividend=True):
+    """构造一个能真正跑通 sparse 成功路径的临时市场库。
+
+    必须同时具备：交易日历、池、行情、指标行、公司行为事件。
+    缺指标行时 MA 策略不产生交易；缺持仓则不会应用分红。
+    """
+    import tempfile
+    from pathlib import Path
+
+    from app.database.db import get_connection, init_db
+    from app.backtest.corporate_actions import ACTION_CASH_DISTRIBUTION
+    from app.validation.config import ValidationConfig
+    from tests.test_corporate_actions import _insert_action, _seed
+
+    workdir = Path(tempfile.mkdtemp(prefix="val_sparse_fixture_"))
+    db_path = workdir / "market.db"
+    init_db(db_path=db_path)
+
+    # 单调上涨 + 指标 MA5 低于现价 → MA 策略会持仓
+    prices = {"510300": [10.0 + i * 0.05 for i in range(n_days)]}
+    dates = _seed(db_path, prices)
+
+    cfg = ValidationConfig(
+        is_start=dates[0], is_end=dates[39],
+        oos_start=dates[40], oos_end=dates[-1],
+        ma_window_grid=(5,), pool_mode="representative",
+    )
+    with get_connection(db_path) as conn:
+        snapshot = conn.execute(
+            "SELECT adjustment_snapshot_id FROM etf_daily_prices "
+            "WHERE code='510300' LIMIT 1").fetchone()[0]
+        for day, close in zip(dates, prices["510300"]):
+            conn.execute(
+                "INSERT INTO etf_indicator_daily "
+                "(etf_code, trade_date, adjustment_snapshot_id, "
+                " calculation_version, run_id, adjusted_close, ma5, ma20, ma60, "
+                " quality_status, created_at) "
+                "VALUES ('510300', ?, ?, ?, 'fixture-run', ?, ?, ?, ?, "
+                "'valid', '2024-01-01T00:00:00')",
+                (day, snapshot, cfg.indicator_version, close,
+                 close - 0.5, close - 1.0, close - 2.0),
+            )
+
+    if with_dividend:
+        _insert_action(
+            db_path, code="510300", action_type=ACTION_CASH_DISTRIBUTION,
+            ex_date=dates[60], effective_date=dates[60],
+            cash_per_share=0.2, record_date=dates[59], pay_date=dates[62],
+        )
+
+    _insert_validation(db_path, "val_audit", grid=cfg.ma_window_grid,
+                       config_hash=cfg.params_hash())
+    init_audit_schema(db_path)
+    return db_path, cfg, dates, workdir
+
+
+def test_sparse_success_path_end_to_end(tmp_path):
+    """sparse 成功路径端到端：真实回测 → 持久化 → 对账 → 删副本 → 返回。
+
+    不依赖正式库，也不重跑历史回测。
+    """
+    from app.validation.audit import (
+        DETAIL_SPARSE_TABLE, ROLE_STRESS_SPARSE, audit_scope, bind, reset,
+    )
     from app.validation.runner import _run_data_stress
     from app.validation.stress import build_scenarios
 
-    _seed_validation(temp_db)
-    vid = "val_audit"
+    db_path, cfg, dates, workdir = _sparse_market_fixture(tmp_path)
     scenario = next(s for s in build_scenarios(["sparse_data"])
                     if s.key == "sparse_data")
-    config = ValidationConfig(is_start="2024-01-02", is_end="2024-01-05",
-                              oos_start="2024-01-08", oos_end="2024-01-12",
-                              ma_window_grid=(5,), pool_mode="representative")
-    split = type("S", (), {"oos_start": "2024-01-08",
-                           "oos_end": "2024-01-12"})()
+    split = type("S", (), {"oos_start": dates[40], "oos_end": dates[-1]})()
 
-    row = _run_data_stress(scenario, config, split, ["510300"], 5, temp_db,
-                           validation_id=vid)
-    assert isinstance(row, dict), "返回值必须是 dict"
-    assert "status" in row
-    if row.get("status") == "success":
-        assert isinstance(row["data_copy"], dict)
-        assert "copy_path" in row["data_copy"]
+    ctx, token = bind("val_audit")
+    try:
+        with audit_scope(ROLE_STRESS_SPARSE, "sparse_data"):
+            row = _run_data_stress(scenario, cfg, split, ["510300"], 5,
+                                   db_path, validation_id="val_audit")
+    finally:
+        reset(token)
+
+    # ---- 必须是真正的成功，不接受命名的失败 ----
+    assert row["status"] == "success", row.get("reason")
+
+    # ---- 返回结构 ----
+    assert isinstance(row["data_copy"], dict)
+    assert row["data_copy"]["removed"] is True
+    copy_path = row["data_copy"]["copy_path"]
+    from pathlib import Path as _Path
+    assert not _Path(copy_path).exists(), "临时副本必须已被删除"
+    assert not _Path(copy_path).parent.exists(), "副本目录必须已被删除"
+
+    # ---- 持久化结果 ----
+    persist = row["audit_persist"]
+    assert persist["ok"] is True
+    assert persist["application_count"] >= 1
+    assert persist["receivable_count"] >= 1
+    assert persist["receivable_amount"] > 0
+
+    # ---- 主库审计表真的有行 ----
+    from app.database.db import get_connection
+    with get_connection(db_path) as conn:
+        apps = conn.execute(
+            "SELECT * FROM audit_sparse_applications "
+            "WHERE validation_id='val_audit' AND run_id=?",
+            (persist["run_id"],)).fetchall()
+        recvs = conn.execute(
+            "SELECT * FROM audit_sparse_receivables "
+            "WHERE validation_id='val_audit' AND run_id=?",
+            (persist["run_id"],)).fetchall()
+    assert len(apps) == persist["application_count"]
+    assert len(recvs) == persist["receivable_count"]
+
+    # ---- 版本号与指纹完整 ----
+    for item in list(apps) + list(recvs):
+        assert item["version_no"] is not None
+        assert item["event_fingerprint"]
+        assert len(item["event_fingerprint"]) == 64
+
+    # ---- 对账字段一致（数值精度 1e-6） ----
+    total = round(sum(float(r["amount"] or 0.0) for r in recvs), 6)
+    assert abs(total - persist["receivable_amount"]) <= 1e-6
+
+    # ---- 审计登记状态 ----
+    from app.validation.audit import list_backtest_runs
+    registered = [r for r in list_backtest_runs("val_audit", db_path=db_path)
+                  if r["run_role"] == ROLE_STRESS_SPARSE]
+    assert len(registered) == 1
+    assert registered[0]["status"] == "success"
+    assert registered[0]["detail_location"] == DETAIL_SPARSE_TABLE
+    assert registered[0]["applied_action_count"] == persist["application_count"]
+    assert registered[0]["receivable_count"] == persist["receivable_count"]
+    assert registered[0]["settled_count"] == persist["settled_count"]
+
+    # ---- 完整性检查不得因该 sparse 明细报缺失 ----
+    from app.validation.audit import audit_completeness
+    checklist = audit_completeness("val_audit", db_path=db_path)
+    sparse_problems = [p for p in checklist["problems"]
+                       if "sparse" in p.lower() or "逐笔明细" in p]
+    assert not sparse_problems, sparse_problems
+
+
+def test_sparse_persist_failure_does_not_return_success(tmp_path, monkeypatch):
+    """持久化失败时不得返回 success。"""
+    from app.validation import audit as audit_module
+    from app.validation.audit import ROLE_STRESS_SPARSE, audit_scope, bind, reset
+    from app.validation.runner import _run_data_stress
+    from app.validation.stress import build_scenarios
+
+    db_path, cfg, dates, _ = _sparse_market_fixture(tmp_path)
+    scenario = next(s for s in build_scenarios(["sparse_data"])
+                    if s.key == "sparse_data")
+    split = type("S", (), {"oos_start": dates[40], "oos_end": dates[-1]})()
+
+    def _boom(*args, **kwargs):
+        raise audit_module.AuditError("模拟持久化失败")
+
+    monkeypatch.setattr(audit_module, "persist_sparse_details", _boom)
+
+    ctx, token = bind("val_audit")
+    try:
+        with audit_scope(ROLE_STRESS_SPARSE, "sparse_data"):
+            row = _run_data_stress(scenario, cfg, split, ["510300"], 5,
+                                   db_path, validation_id="val_audit")
+    finally:
+        reset(token)
+
+    assert row["status"] == "failed"
+    assert "持久化失败" in row["reason"]
+
+    # 审计登记行必须被降级为 failed，不能留 success
+    from app.validation.audit import list_backtest_runs
+    registered = [r for r in list_backtest_runs("val_audit", db_path=db_path)
+                  if r["run_role"] == ROLE_STRESS_SPARSE]
+    for item in registered:
+        assert item["status"] == "failed"
+
+
+def test_sparse_cleanup_failure_marks_failed(tmp_path, monkeypatch):
+    """副本清理失败时不得返回 success。"""
+    from app.validation import audit as audit_module
+    from app.validation.audit import ROLE_STRESS_SPARSE, audit_scope, bind, reset
+    from app.validation.runner import _run_data_stress
+    from app.validation.stress import build_scenarios
+
+    db_path, cfg, dates, _ = _sparse_market_fixture(tmp_path)
+    scenario = next(s for s in build_scenarios(["sparse_data"])
+                    if s.key == "sparse_data")
+    split = type("S", (), {"oos_start": dates[40], "oos_end": dates[-1]})()
+
+    def _boom(source_db):
+        raise OSError("模拟删除失败")
+
+    monkeypatch.setattr(audit_module, "remove_sparse_copy", _boom)
+
+    ctx, token = bind("val_audit")
+    try:
+        with audit_scope(ROLE_STRESS_SPARSE, "sparse_data"):
+            row = _run_data_stress(scenario, cfg, split, ["510300"], 5,
+                                   db_path, validation_id="val_audit")
+    finally:
+        reset(token)
+
+    assert row["status"] == "failed"
+    assert "清理失败" in row["reason"]
 
 
 @pytest.mark.parametrize("field,value", [
@@ -1481,3 +1663,177 @@ def test_stress_insufficient_on_wrong_scenario_incomplete(temp_db):
     result = audit_completeness(vid, db_path=temp_db)
     assert result["complete"] is False
     assert any("只有样本量类场景允许该状态" in p for p in result["problems"])
+
+
+# ================================================================
+# 压力测试预期场景覆盖
+# ================================================================
+
+def _set_stress_config(db_path, vid, keys, source="actual_stress_rows"):
+    import json
+    with get_connection(db_path) as conn:
+        conn.execute(
+            "UPDATE validation_runs SET stress_config=? WHERE validation_id=?",
+            (json.dumps({"expected_keys": list(keys), "source": source}), vid))
+
+
+def _attach_stress_run(db_path, vid, key, *, role=None, status="success",
+                       reason=None, applied=0, receivables=0, amount=0.0,
+                       settled=0, settled_amount=0.0):
+    """给某压力场景登记一条内部回测（含存在性凭证）。"""
+    _evidence(db_path, f"st_{key}")
+    audit.register_backtest(
+        _result(f"st_{key}"), role=role or audit.ROLE_STRESS_COST,
+        scenario_key=key, validation_id=vid, status=status, reason=reason,
+        db_path=db_path)
+
+
+def _add_stress_row(db_path, vid, key, status="success", reason=None):
+    with get_connection(db_path) as conn:
+        conn.execute(
+            "INSERT INTO validation_stress (validation_id, scenario_key, "
+            "scenario_name, is_hypothetical, status, reason, created_at) "
+            "VALUES (?,?,?,0,?,?,'2024-01-01T00:00:00')",
+            (vid, key, key, status, reason))
+
+
+ALL_EXPECTED = ["base", "cost_plus_50", "cost_plus_100",
+                "slippage_x2", "slippage_x3", "sparse_data", "insufficient"]
+
+
+def _stress_ready(temp_db, vid, keys=ALL_EXPECTED):
+    """建好 env：配置落库 + 场景行 + 对应回测。"""
+    _set_stress_config(temp_db, vid, keys)
+    for key in keys:
+        status = "insufficient" if key == "insufficient" else "success"
+        role = (audit.ROLE_STRESS_INSUFFICIENT if key == "insufficient"
+                else audit.ROLE_STRESS_SPARSE if key == "sparse_data"
+                else audit.ROLE_STRESS_COST)
+        _add_stress_row(temp_db, vid, key, status=status)
+        _attach_stress_run(temp_db, vid, key, role=role)
+    # 补一个 out_of_sample，避免因「无登记」早退
+    _evidence(temp_db, "oos_guard")
+    audit.register_backtest(_result("oos_guard"), role=audit.ROLE_OOS,
+                            validation_id=vid, db_path=temp_db)
+
+
+def _stress_problems(result):
+    return [p for p in result["problems"] if "压力" in p]
+
+
+def test_stress_all_expected_present_no_stress_problem(temp_db):
+    """预期场景全部存在且状态正确 → 压力部分无 problem。"""
+    _seed_validation(temp_db, "val_audit")
+    _stress_ready(temp_db, "val_audit")
+    result = audit_completeness("val_audit", db_path=temp_db)
+    assert _stress_problems(result) == [], _stress_problems(result)
+    # 整体仍不完整（缺样本内/WF/基准/regime），但不是压力的问题
+    assert result["complete"] is False
+
+
+def test_stress_missing_one_expected_scenario(temp_db):
+    """缺一个预期场景 → incomplete，并指出缺哪个。"""
+    _seed_validation(temp_db, "val_audit")
+    _stress_ready(temp_db, "val_audit",
+                  keys=["base", "cost_plus_50", "slippage_x2"])
+    # 配置要求全部 7 个，实际只跑了 3 个
+    _set_stress_config(temp_db, "val_audit", ALL_EXPECTED)
+    result = audit_completeness("val_audit", db_path=temp_db)
+    assert result["complete"] is False
+    joined = "；".join(_stress_problems(result))
+    assert "cost_plus_100" in joined, joined
+    assert "缺少预期场景" in joined
+
+
+def test_stress_missing_multiple_expected_scenarios(temp_db):
+    """缺多个预期场景 → 全部列出。"""
+    _seed_validation(temp_db, "val_audit")
+    _stress_ready(temp_db, "val_audit", keys=["base"])
+    _set_stress_config(temp_db, "val_audit",
+                       ["base", "cost_plus_50", "cost_plus_100",
+                        "slippage_x2", "slippage_x3"])
+    result = audit_completeness("val_audit", db_path=temp_db)
+    joined = "；".join(_stress_problems(result))
+    for key in ("cost_plus_50", "cost_plus_100", "slippage_x2", "slippage_x3"):
+        assert key in joined, joined
+
+
+def test_stress_unexpected_scenario_reported(temp_db):
+    """出现不属于本次配置的场景 → 明确报告异常。"""
+    _seed_validation(temp_db, "val_audit")
+    _stress_ready(temp_db, "val_audit", keys=["base"])
+    _add_stress_row(temp_db, "val_audit", "slippage_x3", status="success")
+    _attach_stress_run(temp_db, "val_audit", "slippage_x3")
+    result = audit_completeness("val_audit", db_path=temp_db)
+    joined = "；".join(_stress_problems(result))
+    assert "不属于本次配置的场景" in joined, joined
+    assert "slippage_x3" in joined
+
+
+def test_stress_expected_without_backtest_run(temp_db):
+    """预期场景存在但无对应回测 → incomplete。"""
+    _seed_validation(temp_db, "val_audit")
+    _set_stress_config(temp_db, "val_audit", ["base", "slippage_x2"])
+    _add_stress_row(temp_db, "val_audit", "base")
+    _attach_stress_run(temp_db, "val_audit", "base")
+    _add_stress_row(temp_db, "val_audit", "slippage_x2")
+    result = audit_completeness("val_audit", db_path=temp_db)
+    joined = "；".join(_stress_problems(result))
+    assert "slippage_x2 未登记内部回测" in joined, joined
+
+
+def test_stress_config_missing_fails_closed(temp_db):
+    """配置缺失时不得把空列表当成「没有要求」。"""
+    _seed_validation(temp_db, "val_audit")
+    _add_stress_row(temp_db, "val_audit", "base")
+    _attach_stress_run(temp_db, "val_audit", "base")
+    result = audit_completeness("val_audit", db_path=temp_db)
+    joined = "；".join(_stress_problems(result))
+    assert "预期场景无法确定" in joined, joined
+    assert result["complete"] is False
+
+
+def test_stress_config_empty_dict_fails_closed(temp_db):
+    """stress_config 是空 dict 时同样 fail closed。"""
+    _seed_validation(temp_db, "val_audit")
+    with get_connection(temp_db) as conn:
+        conn.execute("UPDATE validation_runs SET stress_config='{}' "
+                     "WHERE validation_id='val_audit'")
+    _evidence(temp_db, "guard2")
+    audit.register_backtest(_result("guard2"), role=audit.ROLE_OOS,
+                            validation_id="val_audit", db_path=temp_db)
+    result = audit_completeness("val_audit", db_path=temp_db)
+    assert any("预期场景无法确定" in p for p in result["problems"])
+
+
+def test_stress_duplicate_scenario_blocked_by_constraint(temp_db):
+    """同一场景重复登记被唯一约束挡住——重复行在库里不可能出现。"""
+    import sqlite3
+
+    _seed_validation(temp_db, "val_audit")
+    _stress_ready(temp_db, "val_audit", keys=["base"])
+    with pytest.raises(sqlite3.IntegrityError):
+        _add_stress_row(temp_db, "val_audit", "base")
+    with get_connection(temp_db) as conn:
+        n = conn.execute(
+            "SELECT COUNT(*) FROM validation_stress WHERE validation_id=? "
+            "AND scenario_key='base'", ("val_audit",)).fetchone()[0]
+    assert n == 1
+
+
+def test_stress_insufficient_kept_separate(temp_db):
+    """insufficient_data 保持独立状态：既不判执行失败，也不当正式成功。"""
+    _seed_validation(temp_db, "val_audit")
+    _set_stress_config(temp_db, "val_audit", ["insufficient"])
+    _add_stress_row(temp_db, "val_audit", "insufficient", status="insufficient")
+    _attach_stress_run(temp_db, "val_audit", "insufficient",
+                       role=audit.ROLE_STRESS_INSUFFICIENT)
+    result = audit_completeness("val_audit", db_path=temp_db)
+    problems = _stress_problems(result)
+    assert not any("回测执行状态为 failed" in p for p in problems), problems
+    # 场景行状态保持 insufficient，未被改写成 success
+    with get_connection(temp_db) as conn:
+        status = conn.execute(
+            "SELECT status FROM validation_stress WHERE validation_id=? "
+            "AND scenario_key='insufficient'", ("val_audit",)).fetchone()[0]
+    assert status == "insufficient"

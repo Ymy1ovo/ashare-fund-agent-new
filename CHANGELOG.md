@@ -1,5 +1,42 @@
 # 变更日志
 
+## 2026-11-17 — 阶段3A.3.2.3.4.1.1 验收补充（Sparse 成功路径与压力场景覆盖）
+
+补两个验收缺口，不扩大范围。
+
+**缺口一：sparse 成功路径测试是弱断言**
+
+原测试用 `if row.get("status") == "success":` 做条件断言，
+但构造的临时库缺指标行、缺公司行为事件，`_run_data_stress()` 实际返回
+`failed`，`if` 分支从未进入 —— 测试恒绿却什么都没验证。
+
+新增 `_sparse_market_fixture()`：80 个交易日单调上涨、每行补
+`etf_indicator_daily`（MA 策略据此持仓）、OOS 区间内插一次现金分红。
+测试改为 `test_sparse_success_path_end_to_end`，强制断言 13 项：
+`status == success`、`data_copy` 是 dict、`removed is True`、
+副本文件与目录都已删除、`audit_persist["ok"] is True`、
+应用与应收明细真的落主库、`version_no` 与 `event_fingerprint` 完整、
+金额合计差 ≤ 1e-6、审计登记行状态与计数正确、
+`audit_completeness()` 不因该 sparse 明细报缺失。
+
+**缺口二：压力测试只查已登记场景**
+
+`audit_completeness()` 原来只遍历 `validation_stress` 已有行，
+查不出「配置要求 7 个、实际只跑 2 个」这种缺口。
+
+`runner.py` 成功收尾时把本次**真实使用的**场景集合落库到
+`validation_runs.stress_config.expected_keys`（来源是本次构建出的
+`stress_rows`，不是事后推断），同时把 `wf_grid` 落到
+`walkforward_config`。
+
+`audit_completeness()` 现在比对三件事：预期场景是否都登记、
+是否出现不属于配置的场景、是否重复。
+**配置缺失或为空时 fail closed**，报「预期场景无法确定」，
+不把空列表当成「没有要求」。
+
+**测试**：670 → **681**（+11）。
+
+
 ## 2026-11-17 — 阶段3A.3.2.3.4.1.1 审计完整性与 Sparse 明细持久化整改
 
 修复 6 个已知缺陷，未重跑任何内部回测，未改策略/会计/绩效算法。

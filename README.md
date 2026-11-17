@@ -2427,7 +2427,7 @@ if (basis != ACCOUNTING_FORMAL
 | 3A.3.2.3.3 | P0 两条历史验证记录受控重放 | 568 | `phase3A3_2_3_3_*.md` |
 | 3A.3.2.3.4 | 验证内部回测与公司行为审计追溯 | 618 | `phase3A3_2_3_4_*.md` |
 | 3A.3.2.3.4.1 | 审计完整性闸门与明细持久化整改 | 632 | `phase3A3_2_3_4_1_audit*.md` |
-| 3A.3.2.3.4.1.1 | 审计完整性与 Sparse 明细原子化 | **670** | `phase3A3_2_3_4_1_1_*.md` |
+| 3A.3.2.3.4.1.1 | 审计完整性与 Sparse 明细原子化 | **681** | `phase3A3_2_3_4_1_1_*.md` |
 
 当前正式会计版本：`ca-v2-receivable`；正式会计基础：`formal_receivable`；正式估值标记：`formal_valuation=True`。
 
@@ -2682,3 +2682,35 @@ Sparse 明细表新增 `version_no` 与 `event_fingerprint` 两列保留版本�
 - 存量 7 条永久 `unavailable_legacy_evidence`，补写凭证等于伪造
 - `aad7935a2bac4cc4` 的 sparse 逐笔明细永久不可恢复
 - 事务原子性依赖 SQLite 隐式事务，高并发下有锁等待风险（失败会整体回滚）
+
+### 45.8 验收补充（2026-11-17）
+
+**sparse 成功路径测试的弱断言已修**
+
+原测试用条件断言 `if status == "success": ...`，但构造的临时库缺指标行与
+公司行为事件，`_run_data_stress()` 实际返回 `failed`，分支从未进入。
+
+新 fixture 补齐三个必要条件：行情 + `etf_indicator_daily` 指标行 + 公司行为
+事件与持仓。测试改为强制断言 13 项，包括 `status == success`、
+`data_copy` 是 dict、`removed is True`、副本文件与目录都已删除、
+主库审计表真的有行、`version_no` 与 `event_fingerprint` 完整、
+金额合计差 ≤ 1e-6、审计登记行状态与计数正确。
+
+**压力测试预期场景覆盖已补**
+
+`runner.py` 成功收尾时把本次真实使用的场景集合落到
+`validation_runs.stress_config.expected_keys`，同时把 `wf_grid` 落到
+`walkforward_config`。
+
+`audit_completeness()` 现在比对：
+
+| 检查 | 失败表现 |
+| --- | --- |
+| 预期场景是否都登记 | `压力测试缺少预期场景 [...]` |
+| 是否出现不属于配置的场景 | `压力测试出现不属于本次配置的场景 [...]` |
+| 场景是否重复 | `压力测试场景重复登记 [...]` |
+| 配置缺失或为空 | `预期场景无法确定`（fail closed，不当成没有要求） |
+
+存量 54 条记录 `stress_config` 全为空（生成于配置落库之前），按 fail closed
+原则报「无法确定」——它们本来就是 `unavailable_legacy*`，不构成放行风险。
+
