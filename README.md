@@ -2427,7 +2427,8 @@ if (basis != ACCOUNTING_FORMAL
 | 3A.3.2.3.3 | P0 两条历史验证记录受控重放 | 568 | `phase3A3_2_3_3_*.md` |
 | 3A.3.2.3.4 | 验证内部回测与公司行为审计追溯 | 618 | `phase3A3_2_3_4_*.md` |
 | 3A.3.2.3.4.1 | 审计完整性闸门与明细持久化整改 | 632 | `phase3A3_2_3_4_1_audit*.md` |
-| 3A.3.2.3.4.1.1 | 审计完整性与 Sparse 明细原子化 | **688** | `phase3A3_2_3_4_1_1_*.md` |
+| 3A.3.2.3.4.1.1 | 审计完整性与 Sparse 明细原子化 | 688 | `phase3A3_2_3_4_1_1_*.md` |
+| 3A.3.2.3.5 | 历史回测与验证记录重放候选清点 | **688** | `phase3A3_2_3_5_*.md` |
 
 当前正式会计版本：`ca-v2-receivable`；正式会计基础：`formal_receivable`；正式估值标记：`formal_valuation=True`。
 
@@ -2747,4 +2748,89 @@ Sparse 明细表新增 `version_no` 与 `event_fingerprint` 两列保留版本�
 3. 验收表补入 `test_sparse_success_path_end_to_end` 的实测证据
 
 并在 §10.3 明确标注：全部结果为本会话本地执行，非 ChatGPT 独立验证。
+
+## 46. 阶段3A.3.2.3.5 历史回测与验证记录重放候选清点
+
+本阶段**只清点，不重放**。未执行任何历史回测或验证重放，
+未修改任何历史记录、策略、撮合、会计、指标算法或行情数据。
+
+### 46.1 总量与分类
+
+| 分类 | backtest | validation | 合计 |
+| --- | ---: | ---: | ---: |
+| `current_formal` | 1 | 14 | **15** |
+| `replayed` | 1 | 2 | **3** |
+| `legacy_replayable` | 1 | 35 | **36** |
+| `non_replayable` | 9 | 0 | **9** |
+| `failed_attempt` | 0 | 3 | **3** |
+| **合计** | **12** | **54** | **66** |
+
+`failed_attempt` 是呈现层新增的分类，不新增数据库字段、不新增代码常量——
+只是把「源记录自己就失败了」从 `non_replayable` 里拆出来单独统计。
+
+### 46.2 35 条 legacy 实为 9 个唯一配置
+
+按 `config_hash` 去重后只有 9 组，其余是同一配置的重复执行：
+
+| 组 | config_hash | 条数 | 代码数 | 网格 |
+| ---: | --- | ---: | ---: | --- |
+| G1 | `b6b1babace517bdc` | 18 | 6 | 7 档 |
+| G2 | `b1de1d7323a8a35d` | 5 | 6 | 3 档 |
+| G3 | `177a329b6fd72cec` | 5 | 6 | 3 档 |
+| G4 | `86e4b4e8bac296ad` | 2 | 6 | 7 档 |
+| G5 | `4457e246afad6e79` | 1 | 41 | 7 档 |
+| G6 | `11ce7469245afab0` | 1 | 41 | 7 档 |
+| G7 | `9c245d882cb1cc72` | 1 | 6 | 7 档 |
+| G8 | `88d40b3069c50f0a` | 1 | 6 | 7 档 |
+| G9 | `39bac25b0ec4ce91` | 1 | 6 | 7 档 |
+
+按记录条数安排重放要跑 35 次；按唯一配置只要 9 次。
+
+### 46.3 参数恢复方式
+
+validation 的参数**只存在于 `config_hash`**。恢复的唯一诚实做法是把候选参数
+代入哈希函数，完全命中才算证明。哈希覆盖 28 个字段（`_VALIDATION_FIELDS_CURRENT`），
+同时试历史的 26 字段集、`pool_mode` 的 `all`/`representative`、日期原值/月初值。
+
+实测用 `build_validation_config()` 重建 9 组代表，**7 组可完全重建**；
+G4/G5 两组走 historical 字段集，当前 `ValidationConfig` 多了
+`regime_ma_window` / `min_validation_days` 两个新字段，重建哈希对不上——
+参数本身已被证明，只是构造器无法复现旧哈希。
+
+backtest 侧只有 `8412fc1cefb4437e` 可重放，因为它的 `params_source` 全部为
+`recorded`，没有一个字段走默认值。
+
+### 46.4 不可重放原因
+
+9 条 backtest 全部缺 `strategy_param:ma_window` 或 `config:rebalance_tolerance`：
+这些是 2024-01-02~2026-11-09 的短区间用户回测，策略参数写在当时的调用代码里、
+没进 `config_json`。不根据「同期其他记录都用某个值」这类间接推断补值。
+
+3 条 `failed_attempt`：两条是样本内无可用参数组合/手动中断，
+一条（`397118a140c44f47`）是重放尝试本身失败（会计版本为 None）。
+
+### 46.5 推荐第一批重放
+
+| 优先级 | 记录 | 理由 |
+| ---: | --- | --- |
+| 1 | `8412fc1cefb4437e` | 唯一参数 100% `recorded` 的 backtest，1 只标的最快 |
+| 2 | `b3f1e2c89ebc4b95`（G9） | 6 只池 7 档，hash 可完全重建，最干净的 legacy 样本 |
+| 3 | `f9898c695b394808`（G4） | 验证「历史字段集重放」路径 |
+| 4 | `c5589f7dcd1a4a5d`（G7） | 覆盖「短样本内」分支 |
+| 5 | `838a58fa5f3b4025`（G8） | 覆盖「短样本外」分支 |
+| 6 | `7d884a1a03d94915`（G1） | 18 条重复组代表 |
+
+### 46.6 已重放的两条 P0 记录
+
+`32aead3291734f91` → `03410886d1f64fa7`（1 次成功）
+`c46fa37b932944c2` → `aad7935a2bac4cc4`（8 次成功尝试）
+
+两条当前分类均为 `replayed`，不在待重放清单里。本轮**未重复执行**。
+
+### 46.7 数据库前后对照
+
+全部 16 张表行数 0 变化，`validation_runs` 内容指纹
+`9c40fcbf2e7b010c65a2fa4b62313fe6`、`backtest_runs` 内容指纹
+`449be0fda8b7c24ddca7f6a7ae6ac3b3`、行情指纹 `d54727c0…` 前后一致，
+`PRAGMA integrity_check` ok。
 

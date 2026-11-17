@@ -1,5 +1,60 @@
 # 变更日志
 
+## 2026-11-17 — 阶段3A.3.2.3.5 历史回测与验证记录重放候选清点
+
+**只清点，不重放。** 未执行任何历史回测或验证重放，未修改任何历史记录、
+策略、撮合、会计、指标算法或行情数据。
+
+盘点全部 66 条历史记录（`backtest_runs` 12 + `validation_runs` 54），
+交付 `reports/phase3A3_2_3_5_replay_inventory.md`（538 行，逐条清单）。
+
+**五分类统计**
+
+| 分类 | backtest | validation | 合计 |
+| --- | ---: | ---: | ---: |
+| `current_formal` | 1 | 14 | 15 |
+| `replayed` | 1 | 2 | 3 |
+| `legacy_replayable` | 1 | 35 | 36 |
+| `non_replayable` | 9 | 0 | 9 |
+| `failed_attempt` | 0 | 3 | 3 |
+
+`failed_attempt` 是呈现层分类，不新增数据库字段与代码常量。
+
+**关键发现**
+
+35 条 `legacy_replayable` 按 `config_hash` 去重后只有 **9 个唯一配置**
+（G1 18 条、G2 5 条、G3 5 条、G4 2 条、G5~G9 各 1 条）。
+按记录条数安排重放要跑 35 次，按唯一配置只要 9 次。
+
+用 `build_validation_config()` 重建 9 组代表，7 组哈希可完全重建；
+G4/G5 走 historical 字段集，当前构造器多了 `regime_ma_window` /
+`min_validation_days` 两个新字段，重建哈希对不上——参数本身已被证明，
+只是构造器无法复现旧哈希。此点列入待确认事项，本轮不做决定。
+
+**不可重放原因**
+
+9 条 backtest 全部缺 `strategy_param:ma_window` 或 `config:rebalance_tolerance`。
+不根据间接推断补值。3 条 `failed_attempt` 分别是样本内无可用参数组合、
+手动中断、以及重放尝试本身失败（会计版本为 None）。
+
+**已重放的两条 P0 记录**
+
+`32aead3291734f91` → `03410886d1f64fa7`（1 次成功）
+`c46fa37b932944c2` → `aad7935a2bac4cc4`（8 次成功尝试）
+两条当前均为 `replayed`，不在待重放清单，本轮未重复执行。
+
+**推荐第一批重放**
+
+`8412fc1cefb4437e`（唯一参数全 `recorded` 的 backtest）→
+`b3f1e2c89ebc4b95`（G9，最干净的 legacy）→ `f9898c695b394808`（G4）→
+`c5589f7dcd1a4a5d`（G7，短样本内）→ `838a58fa5f3b4025`（G8，短样本外）→
+`7d884a1a03d94915`（G1，18 条重复组代表）。
+
+**核对**：全量 pytest 688 passed / 0 failed / 0 skipped；
+16 张表行数 0 变化，`validation_runs` 与 `backtest_runs` 内容指纹前后相同，
+行情指纹 `d54727c0…` 未变，`PRAGMA integrity_check` ok。
+
+
 ## 2026-11-17 — 阶段3A.3.2.3.4.1.1 压力预期场景独立性
 
 修复「预期场景从实际执行结果反推」的正确性缺陷。
