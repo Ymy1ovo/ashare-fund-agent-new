@@ -69,6 +69,7 @@ from app.validation.storage import (
 from app.validation.stress import (
     assert_no_data_mutation,
     build_scenarios,
+    expected_scenario_keys,
 )
 
 
@@ -522,6 +523,9 @@ def _run_validation_unlocked(
             config, split, codes, best_window, db_path
         )
         _progress("基准完成，开始压力测试")
+        # 阶段3A.3.2.3.4.1.1：预期场景集合必须在**执行之前**独立确定，
+        # 不能等 stress_rows 出来再反推——那样丢场景会连预期一起丢。
+        expected_stress_keys = expected_scenario_keys(stress_keys)
         stress_rows = _build_stress_rows(
             config, split, codes, best_window, stress_keys, db_path,
             validation_id=vid,
@@ -571,14 +575,16 @@ def _run_validation_unlocked(
         record.conclusion = conclusion
         record.summary = summary
         record.notes = notes
-        # 阶段3A.3.2.3.4.1.1：把本次实际使用的压力场景集合与 WF 候选落库，
-        # 供 audit_completeness() 核对「应有场景是否都真的执行过」。
-        # 这是本次验证的真实配置，不是事后推断。
-        expected_stress = [row["key"] for row in stress_rows]
+        # 阶段3A.3.2.3.4.1.1：预期场景来自执行前的独立配置，
+        # 与 stress_rows 无关。某个场景执行失败甚至根本没生成行，
+        # 它依然在 expected_keys 里，审计会把缺失暴露出来。
         record.stress_config = {
-            "expected_keys": expected_stress,
+            "expected_keys": list(expected_stress_keys),
             "requested_keys": list(stress_keys) if stress_keys else None,
-            "source": "actual_stress_rows",
+            "source": (
+                "explicit_request" if stress_keys else "default_scenarios"
+            ),
+            "executed_keys": [row["key"] for row in stress_rows],
         }
         record.walkforward_config = {
             "wf_grid": list(config.wf_grid),

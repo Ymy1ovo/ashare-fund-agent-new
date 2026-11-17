@@ -1056,6 +1056,18 @@ def audit_completeness(validation_id: str, *, db_path=None) -> dict:
     if isinstance(stress_config, dict):
         expected_keys = list(stress_config.get("expected_keys") or [])
         config_source = stress_config.get("source") or "stress_config"
+        # 时序校验：预期集合必须来自执行前的独立配置。若 source 表明
+        # 它是从实际执行结果反推的（旧实现写 actual_stress_rows），
+        # 该配置不能作为「独立预期」，按缺失处理而不是采信。
+        executed = stress_config.get("executed_keys")
+        if config_source == "actual_stress_rows":
+            problems.append(
+                "压力测试预期场景来自实际执行结果反推（source="
+                "actual_stress_rows），不构成独立预期，不能据此判定完整")
+            expected_keys = []
+        elif executed is not None and sorted(expected_keys) == sorted(executed):
+            # 预期与实际完全一致本身正常；但如果 source 不明，需谨慎
+            pass
     if not expected_keys:
         # 配置缺失时 fail closed：不猜、不把空列表当成「没有要求」。
         problems.append(

@@ -298,3 +298,16 @@ def evaluate_insufficient_result(
         ),
         "problems": problems,
     }
+
+
+def expected_scenario_keys(keys: list[str] | None = None) -> list[str]:
+    """本次验证**应当执行**的压力场景集合（独立于实际执行结果）。
+
+    来源只有两个，都不依赖 stress_rows：
+    - 调用方显式请求的 `keys`
+    - 未请求时 → `default_scenarios()` 的完整默认集合
+
+    未知场景直接抛 `StressError`，不静默丢弃。
+    这个函数必须在任何场景执行**之前**调用，作为预期集合的独立来源。
+    """
+    return [scenario.key for scenario in build_scenarios(keys)]

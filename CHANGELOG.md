@@ -1,5 +1,41 @@
 # 变更日志
 
+## 2026-11-17 — 阶段3A.3.2.3.4.1.1 压力预期场景独立性
+
+修复「预期场景从实际执行结果反推」的正确性缺陷。
+
+**问题**：`runner.py` 原来写
+
+```python
+expected_stress = [row["key"] for row in stress_rows]
+record.stress_config = {"expected_keys": expected_stress, ...,
+                        "source": "actual_stress_rows"}
+```
+
+预期集合来自实际生成的 `stress_rows`。若某场景在生成阶段就丢失，
+预期会跟着缩水，审计永远发现不了缺口。
+
+**修复**：
+
+- 新增 `app/validation/stress.py::expected_scenario_keys()`，
+  来源只有显式请求的 `keys` 或 `default_scenarios()` 完整集合，
+  **不读数据库、不读 stress_rows**。未知场景抛 `StressError`。
+- `runner.py` 在任何场景执行**之前**调用它确定 `expected_keys`，
+  `executed_keys` 只作对照记录，不参与判定。
+- `source` 明确标记为 `explicit_request` 或 `default_scenarios`。
+- `audit_completeness()` 增加时序校验：读到旧实现的
+  `source == "actual_stress_rows"` 时判为「反推配置，不构成独立预期」
+  并按缺失处理，不采信。
+
+**统一阶段报告口径**：测试总数统一为最终实际执行的
+**688 passed / 0 failed / 0 skipped**；Sparse 端到端结论统一为
+「已用真实引擎端到端验证」（此前一处写「部分通过」是过时描述，已删）；
+验收表补入真实端到端测试证据；明确标注全部结果为本会话本地执行，
+非 ChatGPT 独立验证。
+
+**测试**：681 → **688**（+7）。
+
+
 ## 2026-11-17 — 阶段3A.3.2.3.4.1.1 验收补充（Sparse 成功路径与压力场景覆盖）
 
 补两个验收缺口，不扩大范围。

@@ -1669,12 +1669,21 @@ def test_stress_insufficient_on_wrong_scenario_incomplete(temp_db):
 # 压力测试预期场景覆盖
 # ================================================================
 
-def _set_stress_config(db_path, vid, keys, source="actual_stress_rows"):
+def _set_stress_config(db_path, vid, keys, source="explicit_request",
+                       executed=None):
+    """写入独立预期配置。
+
+    source 默认 explicit_request——预期集合来自执行前的显式请求，
+    不是从 stress_rows 反推。
+    """
     import json
+    payload = {"expected_keys": list(keys), "source": source}
+    if executed is not None:
+        payload["executed_keys"] = list(executed)
     with get_connection(db_path) as conn:
         conn.execute(
             "UPDATE validation_runs SET stress_config=? WHERE validation_id=?",
-            (json.dumps({"expected_keys": list(keys), "source": source}), vid))
+            (json.dumps(payload), vid))
 
 
 def _attach_stress_run(db_path, vid, key, *, role=None, status="success",
@@ -1837,3 +1846,147 @@ def test_stress_insufficient_kept_separate(temp_db):
             "SELECT status FROM validation_stress WHERE validation_id=? "
             "AND scenario_key='insufficient'", ("val_audit",)).fetchone()[0]
     assert status == "insufficient"
+
+
+# ================================================================
+# 预期场景必须独立于实际执行结果
+# ================================================================
+
+def test_expected_keys_not_derived_from_stress_rows(temp_db):
+    """预期 7 个但执行阶段只生成 2 个 → 审计必须发现缺 5 个。
+
+    预期集合由执行前的独立配置决定，不随 stress_rows 缩水。
+    """
+    _seed_validation(temp_db, "val_audit")
+    _set_stress_config(temp_db, "val_audit", ALL_EXPECTED,
+                       source="default_scenarios")
+    # 实际只跑了 2 个
+    for key in ("base", "slippage_x2"):
+        _add_stress_row(temp_db, "val_audit", key)
+        _attach_stress_run(temp_db, "val_audit", key)
+    _evidence(temp_db, "guard_a")
+    audit.register_backtest(_result("guard_a"), role=audit.ROLE_OOS,
+                            validation_id="val_audit", db_path=temp_db)
+
+    result = audit_completeness("val_audit", db_path=temp_db)
+    joined = "；".join(_stress_problems(result))
+    assert "缺少预期场景" in joined, joined
+    for key in ("cost_plus_50", "cost_plus_100", "slippage_x3",
+                "sparse_data", "insufficient"):
+        assert key in joined, f"{key} 未出现在缺失列表：{joined}"
+    # 已执行的两个不应被报缺失
+    assert "缺少预期场景 ['base'" not in joined
+
+
+def test_expected_keys_from_explicit_request(temp_db):
+    """显式请求 3 个场景，实际只生成 2 个 → 发现缺 1 个。"""
+    _seed_validation(temp_db, "val_audit")
+    requested = ["base", "cost_plus_50", "slippage_x2"]
+    _set_stress_config(temp_db, "val_audit", requested,
+                       source="explicit_request")
+    for key in ("base", "cost_plus_50"):
+        _add_stress_row(temp_db, "val_audit", key)
+        _attach_stress_run(temp_db, "val_audit", key)
+    _evidence(temp_db, "guard_b")
+    audit.register_backtest(_result("guard_b"), role=audit.ROLE_OOS,
+                            validation_id="val_audit", db_path=temp_db)
+
+    result = audit_completeness("val_audit", db_path=temp_db)
+    joined = "；".join(_stress_problems(result))
+    assert "slippage_x2" in joined and "缺少预期场景" in joined, joined
+    assert "cost_plus_100" not in joined, "未请求的场景不应被要求"
+
+
+def test_default_scenario_set_complete_passes(temp_db):
+    """默认 7 个全部执行 → 压力部分无 problem。"""
+    _seed_validation(temp_db, "val_audit")
+    _stress_ready(temp_db, "val_audit", keys=ALL_EXPECTED)
+    _set_stress_config(temp_db, "val_audit", ALL_EXPECTED,
+                       source="default_scenarios",
+                       executed=ALL_EXPECTED)
+    result = audit_completeness("val_audit", db_path=temp_db)
+    assert _stress_problems(result) == [], _stress_problems(result)
+
+
+def test_failed_scenario_stays_in_expected_set(temp_db):
+    """场景执行失败但预期配置完整保留 → 不得从预期集合删除它。"""
+    _seed_validation(temp_db, "val_audit")
+    _set_stress_config(temp_db, "val_audit", ["base", "sparse_data"],
+                       source="explicit_request")
+    _add_stress_row(temp_db, "val_audit", "base")
+    _attach_stress_run(temp_db, "val_audit", "base")
+    # sparse_data 执行失败：场景行仍写进去，回测登记为 failed
+    _add_stress_row(temp_db, "val_audit", "sparse_data", status="failed",
+                    reason="副本创建失败")
+    _attach_stress_run(temp_db, "val_audit", "sparse_data",
+                       role=audit.ROLE_STRESS_SPARSE, status="failed",
+                       reason="副本创建失败")
+    _evidence(temp_db, "guard_c")
+    audit.register_backtest(_result("guard_c"), role=audit.ROLE_OOS,
+                            validation_id="val_audit", db_path=temp_db)
+
+    result = audit_completeness("val_audit", db_path=temp_db)
+    joined = "；".join(_stress_problems(result))
+    # 不能因为失败就把它从预期里删掉（不报「缺少预期场景」）
+    assert "缺少预期场景" not in joined, joined
+    # 但要报执行失败
+    assert "failed" in joined, joined
+    # 配置本身仍是两个
+    import json
+    with get_connection(temp_db) as conn:
+        cfg = json.loads(conn.execute(
+            "SELECT stress_config FROM validation_runs WHERE validation_id=?",
+            ("val_audit",)).fetchone()[0])
+    assert cfg["expected_keys"] == ["base", "sparse_data"]
+
+
+def test_reverse_derived_config_rejected(temp_db):
+    """source=actual_stress_rows 的配置不得被采信为独立预期。"""
+    _seed_validation(temp_db, "val_audit")
+    _set_stress_config(temp_db, "val_audit", ALL_EXPECTED,
+                       source="actual_stress_rows")
+    _evidence(temp_db, "guard_d")
+    audit.register_backtest(_result("guard_d"), role=audit.ROLE_OOS,
+                            validation_id="val_audit", db_path=temp_db)
+    result = audit_completeness("val_audit", db_path=temp_db)
+    joined = "；".join(result["problems"])
+    assert "实际执行结果反推" in joined, joined
+    assert "预期场景无法确定" in joined, joined
+
+
+def test_expected_vs_actual_diff_listed(temp_db):
+    """预期与实际不一致时明确列出两侧差异。"""
+    _seed_validation(temp_db, "val_audit")
+    _set_stress_config(temp_db, "val_audit",
+                       ["base", "cost_plus_50", "slippage_x2"],
+                       source="explicit_request")
+    for key in ("base", "slippage_x3"):
+        _add_stress_row(temp_db, "val_audit", key)
+        _attach_stress_run(temp_db, "val_audit", key)
+    _evidence(temp_db, "guard_e")
+    audit.register_backtest(_result("guard_e"), role=audit.ROLE_OOS,
+                            validation_id="val_audit", db_path=temp_db)
+
+    result = audit_completeness("val_audit", db_path=temp_db)
+    joined = "；".join(_stress_problems(result))
+    # 缺：cost_plus_50、slippage_x2；多：slippage_x3
+    assert "缺少预期场景" in joined and "cost_plus_50" in joined
+    assert "slippage_x2" in joined
+    assert "不属于本次配置的场景" in joined and "slippage_x3" in joined
+    # 两侧都列出
+    assert "预期" in joined and "实际" in joined
+
+
+def test_expected_scenario_keys_function_ignores_execution():
+    """stress.expected_scenario_keys() 是纯配置函数，不依赖任何执行结果。"""
+    from app.validation.stress import default_scenarios, expected_scenario_keys
+
+    default_keys = [s.key for s in default_scenarios()]
+    assert expected_scenario_keys(None) == default_keys
+    assert expected_scenario_keys([]) == default_keys
+    assert expected_scenario_keys(["base", "slippage_x2"]) == [
+        "base", "slippage_x2"]
+    # 未知场景直接抛错，不静默丢弃
+    from app.validation.stress import StressError
+    with pytest.raises(StressError, match="未知压力场景"):
+        expected_scenario_keys(["base", "not_a_scenario"])

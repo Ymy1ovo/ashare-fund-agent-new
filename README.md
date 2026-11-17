@@ -2427,7 +2427,7 @@ if (basis != ACCOUNTING_FORMAL
 | 3A.3.2.3.3 | P0 两条历史验证记录受控重放 | 568 | `phase3A3_2_3_3_*.md` |
 | 3A.3.2.3.4 | 验证内部回测与公司行为审计追溯 | 618 | `phase3A3_2_3_4_*.md` |
 | 3A.3.2.3.4.1 | 审计完整性闸门与明细持久化整改 | 632 | `phase3A3_2_3_4_1_audit*.md` |
-| 3A.3.2.3.4.1.1 | 审计完整性与 Sparse 明细原子化 | **681** | `phase3A3_2_3_4_1_1_*.md` |
+| 3A.3.2.3.4.1.1 | 审计完整性与 Sparse 明细原子化 | **688** | `phase3A3_2_3_4_1_1_*.md` |
 
 当前正式会计版本：`ca-v2-receivable`；正式会计基础：`formal_receivable`；正式估值标记：`formal_valuation=True`。
 
@@ -2665,9 +2665,9 @@ Sparse 明细表新增 `version_no` 与 `event_fingerprint` 两列保留版本�
 
 | 项 | 结果 |
 | --- | ---: |
-| 全量测试 | **670 passed**，0 failed / 0 skipped / 0 xfail |
-| 耗时 | 234.00 秒 |
-| 新增测试 | +38 |
+| 全量测试 | **688 passed**，0 failed / 0 skipped / 0 xfail（阶段终值） |
+| 耗时 | 248.12 ~ 267.12 秒（多次执行） |
+| 本轮新增测试 | +56（.4.1.1 的 38 + 验收补充 11 + 预期独立性 7） |
 | 字段篡改测试 | 23 项（应用 14 + 应收 9） |
 | `audit_trace` 与 `audit_completeness` 不一致 | 0 / 54 |
 | `integrity_check` | ok |
@@ -2713,4 +2713,38 @@ Sparse 明细表新增 `version_no` 与 `event_fingerprint` 两列保留版本�
 
 存量 54 条记录 `stress_config` 全为空（生成于配置落库之前），按 fail closed
 原则报「无法确定」——它们本来就是 `unavailable_legacy*`，不构成放行风险。
+
+### 45.9 压力预期场景独立于执行结果（2026-11-17 二轮修复）
+
+上一轮把 `expected_keys` 写成 `[row["key"] for row in stress_rows]`，
+这是**从实际执行结果反推预期**：某场景在生成阶段丢失时，
+预期会跟着缩水，审计永远发现不了。
+
+**修复**：新增 `stress.expected_scenario_keys()`，来源只有显式请求的
+`keys` 或 `default_scenarios()` 完整集合，函数体不读数据库、不读
+`stress_rows`（测试用 `inspect.getsource()` 断言）。
+
+`runner.py` 在任何场景执行**之前**调用它，`executed_keys` 只作对照记录。
+
+`audit_completeness()` 增加时序校验：读到旧实现的
+`source == "actual_stress_rows"` 时判为「反推配置，不构成独立预期」。
+
+| 场景 | 预期集合 | 实际执行 | 审计结果 |
+| --- | --- | --- | --- |
+| 默认 7 个，只跑 2 个 | 7 个（配置） | 2 个 | 报缺 5 个 |
+| 显式请求 3 个，只跑 2 个 | 3 个（请求） | 2 个 | 只报缺被请求的那个 |
+| 默认 7 个全部执行 | 7 个 | 7 个 | 压力部分无 problem |
+| 某场景执行失败 | 仍含该场景 | 有该场景行但 failed | 报执行失败，不报缺场景 |
+| 配置缺失/为空 | 无法确定 | — | fail closed |
+
+### 45.10 报告口径统一
+
+阶段报告 `phase3A3_2_3_4_1_1_audit_atomicity_fix.md` 修正了三处不一致：
+
+1. 测试总数统一为最终实际执行的 **688 passed / 0 failed / 0 skipped**
+2. Sparse 端到端结论统一为「已用真实引擎端到端验证」，
+   删除此前「部分通过 / 真实端到端未跑」的过时描述
+3. 验收表补入 `test_sparse_success_path_end_to_end` 的实测证据
+
+并在 §10.3 明确标注：全部结果为本会话本地执行，非 ChatGPT 独立验证。
 

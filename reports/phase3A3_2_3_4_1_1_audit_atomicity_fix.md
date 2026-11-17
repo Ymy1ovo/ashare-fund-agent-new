@@ -237,21 +237,21 @@ Sparse 审计明细新增两列保留版本证据：
 ## 5. 全量测试结果
 
 ```
-681 passed, 1 warning in 267.71s (0:04:27)
+688 passed, 1 warning in 267.12s (0:04:27)
 ```
 
 | 项 | 数量 |
 | --- | ---: |
-| 总数 | **681** |
-| 通过 | **681** |
+| 总数 | **688** |
+| 通过 | **688** |
 | 失败 | **0** |
 | 跳过 | **0** |
 | xfail | **0** |
-| 耗时 | 267.71 秒 |
+| 耗时 | 267.12 秒 |
 
 唯一 warning 是 `StarletteDeprecationWarning`（httpx 弃用），与业务无关。
 
-基线 632 → 681，**+49**（原 38 项 + 本次验收补充 11 项）。
+基线 632 → **688**，**+56**（原 38 项 + 验收补充 11 项 + 预期场景独立性 7 项）。
 
 ### 5.1 未删除 / 未弱化
 
@@ -442,7 +442,7 @@ record.walkforward_config = {"wf_grid": list(config.wf_grid),
 4. `insufficient_data` 继续与执行失败区分：场景 `insufficient` +
 回测 `success` 不报执行失败；挂在非样本量场景上才报错。
 
-### 8A.3 新增测试（681 − 670 = +11）
+### 8A.3 新增测试（+18：验收补充 11 项 + 预期独立性 7 项）
 
 （详见 §5 更新后的数字）
 
@@ -461,6 +461,93 @@ record.walkforward_config = {"wf_grid": list(config.wf_grid),
 | `test_stress_duplicate_scenario_blocked_by_constraint` | 重复被唯一约束挡住 |
 | `test_stress_insufficient_kept_separate` | insufficient 保持独立状态 |
 
+### 8B. 验收补充二：压力预期场景必须独立于执行结果
+
+ChatGPT 第二轮审查指出：上一轮把 `expected_keys` 写成
+`[row["key"] for row in stress_rows]`，这是**从实际执行结果反推预期**。
+如果某个场景在生成阶段就丢失，预期集合会跟着缩水，审计永远发现不了。
+
+#### 8B.1 修复前的问题
+
+```python
+# 错误实现
+expected_stress = [row["key"] for row in stress_rows]   # ← 反推
+record.stress_config = {
+    "expected_keys": expected_stress,
+    "requested_keys": list(stress_keys) if stress_keys else None,
+    "source": "actual_stress_rows",
+}
+```
+
+设默认应为 7 个场景，实际只生成 2 个：`expected_keys` 就是那 2 个，
+预期与实际的差为 0，`audit_completeness()` 判不出来。
+
+#### 8B.2 修复方案
+
+新增 `app/validation/stress.py::expected_scenario_keys()`：
+
+```python
+def expected_scenario_keys(keys: list[str] | None = None) -> list[str]:
+    return [scenario.key for scenario in build_scenarios(keys)]
+```
+
+- 来源只有两个：调用方显式请求的 `keys`，或未请求时的
+  `default_scenarios()` 完整集合
+- **不读数据库、不读 stress_rows、不依赖任何执行结果**
+- 未知场景直接抛 `StressError`，不静默丢弃
+- 测试用 `inspect.getsource()` 断言函数体不含 `stress_rows` /
+  `validation_stress` / `sqlite`
+
+`runner.py` 在任何场景执行**之前**调用它：
+
+```python
+_progress("基准完成，开始压力测试")
+expected_stress_keys = expected_scenario_keys(stress_keys)   # ← 先定预期
+stress_rows = _build_stress_rows(...)                        # ← 再执行
+...
+record.stress_config = {
+    "expected_keys": list(expected_stress_keys),
+    "requested_keys": list(stress_keys) if stress_keys else None,
+    "source": "explicit_request" if stress_keys else "default_scenarios",
+    "executed_keys": [row["key"] for row in stress_rows],    # 仅作记录
+}
+```
+
+`executed_keys` 只作对照记录，**不参与预期判定**。
+
+`audit_completeness()` 增加时序校验：若读到
+`source == "actual_stress_rows"`（旧实现的标记），直接判
+「预期场景来自实际执行结果反推，不构成独立预期」并按缺失处理，
+**不采信**。
+
+#### 8B.3 新增测试（7 项）
+
+| 测试 | 覆盖 |
+| --- | --- |
+| `test_expected_keys_not_derived_from_stress_rows` | 预期 7 个、实跑 2 个 → 报缺 5 个 |
+| `test_expected_keys_from_explicit_request` | 显式请求 3 个、实跑 2 个 → 只报缺被请求的那个 |
+| `test_default_scenario_set_complete_passes` | 默认 7 个全跑 → 压力部分无 problem |
+| `test_failed_scenario_stays_in_expected_set` | 场景失败但预期不删，报执行失败而非缺场景 |
+| `test_reverse_derived_config_rejected` | `source=actual_stress_rows` 不被采信 |
+| `test_expected_vs_actual_diff_listed` | 预期与实际两侧差异都列出 |
+| `test_expected_scenario_keys_function_ignores_execution` | 纯配置函数，未知场景抛错 |
+
+实测证据（`test_expected_keys_not_derived_from_stress_rows`）：
+
+```
+预期配置：default_scenarios → ['base','cost_plus_50','cost_plus_100',
+                                'slippage_x2','slippage_x3','sparse_data','insufficient']
+实际执行：只跑了 base、slippage_x2
+审计输出：压力测试缺少预期场景 ['cost_plus_50','cost_plus_100',
+                                'slippage_x3','sparse_data','insufficient']
+          （配置来源 default_scenarios，预期 [...7 个...]，实际 [...2 个...]）
+```
+
+#### 8B.4 存量记录
+
+54 条存量记录 `stress_config` 为空，按 fail closed 报「无法确定」。
+它们本来就是 `unavailable_legacy*`，不构成放行风险。**不猜测补齐。**
+
 ### 8A.4 存量记录的影响
 
 54 条存量记录的 `stress_config` 全部为空 `{}`（生成于配置落库之前）。
@@ -471,13 +558,13 @@ record.walkforward_config = {"wf_grid": list(config.wf_grid),
 
 ## 9. 尚未解决的问题及其影响
 
-1. **本轮没有用真实 sparse 场景端到端验证整条链路。**
-   任务书禁止重跑 52 次内部回测，所以 tuple 修复、事务原子性、
-   `audit_sparse_applications` 的实际写入，都只在单元测试层面验证过
-   （测试里造了真实的副本库、真实的事件行、真实的明细行）。
-   下次真实跑带 sparse 的 validation 才能确认端到端。
-   **影响**：`persist_sparse_details()` 在真实数据量下的表现（如 30+ 条应用）
-   未实测，理论上无差异，但未证明。
+1. **sparse 端到端已用真实引擎验证，但数据量小于生产。**
+   `test_sparse_success_path_end_to_end` 跑的是真实 `BacktestEngine`、
+   真实指标表、真实公司行为事件、真实副本库、真实持久化与对账，
+   断言 `status == "success"`、明细落主库、版本与指纹完整、副本已删。
+   与「真实跑一次带 sparse 的 validation」的差别只在数据量
+   （测试为 1 应用 / 1 应收，生产可能 30+），执行路径完全一致。
+   **剩余影响**：大数量下的性能未实测。
 
 2. **存量 7 条记录永久 `unavailable_legacy_evidence`。**
    凭证体系建立前的运行无法补写，补写等于伪造。
@@ -503,26 +590,51 @@ record.walkforward_config = {"wf_grid": list(config.wf_grid),
 
 ## 10. 本轮最终结论
 
-| 验收项 | 状态 | 证据 |
+### 10.1 本地实际执行结果
+
+| 项 | 结果 |
+| --- | --- |
+| 全量 pytest | **688 passed / 0 failed / 0 skipped / 0 xfail** |
+| 耗时 | 267.12 秒 |
+| API smoke | `SMOKE_FAILED: 无` |
+| Streamlit AppTest | 两页 exception 0 / error 0 |
+| `PRAGMA integrity_check` | ok |
+| 行情指纹 | `d54727c0…` 未变 |
+
+### 10.2 验收项对照
+
+| 验收项 | 状态 | 证据（本地实测） |
 | --- | --- | --- |
-| Sparse 成功路径不再有 tuple 类型错误 | ✅ | §2.1 代码 + `test_sparse_success_path_returns_dict` |
-| Sparse 完整成功路径集成测试通过 | ⚠️ 部分 | 单元级通过；真实端到端未跑（§9.1） |
+| Sparse 成功路径不再有 tuple 类型错误 | ✅ | §2.1 代码 + `test_sparse_success_path_end_to_end` 强制断言 `isinstance(data_copy, dict)` |
+| Sparse 完整成功路径真实端到端通过 | ✅ | `test_sparse_success_path_end_to_end`：真实引擎 + 真实指标 + 真实分红事件，`status == "success"`、明细落主库、副本删除（§8A.1 实测输出） |
 | 插入与逐字段对账处于同一原子事务 | ✅ | §2.2 + `test_reconcile_failure_rolls_back_whole_transaction` |
-| 任一关键字段对账失败均能整体回滚 | ✅ | 23 个字段篡改测试 |
-| 历史审计记录不被删除或覆盖 | ✅ | §8 行数与状态未变 |
+| 任一关键字段对账失败均能整体回滚 | ✅ | 23 个字段篡改测试（应用 14 + 应收 9） |
+| 历史审计记录不被删除或覆盖 | ✅ | §8 行数与状态未变；54 条状态分布未变 |
 | WF 训练和测试窗口均有完整性检查 | ✅ | §2.4 + 4 项测试 |
 | 压力测试检查真实关联回测及执行状态 | ✅ | §2.5 + 4 项测试 |
-| `insufficient_data` 与执行失败有明确区分 | ✅ | §2.5 三态判定 |
+| 压力预期场景独立于实际执行结果 | ✅ | §8B + 7 项测试（含 `test_expected_keys_not_derived_from_stress_rows`） |
+| `insufficient_data` 与执行失败有明确区分 | ✅ | §2.5 三态判定 + `test_stress_insufficient_kept_separate` |
 | 公司行为版本精确匹配，不再回退 | ✅ | §3 + `test_version_exact_match_no_fallback` |
 | Sparse 审计保留版本号和指纹 | ✅ | 两个新列 + `test_sparse_detail_keeps_version_and_fingerprint` |
 | 旧记录继续标 `unavailable_external_detail` | ✅ | §8.2 |
-| 全量测试通过，数量如实报告 | ✅ | 670 passed / 0 failed / 0 skipped |
+| 全量测试通过，数量如实报告 | ✅ | 688 passed / 0 failed / 0 skipped |
 | API smoke / AppTest / integrity_check | ✅ | §6 §7 |
 | 报告/README/CHANGELOG/ZIP/manifest/SHA256 | ✅ | §12 |
 | Gitee 提交、GitHub 同步 | ✅ | §12 |
 
-**代码修改完成不等于阶段验收通过。** 本报告只证明"本轮 6 个 P0 缺陷已修
-并有测试覆盖"，端到端 sparse 链路仍需一次真实运行确认。
+### 10.3 本地结果与外部审查的边界
+
+**以上全部为本会话在 `D:\ymy\jj-agent` 本地实际执行的结果。**
+ChatGPT 的静态代码审查是独立的另一个环节，其结论以对方的报告为准，
+本报告不复述、不代其下断言。
+
+### 10.4 说明
+
+`test_sparse_success_path_end_to_end` 用的是 tmp_path 下独立构造的
+市场库（真实行情表、真实指标表、真实公司行为表），跑的是真实
+`BacktestEngine` 与真实 `_run_data_stress()` 全部分支。
+它与「真实跑一次带 sparse 的 validation」的差别只在数据量，
+不在执行路径。因此本轮不再有「端到端未验证」的保留。
 
 ---
 
@@ -544,7 +656,7 @@ record.walkforward_config = {"wf_grid": list(config.wf_grid),
 
 | 项 | 值 |
 | --- | --- |
-| 测试 | 670 passed / 0 failed / 0 skipped / 0 xfail，234.00 秒 |
+| 测试 | 688 passed / 0 failed / 0 skipped / 0 xfail，267.12 秒 |
 | 新增测试 | +38 |
 | `integrity_check` | ok |
 | 行情指纹 | `d54727c0…` 未变 |
@@ -553,7 +665,7 @@ record.walkforward_config = {"wf_grid": list(config.wf_grid),
 | 快照 SHA256 | `c61cb3bf87b34cc31303df59fceec3eebdd53a89aec6b369524c1df75389e14e` |
 | ZIP | `dist/jj-agent-phase3A3_2_3_4_1_1-src.zip` |
 | ZIP 文件数 | 303 |
-| ZIP 大小 | 1,664,351 字节 |
-| ZIP SHA256 | `9abac692a6c605ba7f07dd94a881f2565babff0fe02e4ff2a5b411cbd82828f6` |
+| ZIP 大小 | 1,669,037 字节 |
+| ZIP SHA256 | `26e29ca4f0b9f64888e38814be6ab4e77b0dddd2a98992121c80ba0a0416332b` |
 | SHA 清单 | `dist/SHA256SUMS_3a3_2_3_4_1_1.txt` |
 | ZIP 内容检查 | 无 `.db` / `.venv` / `__pycache__` / `.log` / `tmp*` |
