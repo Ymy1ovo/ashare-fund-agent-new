@@ -1,5 +1,60 @@
 # 变更日志
 
+## 2026-11-17 — 阶段3A.3.2.3.4.1 审计完整性闸门与明细持久化整改
+
+修复 3A.3.2.3.4 验收发现的问题，未重跑任何内部回测，未改策略与会计算法。
+
+**审计完整性闸门**：
+
+- `register_backtest()` 写入前校验：validation 存在、`backtest_run_id`
+  在 `backtest_runs` 中存在、非空、口径严格正式、不重复登记。
+  任一不满足抛 `AuditError`，不留半条数据。
+- `audit_completeness()` 增加 8 类校验：validation 状态、凭证存在性、
+  `run_scope` 归属、`accounting_basis`、`formal_valuation`、
+  `status`、逐笔明细数量与金额、角色与场景数量。
+- `audit_trace()` 以 `audit_completeness()` 为准判定状态，
+  不再只看关联表里的 `status`。两者对 54 条记录结论**完全一致**。
+- 循环依赖处理：`audit_completeness()` 不调用 `audit_trace()`，
+  方向单向，测试用 `inspect.getsource()` 断言。
+
+**存在性凭证**：
+
+- 新增 `backtest_runs.run_scope` 列，取值 `standalone` / `validation_internal`。
+- `register_run_evidence()` 由真实回测路径在拿到 `BacktestResult` 后立即调用，
+  因此凭证只在真跑过时产生。
+- `list_runs()` 与盘点清单按 `run_scope='standalone'` 过滤，内部回测不混入用户视图。
+
+**sparse 明细持久化**（此前副本删除后只剩计数）：
+
+- 新增 `audit_sparse_applications` 与 `audit_sparse_receivables` 两张主库审计表，
+  唯一键 `(validation_id, run_id, action_id)`，保留原始 run_id / action_id 与
+  金额、份额、登记日、除息日、发放日、到账时间等实际字段。
+- `persist_sparse_details()` 复制后做 7 项逐条对账：应用条数、应收条数、
+  应收金额、已到账条数、已到账金额、应用 action_id 集合、应收 action_id 集合。
+- 对账不通过抛 `AuditError`，副本**不删**，主库不留半条。
+- 复制幂等：`ON CONFLICT DO NOTHING`，重复执行不产生重复行（实测连跑 3 次恒为 1 行）。
+- `remove_sparse_copy()` 只接受目录名含 `val_sparse_` 的路径，拒绝误删。
+
+**事件版本追溯**：
+
+- `audit_trace()` 每条事件带 `version_status`：`available` 或 `version_unavailable`。
+- 版本缺失进 `problems`，`audit_status` 随之不为 `complete`。
+
+**regime 持久化失败**：
+
+- 从「写一条 warning 后仍返回 success」改为「validation 标记 failed 并抛
+  `ValidationError`」，同时保留已登记的内部回测关联不删除。
+
+**存量记录**：
+
+- 47 条 → `unavailable_legacy`（无内部回测登记）
+- 7 条 → `unavailable_legacy_evidence`（有登记但全部缺存在性凭证）
+- `aad7935a2bac4cc4` 的 sparse 关联行标 `unavailable_external_detail`
+  并写明副本已删、逐笔明细不可恢复。绩效与会计数据零改动。
+
+**测试**：618 → **632**（+14，含 12 项反向场景）。
+
+
 ## 2026-11-16 — 阶段3A.3.2.3.4 验证内部回测与公司行为审计追溯
 
 新增（只加不改）：

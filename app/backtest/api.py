@@ -31,7 +31,8 @@ def list_runs(limit: int = 20, db_path=None) -> list[dict[str, Any]]:
         rows = conn.execute(
             "SELECT run_id, strategy_name, strategy_version, initial_cash, start_date, "
             "end_date, indicator_version, input_hash, created_at, summary_json "
-            "FROM backtest_runs ORDER BY created_at DESC, rowid DESC LIMIT ?",
+            "FROM backtest_runs WHERE COALESCE(run_scope,'standalone')='standalone' "
+            "ORDER BY created_at DESC, rowid DESC LIMIT ?",
             (limit,),
         ).fetchall()
     payload = []

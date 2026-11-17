@@ -51,23 +51,31 @@ def test_audit_endpoint_returns_legacy_marker(temp_db):
 
 def test_audit_endpoint_returns_full_chain(temp_db):
     vid = _seed(temp_db)
+    audit.register_run_evidence(_result("api_run_a"), db_path=temp_db)
     audit.register_backtest(_result("api_run_a"), role=ROLE_OOS,
                             validation_id=vid, db_path=temp_db)
+    audit.register_run_evidence(_result("api_run_b"), db_path=temp_db)
     audit.register_backtest(_result("api_run_b"), role=ROLE_BENCHMARK,
                             validation_id=vid, db_path=temp_db)
     resp = client.get(f"/api/validations/{vid}/audit")
     assert resp.status_code == 200
     body = resp.json()
-    assert body["audit_status"] == "complete"
+    # 只有 2 次回测，缺样本内/WF/压力，因此必须不完整
+    assert body["audit_status"] == "incomplete"
+    assert body["problems"], "不完整时必须给出具体原因"
     assert body["backtest_run_count"] == 2
     assert body["role_counts"][ROLE_OOS] == 1
     assert body["role_counts"][ROLE_BENCHMARK] == 1
+    # 两条 run 都存在且被标记为真实存在
+    assert all(link["run_exists"] for link in body["links"])
 
 
 def test_backtest_runs_endpoint_lists_runs(temp_db):
     vid = _seed(temp_db)
+    audit.register_run_evidence(_result("api_run_a"), db_path=temp_db)
     audit.register_backtest(_result("api_run_a"), role=ROLE_OOS,
                             validation_id=vid, db_path=temp_db)
+    audit.register_run_evidence(_result("api_run_b"), db_path=temp_db)
     audit.register_backtest(_result("api_run_b"), role=ROLE_BENCHMARK,
                             validation_id=vid, db_path=temp_db)
     resp = client.get(f"/api/validations/{vid}/backtest-runs")

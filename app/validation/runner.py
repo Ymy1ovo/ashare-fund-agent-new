@@ -227,6 +227,13 @@ def _run_backtest(
     # 阶段3A.3.2.2.3：非正式会计口径的结果不得进入正式验证结论。
     # 这里 fail closed，而不是把 metrics 混进验证结果里。
     _require_formal(result, "样本回测")
+    # 阶段3A.3.2.3.4.1：先落存在性凭证，再登记关联。
+    # 没有凭证的 run_id 不允许出现在 validation_backtest_runs 里，
+    # 因此这一步必须在登记之前、且必须成功。
+    audit.register_run_evidence(
+        result, db_path=audit_db_path if audit_db_path is not None else detail_db,
+        codes=codes,
+    )
     # 阶段3A.3.2.3.4：登记到 validation 审计链路。
     # role 缺省时从上下文取；上下文也没有则登记会抛错（不允许静默跳过）。
     audit.register_backtest(
@@ -238,6 +245,9 @@ def _run_backtest(
         db_path=audit_db_path if audit_db_path is not None else detail_db,
         detail_db_path=(
             audit_detail_db_path if audit_detail_db_path is not None else detail_db
+        ),
+        detail_location=(
+            audit.DETAIL_EXTERNAL_MISSING if audit_detail_db_path is not None else None
         ),
         reason=audit_note,
     )
@@ -513,7 +523,8 @@ def _run_validation_unlocked(
         )
         _progress("基准完成，开始压力测试")
         stress_rows = _build_stress_rows(
-            config, split, codes, best_window, stress_keys, db_path
+            config, split, codes, best_window, stress_keys, db_path,
+            validation_id=vid,
         )
 
         fingerprint_after = _data_fingerprint(db_path)
@@ -565,14 +576,25 @@ def _run_validation_unlocked(
         save_grid(vid, "in_sample", [cell.as_dict() for cell in cells], db_path=db_path)
         save_grid(vid, "out_of_sample", [oos_cell.as_dict()], db_path=db_path)
         save_stress(vid, stress_rows, db_path=db_path)
-        # 阶段3A.3.2.3.4：把已经算好的 regime 分组统计落库（不重算）
+        # 阶段3A.3.2.3.4.1：regime 落库失败不得只写 warning 后当完整。
+        # 失败时把 validation 显式标为 failed 并保留已登记的审计痕迹，
+        # 由 audit_completeness() 判定 incomplete，绝不冒充成功。
         try:
             audit.save_regime_stats(vid, regime_payload, db_path=db_path)
-        except Exception as exc:  # noqa: BLE001 审计写入失败必须记录，不吞
-            notes.append(f"审计：regime 分组统计落库失败（{type(exc).__name__}: {exc}）")
-            record.summary = {**summary,
-                              "audit_warning": f"regime 落库失败：{exc}"}
+        except Exception as exc:  # noqa: BLE001 审计持久化失败必须上抛
+            record.status = "failed"
+            record.error_message = f"审计：regime 分组统计落库失败：{exc}"[:500]
+            record.summary = {
+                **summary,
+                "audit_warning": f"regime 落库失败：{type(exc).__name__}: {exc}",
+            }
+            record.notes = notes + [
+                "审计：regime 分组统计落库失败，本次验证标记为 failed"
+            ]
             save_validation_run(record, db_path=db_path)
+            raise ValidationError(
+                f"审计持久化失败：regime 分组统计落库失败（{exc}）"
+            ) from exc
         return result
 
     except Exception as exc:
@@ -848,7 +870,8 @@ def _build_benchmarks_rows(
 
 
 def _build_stress_rows(
-    config: ValidationConfig, split, codes, best_window, stress_keys, db_path
+    config: ValidationConfig, split, codes, best_window, stress_keys, db_path,
+    *, validation_id: str | None = None,
 ) -> list[dict]:
     """压力测试：成本类只改配置，数据类在独立副本上执行。
 
@@ -858,7 +881,8 @@ def _build_stress_rows(
     for scenario in build_scenarios(stress_keys):
         if scenario.kind == "data":
             rows.append(_run_data_stress(
-                scenario, config, split, codes, best_window, db_path
+                scenario, config, split, codes, best_window, db_path,
+                validation_id=validation_id,
             ))
             continue
         overrides = scenario.apply(config)
@@ -891,7 +915,8 @@ def _build_stress_rows(
 
 
 def _run_data_stress(
-    scenario, config: ValidationConfig, split, codes, best_window, db_path
+    scenario, config: ValidationConfig, split, codes, best_window, db_path,
+    *, validation_id: str | None = None,
 ) -> dict:
     """执行数据类压力场景（sparse_data / insufficient）。"""
     import tempfile
@@ -953,11 +978,45 @@ def _run_data_stress(
                 missing_nav_days=stats_counts["missing_nav"],
             )
             evaluation["return_sample_stats"] = stats_counts
+
+            # 阶段3A.3.2.3.4.1：副本库即将删除，逐笔明细必须先复制到
+            # 主库审计区并逐条对账。对账不通过 → 抛错，副本保留。
+            ctx = audit.current_context()
+            persist_validation_id = (
+                validation_id or (ctx.validation_id if ctx else None)
+            )
+            if not persist_validation_id:
+                raise audit.AuditError(
+                    "sparse 明细持久化缺少 validation_id，拒绝在无归属情况下落库"
+                )
+            persist = audit.persist_sparse_details(
+                persist_validation_id, result.run_id, copy_db, db_path=resolved_db,
+            )
+            audit.mark_sparse_detail_location(
+                persist_validation_id, result.run_id,
+                location=audit.DETAIL_SPARSE_TABLE,
+                note=(
+                    f"逐笔明细已从临时副本 {copy_info['copy_path']} 复制到主库审计区，"
+                    f"副本已删除；对账 {persist['application_count']} 应用 / "
+                    f"{persist['receivable_count']} 应收全部一致"
+                ),
+                applied=persist["application_count"],
+                receivable_count=persist["receivable_count"],
+                receivable_amount=persist["receivable_amount"],
+                settled_count=persist["settled_count"],
+                settled_amount=persist["settled_amount"],
+                db_path=resolved_db,
+            )
+            # 对账与落库全部成功后才允许删除临时副本
+            audit.remove_sparse_copy(copy_db)
+            copy_info = {**copy_info, "removed": True,
+                         "audit_detail": "audit_sparse_applications"},
             return {
                 **base,
                 "status": evaluation["status"],
                 "metrics": metrics,
                 "data_copy": copy_info,
+                "audit_persist": persist,
                 "evaluation": evaluation,
                 "reason": (
                     f"独立副本 {copy_info['copy_path']}；"

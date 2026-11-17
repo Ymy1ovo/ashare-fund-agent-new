@@ -237,7 +237,9 @@ def backtest_manifest(db_path=None, *, successes: dict[str, str] | None = None) 
             "SELECT run_id, strategy_name, strategy_version, config_json, initial_cash, "
             "start_date, end_date, etf_codes, indicator_version, snapshot_ids, input_hash, "
             "summary_json, created_at, accounting_version, evidence_version "
-            "FROM backtest_runs ORDER BY created_at, run_id"
+            "FROM backtest_runs "
+            "WHERE COALESCE(run_scope,'standalone')='standalone' "
+            "ORDER BY created_at, run_id"
         ).fetchall()
 
     records: list[dict] = []

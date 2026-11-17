@@ -189,18 +189,28 @@ with tab6:
 
     trace = audit_trace(validation_id)
     status = trace.get("audit_status")
+    problems = trace.get("problems") or []
     if status == "unavailable_legacy":
         st.warning(
-            f"审计明细不可用（{status}）：{trace.get('reason')}。"
-            "该记录生成于审计体系之前，内部回测 run_id 未留存，无法补齐。"
+            "审计明细不可用（unavailable_legacy）：该记录生成于审计体系之前，"
+            "内部回测 run_id 未留存，无法补齐。"
+        )
+    elif status == "unavailable_legacy_evidence":
+        st.warning(
+            "审计状态：unavailable_legacy_evidence——该记录的内部回测虽然登记过，"
+            "但缺少 backtest_runs 存在性凭证，无法证明回测真实发生。"
         )
     elif status == "validation_not_found":
         st.error("验证记录不存在，无法追溯。")
     else:
         if status == "incomplete":
-            st.warning("审计状态：不完整——存在非 success 的内部回测。")
+            st.warning("审计状态：不完整——存在未通过校验的项目。")
         else:
             st.success("审计状态：完整")
+        if problems:
+            st.write("不完整原因：")
+            for item in problems[:12]:
+                st.write(f"- {item}")
         coverage = audit_coverage(validation_id)
         c1, c2, c3 = st.columns(3)
         c1.metric("内部回测数", trace.get("backtest_run_count"))
@@ -231,6 +241,7 @@ with tab6:
                         "应收金额": _fmt(link["receivable_amount"]),
                         "已到账": link["settled_amount"],
                         "未到账": link["unsettled_amount"],
+                        "明细位置": link.get("detail_location"),
                     }
                     for link in links
                 ],

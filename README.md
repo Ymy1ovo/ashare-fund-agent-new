@@ -2425,7 +2425,8 @@ if (basis != ACCOUNTING_FORMAL
 | 3A.3.2.3.1 | 历史记录重放体系（盘点 / 反证 / 幂等登记） | 538 | `phase3A3_2_3_1_*.md` |
 | 3A.3.2.3.2 | 重放失败闸门（三值短路 / 非布尔真值） | 564 | `phase3A3_2_3_2_*.md` |
 | 3A.3.2.3.3 | P0 两条历史验证记录受控重放 | 568 | `phase3A3_2_3_3_*.md` |
-| 3A.3.2.3.4 | 验证内部回测与公司行为审计追溯 | **618** | `phase3A3_2_3_4_*.md` |
+| 3A.3.2.3.4 | 验证内部回测与公司行为审计追溯 | 618 | `phase3A3_2_3_4_*.md` |
+| 3A.3.2.3.4.1 | 审计完整性闸门与明细持久化整改 | **632** | `phase3A3_2_3_4_1_*.md` |
 
 当前正式会计版本：`ca-v2-receivable`；正式会计基础：`formal_receivable`；正式估值标记：`formal_valuation=True`。
 
@@ -2532,3 +2533,78 @@ WF 窗口数、压力场景数、基准数逐项比对，并逐个核对网格�
 | `integrity_check` | ok |
 | 四条历史记录 | 全字段逐字段相等 |
 | 两次重放绩效 | 逐位相同 |
+
+## 44. 阶段3A.3.2.3.4.1 审计完整性闸门与明细持久化整改
+
+### 44.1 修掉的核心问题
+
+| 问题 | 修复前 | 修复后 |
+| --- | --- | --- |
+| ghost_run | 关联表写一行 `success` 就判 `complete` | 登记期拦截 + 追溯期拦截，双重拒绝 |
+| 明细只有计数 | sparse 副本删除后只剩 23 笔 / 12,728.18 元 | 逐笔明细落主库审计表，7 项对账 |
+| regime 失败 | 写条 warning 仍返回 `success` | validation 标 `failed` 并抛错 |
+| 版本追溯 | 只查 `corporate_actions` | 补 `corporate_action_versions`，缺版本标 `version_unavailable` |
+
+### 44.2 存在性凭证
+
+新增 `backtest_runs.run_scope`：
+
+| 值 | 含义 | 现有 |
+| --- | --- | ---: |
+| `standalone` | 用户直接跑的回测 | 12 |
+| `validation_internal` | validation 内部回测 | 0（本轮未重跑） |
+
+`register_run_evidence()` 由真实回测路径在拿到 `BacktestResult` 后调用，
+凭证只在真跑过时产生。`list_runs()` 与盘点按 `standalone` 过滤。
+
+### 44.3 完整性判定 8 类校验
+
+1. validation 自身 `status == success`
+2. 每个 `backtest_run_id` 在 `backtest_runs` 存在
+3. 凭证 `run_scope == validation_internal`
+4. `accounting_basis == formal_receivable`
+5. `formal_valuation == 1`
+6. `status == success`
+7. 有应用时逐笔明细必须查得到且数量金额一致
+8. 角色数量、压力场景、网格档位、regime 落库
+
+任一项不满足即 `complete=False` 并给出具体原因。
+
+### 44.4 sparse 明细主库审计区
+
+| 表 | 唯一键 |
+| --- | --- |
+| `audit_sparse_applications` | `(validation_id, run_id, action_id)` |
+| `audit_sparse_receivables` | `(validation_id, run_id, action_id)` |
+
+执行顺序不可调换：回测 → 复制 → 7 项对账 → 更新位置 → 删副本。
+对账不通过则副本保留、主库不留半条。复制幂等（连跑 3 次恒为 1 行）。
+
+### 44.5 存量记录状态
+
+| 状态 | 数量 | 含义 |
+| --- | ---: | --- |
+| `unavailable_legacy` | 47 | 完全没有内部回测登记 |
+| `unavailable_legacy_evidence` | 7 | 有登记但全部 52 条缺存在性凭证 |
+| `complete` | **0** | 本轮未产生新的合格记录 |
+
+`aad7935a2bac4cc4` 的 sparse 关联行标 `unavailable_external_detail`，
+绩效与会计数据零改动。
+
+### 44.6 验证
+
+| 项 | 结果 |
+| --- | ---: |
+| 全量测试 | **632 passed**，0 failed / 0 skipped / 0 xfail |
+| 耗时 | 171.55 秒 |
+| 新增测试 | +14（含 12 项反向场景） |
+| `audit_trace` 与 `audit_completeness` 不一致 | 0 / 54 |
+| 行情指纹 | `d54727c0…` 未变 |
+| `integrity_check` | ok |
+| 新增表唯一性 | 实测拦截重复插入 |
+
+### 44.7 遗留
+
+- 存量 7 条永久 `unavailable_legacy_evidence`，补写凭证等于伪造，不做
+- `aad7935a2bac4cc4` 的 sparse 逐笔明细永久不可恢复
+- 版本回退策略（精确未命中取末版）与精确命中的语义不同
