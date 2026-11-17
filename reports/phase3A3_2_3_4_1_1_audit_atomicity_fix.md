@@ -237,7 +237,7 @@ Sparse 审计明细新增两列保留版本证据：
 ## 5. 全量测试结果
 
 ```
-688 passed, 1 warning in 267.12s (0:04:27)
+688 passed, 1 warning in 232.38s (0:03:52)
 ```
 
 | 项 | 数量 |
@@ -247,7 +247,7 @@ Sparse 审计明细新增两列保留版本证据：
 | 失败 | **0** |
 | 跳过 | **0** |
 | xfail | **0** |
-| 耗时 | 267.12 秒 |
+| 耗时 | 232.38 ~ 267.12 秒（多次执行） |
 
 唯一 warning 是 `StarletteDeprecationWarning`（httpx 弃用），与业务无关。
 
@@ -595,7 +595,7 @@ record.stress_config = {
 | 项 | 结果 |
 | --- | --- |
 | 全量 pytest | **688 passed / 0 failed / 0 skipped / 0 xfail** |
-| 耗时 | 267.12 秒 |
+| 耗时 | 232.38 ~ 267.12 秒（多次执行） |
 | API smoke | `SMOKE_FAILED: 无` |
 | Streamlit AppTest | 两页 exception 0 / error 0 |
 | `PRAGMA integrity_check` | ok |
@@ -656,7 +656,7 @@ ChatGPT 的静态代码审查是独立的另一个环节，其结论以对方的
 
 | 项 | 值 |
 | --- | --- |
-| 测试 | 688 passed / 0 failed / 0 skipped / 0 xfail，267.12 秒 |
+| 测试 | 688 passed / 0 failed / 0 skipped / 0 xfail，232.38 ~ 267.12 秒 |
 | 新增测试 | +38 |
 | `integrity_check` | ok |
 | 行情指纹 | `d54727c0…` 未变 |
@@ -665,7 +665,7 @@ ChatGPT 的静态代码审查是独立的另一个环节，其结论以对方的
 | 快照 SHA256 | `c61cb3bf87b34cc31303df59fceec3eebdd53a89aec6b369524c1df75389e14e` |
 | ZIP | `dist/jj-agent-phase3A3_2_3_4_1_1-src.zip` |
 | ZIP 文件数 | 303 |
-| ZIP 大小 | 1,669,037 字节 |
-| ZIP SHA256 | `26e29ca4f0b9f64888e38814be6ab4e77b0dddd2a98992121c80ba0a0416332b` |
+| ZIP 大小 | 1,669,087 字节 |
+| ZIP SHA256 | `48f3688ac14abfa60950d40664f10a7ee575bc8011b246326d55bdc3b75e0c6c` |
 | SHA 清单 | `dist/SHA256SUMS_3a3_2_3_4_1_1.txt` |
 | ZIP 内容检查 | 无 `.db` / `.venv` / `__pycache__` / `.log` / `tmp*` |
