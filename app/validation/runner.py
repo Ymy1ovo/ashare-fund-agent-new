@@ -690,12 +690,20 @@ def _build_regime_payload(
         }
 
     try:
-        engine = BacktestEngine(oos_cfg, oos_strategy, db_path=db_path)
+        # 阶段3A.3.2.3.6.1（缺陷 B）：与 `_run_backtest()` 保持一致——
+        # db_path 为空时解析成正式库路径，否则引擎不写公司行为明细；
+        # 且必须先落存在性凭证，再登记 validation 关联。
+        # `register_backtest()` 有凭证闸门，顺序颠倒会抛 AuditError。
+        from app.config import settings as _settings
+
+        regime_db = db_path if db_path is not None else _settings.database_path
+        engine = BacktestEngine(oos_cfg, oos_strategy, db_path=regime_db)
         oos_result = engine.run(codes, indicator_version=config.indicator_version)
         _require_formal(oos_result, "市场环境分组回测")
+        audit.register_run_evidence(oos_result, db_path=regime_db, codes=codes)
         audit.register_backtest(
             oos_result, role=audit.ROLE_REGIME,
-            scenario_key=config.regime_proxy_code, db_path=db_path,
+            scenario_key=config.regime_proxy_code, db_path=regime_db,
         )
         oos_nav, oos_returns, oos_statuses = risk_return_series(oos_result.daily)
         from app.backtest.metrics import return_sample_stats
@@ -763,6 +771,11 @@ def _build_regime_payload(
             },
         }
     except Exception as exc:
+        # 阶段3A.3.2.3.6.1（缺陷 B）：审计完整性错误必须向外传播，
+        # 不能降级成「regime 全 unavailable 但 validation 仍 success」。
+        # 只有非审计类异常（如预热数据缺失）才走降级返回。
+        if isinstance(exc, audit.AuditError):
+            raise
         return {
             "labels_available": False,
             "error": str(exc)[:200],

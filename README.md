@@ -2429,7 +2429,8 @@ if (basis != ACCOUNTING_FORMAL
 | 3A.3.2.3.4.1 | 审计完整性闸门与明细持久化整改 | 632 | `phase3A3_2_3_4_1_audit*.md` |
 | 3A.3.2.3.4.1.1 | 审计完整性与 Sparse 明细原子化 | 688 | `phase3A3_2_3_4_1_1_*.md` |
 | 3A.3.2.3.5 | 历史回测与验证记录重放候选清点 | 688 | `phase3A3_2_3_5_*.md` |
-| 3A.3.2.3.6 | 第一批历史记录受控重放（5 条，执行 2 条后暂停） | **688** | `phase3A3_2_3_6_*.md` |
+| 3A.3.2.3.6 | 第一批历史记录受控重放（5 条，执行 2 条后暂停） | 688 | `phase3A3_2_3_6_*.md` |
+| 3A.3.2.3.6.1 | 修复重放审计缺陷并重新执行前两条 | **702** | `phase3A3_2_3_6_1_*.md` |
 
 当前正式会计版本：`ca-v2-receivable`；正式会计基础：`formal_receivable`；正式估值标记：`formal_valuation=True`。
 
@@ -2932,4 +2933,124 @@ G1（`7d884a1a03d94915`，`config_hash=b6b1babace517bdc`，源 `input_hash=3e064
 2. 已产生的两条记录如何处置（保留 / 删除重跑 / 保留并标注）
 3. `audit_completeness` 判 `incomplete` 是否可接受
 4. 剩余 3 条是否等修复后再跑（建议如此）
+
+## 48. 阶段3A.3.2.3.6.1 修复重放审计缺陷并重新执行前两条记录
+
+### 48.1 两个缺陷的修复
+
+**缺陷 A：独立回测明细不落库**
+
+`replay_backtest()` 把 `db_path=None` 传给引擎，引擎内
+`if self.db_path is not None` 守卫使明细不写，但 `save_result()`
+走默认库路径落库了。
+
+新增 `effective_db_path()`：`db_path` 非空用它、为空用
+`settings.database_path`，返回值保持 `Path`。
+`replay_backtest()` 与 `replay_validation()` 入口各解析一次，
+引擎、保存、标记、attempt 登记全部复用。
+
+**缺陷 B：regime 回测缺存在性凭证**
+
+`_build_regime_payload()` 直接调 `register_backtest()` 而没先
+`register_run_evidence()`，撞上 3A.3.2.3.4.1 加的凭证闸门，
+抛出的 `AuditError` 被外层 `except` 吞掉。
+
+修复：登记顺序改为 `执行 → _require_formal → register_run_evidence
+→ register_backtest`；`db_path` 空时同样解析成正式库；
+外层 `except` 遇到 `AuditError` 一律向外抛，不再降级。
+
+### 48.2 追加式失效机制
+
+新增 `replay_supersessions` 表：
+
+| 字段 | 含义 |
+| --- | --- |
+| `superseded_attempt_id` | 旧 attempt（唯一索引，不可重复失效） |
+| `superseded_record_id` | 旧结果 |
+| `replacement_attempt_id` / `replacement_record_id` | 新 attempt / 新结果 |
+| `reason` | `missing_corporate_action_details` / `regime_audit_incomplete` |
+
+旧 attempt 行**全字段原样保留**（`status` 仍是当年真实的 `success`），
+只新增关系记录。`find_success()` / `success_map()` 增加
+`NOT EXISTS replay_supersessions` 排除，被取代的旧结果不再算成功重放，
+重新执行不需要 `force`。
+
+### 48.3 重新执行结果
+
+| 项 | Backtest | Validation G9 |
+| --- | --- | --- |
+| 旧 attempt | `2ecb1651d5a3473a` | `b1240a8c3d2847a0` |
+| 旧结果 | `6d4045e45b5f4e0d` | `4d5da66a81da4d52` |
+| 失效原因 | `missing_corporate_action_details` | `regime_audit_incomplete` |
+| 新 attempt | `44e6f14f4185417d` | `8a05c4fa1e4d456b` |
+| 新结果 | `a56ffe74f3ca48fb` | `c5505f0145e34bbd` |
+| accounting_version | `ca-v2-receivable` | `ca-v2-receivable` |
+| accounting_basis | `formal_receivable` | `formal_receivable` |
+| formal_valuation | `True` | `True` |
+| status | success | success |
+| audit_trace | 不适用（standalone） | **complete** |
+| audit_completeness | 不适用 | **True**，problems `[]` |
+
+**Backtest 明细（修复目标）**
+
+| action_id | ex_date | shares_at_ex | cash_per_share | amount | status |
+| ---: | --- | ---: | ---: | ---: | --- |
+| 126 | 2024-01-18 | 289,600 | 0.069 | 19,982.40 | settled |
+| 140 | 2025-06-18 | 289,600 | 0.088 | 25,484.80 | settled |
+| 150 | 2026-01-19 | 289,600 | 0.123 | 35,620.80 | settled |
+
+合计 81,088.00 元，与 `total_return` 增量 `0.081088` 精确对应。
+
+**Validation regime 统计（修复目标）**
+
+| regime | status | samples | cumulative_return |
+| --- | --- | ---: | ---: |
+| bull | **ok** | 323 | +0.422566 |
+| bear | **ok** | 26 | -0.022231 |
+| range | **ok** | 97 | -0.150620 |
+| unclassified | insufficient_sample | 0 | — |
+
+### 48.4 绩效对照
+
+| 指标 | Backtest 源 | Backtest 新 | G9 源 | G9 新 |
+| --- | ---: | ---: | ---: | ---: |
+| IS/OOS total_return | 0.197338 | **0.278426** | 0.178324 | **0.181437** |
+| cagr | 0.068192 | **0.094140** | 0.097151 | **0.098787** |
+| max_drawdown | -0.201356 | **-0.190868** | -0.170868 | **-0.168672** |
+
+新轮与旧轮绩效**完全一致**——两个缺陷都只影响审计证据，不影响绩效计算。
+
+G9 的 `config_hash` 相同（`39bac25b0ec4ce91`）但 `input_hash` 不同
+（`451bdcc990343464` → `a8669b514793eab7`），再次印证
+「同 config_hash 不代表同数据证据」。
+
+### 48.5 数据库对照
+
+| 表 | 前 | 后 | 变化 |
+| --- | ---: | ---: | ---: |
+| `backtest_runs` | 64 | 117 | +53 |
+| `validation_runs` | 55 | 56 | +1 |
+| `replay_attempts` | 13 | 15 | +2 |
+| `replay_supersessions` | 新建 | 2 | +2 |
+| `validation_backtest_runs` | 412 | 464 | +52 |
+| `validation_regime_stats` | 32 | 36 | +4 |
+| `corporate_action_applications` | 6,910 | 7,194 | +284 |
+| `dividend_receivables` | 3,274 | 3,529 | +255 |
+| `corporate_actions` | 166 | 166 | **0** |
+| `corporate_action_versions` | 704 | 704 | **0** |
+| `etf_daily_prices` | 116,609 | 116,609 | **0** |
+
+`integrity_check` ok，行情指纹 `d54727c0…` 未变，
+源记录 `input_hash` 未变。
+
+### 48.6 测试
+
+| 项 | 结果 |
+| --- | ---: |
+| 专项测试 | 14 passed（16.48 秒） |
+| 全量 pytest | **702 passed** / 0 failed / 0 skipped（269.53 秒） |
+| API smoke | `SMOKE_FAILED: 无` |
+| AppTest | 两页 exception 0 / error 0 |
+
+基线 688 → 702（+14）。
 

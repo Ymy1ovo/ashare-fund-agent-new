@@ -30,10 +30,40 @@ from app.replay.registry import (
     STATUS_SKIPPED,
     STATUS_SUCCESS,
     ReplayOutcome,
+    complete_supersession,
     finish_attempt,
     find_success,
+    pending_supersessions,
+    start_supersession,
     start_attempt,
 )
+
+
+def effective_db_path(db_path=None):
+    """把「未指定」解析成正式库路径，保证所有持久化落在同一个库上。
+
+    阶段3A.3.2.3.6.1（缺陷 A）：`BacktestEngine` 内部靠
+    `if self.db_path is not None` 决定是否写公司行为明细，
+    而 `save_result()` / `_stamp_replay_record()` / attempt 登记
+    走的是 `get_connection(None)` 的默认库。两条路径不一致时会出现
+    「记录落库、明细为空」。这里统一解析一次，全线复用。
+
+    返回值保持 `Path`（`get_connection` 需要 `.parent`），不转成 str。
+    """
+    if db_path is not None:
+        return db_path
+    from app.config import settings
+
+    return settings.database_path
+
+
+def _pending_supersession(record_kind: str, source_id: str, db_path=None):
+    """该源记录是否有「已标失效但还没重新执行成功」的关系。"""
+    for item in pending_supersessions(db_path):
+        if (item["record_kind"] == record_kind
+                and item["source_record_id"] == source_id):
+            return item
+    return None
 
 
 def load_backtest_source(source_id: str, db_path=None) -> dict:
@@ -47,6 +77,20 @@ def load_backtest_source(source_id: str, db_path=None) -> dict:
         if item["source_id"] == source_id:
             return item
     raise ReplayError(f"源回测记录无法盘点：{source_id}")
+
+
+def _close_supersession(record_kind: str, source_id: str, attempt_id: str,
+                        replay_record_id: str, db_path=None) -> None:
+    """把该源记录下未闭环的失效关系回填新侧 ID。"""
+    item = _pending_supersession(record_kind, source_id, db_path)
+    if item is None:
+        return
+    complete_supersession(
+        item["supersession_id"],
+        replacement_attempt_id=attempt_id,
+        replacement_record_id=replay_record_id,
+        db_path=db_path,
+    )
 
 
 def load_validation_source(source_id: str, db_path=None) -> dict:
@@ -170,10 +214,16 @@ def replay_backtest(
     """重放一条历史回测。
 
     `force=False` 时若已有成功重放则直接跳过（幂等）。
+    阶段3A.3.2.3.6.1：入口处把库路径解析成 `effective_db_path`，
+    引擎、保存、标记、attempt 全部使用它，避免跨库写入。
     """
+    db_path = effective_db_path(db_path)
     source = load_backtest_source(source_id, db_path)
+    # 阶段3A.3.2.3.6.1：find_success 已排除被取代的 attempt，
+    # 所以这里有值的都是「仍然有效」的重放，不需要 force 也能重跑被取代的那条。
+    reopen = _pending_supersession(BACKTEST, source_id, db_path)
     prior = find_success(BACKTEST, source_id, db_path)
-    if prior and not force:
+    if prior and not force and reopen is None:
         return ReplayOutcome(
             source_id=source_id, status=STATUS_SKIPPED, replay_id=prior,
             reason=f"已存在成功重放 {prior}，跳过（用 --force 强制重跑）",
@@ -234,6 +284,7 @@ def replay_backtest(
         replay_accounting_version=result.accounting_basis,
         db_path=db_path,
     )
+    _close_supersession(BACKTEST, source_id, attempt, result.run_id, db_path)
     return ReplayOutcome(
         source_id=source_id, status=STATUS_SUCCESS, replay_id=result.run_id,
         attempt_id=attempt,
@@ -296,10 +347,15 @@ def replay_validation(    source_id: str,
     force: bool = False,
     db_path=None,
 ) -> ReplayOutcome:
-    """重放一条历史验证记录。"""
+    """重放一条历史验证记录。
+
+    阶段3A.3.2.3.6.1：同样在入口统一库路径，与 `replay_backtest()` 一致。
+    """
+    db_path = effective_db_path(db_path)
     source = load_validation_source(source_id, db_path)
+    reopen = _pending_supersession(VALIDATION, source_id, db_path)
     prior = find_success(VALIDATION, source_id, db_path)
-    if prior and not force:
+    if prior and not force and reopen is None:
         return ReplayOutcome(
             source_id=source_id, status=STATUS_SKIPPED, replay_id=prior,
             reason=f"已存在成功重放 {prior}，跳过（用 --force 强制重跑）",
@@ -388,6 +444,7 @@ def replay_validation(    source_id: str,
         replay_accounting_version=replay_acct,
         db_path=db_path,
     )
+    _close_supersession(VALIDATION, source_id, attempt, result.validation_id, db_path)
     return ReplayOutcome(
         source_id=source_id, status=STATUS_SUCCESS, replay_id=result.validation_id,
         attempt_id=attempt,

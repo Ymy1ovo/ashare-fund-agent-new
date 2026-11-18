@@ -1,5 +1,56 @@
 # 变更日志
 
+## 2026-11-18 — 阶段3A.3.2.3.6.1 修复重放审计缺陷并重新执行前两条记录
+
+**缺陷 A 修复**（`app/replay/runner.py`）
+
+`replay_backtest()` 把 `db_path=None` 传给引擎，引擎内
+`if self.db_path is not None` 守卫使公司行为明细不写，
+但 `save_result()` 走默认库路径落库了，形成「记录落库、明细为空」。
+
+新增 `effective_db_path()`：非空用它、为空用 `settings.database_path`，
+返回值保持 `Path`。`replay_backtest()` 与 `replay_validation()` 入口
+各解析一次，引擎、保存、标记、attempt 登记全部复用同一路径。
+
+**缺陷 B 修复**（`app/validation/runner.py`）
+
+`_build_regime_payload()` 直接调 `register_backtest()` 而没先
+`register_run_evidence()`，撞上 3A.3.2.3.4.1 的凭证闸门，
+抛出的 `AuditError` 被外层 `except` 吞掉，regime 四项统计全变
+`unavailable` 而 validation 仍记 `success`。
+
+登记顺序改为 `执行 → _require_formal → register_run_evidence
+→ register_backtest`；`db_path` 空时同样解析成正式库；
+外层 `except` 遇到 `AuditError` 一律向外抛，不再降级成降级返回。
+未跳过审计、未放宽校验、未伪造 run_id。
+
+**追加式失效机制**（新增 `replay_supersessions` 表）
+
+旧 attempt 行全字段原样保留（`status` 仍是当年真实的 `success`），
+只新增关系记录：旧 attempt / 旧结果 / 新 attempt / 新结果 /
+失效原因 / 时间。`superseded_attempt_id` 唯一索引保证不可重复失效。
+`find_success()` / `success_map()` 增加 `NOT EXISTS replay_supersessions`
+排除，被取代的旧结果不再算成功重放，重新执行不需要 `force`。
+
+**重新执行**
+
+| 项 | Backtest | Validation G9 |
+| --- | --- | --- |
+| 旧 attempt / 结果 | `2ecb1651d5a3473a` / `6d4045e45b5f4e0d` | `b1240a8c3d2847a0` / `4d5da66a81da4d52` |
+| 失效原因 | `missing_corporate_action_details` | `regime_audit_incomplete` |
+| 新 attempt / 结果 | `44e6f14f4185417d` / `a56ffe74f3ca48fb` | `8a05c4fa1e4d456b` / `c5505f0145e34bbd` |
+| accounting_version | `ca-v2-receivable` | `ca-v2-receivable` |
+| audit 结果 | 不适用（standalone） | `complete` / `True`，problems `[]` |
+
+Backtest 补齐 3 条公司行为应用 + 3 条分红应收（81,088.00 元，
+与 `total_return` 增量精确对应）；Validation 补齐 regime 分组统计
+（bull 323 / bear 26 / range 97 全部 `ok`）。
+
+绩效与旧轮完全一致——两个缺陷都只影响审计证据，不影响绩效计算。
+
+**测试**：688 → **702**（+14），全量 702 passed / 0 failed / 0 skipped。
+
+
 ## 2026-11-18 — 阶段3A.3.2.3.6 第一批历史记录受控重放（执行 2 条后暂停）
 
 计划 5 条，完成 2 条，剩余 3 条因发现两个代码层面缺陷而暂停。

@@ -11,6 +11,7 @@ from datetime import datetime
 from typing import Any
 
 from app.database.db import get_connection
+from app.replay.manifest import ReplayError
 
 SCHEMA = """
 CREATE TABLE IF NOT EXISTS replay_attempts (
@@ -33,6 +34,27 @@ CREATE TABLE IF NOT EXISTS replay_attempts (
 CREATE INDEX IF NOT EXISTS idx_replay_source
     ON replay_attempts(record_kind, source_record_id);
 CREATE INDEX IF NOT EXISTS idx_replay_status ON replay_attempts(status);
+
+-- 阶段3A.3.2.3.6.1：追加式失效关系。
+-- 旧 attempt / 旧结果的原始行一律不改，这里只额外记一条
+-- 「谁被谁取代、为什么」。唯一键落在被取代的 attempt 上，
+-- 同一 attempt 不可被失效两次；新侧字段在重新执行成功后回填。
+CREATE TABLE IF NOT EXISTS replay_supersessions (
+    supersession_id TEXT PRIMARY KEY,
+    record_kind TEXT NOT NULL,
+    source_record_id TEXT NOT NULL,
+    superseded_attempt_id TEXT NOT NULL,
+    superseded_record_id TEXT,
+    replacement_attempt_id TEXT,
+    replacement_record_id TEXT,
+    reason TEXT NOT NULL,
+    created_at TEXT NOT NULL,
+    completed_at TEXT
+);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_supersede_attempt
+    ON replay_supersessions(superseded_attempt_id);
+CREATE INDEX IF NOT EXISTS idx_supersede_source
+    ON replay_supersessions(record_kind, source_record_id);
 """
 
 STATUS_RUNNING = "running"
@@ -122,14 +144,20 @@ def finish_attempt(
 
 
 def find_success(record_kind: str, source_record_id: str, db_path=None) -> str | None:
-    """该源记录是否已有成功重放；返回最近的 replay_record_id。"""
+    """该源记录是否已有**仍然有效**的成功重放；返回最近的 replay_record_id。
+
+    阶段3A.3.2.3.6.1：被 `replay_supersessions` 标记失效的旧 attempt
+    不再算数——否则修复缺陷后会被旧结果挡住、无法重新执行。
+    """
     init_replay_schema(db_path)
     with get_connection(db_path) as conn:
         row = conn.execute(
-            "SELECT replay_record_id FROM replay_attempts "
-            "WHERE record_kind=? AND source_record_id=? AND status=? "
-            "AND replay_record_id IS NOT NULL "
-            "ORDER BY finished_at DESC, rowid DESC LIMIT 1",
+            "SELECT replay_record_id FROM replay_attempts a "
+            "WHERE a.record_kind=? AND a.source_record_id=? AND a.status=? "
+            "AND a.replay_record_id IS NOT NULL "
+            "AND NOT EXISTS (SELECT 1 FROM replay_supersessions s "
+            "                WHERE s.superseded_attempt_id = a.attempt_id) "
+            "ORDER BY a.finished_at DESC, a.rowid DESC LIMIT 1",
             (record_kind, source_record_id, STATUS_SUCCESS),
         ).fetchone()
     return str(row[0]) if row else None
@@ -140,9 +168,11 @@ def success_map(record_kind: str, db_path=None) -> dict[str, str]:
     init_replay_schema(db_path)
     with get_connection(db_path) as conn:
         rows = conn.execute(
-            "SELECT source_record_id, replay_record_id FROM replay_attempts "
-            "WHERE record_kind=? AND status=? AND replay_record_id IS NOT NULL "
-            "ORDER BY finished_at",
+            "SELECT a.source_record_id, a.replay_record_id FROM replay_attempts a "
+            "WHERE a.record_kind=? AND a.status=? AND a.replay_record_id IS NOT NULL "
+            "AND NOT EXISTS (SELECT 1 FROM replay_supersessions s "
+            "                WHERE s.superseded_attempt_id = a.attempt_id) "
+            "ORDER BY a.finished_at",
             (record_kind, STATUS_SUCCESS),
         ).fetchall()
     return {str(row[0]): str(row[1]) for row in rows}
@@ -159,4 +189,91 @@ def list_attempts(record_kind: str | None = None, limit: int = 100, db_path=None
     params.append(limit)
     with get_connection(db_path) as conn:
         rows = conn.execute(sql, params).fetchall()
+    return [dict(row) for row in rows]
+
+
+# ---------------------------------------------------------------- 追加式失效
+
+REASON_MISSING_DETAILS = "missing_corporate_action_details"
+REASON_REGIME_INCOMPLETE = "regime_audit_incomplete"
+
+
+def start_supersession(
+    record_kind: str,
+    source_record_id: str,
+    *,
+    superseded_attempt_id: str,
+    reason: str,
+    db_path=None,
+) -> str:
+    """标记一条旧重放结果「已被取代」，返回 supersession_id。
+
+    追加式：旧 attempt 行一律不改（`status` 仍是当年真实的 success），
+    只在这里新增一条关系记录。同一 attempt 只能被失效一次。
+    """
+    init_replay_schema(db_path)
+    with get_connection(db_path) as conn:
+        existing = conn.execute(
+            "SELECT supersession_id FROM replay_supersessions "
+            "WHERE superseded_attempt_id=?", (superseded_attempt_id,)
+        ).fetchone()
+        if existing is not None:
+            return str(existing[0])
+        row = conn.execute(
+            "SELECT replay_record_id FROM replay_attempts WHERE attempt_id=?",
+            (superseded_attempt_id,),
+        ).fetchone()
+        if row is None:
+            raise ReplayError(f"待失效的 attempt 不存在：{superseded_attempt_id}")
+        supersession_id = uuid.uuid4().hex[:16]
+        conn.execute(
+            "INSERT INTO replay_supersessions "
+            "(supersession_id, record_kind, source_record_id, "
+            " superseded_attempt_id, superseded_record_id, reason, created_at) "
+            "VALUES (?,?,?,?,?,?,?)",
+            (supersession_id, record_kind, source_record_id,
+             superseded_attempt_id, row[0], reason, _now()),
+        )
+    return supersession_id
+
+
+def complete_supersession(
+    supersession_id: str,
+    *,
+    replacement_attempt_id: str,
+    replacement_record_id: str,
+    db_path=None,
+) -> None:
+    """重新执行成功后，回填新侧 attempt / result，闭环这条失效关系。"""
+    init_replay_schema(db_path)
+    with get_connection(db_path) as conn:
+        conn.execute(
+            "UPDATE replay_supersessions "
+            "SET replacement_attempt_id=?, replacement_record_id=?, completed_at=? "
+            "WHERE supersession_id=?",
+            (replacement_attempt_id, replacement_record_id, _now(), supersession_id),
+        )
+
+
+def list_supersessions(record_kind: str | None = None, db_path=None) -> list[dict]:
+    """列出全部失效关系；审计报告据此解释旧结果为何不再有效。"""
+    init_replay_schema(db_path)
+    sql = "SELECT * FROM replay_supersessions"
+    params: list[Any] = []
+    if record_kind:
+        sql += " WHERE record_kind=?"
+        params.append(record_kind)
+    sql += " ORDER BY created_at, rowid"
+    with get_connection(db_path) as conn:
+        return [dict(row) for row in conn.execute(sql, params).fetchall()]
+
+
+def pending_supersessions(db_path=None) -> list[dict]:
+    """尚未完成闭环的失效关系（重新执行还没成功）。"""
+    init_replay_schema(db_path)
+    with get_connection(db_path) as conn:
+        rows = conn.execute(
+            "SELECT * FROM replay_supersessions WHERE replacement_attempt_id IS NULL "
+            "ORDER BY created_at, rowid"
+        ).fetchall()
     return [dict(row) for row in rows]
