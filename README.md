@@ -2428,7 +2428,8 @@ if (basis != ACCOUNTING_FORMAL
 | 3A.3.2.3.4 | 验证内部回测与公司行为审计追溯 | 618 | `phase3A3_2_3_4_*.md` |
 | 3A.3.2.3.4.1 | 审计完整性闸门与明细持久化整改 | 632 | `phase3A3_2_3_4_1_audit*.md` |
 | 3A.3.2.3.4.1.1 | 审计完整性与 Sparse 明细原子化 | 688 | `phase3A3_2_3_4_1_1_*.md` |
-| 3A.3.2.3.5 | 历史回测与验证记录重放候选清点 | **688** | `phase3A3_2_3_5_*.md` |
+| 3A.3.2.3.5 | 历史回测与验证记录重放候选清点 | 688 | `phase3A3_2_3_5_*.md` |
+| 3A.3.2.3.6 | 第一批历史记录受控重放（5 条，执行 2 条后暂停） | **688** | `phase3A3_2_3_6_*.md` |
 
 当前正式会计版本：`ca-v2-receivable`；正式会计基础：`formal_receivable`；正式估值标记：`formal_valuation=True`。
 
@@ -2833,4 +2834,102 @@ backtest 侧只有 `8412fc1cefb4437e` 可重放，因为它的 `params_source` �
 `9c40fcbf2e7b010c65a2fa4b62313fe6`、`backtest_runs` 内容指纹
 `449be0fda8b7c24ddca7f6a7ae6ac3b3`、行情指纹 `d54727c0…` 前后一致，
 `PRAGMA integrity_check` ok。
+
+## 47. 阶段3A.3.2.3.6 第一批历史记录受控重放
+
+**本轮中途暂停。** 计划 5 条，完成 2 条，剩余 3 条因发现两个代码层面缺陷而停止。
+
+### 47.1 执行结果
+
+| source_id | 类型 | attempt | 新记录 | status |
+| --- | --- | --- | --- | --- |
+| `8412fc1cefb4437e` | backtest | `2ecb1651d5a3473a` | `6d4045e45b5f4e0d` | success |
+| `b3f1e2c89ebc4b95` | validation G9 | `b1240a8c3d2847a0` | `4d5da66a81da4d52` | success |
+| `c5589f7dcd1a4a5d` | validation G7 | — | — | 未执行 |
+| `838a58fa5f3b4025` | validation G8 | — | — | 未执行 |
+| `7d884a1a03d94915` | validation G1 | — | — | 未执行 |
+
+两条均 `force=False`，源记录 `input_hash` 前后未变，行情与公司行为指纹未变。
+
+### 47.2 两个代码缺陷
+
+**缺陷 A：`replay_backtest()` 不落公司行为明细**
+
+`app/replay/runner.py` 第 203 行 `BacktestEngine(config, strategy, db_path=db_path)`
+默认 `db_path=None`，引擎内 `if self.db_path is not None` 守卫使明细不写；
+但 `save_result()` 用 `db_path=None` 走 `settings.database_path` 落库了。
+结果：记录落库、明细为空。
+
+实测 `6d4045e45b5f4e0d` 的 notes 写「已应用 3 条事件」，
+但 `corporate_action_applications` / `dividend_receivables` 均 0 行。
+
+**缺陷 B：`_build_regime_payload()` 缺存在性凭证（高危）**
+
+`app/validation/runner.py` 第 694-699 行直接调 `audit.register_backtest()`，
+未先 `register_run_evidence()`。3A.3.2.3.4.1（提交 `5a4af82`，2026-11-17 09:15:30）
+给 `register_backtest()` 加了凭证闸门，导致此路径抛 `AuditError`，
+被外层 `except` 吞掉，regime 四项统计全部 `unavailable`。
+
+时间线证据：最后一次成功登记 `regime_grouping` 是 2026-11-16 **16:10:40**，
+早于闸门上线时间。**即闸门上线后所有新 validation 重放都会丢失 regime 数据。**
+
+这是 3A.3.2.3.4.1 引入的回归，不是本阶段造成的。
+
+### 47.3 绩效对照
+
+**backtest `8412fc1cefb4437e`**
+
+| 指标 | 源 | 新 | 差异 |
+| --- | ---: | ---: | ---: |
+| total_return | 0.197338 | 0.278426 | +0.081088 |
+| cagr | 0.068192 | 0.094140 | +0.025948 |
+| max_drawdown | -0.201356 | -0.190868 | +0.010488 |
+
+差异 `0.081088 × 1,000,000 = 81,088.00` 元，与三次分红合计**精确相等**，
+是两阶段分红口径差异，不是计算错误。
+
+**validation G9 `b3f1e2c89ebc4b95`**
+
+| 指标 | 源 | 新 | 差异 |
+| --- | ---: | ---: | ---: |
+| IS total_return | 0.041007 | 0.041007 | **0** |
+| IS cagr | 0.010517 | 0.010517 | **0** |
+| IS max_drawdown | -0.198785 | -0.198785 | **0** |
+| OOS total_return | 0.178324 | 0.181437 | +0.003113 |
+| OOS cagr | 0.097151 | 0.098787 | +0.001636 |
+| OOS max_drawdown | -0.170868 | -0.168672 | +0.002195 |
+
+样本内**完全一致**，样本外差 0.31% 来自分红口径。
+
+### 47.4 G1 专项：同 config_hash 不同 input_hash
+
+G9 已验证这一判断：`config_hash` 完全相同（`39bac25b0ec4ce91`），
+但 `input_hash` 从 `451bdcc990343464` 变为 `a8669b514793eab7`。
+`config_hash` 只覆盖 28 个验证参数，`input_hash` 还覆盖实际数据
+（行情快照、指标版本、公司行为事件集）。
+
+G1（`7d884a1a03d94915`，`config_hash=b6b1babace517bdc`，源 `input_hash=3e064b6673929193`）
+未执行，执行时需照此记录。
+
+### 47.5 数据库对照
+
+| 表 | 前 | 后 | 变化 |
+| --- | ---: | ---: | ---: |
+| `backtest_runs` | 12 | 64 | +52 |
+| `validation_runs` | 54 | 55 | +1 |
+| `replay_attempts` | 11 | 13 | +2 |
+| `validation_backtest_runs` | 361 | 412 | +51 |
+| `validation_regime_stats` | 28 | 32 | +4 |
+| `corporate_actions` | 166 | 166 | 0 |
+| `corporate_action_versions` | 704 | 704 | 0 |
+| `etf_daily_prices` | 116,609 | 116,609 | 0 |
+
+`integrity_check` ok，行情指纹 `d54727c0…` 未变，全量 pytest **688 passed**。
+
+### 47.6 待验收决定
+
+1. 缺陷 A / B 是否现在修（各 2~3 行最小改动）
+2. 已产生的两条记录如何处置（保留 / 删除重跑 / 保留并标注）
+3. `audit_completeness` 判 `incomplete` 是否可接受
+4. 剩余 3 条是否等修复后再跑（建议如此）
 

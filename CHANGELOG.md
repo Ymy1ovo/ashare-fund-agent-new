@@ -1,5 +1,59 @@
 # 变更日志
 
+## 2026-11-18 — 阶段3A.3.2.3.6 第一批历史记录受控重放（执行 2 条后暂停）
+
+计划 5 条，完成 2 条，剩余 3 条因发现两个代码层面缺陷而暂停。
+
+**已完成**
+
+| source_id | 类型 | attempt | 新记录 | status |
+| --- | --- | --- | --- | --- |
+| `8412fc1cefb4437e` | backtest | `2ecb1651d5a3473a` | `6d4045e45b5f4e0d` | success |
+| `b3f1e2c89ebc4b95` | validation G9 | `b1240a8c3d2847a0` | `4d5da66a81da4d52` | success |
+
+两条均 `force=False`，源记录 `input_hash` 未变，行情与公司行为指纹未变。
+
+**绩效**
+
+backtest：`total_return` 0.197338 → 0.278426，差 `+0.081088`，
+`× 1,000,000 = 81,088.00` 元，与三次分红合计精确相等，是口径差异非计算错误。
+
+validation G9：样本内指标**完全一致**（差值 0），
+样本外 `total_return` 0.178324 → 0.181437（+0.31%），同样来自分红口径。
+
+**G1 专项验证**
+
+G9 证实「同 `config_hash` 不同 `input_hash`」：
+`config_hash` 均为 `39bac25b0ec4ce91`，但 `input_hash`
+从 `451bdcc990343464` 变为 `a8669b514793eab7`。
+
+**发现两个代码缺陷（未修，待验收）**
+
+缺陷 A：`app/replay/runner.py::replay_backtest()` 传 `db_path=None` 给引擎，
+引擎内 `if self.db_path is not None` 守卫使公司行为明细不写，
+但 `save_result()` 走默认库路径落库了。结果记录落库、明细为空。
+
+缺陷 B（高危）：`app/validation/runner.py::_build_regime_payload()`
+直接调 `audit.register_backtest()` 而没先 `register_run_evidence()`。
+3A.3.2.3.4.1（`5a4af82`）给 `register_backtest()` 加了凭证闸门，
+导致该路径抛 `AuditError` 并被外层 `except` 吞掉，
+regime 四项统计全部 `unavailable`。
+
+时间线证据：最后一次成功登记 `regime_grouping` 是 2026-11-16 16:10:40，
+早于闸门上线时间 2026-11-17 09:15:30。**闸门上线后所有新 validation
+重放都会丢失 regime 数据**，这是 3A.3.2.3.4.1 引入的回归。
+
+**数据库**
+
+`backtest_runs` 12→64、`validation_runs` 54→55、`replay_attempts` 11→13、
+`validation_backtest_runs` 361→412、`validation_regime_stats` 28→32。
+`corporate_actions` 166、`corporate_action_versions` 704、
+`etf_daily_prices` 116,609 均未变。`integrity_check` ok。
+
+全量 pytest **688 passed**（未改代码，数量不变，
+说明两个缺陷均未被现有测试覆盖）。
+
+
 ## 2026-11-17 — 阶段3A.3.2.3.5 历史回测与验证记录重放候选清点
 
 **只清点，不重放。** 未执行任何历史回测或验证重放，未修改任何历史记录、
