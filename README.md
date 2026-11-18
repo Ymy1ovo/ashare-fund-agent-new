@@ -2431,7 +2431,8 @@ if (basis != ACCOUNTING_FORMAL
 | 3A.3.2.3.5 | 历史回测与验证记录重放候选清点 | 688 | `phase3A3_2_3_5_*.md` |
 | 3A.3.2.3.6 | 第一批历史记录受控重放（5 条，执行 2 条后暂停） | 688 | `phase3A3_2_3_6_*.md` |
 | 3A.3.2.3.6.1 | 修复重放审计缺陷并重新执行前两条 | 702 | `phase3A3_2_3_6_1_*.md` |
-| 3A.3.2.3.6.2 | 第二批历史记录受控重放（G7/G8/G1） | **702** | `phase3A3_2_3_6_2_*.md` |
+| 3A.3.2.3.6.2 | 第二批历史记录受控重放（G7/G8/G1） | 702 | `phase3A3_2_3_6_2_*.md` |
+| 3A 最终收口 | 剩余历史配置重放（G2/G3/G4/G5） | **702** | `phase3A_final_replay_closure.md` |
 
 当前正式会计版本：`ca-v2-receivable`；正式会计基础：`formal_receivable`；正式估值标记：`formal_valuation=True`。
 
@@ -3141,4 +3142,118 @@ MA250 持仓周期最长，2021-01~2024-12 期间经历的除息事件最多，
 | 全量 pytest | **702 passed** / 0 failed / 0 skipped（304.94 秒） |
 | API smoke | `SMOKE_FAILED: 无` |
 | AppTest | 两页 exception 0 / error 0 |
+
+## 50. 阶段3A 最终收口：剩余历史配置重放
+
+处理 G2 / G3 / G4 / G5 四个配置组的代表记录，**阶段3A 正式冻结**。
+
+### 50.1 四个配置组
+
+| 组 | config_hash | 源条数 | 代码数 | 网格 | 字段集 | 代表 |
+| ---: | --- | ---: | ---: | --- | --- | --- |
+| G2 | `b1de1d7323a8a35d` | 5 | 6 | 3 档 | current 28 | `c84356bd50ca4bb5` |
+| G3 | `177a329b6fd72cec` | 5 | 6 | 3 档 | current 28 | `2b21ca9b2c434444` |
+| G4 | `86e4b4e8bac296ad` | 2 | 6 | 7 档 | historical 26 | `f9898c695b394808` |
+| G5 | `4457e246afad6e79` | 1 | 41 | 7 档 | historical 26 | `e725034e46ff47e5` |
+
+每组只重放 1 条代表，其余同配置记录标记为「同配置组，未重复重放」。
+
+### 50.2 重放结果
+
+| 组 | attempt | 新记录 | 新 config_hash | status |
+| ---: | --- | --- | --- | --- |
+| G2 | `fdb0e78069284fb1` | `bde29001291a456b` | `b1de1d7323a8a35d`（同源） | success |
+| G3 | `ce071b8979b5427c` | `df2f811d52d04155` | `177a329b6fd72cec`（同源） | success |
+| G4 | `3508b65202a64aea` | `93c170ca1402419f` | `b6b1babace517bdc`（legacy 映射） | success |
+| G5 | `3337840f523d49e6` | `1c5832e27c6c4f3c` | `11ce7469245afab0`（legacy 映射） | success |
+
+四条全部 `ca-v2-receivable` / `formal_receivable` / `True`、
+`audit_trace=complete`、`audit_completeness=True`（problems `[]`）、`force=False`。
+
+### 50.3 G4/G5 的 legacy 兼容映射
+
+两条记录创建于 2026-11-11 14:29 / 14:39，而 `regime_ma_window` 与
+`min_validation_days` 两个字段由提交 `66db49e`（2026-11-11 16:47:29）引入。
+
+旧版虽未把两者暴露成 `ValidationConfig` 字段，但**行为上一直在用**：
+
+| 字段 | 旧版等价来源 | 值 |
+| --- | --- | ---: |
+| `regime_ma_window` | `regime.py::build_regime_series(ma_window=REGIME_MA_WINDOW)` | 250 |
+| `min_validation_days` | `split.py::split_time_range(min_days=MIN_VALIDATION_TRADING_DAYS)` | 120 |
+
+这是**情况 B**：字段本身不存在，但有可追溯的等价来源，不是「无法证明」。
+
+**不声称字节级相同**：`schema_version` 从 `historical 26` 变为 `current 28`，
+`config_hash` 重新生成（`86e4b4e8bac296ad` → `b6b1babace517bdc`、
+`4457e246afad6e79` → `11ce7469245afab0`），报告标注为 legacy-compatible replay。
+
+**等价性反向验证**：G4 重建后参数与已重放的 G1 **完全相同**
+（`as_dict()` 相等、hash 同为 `b6b1babace517bdc`）；
+G5 重建后与 `b6e1155d19ba4b6a` **完全相同**。
+两条独立路径殊途同归，证明映射值选对了。
+
+### 50.4 绩效差异
+
+| 组 | 选参变化 | IS ret 源→新 | OOS ret 源→新 | 分红金额 |
+| ---: | --- | --- | --- | ---: |
+| G2 | MA60 未变 | -0.1000 → -0.0841 | +0.2243 → +0.1927 | 428,699.54 |
+| G3 | MA30 未变 | -0.1649 → -0.1646 | +0.2191 → +0.2200 | 447,293.28 |
+| G4 | MA60 → MA250 | -0.0853 → +0.0410 | +0.2144 → +0.1814 | 475,647.38 |
+| G5 | MA250 未变 | -0.1456 → +0.1368 | +0.3071 → +0.2011 | 598,485.73 |
+
+G3 差异在 0.04% 以内（与 G2 一样选参未变），是口径切换影响的**对照样本**；
+G4 与第一批 G1 同参数，绩效完全一致；
+G5 选参未变，差异纯来自分红（848 应用、598,485.73 元）。
+
+### 50.5 阶段3A 最终分类
+
+| 类别 | backtest | validation | 合计 |
+| --- | ---: | ---: | ---: |
+| `current_formal` | 3 | 23 | 26 |
+| `replayed` | 2 | 10 | 12 |
+| `legacy_replayable` | 0 | 27 | 27 |
+| `non_replayable` | 9 | 0 | 9 |
+| `failed_attempt` | 0 | 4 | 4 |
+| **合计** | **14** | **64** | **78** |
+
+27 条 `legacy_replayable` **不是待重放**，而是「配置组已被代表覆盖、
+本身不重复执行」的最终态。验证：剩余 27 条里只有 1 条
+（`5ec77faf42d64162`）的 hash 不在已重放组内，而它与 G4 代表参数完全相同。
+**不存在未覆盖的新配置。**
+
+### 50.6 剩余问题
+
+**No remaining P0/P1 blockers.**
+
+| 级别 | # | 内容 |
+| --- | ---: | --- |
+| P2 | 1 | 27 条 legacy 保持旧口径，不可与 current_formal 混用比较 |
+| P2 | 2 | 9 条 backtest 永久 non_replayable（缺 `ma_window` / `rebalance_tolerance`） |
+| P2 | 3 | 4 条 failed_attempt（源记录本身失败） |
+| P2 | 4 | G4/G5 的 config_hash 与源不同（由 28 字段集生成） |
+
+### 50.7 数据完整性
+
+| 表 | 前 | 后 | 变化 |
+| --- | ---: | ---: | ---: |
+| `backtest_runs` | 307 | 507 | +200 |
+| `validation_runs` | 60 | 64 | +4 |
+| `replay_attempts` | 19 | 23 | +4 |
+| `validation_backtest_runs` | 654 | 854 | +200 |
+| `validation_regime_stats` | 48 | 64 | +16 |
+| `corporate_action_applications` | 7,650 | 8,873 | +1,223 |
+| `dividend_receivables` | 3,934 | 4,947 | +1,013 |
+| `corporate_actions` | 166 | 166 | **0** |
+| `corporate_action_versions` | 704 | 704 | **0** |
+| `etf_daily_prices` | 116,609 | 116,609 | **0** |
+
+`integrity_check` ok，行情指纹 `d54727c0…` 未变，
+四条源记录 `input_hash` 未变，越界 source 为空。
+
+### 50.8 封板
+
+**PHASE 3A CLOSED**
+
+下一阶段：3B-1 正式会计口径下的策略有效性基线验证。
 

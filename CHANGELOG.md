@@ -1,5 +1,70 @@
 # 变更日志
 
+## 2026-11-18 — 阶段3A 最终收口：剩余历史配置重放（G2/G3/G4/G5）
+
+处理四个配置组的代表记录，**PHASE 3A CLOSED**。
+
+**四组重放结果**
+
+| 组 | source_id | attempt | 新记录 | config_hash | status |
+| --- | --- | --- | --- | --- | --- |
+| G2 | `c84356bd50ca4bb5` | `fdb0e78069284fb1` | `bde29001291a456b` | `b1de1d7323a8a35d`（同源） | success |
+| G3 | `2b21ca9b2c434444` | `ce071b8979b5427c` | `df2f811d52d04155` | `177a329b6fd72cec`（同源） | success |
+| G4 | `f9898c695b394808` | `3508b65202a64aea` | `93c170ca1402419f` | `b6b1babace517bdc`（legacy 映射） | success |
+| G5 | `e725034e46ff47e5` | `3337840f523d49e6` | `1c5832e27c6c4f3c` | `11ce7469245afab0`（legacy 映射） | success |
+
+四条全部 `ca-v2-receivable` / `formal_receivable` / `True`、
+`audit_trace=complete`、`audit_completeness=True`（problems `[]`）、`force=False`。
+
+**G4/G5 的 legacy 兼容映射**
+
+两条记录创建于 2026-11-11 14:29 / 14:39，`regime_ma_window` 与
+`min_validation_days` 由提交 `66db49e`（2026-11-11 16:47:29）引入。
+旧版未暴露成配置字段，但行为上一直在用：
+`regime.py` 的 `REGIME_MA_WINDOW = 250`、`split.py` 的
+`MIN_VALIDATION_TRADING_DAYS = 120`。这是情况 B（有可追溯等价来源），
+不是情况 C（无法证明）。未用「当前默认值」填历史，用的是旧版实际生效常量。
+
+不声称字节级相同：`schema_version` 从 `historical 26` 变为 `current 28`，
+`config_hash` 重新生成，报告标注 legacy-compatible replay。
+
+等价性反向验证：G4 重建后参数与已重放的 G1 完全相同
+（hash 同为 `b6b1babace517bdc`），G5 与 `b6e1155d19ba4b6a` 完全相同。
+
+**绩效差异**
+
+| 组 | 选参 | IS ret | OOS ret | 分红金额 |
+| --- | --- | --- | --- | ---: |
+| G2 | MA60 未变 | -0.1000 → -0.0841 | +0.2243 → +0.1927 | 428,699.54 |
+| G3 | MA30 未变 | -0.1649 → -0.1646 | +0.2191 → +0.2200 | 447,293.28 |
+| G4 | MA60 → MA250 | -0.0853 → +0.0410 | +0.2144 → +0.1814 | 475,647.38 |
+| G5 | MA250 未变 | -0.1456 → +0.1368 | +0.3071 → +0.2011 | 598,485.73 |
+
+G3 差异在 0.04% 以内，是口径切换影响的对照样本；G4 与 G1 同参数绩效完全一致。
+
+**阶段3A 最终分类（78 条）**
+
+`current_formal` 26 / `replayed` 12 / `legacy_replayable` 27 /
+`non_replayable` 9 / `failed_attempt` 4。
+
+27 条 legacy 是「配置组已被代表覆盖、本身不重复执行」的最终态，
+不是待重放。剩余记录里只有 1 条 hash 不在已重放组内，
+而它与 G4 代表参数完全相同——不存在未覆盖的新配置。
+
+**No remaining P0/P1 blockers.**
+
+**数据库**：`backtest_runs` 307→507、`validation_runs` 60→64、
+`replay_attempts` 19→23、`validation_backtest_runs` 654→854、
+`validation_regime_stats` 48→64、`corporate_action_applications`
+7,650→8,873、`dividend_receivables` 3,934→4,947。
+`corporate_actions` 166、`corporate_action_versions` 704、
+`etf_daily_prices` 116,609 均未变，`integrity_check` ok，
+行情指纹 `d54727c0…` 未变，四条源记录 `input_hash` 未变，越界 source 为空。
+
+**测试**：全量 **702 passed / 0 failed / 0 skipped**（264.50 秒），
+与基线一致——本阶段未改任何工程代码。
+
+
 ## 2026-11-18 — 阶段3A.3.2.3.6.2 第二批历史记录受控重放（G7/G8/G1）
 
 只执行 G7 / G8 / G1 三条，全部成功。未执行 G2/G3/G4/G5，未进入 3A.3.3/3B。
