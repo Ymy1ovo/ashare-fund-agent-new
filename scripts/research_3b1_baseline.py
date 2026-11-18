@@ -59,6 +59,77 @@ def _clean_metrics(d) -> dict:
     return out
 
 
+# ---------------------------------------------------------------- 统计层级
+def dedupe_by_config(units: list[dict]) -> tuple[list[dict], list[dict]]:
+    """按 (config_hash, input_hash) 去重。
+
+    返回 (唯一配置列表, 被合并掉的重复项明细)。被合并的记录**不从
+    units 里删除**，逐条审计明细照旧保留，只是不进入汇总统计。
+    """
+    seen: dict[tuple, str] = {}
+    uniq: list[dict] = []
+    merged: list[dict] = []
+    for u in units:
+        key = (u["config_hash"], u["input_hash"])
+        if key in seen:
+            merged.append({
+                "tag": u["tag"], "record_id": u["record_id"],
+                "config_hash": u["config_hash"], "input_hash": u["input_hash"],
+                "merged_into": seen[key], "reason": "config_hash+input_hash 完全相同",
+            })
+            continue
+        seen[key] = u["tag"]
+        uniq.append(u)
+    return uniq, merged
+
+
+def oos_fingerprint_groups(units: list[dict]) -> list[dict]:
+    """按 OOS 结果指纹（total_return + max_drawdown）合并。
+
+    这只是"结果是否重复"的度量，**不是独立样本数**：共享同一行情库、
+    同一策略代码、同一会计口径、基本同一 OOS 区间的结果，彼此强相关。
+    """
+    groups: dict[tuple, list[str]] = {}
+    for u in units:
+        o = u.get("oos_metrics") or {}
+        key = (
+            round(float(o.get("total_return") or 0.0), 8),
+            round(float(o.get("max_drawdown") or 0.0), 8),
+        )
+        groups.setdefault(key, []).append(u["tag"])
+    out = []
+    for (ret, mdd), tags in sorted(groups.items(), key=lambda kv: -kv[0][0]):
+        out.append({
+            "oos_total_return": ret, "oos_max_drawdown": mdd, "tags": sorted(tags),
+        })
+    return out
+
+
+def count_layers(units: list[dict]) -> dict:
+    """三层计数 + 独立性声明。独立样本数无法严谨定义时写 not_estimable。"""
+    uniq, merged = dedupe_by_config(units)
+    fps = oos_fingerprint_groups(units)
+    return {
+        "included_records": len(units),
+        "unique_config_input_pairs": len(uniq),
+        "unique_oos_result_fingerprints": len(fps),
+        "statistically_independent_samples": "not_estimable",
+        "not_estimable_reason": (
+            "全部记录共享同一行情数据库、同一策略代码、同一成本参数、"
+            "同一会计口径，且主要 OOS 时间段基本相同（2025-01-02~2026-11-09）。"
+            "唯一配置数与结果指纹数都不是独立市场样本数，"
+            "无法据此严谨定义独立样本量。"
+        ),
+        "shared_market_periods": sorted({(u["oos_start"], u["oos_end"])
+                                         for u in units}),
+        "shared_is_periods": sorted({(u["is_start"], u["is_end"])
+                                     for u in units}),
+        "shared_pools": sorted({u["etf_count"] for u in units}),
+        "deduped_records": merged,
+    }
+
+
+
 def _num(x, nd=10):
     return None if x is None else round(float(x), nd)
 
@@ -345,14 +416,24 @@ def study_benchmarks(unit: dict) -> dict:
 
 
 # ---------------------------------------------------------------- 分析
-def analyze_param_ranking(units: list[dict]) -> dict:
-    """研究一/二：参数排名稳定性 + MA250 边界效应。"""
+def analyze_param_ranking(units: list[dict], *,
+                         deduped: bool = False) -> dict:
+    """研究一/二：参数排名稳定性 + MA250 边界效应。
+
+    `deduped=True` 时只统计唯一 (config_hash, input_hash) 配置，
+    避免 G1/G4 这类完全相同的重复记录给同一配置双倍权重。
+    """
+    if not deduped:
+        units, _ = dedupe_by_config(units)
     rank_rows = []
     for u in units:
-        is_r = {ma: (d.get("total_return")) for ma, d in u["is_grid"].items()
+        # 键统一成 int：JSON 往返会把 int 键序列化成 str，
+        # 不归一化会让 IS 最优(60) 与 OOS 最优('60') 比不相等。
+        is_r = {int(ma): (d.get("total_return"))
+                for ma, d in u["is_grid"].items()
                 if d.get("status") == "success"}
         oos = u.get("oos_params") or {}
-        oos_r = {ma: d.get("total_return") for ma, d in oos.items()
+        oos_r = {int(ma): d.get("total_return") for ma, d in oos.items()
                  if d.get("status") != "failed" and d.get("total_return") is not None}
         if not is_r:
             continue
@@ -374,10 +455,10 @@ def analyze_param_ranking(units: list[dict]) -> dict:
     # MA250 边界分析
     ma250 = []
     for u in units:
-        is_grid = u["is_grid"]
-        oos = u.get("oos_params") or {}
+        is_grid = {int(k): v for k, v in (u["is_grid"] or {}).items()}
+        oos = {int(k): v for k, v in (u.get("oos_params") or {}).items()}
         def g(d, k):
-            return d.get(k, {}).get("total_return")
+            return (d.get(k) or {}).get("total_return")
         ma250.append({
             "tag": u["tag"],
             "is_ma120": g(is_grid, 120), "is_ma250": g(is_grid, 250),
@@ -392,22 +473,44 @@ def analyze_param_ranking(units: list[dict]) -> dict:
     boundary_hits = sum(1 for r in rank_rows if r["is_best_on_boundary"])
     ma250_first = sum(1 for r in rank_rows if r["is_best"] == 250)
     oos_match = sum(1 for r in rank_rows if r["is_oos_best_match"])
+    oos_best_dist: dict[str, int] = {}
+    for r in rank_rows:
+        if r["oos_best"] is None:
+            continue
+        key = str(r["oos_best"])
+        oos_best_dist[key] = oos_best_dist.get(key, 0) + 1
+    oos250_first = sum(1 for r in rank_rows if r["oos_best"] == 250)
     return {
         "rows": rank_rows,
         "ma250_boundary": ma250,
+        "basis": "unique_config_input_pairs" if deduped or True else "records",
         "summary": {
             "unit_count": n,
+            "unit_basis": "unique (config_hash, input_hash) 配置",
             "is_best_on_boundary_count": boundary_hits,
             "is_best_on_boundary_ratio": _num(boundary_hits / n, 6) if n else None,
             "is_best_is_ma250_count": ma250_first,
+            "is_best_is_ma250_ratio": _num(ma250_first / n, 6) if n else None,
             "is_oos_best_match_count": oos_match,
             "is_oos_best_match_ratio": _num(oos_match / n, 6) if n else None,
+            "oos_best_param_distribution": oos_best_dist,
+            "oos_best_is_ma250_count": oos250_first,
         },
     }
 
 
-def analyze_walkforward(units: list[dict]) -> dict:
-    """研究五：Walk-Forward 稳定性。"""
+def analyze_walkforward(units: list[dict], *,
+                        deduped: bool = True) -> dict:
+    """研究五：Walk-Forward 稳定性。
+
+    逐条窗口明细全部保留。所有汇总比例基于唯一配置，
+    避免 G1/G4 这类完全相同的重复记录给同一组窗口双倍权重。
+    """
+    merged_note = None
+    if deduped:
+        units, merged = dedupe_by_config(units)
+        if merged:
+            merged_note = [m["tag"] for m in merged]
     rows = []
     for u in units:
         ws = [w for w in u["windows"] if w["status"] == "success"]
@@ -438,7 +541,48 @@ def analyze_walkforward(units: list[dict]) -> dict:
             "best_window_share_of_sum": _num(best / total, 6)
             if (best is not None and total) else None,
         })
-    return {"rows": rows}
+
+    # 分层汇总：唯一配置层面
+    ok_rows = [r for r in rows if r.get("status") != "unavailable"]
+    n = len(ok_rows)
+    concentrated = sum(
+        1 for r in ok_rows
+        if r["best_window_return"] is not None and r["sum_window_return"] is not None
+        and r["best_window_return"] >= r["sum_window_return"])
+    pos_ratios = [r["positive_ratio"] for r in ok_rows
+                  if r["positive_ratio"] is not None]
+    worst = [r["worst_window_return"] for r in ok_rows
+             if r["worst_window_return"] is not None]
+    # 真正不同的市场时间区间：按 (test 窗口集合) 归并
+    tricky: dict[tuple, list[str]] = {}
+    for r in ok_rows:
+        sig = tuple((w["test_start"], w["test_end"]) for w in r["windows"])
+        tricky.setdefault(sig, []).append(r["tag"])
+    return {
+        "rows": rows,
+        "basis": "unique (config_hash, input_hash) 配置",
+        "merged_for_summary": merged_note,
+        "summary": {
+            "unit_count": n,
+            "unit_basis": "unique (config_hash, input_hash) 配置",
+            "total_window_count": sum(r["window_count"] for r in ok_rows),
+            "positive_ratio_min": _num(min(pos_ratios), 6) if pos_ratios else None,
+            "positive_ratio_max": _num(max(pos_ratios), 6) if pos_ratios else None,
+            "worst_window_return_min": _num(min(worst), 10) if worst else None,
+            "worst_window_return_max": _num(max(worst), 10) if worst else None,
+            "all_windows_positive_configs": sum(
+                1 for r in ok_rows if r["positive_ratio"] == 1.0),
+            "concentration_configs": concentrated,
+            "concentration_definition": (
+                "最好单窗口收益 >= 全部窗口收益之和，"
+                "即扣掉最好窗口后其余窗口合计 <= 0"),
+            "distinct_window_schedule_groups": len(tricky),
+            "window_schedule_groups": [
+                {"tags": sorted(v), "windows": len(k)}
+                for k, v in sorted(tricky.items(), key=lambda kv: -len(kv[1]))
+            ],
+        },
+    }
 
 
 def analyze_dividend_cost(units: list[dict]) -> dict:
@@ -492,48 +636,98 @@ def analyze_dividend_cost(units: list[dict]) -> dict:
 
 
 def grade_evidence(units: list[dict], ranking: dict, wf: dict, bench: dict) -> dict:
-    """研究七：证据分级（严格，不因重放次数增加强度）。"""
-    n = len(units)
-    pools = {u["etf_count"] for u in units}
-    oos_ranges = {(u["oos_start"], u["oos_end"]) for u in units}
-    is_ranges = {(u["is_start"], u["is_end"]) for u in units}
+    """研究七：证据分级（严格，不因重放次数增加强度）。
 
-    # 超额收益：MA 最优 vs 同池 Buy & Hold（OOS）
+    统计基础是唯一 (config_hash, input_hash) 配置，不是正式记录条数。
+    独立样本数不可严谨定义，明确写 not_estimable。
+    """
+    uniq, merged = dedupe_by_config(units)
+    layers = count_layers(units)
+
+    # 超额收益：MA 最优 vs 同池 Buy & Hold（OOS），按唯一配置
     excess = []
-    for u in units:
+    for u in uniq:
         b = (u.get("benchmarks") or {}).get("buy_and_hold") or {}
         o = (u.get("oos_metrics") or {}).get("total_return")
-        if b.get("total_return") is not None and o is not None:
+        if b.get("total_return") is not None and (o is not None):
             excess.append({
-                "tag": u["tag"], "ma": o, "buyhold": b.get("total_return"),
+                "tag": u["tag"], "record_id": u["record_id"],
+                "ma": _num(o, 10),
+                "buyhold": _num(b["total_return"], 10),
                 "excess": _num(o - b["total_return"], 10),
             })
-    beat = sum(1 for e in excess if e["excess"] and e["excess"] > 0)
+    vals = sorted(e["excess"] for e in excess if e["excess"] is not None)
+    beat = sum(1 for v in vals if v > 0)
+    lose = sum(1 for v in vals if v < 0)
+    median = None
+    if vals:
+        mid = len(vals) // 2
+        median = _num(vals[mid] if len(vals) % 2
+                      else (vals[mid - 1] + vals[mid]) / 2, 10)
 
     return {
-        "independent_units": n,
-        "distinct_pools": sorted(pools),
-        "distinct_oos_ranges": sorted(oos_ranges),
-        "distinct_is_ranges": sorted(is_ranges),
+        "included_records": layers["included_records"],
+        "unique_config_input_pairs": layers["unique_config_input_pairs"],
+        "unique_oos_result_fingerprints": layers["unique_oos_result_fingerprints"],
+        "statistically_independent_samples": "not_estimable",
+        "not_estimable_reason": layers["not_estimable_reason"],
+        "shared_market_periods": layers["shared_market_periods"],
+        "shared_is_periods": layers["shared_is_periods"],
+        "shared_pools": layers["shared_pools"],
+        "deduped_records": merged,
         "excess_vs_buyhold": excess,
+        "excess_basis": "unique (config_hash, input_hash) 配置，共 %d 组" % len(excess),
         "beat_buyhold_count": beat,
+        "lose_buyhold_count": lose,
         "beat_buyhold_total": len(excess),
-        "note": ("这些单元共享同一行情库、同一成本参数、基本同一 OOS 区间，"
-                 "存在强相关性，不能按独立样本计。"),
+        "excess_min": _num(min(vals), 10) if vals else None,
+        "excess_max": _num(max(vals), 10) if vals else None,
+        "excess_median": median,
+        "note": ("统计基础为唯一配置（不是正式记录条数）。"
+                 "这些配置共享同一行情库、同一策略代码、同一成本参数、"
+                 "同一会计口径，主要 OOS 区间基本相同，彼此强相关；"
+                 "唯一配置数与结果指纹数都不是独立样本数。"),
     }
 
 
 # ---------------------------------------------------------------- 主流程
-def main(out_dir: Path) -> dict:
+def _reuse_previous(payload: dict, units: list[dict]) -> None:
+    """把上一次跑出来的 OOS 参数扫描与基准结果贴回本轮 unit。
+
+    统计修正不需要重跑回测：`oos_params` 与 `benchmarks` 是纯只读重算的
+    确定结果，同一份行情 + 同一份正式记录必然产出同一组数字。
+    这里只复用这两块，其余字段（含审计明细）仍从数据库实时读取。
+    """
+    prev = {u["tag"]: u for u in (payload.get("units") or [])}
+    for u in units:
+        old = prev.get(u["tag"])
+        if not old:
+            continue
+        if "oos_params" in old:
+            u["oos_params"] = old["oos_params"]
+        if "benchmarks" in old:
+            u["benchmarks"] = old["benchmarks"]
+
+
+def main(out_dir: Path, *, reuse_json: bool = False) -> dict:
     units = load_units()
     included = [u for u in units if u.get("included")]
     print(f"读取 {len(units)} 条研究单元，纳入 {len(included)} 条", flush=True)
 
-    for u in included:
-        print(f"  OOS 参数扫描 {u['tag']} ({u['etf_count']} 只)...", flush=True)
-        u["oos_params"] = study_oos_params(u)
-        print(f"  基准回测 {u['tag']}...", flush=True)
-        u["benchmarks"] = study_benchmarks(u)
+    jp = out_dir / "phase3B1_strategy_effectiveness_baseline.json"
+    if reuse_json and jp.exists():
+        prev = json.loads(jp.read_text(encoding="utf-8"))
+        _reuse_previous(prev, included)
+        missing = [u["tag"] for u in included if "oos_params" not in u]
+        if missing:
+            raise SystemExit(f"复用失败，缺少 OOS 参数结果：{missing}")
+        print("  复用上次的 OOS 参数扫描与基准回测结果（不重跑）", flush=True)
+    else:
+        for u in included:
+            print(f"  OOS 参数扫描 {u['tag']} ({u['etf_count']} 只)...", flush=True)
+            u["oos_params"] = study_oos_params(u)
+            print(f"  基准回测 {u['tag']}...", flush=True)
+            u["benchmarks"] = study_benchmarks(u)
 
     ranking = analyze_param_ranking(included)
     wf = analyze_walkforward(included)
@@ -559,6 +753,7 @@ def main(out_dir: Path) -> dict:
         },
         "units": units,
         "included_units": [u["tag"] for u in included],
+        "statistical_layers": count_layers(included),
         "param_ranking": ranking,
         "walkforward": wf,
         "dividend_cost": divcost,
@@ -580,7 +775,6 @@ def main(out_dir: Path) -> dict:
     }
 
     out_dir.mkdir(parents=True, exist_ok=True)
-    jp = out_dir / "phase3B1_strategy_effectiveness_baseline.json"
     jp.write_text(json.dumps(payload, ensure_ascii=False, indent=1), encoding="utf-8")
     print(f"JSON -> {jp}", flush=True)
     return payload
@@ -588,4 +782,4 @@ def main(out_dir: Path) -> dict:
 
 if __name__ == "__main__":
     target = ROOT / "reports"
-    main(target)
+    main(target, reuse_json="--reuse" in sys.argv)

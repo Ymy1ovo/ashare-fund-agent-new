@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-18T16:55:36",
+ "generated_at": "2026-11-18T17:14:42",
  "phase": "3B-1",
  "baseline_head": "cccca5a84d1abd04eaaef01afea6462cdf140d3d",
  "market_fingerprint": {
@@ -6981,6 +6981,47 @@
   "G9",
   "P0b"
  ],
+ "statistical_layers": {
+  "included_records": 9,
+  "unique_config_input_pairs": 8,
+  "unique_oos_result_fingerprints": 6,
+  "statistically_independent_samples": "not_estimable",
+  "not_estimable_reason": "全部记录共享同一行情数据库、同一策略代码、同一成本参数、同一会计口径，且主要 OOS 时间段基本相同（2025-01-02~2026-11-09）。唯一配置数与结果指纹数都不是独立市场样本数，无法据此严谨定义独立样本量。",
+  "shared_market_periods": [
+   [
+    "2025-01-02",
+    "2026-11-09"
+   ],
+   [
+    "2025-06-03",
+    "2026-11-09"
+   ]
+  ],
+  "shared_is_periods": [
+   [
+    "2021-01-04",
+    "2024-12-31"
+   ],
+   [
+    "2021-06-01",
+    "2024-12-31"
+   ]
+  ],
+  "shared_pools": [
+   6,
+   41
+  ],
+  "deduped_records": [
+   {
+    "tag": "G4",
+    "record_id": "93c170ca1402419f",
+    "config_hash": "b6b1babace517bdc",
+    "input_hash": "68433a7834546dbd",
+    "merged_into": "G1",
+    "reason": "config_hash+input_hash 完全相同"
+   }
+  ]
+ },
  "param_ranking": {
   "rows": [
    {
@@ -7085,51 +7126,6 @@
     ],
     "oos_best": 30,
     "is_oos_best_match": true
-   },
-   {
-    "tag": "G4",
-    "record_id": "93c170ca1402419f",
-    "etf_count": 6,
-    "is_returns": {
-     "5": -0.403947616,
-     "10": -0.2106696819,
-     "20": -0.2406737511,
-     "30": -0.1645545061,
-     "60": -0.0840884784,
-     "120": -0.1986031893,
-     "250": 0.0410071457
-    },
-    "is_ranking": [
-     "250",
-     "60",
-     "30",
-     "120",
-     "10",
-     "20",
-     "5"
-    ],
-    "is_best": 250,
-    "is_best_on_boundary": true,
-    "oos_returns": {
-     "5": -0.0787960898,
-     "10": 0.032066204,
-     "20": 0.1761690092,
-     "30": 0.2199802526,
-     "60": 0.1926933137,
-     "120": 0.2008962532,
-     "250": 0.1814374717
-    },
-    "oos_ranking": [
-     "30",
-     "120",
-     "60",
-     "250",
-     "20",
-     "10",
-     "5"
-    ],
-    "oos_best": 30,
-    "is_oos_best_match": false
    },
    {
     "tag": "G5",
@@ -7389,16 +7385,6 @@
     "best_on_grid_max": false
    },
    {
-    "tag": "G4",
-    "is_ma120": -0.1986031893,
-    "is_ma250": 0.0410071457,
-    "oos_ma120": 0.2008962532,
-    "oos_ma250": 0.1814374717,
-    "best_param": 250,
-    "grid_max": 250,
-    "best_on_grid_max": true
-   },
-   {
     "tag": "G5",
     "is_ma120": -0.0510467572,
     "is_ma250": 0.1367761332,
@@ -7449,13 +7435,22 @@
     "best_on_grid_max": true
    }
   ],
+  "basis": "unique_config_input_pairs",
   "summary": {
-   "unit_count": 9,
-   "is_best_on_boundary_count": 8,
-   "is_best_on_boundary_ratio": 0.888889,
-   "is_best_is_ma250_count": 7,
+   "unit_count": 8,
+   "unit_basis": "unique (config_hash, input_hash) 配置",
+   "is_best_on_boundary_count": 7,
+   "is_best_on_boundary_ratio": 0.875,
+   "is_best_is_ma250_count": 6,
+   "is_best_is_ma250_ratio": 0.75,
    "is_oos_best_match_count": 2,
-   "is_oos_best_match_ratio": 0.222222
+   "is_oos_best_match_ratio": 0.25,
+   "oos_best_param_distribution": {
+    "30": 5,
+    "60": 2,
+    "120": 1
+   },
+   "oos_best_is_ma250_count": 0
   }
  },
  "walkforward": {
@@ -7824,187 +7819,6 @@
    },
    {
     "tag": "G3",
-    "windows": [
-     {
-      "window_index": 0,
-      "train_start": "2021-01-04",
-      "train_end": "2023-01-03",
-      "test_start": "2023-01-04",
-      "test_end": "2023-07-03",
-      "train_days": 486,
-      "test_days": 118,
-      "selected_param": 60,
-      "status": "success",
-      "reason": null,
-      "train_total_return": -0.1042960277,
-      "test_total_return": 0.0321930323,
-      "test_cagr": 0.0706287741,
-      "test_sharpe": 0.6451490456,
-      "test_max_drawdown": -0.089408869,
-      "test_trade_count": 146,
-      "test_total_cost": 12209.4677
-     },
-     {
-      "window_index": 1,
-      "train_start": "2021-07-04",
-      "train_end": "2023-07-03",
-      "test_start": "2023-07-04",
-      "test_end": "2024-01-03",
-      "train_days": 484,
-      "test_days": 125,
-      "selected_param": 60,
-      "status": "success",
-      "reason": null,
-      "train_total_return": -0.0076988464,
-      "test_total_return": -0.0918962994,
-      "test_cagr": -0.177908001,
-      "test_sharpe": -2.9858178092,
-      "test_max_drawdown": -0.0988211832,
-      "test_trade_count": 194,
-      "test_total_cost": 20778.1994
-     },
-     {
-      "window_index": 2,
-      "train_start": "2022-01-04",
-      "train_end": "2024-01-03",
-      "test_start": "2024-01-04",
-      "test_end": "2024-07-03",
-      "train_days": 486,
-      "test_days": 118,
-      "selected_param": 60,
-      "status": "success",
-      "reason": null,
-      "train_total_return": -0.0875365288,
-      "test_total_return": 0.013365346,
-      "test_cagr": 0.0290090201,
-      "test_sharpe": 0.382204804,
-      "test_max_drawdown": -0.0650487261,
-      "test_trade_count": 161,
-      "test_total_cost": 10032.754
-     },
-     {
-      "window_index": 3,
-      "train_start": "2022-07-04",
-      "train_end": "2024-07-03",
-      "test_start": "2024-07-04",
-      "test_end": "2025-01-03",
-      "train_days": 486,
-      "test_days": 124,
-      "selected_param": 20,
-      "status": "success",
-      "reason": null,
-      "train_total_return": -0.0871331635,
-      "test_total_return": -0.0283847266,
-      "test_cagr": -0.0572888718,
-      "test_sharpe": -0.2424944341,
-      "test_max_drawdown": -0.1297199638,
-      "test_trade_count": 275,
-      "test_total_cost": 27264.7266
-     },
-     {
-      "window_index": 4,
-      "train_start": "2023-01-04",
-      "train_end": "2025-01-03",
-      "test_start": "2025-01-04",
-      "test_end": "2025-07-03",
-      "train_days": 485,
-      "test_days": 118,
-      "selected_param": 60,
-      "status": "success",
-      "reason": null,
-      "train_total_return": -0.0021059091,
-      "test_total_return": 0.0807341407,
-      "test_cagr": 0.1820211867,
-      "test_sharpe": 1.2734092555,
-      "test_max_drawdown": -0.077266826,
-      "test_trade_count": 145,
-      "test_total_cost": 9821.0593
-     },
-     {
-      "window_index": 5,
-      "train_start": "2023-07-04",
-      "train_end": "2025-07-03",
-      "test_start": "2025-07-04",
-      "test_end": "2026-01-03",
-      "train_days": 485,
-      "test_days": 123,
-      "selected_param": 60,
-      "status": "success",
-      "reason": null,
-      "train_total_return": 0.0392945853,
-      "test_total_return": 0.1871105725,
-      "test_cagr": 0.4251711188,
-      "test_sharpe": 2.8923612982,
-      "test_max_drawdown": -0.0452734378,
-      "test_trade_count": 232,
-      "test_total_cost": 14254.7715
-     },
-     {
-      "window_index": 6,
-      "train_start": "2024-01-04",
-      "train_end": "2026-01-03",
-      "test_start": "2026-01-04",
-      "test_end": "2026-07-03",
-      "train_days": 483,
-      "test_days": 119,
-      "selected_param": 60,
-      "status": "success",
-      "reason": null,
-      "train_total_return": 0.3426798953,
-      "test_total_return": 0.0136724439,
-      "test_cagr": 0.0294255931,
-      "test_sharpe": 0.2530228028,
-      "test_max_drawdown": -0.1061977573,
-      "test_trade_count": 164,
-      "test_total_cost": 13332.7661
-     },
-     {
-      "window_index": 7,
-      "train_start": "2024-07-04",
-      "train_end": "2026-07-03",
-      "test_start": "2026-07-04",
-      "test_end": "2026-11-09",
-      "train_days": 484,
-      "test_days": 85,
-      "selected_param": 60,
-      "status": "success",
-      "reason": "验证窗按数据边界截断至 2026-11-09（原定 2027-01-03）",
-      "train_total_return": 0.3739959682,
-      "test_total_return": -0.0839634331,
-      "test_cagr": -0.2313326553,
-      "test_sharpe": -2.2525813062,
-      "test_max_drawdown": -0.1175002022,
-      "test_trade_count": 119,
-      "test_total_cost": 10086.2131
-     }
-    ],
-    "window_count": 8,
-    "params": [
-     60,
-     60,
-     60,
-     20,
-     60,
-     60,
-     60,
-     60
-    ],
-    "distinct_params": [
-     20,
-     60
-    ],
-    "param_switch_count": 2,
-    "positive_windows": 5,
-    "negative_windows": 3,
-    "positive_ratio": 0.625,
-    "worst_window_return": -0.0918962994,
-    "best_window_return": 0.1871105725,
-    "mean_window_return": 0.0153538845,
-    "sum_window_return": 0.1228310763,
-    "best_window_share_of_sum": 1.523316
-   },
-   {
-    "tag": "G4",
     "windows": [
      {
       "window_index": 0,
@@ -9069,7 +8883,44 @@
     "sum_window_return": 0.37763211,
     "best_window_share_of_sum": 0.567867
    }
-  ]
+  ],
+  "basis": "unique (config_hash, input_hash) 配置",
+  "merged_for_summary": [
+   "G4"
+  ],
+  "summary": {
+   "unit_count": 8,
+   "unit_basis": "unique (config_hash, input_hash) 配置",
+   "total_window_count": 63,
+   "positive_ratio_min": 0.625,
+   "positive_ratio_max": 0.75,
+   "worst_window_return_min": -0.1040123824,
+   "worst_window_return_max": -0.0918962994,
+   "all_windows_positive_configs": 0,
+   "concentration_configs": 6,
+   "concentration_definition": "最好单窗口收益 >= 全部窗口收益之和，即扣掉最好窗口后其余窗口合计 <= 0",
+   "distinct_window_schedule_groups": 2,
+   "window_schedule_groups": [
+    {
+     "tags": [
+      "G1",
+      "G2",
+      "G3",
+      "G5",
+      "G8",
+      "G9",
+      "P0b"
+     ],
+     "windows": 8
+    },
+    {
+     "tags": [
+      "G7"
+     ],
+     "windows": 7
+    }
+   ]
+  }
  },
  "dividend_cost": {
   "rows": [
@@ -10373,12 +10224,12 @@
   ]
  },
  "evidence_grading": {
-  "independent_units": 9,
-  "distinct_pools": [
-   6,
-   41
-  ],
-  "distinct_oos_ranges": [
+  "included_records": 9,
+  "unique_config_input_pairs": 8,
+  "unique_oos_result_fingerprints": 6,
+  "statistically_independent_samples": "not_estimable",
+  "not_estimable_reason": "全部记录共享同一行情数据库、同一策略代码、同一成本参数、同一会计口径，且主要 OOS 时间段基本相同（2025-01-02~2026-11-09）。唯一配置数与结果指纹数都不是独立市场样本数，无法据此严谨定义独立样本量。",
+  "shared_market_periods": [
    [
     "2025-01-02",
     "2026-11-09"
@@ -10388,7 +10239,7 @@
     "2026-11-09"
    ]
   ],
-  "distinct_is_ranges": [
+  "shared_is_periods": [
    [
     "2021-01-04",
     "2024-12-31"
@@ -10398,65 +10249,86 @@
     "2024-12-31"
    ]
   ],
+  "shared_pools": [
+   6,
+   41
+  ],
+  "deduped_records": [
+   {
+    "tag": "G4",
+    "record_id": "93c170ca1402419f",
+    "config_hash": "b6b1babace517bdc",
+    "input_hash": "68433a7834546dbd",
+    "merged_into": "G1",
+    "reason": "config_hash+input_hash 完全相同"
+   }
+  ],
   "excess_vs_buyhold": [
    {
     "tag": "G1",
+    "record_id": "ea21b9d50eb14c74",
     "ma": 0.1814374717,
     "buyhold": 0.1932864143,
     "excess": -0.0118489426
    },
    {
     "tag": "G2",
+    "record_id": "bde29001291a456b",
     "ma": 0.1926933137,
     "buyhold": 0.1932864143,
     "excess": -0.0005931006
    },
    {
     "tag": "G3",
+    "record_id": "df2f811d52d04155",
     "ma": 0.2199802526,
     "buyhold": 0.1932864143,
     "excess": 0.0266938383
    },
    {
-    "tag": "G4",
-    "ma": 0.1814374717,
-    "buyhold": 0.1932864143,
-    "excess": -0.0118489426
-   },
-   {
     "tag": "G5",
+    "record_id": "1c5832e27c6c4f3c",
     "ma": 0.2011455308,
     "buyhold": 0.19309411,
     "excess": 0.0080514208
    },
    {
     "tag": "G7",
+    "record_id": "a52af390b0d5442e",
     "ma": 0.240987408,
     "buyhold": 0.1868316507,
     "excess": 0.0541557573
    },
    {
     "tag": "G8",
+    "record_id": "c68bf2840ebf4f08",
     "ma": 0.0778171723,
     "buyhold": 0.1007711329,
     "excess": -0.0229539606
    },
    {
     "tag": "G9",
+    "record_id": "c5505f0145e34bbd",
     "ma": 0.1814374717,
     "buyhold": 0.1932864143,
     "excess": -0.0118489426
    },
    {
     "tag": "P0b",
+    "record_id": "aad7935a2bac4cc4",
     "ma": 0.2011455308,
     "buyhold": 0.19309411,
     "excess": 0.0080514208
    }
   ],
+  "excess_basis": "unique (config_hash, input_hash) 配置，共 8 组",
   "beat_buyhold_count": 4,
-  "beat_buyhold_total": 9,
-  "note": "这些单元共享同一行情库、同一成本参数、基本同一 OOS 区间，存在强相关性，不能按独立样本计。"
+  "lose_buyhold_count": 4,
+  "beat_buyhold_total": 8,
+  "excess_min": -0.0229539606,
+  "excess_max": 0.0541557573,
+  "excess_median": 0.0037291601,
+  "note": "统计基础为唯一配置（不是正式记录条数）。这些配置共享同一行情库、同一策略代码、同一成本参数、同一会计口径，主要 OOS 区间基本相同，彼此强相关；唯一配置数与结果指纹数都不是独立样本数。"
  },
  "limitations": [
   "OOS 逐参数表现由本脚本只读重算，未写入 validation 正式记录，属于研究数据，不构成新的正式验证结论。",
