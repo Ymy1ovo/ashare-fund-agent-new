@@ -416,3 +416,4 @@ G7 / G8 / G1 / G2 / G3 / G4 / G5 / G6 以及两条 P0 记录均未触碰。
 | 新增测试 | +14 |
 | `integrity_check` | ok |
 | 行情指纹 | `d54727c0…ac49` 未变 |
+| 执行后快照 | `data/backups/fund_agent_post_3a3_2_3_6_1_20261118.db`，275,513,344 字节，SHA256 `e27a2b1f101bd86847764cb0b306961b7cc58ae0af4d23355fff3c0ffd8b9266` |
