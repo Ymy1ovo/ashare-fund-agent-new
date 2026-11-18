@@ -2430,7 +2430,8 @@ if (basis != ACCOUNTING_FORMAL
 | 3A.3.2.3.4.1.1 | 审计完整性与 Sparse 明细原子化 | 688 | `phase3A3_2_3_4_1_1_*.md` |
 | 3A.3.2.3.5 | 历史回测与验证记录重放候选清点 | 688 | `phase3A3_2_3_5_*.md` |
 | 3A.3.2.3.6 | 第一批历史记录受控重放（5 条，执行 2 条后暂停） | 688 | `phase3A3_2_3_6_*.md` |
-| 3A.3.2.3.6.1 | 修复重放审计缺陷并重新执行前两条 | **702** | `phase3A3_2_3_6_1_*.md` |
+| 3A.3.2.3.6.1 | 修复重放审计缺陷并重新执行前两条 | 702 | `phase3A3_2_3_6_1_*.md` |
+| 3A.3.2.3.6.2 | 第二批历史记录受控重放（G7/G8/G1） | **702** | `phase3A3_2_3_6_2_*.md` |
 
 当前正式会计版本：`ca-v2-receivable`；正式会计基础：`formal_receivable`；正式估值标记：`formal_valuation=True`。
 
@@ -3053,4 +3054,91 @@ G9 的 `config_hash` 相同（`39bac25b0ec4ce91`）但 `input_hash` 不同
 | AppTest | 两页 exception 0 / error 0 |
 
 基线 688 → 702（+14）。
+
+## 49. 阶段3A.3.2.3.6.2 第二批历史记录受控重放
+
+执行 G7 / G8 / G1 三条，全部成功。未执行 G2/G3/G4/G5，未进入 3A.3.3/3B。
+
+### 49.1 结果
+
+| source_id | 分组 | attempt | 新记录 | status |
+| --- | --- | --- | --- | --- |
+| `c5589f7dcd1a4a5d` | G7 | `2d304aa91fd44f31` | `a52af390b0d5442e` | success |
+| `838a58fa5f3b4025` | G8 | `1da2e9ecc4b14698` | `c68bf2840ebf4f08` | success |
+| `7d884a1a03d94915` | G1 | `7f9a7886abfc4454` | `ea21b9d50eb14c74` | success |
+
+全部 `force=False`，`accounting_version=ca-v2-receivable`、
+`accounting_basis=formal_receivable`、`formal_valuation=True`、
+`audit_trace=complete`、`audit_completeness=True`（problems `[]`）。
+
+### 49.2 过程异常
+
+G8 第一次执行被 shell 300 秒上限中断，留下 running attempt
+`37e017afb1514fd4` 与孤儿记录 `371b81de27e64f21`。
+未删除任何行：attempt 标 `failed`、孤儿记录标 `failed` 并写明原因，
+随后重新执行成功。
+
+### 49.3 参数忠实恢复
+
+| 组 | 关键差异 | 是否保留 |
+| --- | --- | --- |
+| G7 | IS 起点 `2021-06-01`（晚 5 个月） | ✅ |
+| G8 | OOS 起点 `2025-06-03`（晚 5 个月） | ✅ |
+| G1 | 与 G9 同参数，仅历史更早 | ✅ |
+
+三组的 ETF 池、MA 网格、WF 配置、成本参数、指标版本均逐项比对一致。
+
+### 49.4 G1 的 config_hash 与 input_hash
+
+| 项 | 值 |
+| --- | --- |
+| source `config_hash` | `b6b1babace517bdc` |
+| replay `config_hash` | `b6b1babace517bdc`（**相同**） |
+| source `input_hash` | `3e064b6673929193` |
+| replay `input_hash` | `68433a7834546dbd`（**不同**） |
+
+差异来源：源记录不应用公司行为（应用数 0），新记录应用 151 次。
+行情指纹、指标版本、快照均相同。即**同参数、不同会计口径**，
+不能宣称数据证据相同。
+
+### 49.5 绩效差异归因
+
+三组呈现同一模式：IS 网格里 **MA250 一档**的收益被分红口径放大最多
+（G7 +0.2597、G8 +0.2006、G1 +0.1889），其余档位差异均在 ±0.02 内。
+
+| 组 | MA250 源 | MA250 新 | 最优参数变化 |
+| --- | ---: | ---: | --- |
+| G7 | -0.209494 | +0.050236 | MA60 → MA250 |
+| G8 | -0.159543 | +0.041007 | MA60 → MA250 |
+| G1 | -0.147898 | +0.041007 | MA60 → MA250 |
+
+MA250 持仓周期最长，2021-01~2024-12 期间经历的除息事件最多，
+旧口径不确认分红、新口径全额确认，差距被持仓时长放大。
+最优参数一致切换是**分红口径改变 IS 排序**的结果，不是策略逻辑变化。
+
+### 49.6 数据库对照
+
+| 表 | 前 | 后 | 变化 |
+| --- | ---: | ---: | ---: |
+| `backtest_runs` | 117 | 307 | +190 |
+| `validation_runs` | 56 | 60 | +4 |
+| `replay_attempts` | 15 | 19 | +4 |
+| `validation_backtest_runs` | 464 | 654 | +190 |
+| `validation_regime_stats` | 36 | 48 | +12 |
+| `corporate_action_applications` | 7,194 | 7,650 | +456 |
+| `dividend_receivables` | 3,529 | 3,934 | +405 |
+| `corporate_actions` | 166 | 166 | **0** |
+| `corporate_action_versions` | 704 | 704 | **0** |
+| `etf_daily_prices` | 116,609 | 116,609 | **0** |
+
+`integrity_check` ok，行情指纹 `d54727c0…` 未变，三条源记录 `input_hash` 未变。
+
+### 49.7 测试
+
+| 项 | 结果 |
+| --- | ---: |
+| 重放专项 | 177 passed（171.79 秒） |
+| 全量 pytest | **702 passed** / 0 failed / 0 skipped（304.94 秒） |
+| API smoke | `SMOKE_FAILED: 无` |
+| AppTest | 两页 exception 0 / error 0 |
 

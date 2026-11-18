@@ -1,5 +1,51 @@
 # 变更日志
 
+## 2026-11-18 — 阶段3A.3.2.3.6.2 第二批历史记录受控重放（G7/G8/G1）
+
+只执行 G7 / G8 / G1 三条，全部成功。未执行 G2/G3/G4/G5，未进入 3A.3.3/3B。
+
+| source_id | 分组 | attempt | 新记录 |
+| --- | --- | --- | --- |
+| `c5589f7dcd1a4a5d` | G7 | `2d304aa91fd44f31` | `a52af390b0d5442e` |
+| `838a58fa5f3b4025` | G8 | `1da2e9ecc4b14698` | `c68bf2840ebf4f08` |
+| `7d884a1a03d94915` | G1 | `7f9a7886abfc4454` | `ea21b9d50eb14c74` |
+
+全部 `force=False`，均 `ca-v2-receivable` / `formal_receivable` / `True`，
+`audit_trace=complete`、`audit_completeness=True`（problems `[]`）。
+
+**过程异常**：G8 第一次执行被 shell 300 秒上限中断，留下 running
+attempt `37e017afb1514fd4` 与孤儿记录 `371b81de27e64f21`。
+未删除任何行：attempt 与孤儿记录均标 `failed` 并写明原因，
+随后重新执行成功。
+
+**参数忠实恢复**：G7 的 IS 起点 `2021-06-01`、G8 的 OOS 起点
+`2025-06-03` 均被完整保留，未被当前默认替换。三组的 ETF 池、
+MA 网格、WF 配置、成本参数、指标版本逐项比对一致。
+
+**G1 的 hash 差异**：`config_hash` 相同（`b6b1babace517bdc`），
+`input_hash` 从 `3e064b6673929193` 变为 `68433a7834546dbd`。
+差异完全来自公司行为事件参与（源应用 0 次、新应用 151 次），
+行情指纹与指标版本均未变。同参数、不同会计口径，不宣称数据证据相同。
+
+**绩效差异归因**：三组同一模式——IS 网格里 MA250 一档被分红口径
+放大最多（G7 +0.2597、G8 +0.2006、G1 +0.1889），其余档位差异
+均在 ±0.02 内，导致最优参数一致从 MA60 切到 MA250。
+MA250 持仓周期最长、经历除息事件最多，旧口径不确认分红、
+新口径全额确认，差距被持仓时长放大。是分红口径改变 IS 排序，
+不是策略逻辑变化。
+
+**数据库**：`backtest_runs` 117→307、`validation_runs` 56→60、
+`replay_attempts` 15→19、`validation_backtest_runs` 464→654、
+`validation_regime_stats` 36→48、`corporate_action_applications`
+7,194→7,650、`dividend_receivables` 3,529→3,934。
+`corporate_actions` 166、`corporate_action_versions` 704、
+`etf_daily_prices` 116,609 均未变，`integrity_check` ok，
+行情指纹 `d54727c0…` 未变，三条源记录 `input_hash` 未变。
+
+**测试**：全量 **702 passed / 0 failed / 0 skipped**（304.94 秒），
+与基线一致——本阶段未改代码。
+
+
 ## 2026-11-18 — 阶段3A.3.2.3.6.1 修复重放审计缺陷并重新执行前两条记录
 
 **缺陷 A 修复**（`app/replay/runner.py`）
