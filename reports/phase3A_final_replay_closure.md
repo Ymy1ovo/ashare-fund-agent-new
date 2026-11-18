@@ -532,3 +532,4 @@ ce071b8979b5427c  2b21ca9b2c434444  success
 | 全量测试 | 702 passed / 0 failed / 0 skipped，258.27 秒 |
 | `integrity_check` | ok |
 | 行情指纹 | `d54727c0…ac49` 未变 |
+| 执行后快照 | `data/backups/fund_agent_post_3a3_final_20261118.db`，277,020,672 字节，SHA256 `ec51af1ca8d5f997dcaa0556fafe4f0ab3c861c74b07dd7a03b0e1db93cd0af5` |
