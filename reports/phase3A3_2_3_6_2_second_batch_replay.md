@@ -394,3 +394,4 @@ G2/G3/G4/G5、G6、两条 P0 记录均未触碰。
 | 全量测试 | 702 passed / 0 failed / 0 skipped，304.94 秒 |
 | `integrity_check` | ok |
 | 行情指纹 | `d54727c0…ac49` 未变 |
+| 执行后快照 | `data/backups/fund_agent_post_3a3_2_3_6_2_20261118.db`，276,078,592 字节，SHA256 `37e1e4fc59f86362fd826843e78e21a9fb35312188601b9fff8af4107a8671fb` |
