@@ -1,0 +1,1884 @@
+{
+ "phase": "3B-4.1.1-calibration",
+ "baseline_head": "22b8fc993cd37fce4fcc68671eb07145654c330e",
+ "generated_at": "2026-11-19T19:48:45",
+ "scope": "验收修正：只对已有 43 条清盘事件重新判定基金类型与证据等级。未重新扫描 844 个代码、未新增公告采集、未改数据层与迁移、未入库、未回测。",
+ "corrections": {
+  "what_was_wrong": [
+   "43 条清盘全部标 A 级——错。公告链接全部是 pdf.dfcfw.com（东财转载），即使原文是基金公司正式文本，发布渠道仍是第三方，不能给 A。",
+   "基金类型未区分场内 ETF / ETF 联接 / LOF / 普通开放式，导致把场内 ETF（511000、511050）也算进「支付宝场外基金」样本。",
+   "部分基金名称被截断，漏掉「联接基金」四处（020025、020035、000087、000088）。"
+  ],
+  "what_was_kept": [
+   "费率解析器的三个 Bug 修复（比较符顺序、闭区间连续性、首档下界推断）。",
+   "去重规则（同公告=同事件、披露链归并、终止上市并入清盘）。",
+   "天天基金 F10 费率 = C 级的定级。"
+  ]
+ },
+ "enums": {
+  "product_structure": {
+   "ordinary_open_ended": "普通开放式（场外，无场内交易代码）",
+   "etf_linked": "ETF 联接基金（场外申购，投资于目标 ETF）",
+   "etf": "场内 ETF（交易所上市交易）",
+   "lof": "LOF（上市开放式，场内场外均可）",
+   "other": "其他结构",
+   "unknown": "无法确认"
+  },
+  "investment_type": {
+   "money_market": "货币市场",
+   "bond": "债券",
+   "mixed": "混合",
+   "equity": "股票",
+   "index": "指数（无法归入股/债/混时的兜底）",
+   "other": "其他",
+   "unknown": "无法确认"
+  },
+  "evidence_level": {
+   "A": "基金管理人官网 / 交易所官网 / 证监会电子披露平台的原始公告",
+   "B": "第三方转载（东方财富等），原文完整可读、可追溯，但发布主体非官方",
+   "C": "可靠第三方结构化摘要，无原文",
+   "D": "无法确认来源"
+  }
+ },
+ "calibration": [
+  {
+   "event_key": "鹏华国有企业债债券型证券投资基金|liquidation",
+   "codes_in_event": [
+    "000007"
+   ],
+   "fund_entity_old": "鹏华国有企业债债券型证券投资基金",
+   "fund_entity": "鹏华国有企业债债券型证券投资基金",
+   "name_source": "body",
+   "name_changed": false,
+   "announcement_id": "AN201810091209644486",
+   "announcement_title": "鹏华国有企业债债券型证券投资基金清算报告",
+   "announcement_date": "2018-10-09",
+   "announcement_url": "http://pdf.dfcfw.com/pdf/H2_AN201810091209644486_1.pdf",
+   "event_date": "2018-08-08",
+   "doc_ok": true,
+   "doc_format": "pdf",
+   "product_structure": "ordinary_open_ended",
+   "product_structure_reason": [
+    "基金全称为普通形态，无 ETF/LOF/联接标记"
+   ],
+   "investment_type": "bond",
+   "investment_type_reason": [
+    "名称含「债券」"
+   ],
+   "prefix_hint": null,
+   "prefix_conflict": false,
+   "is_index_fund": false,
+   "is_onshore_etf": false,
+   "offmarket_eligible": true,
+   "evidence_level": "B",
+   "evidence_reason": "第三方转载（pdf.dfcfw.com），原文完整可读、可追溯，但发布主体非官方"
+  },
+  {
+   "event_key": "南方中债中期票据指数债券型发起式证券投资基金|liquidation",
+   "codes_in_event": [
+    "000022",
+    "000023"
+   ],
+   "fund_entity_old": "南方中债中期票据指数债券型发起式证券投资基金",
+   "fund_entity": "南方中债中期票据指数债券型发起式证券投资基金",
+   "name_source": "body",
+   "name_changed": false,
+   "announcement_id": "AN201807041162722976",
+   "announcement_title": "南方中债中期票据指数债券型发起式证券投资基金清算报告",
+   "announcement_date": "2018-07-04",
+   "announcement_url": "http://pdf.dfcfw.com/pdf/H2_AN201807041162722976_1.pdf",
+   "event_date": null,
+   "doc_ok": true,
+   "doc_format": "pdf",
+   "product_structure": "ordinary_open_ended",
+   "product_structure_reason": [
+    "基金全称为普通形态，无 ETF/LOF/联接标记"
+   ],
+   "investment_type": "bond",
+   "investment_type_reason": [
+    "名称含「债券」"
+   ],
+   "prefix_hint": null,
+   "prefix_conflict": false,
+   "is_index_fund": true,
+   "is_onshore_etf": false,
+   "offmarket_eligible": true,
+   "evidence_level": "B",
+   "evidence_reason": "第三方转载（pdf.dfcfw.com），原文完整可读、可追溯，但发布主体非官方"
+  },
+  {
+   "event_key": "泰达宏利信用合利定期开放债券型证券投资基金|liquidation",
+   "codes_in_event": [
+    "000026",
+    "000027"
+   ],
+   "fund_entity_old": "泰达宏利信用合利定期开放债券型证券投资基金",
+   "fund_entity": "泰达宏利信用合利定期开放债券型证券投资基金",
+   "name_source": "body",
+   "name_changed": false,
+   "announcement_id": "AN201811101242667792",
+   "announcement_title": "泰达宏利信用合利定期开放债券型证券投资基金清算报告",
+   "announcement_date": "2018-11-10",
+   "announcement_url": "http://pdf.dfcfw.com/pdf/H2_AN201811101242667792_1.pdf",
+   "event_date": "2018-08-10",
+   "doc_ok": true,
+   "doc_format": "pdf",
+   "product_structure": "ordinary_open_ended",
+   "product_structure_reason": [
+    "基金全称为普通形态，无 ETF/LOF/联接标记"
+   ],
+   "investment_type": "bond",
+   "investment_type_reason": [
+    "名称含「债券」"
+   ],
+   "prefix_hint": null,
+   "prefix_conflict": false,
+   "is_index_fund": false,
+   "is_onshore_etf": false,
+   "offmarket_eligible": true,
+   "evidence_level": "B",
+   "evidence_reason": "第三方转载（pdf.dfcfw.com），原文完整可读、可追溯，但发布主体非官方"
+  },
+  {
+   "event_key": "中银标普全球精选自然资源等权重指数证券投资基金|liquidation",
+   "codes_in_event": [
+    "000049"
+   ],
+   "fund_entity_old": "中银标普全球精选自然资源等权重指数证券投资基金",
+   "fund_entity": "中银标普全球精选自然资源等权重指数证券投资基金",
+   "name_source": "body",
+   "name_changed": false,
+   "announcement_id": "AN202303201584398960",
+   "announcement_title": "中银标普全球精选自然资源等权重指数证券投资基金2023年清算报告",
+   "announcement_date": "2023-03-20",
+   "announcement_url": "http://pdf.dfcfw.com/pdf/H2_AN202303201584398960_1.pdf",
+   "event_date": null,
+   "doc_ok": true,
+   "doc_format": "pdf",
+   "product_structure": "ordinary_open_ended",
+   "product_structure_reason": [
+    "基金全称为普通形态，无 ETF/LOF/联接标记"
+   ],
+   "investment_type": "index",
+   "investment_type_reason": [
+    "名称含「指数」但无股/债/混限定"
+   ],
+   "prefix_hint": null,
+   "prefix_conflict": false,
+   "is_index_fund": true,
+   "is_onshore_etf": false,
+   "offmarket_eligible": true,
+   "evidence_level": "B",
+   "evidence_reason": "第三方转载（pdf.dfcfw.com），原文完整可读、可追溯，但发布主体非官方"
+  },
+  {
+   "event_key": "长盛纯债债券型证券投资基金|liquidation",
+   "codes_in_event": [
+    "000050",
+    "000052"
+   ],
+   "fund_entity_old": "长盛纯债债券型证券投资基金",
+   "fund_entity": "长盛纯债债券型证券投资基金",
+   "name_source": "body",
+   "name_changed": false,
+   "announcement_id": "AN201807061164054790",
+   "announcement_title": "长盛纯债债券型证券投资基金清算报告",
+   "announcement_date": "2018-07-06",
+   "announcement_url": "http://pdf.dfcfw.com/pdf/H2_AN201807061164054790_1.pdf",
+   "event_date": "2018-05-18",
+   "doc_ok": true,
+   "doc_format": "pdf",
+   "product_structure": "ordinary_open_ended",
+   "product_structure_reason": [
+    "基金全称为普通形态，无 ETF/LOF/联接标记"
+   ],
+   "investment_type": "bond",
+   "investment_type_reason": [
+    "名称含「债券」"
+   ],
+   "prefix_hint": null,
+   "prefix_conflict": false,
+   "is_index_fund": false,
+   "is_onshore_etf": false,
+   "offmarket_eligible": true,
+   "evidence_level": "B",
+   "evidence_reason": "第三方转载（pdf.dfcfw.com），原文完整可读、可追溯，但发布主体非官方"
+  },
+  {
+   "event_key": "国联安中证股债动态策略指数证券投资基金|liquidation",
+   "codes_in_event": [
+    "000060"
+   ],
+   "fund_entity_old": "国联安中证股债动态策略指数证券投资基金",
+   "fund_entity": "国联安中证股债动态策略指数证券投资基金",
+   "name_source": "body",
+   "name_changed": false,
+   "announcement_id": "AN201706220662305325",
+   "announcement_title": "国联安中证股债动态策略指数证券投资基金清算报告",
+   "announcement_date": "2017-06-22",
+   "announcement_url": "http://pdf.dfcfw.com/pdf/H2_AN201706220662305325_1.pdf",
+   "event_date": "2017-03-29",
+   "doc_ok": true,
+   "doc_format": "pdf",
+   "product_structure": "ordinary_open_ended",
+   "product_structure_reason": [
+    "基金全称为普通形态，无 ETF/LOF/联接标记"
+   ],
+   "investment_type": "index",
+   "investment_type_reason": [
+    "名称含「指数」但无股/债/混限定"
+   ],
+   "prefix_hint": null,
+   "prefix_conflict": false,
+   "is_index_fund": true,
+   "is_onshore_etf": false,
+   "offmarket_eligible": true,
+   "evidence_level": "B",
+   "evidence_reason": "第三方转载（pdf.dfcfw.com），原文完整可读、可追溯，但发布主体非官方"
+  },
+  {
+   "event_key": "银华量化智慧动力灵活配置混合型证券投资基金|liquidation",
+   "codes_in_event": [
+    "000062"
+   ],
+   "fund_entity_old": "银华量化智慧动力灵活配置混合型证券投资基金",
+   "fund_entity": "银华量化智慧动力灵活配置混合型证券投资基金",
+   "name_source": "body",
+   "name_changed": false,
+   "announcement_id": "AN201811301255063369",
+   "announcement_title": "银华量化智慧动力灵活配置混合型证券投资基金清算报告",
+   "announcement_date": "2018-11-30",
+   "announcement_url": "http://pdf.dfcfw.com/pdf/H2_AN201811301255063369_1.pdf",
+   "event_date": null,
+   "doc_ok": true,
+   "doc_format": "pdf",
+   "product_structure": "ordinary_open_ended",
+   "product_structure_reason": [
+    "基金全称为普通形态，无 ETF/LOF/联接标记"
+   ],
+   "investment_type": "mixed",
+   "investment_type_reason": [
+    "名称含「混合」"
+   ],
+   "prefix_hint": null,
+   "prefix_conflict": false,
+   "is_index_fund": false,
+   "is_onshore_etf": false,
+   "offmarket_eligible": true,
+   "evidence_level": "B",
+   "evidence_reason": "第三方转载（pdf.dfcfw.com），原文完整可读、可追溯，但发布主体非官方"
+  },
+  {
+   "event_key": "嘉实中证金边中期国债交易型开放式指数证券投资基金|liquidation",
+   "codes_in_event": [
+    "000087",
+    "000088"
+   ],
+   "fund_entity_old": "嘉实中证金边中期国债交易型开放式指数证券投资基金",
+   "fund_entity": "嘉实中证金边中期国债交易型开放式指数证券投资基金联接基金",
+   "name_source": "body",
+   "name_changed": true,
+   "announcement_id": "AN202208051576916480",
+   "announcement_title": "嘉实中证金边中期国债交易型开放式指数证券投资基金联接基金清算报告提示性公告",
+   "announcement_date": "2022-08-05",
+   "announcement_url": "http://pdf.dfcfw.com/pdf/H2_AN202208051576916480_1.pdf",
+   "event_date": null,
+   "doc_ok": true,
+   "doc_format": "pdf",
+   "product_structure": "etf_linked",
+   "product_structure_reason": [
+    "基金全称或公告标题含「联接」"
+   ],
+   "investment_type": "index",
+   "investment_type_reason": [
+    "名称含「指数」但无股/债/混限定"
+   ],
+   "prefix_hint": null,
+   "prefix_conflict": false,
+   "is_index_fund": true,
+   "is_onshore_etf": false,
+   "offmarket_eligible": true,
+   "evidence_level": "B",
+   "evidence_reason": "第三方转载（pdf.dfcfw.com），原文完整可读、可追溯，但发布主体非官方"
+  },
+  {
+   "event_key": "信诚新双盈分级债券型证券投资基金|liquidation",
+   "codes_in_event": [
+    "000091",
+    "000092",
+    "000093"
+   ],
+   "fund_entity_old": "信诚新双盈分级债券型证券投资基金",
+   "fund_entity": "信诚新双盈分级债券型证券投资基金",
+   "name_source": "fallback",
+   "name_changed": false,
+   "announcement_id": "AN202007231393501970",
+   "announcement_title": "关于《信诚新双盈分级债券型证券投资基金基金合同》终止的公告",
+   "announcement_date": "2020-07-23",
+   "announcement_url": "http://pdf.dfcfw.com/pdf/H2_AN202007231393501970_1.pdf",
+   "event_date": "2020-06-23",
+   "doc_ok": true,
+   "doc_format": "pdf",
+   "product_structure": "ordinary_open_ended",
+   "product_structure_reason": [
+    "基金全称为普通形态，无 ETF/LOF/联接标记"
+   ],
+   "investment_type": "bond",
+   "investment_type_reason": [
+    "名称含「债券」"
+   ],
+   "prefix_hint": null,
+   "prefix_conflict": false,
+   "is_index_fund": false,
+   "is_onshore_etf": false,
+   "offmarket_eligible": true,
+   "evidence_level": "B",
+   "evidence_reason": "第三方转载（pdf.dfcfw.com），原文完整可读、可追溯，但发布主体非官方"
+  },
+  {
+   "event_key": "创金合信研究精选股票型证券投资基金|liquidation",
+   "codes_in_event": [
+    "010001",
+    "010002"
+   ],
+   "fund_entity_old": "创金合信研究精选股票型证券投资基金",
+   "fund_entity": "创金合信研究精选股票型证券投资基金",
+   "name_source": "body",
+   "name_changed": false,
+   "announcement_id": "AN202306201591081193",
+   "announcement_title": "创金合信研究精选股票型证券投资基金清算报告",
+   "announcement_date": "2023-06-20",
+   "announcement_url": "http://pdf.dfcfw.com/pdf/H2_AN202306201591081193_1.pdf",
+   "event_date": "2023-05-24",
+   "doc_ok": true,
+   "doc_format": "pdf",
+   "product_structure": "ordinary_open_ended",
+   "product_structure_reason": [
+    "基金全称为普通形态，无 ETF/LOF/联接标记"
+   ],
+   "investment_type": "equity",
+   "investment_type_reason": [
+    "名称含「股票」"
+   ],
+   "prefix_hint": null,
+   "prefix_conflict": false,
+   "is_index_fund": false,
+   "is_onshore_etf": false,
+   "offmarket_eligible": true,
+   "evidence_level": "B",
+   "evidence_reason": "第三方转载（pdf.dfcfw.com），原文完整可读、可追溯，但发布主体非官方"
+  },
+  {
+   "event_key": "南方誉鼎一年持有期混合型证券投资基金|liquidation",
+   "codes_in_event": [
+    "010006",
+    "010007"
+   ],
+   "fund_entity_old": "南方誉鼎一年持有期混合型证券投资基金",
+   "fund_entity": "南方誉鼎一年持有期混合型证券投资基金",
+   "name_source": "body",
+   "name_changed": false,
+   "announcement_id": "AN202512261808329446",
+   "announcement_title": "关于南方誉鼎一年持有期混合型证券投资基金基金合同终止及剩余财产分配的公告",
+   "announcement_date": "2025-12-26",
+   "announcement_url": "http://pdf.dfcfw.com/pdf/H2_AN202512261808329446_1.pdf",
+   "event_date": "2025-11-27",
+   "doc_ok": true,
+   "doc_format": "pdf",
+   "product_structure": "ordinary_open_ended",
+   "product_structure_reason": [
+    "基金全称为普通形态，无 ETF/LOF/联接标记"
+   ],
+   "investment_type": "mixed",
+   "investment_type_reason": [
+    "名称含「混合」"
+   ],
+   "prefix_hint": null,
+   "prefix_conflict": false,
+   "is_index_fund": false,
+   "is_onshore_etf": false,
+   "offmarket_eligible": true,
+   "evidence_level": "B",
+   "evidence_reason": "第三方转载（pdf.dfcfw.com），原文完整可读、可追溯，但发布主体非官方"
+  },
+  {
+   "event_key": "博时金福安一年持有期混合型发起式基金|liquidation",
+   "codes_in_event": [
+    "010046",
+    "010047"
+   ],
+   "fund_entity_old": "博时金福安一年持有期混合型发起式基金",
+   "fund_entity": "博时金福安一年持有期混合型发起式基金",
+   "name_source": "fallback",
+   "name_changed": false,
+   "announcement_id": "AN202310251603404388",
+   "announcement_title": "关于博时金福安一年持有期混合型发起式基金中基金(FOF)基金合同终止的公告",
+   "announcement_date": "2023-10-25",
+   "announcement_url": "http://pdf.dfcfw.com/pdf/H2_AN202310251603404388_1.pdf",
+   "event_date": null,
+   "doc_ok": true,
+   "doc_format": "pdf",
+   "product_structure": "ordinary_open_ended",
+   "product_structure_reason": [
+    "基金全称为普通形态，无 ETF/LOF/联接标记"
+   ],
+   "investment_type": "mixed",
+   "investment_type_reason": [
+    "名称含「混合」"
+   ],
+   "prefix_hint": null,
+   "prefix_conflict": false,
+   "is_index_fund": false,
+   "is_onshore_etf": false,
+   "offmarket_eligible": true,
+   "evidence_level": "B",
+   "evidence_reason": "第三方转载（pdf.dfcfw.com），原文完整可读、可追溯，但发布主体非官方"
+  },
+  {
+   "event_key": "东方红鼎元3个月定期开放混合型发起式证券投资基金|liquidation",
+   "codes_in_event": [
+    "010059"
+   ],
+   "fund_entity_old": "东方红鼎元3个月定期开放混合型发起式证券投资基金",
+   "fund_entity": "东方红鼎元3个月定期开放混合型发起式证券投资基金",
+   "name_source": "body",
+   "name_changed": false,
+   "announcement_id": "AN202504151656705066",
+   "announcement_title": "东方红鼎元3个月定期开放混合型发起式证券投资基金清算报告",
+   "announcement_date": "2025-04-15",
+   "announcement_url": "http://pdf.dfcfw.com/pdf/H2_AN202504151656705066_1.pdf",
+   "event_date": "2025-03-04",
+   "doc_ok": true,
+   "doc_format": "pdf",
+   "product_structure": "ordinary_open_ended",
+   "product_structure_reason": [
+    "基金全称为普通形态，无 ETF/LOF/联接标记"
+   ],
+   "investment_type": "mixed",
+   "investment_type_reason": [
+    "名称含「混合」"
+   ],
+   "prefix_hint": null,
+   "prefix_conflict": false,
+   "is_index_fund": false,
+   "is_onshore_etf": false,
+   "offmarket_eligible": true,
+   "evidence_level": "B",
+   "evidence_reason": "第三方转载（pdf.dfcfw.com），原文完整可读、可追溯，但发布主体非官方"
+  },
+  {
+   "event_key": "华泰柏瑞景利混合型证券投资基金|liquidation",
+   "codes_in_event": [
+    "010060",
+    "010061"
+   ],
+   "fund_entity_old": "华泰柏瑞景利混合型证券投资基金",
+   "fund_entity": "华泰柏瑞景利混合型证券投资基金",
+   "name_source": "body",
+   "name_changed": false,
+   "announcement_id": "AN202310231602716825",
+   "announcement_title": "华泰柏瑞景利混合型证券投资基金清算报告提示性公告",
+   "announcement_date": "2023-10-23",
+   "announcement_url": "http://pdf.dfcfw.com/pdf/H2_AN202310231602716825_1.pdf",
+   "event_date": "2023-09-06",
+   "doc_ok": true,
+   "doc_format": "pdf",
+   "product_structure": "ordinary_open_ended",
+   "product_structure_reason": [
+    "基金全称为普通形态，无 ETF/LOF/联接标记"
+   ],
+   "investment_type": "mixed",
+   "investment_type_reason": [
+    "名称含「混合」"
+   ],
+   "prefix_hint": null,
+   "prefix_conflict": false,
+   "is_index_fund": false,
+   "is_onshore_etf": false,
+   "offmarket_eligible": true,
+   "evidence_level": "B",
+   "evidence_reason": "第三方转载（pdf.dfcfw.com），原文完整可读、可追溯，但发布主体非官方"
+  },
+  {
+   "event_key": "方正富邦中证500指数增强型证券投资基金|liquidation",
+   "codes_in_event": [
+    "010066",
+    "010067"
+   ],
+   "fund_entity_old": "方正富邦中证500指数增强型证券投资基金",
+   "fund_entity": "方正富邦中证500指数增强型证券投资基金",
+   "name_source": "body",
+   "name_changed": false,
+   "announcement_id": "AN202211041579909698",
+   "announcement_title": "方正富邦中证500指数增强型证券投资基金清算报告",
+   "announcement_date": "2022-11-04",
+   "announcement_url": "http://pdf.dfcfw.com/pdf/H2_AN202211041579909698_1.pdf",
+   "event_date": null,
+   "doc_ok": true,
+   "doc_format": "pdf",
+   "product_structure": "ordinary_open_ended",
+   "product_structure_reason": [
+    "基金全称为普通形态，无 ETF/LOF/联接标记"
+   ],
+   "investment_type": "index",
+   "investment_type_reason": [
+    "名称含「指数」但无股/债/混限定"
+   ],
+   "prefix_hint": null,
+   "prefix_conflict": false,
+   "is_index_fund": true,
+   "is_onshore_etf": false,
+   "offmarket_eligible": true,
+   "evidence_level": "B",
+   "evidence_reason": "第三方转载（pdf.dfcfw.com），原文完整可读、可追溯，但发布主体非官方"
+  },
+  {
+   "event_key": "方正富邦ESG主题投资混合型证券投资基金|liquidation",
+   "codes_in_event": [
+    "010070",
+    "010071"
+   ],
+   "fund_entity_old": "方正富邦ESG主题投资混合型证券投资基金",
+   "fund_entity": "方正富邦ESG主题投资混合型证券投资基金",
+   "name_source": "body",
+   "name_changed": false,
+   "announcement_id": "AN202409041639723820",
+   "announcement_title": "方正富邦基金管理有限公司关于方正富邦ESG主题投资混合型证券投资基金基金合同终止及剩余财产分配的公告",
+   "announcement_date": "2024-09-04",
+   "announcement_url": "http://pdf.dfcfw.com/pdf/H2_AN202409041639723820_1.pdf",
+   "event_date": "2024-07-02",
+   "doc_ok": true,
+   "doc_format": "pdf",
+   "product_structure": "ordinary_open_ended",
+   "product_structure_reason": [
+    "基金全称为普通形态，无 ETF/LOF/联接标记"
+   ],
+   "investment_type": "mixed",
+   "investment_type_reason": [
+    "名称含「混合」"
+   ],
+   "prefix_hint": null,
+   "prefix_conflict": false,
+   "is_index_fund": false,
+   "is_onshore_etf": false,
+   "offmarket_eligible": true,
+   "evidence_level": "B",
+   "evidence_reason": "第三方转载（pdf.dfcfw.com），原文完整可读、可追溯，但发布主体非官方"
+  },
+  {
+   "event_key": "南方誉隆一年持有期混合型证券投资基金|liquidation",
+   "codes_in_event": [
+    "010074",
+    "010075"
+   ],
+   "fund_entity_old": "南方誉隆一年持有期混合型证券投资基金",
+   "fund_entity": "南方誉隆一年持有期混合型证券投资基金",
+   "name_source": "body",
+   "name_changed": false,
+   "announcement_id": "AN202311181611666263",
+   "announcement_title": "关于南方誉隆一年持有期混合型证券投资基金基金合同终止及剩余财产分配的公告",
+   "announcement_date": "2023-11-18",
+   "announcement_url": "http://pdf.dfcfw.com/pdf/H2_AN202311181611666263_1.pdf",
+   "event_date": null,
+   "doc_ok": true,
+   "doc_format": "pdf",
+   "product_structure": "ordinary_open_ended",
+   "product_structure_reason": [
+    "基金全称为普通形态，无 ETF/LOF/联接标记"
+   ],
+   "investment_type": "mixed",
+   "investment_type_reason": [
+    "名称含「混合」"
+   ],
+   "prefix_hint": null,
+   "prefix_conflict": false,
+   "is_index_fund": false,
+   "is_onshore_etf": false,
+   "offmarket_eligible": true,
+   "evidence_level": "B",
+   "evidence_reason": "第三方转载（pdf.dfcfw.com），原文完整可读、可追溯，但发布主体非官方"
+  },
+  {
+   "event_key": "博时恒荣一年持有期混合型证券投资基金|liquidation",
+   "codes_in_event": [
+    "010078",
+    "010079"
+   ],
+   "fund_entity_old": "博时恒荣一年持有期混合型证券投资基金",
+   "fund_entity": "博时恒荣一年持有期混合型证券投资基金",
+   "name_source": "body",
+   "name_changed": false,
+   "announcement_id": "AN202306291591848633",
+   "announcement_title": "关于博时恒荣一年持有期混合型证券投资基金基金合同终止的公告",
+   "announcement_date": "2023-06-29",
+   "announcement_url": "http://pdf.dfcfw.com/pdf/H2_AN202306291591848633_1.pdf",
+   "event_date": null,
+   "doc_ok": true,
+   "doc_format": "pdf",
+   "product_structure": "ordinary_open_ended",
+   "product_structure_reason": [
+    "基金全称为普通形态，无 ETF/LOF/联接标记"
+   ],
+   "investment_type": "mixed",
+   "investment_type_reason": [
+    "名称含「混合」"
+   ],
+   "prefix_hint": null,
+   "prefix_conflict": false,
+   "is_index_fund": false,
+   "is_onshore_etf": false,
+   "offmarket_eligible": true,
+   "evidence_level": "B",
+   "evidence_reason": "第三方转载（pdf.dfcfw.com），原文完整可读、可追溯，但发布主体非官方"
+  },
+  {
+   "event_key": "中欧优势成长三个月定期开放混合型发起式证券投资基金|liquidation",
+   "codes_in_event": [
+    "010080"
+   ],
+   "fund_entity_old": "中欧优势成长三个月定期开放混合型发起式证券投资基金",
+   "fund_entity": "中欧优势成长三个月定期开放混合型发起式证券投资基金",
+   "name_source": "fallback",
+   "name_changed": false,
+   "announcement_id": "AN202607311827502983",
+   "announcement_title": "中欧优势成长三个月定期开放混合型发起式证券投资基金二次清算报告",
+   "announcement_date": "2026-07-31",
+   "announcement_url": "http://pdf.dfcfw.com/pdf/H2_AN202607311827502983_1.pdf",
+   "event_date": "2026-01-20",
+   "doc_ok": true,
+   "doc_format": "pdf",
+   "product_structure": "ordinary_open_ended",
+   "product_structure_reason": [
+    "基金全称为普通形态，无 ETF/LOF/联接标记"
+   ],
+   "investment_type": "mixed",
+   "investment_type_reason": [
+    "名称含「混合」"
+   ],
+   "prefix_hint": null,
+   "prefix_conflict": false,
+   "is_index_fund": false,
+   "is_onshore_etf": false,
+   "offmarket_eligible": true,
+   "evidence_level": "B",
+   "evidence_reason": "第三方转载（pdf.dfcfw.com），原文完整可读、可追溯，但发布主体非官方"
+  },
+  {
+   "event_key": "博远鑫享三个月持有期债券型证券投资基金|liquidation",
+   "codes_in_event": [
+    "010096",
+    "010097",
+    "010098"
+   ],
+   "fund_entity_old": "博远鑫享三个月持有期债券型证券投资基金",
+   "fund_entity": "博远鑫享三个月持有期债券型证券投资基金",
+   "name_source": "body",
+   "name_changed": false,
+   "announcement_id": "AN202407191638076604",
+   "announcement_title": "博远鑫享三个月持有期债券型证券投资基金2024年清算报告",
+   "announcement_date": "2024-07-19",
+   "announcement_url": "http://pdf.dfcfw.com/pdf/H2_AN202407191638076604_1.pdf",
+   "event_date": "2024-06-26",
+   "doc_ok": true,
+   "doc_format": "pdf",
+   "product_structure": "ordinary_open_ended",
+   "product_structure_reason": [
+    "基金全称为普通形态，无 ETF/LOF/联接标记"
+   ],
+   "investment_type": "bond",
+   "investment_type_reason": [
+    "名称含「债券」"
+   ],
+   "prefix_hint": null,
+   "prefix_conflict": false,
+   "is_index_fund": false,
+   "is_onshore_etf": false,
+   "offmarket_eligible": true,
+   "evidence_level": "B",
+   "evidence_reason": "第三方转载（pdf.dfcfw.com），原文完整可读、可追溯，但发布主体非官方"
+  },
+  {
+   "event_key": "国泰中小板300成长交易型开放式指数证券投资基金|liquidation",
+   "codes_in_event": [
+    "020025"
+   ],
+   "fund_entity_old": "国泰中小板300成长交易型开放式指数证券投资基金",
+   "fund_entity": "国泰中小板300成长交易型开放式指数证券投资基金联接基金",
+   "name_source": "body",
+   "name_changed": true,
+   "announcement_id": "AN201511060011311239",
+   "announcement_title": "国泰中小板300成长交易型开放式指数证券投资基金联接基金清算报告",
+   "announcement_date": "2015-11-06",
+   "announcement_url": "http://pdf.dfcfw.com/pdf/H2_AN201511060011311239_1.pdf",
+   "event_date": "2015-07-30",
+   "doc_ok": true,
+   "doc_format": "pdf",
+   "product_structure": "etf_linked",
+   "product_structure_reason": [
+    "基金全称或公告标题含「联接」"
+   ],
+   "investment_type": "index",
+   "investment_type_reason": [
+    "名称含「指数」但无股/债/混限定"
+   ],
+   "prefix_hint": null,
+   "prefix_conflict": false,
+   "is_index_fund": true,
+   "is_onshore_etf": false,
+   "offmarket_eligible": true,
+   "evidence_level": "B",
+   "evidence_reason": "第三方转载（pdf.dfcfw.com），原文完整可读、可追溯，但发布主体非官方"
+  },
+  {
+   "event_key": "国泰信用债券型证券投资基金|liquidation",
+   "codes_in_event": [
+    "020027",
+    "020028"
+   ],
+   "fund_entity_old": "国泰信用债券型证券投资基金",
+   "fund_entity": "国泰信用债券型证券投资基金",
+   "name_source": "body",
+   "name_changed": false,
+   "announcement_id": "AN201808251182985605",
+   "announcement_title": "国泰信用债券型证券投资基金清算报告",
+   "announcement_date": "2018-08-25",
+   "announcement_url": "http://pdf.dfcfw.com/pdf/H2_AN201808251182985605_1.pdf",
+   "event_date": "2018-05-15",
+   "doc_ok": true,
+   "doc_format": "pdf",
+   "product_structure": "ordinary_open_ended",
+   "product_structure_reason": [
+    "基金全称为普通形态，无 ETF/LOF/联接标记"
+   ],
+   "investment_type": "bond",
+   "investment_type_reason": [
+    "名称含「债券」"
+   ],
+   "prefix_hint": null,
+   "prefix_conflict": false,
+   "is_index_fund": false,
+   "is_onshore_etf": false,
+   "offmarket_eligible": true,
+   "evidence_level": "B",
+   "evidence_reason": "第三方转载（pdf.dfcfw.com），原文完整可读、可追溯，但发布主体非官方"
+  },
+  {
+   "event_key": "国泰创利债券型证券投资基金|liquidation",
+   "codes_in_event": [
+    "020029"
+   ],
+   "fund_entity_old": "国泰创利债券型证券投资基金",
+   "fund_entity": "国泰创利债券型证券投资基金",
+   "name_source": "body",
+   "name_changed": false,
+   "announcement_id": "AN201710190961950570",
+   "announcement_title": "国泰创利债券型证券投资基金清算报告",
+   "announcement_date": "2017-10-19",
+   "announcement_url": "http://pdf.dfcfw.com/pdf/H2_AN201710190961950570_1.pdf",
+   "event_date": "2017-08-14",
+   "doc_ok": true,
+   "doc_format": "pdf",
+   "product_structure": "ordinary_open_ended",
+   "product_structure_reason": [
+    "基金全称为普通形态，无 ETF/LOF/联接标记"
+   ],
+   "investment_type": "bond",
+   "investment_type_reason": [
+    "名称含「债券」"
+   ],
+   "prefix_hint": null,
+   "prefix_conflict": false,
+   "is_index_fund": false,
+   "is_onshore_etf": false,
+   "offmarket_eligible": true,
+   "evidence_level": "B",
+   "evidence_reason": "第三方转载（pdf.dfcfw.com），原文完整可读、可追溯，但发布主体非官方"
+  },
+  {
+   "event_key": "国泰上证5年期国债交易型开放式指数证券投资基金|liquidation",
+   "codes_in_event": [
+    "020035",
+    "020036"
+   ],
+   "fund_entity_old": "国泰上证5年期国债交易型开放式指数证券投资基金",
+   "fund_entity": "国泰上证5年期国债交易型开放式指数证券投资基金联接基金",
+   "name_source": "body",
+   "name_changed": true,
+   "announcement_id": "AN201811301255063290",
+   "announcement_title": "国泰上证5年期国债交易型开放式指数证券投资基金联接基金清算报告",
+   "announcement_date": "2018-11-30",
+   "announcement_url": "http://pdf.dfcfw.com/pdf/H2_AN201811301255063290_1.pdf",
+   "event_date": "2018-10-16",
+   "doc_ok": true,
+   "doc_format": "pdf",
+   "product_structure": "etf_linked",
+   "product_structure_reason": [
+    "基金全称或公告标题含「联接」"
+   ],
+   "investment_type": "index",
+   "investment_type_reason": [
+    "名称含「指数」但无股/债/混限定"
+   ],
+   "prefix_hint": null,
+   "prefix_conflict": false,
+   "is_index_fund": true,
+   "is_onshore_etf": false,
+   "offmarket_eligible": true,
+   "evidence_level": "B",
+   "evidence_reason": "第三方转载（pdf.dfcfw.com），原文完整可读、可追溯，但发布主体非官方"
+  },
+  {
+   "event_key": "红塔红土中债0-3年政策性金融债指数证券投资基金|liquidation",
+   "codes_in_event": [
+    "020048",
+    "020049"
+   ],
+   "fund_entity_old": "红塔红土中债0-3年政策性金融债指数证券投资基金",
+   "fund_entity": "红塔红土中债0-3年政策性金融债指数证券投资基金",
+   "name_source": "body",
+   "name_changed": false,
+   "announcement_id": "AN202602101819845018",
+   "announcement_title": "红塔红土中债0-3年政策性金融债指数证券投资基金基金合同终止及剩余财产分配的公告",
+   "announcement_date": "2026-02-10",
+   "announcement_url": "http://pdf.dfcfw.com/pdf/H2_AN202602101819845018_1.pdf",
+   "event_date": "2026-01-14",
+   "doc_ok": true,
+   "doc_format": "pdf",
+   "product_structure": "ordinary_open_ended",
+   "product_structure_reason": [
+    "基金全称为普通形态，无 ETF/LOF/联接标记"
+   ],
+   "investment_type": "index",
+   "investment_type_reason": [
+    "名称含「指数」但无股/债/混限定"
+   ],
+   "prefix_hint": null,
+   "prefix_conflict": false,
+   "is_index_fund": true,
+   "is_onshore_etf": false,
+   "offmarket_eligible": true,
+   "evidence_level": "B",
+   "evidence_reason": "第三方转载（pdf.dfcfw.com），原文完整可读、可追溯，但发布主体非官方"
+  },
+  {
+   "event_key": "华宝兴业活期通货币市场基金|liquidation",
+   "codes_in_event": [
+    "240021"
+   ],
+   "fund_entity_old": "华宝兴业活期通货币市场基金",
+   "fund_entity": "华宝兴业活期通货币市场基金",
+   "name_source": "body",
+   "name_changed": false,
+   "announcement_id": "AN201512170012144916",
+   "announcement_title": "华宝兴业活期通货币市场基金清算报告",
+   "announcement_date": "2015-12-17",
+   "announcement_url": "http://pdf.dfcfw.com/pdf/H2_AN201512170012144916_1.pdf",
+   "event_date": null,
+   "doc_ok": true,
+   "doc_format": "pdf",
+   "product_structure": "ordinary_open_ended",
+   "product_structure_reason": [
+    "基金全称为普通形态，无 ETF/LOF/联接标记"
+   ],
+   "investment_type": "money_market",
+   "investment_type_reason": [
+    "名称含「货币市场」"
+   ],
+   "prefix_hint": null,
+   "prefix_conflict": false,
+   "is_index_fund": false,
+   "is_onshore_etf": false,
+   "offmarket_eligible": true,
+   "evidence_level": "B",
+   "evidence_reason": "第三方转载（pdf.dfcfw.com），原文完整可读、可追溯，但发布主体非官方"
+  },
+  {
+   "event_key": "国金鑫新灵活配置混合型证券投资基金|liquidation",
+   "codes_in_event": [
+    "501000"
+   ],
+   "fund_entity_old": "国金鑫新灵活配置混合型证券投资基金",
+   "fund_entity": "国金鑫新灵活配置混合型证券投资基金",
+   "name_source": "fallback",
+   "name_changed": false,
+   "announcement_id": "AN202405091632746632",
+   "announcement_title": "国金鑫新灵活配置混合型证券投资基金(LOF)清算报告",
+   "announcement_date": "2024-05-09",
+   "announcement_url": "http://pdf.dfcfw.com/pdf/H2_AN202405091632746632_1.pdf",
+   "event_date": "2024-03-13",
+   "doc_ok": true,
+   "doc_format": "pdf",
+   "product_structure": "lof",
+   "product_structure_reason": [
+    "基金全称/标题/正文含 LOF 或「上市开放式基金」"
+   ],
+   "investment_type": "mixed",
+   "investment_type_reason": [
+    "名称含「混合」"
+   ],
+   "prefix_hint": "LOF（上交所）",
+   "prefix_conflict": false,
+   "is_index_fund": false,
+   "is_onshore_etf": false,
+   "offmarket_eligible": true,
+   "evidence_level": "B",
+   "evidence_reason": "第三方转载（pdf.dfcfw.com），原文完整可读、可追溯，但发布主体非官方"
+  },
+  {
+   "event_key": "长信价值优选混合型证券投资基金|liquidation",
+   "codes_in_event": [
+    "501002"
+   ],
+   "fund_entity_old": "长信价值优选混合型证券投资基金",
+   "fund_entity": "长信价值优选混合型证券投资基金",
+   "name_source": "body",
+   "name_changed": false,
+   "announcement_id": "AN202407191638076328",
+   "announcement_title": "长信价值优选混合型证券投资基金基金清算报告提示性公告",
+   "announcement_date": "2024-07-19",
+   "announcement_url": "http://pdf.dfcfw.com/pdf/H2_AN202407191638076328_1.pdf",
+   "event_date": "2024-06-29",
+   "doc_ok": true,
+   "doc_format": "pdf",
+   "product_structure": "ordinary_open_ended",
+   "product_structure_reason": [
+    "基金全称为普通形态，无 ETF/LOF/联接标记"
+   ],
+   "investment_type": "mixed",
+   "investment_type_reason": [
+    "名称含「混合」"
+   ],
+   "prefix_hint": "LOF（上交所）",
+   "prefix_conflict": true,
+   "is_index_fund": false,
+   "is_onshore_etf": false,
+   "offmarket_eligible": true,
+   "evidence_level": "B",
+   "evidence_reason": "第三方转载（pdf.dfcfw.com），原文完整可读、可追溯，但发布主体非官方"
+  },
+  {
+   "event_key": "长信量化优选混合型证券投资基金|liquidation",
+   "codes_in_event": [
+    "501003"
+   ],
+   "fund_entity_old": "长信量化优选混合型证券投资基金",
+   "fund_entity": "长信量化优选混合型证券投资基金",
+   "name_source": "fallback",
+   "name_changed": false,
+   "announcement_id": "AN201809281203834240",
+   "announcement_title": "长信量化优选混合型证券投资基金(LOF)清算报告",
+   "announcement_date": "2018-09-28",
+   "announcement_url": "http://pdf.dfcfw.com/pdf/H2_AN201809281203834240_1.pdf",
+   "event_date": "2018-08-07",
+   "doc_ok": true,
+   "doc_format": "pdf",
+   "product_structure": "lof",
+   "product_structure_reason": [
+    "基金全称/标题/正文含 LOF 或「上市开放式基金」"
+   ],
+   "investment_type": "mixed",
+   "investment_type_reason": [
+    "名称含「混合」"
+   ],
+   "prefix_hint": "LOF（上交所）",
+   "prefix_conflict": false,
+   "is_index_fund": true,
+   "is_onshore_etf": false,
+   "offmarket_eligible": true,
+   "evidence_level": "B",
+   "evidence_reason": "第三方转载（pdf.dfcfw.com），原文完整可读、可追溯，但发布主体非官方"
+  },
+  {
+   "event_key": "国泰中证国有企业改革指数证券投资基金|liquidation",
+   "codes_in_event": [
+    "501020"
+   ],
+   "fund_entity_old": "国泰中证国有企业改革指数证券投资基金",
+   "fund_entity": "国泰中证国有企业改革指数证券投资基金",
+   "name_source": "fallback",
+   "name_changed": false,
+   "announcement_id": "AN201808251182985602",
+   "announcement_title": "国泰中证国有企业改革指数证券投资基金(LOF)清算报告",
+   "announcement_date": "2018-08-25",
+   "announcement_url": "http://pdf.dfcfw.com/pdf/H2_AN201808251182985602_1.pdf",
+   "event_date": "2018-04-26",
+   "doc_ok": true,
+   "doc_format": "pdf",
+   "product_structure": "lof",
+   "product_structure_reason": [
+    "基金全称/标题/正文含 LOF 或「上市开放式基金」"
+   ],
+   "investment_type": "index",
+   "investment_type_reason": [
+    "名称含「指数」但无股/债/混限定"
+   ],
+   "prefix_hint": "LOF（上交所）",
+   "prefix_conflict": false,
+   "is_index_fund": true,
+   "is_onshore_etf": false,
+   "offmarket_eligible": true,
+   "evidence_level": "B",
+   "evidence_reason": "第三方转载（pdf.dfcfw.com），原文完整可读、可追溯，但发布主体非官方"
+  },
+  {
+   "event_key": "鹏华港股通中证香港中小企业投资主题指数证券投资基金|liquidation",
+   "codes_in_event": [
+    "501023"
+   ],
+   "fund_entity_old": "鹏华港股通中证香港中小企业投资主题指数证券投资基金",
+   "fund_entity": "鹏华港股通中证香港中小企业投资主题指数证券投资基金",
+   "name_source": "fallback",
+   "name_changed": false,
+   "announcement_id": "AN202112141534500909",
+   "announcement_title": "鹏华港股通中证香港中小企业投资主题指数证券投资基金(LOF)2021年清算报告",
+   "announcement_date": "2021-12-14",
+   "announcement_url": "http://pdf.dfcfw.com/pdf/H2_AN202112141534500909_1.pdf",
+   "event_date": "2021-10-20",
+   "doc_ok": true,
+   "doc_format": "pdf",
+   "product_structure": "lof",
+   "product_structure_reason": [
+    "基金全称/标题/正文含 LOF 或「上市开放式基金」"
+   ],
+   "investment_type": "index",
+   "investment_type_reason": [
+    "名称含「指数」但无股/债/混限定"
+   ],
+   "prefix_hint": "LOF（上交所）",
+   "prefix_conflict": false,
+   "is_index_fund": true,
+   "is_onshore_etf": false,
+   "offmarket_eligible": true,
+   "evidence_level": "B",
+   "evidence_reason": "第三方转载（pdf.dfcfw.com），原文完整可读、可追溯，但发布主体非官方"
+  },
+  {
+   "event_key": "国泰融信灵活配置混合型证券投资基金|liquidation",
+   "codes_in_event": [
+    "501027"
+   ],
+   "fund_entity_old": "国泰融信灵活配置混合型证券投资基金",
+   "fund_entity": "国泰融信灵活配置混合型证券投资基金",
+   "name_source": "fallback",
+   "name_changed": false,
+   "announcement_id": "AN202308141594345730",
+   "announcement_title": "国泰融信灵活配置混合型证券投资基金(LOF)清算报告",
+   "announcement_date": "2023-08-14",
+   "announcement_url": "http://pdf.dfcfw.com/pdf/H2_AN202308141594345730_1.pdf",
+   "event_date": "2023-07-25",
+   "doc_ok": true,
+   "doc_format": "pdf",
+   "product_structure": "lof",
+   "product_structure_reason": [
+    "基金全称/标题/正文含 LOF 或「上市开放式基金」"
+   ],
+   "investment_type": "mixed",
+   "investment_type_reason": [
+    "名称含「混合」"
+   ],
+   "prefix_hint": "LOF（上交所）",
+   "prefix_conflict": false,
+   "is_index_fund": false,
+   "is_onshore_etf": false,
+   "offmarket_eligible": true,
+   "evidence_level": "B",
+   "evidence_reason": "第三方转载（pdf.dfcfw.com），原文完整可读、可追溯，但发布主体非官方"
+  },
+  {
+   "event_key": "银华惠安定期开放混合型证券投资基金|liquidation",
+   "codes_in_event": [
+    "501033"
+   ],
+   "fund_entity_old": "银华惠安定期开放混合型证券投资基金",
+   "fund_entity": "银华惠安定期开放混合型证券投资基金",
+   "name_source": "body",
+   "name_changed": false,
+   "announcement_id": "AN201906251336294362",
+   "announcement_title": "银华惠安定期开放混合型证券投资基金清算报告",
+   "announcement_date": "2019-06-25",
+   "announcement_url": "http://pdf.dfcfw.com/pdf/H2_AN201906251336294362_1.pdf",
+   "event_date": "2019-04-04",
+   "doc_ok": true,
+   "doc_format": "pdf",
+   "product_structure": "ordinary_open_ended",
+   "product_structure_reason": [
+    "基金全称为普通形态，无 ETF/LOF/联接标记"
+   ],
+   "investment_type": "mixed",
+   "investment_type_reason": [
+    "名称含「混合」"
+   ],
+   "prefix_hint": "LOF（上交所）",
+   "prefix_conflict": true,
+   "is_index_fund": false,
+   "is_onshore_etf": false,
+   "offmarket_eligible": true,
+   "evidence_level": "B",
+   "evidence_reason": "第三方转载（pdf.dfcfw.com），原文完整可读、可追溯，但发布主体非官方"
+  },
+  {
+   "event_key": "创金合信鼎鑫睿选定期开放混合型证券投资基金|liquidation",
+   "codes_in_event": [
+    "501035"
+   ],
+   "fund_entity_old": "创金合信鼎鑫睿选定期开放混合型证券投资基金",
+   "fund_entity": "创金合信鼎鑫睿选定期开放混合型证券投资基金",
+   "name_source": "fallback",
+   "name_changed": false,
+   "announcement_id": "AN201905061327002013",
+   "announcement_title": "创金合信鼎鑫睿选定期开放混合型证券投资基金(LOF)清算报告",
+   "announcement_date": "2019-05-07",
+   "announcement_url": "http://pdf.dfcfw.com/pdf/H2_AN201905061327002013_1.pdf",
+   "event_date": "2019-02-26",
+   "doc_ok": true,
+   "doc_format": "pdf",
+   "product_structure": "lof",
+   "product_structure_reason": [
+    "基金全称/标题/正文含 LOF 或「上市开放式基金」"
+   ],
+   "investment_type": "mixed",
+   "investment_type_reason": [
+    "名称含「混合」"
+   ],
+   "prefix_hint": "LOF（上交所）",
+   "prefix_conflict": false,
+   "is_index_fund": false,
+   "is_onshore_etf": false,
+   "offmarket_eligible": true,
+   "evidence_level": "B",
+   "evidence_reason": "第三方转载（pdf.dfcfw.com），原文完整可读、可追溯，但发布主体非官方"
+  },
+  {
+   "event_key": "汇添富睿丰混合型证券投资基金|liquidation",
+   "codes_in_event": [
+    "501039",
+    "501040"
+   ],
+   "fund_entity_old": "汇添富睿丰混合型证券投资基金",
+   "fund_entity": "汇添富睿丰混合型证券投资基金",
+   "name_source": "fallback",
+   "name_changed": false,
+   "announcement_id": "AN202402081621122623",
+   "announcement_title": "汇添富睿丰混合型证券投资基金(LOF)清算报告提示性公告",
+   "announcement_date": "2024-02-08",
+   "announcement_url": "http://pdf.dfcfw.com/pdf/H2_AN202402081621122623_1.pdf",
+   "event_date": "2024-01-17",
+   "doc_ok": true,
+   "doc_format": "pdf",
+   "product_structure": "lof",
+   "product_structure_reason": [
+    "基金全称/标题/正文含 LOF 或「上市开放式基金」"
+   ],
+   "investment_type": "mixed",
+   "investment_type_reason": [
+    "名称含「混合」"
+   ],
+   "prefix_hint": "LOF（上交所）",
+   "prefix_conflict": false,
+   "is_index_fund": false,
+   "is_onshore_etf": false,
+   "offmarket_eligible": true,
+   "evidence_level": "B",
+   "evidence_reason": "第三方转载（pdf.dfcfw.com），原文完整可读、可追溯，但发布主体非官方"
+  },
+  {
+   "event_key": "汇添富弘安混合型证券投资基金|liquidation",
+   "codes_in_event": [
+    "501041",
+    "501042"
+   ],
+   "fund_entity_old": "汇添富弘安混合型证券投资基金",
+   "fund_entity": "汇添富弘安混合型证券投资基金",
+   "name_source": "body",
+   "name_changed": false,
+   "announcement_id": "AN202403171626953782",
+   "announcement_title": "汇添富弘安混合型证券投资基金基金合同终止及剩余财产分配的公告",
+   "announcement_date": "2024-03-18",
+   "announcement_url": "http://pdf.dfcfw.com/pdf/H2_AN202403171626953782_1.pdf",
+   "event_date": "2024-01-23",
+   "doc_ok": true,
+   "doc_format": "pdf",
+   "product_structure": "ordinary_open_ended",
+   "product_structure_reason": [
+    "基金全称为普通形态，无 ETF/LOF/联接标记"
+   ],
+   "investment_type": "mixed",
+   "investment_type_reason": [
+    "名称含「混合」"
+   ],
+   "prefix_hint": "LOF（上交所）",
+   "prefix_conflict": true,
+   "is_index_fund": false,
+   "is_onshore_etf": false,
+   "offmarket_eligible": true,
+   "evidence_level": "B",
+   "evidence_reason": "第三方转载（pdf.dfcfw.com），原文完整可读、可追溯，但发布主体非官方"
+  },
+  {
+   "event_key": "财通多策略福佑定期开放灵活配置混合型发起式证券投资基金|liquidation",
+   "codes_in_event": [
+    "501055"
+   ],
+   "fund_entity_old": "财通多策略福佑定期开放灵活配置混合型发起式证券投资基金",
+   "fund_entity": "财通多策略福佑定期开放灵活配置混合型发起式证券投资基金",
+   "name_source": "body",
+   "name_changed": false,
+   "announcement_id": "AN202110301525904812",
+   "announcement_title": "财通多策略福佑定期开放灵活配置混合型发起式证券投资基金基金合同终止公告",
+   "announcement_date": "2021-10-30",
+   "announcement_url": "http://pdf.dfcfw.com/pdf/H2_AN202110301525904812_1.pdf",
+   "event_date": null,
+   "doc_ok": true,
+   "doc_format": "pdf",
+   "product_structure": "ordinary_open_ended",
+   "product_structure_reason": [
+    "基金全称为普通形态，无 ETF/LOF/联接标记"
+   ],
+   "investment_type": "mixed",
+   "investment_type_reason": [
+    "名称含「混合」"
+   ],
+   "prefix_hint": "LOF（上交所）",
+   "prefix_conflict": true,
+   "is_index_fund": false,
+   "is_onshore_etf": false,
+   "offmarket_eligible": true,
+   "evidence_level": "B",
+   "evidence_reason": "第三方转载（pdf.dfcfw.com），原文完整可读、可追溯，但发布主体非官方"
+  },
+  {
+   "event_key": "招商富时中国A-H50指数型证券投资基金|liquidation",
+   "codes_in_event": [
+    "501067",
+    "501068"
+   ],
+   "fund_entity_old": "招商富时中国A-H50指数型证券投资基金",
+   "fund_entity": "招商富时中国A-H50指数型证券投资基金",
+   "name_source": "fallback",
+   "name_changed": false,
+   "announcement_id": "AN202303041584035459",
+   "announcement_title": "招商富时中国A-H50指数型证券投资基金(LOF)清算报告",
+   "announcement_date": "2023-03-04",
+   "announcement_url": "http://pdf.dfcfw.com/pdf/H2_AN202303041584035459_1.pdf",
+   "event_date": null,
+   "doc_ok": true,
+   "doc_format": "pdf",
+   "product_structure": "lof",
+   "product_structure_reason": [
+    "基金全称/标题/正文含 LOF 或「上市开放式基金」"
+   ],
+   "investment_type": "index",
+   "investment_type_reason": [
+    "名称含「指数」但无股/债/混限定"
+   ],
+   "prefix_hint": "LOF（上交所）",
+   "prefix_conflict": false,
+   "is_index_fund": true,
+   "is_onshore_etf": false,
+   "offmarket_eligible": true,
+   "evidence_level": "B",
+   "evidence_reason": "第三方转载（pdf.dfcfw.com），原文完整可读、可追溯，但发布主体非官方"
+  },
+  {
+   "event_key": "华宝标普中国A股质量价值指数证券投资基金|liquidation",
+   "codes_in_event": [
+    "501069"
+   ],
+   "fund_entity_old": "华宝标普中国A股质量价值指数证券投资基金",
+   "fund_entity": "华宝标普中国A股质量价值指数证券投资基金",
+   "name_source": "fallback",
+   "name_changed": false,
+   "announcement_id": "AN202305051586283755",
+   "announcement_title": "华宝标普中国A股质量价值指数证券投资基金(LOF)清算报告",
+   "announcement_date": "2023-05-05",
+   "announcement_url": "http://pdf.dfcfw.com/pdf/H2_AN202305051586283755_1.pdf",
+   "event_date": null,
+   "doc_ok": true,
+   "doc_format": "pdf",
+   "product_structure": "lof",
+   "product_structure_reason": [
+    "基金全称/标题/正文含 LOF 或「上市开放式基金」"
+   ],
+   "investment_type": "index",
+   "investment_type_reason": [
+    "名称含「指数」但无股/债/混限定"
+   ],
+   "prefix_hint": "LOF（上交所）",
+   "prefix_conflict": false,
+   "is_index_fund": true,
+   "is_onshore_etf": false,
+   "offmarket_eligible": true,
+   "evidence_level": "B",
+   "evidence_reason": "第三方转载（pdf.dfcfw.com），原文完整可读、可追溯，但发布主体非官方"
+  },
+  {
+   "event_key": "国金标普中国A股低波红利指数增强证券投资基金|liquidation",
+   "codes_in_event": [
+    "501072"
+   ],
+   "fund_entity_old": "国金标普中国A股低波红利指数增强证券投资基金",
+   "fund_entity": "国金标普中国A股低波红利指数增强证券投资基金",
+   "name_source": "fallback",
+   "name_changed": false,
+   "announcement_id": "AN202201201541473055",
+   "announcement_title": "国金标普中国A股低波红利指数增强证券投资基金(LOF)清算报告",
+   "announcement_date": "2022-01-20",
+   "announcement_url": "http://pdf.dfcfw.com/pdf/H2_AN202201201541473055_1.pdf",
+   "event_date": "2021-12-08",
+   "doc_ok": true,
+   "doc_format": "pdf",
+   "product_structure": "lof",
+   "product_structure_reason": [
+    "基金全称/标题/正文含 LOF 或「上市开放式基金」"
+   ],
+   "investment_type": "index",
+   "investment_type_reason": [
+    "名称含「指数」但无股/债/混限定"
+   ],
+   "prefix_hint": "LOF（上交所）",
+   "prefix_conflict": false,
+   "is_index_fund": true,
+   "is_onshore_etf": false,
+   "offmarket_eligible": true,
+   "evidence_level": "B",
+   "evidence_reason": "第三方转载（pdf.dfcfw.com），原文完整可读、可追溯，但发布主体非官方"
+  },
+  {
+   "event_key": "华宝MSCI中国A股国际通ESG通用指数证券投资基金|liquidation",
+   "codes_in_event": [
+    "501086"
+   ],
+   "fund_entity_old": "华宝MSCI中国A股国际通ESG通用指数证券投资基金",
+   "fund_entity": "华宝MSCI中国A股国际通ESG通用指数证券投资基金",
+   "name_source": "fallback",
+   "name_changed": false,
+   "announcement_id": "AN202311021607909332",
+   "announcement_title": "华宝MSCI中国A股国际通ESG通用指数证券投资基金(LOF)清算报告",
+   "announcement_date": "2023-11-02",
+   "announcement_url": "http://pdf.dfcfw.com/pdf/H2_AN202311021607909332_1.pdf",
+   "event_date": "2023-10-12",
+   "doc_ok": true,
+   "doc_format": "pdf",
+   "product_structure": "lof",
+   "product_structure_reason": [
+    "基金全称/标题/正文含 LOF 或「上市开放式基金」"
+   ],
+   "investment_type": "index",
+   "investment_type_reason": [
+    "名称含「指数」但无股/债/混限定"
+   ],
+   "prefix_hint": "LOF（上交所）",
+   "prefix_conflict": false,
+   "is_index_fund": true,
+   "is_onshore_etf": false,
+   "offmarket_eligible": true,
+   "evidence_level": "B",
+   "evidence_reason": "第三方转载（pdf.dfcfw.com），原文完整可读、可追溯，但发布主体非官方"
+  },
+  {
+   "event_key": "招商中债-0-3年长三角地方政府债交易型开放式指数证券投资基金|liquidation",
+   "codes_in_event": [
+    "511000"
+   ],
+   "fund_entity_old": "招商中债-0-3年长三角地方政府债交易型开放式指数证券投资基金",
+   "fund_entity": "招商中债-0-3年长三角地方政府债交易型开放式指数证券投资基金",
+   "name_source": "body",
+   "name_changed": false,
+   "announcement_id": "AN202103291477831539",
+   "announcement_title": "招商中债-0-3年长三角地方政府债交易型开放式指数证券投资基金清算报告",
+   "announcement_date": "2021-03-29",
+   "announcement_url": "http://pdf.dfcfw.com/pdf/H2_AN202103291477831539_1.pdf",
+   "event_date": "2021-03-16",
+   "doc_ok": true,
+   "doc_format": "pdf",
+   "product_structure": "etf",
+   "product_structure_reason": [
+    "基金全称含「交易型开放式指数证券投资基金」且无「联接」"
+   ],
+   "investment_type": "index",
+   "investment_type_reason": [
+    "名称含「指数」但无股/债/混限定"
+   ],
+   "prefix_hint": "ETF（上交所）",
+   "prefix_conflict": false,
+   "is_index_fund": true,
+   "is_onshore_etf": true,
+   "offmarket_eligible": false,
+   "evidence_level": "B",
+   "evidence_reason": "第三方转载（pdf.dfcfw.com），原文完整可读、可追溯，但发布主体非官方"
+  },
+  {
+   "event_key": "兴业上证1-5年期地方政府债交易型开放式指数证券投资基金|liquidation",
+   "codes_in_event": [
+    "511050"
+   ],
+   "fund_entity_old": "兴业上证1-5年期地方政府债交易型开放式指数证券投资基金",
+   "fund_entity": "兴业上证1-5年期地方政府债交易型开放式指数证券投资基金",
+   "name_source": "body",
+   "name_changed": false,
+   "announcement_id": "AN202107301506930322",
+   "announcement_title": "兴业上证1-5年期地方政府债交易型开放式指数证券投资基金清算报告提示性公告",
+   "announcement_date": "2021-07-30",
+   "announcement_url": "http://pdf.dfcfw.com/pdf/H2_AN202107301506930322_1.pdf",
+   "event_date": "2021-06-11",
+   "doc_ok": true,
+   "doc_format": "pdf",
+   "product_structure": "etf",
+   "product_structure_reason": [
+    "基金全称含「交易型开放式指数证券投资基金」且无「联接」"
+   ],
+   "investment_type": "index",
+   "investment_type_reason": [
+    "名称含「指数」但无股/债/混限定"
+   ],
+   "prefix_hint": "ETF（上交所）",
+   "prefix_conflict": false,
+   "is_index_fund": true,
+   "is_onshore_etf": true,
+   "offmarket_eligible": false,
+   "evidence_level": "B",
+   "evidence_reason": "第三方转载（pdf.dfcfw.com），原文完整可读、可追溯，但发布主体非官方"
+  }
+ ],
+ "stats": {
+  "liquidation_total": 43,
+  "by_product_structure": {
+   "ordinary_open_ended": 27,
+   "etf_linked": 3,
+   "lof": 11,
+   "etf": 2
+  },
+  "by_investment_type": {
+   "bond": 8,
+   "index": 15,
+   "mixed": 18,
+   "equity": 1,
+   "money_market": 1
+  },
+  "by_evidence_level": {
+   "B": 43
+  },
+  "offmarket_count": 41,
+  "onshore_etf_count": 2,
+  "unknown_type_count": 0,
+  "name_changed_count": 3,
+  "etf_linked_count": 3,
+  "lof_count": 11,
+  "ordinary_count": 27
+ },
+ "offmarket_samples": [
+  {
+   "codes": [
+    "000007"
+   ],
+   "name": "鹏华国有企业债债券型证券投资基金",
+   "structure": "ordinary_open_ended",
+   "investment_type": "bond",
+   "evidence_level": "B"
+  },
+  {
+   "codes": [
+    "000022",
+    "000023"
+   ],
+   "name": "南方中债中期票据指数债券型发起式证券投资基金",
+   "structure": "ordinary_open_ended",
+   "investment_type": "bond",
+   "evidence_level": "B"
+  },
+  {
+   "codes": [
+    "000026",
+    "000027"
+   ],
+   "name": "泰达宏利信用合利定期开放债券型证券投资基金",
+   "structure": "ordinary_open_ended",
+   "investment_type": "bond",
+   "evidence_level": "B"
+  },
+  {
+   "codes": [
+    "000049"
+   ],
+   "name": "中银标普全球精选自然资源等权重指数证券投资基金",
+   "structure": "ordinary_open_ended",
+   "investment_type": "index",
+   "evidence_level": "B"
+  },
+  {
+   "codes": [
+    "000050",
+    "000052"
+   ],
+   "name": "长盛纯债债券型证券投资基金",
+   "structure": "ordinary_open_ended",
+   "investment_type": "bond",
+   "evidence_level": "B"
+  },
+  {
+   "codes": [
+    "000060"
+   ],
+   "name": "国联安中证股债动态策略指数证券投资基金",
+   "structure": "ordinary_open_ended",
+   "investment_type": "index",
+   "evidence_level": "B"
+  },
+  {
+   "codes": [
+    "000062"
+   ],
+   "name": "银华量化智慧动力灵活配置混合型证券投资基金",
+   "structure": "ordinary_open_ended",
+   "investment_type": "mixed",
+   "evidence_level": "B"
+  },
+  {
+   "codes": [
+    "000087",
+    "000088"
+   ],
+   "name": "嘉实中证金边中期国债交易型开放式指数证券投资基金联接基金",
+   "structure": "etf_linked",
+   "investment_type": "index",
+   "evidence_level": "B"
+  },
+  {
+   "codes": [
+    "000091",
+    "000092",
+    "000093"
+   ],
+   "name": "信诚新双盈分级债券型证券投资基金",
+   "structure": "ordinary_open_ended",
+   "investment_type": "bond",
+   "evidence_level": "B"
+  },
+  {
+   "codes": [
+    "010001",
+    "010002"
+   ],
+   "name": "创金合信研究精选股票型证券投资基金",
+   "structure": "ordinary_open_ended",
+   "investment_type": "equity",
+   "evidence_level": "B"
+  },
+  {
+   "codes": [
+    "010006",
+    "010007"
+   ],
+   "name": "南方誉鼎一年持有期混合型证券投资基金",
+   "structure": "ordinary_open_ended",
+   "investment_type": "mixed",
+   "evidence_level": "B"
+  },
+  {
+   "codes": [
+    "010046",
+    "010047"
+   ],
+   "name": "博时金福安一年持有期混合型发起式基金",
+   "structure": "ordinary_open_ended",
+   "investment_type": "mixed",
+   "evidence_level": "B"
+  },
+  {
+   "codes": [
+    "010059"
+   ],
+   "name": "东方红鼎元3个月定期开放混合型发起式证券投资基金",
+   "structure": "ordinary_open_ended",
+   "investment_type": "mixed",
+   "evidence_level": "B"
+  },
+  {
+   "codes": [
+    "010060",
+    "010061"
+   ],
+   "name": "华泰柏瑞景利混合型证券投资基金",
+   "structure": "ordinary_open_ended",
+   "investment_type": "mixed",
+   "evidence_level": "B"
+  },
+  {
+   "codes": [
+    "010066",
+    "010067"
+   ],
+   "name": "方正富邦中证500指数增强型证券投资基金",
+   "structure": "ordinary_open_ended",
+   "investment_type": "index",
+   "evidence_level": "B"
+  },
+  {
+   "codes": [
+    "010070",
+    "010071"
+   ],
+   "name": "方正富邦ESG主题投资混合型证券投资基金",
+   "structure": "ordinary_open_ended",
+   "investment_type": "mixed",
+   "evidence_level": "B"
+  },
+  {
+   "codes": [
+    "010074",
+    "010075"
+   ],
+   "name": "南方誉隆一年持有期混合型证券投资基金",
+   "structure": "ordinary_open_ended",
+   "investment_type": "mixed",
+   "evidence_level": "B"
+  },
+  {
+   "codes": [
+    "010078",
+    "010079"
+   ],
+   "name": "博时恒荣一年持有期混合型证券投资基金",
+   "structure": "ordinary_open_ended",
+   "investment_type": "mixed",
+   "evidence_level": "B"
+  },
+  {
+   "codes": [
+    "010080"
+   ],
+   "name": "中欧优势成长三个月定期开放混合型发起式证券投资基金",
+   "structure": "ordinary_open_ended",
+   "investment_type": "mixed",
+   "evidence_level": "B"
+  },
+  {
+   "codes": [
+    "010096",
+    "010097",
+    "010098"
+   ],
+   "name": "博远鑫享三个月持有期债券型证券投资基金",
+   "structure": "ordinary_open_ended",
+   "investment_type": "bond",
+   "evidence_level": "B"
+  },
+  {
+   "codes": [
+    "020025"
+   ],
+   "name": "国泰中小板300成长交易型开放式指数证券投资基金联接基金",
+   "structure": "etf_linked",
+   "investment_type": "index",
+   "evidence_level": "B"
+  },
+  {
+   "codes": [
+    "020027",
+    "020028"
+   ],
+   "name": "国泰信用债券型证券投资基金",
+   "structure": "ordinary_open_ended",
+   "investment_type": "bond",
+   "evidence_level": "B"
+  },
+  {
+   "codes": [
+    "020029"
+   ],
+   "name": "国泰创利债券型证券投资基金",
+   "structure": "ordinary_open_ended",
+   "investment_type": "bond",
+   "evidence_level": "B"
+  },
+  {
+   "codes": [
+    "020035",
+    "020036"
+   ],
+   "name": "国泰上证5年期国债交易型开放式指数证券投资基金联接基金",
+   "structure": "etf_linked",
+   "investment_type": "index",
+   "evidence_level": "B"
+  },
+  {
+   "codes": [
+    "020048",
+    "020049"
+   ],
+   "name": "红塔红土中债0-3年政策性金融债指数证券投资基金",
+   "structure": "ordinary_open_ended",
+   "investment_type": "index",
+   "evidence_level": "B"
+  },
+  {
+   "codes": [
+    "240021"
+   ],
+   "name": "华宝兴业活期通货币市场基金",
+   "structure": "ordinary_open_ended",
+   "investment_type": "money_market",
+   "evidence_level": "B"
+  },
+  {
+   "codes": [
+    "501000"
+   ],
+   "name": "国金鑫新灵活配置混合型证券投资基金",
+   "structure": "lof",
+   "investment_type": "mixed",
+   "evidence_level": "B"
+  },
+  {
+   "codes": [
+    "501002"
+   ],
+   "name": "长信价值优选混合型证券投资基金",
+   "structure": "ordinary_open_ended",
+   "investment_type": "mixed",
+   "evidence_level": "B"
+  },
+  {
+   "codes": [
+    "501003"
+   ],
+   "name": "长信量化优选混合型证券投资基金",
+   "structure": "lof",
+   "investment_type": "mixed",
+   "evidence_level": "B"
+  },
+  {
+   "codes": [
+    "501020"
+   ],
+   "name": "国泰中证国有企业改革指数证券投资基金",
+   "structure": "lof",
+   "investment_type": "index",
+   "evidence_level": "B"
+  },
+  {
+   "codes": [
+    "501023"
+   ],
+   "name": "鹏华港股通中证香港中小企业投资主题指数证券投资基金",
+   "structure": "lof",
+   "investment_type": "index",
+   "evidence_level": "B"
+  },
+  {
+   "codes": [
+    "501027"
+   ],
+   "name": "国泰融信灵活配置混合型证券投资基金",
+   "structure": "lof",
+   "investment_type": "mixed",
+   "evidence_level": "B"
+  },
+  {
+   "codes": [
+    "501033"
+   ],
+   "name": "银华惠安定期开放混合型证券投资基金",
+   "structure": "ordinary_open_ended",
+   "investment_type": "mixed",
+   "evidence_level": "B"
+  },
+  {
+   "codes": [
+    "501035"
+   ],
+   "name": "创金合信鼎鑫睿选定期开放混合型证券投资基金",
+   "structure": "lof",
+   "investment_type": "mixed",
+   "evidence_level": "B"
+  },
+  {
+   "codes": [
+    "501039",
+    "501040"
+   ],
+   "name": "汇添富睿丰混合型证券投资基金",
+   "structure": "lof",
+   "investment_type": "mixed",
+   "evidence_level": "B"
+  },
+  {
+   "codes": [
+    "501041",
+    "501042"
+   ],
+   "name": "汇添富弘安混合型证券投资基金",
+   "structure": "ordinary_open_ended",
+   "investment_type": "mixed",
+   "evidence_level": "B"
+  },
+  {
+   "codes": [
+    "501055"
+   ],
+   "name": "财通多策略福佑定期开放灵活配置混合型发起式证券投资基金",
+   "structure": "ordinary_open_ended",
+   "investment_type": "mixed",
+   "evidence_level": "B"
+  },
+  {
+   "codes": [
+    "501067",
+    "501068"
+   ],
+   "name": "招商富时中国A-H50指数型证券投资基金",
+   "structure": "lof",
+   "investment_type": "index",
+   "evidence_level": "B"
+  },
+  {
+   "codes": [
+    "501069"
+   ],
+   "name": "华宝标普中国A股质量价值指数证券投资基金",
+   "structure": "lof",
+   "investment_type": "index",
+   "evidence_level": "B"
+  },
+  {
+   "codes": [
+    "501072"
+   ],
+   "name": "国金标普中国A股低波红利指数增强证券投资基金",
+   "structure": "lof",
+   "investment_type": "index",
+   "evidence_level": "B"
+  },
+  {
+   "codes": [
+    "501086"
+   ],
+   "name": "华宝MSCI中国A股国际通ESG通用指数证券投资基金",
+   "structure": "lof",
+   "investment_type": "index",
+   "evidence_level": "B"
+  }
+ ],
+ "onshore_etf_samples": [
+  {
+   "codes": [
+    "511000"
+   ],
+   "name": "招商中债-0-3年长三角地方政府债交易型开放式指数证券投资基金",
+   "evidence_level": "B"
+  },
+  {
+   "codes": [
+    "511050"
+   ],
+   "name": "兴业上证1-5年期地方政府债交易型开放式指数证券投资基金",
+   "evidence_level": "B"
+  }
+ ],
+ "unresolved": [
+  "43 条公告均来自东方财富转载，未逐条回源到基金公司官网/交易所官网，因此全部只能给 B 级；若日后回源验证可升 A。",
+  "ETF 联接基金与目标 ETF 的对应关系未建立（公告未写目标 ETF 代码）。",
+  "合并事件仍为 0 个。",
+  "清盘名录覆盖率仍不可量化。"
+ ]
+}

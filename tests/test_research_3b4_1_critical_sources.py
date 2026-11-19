@@ -650,3 +650,251 @@ def test_411_migration_still_ten_tables():
     sql = ROOT / "migrations" / "phase3b4_fund_data_layer.sql"
     body = sql.read_text(encoding="utf-8")
     assert body.count("CREATE TABLE IF NOT EXISTS fund_") == 10
+
+# ================================================================ 3B-4.1.1 验收修正
+from scripts.calibrate_3b4_1_1_types_evidence import (  # noqa: E402
+    INVESTMENT_TYPE, PRODUCT_STRUCTURE, EVIDENCE_LEVELS as EV_CAL,
+    classify_investment, classify_structure, extract_full_name,
+    grade_evidence, offmarket_eligible, prefix_hint,
+)
+
+JSON_CAL = ROOT / "reports" / "phase3B4_1_1_types_evidence_calibration.json"
+MD_CAL = ROOT / "reports" / "phase3B4_1_1_types_evidence_calibration.md"
+
+
+@pytest.fixture(scope="module")
+def pcal() -> dict:
+    return json.loads(JSON_CAL.read_text(encoding="utf-8"))
+
+
+# ---------------- 1. ETF 与 ETF 联接分类
+def test_411c_etf_vs_etf_linked():
+    """ETF 与 ETF 联接必须分开——名字只差「联接基金」三个字。"""
+    etf_name = "招商中债-0-3年长三角地方政府债交易型开放式指数证券投资基金"
+    link_name = "国泰中小板300成长交易型开放式指数证券投资基金联接基金"
+
+    st_etf, _ = classify_structure(etf_name, "")
+    st_link, _ = classify_structure(link_name, "")
+    assert st_etf == "etf"
+    assert st_link == "etf_linked"
+    assert st_etf != st_link
+
+
+def test_411c_etf_linked_requires_lianjie():
+    """只含「交易型开放式指数」不含「联接」的，是 ETF 不是联接。"""
+    st, _ = classify_structure("XX交易型开放式指数证券投资基金", "")
+    assert st == "etf"
+
+
+def test_411c_etf_linked_from_title_only():
+    """正文抽不到，但标题写了「联接基金」，也要判成 etf_linked。"""
+    st, _ = classify_structure("嘉实中证金边中期国债交易型开放式指数证券投资基金", "",
+                               "嘉实…交易型开放式指数证券投资基金联接基金清算报告提示性公告")
+    assert st == "etf_linked"
+
+
+# ---------------- 2. LOF 分类
+def test_411c_lof_classification():
+    st, _ = classify_structure("XX中小盘股票型证券投资基金(LOF)", "")
+    assert st == "lof"
+    st2, _ = classify_structure("XX混合型证券投资基金", "", "XX基金(LOF)清算报告")
+    assert st2 == "lof"
+
+
+def test_411c_lof_by_chinese_marker():
+    st, _ = classify_structure("XX上市开放式基金", "")
+    assert st == "lof"
+
+
+def test_411c_ordinary_not_lof():
+    st, _ = classify_structure("XX灵活配置混合型证券投资基金", "")
+    assert st == "ordinary_open_ended"
+
+
+# ---------------- 3. 场内 ETF 不能计入场外
+def test_411c_onshore_etf_excluded():
+    """场内 ETF 不算场外可买。"""
+    assert offmarket_eligible("etf") is False
+    assert offmarket_eligible("etf_linked") is True
+    assert offmarket_eligible("lof") is True
+    assert offmarket_eligible("ordinary_open_ended") is True
+    assert offmarket_eligible("unknown") is False
+
+
+def test_411c_real_etf_excluded_from_offmarket(pcal):
+    """真实数据里，511000 / 511050 必须被排除在场外集合外。"""
+    cal = pcal["calibration"]
+    for r in cal:
+        if r["product_structure"] == "etf":
+            assert r["offmarket_eligible"] is False, r["codes_in_event"]
+            assert r["is_onshore_etf"] is True
+    etf_codes = {c for r in cal if r["is_onshore_etf"] for c in r["codes_in_event"]}
+    assert "511000" in etf_codes
+    assert "511050" in etf_codes
+
+
+def test_411c_offmarket_count_is_subset(pcal):
+    """场外数量必须严格小于总数（因为有场内 ETF）。"""
+    s = pcal["stats"]
+    assert 0 < s["offmarket_count"] < s["liquidation_total"]
+    assert s["offmarket_count"] + s["onshore_etf_count"] == s["liquidation_total"]
+
+
+# ---------------- 4. 证据等级逐条独立统计
+def test_411c_evidence_per_event(pcal):
+    """每条事件都必须有自己的证据等级，不能共用一个值。"""
+    cal = pcal["calibration"]
+    assert len(cal) == 43
+    for r in cal:
+        assert r["evidence_level"] in ("A", "B", "C", "D")
+        assert r["evidence_reason"], r["codes_in_event"]
+
+
+def test_411c_eastmoney_is_b_not_a():
+    """东财转载不能给 A。"""
+    lvl, reason = grade_evidence("http://pdf.dfcfw.com/pdf/H2_AN123_1.pdf")
+    assert lvl == "B"
+    assert "第三方转载" in reason
+
+
+def test_411c_official_host_without_verify_is_b():
+    lvl, _ = grade_evidence("http://www.csrc.gov.cn/a.pdf", official_verified=False)
+    assert lvl == "B"
+
+
+def test_411c_official_host_verified_is_a():
+    lvl, _ = grade_evidence("http://eid.csrc.gov.cn/fund/a.pdf", official_verified=True)
+    assert lvl == "A"
+
+
+def test_411c_unknown_host_is_d():
+    lvl, _ = grade_evidence("http://some-random-site.com/a.pdf")
+    assert lvl == "D"
+
+
+def test_411c_all_43_are_b(pcal):
+    """真实结论：43 条全部 B 级，一条 A 都没有。"""
+    levels = pcal["stats"]["by_evidence_level"]
+    assert levels.get("A", 0) == 0
+    assert levels.get("B", 0) == 43
+
+
+# ---------------- 5. A 级数量不能被总事件数代替
+def test_411c_a_count_not_total(pcal):
+    """A 级数量必须是独立统计，不能等于事件总数。"""
+    s = pcal["stats"]
+    a = s["by_evidence_level"].get("A", 0)
+    assert a != s["liquidation_total"], "A 级数量不能等于事件总数"
+    assert a == 0
+    # 各级之和必须等于总数
+    total = sum(s["by_evidence_level"].values())
+    assert total == s["liquidation_total"]
+
+
+def test_411c_structure_sum_equals_total(pcal):
+    s = pcal["stats"]
+    assert sum(s["by_product_structure"].values()) == s["liquidation_total"]
+
+
+def test_411c_investment_sum_equals_total(pcal):
+    s = pcal["stats"]
+    assert sum(s["by_investment_type"].values()) == s["liquidation_total"]
+
+
+# ---------------- 6. Markdown 与 JSON 一致
+def test_411c_md_json_consistent(pcal):
+    md = MD_CAL.read_text(encoding="utf-8")
+    s = pcal["stats"]
+    for k in ("liquidation_total", "offmarket_count", "onshore_etf_count",
+              "etf_linked_count", "lof_count", "ordinary_count"):
+        assert str(s[k]) in md, f"报告缺少 {k}={s[k]}"
+
+
+def test_411c_md_mentions_evidence_b(pcal):
+    md = MD_CAL.read_text(encoding="utf-8")
+    assert "B 级" in md or "**B**" in md
+    assert "43" in md
+
+
+def test_411c_md_states_etf_excluded(pcal):
+    md = MD_CAL.read_text(encoding="utf-8")
+    assert "511000" in md
+    assert "511050" in md
+    assert "剔除" in md
+
+
+def test_411c_md_names_lianjie_fixed(pcal):
+    """四处「联接基金」遗漏必须在报告里明确写出。"""
+    md = MD_CAL.read_text(encoding="utf-8")
+    for code in ("020025", "020035", "000087"):
+        assert code in md
+
+
+# ---------------- 名称修正
+def test_411c_name_has_lianjie():
+    n, src = extract_full_name(
+        "国泰中小板300成长交易型开放式指数证券投资基金联接基金清算报告 基金管理人：...",
+        "国泰中小板300成长交易型开放式指数证券投资基金联接基金清算报告")
+    assert n and "联接基金" in n
+
+
+def test_411c_name_no_duplicated_suffix():
+    """「…证券投资基金基金」这种重复尾字必须清掉。"""
+    n, _ = extract_full_name("长信价值优选混合型证券投资基金基金清算报告提示性公告",
+                             "长信价值优选混合型证券投资基金基金清算报告提示性公告")
+    assert n and not n.endswith("基金基金")
+
+
+def test_411c_name_cleans_prefix():
+    n, _ = extract_full_name(
+        "1 关于南方誉鼎一年持有期混合型证券投资基金基金合同终止的公告",
+        "关于南方誉鼎一年持有期混合型证券投资基金基金合同终止的公告")
+    assert n and not n.startswith("关于")
+    assert n and not n.startswith("1")
+
+
+# ---------------- 前缀只作线索
+def test_411c_prefix_hint_not_authoritative():
+    """代码前缀只能作为线索记录，不能据此判定类型。"""
+    assert prefix_hint(["511000"]) is not None
+    assert prefix_hint(["000007"]) is None
+    # 501 开头但原文没写 LOF → 仍判普通开放式，前缀只记 conflict
+    st, _ = classify_structure("汇添富弘安混合型证券投资基金", "")
+    assert st == "ordinary_open_ended"
+    assert prefix_hint(["501041"]) == "LOF（上交所）"
+
+
+# ---------------- 投资类型
+def test_411c_investment_types():
+    assert classify_investment("XX货币市场基金", "")[0] == "money_market"
+    assert classify_investment("XX债券型证券投资基金", "")[0] == "bond"
+    assert classify_investment("XX混合型证券投资基金", "")[0] == "mixed"
+    assert classify_investment("XX股票型证券投资基金", "")[0] == "equity"
+    assert classify_investment("XX中证500指数证券投资基金", "")[0] == "index"
+
+
+def test_411c_investment_unknown_when_no_name():
+    assert classify_investment("", "")[0] == "unknown"
+
+
+# ---------------- 边界
+def test_411c_kept_fee_fixes():
+    """费率解析器的三个修复必须保留（不得回退）。"""
+    text = ("赎回费率|适用期限|赎回费率|小于等于6天|1.50%|"
+            "大于等于7天，小于等于364天|0.50%|大于等于365天|0.00%|注：")
+    tiers = parse_redeem_411(text)
+    assert tiers[0]["holding_days_max"] == 6
+    assert tiers[0]["max_inclusive"] is True
+    assert tiers[0]["holding_days_min"] == 0
+    assert tiers[0]["min_inferred"] is True
+
+
+def test_411c_migration_still_ten_tables():
+    body = (ROOT / "migrations" / "phase3b4_fund_data_layer.sql").read_text(encoding="utf-8")
+    assert body.count("CREATE TABLE IF NOT EXISTS fund_") == 10
+
+
+def test_411c_enums_complete():
+    for k in ("ordinary_open_ended", "etf_linked", "etf", "lof",
+              "money_market", "bond", "mixed", "other", "unknown"):
+        assert k in PRODUCT_STRUCTURE or k in INVESTMENT_TYPE
