@@ -210,7 +210,9 @@ def test_md_has_correction_section():
 def test_figures_are_unique_config(payload):
     """图表必须基于 8 组唯一配置，不得画 9 条。"""
     fig_dir = ROOT / "reports" / "figures"
-    names = sorted(p.name for p in fig_dir.glob("*.png"))
+    # 只检查 3B-1 自己的图；3B-2 的 fig3b2_*.png 由图目录共存，不算在本测试范围
+    names = sorted(p.name for p in fig_dir.glob("fig*.png")
+                   if not p.name.startswith("fig3b2_"))
     assert len(names) == 6
     assert names == [
         "fig1_is_oos_param_return.png",
@@ -220,7 +222,9 @@ def test_figures_are_unique_config(payload):
         "fig5_walkforward_windows.png",
         "fig6_regime_performance.png",
     ]
-    for p in fig_dir.glob("*.png"):
+    for p in fig_dir.glob("fig*.png"):
+        if p.name.startswith("fig3b2_"):
+            continue
         assert p.stat().st_size > 5000
 
 
