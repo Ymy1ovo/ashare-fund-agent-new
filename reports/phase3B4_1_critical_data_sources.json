@@ -1,0 +1,1807 @@
+{
+ "phase": "3B-4.1",
+ "baseline_head": "e02096c5ed944416c1c69182a44a73d8f282d26f",
+ "generated_at": "2026-11-19T14:39:18",
+ "scope": "只做数据源研究、样本验证与技术方案；不改正式数据层、不做迁移、不做回测",
+ "evidence_levels": {
+  "A": "基金公司/监管机构正式公告或合同原文",
+  "B": "权威官方渠道的结构化数据",
+  "C": "可靠第三方数据，可追溯来源",
+  "D": "无法追溯来源或仅有间接推断"
+ },
+ "event_types": {
+  "liquidation": "清盘（基金合同终止并清算）",
+  "merge": "合并（并入其他基金）",
+  "transformation": "转型（分级子份额终止、基金存续）",
+  "share_termination": "份额终止（子份额终止运作/终止上市）",
+  "delisting": "终止上市（转场外或转LOF）"
+ },
+ "sources": [
+  {
+   "name": "天天基金公告列表接口",
+   "url": "http://api.fund.eastmoney.com/f10/JJGG/",
+   "covers_terminated": true,
+   "public": true,
+   "auth_required": false,
+   "fields": [
+    "TITLE",
+    "PUBLISHDATEDesc",
+    "ID",
+    "FUNDCODE"
+   ],
+   "evidence_level": "B",
+   "note": "含已终止基金的全部历史公告，是本阶段最关键发现",
+   "automation_suitable": true
+  },
+  {
+   "name": "东财公告 PDF 原文",
+   "url": "http://pdf.dfcfw.com/pdf/H2_{id}_1.pdf",
+   "covers_terminated": true,
+   "public": true,
+   "auth_required": false,
+   "fields": [
+    "正文全文",
+    "清算报告",
+    "终止上市日",
+    "最后运作日"
+   ],
+   "evidence_level": "A",
+   "note": "基金公司正式披露原文，可直接提取终止日期",
+   "automation_suitable": true
+  },
+  {
+   "name": "天天基金 F10 费率页",
+   "url": "http://fundf10.eastmoney.com/jjfl_{code}.html",
+   "covers_terminated": false,
+   "public": true,
+   "auth_required": false,
+   "fields": [
+    "申购费阶梯",
+    "赎回费阶梯",
+    "管理费",
+    "托管费",
+    "销售服务费"
+   ],
+   "evidence_level": "C",
+   "note": "存续基金可用；已终止基金该页无数据",
+   "automation_suitable": true
+  },
+  {
+   "name": "akshare.fund_name_em",
+   "url": "akshare",
+   "covers_terminated": false,
+   "public": true,
+   "auth_required": false,
+   "fields": [
+    "基金代码",
+    "简称",
+    "类型"
+   ],
+   "evidence_level": "C",
+   "note": "**只含存续基金**，不能用于清盘名录",
+   "automation_suitable": true
+  },
+  {
+   "name": "支付宝基金购买状态",
+   "url": "无公开接口",
+   "covers_terminated": false,
+   "public": false,
+   "auth_required": true,
+   "fields": [],
+   "evidence_level": "D",
+   "note": "登录态内数据，无公开合法接口，不可自动获取",
+   "automation_suitable": false
+  }
+ ],
+ "terminated_funds": {
+  "samples": [
+   {
+    "code": "150008",
+    "name_expected": "国投瑞银瑞和沪深300指数分级-小康",
+    "category": "分级子份额",
+    "note": null,
+    "in_current_name_table": false,
+    "announcement_ok": true,
+    "announcement_total": 474,
+    "event_type": "liquidation",
+    "event_title": "国投瑞银瑞和沪深300指数分级证券投资基金清算报告",
+    "announcement_date": "2020-09-18",
+    "announcement_id": "AN202009181414263559",
+    "announcement_url": "http://pdf.dfcfw.com/pdf/H2_AN202009181414263559_1.pdf",
+    "pdf_ok": true,
+    "pdf_pages": 8,
+    "doc_format": "pdf",
+    "name_actual": "国投瑞银瑞和沪深300指数分级证券投资基金",
+    "established_date": "2009-10-14",
+    "last_trading_date": "2020-08-27",
+    "liquidation_start": "2020-08-28",
+    "delisting_date": null,
+    "final_trading_day": null,
+    "successor_name": null,
+    "successor_code": null,
+    "evidence_level": "A",
+    "automation_suitable": true,
+    "missing_fields": [
+     "delisting_date",
+     "successor_name"
+    ],
+    "conflicts": []
+   },
+   {
+    "code": "150009",
+    "name_expected": "国投瑞银瑞和沪深300指数分级-远见",
+    "category": "分级子份额",
+    "note": null,
+    "in_current_name_table": false,
+    "announcement_ok": true,
+    "announcement_total": 474,
+    "event_type": "liquidation",
+    "event_title": "国投瑞银瑞和沪深300指数分级证券投资基金清算报告",
+    "announcement_date": "2020-09-18",
+    "announcement_id": "AN202009181414263559",
+    "announcement_url": "http://pdf.dfcfw.com/pdf/H2_AN202009181414263559_1.pdf",
+    "pdf_ok": true,
+    "pdf_pages": 8,
+    "doc_format": "pdf",
+    "name_actual": "国投瑞银瑞和沪深300指数分级证券投资基金",
+    "established_date": "2009-10-14",
+    "last_trading_date": "2020-08-27",
+    "liquidation_start": "2020-08-28",
+    "delisting_date": null,
+    "final_trading_day": null,
+    "successor_name": null,
+    "successor_code": null,
+    "evidence_level": "A",
+    "automation_suitable": true,
+    "missing_fields": [
+     "delisting_date",
+     "successor_name"
+    ],
+    "conflicts": []
+   },
+   {
+    "code": "150019",
+    "name_expected": "银华深证100指数分级-锐进",
+    "category": "分级子份额",
+    "note": null,
+    "in_current_name_table": false,
+    "announcement_ok": true,
+    "announcement_total": 812,
+    "event_type": "share_termination",
+    "event_title": "银华基金管理股份有限公司关于银华深证100指数分级证券投资基金之银华稳进份额和银华锐进份额终止运作的特别风险提示公告(2020/12/31)",
+    "announcement_date": "2020-12-31",
+    "announcement_id": "AN202012311445561359",
+    "announcement_url": "http://pdf.dfcfw.com/pdf/H2_AN202012311445561359_1.pdf",
+    "pdf_ok": true,
+    "pdf_pages": 5,
+    "doc_format": "pdf",
+    "name_actual": "公开募集开放式证券投资基金",
+    "established_date": null,
+    "last_trading_date": null,
+    "liquidation_start": null,
+    "delisting_date": "2021-01-04",
+    "final_trading_day": "2020-12-31",
+    "successor_name": null,
+    "successor_code": null,
+    "evidence_level": "A",
+    "automation_suitable": true,
+    "missing_fields": [
+     "established_date",
+     "last_trading_date",
+     "liquidation_start",
+     "successor_name"
+    ],
+    "conflicts": []
+   },
+   {
+    "code": "150023",
+    "name_expected": "申万菱信深证成指分级-进取",
+    "category": "分级子份额",
+    "note": null,
+    "in_current_name_table": false,
+    "announcement_ok": true,
+    "announcement_total": 1116,
+    "event_type": "share_termination",
+    "event_title": "关于申万菱信深证成指分级证券投资基金之申万收益份额、申万进取份额终止运作、终止上市的特别风险提示公告(2020/12/31)",
+    "announcement_date": "2020-12-31",
+    "announcement_id": "AN202012311445561360",
+    "announcement_url": "http://pdf.dfcfw.com/pdf/H2_AN202012311445561360_1.pdf",
+    "pdf_ok": true,
+    "pdf_pages": 6,
+    "doc_format": "pdf",
+    "name_actual": "关于申万菱信深证成指分级证券投资基金",
+    "established_date": null,
+    "last_trading_date": null,
+    "liquidation_start": null,
+    "delisting_date": "2021-01-04",
+    "final_trading_day": "2020-12-31",
+    "successor_name": null,
+    "successor_code": null,
+    "evidence_level": "A",
+    "automation_suitable": true,
+    "missing_fields": [
+     "established_date",
+     "last_trading_date",
+     "liquidation_start",
+     "successor_name"
+    ],
+    "conflicts": []
+   },
+   {
+    "code": "150028",
+    "name_expected": "信诚中证500指数分级-A",
+    "category": "分级子份额",
+    "note": null,
+    "in_current_name_table": false,
+    "announcement_ok": true,
+    "announcement_total": 687,
+    "event_type": "share_termination",
+    "event_title": "中信保诚基金管理有限公司关于信诚中证500指数分级证券投资基金之信诚中证500A份额和信诚中证500B份额终止运作的特别风险提示公告(2020/12/31)",
+    "announcement_date": "2020-12-31",
+    "announcement_id": "AN202012311445587922",
+    "announcement_url": "http://pdf.dfcfw.com/pdf/H2_AN202012311445587922_1.pdf",
+    "pdf_ok": true,
+    "pdf_pages": 4,
+    "doc_format": "pdf",
+    "name_actual": "公开募集开放式证券投资基金",
+    "established_date": null,
+    "last_trading_date": null,
+    "liquidation_start": null,
+    "delisting_date": "2021-01-04",
+    "final_trading_day": "2020-12-31",
+    "successor_name": null,
+    "successor_code": null,
+    "evidence_level": "A",
+    "automation_suitable": true,
+    "missing_fields": [
+     "established_date",
+     "last_trading_date",
+     "liquidation_start",
+     "successor_name"
+    ],
+    "conflicts": []
+   },
+   {
+    "code": "150029",
+    "name_expected": "信诚中证500指数分级-B",
+    "category": "分级子份额",
+    "note": null,
+    "in_current_name_table": false,
+    "announcement_ok": true,
+    "announcement_total": 674,
+    "event_type": "share_termination",
+    "event_title": "中信保诚基金管理有限公司关于信诚中证500指数分级证券投资基金之信诚中证500A份额和信诚中证500B份额终止运作的特别风险提示公告(2020/12/31)",
+    "announcement_date": "2020-12-31",
+    "announcement_id": "AN202012311445587922",
+    "announcement_url": "http://pdf.dfcfw.com/pdf/H2_AN202012311445587922_1.pdf",
+    "pdf_ok": true,
+    "pdf_pages": 4,
+    "doc_format": "pdf",
+    "name_actual": "公开募集开放式证券投资基金",
+    "established_date": null,
+    "last_trading_date": null,
+    "liquidation_start": null,
+    "delisting_date": "2021-01-04",
+    "final_trading_day": "2020-12-31",
+    "successor_name": null,
+    "successor_code": null,
+    "evidence_level": "A",
+    "automation_suitable": true,
+    "missing_fields": [
+     "established_date",
+     "last_trading_date",
+     "liquidation_start",
+     "successor_name"
+    ],
+    "conflicts": []
+   },
+   {
+    "code": "150020",
+    "name_expected": "富国汇利回报分级-汇利A",
+    "category": "分级子份额",
+    "note": null,
+    "in_current_name_table": false,
+    "announcement_ok": true,
+    "announcement_total": 419,
+    "event_type": "delisting",
+    "event_title": "富国基金管理有限公司关于富国汇利回报分级债券型证券投资基金之汇利A和汇利B终止上市交易的提示性公告",
+    "announcement_date": "2017-12-08",
+    "announcement_id": "AN201712081064249979",
+    "announcement_url": "http://pdf.dfcfw.com/pdf/H2_AN201712081064249979_1.pdf",
+    "pdf_ok": true,
+    "pdf_pages": 2,
+    "doc_format": "pdf",
+    "name_actual": "富国基金管理有限公司关于富国汇利回报分级债券型证券投资基金",
+    "established_date": null,
+    "last_trading_date": null,
+    "liquidation_start": null,
+    "delisting_date": "2017-12-11",
+    "final_trading_day": null,
+    "successor_name": "富国汇利回报两年定期开放债券型证券投资基金",
+    "successor_code": null,
+    "evidence_level": "A",
+    "automation_suitable": true,
+    "missing_fields": [
+     "established_date",
+     "last_trading_date",
+     "liquidation_start"
+    ],
+    "conflicts": []
+   },
+   {
+    "code": "150021",
+    "name_expected": "富国汇利回报分级-汇利B",
+    "category": "分级子份额",
+    "note": null,
+    "in_current_name_table": false,
+    "announcement_ok": true,
+    "announcement_total": 418,
+    "event_type": "delisting",
+    "event_title": "富国基金管理有限公司关于富国汇利回报分级债券型证券投资基金之汇利A和汇利B终止上市交易的提示性公告",
+    "announcement_date": "2017-12-08",
+    "announcement_id": "AN201712081064249979",
+    "announcement_url": "http://pdf.dfcfw.com/pdf/H2_AN201712081064249979_1.pdf",
+    "pdf_ok": true,
+    "pdf_pages": 2,
+    "doc_format": "pdf",
+    "name_actual": "富国基金管理有限公司关于富国汇利回报分级债券型证券投资基金",
+    "established_date": null,
+    "last_trading_date": null,
+    "liquidation_start": null,
+    "delisting_date": "2017-12-11",
+    "final_trading_day": null,
+    "successor_name": "富国汇利回报两年定期开放债券型证券投资基金",
+    "successor_code": null,
+    "evidence_level": "A",
+    "automation_suitable": true,
+    "missing_fields": [
+     "established_date",
+     "last_trading_date",
+     "liquidation_start"
+    ],
+    "conflicts": []
+   },
+   {
+    "code": "150032",
+    "name_expected": "嘉实多利分级-优先",
+    "category": "分级子份额",
+    "note": null,
+    "in_current_name_table": false,
+    "announcement_ok": true,
+    "announcement_total": 938,
+    "event_type": "delisting",
+    "event_title": "关于嘉实多利分级债券型证券投资基金之嘉实多利优先份额、嘉实多利进取份额终止上市的提示性公告",
+    "announcement_date": "2020-11-25",
+    "announcement_id": "AN202011251432592298",
+    "announcement_url": "http://pdf.dfcfw.com/pdf/H2_AN202011251432592298_1.pdf",
+    "pdf_ok": true,
+    "pdf_pages": 3,
+    "doc_format": "pdf",
+    "name_actual": "关于嘉实多利分级债券型证券投资基金",
+    "established_date": null,
+    "last_trading_date": null,
+    "liquidation_start": null,
+    "delisting_date": "2020-11-26",
+    "final_trading_day": null,
+    "successor_name": "嘉实多利收益债券型证券投资基金",
+    "successor_code": null,
+    "evidence_level": "A",
+    "automation_suitable": true,
+    "missing_fields": [
+     "established_date",
+     "last_trading_date",
+     "liquidation_start"
+    ],
+    "conflicts": []
+   },
+   {
+    "code": "150033",
+    "name_expected": "嘉实多利分级-进取",
+    "category": "分级子份额",
+    "note": null,
+    "in_current_name_table": false,
+    "announcement_ok": true,
+    "announcement_total": 933,
+    "event_type": "delisting",
+    "event_title": "关于嘉实多利分级债券型证券投资基金之嘉实多利优先份额、嘉实多利进取份额终止上市的提示性公告",
+    "announcement_date": "2020-11-25",
+    "announcement_id": "AN202011251432592298",
+    "announcement_url": "http://pdf.dfcfw.com/pdf/H2_AN202011251432592298_1.pdf",
+    "pdf_ok": true,
+    "pdf_pages": 3,
+    "doc_format": "pdf",
+    "name_actual": "关于嘉实多利分级债券型证券投资基金",
+    "established_date": null,
+    "last_trading_date": null,
+    "liquidation_start": null,
+    "delisting_date": "2020-11-26",
+    "final_trading_day": null,
+    "successor_name": "嘉实多利收益债券型证券投资基金",
+    "successor_code": null,
+    "evidence_level": "A",
+    "automation_suitable": true,
+    "missing_fields": [
+     "established_date",
+     "last_trading_date",
+     "liquidation_start"
+    ],
+    "conflicts": []
+   },
+   {
+    "code": "150030",
+    "name_expected": "银华中证等权重90分级-A",
+    "category": "分级子份额",
+    "note": null,
+    "in_current_name_table": false,
+    "announcement_ok": true,
+    "announcement_total": 741,
+    "event_type": "delisting",
+    "event_title": "银华中证等权重90指数分级证券投资基金之中证90A份额与中证90B份额终止上市的第二次提示性公告",
+    "announcement_date": "2020-11-24",
+    "announcement_id": "AN202011241432285837",
+    "announcement_url": "http://pdf.dfcfw.com/pdf/H2_AN202011241432285837_1.pdf",
+    "pdf_ok": true,
+    "pdf_pages": 2,
+    "doc_format": "pdf",
+    "name_actual": "中华人民共和国证券投资基金",
+    "established_date": null,
+    "last_trading_date": null,
+    "liquidation_start": null,
+    "delisting_date": "2020-11-25",
+    "final_trading_day": null,
+    "successor_name": "银华中证等权重90指数证券投资基金",
+    "successor_code": null,
+    "evidence_level": "A",
+    "automation_suitable": true,
+    "missing_fields": [
+     "established_date",
+     "last_trading_date",
+     "liquidation_start"
+    ],
+    "conflicts": []
+   },
+   {
+    "code": "150031",
+    "name_expected": "银华中证等权重90分级-B",
+    "category": "分级子份额",
+    "note": null,
+    "in_current_name_table": false,
+    "announcement_ok": true,
+    "announcement_total": 728,
+    "event_type": "delisting",
+    "event_title": "银华中证等权重90指数分级证券投资基金之中证90A份额与中证90B份额终止上市的第二次提示性公告",
+    "announcement_date": "2020-11-24",
+    "announcement_id": "AN202011241432285837",
+    "announcement_url": "http://pdf.dfcfw.com/pdf/H2_AN202011241432285837_1.pdf",
+    "pdf_ok": true,
+    "pdf_pages": 2,
+    "doc_format": "pdf",
+    "name_actual": "中华人民共和国证券投资基金",
+    "established_date": null,
+    "last_trading_date": null,
+    "liquidation_start": null,
+    "delisting_date": "2020-11-25",
+    "final_trading_day": null,
+    "successor_name": "银华中证等权重90指数证券投资基金",
+    "successor_code": null,
+    "evidence_level": "A",
+    "automation_suitable": true,
+    "missing_fields": [
+     "established_date",
+     "last_trading_date",
+     "liquidation_start"
+    ],
+    "conflicts": []
+   },
+   {
+    "code": "150035",
+    "name_expected": "泰达宏利聚利分级-B",
+    "category": "分级子份额",
+    "note": null,
+    "in_current_name_table": false,
+    "announcement_ok": true,
+    "announcement_total": 327,
+    "event_type": "delisting",
+    "event_title": "泰达宏利聚利分级债券型证券投资基金之聚利A、聚利B终止上市的提示性公告",
+    "announcement_date": "2016-05-12",
+    "announcement_id": "AN201605120014811083",
+    "announcement_url": "http://pdf.dfcfw.com/pdf/H2_AN201605120014811083_1.pdf",
+    "pdf_ok": true,
+    "pdf_pages": 2,
+    "doc_format": "pdf",
+    "name_actual": "泰达宏利聚利分级债券型证券投资基金",
+    "established_date": null,
+    "last_trading_date": null,
+    "liquidation_start": null,
+    "delisting_date": "2016-05-13",
+    "final_trading_day": null,
+    "successor_name": "泰达宏利聚利债券型证券投资基金",
+    "successor_code": null,
+    "evidence_level": "A",
+    "automation_suitable": true,
+    "missing_fields": [
+     "established_date",
+     "last_trading_date",
+     "liquidation_start"
+    ],
+    "conflicts": []
+   },
+   {
+    "code": "150001",
+    "name_expected": "国投瑞银瑞福深证100分级-优先",
+    "category": "分级子份额",
+    "note": null,
+    "in_current_name_table": false,
+    "announcement_ok": true,
+    "announcement_total": 243,
+    "event_type": "delisting",
+    "event_title": "国投瑞银瑞福深证100指数分级证券投资基金之瑞福进取份额终止上市的提示性公告",
+    "announcement_date": "2015-08-12",
+    "announcement_id": "AN201508120010466830",
+    "announcement_url": "http://pdf.dfcfw.com/pdf/H2_AN201508120010466830_1.pdf",
+    "pdf_ok": true,
+    "pdf_pages": 3,
+    "doc_format": "pdf",
+    "name_actual": "国投瑞银瑞福深证100指数分级证券投资基金",
+    "established_date": null,
+    "last_trading_date": null,
+    "liquidation_start": null,
+    "delisting_date": "2015-08-14",
+    "final_trading_day": null,
+    "successor_name": "国投瑞银瑞福深证100指数证券投资基金",
+    "successor_code": null,
+    "evidence_level": "A",
+    "automation_suitable": true,
+    "missing_fields": [
+     "established_date",
+     "last_trading_date",
+     "liquidation_start"
+    ],
+    "conflicts": []
+   },
+   {
+    "code": "150002",
+    "name_expected": "大成优选股票(LOF)",
+    "category": "LOF",
+    "note": null,
+    "in_current_name_table": false,
+    "announcement_ok": true,
+    "announcement_total": 104,
+    "event_type": "delisting",
+    "event_title": "大成优选：终止上市的第一次提示性公告",
+    "announcement_date": "2012-07-24",
+    "announcement_id": "AN201207230005373689",
+    "announcement_url": "http://pdf.dfcfw.com/pdf/H2_AN201207230005373689_1.pdf",
+    "pdf_ok": true,
+    "pdf_pages": 3,
+    "doc_format": "pdf",
+    "name_actual": "大成优选股票型证券投资基金",
+    "established_date": null,
+    "last_trading_date": null,
+    "liquidation_start": null,
+    "delisting_date": "2012-07-27",
+    "final_trading_day": null,
+    "successor_name": "大成优选股票型证券投资基金",
+    "successor_code": null,
+    "evidence_level": "A",
+    "automation_suitable": true,
+    "missing_fields": [
+     "established_date",
+     "last_trading_date",
+     "liquidation_start"
+    ],
+    "conflicts": []
+   },
+   {
+    "code": "150003",
+    "name_expected": "建信优势动力股票",
+    "category": "LOF",
+    "note": null,
+    "in_current_name_table": false,
+    "announcement_ok": true,
+    "announcement_total": 93,
+    "event_type": "delisting",
+    "event_title": "建信优势：终止上市的第二次提示性公告",
+    "announcement_date": "2013-03-15",
+    "announcement_id": "AN201303140005779765",
+    "announcement_url": "http://pdf.dfcfw.com/pdf/H2_AN201303140005779765_1.pdf",
+    "pdf_ok": true,
+    "pdf_pages": 4,
+    "doc_format": "pdf",
+    "name_actual": "建信优势动力股票型证券投资基金",
+    "established_date": null,
+    "last_trading_date": null,
+    "liquidation_start": null,
+    "delisting_date": "2013-03-18",
+    "final_trading_day": null,
+    "successor_name": "上市开放式基金",
+    "successor_code": null,
+    "evidence_level": "A",
+    "automation_suitable": true,
+    "missing_fields": [
+     "established_date",
+     "last_trading_date",
+     "liquidation_start"
+    ],
+    "conflicts": []
+   },
+   {
+    "code": "184688",
+    "name_expected": "开元证券投资基金",
+    "category": "老封闭式",
+    "note": "该代码的公告列表里没有独立的终止/转型事件公告，只在定期报告或合同标题里提及，回退用最近公告作可追溯证据",
+    "in_current_name_table": false,
+    "announcement_ok": true,
+    "announcement_total": 103,
+    "event_type": "unknown",
+    "event_title": "南方开元沪深300交易型开放式指数证券投资基金2013年度报告",
+    "announcement_date": "2014-03-27",
+    "announcement_id": "AN201403270005325585",
+    "announcement_url": "http://pdf.dfcfw.com/pdf/H2_AN201403270005325585_1.pdf",
+    "pdf_ok": false,
+    "pdf_pages": 0,
+    "doc_format": null,
+    "name_actual": null,
+    "established_date": null,
+    "last_trading_date": null,
+    "liquidation_start": null,
+    "delisting_date": null,
+    "final_trading_day": null,
+    "successor_name": null,
+    "successor_code": null,
+    "evidence_level": "B",
+    "automation_suitable": false,
+    "missing_fields": [
+     "事件型公告",
+     "终止日期",
+     "承接基金"
+    ],
+    "conflicts": []
+   },
+   {
+    "code": "184689",
+    "name_expected": "普惠证券投资基金",
+    "category": "老封闭式",
+    "note": null,
+    "in_current_name_table": false,
+    "announcement_ok": true,
+    "announcement_total": 110,
+    "event_type": "delisting",
+    "event_title": "普惠证券投资基金终止上市的提示性公告",
+    "announcement_date": "2013-12-20",
+    "announcement_id": "AN201312200004812987",
+    "announcement_url": "http://pdf.dfcfw.com/pdf/H2_AN201312200004812987_1.pdf",
+    "pdf_ok": true,
+    "pdf_pages": 1,
+    "doc_format": "html",
+    "name_actual": "为了保护普惠证券投资基金",
+    "established_date": null,
+    "last_trading_date": null,
+    "liquidation_start": null,
+    "delisting_date": "2013-12-23",
+    "final_trading_day": null,
+    "successor_name": "鹏华消费领先灵活配置混合型证券投资基金",
+    "successor_code": null,
+    "evidence_level": "A",
+    "automation_suitable": true,
+    "missing_fields": [
+     "established_date",
+     "last_trading_date",
+     "liquidation_start"
+    ],
+    "conflicts": []
+   },
+   {
+    "code": "184690",
+    "name_expected": "同益证券投资基金",
+    "category": "老封闭式",
+    "note": null,
+    "in_current_name_table": false,
+    "announcement_ok": true,
+    "announcement_total": 101,
+    "event_type": "delisting",
+    "event_title": "同益证券投资基金终止上市的提示性公告",
+    "announcement_date": "2014-04-03",
+    "announcement_id": "AN201404030005371483",
+    "announcement_url": "http://pdf.dfcfw.com/pdf/H2_AN201404030005371483_1.pdf",
+    "pdf_ok": true,
+    "pdf_pages": 1,
+    "doc_format": "html",
+    "name_actual": "中华人民共和国证券投资基金",
+    "established_date": null,
+    "last_trading_date": null,
+    "liquidation_start": null,
+    "delisting_date": "2014-04-04",
+    "final_trading_day": null,
+    "successor_name": "长盛同益成长回报灵活配置混合型证券投资基金",
+    "successor_code": null,
+    "evidence_level": "A",
+    "automation_suitable": true,
+    "missing_fields": [
+     "established_date",
+     "last_trading_date",
+     "liquidation_start"
+    ],
+    "conflicts": []
+   },
+   {
+    "code": "184691",
+    "name_expected": "景宏证券投资基金",
+    "category": "老封闭式",
+    "note": null,
+    "in_current_name_table": false,
+    "announcement_ok": true,
+    "announcement_total": 140,
+    "event_type": "delisting",
+    "event_title": "景宏证券投资基金终止上市的第二次提示性公告",
+    "announcement_date": "2014-04-09",
+    "announcement_id": "AN201404090005394927",
+    "announcement_url": "http://pdf.dfcfw.com/pdf/H2_AN201404090005394927_1.pdf",
+    "pdf_ok": true,
+    "pdf_pages": 1,
+    "doc_format": "html",
+    "name_actual": "为了保障景宏证券投资基金",
+    "established_date": null,
+    "last_trading_date": null,
+    "liquidation_start": null,
+    "delisting_date": "2014-04-10",
+    "final_trading_day": null,
+    "successor_name": "大成中小盘股票型证券投资基金",
+    "successor_code": null,
+    "evidence_level": "A",
+    "automation_suitable": true,
+    "missing_fields": [
+     "established_date",
+     "last_trading_date",
+     "liquidation_start"
+    ],
+    "conflicts": []
+   },
+   {
+    "code": "184692",
+    "name_expected": "裕隆证券投资基金",
+    "category": "老封闭式",
+    "note": null,
+    "in_current_name_table": false,
+    "announcement_ok": true,
+    "announcement_total": 141,
+    "event_type": "delisting",
+    "event_title": "裕隆证券投资基金终止上市的提示性公告",
+    "announcement_date": "2014-05-30",
+    "announcement_id": "AN201405300005944196",
+    "announcement_url": "http://pdf.dfcfw.com/pdf/H2_AN201405300005944196_1.pdf",
+    "pdf_ok": true,
+    "pdf_pages": 1,
+    "doc_format": "html",
+    "name_actual": "为了保障裕隆证券投资基金",
+    "established_date": null,
+    "last_trading_date": null,
+    "liquidation_start": null,
+    "delisting_date": "2014-06-03",
+    "final_trading_day": null,
+    "successor_name": "博时裕隆灵活配置混合型证券投资基金",
+    "successor_code": null,
+    "evidence_level": "A",
+    "automation_suitable": true,
+    "missing_fields": [
+     "established_date",
+     "last_trading_date",
+     "liquidation_start"
+    ],
+    "conflicts": []
+   },
+   {
+    "code": "184698",
+    "name_expected": "天元证券投资基金",
+    "category": "老封闭式",
+    "note": null,
+    "in_current_name_table": false,
+    "announcement_ok": true,
+    "announcement_total": 125,
+    "event_type": "delisting",
+    "event_title": "天元证券投资基金终止上市提示性公告",
+    "announcement_date": "2014-07-02",
+    "announcement_id": "AN201407020006208757",
+    "announcement_url": "http://pdf.dfcfw.com/pdf/H2_AN201407020006208757_1.pdf",
+    "pdf_ok": true,
+    "pdf_pages": 1,
+    "doc_format": "html",
+    "name_actual": "为了保障天元证券投资基金",
+    "established_date": null,
+    "last_trading_date": null,
+    "liquidation_start": null,
+    "delisting_date": "2014-07-03",
+    "final_trading_day": null,
+    "successor_name": "南方天元新产业股票型证券投资基金",
+    "successor_code": null,
+    "evidence_level": "A",
+    "automation_suitable": true,
+    "missing_fields": [
+     "established_date",
+     "last_trading_date",
+     "liquidation_start"
+    ],
+    "conflicts": []
+   },
+   {
+    "code": "184699",
+    "name_expected": "同盛证券投资基金",
+    "category": "老封闭式",
+    "note": null,
+    "in_current_name_table": false,
+    "announcement_ok": true,
+    "announcement_total": 106,
+    "event_type": "delisting",
+    "event_title": "同盛证券投资基金终止上市的提示性公告",
+    "announcement_date": "2014-11-04",
+    "announcement_id": "AN201411040007533421",
+    "announcement_url": "http://pdf.dfcfw.com/pdf/H2_AN201411040007533421_1.pdf",
+    "pdf_ok": true,
+    "pdf_pages": 1,
+    "doc_format": "html",
+    "name_actual": "中华人民共和国证券投资基金",
+    "established_date": null,
+    "last_trading_date": null,
+    "liquidation_start": null,
+    "delisting_date": "2014-11-05",
+    "final_trading_day": null,
+    "successor_name": "长盛同盛成长优选灵活配置混合型证券投资基金",
+    "successor_code": null,
+    "evidence_level": "A",
+    "automation_suitable": true,
+    "missing_fields": [
+     "established_date",
+     "last_trading_date",
+     "liquidation_start"
+    ],
+    "conflicts": []
+   },
+   {
+    "code": "184701",
+    "name_expected": "基金景福",
+    "category": "老封闭式",
+    "note": null,
+    "in_current_name_table": false,
+    "announcement_ok": true,
+    "announcement_total": 207,
+    "event_type": "delisting",
+    "event_title": "景福证券投资基金终止上市的第二次提示性公告",
+    "announcement_date": "2014-12-25",
+    "announcement_id": "AN201412250007998391",
+    "announcement_url": "http://pdf.dfcfw.com/pdf/H2_AN201412250007998391_1.pdf",
+    "pdf_ok": true,
+    "pdf_pages": 1,
+    "doc_format": "html",
+    "name_actual": "为了保障景福证券投资基金",
+    "established_date": null,
+    "last_trading_date": null,
+    "liquidation_start": null,
+    "delisting_date": "2014-12-26",
+    "final_trading_day": null,
+    "successor_name": "大成产业升级股票型证券投资基金",
+    "successor_code": null,
+    "evidence_level": "A",
+    "automation_suitable": true,
+    "missing_fields": [
+     "established_date",
+     "last_trading_date",
+     "liquidation_start"
+    ],
+    "conflicts": []
+   },
+   {
+    "code": "184705",
+    "name_expected": "基金裕泽",
+    "category": "老封闭式",
+    "note": null,
+    "in_current_name_table": false,
+    "announcement_ok": true,
+    "announcement_total": 59,
+    "event_type": "delisting",
+    "event_title": "基金裕泽：终止上市公告",
+    "announcement_date": "2011-04-15",
+    "announcement_id": "AN201203020004795376",
+    "announcement_url": "http://pdf.dfcfw.com/pdf/H2_AN201203020004795376_1.pdf",
+    "pdf_ok": true,
+    "pdf_pages": 4,
+    "doc_format": "pdf",
+    "name_actual": "中华人民共和国证券投资基金",
+    "established_date": null,
+    "last_trading_date": null,
+    "liquidation_start": null,
+    "delisting_date": "2011-04-22",
+    "final_trading_day": null,
+    "successor_name": "博时卓越品牌股票型证券投资基金",
+    "successor_code": null,
+    "evidence_level": "A",
+    "automation_suitable": true,
+    "missing_fields": [
+     "established_date",
+     "last_trading_date",
+     "liquidation_start"
+    ],
+    "conflicts": []
+   }
+  ],
+  "count": 25,
+  "announcement_available": 25,
+  "pdf_readable": 24,
+  "with_terminal_date": 24,
+  "with_established_date": 2,
+  "with_successor": 18,
+  "evidence_a_count": 24,
+  "by_event_type": {
+   "liquidation": 2,
+   "share_termination": 4,
+   "delisting": 18,
+   "unknown": 1
+  },
+  "by_year": {
+   "2011": 1,
+   "2012": 1,
+   "2013": 2,
+   "2014": 7,
+   "2015": 1,
+   "2016": 1,
+   "2017": 2,
+   "2020": 10
+  },
+  "not_in_current_table": 25,
+  "data_source": {
+   "announcement_list": "http://api.fund.eastmoney.com/f10/JJGG/",
+   "pdf": "http://pdf.dfcfw.com/pdf/H2_{announcement_id}_1.pdf",
+   "evidence_level": "A（基金公司正式公告原文 PDF）",
+   "note": "公告与 PDF 均为基金公司正式披露，属 A 级证据"
+  }
+ },
+ "fees": {
+  "samples": [
+   {
+    "code": "000051",
+    "ok": true,
+    "error": null,
+    "page_has_fee": true,
+    "annual_fees": {
+     "management_fee": 0.0015,
+     "custody_fee": 0.0005,
+     "sales_service_fee": 0.0
+    },
+    "purchase_tiers": [
+     {
+      "bound_kind": "小于",
+      "bound_amount": 1000000.0,
+      "original_rate": 0.012,
+      "platform_rate": 0.0012
+     },
+     {
+      "bound_kind": "大于等于",
+      "bound_amount": 1000000.0,
+      "original_rate": 0.009,
+      "platform_rate": 0.0009
+     },
+     {
+      "bound_kind": "大于等于",
+      "bound_amount": 5000000.0,
+      "original_rate": 0.006,
+      "platform_rate": 0.0006
+     }
+    ],
+    "redeem_tiers": [
+     {
+      "condition_text": "小于7天",
+      "bound_kind": "小于",
+      "holding_days": 7,
+      "holding_unit": "天",
+      "holding_days_min": 7,
+      "rate": 0.015
+     },
+     {
+      "condition_text": "大于等于7天，小于1年",
+      "bound_kind": "小于",
+      "holding_days": 365,
+      "holding_unit": "年",
+      "holding_days_min": 7,
+      "rate": 0.005
+     },
+     {
+      "condition_text": "大于等于1年",
+      "bound_kind": "大于等于",
+      "holding_days": 365,
+      "holding_unit": "年",
+      "holding_days_min": 365,
+      "rate": 0.0
+     }
+    ],
+    "evidence_level": "C",
+    "source_url": "http://fundf10.eastmoney.com/jjfl_000051.html",
+    "fetched_at": "2026-11-19T14:39:18",
+    "note": null,
+    "name": "华夏沪深300ETF联接A",
+    "category": "宽基指数",
+    "pair_id": null
+   },
+   {
+    "code": "110020",
+    "ok": true,
+    "error": null,
+    "page_has_fee": true,
+    "annual_fees": {
+     "management_fee": 0.0015,
+     "custody_fee": 0.0005,
+     "sales_service_fee": 0.0
+    },
+    "purchase_tiers": [
+     {
+      "bound_kind": "小于",
+      "bound_amount": 1000000.0,
+      "original_rate": 0.012,
+      "platform_rate": 0.0012
+     },
+     {
+      "bound_kind": "大于等于",
+      "bound_amount": 1000000.0,
+      "original_rate": 0.008,
+      "platform_rate": 0.0008
+     },
+     {
+      "bound_kind": "大于等于",
+      "bound_amount": 5000000.0,
+      "original_rate": 0.002,
+      "platform_rate": 0.0002
+     }
+    ],
+    "redeem_tiers": [
+     {
+      "condition_text": "小于等于6天",
+      "bound_kind": "同上限",
+      "holding_days": 6,
+      "holding_unit": "天",
+      "holding_days_min": 6,
+      "rate": 0.015
+     },
+     {
+      "condition_text": "大于等于7天，小于等于364天",
+      "bound_kind": "同上限",
+      "holding_days": 364,
+      "holding_unit": "天",
+      "holding_days_min": 7,
+      "rate": 0.005
+     },
+     {
+      "condition_text": "大于等于365天，小于等于729天",
+      "bound_kind": "同上限",
+      "holding_days": 729,
+      "holding_unit": "天",
+      "holding_days_min": 365,
+      "rate": 0.0025
+     },
+     {
+      "condition_text": "大于等于730天",
+      "bound_kind": "大于等于",
+      "holding_days": 730,
+      "holding_unit": "天",
+      "holding_days_min": 730,
+      "rate": 0.0
+     }
+    ],
+    "evidence_level": "C",
+    "source_url": "http://fundf10.eastmoney.com/jjfl_110020.html",
+    "fetched_at": "2026-11-19T14:39:18",
+    "note": null,
+    "name": "易方达沪深300ETF联接A",
+    "category": "宽基指数",
+    "pair_id": null
+   },
+   {
+    "code": "161725",
+    "ok": true,
+    "error": null,
+    "page_has_fee": true,
+    "annual_fees": {
+     "management_fee": 0.01,
+     "custody_fee": 0.002,
+     "sales_service_fee": 0.0
+    },
+    "purchase_tiers": [
+     {
+      "bound_kind": "小于",
+      "bound_amount": 500000.0,
+      "original_rate": 0.01,
+      "platform_rate": 0.001
+     },
+     {
+      "bound_kind": "大于等于",
+      "bound_amount": 500000.0,
+      "original_rate": 0.005,
+      "platform_rate": 0.0005
+     }
+    ],
+    "redeem_tiers": [
+     {
+      "condition_text": "小于7天",
+      "bound_kind": "小于",
+      "holding_days": 7,
+      "holding_unit": "天",
+      "holding_days_min": 7,
+      "rate": 0.015
+     },
+     {
+      "condition_text": "大于等于7天，小于365天",
+      "bound_kind": "小于",
+      "holding_days": 365,
+      "holding_unit": "天",
+      "holding_days_min": 7,
+      "rate": 0.005
+     },
+     {
+      "condition_text": "大于等于365天，小于730天",
+      "bound_kind": "小于",
+      "holding_days": 730,
+      "holding_unit": "天",
+      "holding_days_min": 365,
+      "rate": 0.0025
+     },
+     {
+      "condition_text": "大于等于730天",
+      "bound_kind": "大于等于",
+      "holding_days": 730,
+      "holding_unit": "天",
+      "holding_days_min": 730,
+      "rate": 0.0
+     }
+    ],
+    "evidence_level": "C",
+    "source_url": "http://fundf10.eastmoney.com/jjfl_161725.html",
+    "fetched_at": "2026-11-19T14:39:18",
+    "note": null,
+    "name": "招商中证白酒指数(LOF)A",
+    "category": "行业指数",
+    "pair_id": "pair_1"
+   },
+   {
+    "code": "012414",
+    "ok": true,
+    "error": null,
+    "page_has_fee": true,
+    "annual_fees": {
+     "management_fee": 0.01,
+     "custody_fee": 0.002,
+     "sales_service_fee": 0.001
+    },
+    "purchase_tiers": [],
+    "redeem_tiers": [
+     {
+      "condition_text": "小于7天",
+      "bound_kind": "小于",
+      "holding_days": 7,
+      "holding_unit": "天",
+      "holding_days_min": 7,
+      "rate": 0.015
+     },
+     {
+      "condition_text": "大于等于7天",
+      "bound_kind": "大于等于",
+      "holding_days": 7,
+      "holding_unit": "天",
+      "holding_days_min": 7,
+      "rate": 0.0
+     }
+    ],
+    "evidence_level": "C",
+    "source_url": "http://fundf10.eastmoney.com/jjfl_012414.html",
+    "fetched_at": "2026-11-19T14:39:18",
+    "note": null,
+    "name": "招商中证白酒指数(LOF)C",
+    "category": "行业指数",
+    "pair_id": "pair_1"
+   },
+   {
+    "code": "000015",
+    "ok": true,
+    "error": null,
+    "page_has_fee": true,
+    "annual_fees": {
+     "management_fee": 0.003,
+     "custody_fee": 0.001,
+     "sales_service_fee": 0.0
+    },
+    "purchase_tiers": [
+     {
+      "bound_kind": "小于",
+      "bound_amount": 500000.0,
+      "original_rate": 0.008,
+      "platform_rate": 0.0008
+     },
+     {
+      "bound_kind": "大于等于",
+      "bound_amount": 500000.0,
+      "original_rate": 0.006,
+      "platform_rate": 0.0006
+     },
+     {
+      "bound_kind": "大于等于",
+      "bound_amount": 2000000.0,
+      "original_rate": 0.004,
+      "platform_rate": 0.0004
+     }
+    ],
+    "redeem_tiers": [
+     {
+      "condition_text": "小于7天",
+      "bound_kind": "小于",
+      "holding_days": 7,
+      "holding_unit": "天",
+      "holding_days_min": 7,
+      "rate": 0.015
+     },
+     {
+      "condition_text": "大于等于7天，小于30天",
+      "bound_kind": "小于",
+      "holding_days": 30,
+      "holding_unit": "天",
+      "holding_days_min": 7,
+      "rate": 0.001
+     },
+     {
+      "condition_text": "大于等于30天",
+      "bound_kind": "大于等于",
+      "holding_days": 30,
+      "holding_unit": "天",
+      "holding_days_min": 30,
+      "rate": 0.0
+     }
+    ],
+    "evidence_level": "C",
+    "source_url": "http://fundf10.eastmoney.com/jjfl_000015.html",
+    "fetched_at": "2026-11-19T14:39:18",
+    "note": null,
+    "name": "华夏纯债债券A",
+    "category": "债券",
+    "pair_id": "pair_2"
+   },
+   {
+    "code": "000016",
+    "ok": true,
+    "error": null,
+    "page_has_fee": true,
+    "annual_fees": {
+     "management_fee": 0.003,
+     "custody_fee": 0.001,
+     "sales_service_fee": 0.004
+    },
+    "purchase_tiers": [],
+    "redeem_tiers": [
+     {
+      "condition_text": "小于7天",
+      "bound_kind": "小于",
+      "holding_days": 7,
+      "holding_unit": "天",
+      "holding_days_min": 7,
+      "rate": 0.015
+     },
+     {
+      "condition_text": "大于等于7天，小于30天",
+      "bound_kind": "小于",
+      "holding_days": 30,
+      "holding_unit": "天",
+      "holding_days_min": 7,
+      "rate": 0.001
+     },
+     {
+      "condition_text": "大于等于30天",
+      "bound_kind": "大于等于",
+      "holding_days": 30,
+      "holding_unit": "天",
+      "holding_days_min": 30,
+      "rate": 0.0
+     }
+    ],
+    "evidence_level": "C",
+    "source_url": "http://fundf10.eastmoney.com/jjfl_000016.html",
+    "fetched_at": "2026-11-19T14:39:18",
+    "note": null,
+    "name": "华夏纯债债券C",
+    "category": "债券",
+    "pair_id": "pair_2"
+   },
+   {
+    "code": "007300",
+    "ok": true,
+    "error": null,
+    "page_has_fee": true,
+    "annual_fees": {
+     "management_fee": 0.005,
+     "custody_fee": 0.001,
+     "sales_service_fee": 0.0
+    },
+    "purchase_tiers": [
+     {
+      "bound_kind": "小于",
+      "bound_amount": 1000000.0,
+      "original_rate": 0.008,
+      "platform_rate": 0.0008
+     },
+     {
+      "bound_kind": "大于等于",
+      "bound_amount": 1000000.0,
+      "original_rate": 0.006,
+      "platform_rate": 0.0006
+     }
+    ],
+    "redeem_tiers": [
+     {
+      "condition_text": "小于7天",
+      "bound_kind": "小于",
+      "holding_days": 7,
+      "holding_unit": "天",
+      "holding_days_min": 7,
+      "rate": 0.015
+     },
+     {
+      "condition_text": "大于等于7天，小于365天",
+      "bound_kind": "小于",
+      "holding_days": 365,
+      "holding_unit": "天",
+      "holding_days_min": 7,
+      "rate": 0.005
+     },
+     {
+      "condition_text": "大于等于365天",
+      "bound_kind": "大于等于",
+      "holding_days": 365,
+      "holding_unit": "天",
+      "holding_days_min": 365,
+      "rate": 0.0
+     }
+    ],
+    "evidence_level": "C",
+    "source_url": "http://fundf10.eastmoney.com/jjfl_007300.html",
+    "fetched_at": "2026-11-19T14:39:18",
+    "note": null,
+    "name": "国联安中证半导体ETF联接A",
+    "category": "ETF联接",
+    "pair_id": "pair_3"
+   },
+   {
+    "code": "007301",
+    "ok": true,
+    "error": null,
+    "page_has_fee": true,
+    "annual_fees": {
+     "management_fee": 0.005,
+     "custody_fee": 0.001,
+     "sales_service_fee": 0.0025
+    },
+    "purchase_tiers": [],
+    "redeem_tiers": [
+     {
+      "condition_text": "小于7天",
+      "bound_kind": "小于",
+      "holding_days": 7,
+      "holding_unit": "天",
+      "holding_days_min": 7,
+      "rate": 0.015
+     },
+     {
+      "condition_text": "大于等于7天",
+      "bound_kind": "大于等于",
+      "holding_days": 7,
+      "holding_unit": "天",
+      "holding_days_min": 7,
+      "rate": 0.0
+     }
+    ],
+    "evidence_level": "C",
+    "source_url": "http://fundf10.eastmoney.com/jjfl_007301.html",
+    "fetched_at": "2026-11-19T14:39:18",
+    "note": null,
+    "name": "国联安中证半导体ETF联接C",
+    "category": "ETF联接",
+    "pair_id": "pair_3"
+   },
+   {
+    "code": "110022",
+    "ok": true,
+    "error": null,
+    "page_has_fee": true,
+    "annual_fees": {
+     "management_fee": 0.012,
+     "custody_fee": 0.002,
+     "sales_service_fee": null
+    },
+    "purchase_tiers": [
+     {
+      "bound_kind": "小于",
+      "bound_amount": 1000000.0,
+      "original_rate": 0.015,
+      "platform_rate": 0.0015
+     },
+     {
+      "bound_kind": "大于等于",
+      "bound_amount": 1000000.0,
+      "original_rate": 0.012,
+      "platform_rate": 0.0012
+     },
+     {
+      "bound_kind": "大于等于",
+      "bound_amount": 5000000.0,
+      "original_rate": 0.003,
+      "platform_rate": 0.0003
+     }
+    ],
+    "redeem_tiers": [
+     {
+      "condition_text": "小于等于6天",
+      "bound_kind": "同上限",
+      "holding_days": 6,
+      "holding_unit": "天",
+      "holding_days_min": 6,
+      "rate": 0.015
+     },
+     {
+      "condition_text": "大于等于7天，小于等于364天",
+      "bound_kind": "同上限",
+      "holding_days": 364,
+      "holding_unit": "天",
+      "holding_days_min": 7,
+      "rate": 0.005
+     },
+     {
+      "condition_text": "大于等于365天，小于等于729天",
+      "bound_kind": "同上限",
+      "holding_days": 729,
+      "holding_unit": "天",
+      "holding_days_min": 365,
+      "rate": 0.0025
+     },
+     {
+      "condition_text": "大于等于730天",
+      "bound_kind": "大于等于",
+      "holding_days": 730,
+      "holding_unit": "天",
+      "holding_days_min": 730,
+      "rate": 0.0
+     }
+    ],
+    "evidence_level": "C",
+    "source_url": "http://fundf10.eastmoney.com/jjfl_110022.html",
+    "fetched_at": "2026-11-19T14:39:18",
+    "note": null,
+    "name": "易方达消费行业股票",
+    "category": "主动权益",
+    "pair_id": null
+   },
+   {
+    "code": "161005",
+    "ok": true,
+    "error": null,
+    "page_has_fee": true,
+    "annual_fees": {
+     "management_fee": 0.012,
+     "custody_fee": 0.002,
+     "sales_service_fee": 0.0
+    },
+    "purchase_tiers": [
+     {
+      "bound_kind": "小于",
+      "bound_amount": 1000000.0,
+      "original_rate": 0.015,
+      "platform_rate": 0.0015
+     },
+     {
+      "bound_kind": "大于等于",
+      "bound_amount": 1000000.0,
+      "original_rate": 0.012,
+      "platform_rate": 0.0012
+     }
+    ],
+    "redeem_tiers": [
+     {
+      "condition_text": "小于7天",
+      "bound_kind": "小于",
+      "holding_days": 7,
+      "holding_unit": "天",
+      "holding_days_min": 7,
+      "rate": 0.015
+     },
+     {
+      "condition_text": "大于等于7天",
+      "bound_kind": "大于等于",
+      "holding_days": 7,
+      "holding_unit": "天",
+      "holding_days_min": 7,
+      "rate": 0.005
+     }
+    ],
+    "evidence_level": "C",
+    "source_url": "http://fundf10.eastmoney.com/jjfl_161005.html",
+    "fetched_at": "2026-11-19T14:39:18",
+    "note": null,
+    "name": "富国天惠成长混合(LOF)A",
+    "category": "主动权益",
+    "pair_id": null
+   },
+   {
+    "code": "000478",
+    "ok": true,
+    "error": null,
+    "page_has_fee": true,
+    "annual_fees": {
+     "management_fee": 0.01,
+     "custody_fee": 0.002,
+     "sales_service_fee": 0.0
+    },
+    "purchase_tiers": [
+     {
+      "bound_kind": "小于",
+      "bound_amount": 1000000.0,
+      "original_rate": 0.015,
+      "platform_rate": 0.0015
+     },
+     {
+      "bound_kind": "大于等于",
+      "bound_amount": 1000000.0,
+      "original_rate": 0.01,
+      "platform_rate": 0.001
+     }
+    ],
+    "redeem_tiers": [
+     {
+      "condition_text": "小于7天",
+      "bound_kind": "小于",
+      "holding_days": 7,
+      "holding_unit": "天",
+      "holding_days_min": 7,
+      "rate": 0.015
+     },
+     {
+      "condition_text": "大于等于7天，小于365天",
+      "bound_kind": "小于",
+      "holding_days": 365,
+      "holding_unit": "天",
+      "holding_days_min": 7,
+      "rate": 0.005
+     },
+     {
+      "condition_text": "大于等于365天，小于730天",
+      "bound_kind": "小于",
+      "holding_days": 730,
+      "holding_unit": "天",
+      "holding_days_min": 365,
+      "rate": 0.0025
+     },
+     {
+      "condition_text": "大于等于730天",
+      "bound_kind": "大于等于",
+      "holding_days": 730,
+      "holding_unit": "天",
+      "holding_days_min": 730,
+      "rate": 0.0
+     }
+    ],
+    "evidence_level": "C",
+    "source_url": "http://fundf10.eastmoney.com/jjfl_000478.html",
+    "fetched_at": "2026-11-19T14:39:18",
+    "note": null,
+    "name": "建信中证500指数增强A",
+    "category": "指数增强",
+    "pair_id": null
+   },
+   {
+    "code": "000198",
+    "ok": true,
+    "error": null,
+    "page_has_fee": true,
+    "annual_fees": {
+     "management_fee": 0.003,
+     "custody_fee": 0.0007,
+     "sales_service_fee": 0.0025
+    },
+    "purchase_tiers": [],
+    "redeem_tiers": [],
+    "evidence_level": "C",
+    "source_url": "http://fundf10.eastmoney.com/jjfl_000198.html",
+    "fetched_at": "2026-11-19T14:39:18",
+    "note": "赎回费阶梯解析为空，需人工核对页面",
+    "name": "天弘余额宝货币",
+    "category": "货币",
+    "pair_id": null
+   }
+  ],
+  "count": 12,
+  "with_redeem_tiers": 11,
+  "with_purchase_tiers": 8,
+  "with_annual_fees": 12,
+  "ac_pairs": [
+   {
+    "pair_id": "pair_1",
+    "a_code": "161725",
+    "a_name": "招商中证白酒指数(LOF)A",
+    "c_code": "012414",
+    "c_name": "招商中证白酒指数(LOF)C",
+    "a_purchase_rate": 0.01,
+    "c_purchase_rate": null,
+    "a_sales_service_fee": 0.0,
+    "c_sales_service_fee": 0.001,
+    "a_redeem_tier_count": 4,
+    "c_redeem_tier_count": 2,
+    "a_management_fee": 0.01,
+    "c_management_fee": 0.01
+   },
+   {
+    "pair_id": "pair_2",
+    "a_code": "000015",
+    "a_name": "华夏纯债债券A",
+    "c_code": "000016",
+    "c_name": "华夏纯债债券C",
+    "a_purchase_rate": 0.008,
+    "c_purchase_rate": null,
+    "a_sales_service_fee": 0.0,
+    "c_sales_service_fee": 0.004,
+    "a_redeem_tier_count": 3,
+    "c_redeem_tier_count": 3,
+    "a_management_fee": 0.003,
+    "c_management_fee": 0.003
+   },
+   {
+    "pair_id": "pair_3",
+    "a_code": "007300",
+    "a_name": "国联安中证半导体ETF联接A",
+    "c_code": "007301",
+    "c_name": "国联安中证半导体ETF联接C",
+    "a_purchase_rate": 0.008,
+    "c_purchase_rate": null,
+    "a_sales_service_fee": 0.0,
+    "c_sales_service_fee": 0.0025,
+    "a_redeem_tier_count": 3,
+    "c_redeem_tier_count": 2,
+    "a_management_fee": 0.005,
+    "c_management_fee": 0.005
+   }
+  ],
+  "ac_pair_count": 3,
+  "historical_fee_probe": [
+   {
+    "code": "150008",
+    "page_ok": true,
+    "has_fee": false,
+    "recoverable": false,
+    "evidence_level": "D"
+   },
+   {
+    "code": "150019",
+    "page_ok": true,
+    "has_fee": false,
+    "recoverable": false,
+    "evidence_level": "D"
+   },
+   {
+    "code": "150020",
+    "page_ok": true,
+    "has_fee": false,
+    "recoverable": false,
+    "evidence_level": "D"
+   },
+   {
+    "code": "184688",
+    "page_ok": true,
+    "has_fee": false,
+    "recoverable": false,
+    "evidence_level": "D"
+   }
+  ],
+  "historical_fee_recoverable": 0,
+  "data_source": {
+   "fee_page": "http://fundf10.eastmoney.com/jjfl_{code}.html",
+   "evidence_level": "C",
+   "note": "天天基金 F10 费率页由基金公司提供费率数据，但属第三方展示，不是合同原文；标注 C 级。"
+  }
+ },
+ "alipay": {
+  "probes": [
+   {
+    "name": "支付宝主站",
+    "url": "https://www.alipay.com/",
+    "reachable": true,
+    "status": 200,
+    "error": null,
+    "content_length": 6565,
+    "public_api_for_fund_status": false
+   },
+   {
+    "name": "支付宝开放平台",
+    "url": "https://open.alipay.com/",
+    "reachable": true,
+    "status": 200,
+    "error": null,
+    "content_length": 161600,
+    "public_api_for_fund_status": false
+   },
+   {
+    "name": "蚂蚁集团官网",
+    "url": "https://www.antgroup.com/",
+    "reachable": true,
+    "status": 200,
+    "error": null,
+    "content_length": 35854,
+    "public_api_for_fund_status": false
+   },
+   {
+    "name": "支付宝基金子站",
+    "url": "https://fund.alipay.com/",
+    "reachable": false,
+    "status": null,
+    "error": "ConnectionError: ('Connection aborted.', ConnectionAbortedError(10053, '你的主机中的软件中止了一个已建立的连接。', None, 10053, None))",
+    "public_api_for_fund_status": false
+   },
+   {
+    "name": "支付宝基金产品页",
+    "url": "https://fund.alipay.com/fund/000051",
+    "reachable": false,
+    "status": null,
+    "error": "ConnectionError: ('Connection aborted.', ConnectionAbortedError(10053, '你的主机中的软件中止了一个已建立的连接。', None, 10053, None))",
+    "public_api_for_fund_status": false
+   }
+  ],
+  "conclusion": "not_obtainable",
+  "reason": "支付宝基金购买状态属于**登录态内的账户/渠道数据**，没有公开、稳定、合法的接口可以查询「某只基金在支付宝能否购买」。支付宝主站与开放平台均不提供面向第三方的基金可购买状态 API；基金子站需要登录且受访问控制。",
+  "prohibited": [
+   "尝试绕过登录/验证码/风控获取状态",
+   "使用非公开接口（逆向 APP 或网页私有 API）",
+   "把天天基金申购状态当作支付宝状态"
+  ],
+  "distinction": {
+   "fund_open_subscription": "基金合同层面开放申购，可用天天基金状态近似判断",
+   "eastmoney_purchasable": "天天基金作为销售渠道可购买，仅代表该渠道",
+   "alipay_purchasable": "支付宝作为销售渠道可购买，**无公开数据源**"
+  },
+  "recommendation": {
+   "storage": "fund_subscription_status.alipay_purchasable 保持 'unknown'",
+   "manual": "建立人工核实流程：在 fund_subscription_status 增记 verified_by='manual' + as_of_date + screenshot_path，由人工在支付宝 APP 内确认后录入",
+   "never_infer": "禁止由天天基金状态、基金合同开放申购状态推断支付宝状态"
+  }
+ },
+ "answers": {
+  "q1_liquidated_roster_reliable": {
+   "answer": "partially",
+   "detail": "25 只样本中 25 只有公告、24 只 PDF 可读、24 只能提取终止日期。名录**可以建立**，但只能「按事件建立」，不能「按全量清单建立」。",
+   "coverage": "无法量化（没有权威全量清单可比对）",
+   "main_gap": "缺一个权威的「全市场已终止基金清单」；只能靠代码域扫描 + 公告反查"
+  },
+  "q2_redemption_fee_tiers": {
+   "answer": "yes_for_living_funds",
+   "detail": "12 只样本中 11 只成功解析出赎回费阶梯，8 只解析出申购费阶梯，12 只拿到年化费率。",
+   "caveat": "来源是天天基金 F10 页（C 级），不是合同原文（A 级）"
+  },
+  "q3_historical_fees_recoverable": {
+   "answer": "no",
+   "detail": "探测 4 只已终止基金，仅 0 只费率页有数据。",
+   "conclusion": "已终止基金的历史费率在公开渠道基本不可恢复"
+  },
+  "q4_alipay_status_automatable": {
+   "answer": "no",
+   "detail": "支付宝基金购买状态属于**登录态内的账户/渠道数据**，没有公开、稳定、合法的接口可以查询「某只基金在支付宝能否购买」。支付宝主站与开放平台均不提供面向第三方的基金可购买状态 API；基金子站需要登录且受访问控制。",
+   "recommendation": {
+    "storage": "fund_subscription_status.alipay_purchasable 保持 'unknown'",
+    "manual": "建立人工核实流程：在 fund_subscription_status 增记 verified_by='manual' + as_of_date + screenshot_path，由人工在支付宝 APP 内确认后录入",
+    "never_infer": "禁止由天天基金状态、基金合同开放申购状态推断支付宝状态"
+   }
+  },
+  "q5_worth_automating": [
+   "历史清盘/合并名录（公告列表 + PDF 原文，A 级证据，可自动化）",
+   "存续基金费率（F10 页可解析，C 级，可自动化但须标注非合同原文）"
+  ],
+  "q6_keep_manual": [
+   "支付宝可购买状态（无公开接口，必须人工核实）",
+   "已终止基金的历史费率（不可恢复，只能人工从合同 PDF 提取）",
+   "合并承接基金代码（部分公告未明确写出，需人工核对）"
+  ]
+ },
+ "unresolved": [
+  "清盘名录覆盖率无法量化：没有权威的全量清单可比对",
+  "净值数据源只覆盖部分已终止基金（150001 返回 404）",
+  "已终止基金的历史费率在公开渠道不可恢复",
+  "支付宝可购买状态无公开合法接口",
+  "合并承接基金代码仅部分公告明确写出"
+ ]
+}
