@@ -1,5 +1,57 @@
 # 变更日志
 
+## 2026-11-19 — 阶段3B-4.0 场外基金数据层基础设施落地
+
+按 3B-3 的 10 张表设计正式落地独立场外基金数据层，不改 ETF 侧任何东西。
+
+**10 张表全部创建**：`fund_master` / `fund_share_classes` / `fund_nav_daily` /
+`fund_dividends` / `fund_manager_history` / `fund_aum_history` / `fund_fee_rules` /
+`fund_subscription_status` / `fund_lifecycle_events` / `fund_data_quality`。
+全部 IF NOT EXISTS，可重复执行。
+
+**核心约束**：
+
+- `fund_nav_daily` 用 CHECK 强制「净值型必须有 unit_nav 且不能有 per_10k_yield；
+  货币型反之」，从 DDL 层面禁止两种口径混用。
+- `fund_dividends` 唯一键含 `source`，同源幂等、**不同源各留一条**保留差异证据。
+- `fund_subscription_status` 唯一键含 `as_of_date`，按日快照，历史不被覆盖。
+- `alipay_purchasable` CHECK 只允许 unknown/yes/no，默认 unknown。
+- `lifecycle_status` CHECK 只允许 active/terminated/merged/unknown。
+
+**12 只样本真实入库**：9 个基金本体 / 12 个份额 / 39,822 条净值 /
+44 条分红 / 12 条状态快照 / 31 条质量记录。
+
+**A/C 归属修正**：第一版把 12 只样本当成 12 只独立基金，A/C 各自成体（12 个 master）。
+改为按「去后缀后名称一致」分组后修正为 **9 个 master**，三组 A/C 全部正确归属
+（白酒 161725+012414、半导体联接 007300+007301、华夏纯债 000015+000016）。
+基础名不一致时**不强行合并**，各自成体并标 `needs_review=1`。
+
+**幂等验证（导入三次）**：master 9/9/9、share 12/12/12、nav 39,822 三次一致、
+quality 31/31/31。分红 40→44→44：不是重复写入，是分红接口单次返回不完整，
+第 2、3 次补全后收敛；按 `(share_class_id, ex_date, source)` 分组重复组数 = 0。
+
+**未知字段一律不伪造**：赎回费率 NULL（`fund_fee_rules` 0 行，未填行业平均）、
+清盘日期 NULL、经理任职起止 NULL、支付宝可购买全部 unknown。
+
+**数据层模块化**（不堆在一个大文件）：`app/fund/` 下 9 个模块，
+repository / repo_nav / repo_status / repo_quality 各管一块，
+models 是 10 类 dataclass，normalize 是纯函数，ingest 有完整 Mock 注入点。
+
+**测试**：48 项专项测试，全部用独立临时数据库 + Mock 外部接口，
+不联网、不污染正式库。覆盖迁移幂等、外键、A/C 归属、净值分离、
+分红换算、跨源留证、状态快照、支付宝 unknown、费率 NULL、
+事务回滚、货币分支等 30+ 个点。
+
+**工程边界**：未改 `app/backtest/` `app/validation/` `app/quant/`；
+未改 ETF 公司行为/会计/撮合；未开发场外回测引擎；未开发策略；未接实盘。
+ETF 侧全部表行数变化 0，integrity_check ok，行情指纹 d54727c0… 未变。
+
+**仍未解决**：清盘基金名录缺失（`survivorship_bias_unresolved`）、
+赎回费阶梯无数据源。本轮只解决基础设施，没有解决数据可得性。
+
+**全量测试**：856 passed / 0 failed / 0 skipped（317.14 秒）。
+
+
 ## 2026-11-19 — 阶段3B-3.1 场外基金历史净值连续性审计补强
 
 修正 3B-3 的证据不足：原报告写「12 只样本历史净值全部连续、无空洞」，

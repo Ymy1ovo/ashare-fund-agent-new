@@ -2437,7 +2437,8 @@ if (basis != ACCOUNTING_FORMAL
 | 3B-1.1 | 研究统计去重与结论校准 | 723 | `phase3B1_strategy_effectiveness_baseline.md`（v2） |
 | 3B-2 | 新策略候选研究与第一轮验证 | 747 | `phase3B2_strategy_candidates.md` |
 | 3B-3 | 支付宝场外基金数据体系可行性审计 | 784 | `phase3B3_fund_data_feasibility.md` |
-| 3B-3.1 | 场外基金历史净值连续性审计补强 | **808** | `phase3B3_fund_data_feasibility.md`（v2 §6.0） |
+| 3B-3.1 | 场外基金历史净值连续性审计补强 | 808 | `phase3B3_fund_data_feasibility.md`（v2 §6.0） |
+| 3B-4.0 | 场外基金数据层基础设施落地 | **856** | `phase3B4_fund_data_layer.md` |
 
 当前正式会计版本：`ca-v2-receivable`；正式会计基础：`formal_receivable`；正式估值标记：`formal_valuation=True`。
 
@@ -3809,4 +3810,142 @@ bear 仅 26 天样本，置信度极低。
 | 报告（v2，新增 §6.0） | `reports/phase3B3_fund_data_feasibility.md` |
 | 机器可读结果 | `reports/phase3B3_fund_data_feasibility.json` |
 | 专项测试 | `tests/test_research_3b3_fund_data.py`（61 项） |
+
+## 55. 阶段3B-4.0 场外基金数据层基础设施落地
+
+### 55.1 结论
+
+> **10 张表全部落地，12 只样本基金完成真实入库，迁移与导入均可重复执行。**
+
+| 验收标准 | 结果 |
+| --- | --- |
+| 10 张表全部落地 | ✅ |
+| 迁移可重复执行 | ✅ 三次无变化 |
+| 本体与份额关系正确 | ✅ 9 本体 / 12 份额 |
+| 12 只样本真实入库 | ✅ |
+| 单位/累计净值/分红口径正确 | ✅ |
+| 重复导入无重复 | ✅ |
+| 未知字段不被伪造 | ✅ |
+| 新增测试通过 | ✅ 48 项 |
+| 原有 ETF 数据未变 | ✅ 行数 0 变化，指纹一致 |
+
+### 55.2 新增 10 张表（全部在 `migrations/phase3b4_fund_data_layer.sql`）
+
+| 表 | 行数 | 用途 |
+| --- | ---: | --- |
+| `fund_master` | 9 | 基金本体（A/C 共用一行） |
+| `fund_share_classes` | 12 | 份额类别（A/C/E/I） |
+| `fund_nav_daily` | 39,822 | 每日净值（单位/累计分列） |
+| `fund_dividends` | 44 | 分红（保留每10份原文 + 归一化） |
+| `fund_manager_history` | 8 | 经理任职（A/C 共用本体，8 个本体有经理） |
+| `fund_aum_history` | 8 | 规模（货币基金无基本信息，未入库） |
+| `fund_fee_rules` | **0** | 费率规则（无数据源，rate=NULL） |
+| `fund_subscription_status` | 12 | 申购状态按日快照 |
+| `fund_lifecycle_events` | 8 | 生命周期事件（established，货币基金无） |
+| `fund_data_quality` | 31 | 数据质量 |
+
+### 55.3 关键约束
+
+| 约束 | 作用 |
+| --- | --- |
+| `fund_share_classes.share_class_code UNIQUE` | 份额代码独立，不被合并 |
+| `fund_nav_daily` 主键 `(share_class_id, nav_date, nav_kind)` | 同日期同类型只一行 |
+| `fund_nav_daily` CHECK | 净值型必须有 unit_nav 且不能有 per_10k_yield；货币型反之 |
+| `fund_dividends` UNIQUE `(share_class_id, ex_date, source)` | 同源幂等，**不同源各留一条**保留差异 |
+| `fund_subscription_status` UNIQUE `(share_class_id, as_of_date, source)` | 按日快照，历史不被覆盖 |
+| `alipay_purchasable` CHECK | 只允许 unknown/yes/no，默认 unknown |
+| `lifecycle_status` CHECK | 只允许 active/terminated/merged/unknown |
+
+### 55.4 数据层结构（不堆在一个大文件里）
+
+| 模块 | 职责 |
+| --- | --- |
+| `app/fund/migration.py` | 建表入口 |
+| `app/fund/models.py` | 10 类记录 dataclass |
+| `app/fund/normalize.py` | 归一化纯函数（每10份换算、份额类别识别） |
+| `app/fund/repo_base.py` | 来源置信度与覆盖规则 |
+| `app/fund/repository.py` | 本体/份额/生命周期/经理/规模 |
+| `app/fund/repo_nav.py` | 净值与分红 |
+| `app/fund/repo_status.py` | 状态快照与费率 |
+| `app/fund/repo_quality.py` | 数据质量 |
+| `app/fund/ingest.py` | 导入流程（Mock 注入点齐全） |
+
+### 55.5 A/C 归属（本轮关键修正）
+
+12 个份额代码 → **9 个基金本体**。
+
+| 本体 | 份额 |
+| --- | --- |
+| 招商中证白酒 | `161725`(A) + `012414`(C) |
+| 国联安半导体ETF联接 | `007300`(A) + `007301`(C) |
+| 华夏纯债债券 | `000015`(A) + `000016`(C) |
+
+归属依据是「去掉份额后缀后名称一致」——这是**弱依据**，所以：
+
+- 单成员组 → 天然独立本体，不标待核实；
+- 多成员且基础名一致 → 合并为一个本体，A 类作主代码；
+- 多成员但基础名不一致 → **各自独立成体并标 `needs_review=1`，不强行合并**。
+
+第一版实现把「12 只样本」当成 12 只独立基金，导致 A/C 各自成体（12 个 master）。
+改为按本体分组后修正为 9 个。
+
+### 55.6 幂等验证
+
+同一批真实数据导入三次：
+
+| 表 | 第1次 | 第2次 | 第3次 | 结果 |
+| --- | ---: | ---: | ---: | --- |
+| `fund_master` | 9 | 9 | 9 | ✅ 收敛 |
+| `fund_share_classes` | 12 | 12 | 12 | ✅ 收敛 |
+| `fund_nav_daily` | 39,822 | 39,822 | 39,822 | ✅ 收敛 |
+| `fund_dividends` | 40 | 44 | 44 | ⚠️ 见下 |
+| `fund_data_quality` | 31 | 31 | 31 | ✅ 收敛 |
+
+**分红 40→44 不是重复写入**：3B-3.1 已实测分红接口单次返回会不完整。
+第 1 次抓 40 条，第 2、3 次抓到更完整 44 条后收敛。
+按 `(share_class_id, ex_date, source)` 分组重复组数 = **0**，只是补全不是重复。
+
+### 55.7 未知字段处理
+
+| 字段 | 处理 |
+| --- | --- |
+| 赎回费率 | **NULL**，未填行业平均（`fund_fee_rules` 0 行） |
+| 清盘日期 | **NULL**，未推测 |
+| 经理任职起止 | **NULL**，未用今天伪造 |
+| 支付宝可购买 | **unknown**，DDL CHECK 约束强制 |
+| 成立日期（货币基金） | **NULL**，接口不支持 |
+
+### 55.8 仍未解决
+
+| 严重性 | 问题 |
+| --- | --- |
+| 🔴 高 | **清盘基金名录缺失**，`survivorship_bias_unresolved` 未解决 |
+| 🔴 高 | **赎回费阶梯无数据源**，表建了但 0 行 |
+| 🟡 中 | 销售服务费、基金转换、支付宝状态、申购状态历史 |
+| 🟢 低 | 规模历史、经理任职、货币基本信息、分红完整 |
+
+本轮只解决**基础设施**问题（表、仓储、导入、幂等、留痕），
+**没有**解决数据可得性问题。前两条不解决仍不能做正式回测。
+
+### 55.9 工程边界
+
+未修改 `app/backtest/` `app/validation/` `app/quant/`；未改 ETF 公司行为/会计/撮合；
+未开发场外回测引擎；未开发策略；未接实盘。
+
+| 检查 | 结果 |
+| --- | --- |
+| ETF 侧全部表行数变化 | **0** |
+| `integrity_check` | ok |
+| 行情指纹 | `d54727c0…` 未变（116,609 行） |
+
+### 55.10 产物
+
+| 项 | 路径 |
+| --- | --- |
+| 迁移 | `migrations/phase3b4_fund_data_layer.sql` |
+| 数据层 | `app/fund/`（9 个模块） |
+| 导入脚本 | `scripts/ingest_3b4_fund_sample.py` |
+| 专项测试 | `tests/test_fund_data_layer.py`（48 项） |
+| 报告 | `reports/phase3B4_fund_data_layer.md` |
+| 机器可读 | `reports/phase3B4_fund_data_layer.json` |
 

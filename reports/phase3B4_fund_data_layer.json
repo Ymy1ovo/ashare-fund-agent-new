@@ -1,0 +1,537 @@
+{
+ "schema_before": {
+  "fund_master": {
+   "exists": true,
+   "rows": 9
+  },
+  "fund_share_classes": {
+   "exists": true,
+   "rows": 12
+  },
+  "fund_nav_daily": {
+   "exists": true,
+   "rows": 39822
+  },
+  "fund_dividends": {
+   "exists": true,
+   "rows": 44
+  },
+  "fund_manager_history": {
+   "exists": true,
+   "rows": 8
+  },
+  "fund_aum_history": {
+   "exists": true,
+   "rows": 8
+  },
+  "fund_fee_rules": {
+   "exists": true,
+   "rows": 0
+  },
+  "fund_subscription_status": {
+   "exists": true,
+   "rows": 12
+  },
+  "fund_lifecycle_events": {
+   "exists": true,
+   "rows": 8
+  },
+  "fund_data_quality": {
+   "exists": true,
+   "rows": 31
+  }
+ },
+ "stats": {
+  "master_inserted": 9,
+  "master_updated": 0,
+  "share_inserted": 12,
+  "share_updated": 0,
+  "nav_written": 34903,
+  "money_written": 4919,
+  "dividend_written": 40,
+  "status_written": 12,
+  "manager_written": 11,
+  "aum_written": 11,
+  "lifecycle_written": 8,
+  "quality_written": 31,
+  "skipped": 0,
+  "error_count": 0,
+  "errors": []
+ },
+ "samples": [
+  {
+   "code": "000051",
+   "category": "宽基指数",
+   "status": "ok",
+   "notes": [],
+   "fund_id": 14,
+   "share_class_id": 14,
+   "group_merged": false,
+   "group_primary": null,
+   "needs_review": false,
+   "is_money": false,
+   "nav": {
+    "kind": "net_value",
+    "inserted": 0,
+    "updated": 4220,
+    "skipped": 0,
+    "skipped_lower_source": 0,
+    "rows": 4220,
+    "unit_only_dates": 0,
+    "acc_only_dates": 0
+   },
+   "dividends": {
+    "inserted": 0,
+    "updated": 0,
+    "skipped": 0
+   },
+   "status_rows": 1
+  },
+  {
+   "code": "110020",
+   "category": "宽基指数",
+   "status": "ok",
+   "notes": [],
+   "fund_id": 15,
+   "share_class_id": 15,
+   "group_merged": false,
+   "group_primary": null,
+   "needs_review": false,
+   "is_money": false,
+   "nav": {
+    "kind": "net_value",
+    "inserted": 0,
+    "updated": 4186,
+    "skipped": 0,
+    "skipped_lower_source": 0,
+    "rows": 4186,
+    "unit_only_dates": 0,
+    "acc_only_dates": 0
+   },
+   "dividends": {
+    "inserted": 0,
+    "updated": 0,
+    "skipped": 0
+   },
+   "status_rows": 1
+  },
+  {
+   "code": "161725",
+   "category": "行业指数",
+   "status": "ok",
+   "notes": [],
+   "fund_id": 16,
+   "share_class_id": 16,
+   "group_merged": true,
+   "group_primary": "161725",
+   "needs_review": false,
+   "is_money": false,
+   "nav": {
+    "kind": "net_value",
+    "inserted": 0,
+    "updated": 2794,
+    "skipped": 0,
+    "skipped_lower_source": 0,
+    "rows": 2794,
+    "unit_only_dates": 0,
+    "acc_only_dates": 0
+   },
+   "dividends": {
+    "inserted": 0,
+    "updated": 3,
+    "skipped": 0
+   },
+   "status_rows": 1
+  },
+  {
+   "code": "012414",
+   "category": "行业指数",
+   "status": "ok",
+   "notes": [],
+   "fund_id": 16,
+   "share_class_id": 17,
+   "group_merged": true,
+   "group_primary": "161725",
+   "needs_review": false,
+   "is_money": false,
+   "nav": {
+    "kind": "net_value",
+    "inserted": 0,
+    "updated": 1338,
+    "skipped": 0,
+    "skipped_lower_source": 0,
+    "rows": 1338,
+    "unit_only_dates": 0,
+    "acc_only_dates": 0
+   },
+   "dividends": {
+    "inserted": 0,
+    "updated": 3,
+    "skipped": 0
+   },
+   "status_rows": 1
+  },
+  {
+   "code": "007300",
+   "category": "ETF联接",
+   "status": "ok",
+   "notes": [],
+   "fund_id": 17,
+   "share_class_id": 18,
+   "group_merged": true,
+   "group_primary": "007300",
+   "needs_review": false,
+   "is_money": false,
+   "nav": {
+    "kind": "net_value",
+    "inserted": 0,
+    "updated": 1799,
+    "skipped": 0,
+    "skipped_lower_source": 0,
+    "rows": 1799,
+    "unit_only_dates": 0,
+    "acc_only_dates": 0
+   },
+   "dividends": {
+    "inserted": 0,
+    "updated": 0,
+    "skipped": 0
+   },
+   "status_rows": 1
+  },
+  {
+   "code": "007301",
+   "category": "ETF联接",
+   "status": "ok",
+   "notes": [],
+   "fund_id": 17,
+   "share_class_id": 19,
+   "group_merged": true,
+   "group_primary": "007300",
+   "needs_review": false,
+   "is_money": false,
+   "nav": {
+    "kind": "net_value",
+    "inserted": 0,
+    "updated": 1799,
+    "skipped": 0,
+    "skipped_lower_source": 0,
+    "rows": 1799,
+    "unit_only_dates": 0,
+    "acc_only_dates": 0
+   },
+   "dividends": {
+    "inserted": 0,
+    "updated": 0,
+    "skipped": 0
+   },
+   "status_rows": 1
+  },
+  {
+   "code": "110022",
+   "category": "主动权益",
+   "status": "ok",
+   "notes": [],
+   "fund_id": 18,
+   "share_class_id": 20,
+   "group_merged": false,
+   "group_primary": null,
+   "needs_review": false,
+   "is_money": false,
+   "nav": {
+    "kind": "net_value",
+    "inserted": 0,
+    "updated": 3927,
+    "skipped": 0,
+    "skipped_lower_source": 0,
+    "rows": 3927,
+    "unit_only_dates": 0,
+    "acc_only_dates": 0
+   },
+   "dividends": {
+    "inserted": 0,
+    "updated": 0,
+    "skipped": 0
+   },
+   "status_rows": 1
+  },
+  {
+   "code": "161005",
+   "category": "主动权益",
+   "status": "ok",
+   "notes": [],
+   "fund_id": 19,
+   "share_class_id": 21,
+   "group_merged": false,
+   "group_primary": null,
+   "needs_review": false,
+   "is_money": false,
+   "nav": {
+    "kind": "net_value",
+    "inserted": 0,
+    "updated": 5124,
+    "skipped": 0,
+    "skipped_lower_source": 0,
+    "rows": 5124,
+    "unit_only_dates": 0,
+    "acc_only_dates": 0
+   },
+   "dividends": {
+    "inserted": 0,
+    "updated": 16,
+    "skipped": 0
+   },
+   "status_rows": 1
+  },
+  {
+   "code": "000478",
+   "category": "指数增强",
+   "status": "ok",
+   "notes": [],
+   "fund_id": 20,
+   "share_class_id": 22,
+   "group_merged": false,
+   "group_primary": null,
+   "needs_review": false,
+   "is_money": false,
+   "nav": {
+    "kind": "net_value",
+    "inserted": 0,
+    "updated": 3096,
+    "skipped": 0,
+    "skipped_lower_source": 0,
+    "rows": 3096,
+    "unit_only_dates": 0,
+    "acc_only_dates": 0
+   },
+   "dividends": {
+    "inserted": 0,
+    "updated": 0,
+    "skipped": 0
+   },
+   "status_rows": 1
+  },
+  {
+   "code": "000015",
+   "category": "债券",
+   "status": "ok",
+   "notes": [],
+   "fund_id": 21,
+   "share_class_id": 23,
+   "group_merged": true,
+   "group_primary": "000015",
+   "needs_review": false,
+   "is_money": false,
+   "nav": {
+    "kind": "net_value",
+    "inserted": 0,
+    "updated": 3310,
+    "skipped": 0,
+    "skipped_lower_source": 0,
+    "rows": 3310,
+    "unit_only_dates": 0,
+    "acc_only_dates": 0
+   },
+   "dividends": {
+    "inserted": 0,
+    "updated": 9,
+    "skipped": 0
+   },
+   "status_rows": 1
+  },
+  {
+   "code": "000016",
+   "category": "债券",
+   "status": "ok",
+   "notes": [],
+   "fund_id": 21,
+   "share_class_id": 24,
+   "group_merged": true,
+   "group_primary": "000015",
+   "needs_review": false,
+   "is_money": false,
+   "nav": {
+    "kind": "net_value",
+    "inserted": 0,
+    "updated": 3310,
+    "skipped": 0,
+    "skipped_lower_source": 0,
+    "rows": 3310,
+    "unit_only_dates": 0,
+    "acc_only_dates": 0
+   },
+   "dividends": {
+    "inserted": 0,
+    "updated": 9,
+    "skipped": 0
+   },
+   "status_rows": 1
+  },
+  {
+   "code": "000198",
+   "category": "货币",
+   "status": "ok",
+   "notes": [
+    "基本信息接口失败，字段保持 NULL"
+   ],
+   "fund_id": 22,
+   "share_class_id": 25,
+   "group_merged": false,
+   "group_primary": null,
+   "needs_review": false,
+   "is_money": true,
+   "nav": {
+    "kind": "money_yield",
+    "inserted": 0,
+    "updated": 4919,
+    "skipped": 0,
+    "skipped_lower_source": 0,
+    "rows": 4919
+   },
+   "status_rows": 1
+  }
+ ],
+ "db_counts": {
+  "fund_master": 9,
+  "fund_share_classes": 12,
+  "fund_nav_daily": 39822,
+  "fund_nav_daily_net_value": 34903,
+  "fund_nav_daily_money_yield": 4919,
+  "fund_dividends": 44,
+  "fund_subscription_status": 12,
+  "fund_fee_rules": 0,
+  "fund_data_quality": 31,
+  "fund_manager_history": 8,
+  "fund_aum_history": 8,
+  "fund_lifecycle_events": 8
+ },
+ "quality_summary": {
+  "missing": 26,
+  "ok": 5
+ },
+ "share_grouping": [
+  {
+   "category": "宽基指数",
+   "codes": [
+    "000051"
+   ],
+   "distinct_fund_ids": 1,
+   "fund_id_to_codes": {
+    "14": [
+     "000051"
+    ]
+   },
+   "correctly_grouped": true
+  },
+  {
+   "category": "宽基指数",
+   "codes": [
+    "110020"
+   ],
+   "distinct_fund_ids": 1,
+   "fund_id_to_codes": {
+    "15": [
+     "110020"
+    ]
+   },
+   "correctly_grouped": true
+  },
+  {
+   "category": "行业指数",
+   "codes": [
+    "161725",
+    "012414"
+   ],
+   "distinct_fund_ids": 1,
+   "fund_id_to_codes": {
+    "16": [
+     "161725",
+     "012414"
+    ]
+   },
+   "correctly_grouped": true
+  },
+  {
+   "category": "ETF联接",
+   "codes": [
+    "007300",
+    "007301"
+   ],
+   "distinct_fund_ids": 1,
+   "fund_id_to_codes": {
+    "17": [
+     "007300",
+     "007301"
+    ]
+   },
+   "correctly_grouped": true
+  },
+  {
+   "category": "主动权益",
+   "codes": [
+    "110022"
+   ],
+   "distinct_fund_ids": 1,
+   "fund_id_to_codes": {
+    "18": [
+     "110022"
+    ]
+   },
+   "correctly_grouped": true
+  },
+  {
+   "category": "主动权益",
+   "codes": [
+    "161005"
+   ],
+   "distinct_fund_ids": 1,
+   "fund_id_to_codes": {
+    "19": [
+     "161005"
+    ]
+   },
+   "correctly_grouped": true
+  },
+  {
+   "category": "指数增强",
+   "codes": [
+    "000478"
+   ],
+   "distinct_fund_ids": 1,
+   "fund_id_to_codes": {
+    "20": [
+     "000478"
+    ]
+   },
+   "correctly_grouped": true
+  },
+  {
+   "category": "债券",
+   "codes": [
+    "000015",
+    "000016"
+   ],
+   "distinct_fund_ids": 1,
+   "fund_id_to_codes": {
+    "21": [
+     "000015",
+     "000016"
+    ]
+   },
+   "correctly_grouped": true
+  },
+  {
+   "category": "货币",
+   "codes": [
+    "000198"
+   ],
+   "distinct_fund_ids": 1,
+   "fund_id_to_codes": {
+    "22": [
+     "000198"
+    ]
+   },
+   "correctly_grouped": true
+  }
+ ]
+}

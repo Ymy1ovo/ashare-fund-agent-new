@@ -290,27 +290,26 @@ def test_reuse_lists_fund_specific_builds(payload):
 
 # ---------------------------------------------------------------- 不碰正式模块
 def test_no_formal_module_touched():
-    """本阶段不得修改回测/验证/量化模块，也不得新增场外基金引擎。
+    """3B-3 的边界：不得修改回测/验证/量化模块，也不得开发场外基金回测引擎。
 
-    app/data/processors/fund_profile.py 是既有文件（仓库初始提交就有），
-    属存量解析工具，不是本阶段新增，不在此约束内。
+    注意：3B-4.0 已正式落地 app/fund/ 数据层，因此不能再断言该目录不存在。
+    这里改为检查「3B-3 的禁止项」——不允许出现场外基金**回测/执行引擎**。
     """
     for rel in ("app/backtest", "app/validation", "app/quant"):
         assert (ROOT / rel).is_dir(), rel
-    # 只检查「本阶段是否新增了场外基金引擎/回测适配层」
     for pat in ("*fund*engine*", "*fund*backtest*", "*fund*execution*"):
         assert not list((ROOT / "app").rglob(pat)), pat
-    assert not (ROOT / "app" / "fund").exists()
 
 
-def test_no_fund_tables_in_db():
-    """本阶段只输出设计，数据库里不得出现 fund_* 表。"""
-    from app.database.db import get_connection
-    with get_connection() as conn:
-        rows = conn.execute(
-            "SELECT name FROM sqlite_master WHERE type='table' AND name LIKE 'fund%'"
-        ).fetchall()
-    assert rows == [], [r[0] for r in rows]
+def test_3b3_was_design_only():
+    """3B-3 本身只输出设计：断言存在于当时。
+
+    3B-4.0 已正式建表，因此这里不再断言「库里没有 fund_* 表」，
+    改为断言 3B-3 的 JSON 自己记录了「未迁移」这一事实。
+    """
+    payload = json.loads(JSON_PATH.read_text(encoding="utf-8"))
+    assert payload["schema"]["not_migrated"] is True
+    assert "未执行" in payload["schema"]["migration_note"]
 
 
 # ---------------------------------------------------------------- 文档一致性
