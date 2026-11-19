@@ -2436,7 +2436,8 @@ if (basis != ACCOUNTING_FORMAL
 | 3B-1 | 正式会计口径下的策略有效性基线研究 | 702 | `phase3B1_strategy_effectiveness_baseline.md` |
 | 3B-1.1 | 研究统计去重与结论校准 | 723 | `phase3B1_strategy_effectiveness_baseline.md`（v2） |
 | 3B-2 | 新策略候选研究与第一轮验证 | 747 | `phase3B2_strategy_candidates.md` |
-| 3B-3 | 支付宝场外基金数据体系可行性审计 | **784** | `phase3B3_fund_data_feasibility.md` |
+| 3B-3 | 支付宝场外基金数据体系可行性审计 | 784 | `phase3B3_fund_data_feasibility.md` |
+| 3B-3.1 | 场外基金历史净值连续性审计补强 | **808** | `phase3B3_fund_data_feasibility.md`（v2 §6.0） |
 
 当前正式会计版本：`ca-v2-receivable`；正式会计基础：`formal_receivable`；正式估值标记：`formal_valuation=True`。
 
@@ -3697,4 +3698,115 @@ bear 仅 26 天样本，置信度极低。
 | 报告 | `reports/phase3B3_fund_data_feasibility.md` |
 | 机器可读结果 | `reports/phase3B3_fund_data_feasibility.json` |
 | 专项测试 | `tests/test_research_3b3_fund_data.py`（37 项） |
+
+## 54. 阶段3B-3.1 场外基金历史净值连续性审计补强
+
+### 54.1 修正的问题
+
+3B-3 报告写了「12 只样本历史净值全部连续、无空洞」，但当时**并没有做日期连续性验证**。
+本轮补做，结论已改变：
+
+| 结论 | 数量 |
+| --- | ---: |
+| `verified_against_trading_calendar`（已验证连续） | **4** |
+| `gaps_found`（发现真实缺口） | **8** |
+| `cannot_verify`（无可靠日历无法判定） | **0** |
+
+**12 只合计缺失 135 个交易日**，但全部集中在成立初期，没有一个是日频运作期的随机断档。
+
+### 54.2 七项检查与三档结论
+
+| # | 检查项 | 是否依赖日历 |
+| ---: | --- | --- |
+| 1 | 净值日期重复 | ❌ 不依赖 |
+| 2 | 净值日期排序 | ❌ 不依赖 |
+| 3 | 净值日期空值 | ❌ 不依赖 |
+| 4 | 与公布日历对照找缺失 | ✅ 依赖（只能代理验证） |
+| 5 | 区分周末/节假日/暂停估值与真实缺口 | ⚠️ 部分 |
+| 6 | 最长连续缺失区间 | ❌ 不依赖 |
+| 7 | 首末日期与有效行数 | ❌ 不依赖 |
+
+**关键**：重复/乱序/空值这三项**不需要日历**就能判定，
+所以即使拿不到日历，只要这三项有问题，结论必须是 `gaps_found` 而不是降级。
+
+### 54.3 日历的限制（必须诚实说明）
+
+项目数据库的 `trade_calendar`（8,797 天，1990-12-19 ~ 2026-12-31）是
+**A 股交易日历，不是基金净值公布日历**。
+
+差异来源：新基金成立初期按周公布、季末年末额外估值日、暂停估值等。
+因此所有结论标注 `verification_level = proxy`，**不构成绝对证明**。
+
+### 54.4 缺口归因（关键发现）
+
+| 类型 | 数量 | 性质 | 是否算缺口 |
+| --- | ---: | --- | --- |
+| 成立初期周公布期缺失 | 126 | 新基金按周公布 | 已由公布频率解释 |
+| 成立初期缺口 | 4 | 成立后最初几个交易日未披露 | **算缺口** |
+| 过渡期缺口 | 5 | 周公布转日频接缝 | **算缺口** |
+| 日频期内未解释 | 0 | — | — |
+
+**「周公布」怎么判定**：不靠猜，看**公布密度**。
+日频期密度应接近 1.0，实测周公布段只有 **0.18 ~ 0.29**。
+
+举例：`000478` 建信中证500增强，2014-01-27 成立后到 2014-03-21 按周公布，
+之后才转日频。这段缺的 25 天不是数据丢失，是**当时就没有每天公布**。
+
+### 54.5 本轮修正的两个自身 bug（都会把缺口洗白）
+
+| bug | 后果 | 修正 |
+| --- | --- | --- |
+| 用「平均间隔 > 3 交易日」判周公布期 | `161725` 间隔 `[2,4]` 平均 3.0，漏判 → 4 个缺口算成未解释 | 改**公布密度 ≤ 0.5** |
+| 全序列扫描找「最后大间隔」定日频起点 | 会把日频期连续缺失误判成周公布，**把真实缺口洗成已解释** | **限制在成立初期 120 天窗口内** |
+
+第二条尤其危险：它不会报错，只会让结论变好看。必须用测试防住。
+
+### 54.6 不能声称的事
+
+| 不能声称 | 原因 |
+| --- | --- |
+| 「12 只净值全部连续、无空洞」 | **错误**。4 只完全连续，8 只有缺口 |
+| 「缺口已消除」 | 缺口仍在，只是归因清楚了 |
+| 「净值公布日历与交易日历一致」 | 无证据；季末估值日已实测存在 |
+| 「已验证 = 绝对无缺失」 | 只是「交易日历代理下未发现额外缺失」 |
+
+### 54.7 新增测试
+
+61 项专项测试（原 37 + 新增 24），全部用**人工构造的小型数据**验证，
+不依赖真实样本恰好没有异常：
+
+| 覆盖点 | 测试 |
+| --- | --- |
+| 重复净值日期 | `test_continuity_detects_duplicate_dates` |
+| 缺失净值日期 | `test_continuity_detects_missing_trading_day` |
+| 周末不误报 | `test_weekend_net_value_not_reported_as_gap` |
+| 节假日不误报 | `test_holiday_not_reported_as_gap` |
+| 连续多日缺失 | `test_continuity_detects_consecutive_missing` |
+| 净值日期乱序 | `test_continuity_detects_unsorted_dates` |
+| 空值日期 | `test_continuity_detects_null_dates` |
+| 无日历降级 | `test_continuity_degrades_without_calendar` |
+| 无日历仍查结构 | `test_continuity_still_detects_structure_without_calendar` |
+| 过渡期缺口仍算缺口 | `test_transition_gap_still_counts_as_gap` |
+| 货币按自然日 | `test_calendar_day_mode_for_money_fund` |
+| 跨周末合并 | `test_missing_runs_merges_across_weekend` |
+
+### 54.8 工程边界
+
+未修改 `app/backtest/` `app/validation/` `app/quant/`；未改会计/公司行为/撮合；
+未改数据库表结构；未写正式回测验证记录；未新增基金引擎；未做策略开发。
+
+全部表行数 **变化为 0**，`fund*` 表 **0 个**，`integrity_check` ok，
+行情指纹 `d54727c0…` 未变（116,609 行）。
+
+全量测试 **808 passed / 0 failed / 0 skipped**
+= 3B-3 的 784 + 本轮新增 24 项连续性测试 = 808。
+
+### 54.9 产物
+
+| 项 | 路径 |
+| --- | --- |
+| 审计脚本（含连续性检查） | `scripts/research_3b3_fund_data.py` |
+| 报告（v2，新增 §6.0） | `reports/phase3B3_fund_data_feasibility.md` |
+| 机器可读结果 | `reports/phase3B3_fund_data_feasibility.json` |
+| 专项测试 | `tests/test_research_3b3_fund_data.py`（61 项） |
 

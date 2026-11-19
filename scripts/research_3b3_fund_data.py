@@ -119,6 +119,367 @@ def _fetch_dividends_stable(code: str, attempts: int = 4) -> tuple:
     return out, None, stable
 
 
+# ---------------------------------------------------------------- 净值连续性
+# 判定口径说明：
+# 数据库里的 trade_calendar 是「A 股交易日历」，**不是「基金净值公布日历」**。
+# 场外基金净值公布日通常与交易日一致，但存在已知差异：
+#   - 新基金成立初期常按周公布，之后才转为每日；
+#   - 部分基金在季末/年末有额外估值日（非交易日却有净值）；
+#   - 暂停估值、巨额赎回等特殊情形。
+# 因此本模块给出的是**代理验证**，不是绝对证明，
+# 结论字段必须带 verification_level 以区分。
+
+INITIAL_WINDOW_DAYS = 120      # 成立初期「周公布」观察窗口
+WEEKLY_GAP_TRADING_DAYS = 3    # 实际净值日平均间隔 > 3 个交易日 → 视为低频公布期
+TRANSITION_WINDOW_TRADING_DAYS = 10  # 日频起点后多少交易日内视为「过渡期」
+STARTUP_WINDOW_TRADING_DAYS = 5      # 首日后多少交易日内视为「成立初期缺口」
+LOW_FREQ_DENSITY_THRESHOLD = 0.5     # 公布密度 <= 50% 视为低频公布期（日频应接近 100%）
+
+
+def _to_dates(values) -> list:
+    """把任意日期序列规整为排序后的 ISO 字符串列表，同时保留原始顺序信息。"""
+    out = []
+    for v in values:
+        if v is None:
+            continue
+        try:
+            if pd.isna(v):
+                continue
+        except (TypeError, ValueError):
+            pass
+        if hasattr(v, "strftime"):
+            out.append(v.strftime("%Y-%m-%d"))
+        else:
+            out.append(str(v)[:10])
+    return out
+
+
+def _missing_runs(missing: list) -> list:
+    """把缺失日期合并成连续区间。
+
+    跨周末不算断开：两个缺失日之间自然日差 <= 3 天视为同一段。
+    """
+    if not missing:
+        return []
+    import datetime as _dt
+    runs = []
+    start = prev = missing[0]
+    for d in missing[1:]:
+        a = _dt.date.fromisoformat(prev)
+        b = _dt.date.fromisoformat(d)
+        if (b - a).days > 3:
+            runs.append({"start": start, "end": prev})
+            start = d
+        prev = d
+    runs.append({"start": start, "end": prev})
+    return runs
+
+
+def _run_length_trading_days(run: dict, calendar_set: set) -> int:
+    """区间内有多少个交易日（用于判断缺口大小）。"""
+    import datetime as _dt
+    a = _dt.date.fromisoformat(run["start"])
+    b = _dt.date.fromisoformat(run["end"])
+    n = 0
+    cur = a
+    while cur <= b:
+        if cur.isoformat() in calendar_set:
+            n += 1
+        cur += _dt.timedelta(days=1)
+    return n
+
+
+def check_nav_continuity(dates, calendar=None, *,
+                         initial_window_days: int = INITIAL_WINDOW_DAYS,
+                         calendar_mode: str = "trading_day") -> dict:
+    """净值日期连续性检查（纯函数，便于人工构造数据测试）。
+
+    参数
+    ----
+    dates : 净值日期序列（可含 None / NaT / 乱序 / 重复）
+    calendar : 交易日列表；为 None 或空表示拿不到可靠日历 → 降级为 cannot_verify
+
+    返回
+    ----
+    dict，包含七项必须检查 + 三档结论。
+    """
+    raw = _to_dates(dates)
+    null_count = len(list(dates)) - len(raw) if dates is not None else 0
+
+    result = {
+        "total_rows": len(raw),
+        "null_date_count": max(null_count, 0),
+        "duplicate_dates": [],
+        "is_sorted": True,
+        "first_date": raw[0] if raw else None,
+        "last_date": raw[-1] if raw else None,
+        "calendar_available": bool(calendar),
+        "calendar_source": None,
+        "verification_level": "cannot_verify",
+        "expected_days": None,
+        "missing_days": None,
+        "missing_runs": None,
+        "longest_gap": None,
+        "unexplained_missing": None,
+        "explained_by_initial_weekly": None,
+        "off_calendar_dates": [],
+        "verdict": "cannot_verify",
+        "verdict_reason": None,
+    }
+
+    if not raw:
+        result["verdict_reason"] = "无有效净值日期"
+        return result
+
+    # --- 1) 重复
+    seen, dups = set(), []
+    for d in raw:
+        if d in seen and d not in dups:
+            dups.append(d)
+        seen.add(d)
+    result["duplicate_dates"] = sorted(dups)
+
+    # --- 2) 排序（用原始顺序判断，不能用排序后的）
+    result["is_sorted"] = raw == sorted(raw)
+
+    # 去重排序后再做缺口分析，避免重复把判断搅乱
+    uniq = sorted(set(raw))
+
+    # --- 3) 空值已在 _to_dates 阶段剔除并计数
+
+    # --- 4/5/6) 与日历对照
+    # 关键：重复/乱序/空值这三项**不依赖日历**就能判定。
+    # 即使拿不到日历，只要这三项有问题，结论必须是 gaps_found 而不是降级。
+    structural = []
+    if result["duplicate_dates"]:
+        structural.append(f"{len(result['duplicate_dates'])} 个重复日期")
+    if not result["is_sorted"]:
+        structural.append("日期乱序")
+    if result["null_date_count"]:
+        structural.append(f"{result['null_date_count']} 个空值日期")
+
+    # 货币基金按自然日核对，日历由序列自身首末日期推导，不需要外部日历
+    if calendar_mode == "calendar_day":
+        calendar = ["__derived__"]
+
+    if not calendar:
+        if structural:
+            result["verdict"] = "gaps_found"
+            result["verdict_reason"] = (
+                "；".join(structural) + "（无需日历即可判定）")
+        else:
+            result["verdict"] = "cannot_verify"
+            result["verdict_reason"] = (
+                "无重复、无乱序、无空值；但无法取得可靠的基金净值公布日历，"
+                "不能判定日期是否缺失")
+        return result
+
+    cal = sorted(set(_to_dates(calendar)))
+
+    # 货币基金每自然日公布万份收益（含周末），核对基准必须是自然日而非交易日。
+    if calendar_mode == "calendar_day":
+        import datetime as _dt2
+        _first = min(_to_dates(dates))
+        _last = max(_to_dates(dates))
+        _a = _dt2.date.fromisoformat(_first)
+        _b = _dt2.date.fromisoformat(_last)
+        cal = []
+        cur = _a
+        while cur <= _b:
+            cal.append(cur.isoformat())
+            cur += _dt2.timedelta(days=1)
+        result["calendar_source"] = "自然日（货币基金按日公布万份收益）"
+        result["day_unit"] = "自然日"
+    else:
+        result["calendar_source"] = "trade_calendar（A股交易日历）"
+
+    cal_set = set(cal)
+    result["verification_level"] = "proxy"
+
+    first, last = uniq[0], uniq[-1]
+    expected = [d for d in cal if first <= d <= last]
+    got = set(uniq)
+    missing = [d for d in expected if d not in got]
+    off_cal = [d for d in uniq if d not in cal_set]
+
+    result["expected_days"] = len(expected)
+    result["missing_days"] = len(missing)
+    result["off_calendar_dates"] = off_cal[:50]
+    result["off_calendar_note"] = (
+        "非交易日却有净值：公募基金的季末/年末估值日等属正常安排，"
+        "**不作为缺口或错误判定**，仅记录以供核对")
+    result["off_calendar_is_problem"] = False
+
+    # 成立初期窗口：新基金常按周公布，缺日属正常运作模式而非数据缺陷
+    import datetime as _dt
+    window_end = (_dt.date.fromisoformat(first)
+                  + _dt.timedelta(days=initial_window_days)).isoformat()
+    early = [d for d in missing if d <= window_end]
+    later = [d for d in missing if d > window_end]
+
+    # 识别「成立初期低频公布期」：从首日往后找第一个转入日频的转折点。
+    # 做法：逐点检查「从该点起，后续连续 10 个间隔里至少 8 个是 1 个交易日」，
+    # 第一个满足的位置即为日频起点。这比整窗口平均更准——
+    # 因为新基金常是「前 1~2 个月按周，之后转日频」，平均会被两段稀释。
+    # 做法：找「最后一次间隔 > 3 个交易日」的位置，其下一个净值日即日频起点。
+    # 早期用「第一个满足连续 10 个间隔多为 1」的写法，会在周公布段中间提前命中
+    # （因为它只往后看 10 个点，跨过了转日频的边界），实测把 000015 的日频起点
+    # 判成 2013-04-19，而真实起点是 2013-05-06，导致 5 个缺口被误报。
+    # 关键约束：只允许在「成立初期窗口」内寻找日频起点。
+    # 早期实现扫描全序列找最后一个大间隔，会把「日频期中某段连续缺失」
+    # 误判成周公布期，进而把真实缺口洗成「已解释」。实测已复现该错误。
+    daily_start_idx = None
+    idx_seq = [cal.index(d) for d in uniq if d in cal_set]
+    window_end_idx = cal.index(window_end) if window_end in cal_set else len(cal) - 1
+    last_big_gap = -1
+    for i in range(len(idx_seq) - 1):
+        if idx_seq[i] > window_end_idx:
+            break
+        if idx_seq[i + 1] - idx_seq[i] > 3:
+            last_big_gap = i
+    if last_big_gap >= 0 and last_big_gap + 1 < len(idx_seq):
+        # 还要求日频起点本身也落在成立初期窗口内
+        if idx_seq[last_big_gap + 1] <= window_end_idx:
+            daily_start_idx = last_big_gap + 1
+    daily_start_date = None
+    low_freq_rows = 0
+    if daily_start_idx is not None and daily_start_idx > 0:
+        daily_start_date = uniq[daily_start_idx]
+        low_freq_rows = daily_start_idx
+        early_cut = daily_start_date
+    else:
+        early_cut = window_end
+
+    early = [d for d in missing if d <= early_cut]
+    later = [d for d in missing if d > early_cut]
+
+    # 过渡期缺口：日频起点之后紧邻的少数缺口，通常是「周公布转日频」的接缝
+    # （最后一个周公布日之后那一天没披露）。这类缺口**仍然如实算作缺口**，
+    # 只是单独归类说明性质，绝不并入「已验证连续」。
+    transition = []
+    if daily_start_idx is not None and later:
+        base_idx = idx_seq[daily_start_idx]
+        for d in later:
+            if d in cal_set and cal.index(d) - base_idx <= TRANSITION_WINDOW_TRADING_DAYS:
+                transition.append(d)
+    later2 = [d for d in later if d not in set(transition)]
+
+    # 成立初期缺口：位于首日之后 STARTUP_WINDOW_TRADING_DAYS 个交易日内。
+    # 这类缺口常见于「成立次日未披露」，如实记录但单独归类。
+    startup = []
+    # is_weekly_phase 在下方计算；这里先占位，稍后回填
+    startup_set = set()
+    # 用「公布密度」而不是「平均间隔」判定低频期。
+    # 平均间隔对只有 2~3 个样本的短窗口不稳定：
+    # 161725 的周公布段实际间隔是 [2, 4]，平均 3.0，用 > 3 判据会漏判。
+    # 密度 = 该段实际净值日数 / 该段覆盖的交易日数，
+    # 日频时期应接近 100%，实测周公布段只有 23%~43%，区分度极高。
+    avg_gap = None
+    density = None
+    if low_freq_rows >= 1:
+        span = idx_seq[daily_start_idx] - idx_seq[0] + 1
+        avg_gap = round((span - 1) / low_freq_rows, 2)
+        density = round(low_freq_rows / span, 3)
+    # 只要检测到「日频起点晚于首日」且该段确实有缺失，就认定存在低频公布期。
+    # 早期用「低频行数 >= 3」判定，像 000051 这种只按周公布 2 次的会漏判，
+    # 导致整段可解释的缺失被算成真实缺口。
+    # 必须同时满足三条才认定为「低频公布期」：
+    #   1) 找到了日频起点（晚于首日）
+    #   2) 该段平均间隔确实 > 3 个交易日（真的低频，不是日频期里的普通缺口）
+    #   3) 该段确有缺失
+    # 只看「有没有大间隔」会把「日频期里连续缺几天」误判成周公布，
+    # 从而把真实缺口洗成已解释——这是必须防住的错误。
+    is_weekly_phase = bool(
+        daily_start_date is not None and len(early) > 0
+        and low_freq_rows >= 2
+        and density is not None and density <= LOW_FREQ_DENSITY_THRESHOLD)
+
+    # 成立初期缺口：只在「未检测到周公布期」时单独归类。
+    # 若已检测到周公布期，成立初期的缺日已由公布频率解释，
+    # 再标 startup 会把同一批缺口重复归类。
+    startup = []
+    if not is_weekly_phase:
+        base0 = cal.index(uniq[0]) if uniq[0] in cal_set else 0
+        for d in list(missing):
+            if d in cal_set and cal.index(d) - base0 <= STARTUP_WINDOW_TRADING_DAYS:
+                startup.append(d)
+        startup_set = set(startup)
+        early = [d for d in early if d not in startup_set]
+        later2 = [d for d in later2 if d not in startup_set]
+        transition = [d for d in transition if d not in startup_set]
+
+    result["explained_by_initial_weekly"] = len(early) if is_weekly_phase else 0
+    result["transition_gap_days"] = len(transition)
+    result["transition_gap_dates"] = transition[:20]
+    result["transition_gap_note"] = (
+        "位于周公布转日频接缝处的缺口，性质上属过渡期未披露，"
+        "但仍计为缺口，不并入「已验证连续」" if transition else None)
+    result["startup_gap_days"] = len(startup)
+    result["startup_gap_dates"] = startup[:20]
+    result["startup_gap_note"] = (
+        "成立后最初若干个交易日未披露净值，如实计入缺口，不算「已验证连续」"
+        if startup else None)
+    result["unexplained_missing"] = len(later2) + (
+        0 if is_weekly_phase else len(early))
+    result["initial_weekly_phase"] = {
+        "window_days": initial_window_days,
+        "detected": is_weekly_phase,
+        "low_freq_row_count": low_freq_rows,
+        "daily_phase_start": daily_start_date,
+        "avg_trading_day_gap": avg_gap,
+        "publish_density": density,
+        "low_freq_density_threshold": LOW_FREQ_DENSITY_THRESHOLD,
+        "rows_in_window": len([d for d in uniq if d <= window_end]),
+        "note": (f"成立后至 {daily_start_date} 为低频公布期（共 {low_freq_rows} 个净值日），"
+                 f"之后转为日频；该段缺日属正常运作模式"
+                 if is_weekly_phase else "未检测到低频公布期，成立初期即为日频"),
+    }
+
+    runs = _missing_runs(missing)
+    for r in runs:
+        r["trading_days"] = _run_length_trading_days(r, cal_set)
+    result["missing_runs"] = runs[:50]
+    if runs:
+        longest = max(runs, key=lambda x: x["trading_days"])
+        result["longest_gap"] = dict(longest)
+
+    # --- 7) 三档结论
+    # 注意：off_calendar_dates（非交易日却有净值）**不算缺口**。
+    # 季末/年末估值日、特殊估值安排在公募基金里真实存在，属正常情况。
+    # 只有重复、乱序、空值、以及「窗口外交易日缺净值」才算问题。
+    unexplained = result["unexplained_missing"] or 0
+
+    if structural:
+        result["verdict"] = "gaps_found"
+        result["verdict_reason"] = "；".join(structural)
+    elif transition or startup or unexplained > 0:
+        result["verdict"] = "gaps_found"
+        parts = []
+        if startup:
+            parts.append(f"{len(startup)} 个成立初期缺口")
+        if transition:
+            parts.append(f"{len(transition)} 个过渡期单日缺口（周公布转日频接缝）")
+        if unexplained > 0:
+            unit = result.get("day_unit") or "交易日"
+            parts.append(f"{unexplained} 个日频期内{unit}无净值")
+        result["verdict_reason"] = "；".join(parts) + "，如实记为缺口"
+    else:
+        result["verdict"] = "verified_against_trading_calendar"
+        if not missing:
+            result["verdict_reason"] = (
+                "无重复、无乱序、无空值；该基金首末日期范围内无任何缺失交易日，完全连续")
+        else:
+            result["verdict_reason"] = (
+                f"无重复、无乱序、无空值；{len(missing)} 个缺失日全部落在成立初期"
+                f"周公布窗口内（密度 {density}），已由公布频率解释")
+
+    # 无论如何都要声明：这是代理验证，不是绝对证明
+    result["caveat"] = (
+        "trade_calendar 是 A 股交易日历，不是基金净值公布日历。"
+        "本结论为代理验证：能排除明显缺口，但不能证明某日在任何情况下都应有净值。")
+    return result
+
+
 def _parse_cash_per_10(text) -> float | None:
     """从「每10份派现金0.1000元」解析出每份现金分红。
 
@@ -372,7 +733,24 @@ def _basic_info_fallback(code: str, category: str, exc) -> dict:
     }
 
 
-def verify_fund(code: str, category: str, expected_name: str) -> dict:
+def load_trade_calendar() -> list:
+    """从项目数据库读取 A 股交易日历。读不到就返回空列表（触发降级）。
+
+    注意：这是「交易日历」，不是「基金净值公布日历」；
+    用作代理验证，结论必须带 caveat。
+    """
+    try:
+        from app.database.db import get_connection
+        with get_connection() as conn:
+            rows = conn.execute(
+                "SELECT trade_date FROM trade_calendar ORDER BY trade_date").fetchall()
+        return [str(r[0]) for r in rows]
+    except Exception:  # noqa: BLE001 读不到就降级，不阻断
+        return []
+
+
+def verify_fund(code: str, category: str, expected_name: str,
+                calendar: list | None = None) -> dict:
     """对单只基金做真实数据验证。"""
     out = {
         "code": code,
@@ -454,6 +832,8 @@ def verify_fund(code: str, category: str, expected_name: str) -> dict:
                 "note": "货币基金无单位净值，用每万份收益与 7 日年化",
                 "latest_7d_annual": _num(m.iloc[-1]["7日年化收益率"], 4),
             }
+            out["continuity"] = check_nav_continuity(
+                list(m["净值日期"]), calendar, calendar_mode="calendar_day")
         except Exception as exc:  # noqa: BLE001
             out["anomalies"].append(f"货币收益序列失败: {type(exc).__name__}")
         _pause()
@@ -494,6 +874,10 @@ def verify_fund(code: str, category: str, expected_name: str) -> dict:
             # big.index 已经是日期，直接用它；早期写成 values.index[big.index]
             # 会把日期当整数位置索引，得到 '277' 这种假日期。
             out["nav_jump_dates"] = [str(d) for d in big.index] if len(big) else []
+
+            # 净值日期连续性：七项检查 + 三档结论
+            out["continuity"] = check_nav_continuity(
+                list(nav.index), calendar)
             # 同时记录跳变发生日与前一日的净值，便于人工复核是分红还是拆分
             out["nav_jump_detail"] = [
                 {
@@ -976,11 +1360,16 @@ def main(out_dir: Path) -> dict:
     print("审计 A/C 份额...", flush=True)
     share = audit_share_classes()
 
+    print("加载交易日历（净值连续性代理日历）...", flush=True)
+    calendar = load_trade_calendar()
+    print(f"  交易日历 {len(calendar)} 天"
+          f"{'（可用）' if calendar else '（不可用，连续性检查将降级）'}", flush=True)
+
     print(f"验证 {len(SAMPLE_FUNDS)} 只样本基金...", flush=True)
     funds = []
     for code, cat, name in SAMPLE_FUNDS:
         print(f"  {code} {cat}...", flush=True)
-        funds.append(verify_fund(code, cat, name))
+        funds.append(verify_fund(code, cat, name, calendar))
 
     codes = [f[0] for f in SAMPLE_FUNDS]
     print("审计费率与状态...", flush=True)
@@ -994,6 +1383,14 @@ def main(out_dir: Path) -> dict:
     reuse = design_reuse()
 
     ok_funds = [f for f in funds if f["status"].startswith("ok")]
+
+    # 连续性三档统计：必须分开计数，不能合并成一个「通过」
+    cont = [f.get("continuity") or {} for f in funds]
+    cont_verified = sum(
+        1 for c in cont if c.get("verdict") == "verified_against_trading_calendar")
+    cont_gaps = sum(1 for c in cont if c.get("verdict") == "gaps_found")
+    cont_cannot = sum(1 for c in cont if c.get("verdict") == "cannot_verify")
+
     summary = {
         "sample_target": len(SAMPLE_FUNDS),
         "sample_verified": len(ok_funds),
@@ -1004,6 +1401,14 @@ def main(out_dir: Path) -> dict:
                               if (f.get("dividends") or {}).get("count")),
         "with_splits": sum(1 for f in funds
                            if (f.get("splits") or {}).get("count")),
+        "continuity_calendar_available": bool(calendar),
+        "continuity_verified": cont_verified,
+        "continuity_gaps_found": cont_gaps,
+        "continuity_cannot_verify": cont_cannot,
+        "continuity_total_missing_days": sum(
+            (c.get("missing_days") or 0) for c in cont),
+        "continuity_total_unexplained": sum(
+            (c.get("unexplained_missing") or 0) for c in cont),
     }
 
     payload = {
@@ -1023,6 +1428,28 @@ def main(out_dir: Path) -> dict:
         "schema": schema,
         "reuse": reuse,
         "summary": summary,
+        "continuity_audit": {
+            "calendar_source": "trade_calendar（项目数据库 A 股交易日历）",
+            "calendar_days": len(calendar),
+            "calendar_is_fund_nav_calendar": False,
+            "verification_level": "proxy",
+            "initial_window_days": INITIAL_WINDOW_DAYS,
+            "weekly_gap_threshold_trading_days": WEEKLY_GAP_TRADING_DAYS,
+            "verdict_legend": {
+                "verified_against_trading_calendar":
+                    "已按交易日历代理验证连续，缺口全部由成立初期周公布解释",
+                "gaps_found": "发现真实数据缺口（重复/乱序/空值/窗口外缺失）",
+                "cannot_verify": "无可靠净值公布日历，无法判定是否缺失",
+            },
+            "caveat": (
+                "trade_calendar 是 A 股交易日历，不是基金净值公布日历。"
+                "该检查是代理验证：能排除明显缺口，但不能证明某日在任何情况下都应有净值；"
+                "也不能证明非交易日出现净值一定是错误（季末估值日等属正常）。"),
+            "not_a_proof_statement": (
+                "本阶段不再声称「12 只样本净值全部连续、无空洞」。"
+                "准确表述是：在 A 股交易日历代理下，已验证若干只，"
+                "并记录缺口与降级情况。"),
+        },
         "unresolved": [
             "survivorship_bias_unresolved：无已清盘基金名录",
             "清盘/合并基金的净值历史无法系统性获取",

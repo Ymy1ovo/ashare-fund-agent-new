@@ -1,7 +1,7 @@
 {
  "phase": "3B-3",
  "baseline_head": "e14a8fa6e5a3294ce00d2c2168756130fa4dee32",
- "generated_at": "2026-11-19T10:59:13",
+ "generated_at": "2026-11-19T11:47:28",
  "akshare_version": "1.20.36",
  "scope": "只做数据源审计、覆盖验证与架构设计；不开发策略、不改回测引擎、不写正式库",
  "sources": {
@@ -10,7 +10,7 @@
     "source": "akshare.fund_name_em 全量基金代码表",
     "public": true,
     "auth_required": false,
-    "probed_at": "2026-11-19T10:57:04",
+    "probed_at": "2026-11-19T11:45:09",
     "status": "ok",
     "rows": 28380,
     "columns": [
@@ -36,7 +36,7 @@
     "source": "akshare.fund_open_fund_daily_em 开放式基金当日净值全表",
     "public": true,
     "auth_required": false,
-    "probed_at": "2026-11-19T10:57:05",
+    "probed_at": "2026-11-19T11:45:10",
     "status": "ok",
     "rows": 24398,
     "columns": [
@@ -74,7 +74,7 @@
     "source": "akshare.fund_purchase_em 申购/赎回状态与限额",
     "public": true,
     "auth_required": false,
-    "probed_at": "2026-11-19T10:57:08",
+    "probed_at": "2026-11-19T11:45:12",
     "status": "ok",
     "rows": 28075,
     "columns": [
@@ -114,7 +114,7 @@
     "source": "akshare.fund_manager_em 基金经理任职",
     "public": true,
     "auth_required": false,
-    "probed_at": "2026-11-19T10:57:12",
+    "probed_at": "2026-11-19T11:45:14",
     "status": "ok",
     "rows": 36935,
     "columns": [
@@ -146,7 +146,7 @@
     "source": "akshare.fund_scale_open_sina 开放式基金规模",
     "public": true,
     "auth_required": false,
-    "probed_at": "2026-11-19T10:57:19",
+    "probed_at": "2026-11-19T11:45:23",
     "status": "ok",
     "rows": 7222,
     "columns": [
@@ -180,7 +180,7 @@
     "source": "akshare.fund_scale_close_sina 封闭式基金规模",
     "public": true,
     "auth_required": false,
-    "probed_at": "2026-11-19T10:57:21",
+    "probed_at": "2026-11-19T11:45:25",
     "status": "ok",
     "rows": 209,
     "columns": [
@@ -214,7 +214,7 @@
     "source": "akshare.fund_hold_structure_em 持有人结构",
     "public": true,
     "auth_required": false,
-    "probed_at": "2026-11-19T10:57:22",
+    "probed_at": "2026-11-19T11:45:26",
     "status": "ok",
     "rows": 45,
     "columns": [
@@ -244,7 +244,7 @@
     "source": "akshare.fund_open_fund_info_em(indicator=单位净值走势)",
     "public": true,
     "auth_required": false,
-    "probed_at": "2026-11-19T10:57:23",
+    "probed_at": "2026-11-19T11:45:28",
     "status": "ok",
     "rows": 4220,
     "columns": [
@@ -266,7 +266,7 @@
     "source": "akshare.fund_open_fund_info_em(indicator=累计净值走势)",
     "public": true,
     "auth_required": false,
-    "probed_at": "2026-11-19T10:57:23",
+    "probed_at": "2026-11-19T11:45:29",
     "status": "ok",
     "rows": 4220,
     "columns": [
@@ -286,7 +286,7 @@
     "source": "akshare.fund_open_fund_info_em(indicator=分红送配详情)",
     "public": true,
     "auth_required": false,
-    "probed_at": "2026-11-19T10:57:24",
+    "probed_at": "2026-11-19T11:45:29",
     "status": "ok",
     "rows": 3,
     "columns": [
@@ -312,7 +312,7 @@
     "source": "akshare.fund_open_fund_info_em(indicator=拆分详情)",
     "public": true,
     "auth_required": false,
-    "probed_at": "2026-11-19T10:57:24",
+    "probed_at": "2026-11-19T11:45:29",
     "status": "ok",
     "rows": 9,
     "columns": [
@@ -336,7 +336,7 @@
     "source": "akshare.fund_money_fund_info_em 货币基金收益序列",
     "public": true,
     "auth_required": false,
-    "probed_at": "2026-11-19T10:57:25",
+    "probed_at": "2026-11-19T11:45:30",
     "status": "ok",
     "rows": 4919,
     "columns": [
@@ -362,7 +362,7 @@
     "source": "akshare.fund_individual_basic_info_xq 基金基本信息",
     "public": true,
     "auth_required": false,
-    "probed_at": "2026-11-19T10:57:52",
+    "probed_at": "2026-11-19T11:45:51",
     "status": "ok",
     "rows": 14,
     "columns": [
@@ -382,7 +382,7 @@
     "source": "akshare.fund_portfolio_hold_em 基金持仓",
     "public": true,
     "auth_required": false,
-    "probed_at": "2026-11-19T10:57:52",
+    "probed_at": "2026-11-19T11:45:52",
     "status": "ok",
     "rows": 137,
     "columns": [
@@ -555,6 +555,82 @@
     "dates": []
    },
    "nav_jump_dates": [],
+   "continuity": {
+    "total_rows": 4220,
+    "null_date_count": 0,
+    "duplicate_dates": [],
+    "is_sorted": true,
+    "first_date": "2009-07-10",
+    "last_date": "2026-11-18",
+    "calendar_available": true,
+    "calendar_source": "trade_calendar（A股交易日历）",
+    "verification_level": "proxy",
+    "expected_days": 4216,
+    "missing_days": 9,
+    "missing_runs": [
+     {
+      "start": "2009-07-13",
+      "end": "2009-07-16",
+      "trading_days": 4
+     },
+     {
+      "start": "2009-07-20",
+      "end": "2009-07-23",
+      "trading_days": 4
+     },
+     {
+      "start": "2009-07-27",
+      "end": "2009-07-27",
+      "trading_days": 1
+     }
+    ],
+    "longest_gap": {
+     "start": "2009-07-13",
+     "end": "2009-07-16",
+     "trading_days": 4
+    },
+    "unexplained_missing": 0,
+    "explained_by_initial_weekly": 8,
+    "off_calendar_dates": [
+     "2011-12-31",
+     "2012-03-31",
+     "2012-06-30",
+     "2012-09-30",
+     "2013-06-30",
+     "2016-12-31",
+     "2017-12-31",
+     "2018-06-30",
+     "2018-12-31",
+     "2019-06-30",
+     "2022-12-31",
+     "2023-12-31",
+     "2024-06-30"
+    ],
+    "verdict": "gaps_found",
+    "verdict_reason": "1 个过渡期单日缺口（周公布转日频接缝），如实记为缺口",
+    "off_calendar_note": "非交易日却有净值：公募基金的季末/年末估值日等属正常安排，**不作为缺口或错误判定**，仅记录以供核对",
+    "off_calendar_is_problem": false,
+    "transition_gap_days": 1,
+    "transition_gap_dates": [
+     "2009-07-27"
+    ],
+    "transition_gap_note": "位于周公布转日频接缝处的缺口，性质上属过渡期未披露，但仍计为缺口，不并入「已验证连续」",
+    "startup_gap_days": 0,
+    "startup_gap_dates": [],
+    "startup_gap_note": null,
+    "initial_weekly_phase": {
+     "window_days": 120,
+     "detected": true,
+     "low_freq_row_count": 2,
+     "daily_phase_start": "2009-07-24",
+     "avg_trading_day_gap": 5.0,
+     "publish_density": 0.182,
+     "low_freq_density_threshold": 0.5,
+     "rows_in_window": 71,
+     "note": "成立后至 2009-07-24 为低频公布期（共 2 个净值日），之后转为日频；该段缺日属正常运作模式"
+    },
+    "caveat": "trade_calendar 是 A 股交易日历，不是基金净值公布日历。本结论为代理验证：能排除明显缺口，但不能证明某日在任何情况下都应有净值。"
+   },
    "nav_jump_detail": [],
    "unit_vs_acc": {
     "unit_last": 1.5402,
@@ -616,6 +692,87 @@
     "dates": []
    },
    "nav_jump_dates": [],
+   "continuity": {
+    "total_rows": 4186,
+    "null_date_count": 0,
+    "duplicate_dates": [],
+    "is_sorted": true,
+    "first_date": "2009-08-26",
+    "last_date": "2026-11-18",
+    "calendar_available": true,
+    "calendar_source": "trade_calendar（A股交易日历）",
+    "verification_level": "proxy",
+    "expected_days": 4183,
+    "missing_days": 10,
+    "missing_runs": [
+     {
+      "start": "2009-08-27",
+      "end": "2009-08-27",
+      "trading_days": 1
+     },
+     {
+      "start": "2009-08-31",
+      "end": "2009-09-03",
+      "trading_days": 4
+     },
+     {
+      "start": "2009-09-07",
+      "end": "2009-09-10",
+      "trading_days": 4
+     },
+     {
+      "start": "2009-09-14",
+      "end": "2009-09-14",
+      "trading_days": 1
+     }
+    ],
+    "longest_gap": {
+     "start": "2009-08-31",
+     "end": "2009-09-03",
+     "trading_days": 4
+    },
+    "unexplained_missing": 0,
+    "explained_by_initial_weekly": 9,
+    "off_calendar_dates": [
+     "2011-12-31",
+     "2012-03-31",
+     "2012-06-30",
+     "2012-09-30",
+     "2013-06-30",
+     "2016-12-31",
+     "2017-12-31",
+     "2018-06-30",
+     "2018-12-31",
+     "2019-06-30",
+     "2022-12-31",
+     "2023-12-31",
+     "2024-06-30"
+    ],
+    "verdict": "gaps_found",
+    "verdict_reason": "1 个过渡期单日缺口（周公布转日频接缝），如实记为缺口",
+    "off_calendar_note": "非交易日却有净值：公募基金的季末/年末估值日等属正常安排，**不作为缺口或错误判定**，仅记录以供核对",
+    "off_calendar_is_problem": false,
+    "transition_gap_days": 1,
+    "transition_gap_dates": [
+     "2009-09-14"
+    ],
+    "transition_gap_note": "位于周公布转日频接缝处的缺口，性质上属过渡期未披露，但仍计为缺口，不并入「已验证连续」",
+    "startup_gap_days": 0,
+    "startup_gap_dates": [],
+    "startup_gap_note": null,
+    "initial_weekly_phase": {
+     "window_days": 120,
+     "detected": true,
+     "low_freq_row_count": 3,
+     "daily_phase_start": "2009-09-11",
+     "avg_trading_day_gap": 4.0,
+     "publish_density": 0.231,
+     "low_freq_density_threshold": 0.5,
+     "rows_in_window": 71,
+     "note": "成立后至 2009-09-11 为低频公布期（共 3 个净值日），之后转为日频；该段缺日属正常运作模式"
+    },
+    "caveat": "trade_calendar 是 A 股交易日历，不是基金净值公布日历。本结论为代理验证：能排除明显缺口，但不能证明某日在任何情况下都应有净值。"
+   },
    "nav_jump_detail": [],
    "unit_vs_acc": {
     "unit_last": 1.6526,
@@ -762,6 +919,70 @@
     "2019-07-02",
     "2020-08-26"
    ],
+   "continuity": {
+    "total_rows": 2794,
+    "null_date_count": 0,
+    "duplicate_dates": [],
+    "is_sorted": true,
+    "first_date": "2015-05-27",
+    "last_date": "2026-11-18",
+    "calendar_available": true,
+    "calendar_source": "trade_calendar（A股交易日历）",
+    "verification_level": "proxy",
+    "expected_days": 2790,
+    "missing_days": 4,
+    "missing_runs": [
+     {
+      "start": "2015-05-28",
+      "end": "2015-05-28",
+      "trading_days": 1
+     },
+     {
+      "start": "2015-06-01",
+      "end": "2015-06-03",
+      "trading_days": 3
+     }
+    ],
+    "longest_gap": {
+     "start": "2015-06-01",
+     "end": "2015-06-03",
+     "trading_days": 3
+    },
+    "unexplained_missing": 0,
+    "explained_by_initial_weekly": 4,
+    "off_calendar_dates": [
+     "2016-12-31",
+     "2017-12-31",
+     "2018-06-30",
+     "2018-12-31",
+     "2019-06-30",
+     "2022-12-31",
+     "2023-12-31",
+     "2024-06-30"
+    ],
+    "verdict": "verified_against_trading_calendar",
+    "verdict_reason": "无重复、无乱序、无空值；4 个缺失日全部落在成立初期周公布窗口内（密度 0.286），已由公布频率解释",
+    "off_calendar_note": "非交易日却有净值：公募基金的季末/年末估值日等属正常安排，**不作为缺口或错误判定**，仅记录以供核对",
+    "off_calendar_is_problem": false,
+    "transition_gap_days": 0,
+    "transition_gap_dates": [],
+    "transition_gap_note": null,
+    "startup_gap_days": 0,
+    "startup_gap_dates": [],
+    "startup_gap_note": null,
+    "initial_weekly_phase": {
+     "window_days": 120,
+     "detected": true,
+     "low_freq_row_count": 2,
+     "daily_phase_start": "2015-06-04",
+     "avg_trading_day_gap": 3.0,
+     "publish_density": 0.286,
+     "low_freq_density_threshold": 0.5,
+     "rows_in_window": 80,
+     "note": "成立后至 2015-06-04 为低频公布期（共 2 个净值日），之后转为日频；该段缺日属正常运作模式"
+    },
+    "caveat": "trade_calendar 是 A 股交易日历，不是基金净值公布日历。本结论为代理验证：能排除明显缺口，但不能证明某日在任何情况下都应有净值。"
+   },
    "nav_jump_detail": [
     {
      "date": "2017-09-26",
@@ -875,6 +1096,62 @@
     "dates": []
    },
    "nav_jump_dates": [],
+   "continuity": {
+    "total_rows": 1338,
+    "null_date_count": 0,
+    "duplicate_dates": [],
+    "is_sorted": true,
+    "first_date": "2021-05-18",
+    "last_date": "2026-11-18",
+    "calendar_available": true,
+    "calendar_source": "trade_calendar（A股交易日历）",
+    "verification_level": "proxy",
+    "expected_days": 1336,
+    "missing_days": 1,
+    "missing_runs": [
+     {
+      "start": "2021-05-19",
+      "end": "2021-05-19",
+      "trading_days": 1
+     }
+    ],
+    "longest_gap": {
+     "start": "2021-05-19",
+     "end": "2021-05-19",
+     "trading_days": 1
+    },
+    "unexplained_missing": 0,
+    "explained_by_initial_weekly": 0,
+    "off_calendar_dates": [
+     "2022-12-31",
+     "2023-12-31",
+     "2024-06-30"
+    ],
+    "verdict": "gaps_found",
+    "verdict_reason": "1 个成立初期缺口，如实记为缺口",
+    "off_calendar_note": "非交易日却有净值：公募基金的季末/年末估值日等属正常安排，**不作为缺口或错误判定**，仅记录以供核对",
+    "off_calendar_is_problem": false,
+    "transition_gap_days": 0,
+    "transition_gap_dates": [],
+    "transition_gap_note": null,
+    "startup_gap_days": 1,
+    "startup_gap_dates": [
+     "2021-05-19"
+    ],
+    "startup_gap_note": "成立后最初若干个交易日未披露净值，如实计入缺口，不算「已验证连续」",
+    "initial_weekly_phase": {
+     "window_days": 120,
+     "detected": false,
+     "low_freq_row_count": 0,
+     "daily_phase_start": null,
+     "avg_trading_day_gap": null,
+     "publish_density": null,
+     "low_freq_density_threshold": 0.5,
+     "rows_in_window": 85,
+     "note": "未检测到低频公布期，成立初期即为日频"
+    },
+    "caveat": "trade_calendar 是 A 股交易日历，不是基金净值公布日历。本结论为代理验证：能排除明显缺口，但不能证明某日在任何情况下都应有净值。"
+   },
    "nav_jump_detail": [],
    "unit_vs_acc": {
     "unit_last": 0.576,
@@ -936,6 +1213,51 @@
     "dates": []
    },
    "nav_jump_dates": [],
+   "continuity": {
+    "total_rows": 1799,
+    "null_date_count": 0,
+    "duplicate_dates": [],
+    "is_sorted": true,
+    "first_date": "2019-06-26",
+    "last_date": "2026-11-18",
+    "calendar_available": true,
+    "calendar_source": "trade_calendar（A股交易日历）",
+    "verification_level": "proxy",
+    "expected_days": 1795,
+    "missing_days": 0,
+    "missing_runs": [],
+    "longest_gap": null,
+    "unexplained_missing": 0,
+    "explained_by_initial_weekly": 0,
+    "off_calendar_dates": [
+     "2019-06-30",
+     "2022-12-31",
+     "2023-12-31",
+     "2024-06-30"
+    ],
+    "verdict": "verified_against_trading_calendar",
+    "verdict_reason": "无重复、无乱序、无空值；该基金首末日期范围内无任何缺失交易日，完全连续",
+    "off_calendar_note": "非交易日却有净值：公募基金的季末/年末估值日等属正常安排，**不作为缺口或错误判定**，仅记录以供核对",
+    "off_calendar_is_problem": false,
+    "transition_gap_days": 0,
+    "transition_gap_dates": [],
+    "transition_gap_note": null,
+    "startup_gap_days": 0,
+    "startup_gap_dates": [],
+    "startup_gap_note": null,
+    "initial_weekly_phase": {
+     "window_days": 120,
+     "detected": false,
+     "low_freq_row_count": 0,
+     "daily_phase_start": null,
+     "avg_trading_day_gap": null,
+     "publish_density": null,
+     "low_freq_density_threshold": 0.5,
+     "rows_in_window": 82,
+     "note": "未检测到低频公布期，成立初期即为日频"
+    },
+    "caveat": "trade_calendar 是 A 股交易日历，不是基金净值公布日历。本结论为代理验证：能排除明显缺口，但不能证明某日在任何情况下都应有净值。"
+   },
    "nav_jump_detail": [],
    "unit_vs_acc": {
     "unit_last": 3.0432,
@@ -997,6 +1319,51 @@
     "dates": []
    },
    "nav_jump_dates": [],
+   "continuity": {
+    "total_rows": 1799,
+    "null_date_count": 0,
+    "duplicate_dates": [],
+    "is_sorted": true,
+    "first_date": "2019-06-26",
+    "last_date": "2026-11-18",
+    "calendar_available": true,
+    "calendar_source": "trade_calendar（A股交易日历）",
+    "verification_level": "proxy",
+    "expected_days": 1795,
+    "missing_days": 0,
+    "missing_runs": [],
+    "longest_gap": null,
+    "unexplained_missing": 0,
+    "explained_by_initial_weekly": 0,
+    "off_calendar_dates": [
+     "2019-06-30",
+     "2022-12-31",
+     "2023-12-31",
+     "2024-06-30"
+    ],
+    "verdict": "verified_against_trading_calendar",
+    "verdict_reason": "无重复、无乱序、无空值；该基金首末日期范围内无任何缺失交易日，完全连续",
+    "off_calendar_note": "非交易日却有净值：公募基金的季末/年末估值日等属正常安排，**不作为缺口或错误判定**，仅记录以供核对",
+    "off_calendar_is_problem": false,
+    "transition_gap_days": 0,
+    "transition_gap_dates": [],
+    "transition_gap_note": null,
+    "startup_gap_days": 0,
+    "startup_gap_dates": [],
+    "startup_gap_note": null,
+    "initial_weekly_phase": {
+     "window_days": 120,
+     "detected": false,
+     "low_freq_row_count": 0,
+     "daily_phase_start": null,
+     "avg_trading_day_gap": null,
+     "publish_density": null,
+     "low_freq_density_threshold": 0.5,
+     "rows_in_window": 82,
+     "note": "未检测到低频公布期，成立初期即为日频"
+    },
+    "caveat": "trade_calendar 是 A 股交易日历，不是基金净值公布日历。本结论为代理验证：能排除明显缺口，但不能证明某日在任何情况下都应有净值。"
+   },
    "nav_jump_detail": [],
    "unit_vs_acc": {
     "unit_last": 2.9802,
@@ -1058,6 +1425,112 @@
     "dates": []
    },
    "nav_jump_dates": [],
+   "continuity": {
+    "total_rows": 3927,
+    "null_date_count": 0,
+    "duplicate_dates": [],
+    "is_sorted": true,
+    "first_date": "2010-08-20",
+    "last_date": "2026-11-18",
+    "calendar_available": true,
+    "calendar_source": "trade_calendar（A股交易日历）",
+    "verification_level": "proxy",
+    "expected_days": 3943,
+    "missing_days": 29,
+    "missing_runs": [
+     {
+      "start": "2010-08-23",
+      "end": "2010-08-26",
+      "trading_days": 4
+     },
+     {
+      "start": "2010-08-30",
+      "end": "2010-09-02",
+      "trading_days": 4
+     },
+     {
+      "start": "2010-09-06",
+      "end": "2010-09-09",
+      "trading_days": 4
+     },
+     {
+      "start": "2010-09-13",
+      "end": "2010-09-16",
+      "trading_days": 4
+     },
+     {
+      "start": "2010-09-20",
+      "end": "2010-09-20",
+      "trading_days": 1
+     },
+     {
+      "start": "2010-09-27",
+      "end": "2010-09-29",
+      "trading_days": 3
+     },
+     {
+      "start": "2010-10-11",
+      "end": "2010-10-14",
+      "trading_days": 4
+     },
+     {
+      "start": "2010-10-18",
+      "end": "2010-10-21",
+      "trading_days": 4
+     },
+     {
+      "start": "2010-10-25",
+      "end": "2010-10-25",
+      "trading_days": 1
+     }
+    ],
+    "longest_gap": {
+     "start": "2010-08-23",
+     "end": "2010-08-26",
+     "trading_days": 4
+    },
+    "unexplained_missing": 0,
+    "explained_by_initial_weekly": 28,
+    "off_calendar_dates": [
+     "2011-12-31",
+     "2012-03-31",
+     "2012-06-30",
+     "2012-09-30",
+     "2013-06-30",
+     "2016-12-31",
+     "2017-12-31",
+     "2018-06-30",
+     "2018-12-31",
+     "2019-06-30",
+     "2022-12-31",
+     "2023-12-31",
+     "2024-06-30"
+    ],
+    "verdict": "gaps_found",
+    "verdict_reason": "1 个过渡期单日缺口（周公布转日频接缝），如实记为缺口",
+    "off_calendar_note": "非交易日却有净值：公募基金的季末/年末估值日等属正常安排，**不作为缺口或错误判定**，仅记录以供核对",
+    "off_calendar_is_problem": false,
+    "transition_gap_days": 1,
+    "transition_gap_dates": [
+     "2010-10-25"
+    ],
+    "transition_gap_note": "位于周公布转日频接缝处的缺口，性质上属过渡期未披露，但仍计为缺口，不并入「已验证连续」",
+    "startup_gap_days": 0,
+    "startup_gap_dates": [],
+    "startup_gap_note": null,
+    "initial_weekly_phase": {
+     "window_days": 120,
+     "detected": true,
+     "low_freq_row_count": 9,
+     "daily_phase_start": "2010-10-22",
+     "avg_trading_day_gap": 4.11,
+     "publish_density": 0.237,
+     "low_freq_density_threshold": 0.5,
+     "rows_in_window": 49,
+     "note": "成立后至 2010-10-22 为低频公布期（共 9 个净值日），之后转为日频；该段缺日属正常运作模式"
+    },
+    "caveat": "trade_calendar 是 A 股交易日历，不是基金净值公布日历。本结论为代理验证：能排除明显缺口，但不能证明某日在任何情况下都应有净值。"
+   },
    "nav_jump_detail": [],
    "unit_vs_acc": {
     "unit_last": 3.01,
@@ -1238,6 +1711,81 @@
     "2007-01-05",
     "2016-02-23"
    ],
+   "continuity": {
+    "total_rows": 5124,
+    "null_date_count": 0,
+    "duplicate_dates": [],
+    "is_sorted": true,
+    "first_date": "2005-11-16",
+    "last_date": "2026-11-18",
+    "calendar_available": true,
+    "calendar_source": "trade_calendar（A股交易日历）",
+    "verification_level": "proxy",
+    "expected_days": 5103,
+    "missing_days": 1,
+    "missing_runs": [
+     {
+      "start": "2005-11-17",
+      "end": "2005-11-17",
+      "trading_days": 1
+     }
+    ],
+    "longest_gap": {
+     "start": "2005-11-17",
+     "end": "2005-11-17",
+     "trading_days": 1
+    },
+    "unexplained_missing": 0,
+    "explained_by_initial_weekly": 0,
+    "off_calendar_dates": [
+     "2005-12-31",
+     "2006-09-30",
+     "2006-12-31",
+     "2007-03-31",
+     "2007-06-30",
+     "2007-09-30",
+     "2007-12-29",
+     "2007-12-31",
+     "2008-09-30",
+     "2011-12-31",
+     "2012-03-31",
+     "2012-06-30",
+     "2012-09-30",
+     "2013-06-30",
+     "2016-12-31",
+     "2017-12-31",
+     "2018-06-30",
+     "2018-12-31",
+     "2019-06-30",
+     "2022-12-31",
+     "2023-12-31",
+     "2024-06-30"
+    ],
+    "verdict": "gaps_found",
+    "verdict_reason": "1 个成立初期缺口，如实记为缺口",
+    "off_calendar_note": "非交易日却有净值：公募基金的季末/年末估值日等属正常安排，**不作为缺口或错误判定**，仅记录以供核对",
+    "off_calendar_is_problem": false,
+    "transition_gap_days": 0,
+    "transition_gap_dates": [],
+    "transition_gap_note": null,
+    "startup_gap_days": 1,
+    "startup_gap_dates": [
+     "2005-11-17"
+    ],
+    "startup_gap_note": "成立后最初若干个交易日未披露净值，如实计入缺口，不算「已验证连续」",
+    "initial_weekly_phase": {
+     "window_days": 120,
+     "detected": false,
+     "low_freq_row_count": 0,
+     "daily_phase_start": null,
+     "avg_trading_day_gap": null,
+     "publish_density": null,
+     "low_freq_density_threshold": 0.5,
+     "rows_in_window": 78,
+     "note": "未检测到低频公布期，成立初期即为日频"
+    },
+    "caveat": "trade_calendar 是 A 股交易日历，不是基金净值公布日历。本结论为代理验证：能排除明显缺口，但不能证明某日在任何情况下都应有净值。"
+   },
    "nav_jump_detail": [
     {
      "date": "2007-01-05",
@@ -1323,6 +1871,95 @@
     "dates": []
    },
    "nav_jump_dates": [],
+   "continuity": {
+    "total_rows": 3096,
+    "null_date_count": 0,
+    "duplicate_dates": [],
+    "is_sorted": true,
+    "first_date": "2014-01-27",
+    "last_date": "2026-11-18",
+    "calendar_available": true,
+    "calendar_source": "trade_calendar（A股交易日历）",
+    "verification_level": "proxy",
+    "expected_days": 3113,
+    "missing_days": 25,
+    "missing_runs": [
+     {
+      "start": "2014-01-28",
+      "end": "2014-01-29",
+      "trading_days": 2
+     },
+     {
+      "start": "2014-02-10",
+      "end": "2014-02-13",
+      "trading_days": 4
+     },
+     {
+      "start": "2014-02-18",
+      "end": "2014-02-20",
+      "trading_days": 3
+     },
+     {
+      "start": "2014-02-24",
+      "end": "2014-02-27",
+      "trading_days": 4
+     },
+     {
+      "start": "2014-03-03",
+      "end": "2014-03-06",
+      "trading_days": 4
+     },
+     {
+      "start": "2014-03-10",
+      "end": "2014-03-13",
+      "trading_days": 4
+     },
+     {
+      "start": "2014-03-17",
+      "end": "2014-03-20",
+      "trading_days": 4
+     }
+    ],
+    "longest_gap": {
+     "start": "2014-02-10",
+     "end": "2014-02-13",
+     "trading_days": 4
+    },
+    "unexplained_missing": 0,
+    "explained_by_initial_weekly": 25,
+    "off_calendar_dates": [
+     "2016-12-31",
+     "2017-12-31",
+     "2018-06-30",
+     "2018-12-31",
+     "2019-06-30",
+     "2022-12-31",
+     "2023-12-31",
+     "2024-06-30"
+    ],
+    "verdict": "verified_against_trading_calendar",
+    "verdict_reason": "无重复、无乱序、无空值；25 个缺失日全部落在成立初期周公布窗口内（密度 0.257），已由公布频率解释",
+    "off_calendar_note": "非交易日却有净值：公募基金的季末/年末估值日等属正常安排，**不作为缺口或错误判定**，仅记录以供核对",
+    "off_calendar_is_problem": false,
+    "transition_gap_days": 0,
+    "transition_gap_dates": [],
+    "transition_gap_note": null,
+    "startup_gap_days": 0,
+    "startup_gap_dates": [],
+    "startup_gap_note": null,
+    "initial_weekly_phase": {
+     "window_days": 120,
+     "detected": true,
+     "low_freq_row_count": 9,
+     "daily_phase_start": "2014-03-21",
+     "avg_trading_day_gap": 3.78,
+     "publish_density": 0.257,
+     "low_freq_density_threshold": 0.5,
+     "rows_in_window": 54,
+     "note": "成立后至 2014-03-21 为低频公布期（共 9 个净值日），之后转为日频；该段缺日属正常运作模式"
+    },
+    "caveat": "trade_calendar 是 A 股交易日历，不是基金净值公布日历。本结论为代理验证：能排除明显缺口，但不能证明某日在任何情况下都应有净值。"
+   },
    "nav_jump_detail": [],
    "unit_vs_acc": {
     "unit_last": 2.8419,
@@ -1448,6 +2085,103 @@
     "dates": []
    },
    "nav_jump_dates": [],
+   "continuity": {
+    "total_rows": 3310,
+    "null_date_count": 0,
+    "duplicate_dates": [],
+    "is_sorted": true,
+    "first_date": "2013-03-08",
+    "last_date": "2026-11-18",
+    "calendar_available": true,
+    "calendar_source": "trade_calendar（A股交易日历）",
+    "verification_level": "proxy",
+    "expected_days": 3328,
+    "missing_days": 27,
+    "missing_runs": [
+     {
+      "start": "2013-03-11",
+      "end": "2013-03-14",
+      "trading_days": 4
+     },
+     {
+      "start": "2013-03-18",
+      "end": "2013-03-21",
+      "trading_days": 4
+     },
+     {
+      "start": "2013-03-25",
+      "end": "2013-03-28",
+      "trading_days": 4
+     },
+     {
+      "start": "2013-04-01",
+      "end": "2013-04-02",
+      "trading_days": 2
+     },
+     {
+      "start": "2013-04-08",
+      "end": "2013-04-11",
+      "trading_days": 4
+     },
+     {
+      "start": "2013-04-15",
+      "end": "2013-04-18",
+      "trading_days": 4
+     },
+     {
+      "start": "2013-04-22",
+      "end": "2013-04-25",
+      "trading_days": 4
+     },
+     {
+      "start": "2013-05-02",
+      "end": "2013-05-02",
+      "trading_days": 1
+     }
+    ],
+    "longest_gap": {
+     "start": "2013-03-11",
+     "end": "2013-03-14",
+     "trading_days": 4
+    },
+    "unexplained_missing": 0,
+    "explained_by_initial_weekly": 26,
+    "off_calendar_dates": [
+     "2013-06-30",
+     "2016-12-31",
+     "2017-12-31",
+     "2018-06-30",
+     "2018-12-31",
+     "2019-06-30",
+     "2022-12-31",
+     "2023-12-31",
+     "2024-06-30"
+    ],
+    "verdict": "gaps_found",
+    "verdict_reason": "1 个过渡期单日缺口（周公布转日频接缝），如实记为缺口",
+    "off_calendar_note": "非交易日却有净值：公募基金的季末/年末估值日等属正常安排，**不作为缺口或错误判定**，仅记录以供核对",
+    "off_calendar_is_problem": false,
+    "transition_gap_days": 1,
+    "transition_gap_dates": [
+     "2013-05-02"
+    ],
+    "transition_gap_note": "位于周公布转日频接缝处的缺口，性质上属过渡期未披露，但仍计为缺口，不并入「已验证连续」",
+    "startup_gap_days": 0,
+    "startup_gap_dates": [],
+    "startup_gap_note": null,
+    "initial_weekly_phase": {
+     "window_days": 120,
+     "detected": true,
+     "low_freq_row_count": 7,
+     "daily_phase_start": "2013-04-26",
+     "avg_trading_day_gap": 4.71,
+     "publish_density": 0.206,
+     "low_freq_density_threshold": 0.5,
+     "rows_in_window": 52,
+     "note": "成立后至 2013-04-26 为低频公布期（共 7 个净值日），之后转为日频；该段缺日属正常运作模式"
+    },
+    "caveat": "trade_calendar 是 A 股交易日历，不是基金净值公布日历。本结论为代理验证：能排除明显缺口，但不能证明某日在任何情况下都应有净值。"
+   },
    "nav_jump_detail": [],
    "unit_vs_acc": {
     "unit_last": 1.2109,
@@ -1573,6 +2307,103 @@
     "dates": []
    },
    "nav_jump_dates": [],
+   "continuity": {
+    "total_rows": 3310,
+    "null_date_count": 0,
+    "duplicate_dates": [],
+    "is_sorted": true,
+    "first_date": "2013-03-08",
+    "last_date": "2026-11-18",
+    "calendar_available": true,
+    "calendar_source": "trade_calendar（A股交易日历）",
+    "verification_level": "proxy",
+    "expected_days": 3328,
+    "missing_days": 27,
+    "missing_runs": [
+     {
+      "start": "2013-03-11",
+      "end": "2013-03-14",
+      "trading_days": 4
+     },
+     {
+      "start": "2013-03-18",
+      "end": "2013-03-21",
+      "trading_days": 4
+     },
+     {
+      "start": "2013-03-25",
+      "end": "2013-03-28",
+      "trading_days": 4
+     },
+     {
+      "start": "2013-04-01",
+      "end": "2013-04-02",
+      "trading_days": 2
+     },
+     {
+      "start": "2013-04-08",
+      "end": "2013-04-11",
+      "trading_days": 4
+     },
+     {
+      "start": "2013-04-15",
+      "end": "2013-04-18",
+      "trading_days": 4
+     },
+     {
+      "start": "2013-04-22",
+      "end": "2013-04-25",
+      "trading_days": 4
+     },
+     {
+      "start": "2013-05-02",
+      "end": "2013-05-02",
+      "trading_days": 1
+     }
+    ],
+    "longest_gap": {
+     "start": "2013-03-11",
+     "end": "2013-03-14",
+     "trading_days": 4
+    },
+    "unexplained_missing": 0,
+    "explained_by_initial_weekly": 26,
+    "off_calendar_dates": [
+     "2013-06-30",
+     "2016-12-31",
+     "2017-12-31",
+     "2018-06-30",
+     "2018-12-31",
+     "2019-06-30",
+     "2022-12-31",
+     "2023-12-31",
+     "2024-06-30"
+    ],
+    "verdict": "gaps_found",
+    "verdict_reason": "1 个过渡期单日缺口（周公布转日频接缝），如实记为缺口",
+    "off_calendar_note": "非交易日却有净值：公募基金的季末/年末估值日等属正常安排，**不作为缺口或错误判定**，仅记录以供核对",
+    "off_calendar_is_problem": false,
+    "transition_gap_days": 1,
+    "transition_gap_dates": [
+     "2013-05-02"
+    ],
+    "transition_gap_note": "位于周公布转日频接缝处的缺口，性质上属过渡期未披露，但仍计为缺口，不并入「已验证连续」",
+    "startup_gap_days": 0,
+    "startup_gap_dates": [],
+    "startup_gap_note": null,
+    "initial_weekly_phase": {
+     "window_days": 120,
+     "detected": true,
+     "low_freq_row_count": 7,
+     "daily_phase_start": "2013-04-26",
+     "avg_trading_day_gap": 4.71,
+     "publish_density": 0.206,
+     "low_freq_density_threshold": 0.5,
+     "rows_in_window": 52,
+     "note": "成立后至 2013-04-26 为低频公布期（共 7 个净值日），之后转为日频；该段缺日属正常运作模式"
+    },
+    "caveat": "trade_calendar 是 A 股交易日历，不是基金净值公布日历。本结论为代理验证：能排除明显缺口，但不能证明某日在任何情况下都应有净值。"
+   },
    "nav_jump_detail": [],
    "unit_vs_acc": {
     "unit_last": 1.1968,
@@ -1611,7 +2442,61 @@
    "anomalies": [],
    "status": "ok",
    "name_actual": "天弘余额宝货币",
-   "basic_info_source": "fund_name_em + fund_scale_open_sina（非雪球）"
+   "basic_info_source": "fund_name_em + fund_scale_open_sina（非雪球）",
+   "continuity": {
+    "total_rows": 4919,
+    "null_date_count": 0,
+    "duplicate_dates": [],
+    "is_sorted": true,
+    "first_date": "2013-05-30",
+    "last_date": "2026-11-18",
+    "calendar_available": true,
+    "calendar_source": "自然日（货币基金按日公布万份收益）",
+    "verification_level": "proxy",
+    "expected_days": 4921,
+    "missing_days": 2,
+    "missing_runs": [
+     {
+      "start": "2013-05-31",
+      "end": "2013-06-01",
+      "trading_days": 2
+     }
+    ],
+    "longest_gap": {
+     "start": "2013-05-31",
+     "end": "2013-06-01",
+     "trading_days": 2
+    },
+    "unexplained_missing": 0,
+    "explained_by_initial_weekly": 0,
+    "off_calendar_dates": [],
+    "verdict": "gaps_found",
+    "verdict_reason": "2 个成立初期缺口，如实记为缺口",
+    "day_unit": "自然日",
+    "off_calendar_note": "非交易日却有净值：公募基金的季末/年末估值日等属正常安排，**不作为缺口或错误判定**，仅记录以供核对",
+    "off_calendar_is_problem": false,
+    "transition_gap_days": 0,
+    "transition_gap_dates": [],
+    "transition_gap_note": null,
+    "startup_gap_days": 2,
+    "startup_gap_dates": [
+     "2013-05-31",
+     "2013-06-01"
+    ],
+    "startup_gap_note": "成立后最初若干个交易日未披露净值，如实计入缺口，不算「已验证连续」",
+    "initial_weekly_phase": {
+     "window_days": 120,
+     "detected": false,
+     "low_freq_row_count": 0,
+     "daily_phase_start": null,
+     "avg_trading_day_gap": null,
+     "publish_density": null,
+     "low_freq_density_threshold": 0.5,
+     "rows_in_window": 119,
+     "note": "未检测到低频公布期，成立初期即为日频"
+    },
+    "caveat": "trade_calendar 是 A 股交易日历，不是基金净值公布日历。本结论为代理验证：能排除明显缺口，但不能证明某日在任何情况下都应有净值。"
+   }
   }
  ],
  "fees_and_status": {
@@ -2112,7 +2997,28 @@
    "货币"
   ],
   "with_dividends": 5,
-  "with_splits": 1
+  "with_splits": 1,
+  "continuity_calendar_available": true,
+  "continuity_verified": 4,
+  "continuity_gaps_found": 8,
+  "continuity_cannot_verify": 0,
+  "continuity_total_missing_days": 135,
+  "continuity_total_unexplained": 0
+ },
+ "continuity_audit": {
+  "calendar_source": "trade_calendar（项目数据库 A 股交易日历）",
+  "calendar_days": 8797,
+  "calendar_is_fund_nav_calendar": false,
+  "verification_level": "proxy",
+  "initial_window_days": 120,
+  "weekly_gap_threshold_trading_days": 3,
+  "verdict_legend": {
+   "verified_against_trading_calendar": "已按交易日历代理验证连续，缺口全部由成立初期周公布解释",
+   "gaps_found": "发现真实数据缺口（重复/乱序/空值/窗口外缺失）",
+   "cannot_verify": "无可靠净值公布日历，无法判定是否缺失"
+  },
+  "caveat": "trade_calendar 是 A 股交易日历，不是基金净值公布日历。该检查是代理验证：能排除明显缺口，但不能证明某日在任何情况下都应有净值；也不能证明非交易日出现净值一定是错误（季末估值日等属正常）。",
+  "not_a_proof_statement": "本阶段不再声称「12 只样本净值全部连续、无空洞」。准确表述是：在 A 股交易日历代理下，已验证若干只，并记录缺口与降级情况。"
  },
  "unresolved": [
   "survivorship_bias_unresolved：无已清盘基金名录",

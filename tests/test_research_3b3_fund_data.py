@@ -15,7 +15,8 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from scripts.research_3b3_fund_data import (  # noqa: E402
-    SAMPLE_FUNDS, SHARE_PAIRS, _parse_cash_per_10, design_reuse, design_schema,
+    INITIAL_WINDOW_DAYS, SAMPLE_FUNDS, SHARE_PAIRS, _missing_runs,
+    _parse_cash_per_10, check_nav_continuity, design_reuse, design_schema,
 )
 
 JSON_PATH = ROOT / "reports" / "phase3B3_fund_data_feasibility.json"
@@ -331,3 +332,241 @@ def test_unresolved_listed(payload):
 
 def test_baseline_head_recorded(payload):
     assert payload["baseline_head"].startswith("e14a8fa")
+
+# ================================================================
+# 净值日期连续性：全部用人工构造的小型数据验证
+# ================================================================
+
+# 一段干净的交易日历（跳过周末：1/6、1/7、1/13、1/14）
+CAL = [
+    "2024-01-02", "2024-01-03", "2024-01-04", "2024-01-05",
+    "2024-01-08", "2024-01-09", "2024-01-10", "2024-01-11", "2024-01-12",
+    "2024-01-15", "2024-01-16", "2024-01-17", "2024-01-18", "2024-01-19",
+]
+
+
+def test_continuity_complete_series_is_verified():
+    """完整序列：三档结论必须是「已按交易日历代理验证」。"""
+    r = check_nav_continuity(CAL, CAL)
+    assert r["verdict"] == "verified_against_trading_calendar"
+    assert r["missing_days"] == 0
+    assert r["unexplained_missing"] == 0
+    assert r["duplicate_dates"] == []
+    assert r["is_sorted"] is True
+    assert r["null_date_count"] == 0
+
+
+def test_continuity_detects_duplicate_dates():
+    """重复净值日期必须被检出。"""
+    r = check_nav_continuity(CAL + ["2024-01-05"], CAL)
+    assert r["verdict"] == "gaps_found"
+    assert "2024-01-05" in r["duplicate_dates"]
+    assert "重复" in r["verdict_reason"]
+
+
+def test_continuity_detects_unsorted_dates():
+    """乱序必须被检出（且不能用排序后的结果掩盖）。"""
+    bad = list(CAL)
+    bad[0], bad[-1] = bad[-1], bad[0]
+    r = check_nav_continuity(bad, CAL)
+    assert r["verdict"] == "gaps_found"
+    assert r["is_sorted"] is False
+    assert "乱序" in r["verdict_reason"]
+
+
+def test_continuity_detects_null_dates():
+    """空值日期必须被检出并计数。"""
+    r = check_nav_continuity(CAL[:5] + [None] + CAL[5:], CAL)
+    assert r["verdict"] == "gaps_found"
+    assert r["null_date_count"] == 1
+    assert "空值" in r["verdict_reason"]
+
+
+def test_continuity_detects_missing_trading_day():
+    """单个交易日缺失必须被检出。"""
+    r = check_nav_continuity([d for d in CAL if d != "2024-01-10"], CAL)
+    assert r["verdict"] == "gaps_found"
+    assert r["missing_days"] == 1
+
+
+def test_continuity_detects_consecutive_missing():
+    """连续多日缺失必须合并成一段，并记录区间。"""
+    drop = {"2024-01-09", "2024-01-10", "2024-01-11"}
+    r = check_nav_continuity([d for d in CAL if d not in drop], CAL)
+    assert r["verdict"] == "gaps_found"
+    assert r["missing_days"] == 3
+    runs = r["missing_runs"]
+    assert len(runs) == 1
+    assert runs[0]["start"] == "2024-01-09"
+    assert runs[0]["end"] == "2024-01-11"
+    assert runs[0]["trading_days"] == 3
+
+
+def test_continuity_records_longest_gap():
+    """最长连续缺失区间要单独记下来。"""
+    r = check_nav_continuity(
+        [d for d in CAL if d not in {"2024-01-09", "2024-01-10"}], CAL)
+    assert r["longest_gap"] is not None
+    assert r["longest_gap"]["start"] == "2024-01-09"
+    assert r["longest_gap"]["trading_days"] == 2
+
+
+def test_weekend_net_value_not_reported_as_gap():
+    """周末出现净值（季末估值日）不是缺口，不得误报。"""
+    # 2024-01-06 是周六
+    r = check_nav_continuity(sorted(CAL + ["2024-01-06"]), CAL)
+    assert r["verdict"] == "verified_against_trading_calendar"
+    assert "2024-01-06" in r["off_calendar_dates"]
+    assert r["off_calendar_is_problem"] is False
+
+
+def test_holiday_not_reported_as_gap():
+    """节假日不在日历里，自然不会被算作「应有净值却缺失」。"""
+    # 构造一个跨春节的日历：2024-02-09 之后到 2024-02-19 是假期
+    cal = ["2024-02-07", "2024-02-08", "2024-02-09",
+           "2024-02-19", "2024-02-20", "2024-02-21"]
+    r = check_nav_continuity(cal, cal)
+    assert r["verdict"] == "verified_against_trading_calendar"
+    assert r["missing_days"] == 0
+
+
+def test_continuity_degrades_without_calendar():
+    """拿不到可靠日历且无结构问题 → cannot_verify，不得声称连续。"""
+    r = check_nav_continuity(CAL, None)
+    assert r["verdict"] == "cannot_verify"
+    assert r["calendar_available"] is False
+    assert "无法" in r["verdict_reason"]
+
+
+def test_continuity_still_detects_structure_without_calendar():
+    """无日历也不能放过重复/乱序/空值——这些不依赖日历。"""
+    r = check_nav_continuity(CAL + ["2024-01-05"], None)
+    assert r["verdict"] == "gaps_found"
+    assert r["duplicate_dates"]
+
+
+def test_continuity_empty_input():
+    r = check_nav_continuity([], CAL)
+    assert r["verdict"] == "cannot_verify"
+    assert r["total_rows"] == 0
+
+
+def test_continuity_always_carries_caveat():
+    """任何结论都必须带「代理验证」caveat，不能当绝对证明。"""
+    for cal in (CAL,):
+        r = check_nav_continuity(CAL, cal)
+        assert r["verification_level"] == "proxy"
+        assert "不是基金净值公布日历" in r["caveat"]
+
+
+def test_initial_weekly_phase_explained():
+    """成立初期按周公布造成的缺日，应被识别为低频期而非缺口。"""
+    # 前 4 次按周（1/2、1/9、1/16），之后转日频
+    weekly = ["2024-01-02", "2024-01-09", "2024-01-16"]
+    daily = [d for d in CAL if d > "2024-01-16"]
+    r = check_nav_continuity(weekly + daily, CAL)
+    assert r["initial_weekly_phase"]["detected"] is True
+    assert r["explained_by_initial_weekly"] > 0
+
+
+def test_transition_gap_still_counts_as_gap():
+    """周公布转日频接缝处的缺口仍算缺口，不能并入「已验证连续」。"""
+    weekly = ["2024-01-02", "2024-01-09", "2024-01-16"]
+    # 跳过 1/17（接缝），之后日频
+    daily = [d for d in CAL if d > "2024-01-17"]
+    r = check_nav_continuity(weekly + daily, CAL)
+    assert r["verdict"] == "gaps_found"
+    assert r["transition_gap_days"] >= 1
+    assert "缺口" in r["verdict_reason"]
+
+
+def test_calendar_day_mode_for_money_fund():
+    """货币基金按自然日核对，周末也应有净值。"""
+    cal_days = ["2024-01-01", "2024-01-02", "2024-01-03", "2024-01-04"]
+    r = check_nav_continuity(cal_days, None, calendar_mode="calendar_day")
+    assert r["calendar_source"].startswith("自然日")
+    # 缺 1/3 → 应报缺口
+    r2 = check_nav_continuity(
+        ["2024-01-01", "2024-01-02", "2024-01-04"], None,
+        calendar_mode="calendar_day")
+    assert r2["verdict"] == "gaps_found"
+    assert r2["missing_days"] == 1
+
+
+def test_missing_runs_merges_across_weekend():
+    """跨周末的缺失算同一段，不能被拆成两段。"""
+    runs = _missing_runs(["2024-01-05", "2024-01-08"])  # 周五 + 下周一
+    assert len(runs) == 1
+    assert runs[0]["start"] == "2024-01-05"
+    assert runs[0]["end"] == "2024-01-08"
+
+
+def test_missing_runs_splits_on_long_break():
+    """间隔超过 3 天必须拆成独立区间。"""
+    runs = _missing_runs(["2024-01-05", "2024-01-15"])
+    assert len(runs) == 2
+
+
+# ---------------------------------------------------------------- 真实样本结论
+def test_sample_continuity_present(payload):
+    """每只样本都必须有连续性结果，不能留空。"""
+    for f in payload["sample_funds"]:
+        c = f.get("continuity")
+        assert c, f["code"]
+        assert c["verdict"] in (
+            "verified_against_trading_calendar", "gaps_found", "cannot_verify")
+
+
+def test_continuity_three_tiers_counted(payload):
+    """三档结论必须分开计数，不能合并成一个「通过」。"""
+    s = payload["summary"]
+    for k in ("continuity_verified", "continuity_gaps_found",
+              "continuity_cannot_verify"):
+        assert isinstance(s[k], int)
+    total = (s["continuity_verified"] + s["continuity_gaps_found"]
+             + s["continuity_cannot_verify"])
+    assert total == len(payload["sample_funds"])
+
+
+def test_gaps_found_is_honestly_reported(payload):
+    """本轮真实结论：不是全部连续。必须如实体现。"""
+    s = payload["summary"]
+    assert s["continuity_calendar_available"] is True
+    # 若真的全部通过，这条会失败——用来防止「为了好看写全通过」
+    assert s["continuity_gaps_found"] >= 1
+    assert s["continuity_total_missing_days"] >= 1
+
+
+def test_doc_does_not_claim_all_continuous(payload):
+    """报告不得再「声称」全部连续。
+
+    报告在「不能声称的事」一节里会**引用**这句话来否定它，
+    所以要先剥掉该章节再看正文，否则会把否定句误判成声明。
+    """
+    md = MD_PATH.read_text(encoding="utf-8")
+    cut = md.find("#### 6.0.6 不能声称的事")
+    assert cut > 0, "报告缺少「不能声称的事」章节"
+    body = md[:cut]
+    for b in ("全部连续、无空洞", "净值全部连续"):
+        for line in body.splitlines():
+            if b not in line:
+                continue
+            # 允许「引用后否定」的写法（含修正/错误/不再/原报告 等字样），
+            # 但不允许把它当成结论陈述。
+            assert any(k in line for k in
+                       ("修正", "错误", "不再", "原报告", "不得", "不能声称")), \
+                f"正文仍在声称：{b} → {line.strip()}"
+
+
+def test_continuity_audit_declares_proxy(payload):
+    ca = payload["continuity_audit"]
+    assert ca["calendar_is_fund_nav_calendar"] is False
+    assert ca["verification_level"] == "proxy"
+    assert "代理" in ca["caveat"]
+
+
+def test_every_verdict_has_reason(payload):
+    """每个结论都必须给出理由，不能只给标签。"""
+    for f in payload["sample_funds"]:
+        c = f["continuity"]
+        assert c["verdict_reason"], f["code"]
