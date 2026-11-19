@@ -1,0 +1,2126 @@
+{
+ "phase": "3B-3",
+ "baseline_head": "e14a8fa6e5a3294ce00d2c2168756130fa4dee32",
+ "generated_at": "2026-11-19T10:59:13",
+ "akshare_version": "1.20.36",
+ "scope": "只做数据源审计、覆盖验证与架构设计；不开发策略、不改回测引擎、不写正式库",
+ "sources": {
+  "probes": [
+   {
+    "source": "akshare.fund_name_em 全量基金代码表",
+    "public": true,
+    "auth_required": false,
+    "probed_at": "2026-11-19T10:57:04",
+    "status": "ok",
+    "rows": 28380,
+    "columns": [
+     "基金代码",
+     "拼音缩写",
+     "基金简称",
+     "基金类型",
+     "拼音全称"
+    ],
+    "sample": {
+     "基金代码": "000001",
+     "拼音缩写": "HXCZHH",
+     "基金简称": "华夏成长混合",
+     "基金类型": "混合型-灵活",
+     "拼音全称": "HUAXIACHENGZHANGHUNHE"
+    },
+    "error": null,
+    "note": "东方财富基金代码总表；只含当前清单，不含已清盘",
+    "long_term_stable": "中",
+    "stability_reason": "东财公开 JS，长期存在但无 SLA"
+   },
+   {
+    "source": "akshare.fund_open_fund_daily_em 开放式基金当日净值全表",
+    "public": true,
+    "auth_required": false,
+    "probed_at": "2026-11-19T10:57:05",
+    "status": "ok",
+    "rows": 24398,
+    "columns": [
+     "基金代码",
+     "基金简称",
+     "2026-11-18-单位净值",
+     "2026-11-18-累计净值",
+     "2026-11-17-单位净值",
+     "2026-11-17-累计净值",
+     "日增长值",
+     "日增长率",
+     "申购状态",
+     "赎回状态",
+     "手续费"
+    ],
+    "sample": {
+     "基金代码": "257070",
+     "基金简称": "国联安优选行业混合A",
+     "2026-11-18-单位净值": "3.4869",
+     "2026-11-18-累计净值": "3.7879",
+     "2026-11-17-单位净值": "3.3059",
+     "2026-11-17-累计净值": "3.6069",
+     "日增长值": "0.181",
+     "日增长率": "5.48",
+     "申购状态": "开放申购",
+     "赎回状态": "开放赎回",
+     "手续费": "0.15%"
+    },
+    "error": null,
+    "note": "只含最近 2 个交易日，不能替代历史序列",
+    "long_term_stable": "中",
+    "stability_reason": "天天基金行情页结构化数据，字段稳定但只给近两日"
+   },
+   {
+    "source": "akshare.fund_purchase_em 申购/赎回状态与限额",
+    "public": true,
+    "auth_required": false,
+    "probed_at": "2026-11-19T10:57:08",
+    "status": "ok",
+    "rows": 28075,
+    "columns": [
+     "序号",
+     "基金代码",
+     "基金简称",
+     "基金类型",
+     "最新净值/万份收益",
+     "最新净值/万份收益-报告时间",
+     "申购状态",
+     "赎回状态",
+     "下一开放日",
+     "购买起点",
+     "日累计限定金额",
+     "手续费"
+    ],
+    "sample": {
+     "序号": "1",
+     "基金代码": "000001",
+     "基金简称": "华夏成长混合",
+     "基金类型": "混合型-灵活",
+     "最新净值/万份收益": "0.96",
+     "最新净值/万份收益-报告时间": "11-18",
+     "申购状态": "开放申购",
+     "赎回状态": "开放赎回",
+     "下一开放日": "NaT",
+     "购买起点": "10.0",
+     "日累计限定金额": "100000000000.0",
+     "手续费": "0.15"
+    },
+    "error": null,
+    "note": "含申购状态、赎回状态、购买起点、日累计限额、手续费",
+    "long_term_stable": "中",
+    "stability_reason": "天天基金申购状态页，长期存在；状态本身每日变化"
+   },
+   {
+    "source": "akshare.fund_manager_em 基金经理任职",
+    "public": true,
+    "auth_required": false,
+    "probed_at": "2026-11-19T10:57:12",
+    "status": "ok",
+    "rows": 36935,
+    "columns": [
+     "序号",
+     "姓名",
+     "所属公司",
+     "现任基金代码",
+     "现任基金",
+     "累计从业时间",
+     "现任基金资产总规模",
+     "现任基金最佳回报"
+    ],
+    "sample": {
+     "序号": "1",
+     "姓名": "艾邦妮",
+     "所属公司": "华夏基金",
+     "现任基金代码": "001924",
+     "现任基金": "华夏国企改革混合",
+     "累计从业时间": "1541",
+     "现任基金资产总规模": "2.48",
+     "现任基金最佳回报": "13.55"
+    },
+    "error": null,
+    "note": "按「经理-基金」展开，无历任起止日期",
+    "long_term_stable": "中",
+    "stability_reason": "东财经理库，结构稳定但字段有限"
+   },
+   {
+    "source": "akshare.fund_scale_open_sina 开放式基金规模",
+    "public": true,
+    "auth_required": false,
+    "probed_at": "2026-11-19T10:57:19",
+    "status": "ok",
+    "rows": 7222,
+    "columns": [
+     "序号",
+     "基金代码",
+     "基金简称",
+     "单位净值",
+     "总募集规模",
+     "最近总份额",
+     "成立日期",
+     "基金经理",
+     "更新日期"
+    ],
+    "sample": {
+     "序号": "1",
+     "基金代码": "510300",
+     "基金简称": "华泰柏瑞沪深300ETF",
+     "单位净值": "4.0585",
+     "总募集规模": "3296860.0",
+     "最近总份额": "24119600000.0",
+     "成立日期": "2012-05-04",
+     "基金经理": "柳军",
+     "更新日期": "2026-11-18"
+    },
+    "error": null,
+    "note": "含总募集规模、最近总份额、成立日期、基金经理",
+    "long_term_stable": "中",
+    "stability_reason": "新浪基金数据中心，长期存在；实测部分标的净值/更新日期为 NaN"
+   },
+   {
+    "source": "akshare.fund_scale_close_sina 封闭式基金规模",
+    "public": true,
+    "auth_required": false,
+    "probed_at": "2026-11-19T10:57:21",
+    "status": "ok",
+    "rows": 209,
+    "columns": [
+     "序号",
+     "基金代码",
+     "基金简称",
+     "单位净值",
+     "总募集规模",
+     "最近总份额",
+     "成立日期",
+     "基金经理",
+     "更新日期"
+    ],
+    "sample": {
+     "序号": "1",
+     "基金代码": "007420",
+     "基金简称": "华安鼎信3个月定开债",
+     "单位净值": "nan",
+     "总募集规模": "903344.0",
+     "最近总份额": "9033440000.0",
+     "成立日期": "2019-05-15",
+     "基金经理": "鲍越愚",
+     "更新日期": "NaT"
+    },
+    "error": null,
+    "note": "封闭式基金，不是「已清盘基金」",
+    "long_term_stable": "中",
+    "stability_reason": "新浪封闭式基金列表；极易被误读为清盘基金"
+   },
+   {
+    "source": "akshare.fund_hold_structure_em 持有人结构",
+    "public": true,
+    "auth_required": false,
+    "probed_at": "2026-11-19T10:57:22",
+    "status": "ok",
+    "rows": 45,
+    "columns": [
+     "序号",
+     "截止日期",
+     "基金家数",
+     "机构持有比列",
+     "个人持有比列",
+     "内部持有比列",
+     "总份额"
+    ],
+    "sample": {
+     "序号": "1",
+     "截止日期": "2026-06-30",
+     "基金家数": "25763",
+     "机构持有比列": "43.22",
+     "个人持有比列": "56.03",
+     "内部持有比列": "2.18",
+     "总份额": "331742.67"
+    },
+    "error": null,
+    "note": "全市场汇总，不是单只基金",
+    "long_term_stable": "中",
+    "stability_reason": "东财季度汇总，低频更新"
+   },
+   {
+    "source": "akshare.fund_open_fund_info_em(indicator=单位净值走势)",
+    "public": true,
+    "auth_required": false,
+    "probed_at": "2026-11-19T10:57:23",
+    "status": "ok",
+    "rows": 4220,
+    "columns": [
+     "净值日期",
+     "单位净值",
+     "日增长率"
+    ],
+    "sample": {
+     "净值日期": "2009-07-10",
+     "单位净值": "1.0",
+     "日增长率": "0.0"
+    },
+    "error": null,
+    "note": "单只基金全历史单位净值；是本阶段最关键的历史数据来源",
+    "long_term_stable": "高",
+    "stability_reason": "东财 F10 净值接口，多年稳定；是本阶段核心数据源"
+   },
+   {
+    "source": "akshare.fund_open_fund_info_em(indicator=累计净值走势)",
+    "public": true,
+    "auth_required": false,
+    "probed_at": "2026-11-19T10:57:23",
+    "status": "ok",
+    "rows": 4220,
+    "columns": [
+     "净值日期",
+     "累计净值"
+    ],
+    "sample": {
+     "净值日期": "2009-07-10",
+     "累计净值": "1.0"
+    },
+    "error": null,
+    "note": "累计净值，与单位净值必须分开使用",
+    "long_term_stable": "高",
+    "stability_reason": "与单位净值同源 F10 接口，稳定性一致"
+   },
+   {
+    "source": "akshare.fund_open_fund_info_em(indicator=分红送配详情)",
+    "public": true,
+    "auth_required": false,
+    "probed_at": "2026-11-19T10:57:24",
+    "status": "ok",
+    "rows": 3,
+    "columns": [
+     "年份",
+     "权益登记日",
+     "除息日",
+     "每10份分红",
+     "分红发放日"
+    ],
+    "sample": {
+     "年份": "2021年",
+     "权益登记日": "2021-12-31",
+     "除息日": "2021-12-31",
+     "每10份分红": "每10份派现金0.4500元",
+     "分红发放日": "2022-01-05"
+    },
+    "error": null,
+    "note": "含权益登记日、除息日、每10份分红、发放日",
+    "long_term_stable": "高",
+    "stability_reason": "同源 F10；但实测存在两次返回条数不一致，需取并集"
+   },
+   {
+    "source": "akshare.fund_open_fund_info_em(indicator=拆分详情)",
+    "public": true,
+    "auth_required": false,
+    "probed_at": "2026-11-19T10:57:24",
+    "status": "ok",
+    "rows": 9,
+    "columns": [
+     "年份",
+     "拆分折算日",
+     "拆分类型",
+     "拆分折算比例"
+    ],
+    "sample": {
+     "年份": "2020年",
+     "拆分折算日": "2020-12-15",
+     "拆分类型": "份额折算",
+     "拆分折算比例": "1:1.0054"
+    },
+    "error": null,
+    "note": "份额折算/拆分记录",
+    "long_term_stable": "高",
+    "stability_reason": "同源 F10，拆分记录完整"
+   },
+   {
+    "source": "akshare.fund_money_fund_info_em 货币基金收益序列",
+    "public": true,
+    "auth_required": false,
+    "probed_at": "2026-11-19T10:57:25",
+    "status": "ok",
+    "rows": 4919,
+    "columns": [
+     "净值日期",
+     "每万份收益",
+     "7日年化收益率",
+     "申购状态",
+     "赎回状态"
+    ],
+    "sample": {
+     "净值日期": "2013-05-30",
+     "每万份收益": "1.1349",
+     "7日年化收益率": "2.093",
+     "申购状态": "封闭期",
+     "赎回状态": "封闭期"
+    },
+    "error": null,
+    "note": "货币基金用「每万份收益+7日年化」，没有单位净值",
+    "long_term_stable": "高",
+    "stability_reason": "东财货币基金专用接口；实测偶发 SSLError，需重试"
+   },
+   {
+    "source": "akshare.fund_individual_basic_info_xq 基金基本信息",
+    "public": true,
+    "auth_required": false,
+    "probed_at": "2026-11-19T10:57:52",
+    "status": "ok",
+    "rows": 14,
+    "columns": [
+     "item",
+     "value"
+    ],
+    "sample": {
+     "item": "基金代码",
+     "value": "110022"
+    },
+    "error": null,
+    "note": "含成立时间、规模、公司、经理、类型、业绩比较基准",
+    "long_term_stable": "中",
+    "stability_reason": "雪球接口；实测货币基金返回 KeyError，需兜底"
+   },
+   {
+    "source": "akshare.fund_portfolio_hold_em 基金持仓",
+    "public": true,
+    "auth_required": false,
+    "probed_at": "2026-11-19T10:57:52",
+    "status": "ok",
+    "rows": 137,
+    "columns": [
+     "序号",
+     "股票代码",
+     "股票名称",
+     "占净值比例",
+     "持股数",
+     "持仓市值",
+     "季度"
+    ],
+    "sample": {
+     "序号": "1",
+     "股票代码": "600519",
+     "股票名称": "贵州茅台",
+     "占净值比例": "9.74",
+     "持股数": "118.19",
+     "持仓市值": "184489.91",
+     "季度": "2025年1季度股票投资明细"
+    },
+    "error": null,
+    "note": "季度前十大重仓，按年查询",
+    "long_term_stable": "中",
+    "stability_reason": "东财季报持仓，按年查询，滞后于季报披露"
+   }
+  ],
+  "money_fund_special_case": [
+   {
+    "code": "000581",
+    "rows": null,
+    "error": "JSEvalException: <anonymous>:1: ReferenceError: Data_netWorthTrend is not defined\nJSON.stringify((function(){return (Data_netWorthTrend)}"
+   },
+   {
+    "code": "519505",
+    "rows": null,
+    "error": "JSEvalException: <anonymous>:1: ReferenceError: Data_netWorthTrend is not defined\nJSON.stringify((function(){return (Data_netWorthTrend)}"
+   }
+  ],
+  "summary": {
+   "total": 14,
+   "ok": 14,
+   "empty": 0,
+   "failed": 0
+  }
+ },
+ "survivorship": {
+  "fund_name_em_total": 28380,
+  "fund_purchase_em_total": 28075,
+  "purchase_status_values": [
+   "",
+   "场内交易",
+   "封闭期",
+   "开放申购",
+   "暂停申购",
+   "认购期",
+   "限大额"
+  ],
+  "has_liquidated_status": false,
+  "name_keyword_hits": 2,
+  "name_keyword_sample": [
+   {
+    "基金代码": "024519",
+    "基金简称": "华安上海清算所0-5年政金债指数A"
+   },
+   {
+    "基金代码": "024520",
+    "基金简称": "华安上海清算所0-5年政金债指数C"
+   }
+  ],
+  "liquidated_fund_source_available": false,
+  "conclusion": "survivorship_bias_unresolved",
+  "reason": "AKShare 提供的 fund_name_em / fund_open_fund_daily_em / fund_purchase_em 都只覆盖「当前清单」，没有任何接口返回已清盘、已合并或已终止运作的基金名录。fund_scale_close_sina 是「封闭式基金」而非「已清盘基金」，容易被误读，必须在架构里显式区分。",
+  "mitigation": [
+   "短期：明确标注 survivorship_bias_unresolved，所有历史回测结论必须附带该限制。",
+   "中期：从基金业协会 / 证监会公告 / 天天基金清盘公告页自行构建 fund_lifecycle_events 表，按公告逐条补录。",
+   "长期：建立「历史基金全量快照」机制，每期抓取全量清单留档，用快照差异反推清盘时点。"
+  ]
+ },
+ "share_classes": {
+  "pairs": [
+   {
+    "base_name": "招商中证白酒指数(LOF)",
+    "a_code": "161725",
+    "a_name": "招商中证白酒指数(LOF)A",
+    "c_code": "012414",
+    "c_name": "招商中证白酒指数(LOF)C",
+    "note": "同一基金本体的不同份额类别，不得计为两个投资标的"
+   },
+   {
+    "base_name": "国联安中证半导体ETF联接",
+    "a_code": "007300",
+    "a_name": "国联安中证半导体ETF联接A",
+    "c_code": "007301",
+    "c_name": "国联安中证半导体ETF联接C",
+    "note": "同一基金本体的不同份额类别，不得计为两个投资标的"
+   },
+   {
+    "base_name": "华夏纯债债券",
+    "a_code": "000015",
+    "a_name": "华夏纯债债券A",
+    "c_code": "000016",
+    "c_name": "华夏纯债债券C",
+    "note": "同一基金本体的不同份额类别，不得计为两个投资标的"
+   },
+   {
+    "base_name": "易方达消费行业（无 C 类在样本内）",
+    "a_code": "110022",
+    "a_name": "易方达消费行业股票",
+    "c_code": null,
+    "c_name": null,
+    "note": "同一基金本体的不同份额类别，不得计为两个投资标的"
+   }
+  ],
+  "suffix_a_count": 10878,
+  "suffix_c_count": 10401,
+  "total_funds": 28380,
+  "conclusion": "A/C 在 fund_name_em 里是**独立代码、独立名称后缀**，但同属一个基金本体。架构必须拆成 fund_master（本体）与 fund_share_classes（份额）两级，否则基金会重复计数。"
+ },
+ "sample_funds": [
+  {
+   "code": "000051",
+   "category": "宽基指数",
+   "expected_name": "华夏沪深300ETF联接A",
+   "name_matched": true,
+   "unit_nav": {
+    "rows": 4220,
+    "first_date": "2009-07-10",
+    "last_date": "2026-11-18",
+    "first_value": 1.0,
+    "last_value": 1.5402,
+    "min": 0.622,
+    "max": 1.936,
+    "non_positive_count": 0
+   },
+   "acc_nav": {
+    "rows": 4220,
+    "first_date": "2009-07-10",
+    "last_date": "2026-11-18",
+    "first_value": 1.0,
+    "last_value": 1.5402
+   },
+   "dividends": {
+    "count": 0,
+    "rows": [],
+    "fetch_stable": true,
+    "note": "两次抓取条数一致"
+   },
+   "splits": {
+    "count": 0,
+    "rows": []
+   },
+   "basic_info": {
+    "name": "华夏沪深300ETF联接A",
+    "full_name": "华夏沪深300交易型开放式指数证券投资基金联接基金",
+    "established": "2009-07-10",
+    "scale": "114.34亿",
+    "company": "华夏基金管理有限公司",
+    "manager": "赵宗庭",
+    "type": "股票型-标准指数",
+    "benchmark": "沪深300指数收益率×95%＋1%（指年收益率，评价时应按期间折算）",
+    "custodian": "中国工商银行股份有限公司"
+   },
+   "anomalies": [],
+   "status": "ok",
+   "name_match_basis": "去噪后双向包含（忽略中证/ETF/全半角括号）",
+   "name_actual": "华夏沪深300ETF联接A",
+   "nav_jumps": {
+    "count": 0,
+    "max_abs_pct": null,
+    "dates": []
+   },
+   "nav_jump_dates": [],
+   "nav_jump_detail": [],
+   "unit_vs_acc": {
+    "unit_last": 1.5402,
+    "acc_last": 1.5402,
+    "diff": 0.0,
+    "interpretation": "无分红或口径一致"
+   }
+  },
+  {
+   "code": "110020",
+   "category": "宽基指数",
+   "expected_name": "易方达沪深300ETF联接A",
+   "name_matched": true,
+   "unit_nav": {
+    "rows": 4186,
+    "first_date": "2009-08-26",
+    "last_date": "2026-11-18",
+    "first_value": 1.0,
+    "last_value": 1.6526,
+    "min": 0.6665,
+    "max": 2.047,
+    "non_positive_count": 0
+   },
+   "acc_nav": {
+    "rows": 4186,
+    "first_date": "2009-08-26",
+    "last_date": "2026-11-18",
+    "first_value": 1.0,
+    "last_value": 1.6526
+   },
+   "dividends": {
+    "count": 0,
+    "rows": [],
+    "fetch_stable": true,
+    "note": "两次抓取条数一致"
+   },
+   "splits": {
+    "count": 0,
+    "rows": []
+   },
+   "basic_info": {
+    "name": "易方达沪深300ETF联接A",
+    "full_name": "易方达沪深300交易型开放式指数发起式证券投资基金联接基金",
+    "established": "2009-08-26",
+    "scale": "158.24亿",
+    "company": "易方达基金管理有限公司",
+    "manager": "余海燕 庞亚平",
+    "type": "股票型-标准指数",
+    "benchmark": "沪深300指数收益率X95%+活期存款利率(税后)X5%",
+    "custodian": "中国建设银行股份有限公司"
+   },
+   "anomalies": [],
+   "status": "ok",
+   "name_match_basis": "去噪后双向包含（忽略中证/ETF/全半角括号）",
+   "name_actual": "易方达沪深300ETF联接A",
+   "nav_jumps": {
+    "count": 0,
+    "max_abs_pct": null,
+    "dates": []
+   },
+   "nav_jump_dates": [],
+   "nav_jump_detail": [],
+   "unit_vs_acc": {
+    "unit_last": 1.6526,
+    "acc_last": 1.6526,
+    "diff": 0.0,
+    "interpretation": "无分红或口径一致"
+   }
+  },
+  {
+   "code": "161725",
+   "category": "行业指数",
+   "expected_name": "招商中证白酒指数(LOF)A",
+   "name_matched": true,
+   "unit_nav": {
+    "rows": 2794,
+    "first_date": "2015-05-27",
+    "last_date": "2026-11-18",
+    "first_value": 1.0,
+    "last_value": 0.5791,
+    "min": 0.4959,
+    "max": 1.6466,
+    "non_positive_count": 0
+   },
+   "acc_nav": {
+    "rows": 2794,
+    "first_date": "2015-05-27",
+    "last_date": "2026-11-18",
+    "first_value": 1.0,
+    "last_value": 2.2952
+   },
+   "dividends": {
+    "count": 3,
+    "rows": [
+     {
+      "record_date": "2021-12-31",
+      "ex_date": "2021-12-31",
+      "pay_date": "2022-01-05",
+      "cash_per_share": 0.045,
+      "raw": "每10份派现金0.4500元"
+     },
+     {
+      "record_date": "2021-12-09",
+      "ex_date": "2021-12-09",
+      "pay_date": "2021-12-13",
+      "cash_per_share": 0.028,
+      "raw": "每10份派现金0.2800元"
+     },
+     {
+      "record_date": "2021-09-07",
+      "ex_date": "2021-09-07",
+      "pay_date": "2021-09-09",
+      "cash_per_share": 0.012,
+      "raw": "每10份派现金0.1200元"
+     }
+    ],
+    "fetch_stable": true,
+    "note": "两次抓取条数一致"
+   },
+   "splits": {
+    "count": 9,
+    "rows": [
+     {
+      "年份": "2020年",
+      "拆分折算日": "2020-12-15",
+      "拆分类型": "份额折算",
+      "拆分折算比例": "1:1.0054"
+     },
+     {
+      "年份": "2020年",
+      "拆分折算日": "2020-08-26",
+      "拆分类型": "份额折算",
+      "拆分折算比例": "1:1.4982"
+     },
+     {
+      "年份": "2019年",
+      "拆分折算日": "2019-12-16",
+      "拆分类型": "份额折算",
+      "拆分折算比例": "1:1.0107"
+     },
+     {
+      "年份": "2019年",
+      "拆分折算日": "2019-07-02",
+      "拆分类型": "份额折算",
+      "拆分折算比例": "1:1.5569"
+     },
+     {
+      "年份": "2018年",
+      "拆分折算日": "2018-12-17",
+      "拆分类型": "份额折算",
+      "拆分折算比例": "1:1.0255"
+     },
+     {
+      "年份": "2017年",
+      "拆分折算日": "2017-12-15",
+      "拆分类型": "份额折算",
+      "拆分折算比例": "1:1.0045"
+     },
+     {
+      "年份": "2017年",
+      "拆分折算日": "2017-09-26",
+      "拆分类型": "份额折算",
+      "拆分折算比例": "1:1.4942"
+     },
+     {
+      "年份": "2016年",
+      "拆分折算日": "2016-12-15",
+      "拆分类型": "份额折算",
+      "拆分折算比例": "1:1.0230"
+     },
+     {
+      "年份": "2015年",
+      "拆分折算日": "2015-12-15",
+      "拆分类型": "份额折算",
+      "拆分折算比例": "1:1.0180"
+     }
+    ]
+   },
+   "basic_info": {
+    "name": "招商中证白酒指数",
+    "full_name": "招商中证白酒指数证券投资基金",
+    "established": "2015-05-27",
+    "scale": "209.47亿",
+    "company": "招商基金管理有限公司",
+    "manager": "侯昊",
+    "type": "股票型-标准指数",
+    "benchmark": "中证白酒指数收益率×95%＋金融机构人民币活期存款基准利率（税后）×5%",
+    "custodian": "中国银行股份有限公司"
+   },
+   "anomalies": [],
+   "status": "ok",
+   "name_match_basis": "去噪后双向包含（忽略中证/ETF/全半角括号）",
+   "name_actual": "招商中证白酒指数",
+   "nav_jumps": {
+    "count": 3,
+    "max_abs_pct": 35.27,
+    "dates": [
+     "2017-09-26",
+     "2019-07-02",
+     "2020-08-26"
+    ]
+   },
+   "nav_jump_dates": [
+    "2017-09-26",
+    "2019-07-02",
+    "2020-08-26"
+   ],
+   "nav_jump_detail": [
+    {
+     "date": "2017-09-26",
+     "prev_nav": 1.5,
+     "this_nav": 1.0,
+     "pct": -0.333333
+    },
+    {
+     "date": "2019-07-02",
+     "prev_nav": 1.5448,
+     "this_nav": 1.0,
+     "pct": -0.352667
+    },
+    {
+     "date": "2020-08-26",
+     "prev_nav": 1.5018,
+     "this_nav": 1.0,
+     "pct": -0.334132
+    }
+   ],
+   "nav_jump_attribution": {
+    "total": 3,
+    "explained_by_splits": 3,
+    "explained_by_dividends": 0,
+    "unexplained": 0,
+    "unexplained_dates": [],
+    "note": "除息日单位净值会因分红下跌，属于正常事件；拆分/折算日净值跳变也正常。只有两类记录都对不上的跳变才算数据异常。"
+   },
+   "notes": [
+    "3 次跳变由份额折算/拆分解释"
+   ],
+   "unit_vs_acc": {
+    "unit_last": 0.5791,
+    "acc_last": 2.2952,
+    "diff": 1.7161,
+    "interpretation": "差额即历史累计现金分红（未含拆分）"
+   }
+  },
+  {
+   "code": "012414",
+   "category": "行业指数",
+   "expected_name": "招商中证白酒指数(LOF)C",
+   "name_matched": true,
+   "unit_nav": {
+    "rows": 1338,
+    "first_date": "2021-05-18",
+    "last_date": "2026-11-18",
+    "first_value": 1.4453,
+    "last_value": 0.576,
+    "min": 0.4935,
+    "max": 1.6466,
+    "non_positive_count": 0
+   },
+   "acc_nav": {
+    "rows": 1338,
+    "first_date": "2021-05-18",
+    "last_date": "2026-11-18",
+    "first_value": 1.4453,
+    "last_value": 0.661
+   },
+   "dividends": {
+    "count": 3,
+    "rows": [
+     {
+      "record_date": "2021-12-31",
+      "ex_date": "2021-12-31",
+      "pay_date": "2022-01-04",
+      "cash_per_share": 0.045,
+      "raw": "每10份派现金0.4500元"
+     },
+     {
+      "record_date": "2021-12-09",
+      "ex_date": "2021-12-09",
+      "pay_date": "2021-12-10",
+      "cash_per_share": 0.028,
+      "raw": "每10份派现金0.2800元"
+     },
+     {
+      "record_date": "2021-09-07",
+      "ex_date": "2021-09-07",
+      "pay_date": "2021-09-08",
+      "cash_per_share": 0.012,
+      "raw": "每10份派现金0.1200元"
+     }
+    ],
+    "fetch_stable": true,
+    "note": "两次抓取条数一致"
+   },
+   "splits": {
+    "count": 0,
+    "rows": []
+   },
+   "basic_info": {
+    "name": "招商中证白酒指数C",
+    "full_name": "招商中证白酒指数证券投资基金",
+    "established": "2021-05-18",
+    "scale": "125.12亿",
+    "company": "招商基金管理有限公司",
+    "manager": "侯昊",
+    "type": "股票型-标准指数",
+    "benchmark": "中证白酒指数收益率×95%＋金融机构人民币活期存款基准利率（税后）×5%",
+    "custodian": "中国银行股份有限公司"
+   },
+   "anomalies": [],
+   "status": "ok",
+   "name_match_basis": "去噪后双向包含（忽略中证/ETF/全半角括号）",
+   "name_actual": "招商中证白酒指数C",
+   "nav_jumps": {
+    "count": 0,
+    "max_abs_pct": null,
+    "dates": []
+   },
+   "nav_jump_dates": [],
+   "nav_jump_detail": [],
+   "unit_vs_acc": {
+    "unit_last": 0.576,
+    "acc_last": 0.661,
+    "diff": 0.085,
+    "interpretation": "差额即历史累计现金分红（未含拆分）"
+   }
+  },
+  {
+   "code": "007300",
+   "category": "ETF联接",
+   "expected_name": "国联安中证半导体ETF联接A",
+   "name_matched": true,
+   "unit_nav": {
+    "rows": 1799,
+    "first_date": "2019-06-26",
+    "last_date": "2026-11-18",
+    "first_value": 1.0001,
+    "last_value": 3.0432,
+    "min": 0.9904,
+    "max": 5.6699,
+    "non_positive_count": 0
+   },
+   "acc_nav": {
+    "rows": 1799,
+    "first_date": "2019-06-26",
+    "last_date": "2026-11-18",
+    "first_value": 1.0001,
+    "last_value": 3.0432
+   },
+   "dividends": {
+    "count": 0,
+    "rows": [],
+    "fetch_stable": true,
+    "note": "两次抓取条数一致"
+   },
+   "splits": {
+    "count": 0,
+    "rows": []
+   },
+   "basic_info": {
+    "name": "国联安半导体ETF联接A",
+    "full_name": "国联安中证全指半导体产品与设备交易型开放式指数证券投资基金联接基金",
+    "established": "2019-06-26",
+    "scale": "13.25亿",
+    "company": "国联安基金管理有限公司",
+    "manager": "黄欣 章椹元",
+    "type": "股票型-标准指数",
+    "benchmark": "中证全指半导体产品与设备指数收益率×95%＋银行活期存款利率（税后）×5%",
+    "custodian": "国泰海通证券股份有限公司"
+   },
+   "anomalies": [],
+   "status": "ok",
+   "name_match_basis": "去噪后双向包含（忽略中证/ETF/全半角括号）",
+   "name_actual": "国联安半导体ETF联接A",
+   "nav_jumps": {
+    "count": 0,
+    "max_abs_pct": null,
+    "dates": []
+   },
+   "nav_jump_dates": [],
+   "nav_jump_detail": [],
+   "unit_vs_acc": {
+    "unit_last": 3.0432,
+    "acc_last": 3.0432,
+    "diff": 0.0,
+    "interpretation": "无分红或口径一致"
+   }
+  },
+  {
+   "code": "007301",
+   "category": "ETF联接",
+   "expected_name": "国联安中证半导体ETF联接C",
+   "name_matched": true,
+   "unit_nav": {
+    "rows": 1799,
+    "first_date": "2019-06-26",
+    "last_date": "2026-11-18",
+    "first_value": 1.0001,
+    "last_value": 2.9802,
+    "min": 0.9901,
+    "max": 5.5579,
+    "non_positive_count": 0
+   },
+   "acc_nav": {
+    "rows": 1799,
+    "first_date": "2019-06-26",
+    "last_date": "2026-11-18",
+    "first_value": 1.0001,
+    "last_value": 2.9802
+   },
+   "dividends": {
+    "count": 0,
+    "rows": [],
+    "fetch_stable": true,
+    "note": "两次抓取条数一致"
+   },
+   "splits": {
+    "count": 0,
+    "rows": []
+   },
+   "basic_info": {
+    "name": "国联安半导体ETF联接C",
+    "full_name": "国联安中证全指半导体产品与设备交易型开放式指数证券投资基金联接基金",
+    "established": "2019-06-26",
+    "scale": "20.81亿",
+    "company": "国联安基金管理有限公司",
+    "manager": "黄欣 章椹元",
+    "type": "股票型-标准指数",
+    "benchmark": "中证全指半导体产品与设备指数收益率×95%＋银行活期存款利率（税后）×5%",
+    "custodian": "国泰海通证券股份有限公司"
+   },
+   "anomalies": [],
+   "status": "ok",
+   "name_match_basis": "去噪后双向包含（忽略中证/ETF/全半角括号）",
+   "name_actual": "国联安半导体ETF联接C",
+   "nav_jumps": {
+    "count": 0,
+    "max_abs_pct": null,
+    "dates": []
+   },
+   "nav_jump_dates": [],
+   "nav_jump_detail": [],
+   "unit_vs_acc": {
+    "unit_last": 2.9802,
+    "acc_last": 2.9802,
+    "diff": 0.0,
+    "interpretation": "无分红或口径一致"
+   }
+  },
+  {
+   "code": "110022",
+   "category": "主动权益",
+   "expected_name": "易方达消费行业股票",
+   "name_matched": true,
+   "unit_nav": {
+    "rows": 3927,
+    "first_date": "2010-08-20",
+    "last_date": "2026-11-18",
+    "first_value": 1.0,
+    "last_value": 3.01,
+    "min": 0.729,
+    "max": 6.129,
+    "non_positive_count": 0
+   },
+   "acc_nav": {
+    "rows": 3927,
+    "first_date": "2010-08-20",
+    "last_date": "2026-11-18",
+    "first_value": 1.0,
+    "last_value": 3.01
+   },
+   "dividends": {
+    "count": 0,
+    "rows": [],
+    "fetch_stable": true,
+    "note": "两次抓取条数一致"
+   },
+   "splits": {
+    "count": 0,
+    "rows": []
+   },
+   "basic_info": {
+    "name": "易方达消费行业",
+    "full_name": "易方达消费行业股票型证券投资基金",
+    "established": "2010-08-20",
+    "scale": "101.09亿",
+    "company": "易方达基金管理有限公司",
+    "manager": "萧楠",
+    "type": "股票型-普通",
+    "benchmark": "中证内地消费主题指数收益率×85%+中债总指数收益率×15%",
+    "custodian": "中国农业银行股份有限公司"
+   },
+   "anomalies": [],
+   "status": "ok",
+   "name_match_basis": "去噪后双向包含（忽略中证/ETF/全半角括号）",
+   "name_actual": "易方达消费行业",
+   "nav_jumps": {
+    "count": 0,
+    "max_abs_pct": null,
+    "dates": []
+   },
+   "nav_jump_dates": [],
+   "nav_jump_detail": [],
+   "unit_vs_acc": {
+    "unit_last": 3.01,
+    "acc_last": 3.01,
+    "diff": 0.0,
+    "interpretation": "无分红或口径一致"
+   }
+  },
+  {
+   "code": "161005",
+   "category": "主动权益",
+   "expected_name": "富国天惠成长混合(LOF)A",
+   "name_matched": true,
+   "unit_nav": {
+    "rows": 5124,
+    "first_date": "2005-11-16",
+    "last_date": "2026-11-18",
+    "first_value": 1.0,
+    "last_value": 2.4727,
+    "min": 0.7755,
+    "max": 4.149,
+    "non_positive_count": 0
+   },
+   "acc_nav": {
+    "rows": 5124,
+    "first_date": "2005-11-16",
+    "last_date": "2026-11-18",
+    "first_value": 1.0,
+    "last_value": 5.5207
+   },
+   "dividends": {
+    "count": 16,
+    "rows": [
+     {
+      "record_date": "2021-03-26",
+      "ex_date": "2021-03-26",
+      "pay_date": "2021-03-30",
+      "cash_per_share": 0.15,
+      "raw": "每10份派现金1.5000元"
+     },
+     {
+      "record_date": "2020-03-19",
+      "ex_date": "2020-03-19",
+      "pay_date": "2020-03-23",
+      "cash_per_share": 0.11,
+      "raw": "每10份派现金1.1000元"
+     },
+     {
+      "record_date": "2018-04-02",
+      "ex_date": "2018-04-02",
+      "pay_date": "2018-04-04",
+      "cash_per_share": 0.1,
+      "raw": "每10份派现金1.0000元"
+     },
+     {
+      "record_date": "2016-02-23",
+      "ex_date": "2016-02-23",
+      "pay_date": "2016-02-25",
+      "cash_per_share": 0.65,
+      "raw": "每10份派现金6.5000元"
+     },
+     {
+      "record_date": "2015-01-21",
+      "ex_date": "2015-01-21",
+      "pay_date": "2015-01-23",
+      "cash_per_share": 0.14,
+      "raw": "每10份派现金1.4000元"
+     },
+     {
+      "record_date": "2014-01-17",
+      "ex_date": "2014-01-17",
+      "pay_date": "2014-01-21",
+      "cash_per_share": 0.135,
+      "raw": "每10份派现金1.3500元"
+     },
+     {
+      "record_date": "2011-01-26",
+      "ex_date": "2011-01-26",
+      "pay_date": "2011-01-28",
+      "cash_per_share": 0.083,
+      "raw": "每10份派现金0.8300元"
+     },
+     {
+      "record_date": "2010-01-08",
+      "ex_date": "2010-01-08",
+      "pay_date": "2010-01-12",
+      "cash_per_share": 0.18,
+      "raw": "每10份派现金1.8000元"
+     },
+     {
+      "record_date": "2008-03-05",
+      "ex_date": "2008-03-05",
+      "pay_date": "2008-03-07",
+      "cash_per_share": 0.3,
+      "raw": "每10份派现金3.0000元"
+     },
+     {
+      "record_date": "2007-01-05",
+      "ex_date": "2007-01-05",
+      "pay_date": "2007-01-09",
+      "cash_per_share": 0.53,
+      "raw": "每10份派现金5.3000元"
+     },
+     {
+      "record_date": "2006-12-27",
+      "ex_date": "2006-12-27",
+      "pay_date": "2006-12-29",
+      "cash_per_share": 0.3,
+      "raw": "每10份派现金3.0000元"
+     },
+     {
+      "record_date": "2006-12-20",
+      "ex_date": "2006-12-20",
+      "pay_date": "2006-12-22",
+      "cash_per_share": 0.2,
+      "raw": "每10份派现金2.0000元"
+     },
+     {
+      "record_date": "2006-10-16",
+      "ex_date": "2006-10-16",
+      "pay_date": "2006-10-18",
+      "cash_per_share": 0.05,
+      "raw": "每10份派现金0.5000元"
+     },
+     {
+      "record_date": "2006-04-12",
+      "ex_date": "2006-04-12",
+      "pay_date": "2006-04-14",
+      "cash_per_share": 0.05,
+      "raw": "每10份派现金0.5000元"
+     },
+     {
+      "record_date": "2006-03-24",
+      "ex_date": "2006-03-24",
+      "pay_date": "2006-03-28",
+      "cash_per_share": 0.03,
+      "raw": "每10份派现金0.3000元"
+     },
+     {
+      "record_date": "2006-02-17",
+      "ex_date": "2006-02-17",
+      "pay_date": "2006-02-21",
+      "cash_per_share": 0.04,
+      "raw": "每10份派现金0.4000元"
+     }
+    ],
+    "fetch_stable": true,
+    "note": "两次抓取条数一致"
+   },
+   "splits": {
+    "count": 0,
+    "rows": []
+   },
+   "basic_info": {
+    "name": "富国天惠成长混合（LOF）A",
+    "full_name": "富国天惠精选成长混合型证券投资基金(LOF)",
+    "established": "2005-11-16",
+    "scale": "157.57亿",
+    "company": "富国基金管理有限公司",
+    "manager": "朱少醒",
+    "type": "混合型-偏股",
+    "benchmark": "沪深300指数收益率×70%+中债综合全价指数收益率×25%+同业存款利率×5%",
+    "custodian": "中国工商银行股份有限公司"
+   },
+   "anomalies": [],
+   "status": "ok",
+   "name_match_basis": "去噪后双向包含（忽略中证/ETF/全半角括号）",
+   "name_actual": "富国天惠成长混合（LOF）A",
+   "nav_jumps": {
+    "count": 2,
+    "max_abs_pct": 33.75,
+    "dates": [
+     "2007-01-05",
+     "2016-02-23"
+    ]
+   },
+   "nav_jump_dates": [
+    "2007-01-05",
+    "2016-02-23"
+   ],
+   "nav_jump_detail": [
+    {
+     "date": "2007-01-05",
+     "prev_nav": 1.5586,
+     "this_nav": 1.0326,
+     "pct": -0.337482
+    },
+    {
+     "date": "2016-02-23",
+     "prev_nav": 2.2351,
+     "this_nav": 1.5698,
+     "pct": -0.29766
+    }
+   ],
+   "nav_jump_attribution": {
+    "total": 2,
+    "explained_by_splits": 0,
+    "explained_by_dividends": 2,
+    "unexplained": 0,
+    "unexplained_dates": [],
+    "note": "除息日单位净值会因分红下跌，属于正常事件；拆分/折算日净值跳变也正常。只有两类记录都对不上的跳变才算数据异常。"
+   },
+   "notes": [
+    "2 次跳变由现金分红除息解释"
+   ],
+   "unit_vs_acc": {
+    "unit_last": 2.4727,
+    "acc_last": 5.5207,
+    "diff": 3.048,
+    "interpretation": "差额即历史累计现金分红（未含拆分）"
+   }
+  },
+  {
+   "code": "000478",
+   "category": "指数增强",
+   "expected_name": "建信中证500指数增强A",
+   "name_matched": true,
+   "unit_nav": {
+    "rows": 3096,
+    "first_date": "2014-01-27",
+    "last_date": "2026-11-18",
+    "first_value": 1.0,
+    "last_value": 2.8419,
+    "min": 0.9418,
+    "max": 3.9254,
+    "non_positive_count": 0
+   },
+   "acc_nav": {
+    "rows": 3096,
+    "first_date": "2014-01-27",
+    "last_date": "2026-11-18",
+    "first_value": 1.0,
+    "last_value": 2.8419
+   },
+   "dividends": {
+    "count": 0,
+    "rows": [],
+    "fetch_stable": true,
+    "note": "两次抓取条数一致"
+   },
+   "splits": {
+    "count": 0,
+    "rows": []
+   },
+   "basic_info": {
+    "name": "建信中证500指数增强A",
+    "full_name": "建信中证500指数增强型证券投资基金",
+    "established": "2014-01-27",
+    "scale": "23.14亿",
+    "company": "建信基金管理有限责任公司",
+    "manager": "叶乐天",
+    "type": "股票型-增强指数",
+    "benchmark": "95%×中证500指数收益率+5%×商业银行活期存款利率（税前）",
+    "custodian": "中信银行股份有限公司"
+   },
+   "anomalies": [],
+   "status": "ok",
+   "name_match_basis": "去噪后双向包含（忽略中证/ETF/全半角括号）",
+   "name_actual": "建信中证500指数增强A",
+   "nav_jumps": {
+    "count": 0,
+    "max_abs_pct": null,
+    "dates": []
+   },
+   "nav_jump_dates": [],
+   "nav_jump_detail": [],
+   "unit_vs_acc": {
+    "unit_last": 2.8419,
+    "acc_last": 2.8419,
+    "diff": 0.0,
+    "interpretation": "无分红或口径一致"
+   }
+  },
+  {
+   "code": "000015",
+   "category": "债券",
+   "expected_name": "华夏纯债债券A",
+   "name_matched": true,
+   "unit_nav": {
+    "rows": 3310,
+    "first_date": "2013-03-08",
+    "last_date": "2026-11-18",
+    "first_value": 1.0,
+    "last_value": 1.2109,
+    "min": 0.975,
+    "max": 1.322,
+    "non_positive_count": 0
+   },
+   "acc_nav": {
+    "rows": 3310,
+    "first_date": "2013-03-08",
+    "last_date": "2026-11-18",
+    "first_value": 1.0,
+    "last_value": 1.6015
+   },
+   "dividends": {
+    "count": 9,
+    "rows": [
+     {
+      "record_date": "2024-04-29",
+      "ex_date": "2024-04-29",
+      "pay_date": "2024-04-30",
+      "cash_per_share": 0.021,
+      "raw": "每10份派现金0.2100元"
+     },
+     {
+      "record_date": "2024-01-29",
+      "ex_date": "2024-01-29",
+      "pay_date": "2024-01-30",
+      "cash_per_share": 0.0035,
+      "raw": "每10份派现金0.0350元"
+     },
+     {
+      "record_date": "2023-12-19",
+      "ex_date": "2023-12-19",
+      "pay_date": "2023-12-20",
+      "cash_per_share": 0.115,
+      "raw": "每10份派现金1.1500元"
+     },
+     {
+      "record_date": "2023-10-24",
+      "ex_date": "2023-10-24",
+      "pay_date": "2023-10-25",
+      "cash_per_share": 0.0315,
+      "raw": "每10份派现金0.3150元"
+     },
+     {
+      "record_date": "2023-09-26",
+      "ex_date": "2023-09-26",
+      "pay_date": "2023-09-27",
+      "cash_per_share": 0.05,
+      "raw": "每10份派现金0.5000元"
+     },
+     {
+      "record_date": "2020-12-07",
+      "ex_date": "2020-12-07",
+      "pay_date": "2020-12-08",
+      "cash_per_share": 0.0563,
+      "raw": "每10份派现金0.5630元"
+     },
+     {
+      "record_date": "2019-12-16",
+      "ex_date": "2019-12-16",
+      "pay_date": "2019-12-17",
+      "cash_per_share": 0.0273,
+      "raw": "每10份派现金0.2730元"
+     },
+     {
+      "record_date": "2018-12-20",
+      "ex_date": "2018-12-20",
+      "pay_date": "2018-12-21",
+      "cash_per_share": 0.056,
+      "raw": "每10份派现金0.5600元"
+     },
+     {
+      "record_date": "2016-01-06",
+      "ex_date": "2016-01-06",
+      "pay_date": "2016-01-07",
+      "cash_per_share": 0.03,
+      "raw": "每10份派现金0.3000元"
+     }
+    ],
+    "fetch_stable": true,
+    "note": "两次抓取条数一致"
+   },
+   "splits": {
+    "count": 0,
+    "rows": []
+   },
+   "basic_info": {
+    "name": "华夏纯债债券A",
+    "full_name": "华夏纯债债券型证券投资基金",
+    "established": "2013-03-08",
+    "scale": "108.71亿",
+    "company": "华夏基金管理有限公司",
+    "manager": "柳万军",
+    "type": "债券型-长期纯债",
+    "benchmark": "中债综合指数",
+    "custodian": "中国建设银行股份有限公司"
+   },
+   "anomalies": [],
+   "status": "ok",
+   "name_match_basis": "去噪后双向包含（忽略中证/ETF/全半角括号）",
+   "name_actual": "华夏纯债债券A",
+   "nav_jumps": {
+    "count": 0,
+    "max_abs_pct": null,
+    "dates": []
+   },
+   "nav_jump_dates": [],
+   "nav_jump_detail": [],
+   "unit_vs_acc": {
+    "unit_last": 1.2109,
+    "acc_last": 1.6015,
+    "diff": 0.3906,
+    "interpretation": "差额即历史累计现金分红（未含拆分）"
+   }
+  },
+  {
+   "code": "000016",
+   "category": "债券",
+   "expected_name": "华夏纯债债券C",
+   "name_matched": true,
+   "unit_nav": {
+    "rows": 3310,
+    "first_date": "2013-03-08",
+    "last_date": "2026-11-18",
+    "first_value": 1.0,
+    "last_value": 1.1968,
+    "min": 0.972,
+    "max": 1.272,
+    "non_positive_count": 0
+   },
+   "acc_nav": {
+    "rows": 3310,
+    "first_date": "2013-03-08",
+    "last_date": "2026-11-18",
+    "first_value": 1.0,
+    "last_value": 1.5276
+   },
+   "dividends": {
+    "count": 9,
+    "rows": [
+     {
+      "record_date": "2024-04-29",
+      "ex_date": "2024-04-29",
+      "pay_date": "2024-04-30",
+      "cash_per_share": 0.038,
+      "raw": "每10份派现金0.3800元"
+     },
+     {
+      "record_date": "2024-01-29",
+      "ex_date": "2024-01-29",
+      "pay_date": "2024-01-30",
+      "cash_per_share": 0.0555,
+      "raw": "每10份派现金0.5550元"
+     },
+     {
+      "record_date": "2023-12-19",
+      "ex_date": "2023-12-19",
+      "pay_date": "2023-12-20",
+      "cash_per_share": 0.0208,
+      "raw": "每10份派现金0.2080元"
+     },
+     {
+      "record_date": "2023-10-24",
+      "ex_date": "2023-10-24",
+      "pay_date": "2023-10-25",
+      "cash_per_share": 0.0252,
+      "raw": "每10份派现金0.2520元"
+     },
+     {
+      "record_date": "2023-09-26",
+      "ex_date": "2023-09-26",
+      "pay_date": "2023-09-27",
+      "cash_per_share": 0.031,
+      "raw": "每10份派现金0.3100元"
+     },
+     {
+      "record_date": "2020-12-07",
+      "ex_date": "2020-12-07",
+      "pay_date": "2020-12-08",
+      "cash_per_share": 0.0548,
+      "raw": "每10份派现金0.5480元"
+     },
+     {
+      "record_date": "2019-12-16",
+      "ex_date": "2019-12-16",
+      "pay_date": "2019-12-17",
+      "cash_per_share": 0.0205,
+      "raw": "每10份派现金0.2050元"
+     },
+     {
+      "record_date": "2018-12-20",
+      "ex_date": "2018-12-20",
+      "pay_date": "2018-12-21",
+      "cash_per_share": 0.055,
+      "raw": "每10份派现金0.5500元"
+     },
+     {
+      "record_date": "2016-01-06",
+      "ex_date": "2016-01-06",
+      "pay_date": "2016-01-07",
+      "cash_per_share": 0.03,
+      "raw": "每10份派现金0.3000元"
+     }
+    ],
+    "fetch_stable": true,
+    "note": "两次抓取条数一致"
+   },
+   "splits": {
+    "count": 0,
+    "rows": []
+   },
+   "basic_info": {
+    "name": "华夏纯债债券C",
+    "full_name": "华夏纯债债券型证券投资基金",
+    "established": "2013-03-08",
+    "scale": "13.55亿",
+    "company": "华夏基金管理有限公司",
+    "manager": "柳万军",
+    "type": "债券型-长期纯债",
+    "benchmark": "中债综合指数",
+    "custodian": "中国建设银行股份有限公司"
+   },
+   "anomalies": [],
+   "status": "ok",
+   "name_match_basis": "去噪后双向包含（忽略中证/ETF/全半角括号）",
+   "name_actual": "华夏纯债债券C",
+   "nav_jumps": {
+    "count": 0,
+    "max_abs_pct": null,
+    "dates": []
+   },
+   "nav_jump_dates": [],
+   "nav_jump_detail": [],
+   "unit_vs_acc": {
+    "unit_last": 1.1968,
+    "acc_last": 1.5276,
+    "diff": 0.3308,
+    "interpretation": "差额即历史累计现金分红（未含拆分）"
+   }
+  },
+  {
+   "code": "000198",
+   "category": "货币",
+   "expected_name": "天弘余额宝货币",
+   "name_matched": true,
+   "unit_nav": {
+    "type": "money_fund_yield",
+    "rows": 4919,
+    "first_date": "2013-05-30",
+    "last_date": "2026-11-18",
+    "note": "货币基金无单位净值，用每万份收益与 7 日年化",
+    "latest_7d_annual": 0.79
+   },
+   "acc_nav": null,
+   "dividends": null,
+   "splits": null,
+   "basic_info": {
+    "name": "天弘余额宝货币",
+    "full_name": null,
+    "established": "2013-05-29",
+    "scale": "645136000000.0",
+    "company": null,
+    "manager": "王昌俊、刘莹、田瑶",
+    "type": "货币型-普通货币",
+    "benchmark": null,
+    "custodian": null
+   },
+   "anomalies": [],
+   "status": "ok",
+   "name_actual": "天弘余额宝货币",
+   "basic_info_source": "fund_name_em + fund_scale_open_sina（非雪球）"
+  }
+ ],
+ "fees_and_status": {
+  "sample_rows": [
+   {
+    "code": "000015",
+    "name": "华夏纯债债券A",
+    "purchase_status": "开放申购",
+    "redeem_status": "开放赎回",
+    "min_purchase": 10.0,
+    "daily_limit": 100000000000.0,
+    "fee_pct": 0.08
+   },
+   {
+    "code": "000016",
+    "name": "华夏纯债债券C",
+    "purchase_status": "开放申购",
+    "redeem_status": "开放赎回",
+    "min_purchase": 10.0,
+    "daily_limit": 100000000000.0,
+    "fee_pct": 0.0
+   },
+   {
+    "code": "000051",
+    "name": "华夏沪深300ETF联接A",
+    "purchase_status": "开放申购",
+    "redeem_status": "开放赎回",
+    "min_purchase": 10.0,
+    "daily_limit": 100000000000.0,
+    "fee_pct": 0.12
+   },
+   {
+    "code": "000198",
+    "name": "天弘余额宝货币",
+    "purchase_status": "开放申购",
+    "redeem_status": "开放赎回",
+    "min_purchase": 0.01,
+    "daily_limit": 0.0,
+    "fee_pct": 0.0
+   },
+   {
+    "code": "000478",
+    "name": "建信中证500指数增强A",
+    "purchase_status": "开放申购",
+    "redeem_status": "开放赎回",
+    "min_purchase": 10.0,
+    "daily_limit": 100000000000.0,
+    "fee_pct": 0.15
+   },
+   {
+    "code": "007300",
+    "name": "国联安中证半导体ETF联接A",
+    "purchase_status": "开放申购",
+    "redeem_status": "开放赎回",
+    "min_purchase": 10.0,
+    "daily_limit": 100000000000.0,
+    "fee_pct": 0.08
+   },
+   {
+    "code": "007301",
+    "name": "国联安中证半导体ETF联接C",
+    "purchase_status": "开放申购",
+    "redeem_status": "开放赎回",
+    "min_purchase": 10.0,
+    "daily_limit": 100000000000.0,
+    "fee_pct": 0.0
+   },
+   {
+    "code": "012414",
+    "name": "招商中证白酒指数(LOF)C",
+    "purchase_status": "限大额",
+    "redeem_status": "开放赎回",
+    "min_purchase": 10.0,
+    "daily_limit": 300000.0,
+    "fee_pct": 0.0
+   },
+   {
+    "code": "110020",
+    "name": "易方达沪深300ETF联接A",
+    "purchase_status": "开放申购",
+    "redeem_status": "开放赎回",
+    "min_purchase": 10.0,
+    "daily_limit": 100000000000.0,
+    "fee_pct": 0.12
+   },
+   {
+    "code": "110022",
+    "name": "易方达消费行业股票",
+    "purchase_status": "开放申购",
+    "redeem_status": "开放赎回",
+    "min_purchase": 10.0,
+    "daily_limit": 100000000000.0,
+    "fee_pct": 0.15
+   },
+   {
+    "code": "161005",
+    "name": "富国天惠成长混合(LOF)A",
+    "purchase_status": "限大额",
+    "redeem_status": "开放赎回",
+    "min_purchase": 10.0,
+    "daily_limit": 20000.0,
+    "fee_pct": 0.15
+   },
+   {
+    "code": "161725",
+    "name": "招商中证白酒指数(LOF)A",
+    "purchase_status": "限大额",
+    "redeem_status": "开放赎回",
+    "min_purchase": 10.0,
+    "daily_limit": 500000.0,
+    "fee_pct": 0.1
+   }
+  ],
+  "status_values": [
+   "",
+   "场内交易",
+   "封闭期",
+   "开放申购",
+   "暂停申购",
+   "认购期",
+   "限大额"
+  ],
+  "fee_field": "手续费（百分数，来自天天基金列表页，非合同费率）",
+  "has_redemption_fee_field": false,
+  "has_holding_period_rule": false,
+  "limitation": "接口只给「申购手续费」一个数，没有赎回费阶梯、没有持有期限规则、没有 A/C 费率差异的结构化数据。这些必须从基金合同/招募说明书人工核实或另建数据源。"
+ },
+ "trading_rules": {
+  "rules": [
+   {
+    "id": "T1",
+    "rule": "15:00 申购赎回截止时间",
+    "detail": "T 日 15:00 前提交按 T 日净值成交，之后按 T+1 日净值",
+    "evidence_level": "行业通则，基金合同普遍载明",
+    "data_source_available": false,
+    "needs_manual_verification": true,
+    "note": "AKShare 无此字段；属交易规则而非数据字段"
+   },
+   {
+    "id": "T2",
+    "rule": "不同提交时间对应的净值日期",
+    "detail": "15:00 前后分属不同净值日；节假日顺延",
+    "evidence_level": "行业通则",
+    "data_source_available": false,
+    "needs_manual_verification": true,
+    "note": "需按基金合同 + 交易所日历联合判定"
+   },
+   {
+    "id": "T3",
+    "rule": "申购确认时间",
+    "detail": "通常 T+1 确认份额，QDII 为 T+2",
+    "evidence_level": "行业通则，个别基金不同",
+    "data_source_available": false,
+    "needs_manual_verification": true,
+    "note": "不能对所有基金统一假设 T+1"
+   },
+   {
+    "id": "T4",
+    "rule": "赎回确认与到账时间",
+    "detail": "股票型通常 T+1 确认、T+3~T+7 到账；货币基金 T+1",
+    "evidence_level": "行业通则，各基金差异大",
+    "data_source_available": false,
+    "needs_manual_verification": true,
+    "note": "到账时间受销售渠道影响，支付宝与直销可能不同"
+   },
+   {
+    "id": "T5",
+    "rule": "申购费及平台折扣",
+    "detail": "合同费率 1.5% 左右，第三方平台常打 1 折",
+    "evidence_level": "合同费率可查；平台折扣是动态的",
+    "data_source_available": true,
+    "needs_manual_verification": true,
+    "note": "fund_purchase_em 的「手续费」是列表页展示值，不等于合同费率，也不保证与支付宝一致"
+   },
+   {
+    "id": "T6",
+    "rule": "按持有期限变化的赎回费",
+    "detail": "常见 <7天 1.5%、7天~1年 0.5%、1~2年 0.25%、>2年 0",
+    "evidence_level": "合同可证实，各基金不同",
+    "data_source_available": false,
+    "needs_manual_verification": true,
+    "note": "**AKShare 完全没有赎回费阶梯字段**，必须人工或另建数据源"
+   },
+   {
+    "id": "T7",
+    "rule": "A类与C类份额费用差异",
+    "detail": "A 类收申购费、不收销售服务费；C 类免申购费、按年收销售服务费",
+    "evidence_level": "合同可证实",
+    "data_source_available": false,
+    "needs_manual_verification": true,
+    "note": "接口只能看到 A/C 申购手续费不同（C 常为 0），销售服务费没有字段"
+   },
+   {
+    "id": "T8",
+    "rule": "暂停申购、限购、巨额赎回",
+    "detail": "暂停申购/限大额可由接口获取；巨额赎回是事件性的",
+    "evidence_level": "部分可获取",
+    "data_source_available": true,
+    "needs_manual_verification": true,
+    "note": "状态是**当日快照**，没有历史状态序列；巨额赎回无接口"
+   },
+   {
+    "id": "T9",
+    "rule": "基金转换规则",
+    "detail": "同公司基金间可转换，费率与限制各家不同",
+    "evidence_level": "合同可证实",
+    "data_source_available": false,
+    "needs_manual_verification": true,
+    "note": "**完全没有接口**，且支付宝是否支持转换属平台功能，无可靠证据时必须标 unknown"
+   },
+   {
+    "id": "T10",
+    "rule": "支付宝可购买状态",
+    "detail": "平台代销名单是动态信息",
+    "evidence_level": "无法证实",
+    "data_source_available": false,
+    "needs_manual_verification": true,
+    "note": "**unknown**。没有可靠证据，不得声称某基金一定能在支付宝买到"
+   }
+  ],
+  "summary": {
+   "total": 10,
+   "data_source_available": 2,
+   "needs_manual_verification": 10,
+   "fully_unknown": 1
+  }
+ },
+ "schema": {
+  "tables": [
+   {
+    "table": "fund_master",
+    "purpose": "基金本体（一只基金一行，A/C 份额共用）",
+    "key": "fund_id (surrogate) + fund_code_primary",
+    "columns": [
+     "fund_id",
+     "fund_code_primary",
+     "fund_name",
+     "fund_full_name",
+     "fund_company",
+     "custodian",
+     "fund_type_l1",
+     "fund_type_l2",
+     "invest_scope",
+     "benchmark",
+     "established_date",
+     "terminated_date",
+     "lifecycle_status",
+     "is_index_fund",
+     "tracking_index",
+     "source",
+     "source_updated_at",
+     "data_version"
+    ],
+    "note": "terminated_date 是清盘日的落点；当前数据源拿不到，必须先留字段"
+   },
+   {
+    "table": "fund_share_classes",
+    "purpose": "份额类别（A/C/E/I 等），一个基金本体多行",
+    "key": "share_class_id + (fund_id, share_class_code) UNIQUE",
+    "columns": [
+     "share_class_id",
+     "fund_id",
+     "share_class_code",
+     "share_class_name",
+     "share_class_type",
+     "currency",
+     "is_primary",
+     "management_fee",
+     "custody_fee",
+     "sales_service_fee",
+     "min_purchase",
+     "min_holding",
+     "listed_date",
+     "terminated_date",
+     "source",
+     "source_updated_at"
+    ],
+    "note": "**A/C 在这里区分，不在 fund_master 里**，避免基金数量重复计数"
+   },
+   {
+    "table": "fund_nav_daily",
+    "purpose": "每日净值（单位净值 + 累计净值，分开存）",
+    "key": "(share_class_id, nav_date) PK",
+    "columns": [
+     "share_class_id",
+     "nav_date",
+     "unit_nav",
+     "acc_nav",
+     "daily_return",
+     "nav_status",
+     "source",
+     "ingested_at"
+    ],
+    "note": "**单位净值与累计净值必须是两列**，混用是本项目已知的历史错误来源"
+   },
+   {
+    "table": "fund_dividends",
+    "purpose": "分红记录",
+    "key": "(share_class_id, ex_date) PK",
+    "columns": [
+     "share_class_id",
+     "record_date",
+     "ex_date",
+     "pay_date",
+     "cash_per_share",
+     "dividend_type",
+     "reinvest_nav",
+     "source",
+     "ingested_at"
+    ],
+    "note": "每10份分红必须归一化为每份，否则与净值口径差 10 倍"
+   },
+   {
+    "table": "fund_manager_history",
+    "purpose": "基金经理任职历史",
+    "key": "(fund_id, manager_name, start_date)",
+    "columns": [
+     "fund_id",
+     "manager_name",
+     "company",
+     "start_date",
+     "end_date",
+     "tenure_days",
+     "source",
+     "ingested_at"
+    ],
+    "note": "**当前接口只给现任经理，没有起止日期**，start_date 需人工/公告补录"
+   },
+   {
+    "table": "fund_aum_history",
+    "purpose": "规模历史",
+    "key": "(share_class_id 或 fund_id, report_date)",
+    "columns": [
+     "fund_id",
+     "share_class_id",
+     "report_date",
+     "aum_total",
+     "shares_total",
+     "aum_unit",
+     "source",
+     "ingested_at"
+    ],
+    "note": "接口只给「最新规模」，历史规模要按季报补"
+   },
+   {
+    "table": "fund_fee_rules",
+    "purpose": "费率规则（申购/赎回/销售服务）",
+    "key": "(share_class_id, fee_type, tier_order)",
+    "columns": [
+     "share_class_id",
+     "fee_type",
+     "tier_order",
+     "lower_bound",
+     "upper_bound",
+     "rate",
+     "holding_days_min",
+     "holding_days_max",
+     "effective_from",
+     "effective_to",
+     "source",
+     "evidence_level"
+    ],
+    "note": "**赎回费阶梯必须有**，当前数据源完全没有"
+   },
+   {
+    "table": "fund_subscription_status",
+    "purpose": "申购/赎回状态快照",
+    "key": "(share_class_id, as_of_date)",
+    "columns": [
+     "share_class_id",
+     "as_of_date",
+     "purchase_status",
+     "redeem_status",
+     "daily_limit",
+     "min_purchase",
+     "next_open_date",
+     "source",
+     "ingested_at"
+    ],
+    "note": "必须**按日留快照**才有历史，单次抓取只是当日状态"
+   },
+   {
+    "table": "fund_lifecycle_events",
+    "purpose": "生命周期事件（成立/清盘/合并/份额变更）",
+    "key": "event_id + (fund_id, event_date, event_type)",
+    "columns": [
+     "event_id",
+     "fund_id",
+     "event_type",
+     "event_date",
+     "announcement_date",
+     "announcement_url",
+     "detail",
+     "successor_fund_id",
+     "evidence_level",
+     "source",
+     "ingested_at"
+    ],
+    "note": "**清盘/合并就落这张表**；当前无数据源，是架构的第一优先补齐项"
+   },
+   {
+    "table": "fund_data_quality",
+    "purpose": "数据质量状态",
+    "key": "(table_name, record_key, check_name)",
+    "columns": [
+     "table_name",
+     "record_key",
+     "check_name",
+     "status",
+     "detail",
+     "checked_at",
+     "severity"
+    ],
+    "note": "沿用项目已有 data_quality 思路，独立于 ETF 侧"
+   }
+  ],
+  "table_count": 10,
+  "principles": [
+   "基金本体与份额分两级，A/C 不重复计数",
+   "单位净值与累计净值分列，禁止混用",
+   "所有表保留 source / ingested_at / data_version",
+   "生命周期事件单独建表，清盘与合并有落点",
+   "申购状态按日快照，才有历史可回溯",
+   "费率按阶梯存，赎回费必须有 holding_days 区间"
+  ],
+  "not_migrated": true,
+  "migration_note": "本阶段只输出设计，**未执行任何数据库迁移**"
+ },
+ "reuse": {
+  "reusable": [
+   {
+    "module": "指标计算（MA/RSI/MACD/波动率）",
+    "decision": "可复用",
+    "note": "算法本身与标的是场内还是场外无关；需要新的数据适配层喂入"
+   },
+   {
+    "module": "风险指标（Sharpe/Sortino/Calmar/最大回撤）",
+    "decision": "可复用",
+    "note": "基于净值序列，场外基金同样适用"
+   },
+   {
+    "module": "组合分析（权重、再平衡、归因）",
+    "decision": "可复用",
+    "note": "逻辑层与执行层解耦后可复用"
+   },
+   {
+    "module": "报告生成",
+    "decision": "可复用",
+    "note": "仅需替换数据来源与字段名"
+   },
+   {
+    "module": "数据质量检查框架",
+    "decision": "可复用",
+    "note": "检查规则需新增场外基金特有项（如净值停更、份额拆分）"
+   },
+   {
+    "module": "研究框架（脚本 + JSON + 报告 + 测试）",
+    "decision": "可复用",
+    "note": "3B-1/3B-2/3B-3 已形成稳定范式"
+   }
+  ],
+  "to_build": [
+   {
+    "module": "场外基金净值数据层",
+    "reason": "标的、频率、字段全部不同"
+   },
+   {
+    "module": "申购赎回执行模型",
+    "reason": "T+1 确认、15:00 截止、按净值成交，与场内撮合完全不同"
+   },
+   {
+    "module": "基金费率模型",
+    "reason": "申购费/赎回费阶梯/销售服务费，场内没有"
+   },
+   {
+    "module": "基金经理与份额管理",
+    "reason": "场内 ETF 没有这个概念"
+   },
+   {
+    "module": "场外基金回测适配层",
+    "reason": "把现有引擎的撮合换成绩效确认模型"
+   }
+  ],
+  "hard_boundary": "**不把场内 ETF 回测引擎改造成场外基金引擎。** 两者交易模型差异是结构性的（撮合 vs 确认、日内 vs T+1、价格 vs 净值），改造成本高于重建。"
+ },
+ "summary": {
+  "sample_target": 12,
+  "sample_verified": 12,
+  "sample_failed": 0,
+  "with_anomalies": 0,
+  "categories_covered": [
+   "ETF联接",
+   "主动权益",
+   "债券",
+   "宽基指数",
+   "指数增强",
+   "行业指数",
+   "货币"
+  ],
+  "with_dividends": 5,
+  "with_splits": 1
+ },
+ "unresolved": [
+  "survivorship_bias_unresolved：无已清盘基金名录",
+  "清盘/合并基金的净值历史无法系统性获取",
+  "赎回费阶梯、销售服务费、持有期限规则无结构化数据源",
+  "基金转换规则完全无接口",
+  "支付宝可购买状态 = unknown，无可信证据",
+  "基金成立日期在部分接口缺失或不一致",
+  "基金经理历任起止日期需从公告补录"
+ ]
+}
