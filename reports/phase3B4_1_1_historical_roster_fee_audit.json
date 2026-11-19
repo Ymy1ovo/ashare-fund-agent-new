@@ -1,0 +1,3727 @@
+{
+ "phase": "3B-4.1.1",
+ "baseline_head": "472603d42ec4bc19569f8ce66feff451bd80faaf",
+ "generated_at": "2026-11-19T19:13:34",
+ "scope": "只做样本重新审计与费率边界审计；不改数据层、不改迁移、不入库、不做回测",
+ "event_types": {
+  "liquidation": "基金合同终止并清算（基金本体消失）",
+  "merge": "基金合并，并入另一只基金（本体消失）",
+  "transformation": "转型，基金本体继续存续（仅变更类型/名称）",
+  "share_termination": "份额终止（子份额终止运作，母基金存续）",
+  "delisting": "终止上市（转场外/转LOF，基金本体存续）",
+  "unknown": "无法判定"
+ },
+ "roster": {
+  "scanned_codes": 844,
+  "raw_code_records": 310,
+  "raw_announcement_events": 216,
+  "distinct_events": 59,
+  "distinct_fund_entities": 58,
+  "duplicate_collapsed": 251,
+  "absorbed_delisting_into_liquidation": 12,
+  "verified_count": 57,
+  "verified_fund_entities": 57,
+  "by_event_type_all": {
+   "liquidation": 43,
+   "transformation": 4,
+   "delisting": 12,
+   "merge": 0,
+   "share_termination": 0
+  },
+  "by_event_type_verified": {
+   "liquidation": 43,
+   "transformation": 4,
+   "delisting": 10
+  },
+  "evidence_a_count": 40,
+  "events": [
+   {
+    "event_key": "鹏华国有企业债债券型证券投资基金|liquidation",
+    "fund_entity": "鹏华国有企业债债券型证券投资基金",
+    "event_type": "liquidation",
+    "codes_in_event": [
+     "000007"
+    ],
+    "code_count": 1,
+    "announcement_count": 1,
+    "announcement_ids": [
+     "AN201810091209644486"
+    ],
+    "first_announcement_date": "2018-10-09",
+    "last_announcement_date": "2018-10-09",
+    "announcement_id": "AN201810091209644486",
+    "announcement_title": "鹏华国有企业债债券型证券投资基金清算报告",
+    "announcement_date": "2018-10-09",
+    "all_titles": [
+     "鹏华国有企业债债券型证券投资基金清算报告"
+    ],
+    "announcement_url": "http://pdf.dfcfw.com/pdf/H2_AN201810091209644486_1.pdf",
+    "doc_format": "pdf",
+    "doc_ok": true,
+    "fund_full_name": "鹏华国有企业债债券型证券投资基金",
+    "established_date": "2013-03-08",
+    "last_trading_date": "2018-08-07",
+    "liquidation_start": "2018-08-08",
+    "delisting_date": null,
+    "event_date": "2018-08-08",
+    "successor_name": null,
+    "successor_code": null,
+    "evidence_level": "A",
+    "missing_fields": [
+     "successor_name"
+    ],
+    "doc_excerpt": "鹏华国有企业债债券型证券投资基金 清算报告 基金管理人：鹏华基金管理有限公司 基金托管人：中国工商银行股份有限公司 公告日期：2018 年 10 月 9 日鹏华国有企业债债券型证券投资基金清算报告 第 2 页 共9 页 一、重要提示 鹏华国有企业债债券型证券投资基金(以下简称 “本基金”) 经中国证券监督管理委员会 （以下简称“中国证监会”）证监许可[2012]1630 号文准予核准注册，于 2013 年 3 月 8 日成立 并正式运作",
+    "final_trading_day": null
+   },
+   {
+    "event_key": "南方中债中期票据指数债券型发起式证券投资基金|liquidation",
+    "fund_entity": "南方中债中期票据指数债券型发起式证券投资基金",
+    "event_type": "liquidation",
+    "codes_in_event": [
+     "000022",
+     "000023"
+    ],
+    "code_count": 2,
+    "announcement_count": 1,
+    "announcement_ids": [
+     "AN201807041162722976"
+    ],
+    "first_announcement_date": "2018-07-04",
+    "last_announcement_date": "2018-07-04",
+    "announcement_id": "AN201807041162722976",
+    "announcement_title": "南方中债中期票据指数债券型发起式证券投资基金清算报告",
+    "announcement_date": "2018-07-04",
+    "all_titles": [
+     "南方中债中期票据指数债券型发起式证券投资基金清算报告"
+    ],
+    "announcement_url": "http://pdf.dfcfw.com/pdf/H2_AN201807041162722976_1.pdf",
+    "doc_format": "pdf",
+    "doc_ok": true,
+    "fund_full_name": "南方中债中期票据指数债券型发起式证券投资基金",
+    "established_date": null,
+    "last_trading_date": null,
+    "liquidation_start": null,
+    "delisting_date": null,
+    "event_date": null,
+    "successor_name": null,
+    "successor_code": null,
+    "evidence_level": "B",
+    "missing_fields": [
+     "established_date",
+     "event_date",
+     "successor_name"
+    ],
+    "doc_excerpt": "南方中债中期票据指数债券型发起式证券投资基金清 算报告 基金管理人：南方基金管理股份有限公司 基金托管人：中国银行股份有限公司 报告出具日：2018 年 5 月 23 日 报告送出日：2018 年 7 月 4 号 一、基金简介 （一）、基本情况 1.基本信息 基金简称 南方中债中期票据指数债券发起式 基金主代码 000022 基金运作方式 契约型开放式 基金合同生效日 2013 年 05 月 03 日 最后运作日基金份额总额 31,91",
+    "final_trading_day": null
+   },
+   {
+    "event_key": "泰达宏利信用合利定期开放债券型证券投资基金|liquidation",
+    "fund_entity": "泰达宏利信用合利定期开放债券型证券投资基金",
+    "event_type": "liquidation",
+    "codes_in_event": [
+     "000026",
+     "000027"
+    ],
+    "code_count": 2,
+    "announcement_count": 5,
+    "announcement_ids": [
+     "AN201807191168021865",
+     "AN201807261170306973",
+     "AN201808021173381873",
+     "AN201808101176883943",
+     "AN201811101242667792"
+    ],
+    "first_announcement_date": "2018-07-19",
+    "last_announcement_date": "2018-11-10",
+    "announcement_id": "AN201811101242667792",
+    "announcement_title": "泰达宏利信用合利定期开放债券型证券投资基金清算报告",
+    "announcement_date": "2018-11-10",
+    "all_titles": [
+     "关于泰达宏利信用合利定期开放债券型证券投资基金可能触发基金合同终止情形的提示性公告",
+     "关于泰达宏利信用合利定期开放债券型证券投资基金可能触发基金合同终止情形的第二次提示性公告",
+     "关于泰达宏利信用合利定期开放债券型证券投资基金可能触发基金合同终止情形的第三次提示性公告",
+     "关于泰达宏利信用合利定期开放债券型证券投资基金基金合同终止及财产清算的公告",
+     "泰达宏利信用合利定期开放债券型证券投资基金清算报告"
+    ],
+    "announcement_url": "http://pdf.dfcfw.com/pdf/H2_AN201811101242667792_1.pdf",
+    "doc_format": "pdf",
+    "doc_ok": true,
+    "fund_full_name": "泰达宏利信用合利定期开放债券型证券投资基金",
+    "established_date": "2013-03-19",
+    "last_trading_date": "2018-08-09",
+    "liquidation_start": "2018-08-10",
+    "delisting_date": null,
+    "event_date": "2018-08-10",
+    "successor_name": null,
+    "successor_code": null,
+    "evidence_level": "A",
+    "missing_fields": [
+     "successor_name"
+    ],
+    "doc_excerpt": " 泰达宏利信用合利定期开放债券型证券投资基金 清算报告 基金管理人：泰达宏利基金管理有限公司 基金托管人：中国银行股份有限公司 清算报告出具日：2018 年 9 月 7 日 清算报告公告日：2018 年 11 月 10 日 泰达宏利信用合利定期开放债券型证券投资基金清算报告 2 目录 重要提示.........................................................................",
+    "final_trading_day": null
+   },
+   {
+    "event_key": "中银标普全球精选自然资源等权重指数证券投资基金|liquidation",
+    "fund_entity": "中银标普全球精选自然资源等权重指数证券投资基金",
+    "event_type": "liquidation",
+    "codes_in_event": [
+     "000049"
+    ],
+    "code_count": 1,
+    "announcement_count": 4,
+    "announcement_ids": [
+     "AN202301101581833993",
+     "AN202301171582068029",
+     "AN202303201584400497",
+     "AN202303201584398960"
+    ],
+    "first_announcement_date": "2023-01-10",
+    "last_announcement_date": "2023-03-20",
+    "announcement_id": "AN202303201584398960",
+    "announcement_title": "中银标普全球精选自然资源等权重指数证券投资基金2023年清算报告",
+    "announcement_date": "2023-03-20",
+    "all_titles": [
+     "中银基金管理有限公司关于中银标普全球精选自然资源等权重指数证券投资基金基金合同终止及基金财产清算的提示性公告",
+     "中银基金管理有限公司关于中银标普全球精选自然资源等权重指数证券投资基金基金合同终止及基金财产清算的公告",
+     "中银标普全球精选自然资源等权重指数证券投资基金清算报告提示性公告",
+     "中银标普全球精选自然资源等权重指数证券投资基金2023年清算报告"
+    ],
+    "announcement_url": "http://pdf.dfcfw.com/pdf/H2_AN202303201584398960_1.pdf",
+    "doc_format": "pdf",
+    "doc_ok": true,
+    "fund_full_name": "中银标普全球精选自然资源等权重指数证券投资基金",
+    "established_date": "2013-03-19",
+    "last_trading_date": null,
+    "liquidation_start": null,
+    "delisting_date": null,
+    "event_date": null,
+    "successor_name": null,
+    "successor_code": null,
+    "evidence_level": "B",
+    "missing_fields": [
+     "event_date",
+     "successor_name"
+    ],
+    "doc_excerpt": "1 中银标普全球精选自然资源等权重指数证券投 资基金清算报告 基金管理人：中银基金管理有限公司 基金托管人：招商银行股份有限公司 清算报告出具日：2023 年 3 月 1 日 清算报告公告日：2023 年 3 月 20 日 2 一、 重要提示 中银标普全球精选自然资源等权重指数证券投资基金（以下简称“本基金”） 经中国证券监督管理委员会（以下简称“中国证监会”）证监许可〔2012〕1743 号文注册募集，于 2013 年 3 月 19 ",
+    "final_trading_day": null
+   },
+   {
+    "event_key": "长盛纯债债券型证券投资基金|liquidation",
+    "fund_entity": "长盛纯债债券型证券投资基金",
+    "event_type": "liquidation",
+    "codes_in_event": [
+     "000050",
+     "000052"
+    ],
+    "code_count": 2,
+    "announcement_count": 1,
+    "announcement_ids": [
+     "AN201807061164054790"
+    ],
+    "first_announcement_date": "2018-07-06",
+    "last_announcement_date": "2018-07-06",
+    "announcement_id": "AN201807061164054790",
+    "announcement_title": "长盛纯债债券型证券投资基金清算报告",
+    "announcement_date": "2018-07-06",
+    "all_titles": [
+     "长盛纯债债券型证券投资基金清算报告"
+    ],
+    "announcement_url": "http://pdf.dfcfw.com/pdf/H2_AN201807061164054790_1.pdf",
+    "doc_format": "pdf",
+    "doc_ok": true,
+    "fund_full_name": "长盛纯债债券型证券投资基金",
+    "established_date": "2013-03-13",
+    "last_trading_date": null,
+    "liquidation_start": "2018-05-18",
+    "delisting_date": null,
+    "event_date": "2018-05-18",
+    "successor_name": null,
+    "successor_code": null,
+    "evidence_level": "A",
+    "missing_fields": [
+     "successor_name"
+    ],
+    "doc_excerpt": "长盛纯债债券型证券投资基金 清算报告 2018 年 6 月 8 日 基金管理人：长盛基金管理有限公司 基金托管人：中国银行股份有限公司 公告日期：2018 年 7 月 6 日 1 一、重要提示 长盛纯债债券型证券投资基金（以下简称“长盛纯债”或“本基金”）经中国证券 监督管理委员会证监许可【2013】145号文核准注册，于2013年3月13日成立并正式 运作，基金托管人为中国银行股份有限公司（以下简称“中国银行”）。 根据《中华人民共和",
+    "final_trading_day": null
+   },
+   {
+    "event_key": "国联安中证股债动态策略指数证券投资基金|liquidation",
+    "fund_entity": "国联安中证股债动态策略指数证券投资基金",
+    "event_type": "liquidation",
+    "codes_in_event": [
+     "000060"
+    ],
+    "code_count": 1,
+    "announcement_count": 1,
+    "announcement_ids": [
+     "AN201706220662305325"
+    ],
+    "first_announcement_date": "2017-06-22",
+    "last_announcement_date": "2017-06-22",
+    "announcement_id": "AN201706220662305325",
+    "announcement_title": "国联安中证股债动态策略指数证券投资基金清算报告",
+    "announcement_date": "2017-06-22",
+    "all_titles": [
+     "国联安中证股债动态策略指数证券投资基金清算报告"
+    ],
+    "announcement_url": "http://pdf.dfcfw.com/pdf/H2_AN201706220662305325_1.pdf",
+    "doc_format": "pdf",
+    "doc_ok": true,
+    "fund_full_name": "国联安中证股债动态策略指数证券投资基金",
+    "established_date": "2017-03-29",
+    "last_trading_date": "2017-03-28",
+    "liquidation_start": "2017-03-29",
+    "delisting_date": null,
+    "event_date": "2017-03-29",
+    "successor_name": null,
+    "successor_code": null,
+    "evidence_level": "A",
+    "missing_fields": [
+     "successor_name"
+    ],
+    "doc_excerpt": "国联安中证股债动态策略指数证券投资基 金清算报告 基金管理人：国联安基金管理有限公司 基金托管人：中国建设银行股份有限公司 报告公告日：二零一七年六月二十二日 §1 重要提示 国联安中证股债动态策略指数证券投资基金(以下简称“本基金”)经中国证券监督管理委 员会(以 下简称“中国证监会”)《关于核准国联安中证股债动态策略指数证券投资基金募 集的批复》(证监许可[2013]128 文)批准，由国联安基金管理有限公司依照《中华人民共和 国证",
+    "final_trading_day": null
+   },
+   {
+    "event_key": "银华量化智慧动力灵活配置混合型证券投资基金|liquidation",
+    "fund_entity": "银华量化智慧动力灵活配置混合型证券投资基金",
+    "event_type": "liquidation",
+    "codes_in_event": [
+     "000062"
+    ],
+    "code_count": 1,
+    "announcement_count": 1,
+    "announcement_ids": [
+     "AN201811301255063369"
+    ],
+    "first_announcement_date": "2018-11-30",
+    "last_announcement_date": "2018-11-30",
+    "announcement_id": "AN201811301255063369",
+    "announcement_title": "银华量化智慧动力灵活配置混合型证券投资基金清算报告",
+    "announcement_date": "2018-11-30",
+    "all_titles": [
+     "银华量化智慧动力灵活配置混合型证券投资基金清算报告"
+    ],
+    "announcement_url": "http://pdf.dfcfw.com/pdf/H2_AN201811301255063369_1.pdf",
+    "doc_format": "pdf",
+    "doc_ok": true,
+    "fund_full_name": "银华量化智慧动力灵活配置混合型证券投资基金",
+    "established_date": "2018-09-28",
+    "last_trading_date": null,
+    "liquidation_start": null,
+    "delisting_date": null,
+    "event_date": null,
+    "successor_name": null,
+    "successor_code": null,
+    "evidence_level": "B",
+    "missing_fields": [
+     "event_date",
+     "successor_name"
+    ],
+    "doc_excerpt": "银华量化智慧动力灵活配置混合型证券投资基金 清算报告 1 银华量化智慧动力灵活配置混合型证券投资基金 清算报告 基金管理人：银华基金管理股份有限公司 基金托管人：中国建设银行股份有限公司 清算报告公告日：2018 年 11 月 30 日银华量化智慧动力灵活配置混合型证券投资基金 清算报告 2 目录 重要提示 .................................................................",
+    "final_trading_day": null
+   },
+   {
+    "event_key": "嘉实中证金边中期国债交易型开放式指数证券投资基金|liquidation",
+    "fund_entity": "嘉实中证金边中期国债交易型开放式指数证券投资基金",
+    "event_type": "liquidation",
+    "codes_in_event": [
+     "000087",
+     "000088"
+    ],
+    "code_count": 2,
+    "announcement_count": 2,
+    "announcement_ids": [
+     "AN202208051576917304",
+     "AN202208051576916480"
+    ],
+    "first_announcement_date": "2022-08-05",
+    "last_announcement_date": "2022-08-05",
+    "announcement_id": "AN202208051576916480",
+    "announcement_title": "嘉实中证金边中期国债交易型开放式指数证券投资基金联接基金清算报告提示性公告",
+    "announcement_date": "2022-08-05",
+    "all_titles": [
+     "嘉实中证金边中期国债交易型开放式指数证券投资基金联接基金清算报告",
+     "嘉实中证金边中期国债交易型开放式指数证券投资基金联接基金清算报告提示性公告"
+    ],
+    "announcement_url": "http://pdf.dfcfw.com/pdf/H2_AN202208051576916480_1.pdf",
+    "doc_format": "pdf",
+    "doc_ok": true,
+    "fund_full_name": "嘉实中证金边中期国债交易型开放式指数证券投资基金",
+    "established_date": null,
+    "last_trading_date": null,
+    "liquidation_start": null,
+    "delisting_date": null,
+    "event_date": null,
+    "successor_name": null,
+    "successor_code": null,
+    "evidence_level": "B",
+    "missing_fields": [
+     "established_date",
+     "event_date",
+     "successor_name"
+    ],
+    "doc_excerpt": "嘉 实 中 证 金 边 中 期 国 债 交 易 型 开 放 式 指 数 证 券 投 资 基 金 联 接 基 金 清 算 报 告 提 示 性 公 告 嘉 实 中 证 金 边 中 期 国 债 交 易 型 开 放 式 指 数 证 券 投 资 基 金 联 接 基 金 自 2 0 2 2 年 6 月 1 5 日 起 进 入 清 算 期 。 清 算 报 告 全 文 于 2 0 2 2 年 8 月 5 在 本 公 司 网 站 [ w w w . j ",
+    "final_trading_day": null
+   },
+   {
+    "event_key": "信诚新双盈分级债券型证券投资基金|liquidation",
+    "fund_entity": "信诚新双盈分级债券型证券投资基金",
+    "event_type": "liquidation",
+    "codes_in_event": [
+     "000091",
+     "000092",
+     "000093"
+    ],
+    "code_count": 3,
+    "announcement_count": 3,
+    "announcement_ids": [
+     "AN202007231393526349",
+     "AN202007231393501979",
+     "AN202007231393501970"
+    ],
+    "first_announcement_date": "2020-07-23",
+    "last_announcement_date": "2020-07-23",
+    "announcement_id": "AN202007231393501970",
+    "announcement_title": "关于《信诚新双盈分级债券型证券投资基金基金合同》终止的公告",
+    "announcement_date": "2020-07-23",
+    "all_titles": [
+     "信诚新双盈分级债券型证券投资基金清算报告",
+     "信诚新双盈分级债券型证券投资基金清算报告提示性公告",
+     "关于《信诚新双盈分级债券型证券投资基金基金合同》终止的公告"
+    ],
+    "announcement_url": "http://pdf.dfcfw.com/pdf/H2_AN202007231393501970_1.pdf",
+    "doc_format": "pdf",
+    "doc_ok": true,
+    "fund_full_name": "信诚新双盈分级债券型证券投资基金",
+    "established_date": null,
+    "last_trading_date": "2020-06-22",
+    "liquidation_start": "2020-06-23",
+    "delisting_date": null,
+    "event_date": "2020-06-23",
+    "successor_name": null,
+    "successor_code": null,
+    "evidence_level": "A",
+    "missing_fields": [
+     "established_date",
+     "successor_name"
+    ],
+    "doc_excerpt": "关于《信诚新双盈分级债券型证券投资 基金基金合同》终止的公告 信诚新双盈分级债券型证券投资基金基金合同于 2013 年 5 月 9 日正式生效，本基金的基金管理人为中信 保诚基金管理有限公司，基金托管人为中国建设银行股份有限公司。鉴于市场环境的变化，根据《中华人 民共和国证券投资基金法》、《公开募集证券投资基金运作管理办法》和《信诚新双盈分级债券型证券投 资基金基金合同》的有关规定，本基金管理人以通讯方式召开基金份额持有人大会，审议《关",
+    "final_trading_day": null
+   },
+   {
+    "event_key": "创金合信研究精选股票型证券投资基金|liquidation",
+    "fund_entity": "创金合信研究精选股票型证券投资基金",
+    "event_type": "liquidation",
+    "codes_in_event": [
+     "010001",
+     "010002"
+    ],
+    "code_count": 2,
+    "announcement_count": 2,
+    "announcement_ids": [
+     "AN202306201591083666",
+     "AN202306201591081193"
+    ],
+    "first_announcement_date": "2023-06-20",
+    "last_announcement_date": "2023-06-20",
+    "announcement_id": "AN202306201591081193",
+    "announcement_title": "创金合信研究精选股票型证券投资基金清算报告",
+    "announcement_date": "2023-06-20",
+    "all_titles": [
+     "创金合信研究精选股票型证券投资基金清算报告提示性公告",
+     "创金合信研究精选股票型证券投资基金清算报告"
+    ],
+    "announcement_url": "http://pdf.dfcfw.com/pdf/H2_AN202306201591081193_1.pdf",
+    "doc_format": "pdf",
+    "doc_ok": true,
+    "fund_full_name": "创金合信研究精选股票型证券投资基金",
+    "established_date": "2023-05-24",
+    "last_trading_date": "2023-05-23",
+    "liquidation_start": "2023-05-24",
+    "delisting_date": null,
+    "event_date": "2023-05-24",
+    "successor_name": null,
+    "successor_code": null,
+    "evidence_level": "A",
+    "missing_fields": [
+     "successor_name"
+    ],
+    "doc_excerpt": " 创金合信研究精选股票型证券投资基金 清算报告 基金管理人：创金合信基金管理有限公司 基金托管人：中国民生银行股份有限公司 一、重要提示 创金合信研究精选股票型证券投资基金（以下简称“本基金”）经中国证券监督管理 委员会(以下简称“中国证监会”)证监许可[2020]年 1573 号《关于准予创金合信研究精 选股票型证券投资基金注册的批复》准予注册。由创金合信基金管理有限公司按照《中华 人民共和国证券投资基金法》和《创金合信研究精选股票型",
+    "final_trading_day": null
+   },
+   {
+    "event_key": "南方誉鼎一年持有期混合型证券投资基金|liquidation",
+    "fund_entity": "南方誉鼎一年持有期混合型证券投资基金",
+    "event_type": "liquidation",
+    "codes_in_event": [
+     "010006",
+     "010007"
+    ],
+    "code_count": 2,
+    "announcement_count": 5,
+    "announcement_ids": [
+     "AN202511251787864082",
+     "AN202511271789111550",
+     "AN202512251807665272",
+     "AN202512251807665049",
+     "AN202512261808329446"
+    ],
+    "first_announcement_date": "2025-11-25",
+    "last_announcement_date": "2025-12-26",
+    "announcement_id": "AN202512261808329446",
+    "announcement_title": "关于南方誉鼎一年持有期混合型证券投资基金基金合同终止及剩余财产分配的公告",
+    "announcement_date": "2025-12-26",
+    "all_titles": [
+     "关于南方誉鼎一年持有期混合型证券投资基金可能触发基金合同终止情形的提示性公告",
+     "关于南方誉鼎一年持有期混合型证券投资基金基金合同终止及基金财产清算的公告",
+     "南方誉鼎一年持有期混合型证券投资基金清算报告提示性公告",
+     "南方誉鼎一年持有期混合型证券投资基金清算报告",
+     "关于南方誉鼎一年持有期混合型证券投资基金基金合同终止及剩余财产分配的公告"
+    ],
+    "announcement_url": "http://pdf.dfcfw.com/pdf/H2_AN202512261808329446_1.pdf",
+    "doc_format": "pdf",
+    "doc_ok": true,
+    "fund_full_name": "关于南方誉鼎一年持有期混合型证券投资基金",
+    "established_date": null,
+    "last_trading_date": "2025-11-27",
+    "liquidation_start": null,
+    "delisting_date": null,
+    "event_date": "2025-11-27",
+    "successor_name": null,
+    "successor_code": null,
+    "evidence_level": "A",
+    "missing_fields": [
+     "established_date",
+     "successor_name"
+    ],
+    "doc_excerpt": "1 关于南方誉鼎一年持有期混合型证券投资基金 基金合同终止及剩余财产分配的公告 南方基金管理股份有限公司（以下简称“本基金管理人”）旗下南方誉鼎一年持有期 混合型证券投资基金（以下简称“本基金”）已触发基金合同自动终止的情形，本基金最后 运作日为 2025 年 11 月 27 日。 本基金自 2025 年 11 月 28 日至 2025 年 12 月 9 日期间进行了基金财产清算。基金财产 清算报告报监管机构备案后，本基金管理人于 20",
+    "final_trading_day": null
+   },
+   {
+    "event_key": "博时金福安一年持有期混合型发起式基金|liquidation",
+    "fund_entity": "博时金福安一年持有期混合型发起式基金",
+    "event_type": "liquidation",
+    "codes_in_event": [
+     "010046",
+     "010047"
+    ],
+    "code_count": 2,
+    "announcement_count": 4,
+    "announcement_ids": [
+     "AN202309011597291501",
+     "AN202309081598084611",
+     "AN202310251603453022",
+     "AN202310251603404388"
+    ],
+    "first_announcement_date": "2023-09-01",
+    "last_announcement_date": "2023-10-25",
+    "announcement_id": "AN202310251603404388",
+    "announcement_title": "关于博时金福安一年持有期混合型发起式基金中基金(FOF)基金合同终止的公告",
+    "announcement_date": "2023-10-25",
+    "all_titles": [
+     "关于博时金福安一年持有期混合型发起式基金中基金(FOF)可能触发基金合同终止情形的提示公告",
+     "关于博时金福安一年持有期混合型发起式基金中基金(FOF)基金合同终止及基金财产清算的公告",
+     "博时金福安一年持有期混合型发起式基金中基金(FOF)清算报告",
+     "关于博时金福安一年持有期混合型发起式基金中基金(FOF)基金合同终止的公告"
+    ],
+    "announcement_url": "http://pdf.dfcfw.com/pdf/H2_AN202310251603404388_1.pdf",
+    "doc_format": "pdf",
+    "doc_ok": true,
+    "fund_full_name": "中华人民共和国证券投资基金",
+    "established_date": null,
+    "last_trading_date": null,
+    "liquidation_start": null,
+    "delisting_date": null,
+    "event_date": null,
+    "successor_name": null,
+    "successor_code": null,
+    "evidence_level": "B",
+    "missing_fields": [
+     "established_date",
+     "event_date",
+     "successor_name"
+    ],
+    "doc_excerpt": "关 于 博 时 金 福 安 一 年 持 有 期 混 合 型 发 起 式 基 金 中 基 金 （ F O F ） 基 金 合 同 终 止 的 公 告 根 据 《 中 华 人 民 共 和 国 证 券 投 资 基 金 法 》 、 《 公 开 募 集 证 券 投 资 基 金 运 作 管 理 办 法 》 、 《 博 时 金 福 安 一 年 持 有 期 混 合 型 发 起 式 基 金 中 基 金 （ F O F ） 基 金 合 同 》 （ 以 下 ",
+    "final_trading_day": null
+   },
+   {
+    "event_key": "东方红鼎元3个月定期开放混合型发起式证券投资基金|liquidation",
+    "fund_entity": "东方红鼎元3个月定期开放混合型发起式证券投资基金",
+    "event_type": "liquidation",
+    "codes_in_event": [
+     "010059"
+    ],
+    "code_count": 1,
+    "announcement_count": 2,
+    "announcement_ids": [
+     "AN202503051644061121",
+     "AN202504151656705066"
+    ],
+    "first_announcement_date": "2025-03-05",
+    "last_announcement_date": "2025-04-15",
+    "announcement_id": "AN202504151656705066",
+    "announcement_title": "东方红鼎元3个月定期开放混合型发起式证券投资基金清算报告",
+    "announcement_date": "2025-04-15",
+    "all_titles": [
+     "关于东方红鼎元3个月定期开放混合型发起式证券投资基金基金合同终止及基金财产清算的公告",
+     "东方红鼎元3个月定期开放混合型发起式证券投资基金清算报告"
+    ],
+    "announcement_url": "http://pdf.dfcfw.com/pdf/H2_AN202504151656705066_1.pdf",
+    "doc_format": "pdf",
+    "doc_ok": true,
+    "fund_full_name": "个月定期开放混合型发起式证券投资基金",
+    "established_date": null,
+    "last_trading_date": "2025-03-04",
+    "liquidation_start": null,
+    "delisting_date": null,
+    "event_date": "2025-03-04",
+    "successor_name": null,
+    "successor_code": null,
+    "evidence_level": "A",
+    "missing_fields": [
+     "established_date",
+     "successor_name"
+    ],
+    "doc_excerpt": " 东方红鼎元 3 个月定期开放混合型发起 式证券投资基金 清算报告 基金管理人：上海东方证券资产管理有限公司 基金托管人：上海浦东发展银行股份有限公司 报告出具日期：2025 年 3 月 20 日 报告公告日期：2025 年 4 月 15 日 1 目录 1、重要提示 ......................................................................................",
+    "final_trading_day": null
+   },
+   {
+    "event_key": "华泰柏瑞景利混合型证券投资基金|liquidation",
+    "fund_entity": "华泰柏瑞景利混合型证券投资基金",
+    "event_type": "liquidation",
+    "codes_in_event": [
+     "010060",
+     "010061"
+    ],
+    "code_count": 2,
+    "announcement_count": 4,
+    "announcement_ids": [
+     "AN202308311596882333",
+     "AN202309061597641236",
+     "AN202310231602718386",
+     "AN202310231602716825"
+    ],
+    "first_announcement_date": "2023-08-31",
+    "last_announcement_date": "2023-10-23",
+    "announcement_id": "AN202310231602716825",
+    "announcement_title": "华泰柏瑞景利混合型证券投资基金清算报告提示性公告",
+    "announcement_date": "2023-10-23",
+    "all_titles": [
+     "关于华泰柏瑞景利混合型证券投资基金可能触发基金合同终止情形的风险提示公告",
+     "华泰柏瑞景利混合型证券投资基金基金合同终止及基金财产清算的公告",
+     "华泰柏瑞基金管理有限公司华泰柏瑞景利混合型证券投资基金清算报告",
+     "华泰柏瑞景利混合型证券投资基金清算报告提示性公告"
+    ],
+    "announcement_url": "http://pdf.dfcfw.com/pdf/H2_AN202310231602716825_1.pdf",
+    "doc_format": "pdf",
+    "doc_ok": true,
+    "fund_full_name": "华泰柏瑞景利混合型证券投资基金清算报告提示性公告华泰柏瑞景利混合型证券投资基金",
+    "established_date": null,
+    "last_trading_date": null,
+    "liquidation_start": "2023-09-06",
+    "delisting_date": null,
+    "event_date": "2023-09-06",
+    "successor_name": null,
+    "successor_code": null,
+    "evidence_level": "A",
+    "missing_fields": [
+     "established_date",
+     "successor_name"
+    ],
+    "doc_excerpt": "华泰柏瑞景利混合型证券投资基金 清算报告提示性公告 华泰柏瑞景利混合型证券投资基金自 2023 年 9 月 6 日起进入清算期 。 清算报告全文于 2023 年 10 月 23 日在本公司网站 [www.huatai-pb.com] 和中国证监会基金电子披露网站 （ http:// eid.csrc.gov.cn/fund ） 披露 ， 供投资者查阅 。 如有疑问可拨打本公司客服电话 （ 400 - 888 - 0001 [ 免长途费用",
+    "final_trading_day": null
+   },
+   {
+    "event_key": "方正富邦中证500指数增强型证券投资基金|liquidation",
+    "fund_entity": "方正富邦中证500指数增强型证券投资基金",
+    "event_type": "liquidation",
+    "codes_in_event": [
+     "010066",
+     "010067"
+    ],
+    "code_count": 2,
+    "announcement_count": 3,
+    "announcement_ids": [
+     "AN202211041579947959",
+     "AN202211041579909799",
+     "AN202211041579909698"
+    ],
+    "first_announcement_date": "2022-11-04",
+    "last_announcement_date": "2022-11-04",
+    "announcement_id": "AN202211041579909698",
+    "announcement_title": "方正富邦中证500指数增强型证券投资基金清算报告",
+    "announcement_date": "2022-11-04",
+    "all_titles": [
+     "方正富邦基金管理有限公司关于方正富邦中证500指数增强型证券投资基金基金清算报告提示性公告",
+     "方正富邦基金管理有限公司关于方正富邦中证500指数增强型证券投资基金基金合同终止及剩余财产分配的公告",
+     "方正富邦中证500指数增强型证券投资基金清算报告"
+    ],
+    "announcement_url": "http://pdf.dfcfw.com/pdf/H2_AN202211041579909698_1.pdf",
+    "doc_format": "pdf",
+    "doc_ok": true,
+    "fund_full_name": "中华人民共和国证券投资基金",
+    "established_date": null,
+    "last_trading_date": null,
+    "liquidation_start": null,
+    "delisting_date": null,
+    "event_date": null,
+    "successor_name": null,
+    "successor_code": null,
+    "evidence_level": "B",
+    "missing_fields": [
+     "established_date",
+     "event_date",
+     "successor_name"
+    ],
+    "doc_excerpt": " 方正富邦中证 500 指数增强型 证券投资基金 清算报告 基金管理人：方正富邦基金管理有限公司 基金托管人：国信证券股份有限公司 报告出具日期：二〇二二年十月二十四日 报告公告日期：二〇二二年十一月四日 方正富邦中证 500 指数增强型证券投资基金清算报告 1 目 录 一、重要提示........................................................ 2 二、基金产品概况...........",
+    "final_trading_day": null
+   },
+   {
+    "event_key": "方正富邦ESG主题投资混合型证券投资基金|liquidation",
+    "fund_entity": "方正富邦ESG主题投资混合型证券投资基金",
+    "event_type": "liquidation",
+    "codes_in_event": [
+     "010070",
+     "010071"
+    ],
+    "code_count": 2,
+    "announcement_count": 2,
+    "announcement_ids": [
+     "AN202409041639724885",
+     "AN202409041639723820"
+    ],
+    "first_announcement_date": "2024-09-04",
+    "last_announcement_date": "2024-09-04",
+    "announcement_id": "AN202409041639723820",
+    "announcement_title": "方正富邦基金管理有限公司关于方正富邦ESG主题投资混合型证券投资基金基金合同终止及剩余财产分配的公告",
+    "announcement_date": "2024-09-04",
+    "all_titles": [
+     "方正富邦ESG主题投资混合型证券投资基金清算报告",
+     "方正富邦基金管理有限公司关于方正富邦ESG主题投资混合型证券投资基金基金合同终止及剩余财产分配的公告"
+    ],
+    "announcement_url": "http://pdf.dfcfw.com/pdf/H2_AN202409041639723820_1.pdf",
+    "doc_format": "pdf",
+    "doc_ok": true,
+    "fund_full_name": "主题投资混合型证券投资基金",
+    "established_date": null,
+    "last_trading_date": "2024-07-02",
+    "liquidation_start": null,
+    "delisting_date": null,
+    "event_date": "2024-07-02",
+    "successor_name": null,
+    "successor_code": null,
+    "evidence_level": "A",
+    "missing_fields": [
+     "established_date",
+     "successor_name"
+    ],
+    "doc_excerpt": "方正富邦基金管理有限公司 关于方正富邦 ESG 主题投资混合型证券投资基金 基金合同终止及剩余财产分配的公告 根据《中华人民共和国证券投资基金法》、《公开募集证 券投资基金运作管理办法》和《方正富邦 ESG 主题投资混合 型证券投资基金基金合同》（以下简称“基金合同”）的有关 规定，方正富邦 ESG 主题投资混合型证券投资基金（以下简 称“本基金”）已召开基金份额持有人大会决定终止本基金基 金合同，大会决议生效日期为 2024 年 7 ",
+    "final_trading_day": null
+   },
+   {
+    "event_key": "南方誉隆一年持有期混合型证券投资基金|liquidation",
+    "fund_entity": "南方誉隆一年持有期混合型证券投资基金",
+    "event_type": "liquidation",
+    "codes_in_event": [
+     "010074",
+     "010075"
+    ],
+    "code_count": 2,
+    "announcement_count": 4,
+    "announcement_ids": [
+     "AN202309121598296963",
+     "AN202309131598359692",
+     "AN202311171611291250",
+     "AN202311181611666263"
+    ],
+    "first_announcement_date": "2023-09-12",
+    "last_announcement_date": "2023-11-18",
+    "announcement_id": "AN202311181611666263",
+    "announcement_title": "关于南方誉隆一年持有期混合型证券投资基金基金合同终止及剩余财产分配的公告",
+    "announcement_date": "2023-11-18",
+    "all_titles": [
+     "关于南方誉隆一年持有期混合型证券投资基金可能触发基金合同终止情形的提示性公告",
+     "关于南方誉隆一年持有期混合型证券投资基金基金合同终止及基金财产清算的公告",
+     "南方誉隆一年持有期混合型证券投资基金2023年清算报告",
+     "关于南方誉隆一年持有期混合型证券投资基金基金合同终止及剩余财产分配的公告"
+    ],
+    "announcement_url": "http://pdf.dfcfw.com/pdf/H2_AN202311181611666263_1.pdf",
+    "doc_format": "pdf",
+    "doc_ok": true,
+    "fund_full_name": "关于南方誉隆一年持有期混合型证券投资基金",
+    "established_date": null,
+    "last_trading_date": null,
+    "liquidation_start": null,
+    "delisting_date": null,
+    "event_date": null,
+    "successor_name": null,
+    "successor_code": null,
+    "evidence_level": "B",
+    "missing_fields": [
+     "established_date",
+     "event_date",
+     "successor_name"
+    ],
+    "doc_excerpt": "1 关于南方誉隆一年持有期混合型证券投资基金 基金合同终止及剩余财产分配的公告 南方基金管理股份有限公司（以下简称“基金管理人”）旗下南方誉隆一年持有期混 合型证券投资基金（以下简称“本基金”）已触发基金合同自动终止的情形。 本基金自 2023 年 9 月 14 日至 2023 年 11 月 3 日期间进行了基金财产清算。基金财产 清算报告报中国证监会备案后，本基金管理人于 2023 年 11 月 17 日在规定网站上刊登了《南 方誉隆",
+    "final_trading_day": null
+   },
+   {
+    "event_key": "博时恒荣一年持有期混合型证券投资基金|liquidation",
+    "fund_entity": "博时恒荣一年持有期混合型证券投资基金",
+    "event_type": "liquidation",
+    "codes_in_event": [
+     "010078",
+     "010079"
+    ],
+    "code_count": 2,
+    "announcement_count": 12,
+    "announcement_ids": [
+     "AN202202101546042360",
+     "AN202202241548833237",
+     "AN202211031579835027",
+     "AN202211171580323108",
+     "AN202211241580529531",
+     "AN202304201585602089",
+     "AN202305061586323347",
+     "AN202305131586598352",
+     "AN202305201586991064",
+     "AN202306291591851545",
+     "AN202306291591848678",
+     "AN202306291591848633"
+    ],
+    "first_announcement_date": "2022-02-10",
+    "last_announcement_date": "2023-06-29",
+    "announcement_id": "AN202306291591848633",
+    "announcement_title": "关于博时恒荣一年持有期混合型证券投资基金基金合同终止的公告",
+    "announcement_date": "2023-06-29",
+    "all_titles": [
+     "博时基金管理有限公司关于博时恒荣一年持有期混合型证券投资基金可能触发基金合同终止情形的提示公告",
+     "博时基金管理有限公司关于博时恒荣一年持有期混合型证券投资基金可能触发基金合同终止情形的提示公告",
+     "博时基金管理有限公司关于博时恒荣一年持有期混合型证券投资基金可能触发基金合同终止情形的提示公告",
+     "博时基金管理有限公司关于博时恒荣一年持有期混合型证券投资基金可能触发基金合同终止情形的提示公告",
+     "博时基金管理有限公司关于博时恒荣一年持有期混合型证券投资基金可能触发基金合同终止情形的提示公告",
+     "关于博时恒荣一年持有期混合型证券投资基金可能触发基金合同终止情形的提示公告",
+     "关于博时恒荣一年持有期混合型证券投资基金可能触发基金合同终止情形的提示公告",
+     "关于博时恒荣一年持有期混合型证券投资基金可能触发基金合同终止情形的提示公告",
+     "关于博时恒荣一年持有期混合型证券投资基金基金合同终止及基金财产清算的公告",
+     "博时恒荣一年持有期混合型证券投资基金基金清算报告",
+     "博时恒荣一年持有期混合型证券投资基金清算报告提示性公告",
+     "关于博时恒荣一年持有期混合型证券投资基金基金合同终止的公告"
+    ],
+    "announcement_url": "http://pdf.dfcfw.com/pdf/H2_AN202306291591848633_1.pdf",
+    "doc_format": "pdf",
+    "doc_ok": true,
+    "fund_full_name": "关于博时恒荣一年持有期混合型证券投资基金",
+    "established_date": null,
+    "last_trading_date": null,
+    "liquidation_start": null,
+    "delisting_date": null,
+    "event_date": null,
+    "successor_name": null,
+    "successor_code": null,
+    "evidence_level": "B",
+    "missing_fields": [
+     "established_date",
+     "event_date",
+     "successor_name"
+    ],
+    "doc_excerpt": "关于博时恒荣一年持有期混合型证券 投资基金基金合同终止的公告 根据 《 中华人民共和国证券投资基金法 》、《 公开募集证券投资基金运作 管理办法 》、《 博时恒荣一年持有期混合型证券投资基金基金合同 》（ 以下简称 “ 《 基金合同 》 ” ） 的有关规定 ， 博时恒荣一年持有期混合型证券投资基金 （ 以下 简称 “ 本基金 ” ） 出现法律法规以及 《 基金合同 》 规定的终止事由 。 本基金管理 人博时基金管理有限公司 （ 以下简称",
+    "final_trading_day": null
+   },
+   {
+    "event_key": "中欧优势成长三个月定期开放混合型发起式证券投资基金|liquidation",
+    "fund_entity": "中欧优势成长三个月定期开放混合型发起式证券投资基金",
+    "event_type": "liquidation",
+    "codes_in_event": [
+     "010080"
+    ],
+    "code_count": 1,
+    "announcement_count": 3,
+    "announcement_ids": [
+     "AN202601211818169964",
+     "AN202602251820003644",
+     "AN202607311827502983"
+    ],
+    "first_announcement_date": "2026-01-21",
+    "last_announcement_date": "2026-07-31",
+    "announcement_id": "AN202607311827502983",
+    "announcement_title": "中欧优势成长三个月定期开放混合型发起式证券投资基金二次清算报告",
+    "announcement_date": "2026-07-31",
+    "all_titles": [
+     "中欧基金管理有限公司关于中欧优势成长三个月定期开放混合型发起式证券投资基金基金合同终止及基金财产清算的公告",
+     "中欧优势成长三个月定期开放混合型发起式证券投资基金清算报告",
+     "中欧优势成长三个月定期开放混合型发起式证券投资基金二次清算报告"
+    ],
+    "announcement_url": "http://pdf.dfcfw.com/pdf/H2_AN202607311827502983_1.pdf",
+    "doc_format": "pdf",
+    "doc_ok": true,
+    "fund_full_name": "中欧优势成长三个月定期开放混合型发起式证券投资基金",
+    "established_date": "2020-09-18",
+    "last_trading_date": "2026-01-20",
+    "liquidation_start": null,
+    "delisting_date": null,
+    "event_date": "2026-01-20",
+    "successor_name": null,
+    "successor_code": null,
+    "evidence_level": "A",
+    "missing_fields": [
+     "successor_name"
+    ],
+    "doc_excerpt": "中欧优势成长三个月定期开放混合型发起式证券投资基金二次清算 报告 基金管理人：中欧基金管理有限公司 基金托管人：中国邮政储蓄银行股份有限公司 报告出具日期：2026 年 7 月 27 日 报告公告日期：2026 年 7 月 31 日 一、重要提示 中欧优势成长三个月定期开放混合型发起式证券投资基金（以下简称“本基 金”）经中国证监会《关于准予中欧优势成长三个月定期开放混合型发起式证券 投资基金注册的批复》（证监许可[2020]1708 ",
+    "final_trading_day": null
+   },
+   {
+    "event_key": "博远鑫享三个月持有期债券型证券投资基金|liquidation",
+    "fund_entity": "博远鑫享三个月持有期债券型证券投资基金",
+    "event_type": "liquidation",
+    "codes_in_event": [
+     "010096",
+     "010097",
+     "010098"
+    ],
+    "code_count": 3,
+    "announcement_count": 3,
+    "announcement_ids": [
+     "AN202406261636896107",
+     "AN202407191638082952",
+     "AN202407191638076604"
+    ],
+    "first_announcement_date": "2024-06-26",
+    "last_announcement_date": "2024-07-19",
+    "announcement_id": "AN202407191638076604",
+    "announcement_title": "博远鑫享三个月持有期债券型证券投资基金2024年清算报告",
+    "announcement_date": "2024-07-19",
+    "all_titles": [
+     "关于博远鑫享三个月持有期债券型证券投资基金基金合同终止及基金财产清算的公告",
+     "博远鑫享三个月持有期债券型证券投资基金清算报告提示性公告",
+     "博远鑫享三个月持有期债券型证券投资基金2024年清算报告"
+    ],
+    "announcement_url": "http://pdf.dfcfw.com/pdf/H2_AN202407191638076604_1.pdf",
+    "doc_format": "pdf",
+    "doc_ok": true,
+    "fund_full_name": "博远鑫享三个月持有期债券型证券投资基金",
+    "established_date": "2024-06-26",
+    "last_trading_date": "2024-06-26",
+    "liquidation_start": null,
+    "delisting_date": null,
+    "event_date": "2024-06-26",
+    "successor_name": null,
+    "successor_code": null,
+    "evidence_level": "A",
+    "missing_fields": [
+     "successor_name"
+    ],
+    "doc_excerpt": "博远鑫享三个月持有期债券型证券投资基金 清算报告 基金管理人:博远基金管理有限公司 基金托管人:宁波银行股份有限公司 清算报告出具日: 二〇二四年七月十五日 清算报告公告日: 二〇二四年七月十九日1、重要提示 博远鑫享三个月持有期债券型证券投资基金（以下简称“本基金”）经中国 证券监督管理委员会证监许可[2020]1774号文注册募集。《博远鑫享三个月持有 期债券型证券投资基金基金合同》（以下简称“《基金合同》”）于2020年9月30 ",
+    "final_trading_day": null
+   },
+   {
+    "event_key": "国泰中小板300成长交易型开放式指数证券投资基金|liquidation",
+    "fund_entity": "国泰中小板300成长交易型开放式指数证券投资基金",
+    "event_type": "liquidation",
+    "codes_in_event": [
+     "020025"
+    ],
+    "code_count": 1,
+    "announcement_count": 3,
+    "announcement_ids": [
+     "AN201507200010248379",
+     "AN201507210010259860",
+     "AN201511060011311239"
+    ],
+    "first_announcement_date": "2015-07-20",
+    "last_announcement_date": "2015-11-06",
+    "announcement_id": "AN201511060011311239",
+    "announcement_title": "国泰中小板300成长交易型开放式指数证券投资基金联接基金清算报告",
+    "announcement_date": "2015-11-06",
+    "all_titles": [
+     "关于国泰中小板300成长交易型开放式指数证券投资基金联接基金召开基金份额持有人大会审议终止基金合同的提示性公告(2015-7-20)",
+     "关于国泰中小板300成长交易型开放式指数证券投资基金联接基金召开基金份额持有人大会审议终止基金合同的提示性公告(2015-7-21)",
+     "国泰中小板300成长交易型开放式指数证券投资基金联接基金清算报告"
+    ],
+    "announcement_url": "http://pdf.dfcfw.com/pdf/H2_AN201511060011311239_1.pdf",
+    "doc_format": "pdf",
+    "doc_ok": true,
+    "fund_full_name": "成长交易型开放式指数证券投资基金",
+    "established_date": null,
+    "last_trading_date": null,
+    "liquidation_start": "2015-07-30",
+    "delisting_date": null,
+    "event_date": "2015-07-30",
+    "successor_name": null,
+    "successor_code": null,
+    "evidence_level": "A",
+    "missing_fields": [
+     "established_date",
+     "successor_name"
+    ],
+    "doc_excerpt": "国泰中小板 300 成长交易型开放式指数证券投资基金联接基金清算报告 国泰中小板 300 成长交易型开放式指数证券投资基金 联接基金清算报告 基金管理人：国泰基金管理有限公司 基金托管人：中国银行股份有限公司 公告日期：2015 年 11 月 6 日国泰中小板 300 成长交易型开放式指数证券投资基金联接基金清算报告 2 1 重要提示及目录 1.1 重要提示 国泰中小板 300 成长交易型开放式指数证券投资基金联接基金(以下简称“本基金",
+    "final_trading_day": null
+   },
+   {
+    "event_key": "国泰信用债券型证券投资基金|liquidation",
+    "fund_entity": "国泰信用债券型证券投资基金",
+    "event_type": "liquidation",
+    "codes_in_event": [
+     "020027",
+     "020028"
+    ],
+    "code_count": 2,
+    "announcement_count": 4,
+    "announcement_ids": [
+     "AN201805021134450756",
+     "AN201805031135774182",
+     "AN201805041137042240",
+     "AN201808251182985605"
+    ],
+    "first_announcement_date": "2018-05-02",
+    "last_announcement_date": "2018-08-25",
+    "announcement_id": "AN201808251182985605",
+    "announcement_title": "国泰信用债券型证券投资基金清算报告",
+    "announcement_date": "2018-08-25",
+    "all_titles": [
+     "关于国泰信用债券型证券投资基金基金合同终止及基金财产清算的公告",
+     "关于国泰信用债券型证券投资基金基金合同终止及基金财产清算的第一次提示性公告",
+     "关于国泰信用债券型证券投资基金基金合同终止及基金财产清算的第二次提示性公告",
+     "国泰信用债券型证券投资基金清算报告"
+    ],
+    "announcement_url": "http://pdf.dfcfw.com/pdf/H2_AN201808251182985605_1.pdf",
+    "doc_format": "pdf",
+    "doc_ok": true,
+    "fund_full_name": "国泰信用债券型证券投资基金清算报告国泰信用债券型证券投资基金",
+    "established_date": null,
+    "last_trading_date": "2018-05-15",
+    "liquidation_start": null,
+    "delisting_date": null,
+    "event_date": "2018-05-15",
+    "successor_name": null,
+    "successor_code": null,
+    "evidence_level": "A",
+    "missing_fields": [
+     "established_date",
+     "successor_name"
+    ],
+    "doc_excerpt": "国泰信用债券型证券投资基金清算报告 国泰信用债券型证券投资基金清算报告 基金管理人：国泰基金管理有限公司 基金托管人：中国工商银行股份有限公司 公告日期：2018 年 8 月 25 日国泰信用债券型证券投资基金清算报告 第2页共13页 1 重要提示及目录 1.1 重要提示 国泰信用债券型证券投资基金(以下简称“本基金”)经中国证券监督管理委员会(以下简称“中国 证监会”)证监基金字[2012]485 号《关于核准国泰信用债券型证券投资基",
+    "final_trading_day": null
+   },
+   {
+    "event_key": "国泰创利债券型证券投资基金|liquidation",
+    "fund_entity": "国泰创利债券型证券投资基金",
+    "event_type": "liquidation",
+    "codes_in_event": [
+     "020029"
+    ],
+    "code_count": 1,
+    "announcement_count": 4,
+    "announcement_ids": [
+     "AN201708010759920735",
+     "AN201708020763280459",
+     "AN201708030767431232",
+     "AN201710190961950570"
+    ],
+    "first_announcement_date": "2017-08-01",
+    "last_announcement_date": "2017-10-19",
+    "announcement_id": "AN201710190961950570",
+    "announcement_title": "国泰创利债券型证券投资基金清算报告",
+    "announcement_date": "2017-10-19",
+    "all_titles": [
+     "关于国泰创利债券型证券投资基金基金合同终止及基金财产清算的公告",
+     "关于国泰创利债券型证券投资基金基金合同终止及基金财产清算的第一次提示性公告",
+     "关于国泰创利债券型证券投资基金基金合同终止及基金财产清算的第二次提示性公告",
+     "国泰创利债券型证券投资基金清算报告"
+    ],
+    "announcement_url": "http://pdf.dfcfw.com/pdf/H2_AN201710190961950570_1.pdf",
+    "doc_format": "pdf",
+    "doc_ok": true,
+    "fund_full_name": "国泰创利债券型证券投资基金",
+    "established_date": null,
+    "last_trading_date": "2017-08-14",
+    "liquidation_start": null,
+    "delisting_date": null,
+    "event_date": "2017-08-14",
+    "successor_name": null,
+    "successor_code": null,
+    "evidence_level": "A",
+    "missing_fields": [
+     "established_date",
+     "successor_name"
+    ],
+    "doc_excerpt": "国泰创利债券型证券投资基金清算报告 基金管理人：国泰基金管理有限公司 基金托管人：中国建设银行股份有限公司 公告日期：2017 年 10 月 19 日 1 重要提示及目录 1.1 重要提示 国泰创利债券型证券投资基金（以下简称本基金）由国泰 6 个月短期理财债券型证券投资基金（以下简称 国泰 6 个月短期理财债券基金）转型而来。 国泰 6 个月短期理财债券基金经中国证监会证监许可[2012]1044 号文核准募集（《关于核准国泰 6 个",
+    "final_trading_day": null
+   },
+   {
+    "event_key": "国泰上证5年期国债交易型开放式指数证券投资基金|liquidation",
+    "fund_entity": "国泰上证5年期国债交易型开放式指数证券投资基金",
+    "event_type": "liquidation",
+    "codes_in_event": [
+     "020035",
+     "020036"
+    ],
+    "code_count": 2,
+    "announcement_count": 1,
+    "announcement_ids": [
+     "AN201811301255063290"
+    ],
+    "first_announcement_date": "2018-11-30",
+    "last_announcement_date": "2018-11-30",
+    "announcement_id": "AN201811301255063290",
+    "announcement_title": "国泰上证5年期国债交易型开放式指数证券投资基金联接基金清算报告",
+    "announcement_date": "2018-11-30",
+    "all_titles": [
+     "国泰上证5年期国债交易型开放式指数证券投资基金联接基金清算报告"
+    ],
+    "announcement_url": "http://pdf.dfcfw.com/pdf/H2_AN201811301255063290_1.pdf",
+    "doc_format": "pdf",
+    "doc_ok": true,
+    "fund_full_name": "年期国债交易型开放式指数证券投资基金",
+    "established_date": null,
+    "last_trading_date": "2018-10-16",
+    "liquidation_start": null,
+    "delisting_date": null,
+    "event_date": "2018-10-16",
+    "successor_name": null,
+    "successor_code": null,
+    "evidence_level": "A",
+    "missing_fields": [
+     "established_date",
+     "successor_name"
+    ],
+    "doc_excerpt": "国泰上证 5 年期国债交易型开放式指数证券投资基金联接基金清算报告 国泰上证 5 年期国债交易型开放式指数证券投资基金联接 基金清算报告 基金管理人：国泰基金管理有限公司 基金托管人：中国建设银行股份有限公司 公告日期：2018 年 11 月 30 日国泰上证 5 年期国债交易型开放式指数证券投资基金联接基金清算报告 第2页共14页 1 重要提示及目录 1.1 重要提示 国泰上证 5 年期国债交易型开放式指数证券投资基金联接基金(以下简",
+    "final_trading_day": null
+   },
+   {
+    "event_key": "红塔红土中债0-3年政策性金融债指数证券投资基金|liquidation",
+    "fund_entity": "红塔红土中债0-3年政策性金融债指数证券投资基金",
+    "event_type": "liquidation",
+    "codes_in_event": [
+     "020048",
+     "020049"
+    ],
+    "code_count": 2,
+    "announcement_count": 6,
+    "announcement_ids": [
+     "AN202512161801429397",
+     "AN202512301811048967",
+     "AN202601081816833832",
+     "AN202601151817031095",
+     "AN202602101819845040",
+     "AN202602101819845018"
+    ],
+    "first_announcement_date": "2025-12-16",
+    "last_announcement_date": "2026-02-10",
+    "announcement_id": "AN202602101819845018",
+    "announcement_title": "红塔红土中债0-3年政策性金融债指数证券投资基金基金合同终止及剩余财产分配的公告",
+    "announcement_date": "2026-02-10",
+    "all_titles": [
+     "红塔红土基金管理有限公司关于红塔红土中债0-3年政策性金融债指数证券投资基金可能触发基金合同终止情形的第一次提示性公告",
+     "红塔红土基金管理有限公司关于红塔红土中债0-3年政策性金融债指数证券投资基金可能触发基金合同终止情形的第二次提示性公告",
+     "红塔红土基金管理有限公司关于红塔红土中债0-3年政策性金融债指数证券投资基金可能触发基金合同终止情形的第三次提示性公告",
+     "红塔红土基金管理有限公司关于红塔红土中债0-3年政策性金融债指数证券投资基金基金合同终止及基金财产清算的公告",
+     "红塔红土中债0-3年政策性金融债指数证券投资基金清算报告提示性公告",
+     "红塔红土中债0-3年政策性金融债指数证券投资基金基金合同终止及剩余财产分配的公告"
+    ],
+    "announcement_url": "http://pdf.dfcfw.com/pdf/H2_AN202602101819845018_1.pdf",
+    "doc_format": "pdf",
+    "doc_ok": true,
+    "fund_full_name": "3年政策性金融债指数证券投资基金",
+    "established_date": null,
+    "last_trading_date": "2026-01-14",
+    "liquidation_start": null,
+    "delisting_date": null,
+    "event_date": "2026-01-14",
+    "successor_name": null,
+    "successor_code": null,
+    "evidence_level": "A",
+    "missing_fields": [
+     "established_date",
+     "successor_name"
+    ],
+    "doc_excerpt": "红塔红土中债0-3年政策性金融债指数证券投资基金 基金合同终止及剩余财产分配的公告 根据《中华人民共和国证券投资基金法》、《公开募集证券投资基 金运作管理办法》和《红塔红土中债 0-3年政策性金融债指数证券投 资基金基金合同》（以下简称“《基金合同》”）等有关规定，红塔红土 中债 0-3年政策性金融债指数证券投资基金（以下简称“本基金”） 已触发《基金合同》中约定的基金终止条款，本基金最后运作日为 2026年1 月14日。 基金财产清算",
+    "final_trading_day": null
+   },
+   {
+    "event_key": "华宝兴业活期通货币市场基金|liquidation",
+    "fund_entity": "华宝兴业活期通货币市场基金",
+    "event_type": "liquidation",
+    "codes_in_event": [
+     "240021"
+    ],
+    "code_count": 1,
+    "announcement_count": 1,
+    "announcement_ids": [
+     "AN201512170012144916"
+    ],
+    "first_announcement_date": "2015-12-17",
+    "last_announcement_date": "2015-12-17",
+    "announcement_id": "AN201512170012144916",
+    "announcement_title": "华宝兴业活期通货币市场基金清算报告",
+    "announcement_date": "2015-12-17",
+    "all_titles": [
+     "华宝兴业活期通货币市场基金清算报告"
+    ],
+    "announcement_url": "http://pdf.dfcfw.com/pdf/H2_AN201512170012144916_1.pdf",
+    "doc_format": "pdf",
+    "doc_ok": true,
+    "fund_full_name": null,
+    "established_date": null,
+    "last_trading_date": null,
+    "liquidation_start": null,
+    "delisting_date": null,
+    "event_date": null,
+    "successor_name": null,
+    "successor_code": null,
+    "evidence_level": "B",
+    "missing_fields": [
+     "established_date",
+     "event_date",
+     "successor_name"
+    ],
+    "doc_excerpt": "华宝兴业活期通货币市场基金 清算报告 基金管理人：华宝兴业基金管理有限公司 基金托管人：中国银行股份有限公司 报告送出日期：2015 年 12 月 17 日华宝兴业活期通货币市场基金 2015 年 11 月 2 日(基金最后开放日的确认日)资产负债表（经审计） (除特别注明外，金额单位为人民币元) - 1 - 资 产 附注号 本期末 2015 年 11 月 2 日 (基金最后开放日 的确认日) 上期末 2014 年 12 月 31 日 ",
+    "final_trading_day": null
+   },
+   {
+    "event_key": "国金鑫新灵活配置混合型证券投资基金|liquidation",
+    "fund_entity": "国金鑫新灵活配置混合型证券投资基金",
+    "event_type": "liquidation",
+    "codes_in_event": [
+     "501000"
+    ],
+    "code_count": 1,
+    "announcement_count": 4,
+    "announcement_ids": [
+     "AN202405091632746632",
+     "AN202406201636718900",
+     "AN202406261636921599",
+     "AN202406281636985324"
+    ],
+    "first_announcement_date": "2024-05-09",
+    "last_announcement_date": "2024-05-09",
+    "announcement_id": "AN202405091632746632",
+    "announcement_title": "国金鑫新灵活配置混合型证券投资基金(LOF)清算报告",
+    "announcement_date": "2024-05-09",
+    "all_titles": [
+     "国金鑫新灵活配置混合型证券投资基金(LOF)清算报告",
+     "国金鑫新灵活配置混合型证券投资基金(LOF)终止上市交易公告",
+     "国金鑫新灵活配置混合型证券投资基金(LOF)终止上市的提示性公告",
+     "关于国金鑫新灵活配置混合型证券投资基金(LOF)终止上市的公告"
+    ],
+    "absorbed_events": [
+     "delisting"
+    ],
+    "announcement_url": "http://pdf.dfcfw.com/pdf/H2_AN202405091632746632_1.pdf",
+    "doc_format": "pdf",
+    "doc_ok": true,
+    "fund_full_name": "国金基金管理有限公司国金鑫新灵活配置混合型证券投资基金",
+    "established_date": null,
+    "last_trading_date": "2024-03-12",
+    "liquidation_start": "2024-03-13",
+    "delisting_date": null,
+    "event_date": "2024-03-13",
+    "successor_name": null,
+    "successor_code": null,
+    "evidence_level": "A",
+    "missing_fields": [
+     "established_date",
+     "successor_name"
+    ],
+    "doc_excerpt": " 国金基金管理有限公司 国金鑫新灵活配置混合型证券投资基金（LOF） 清算报告 基金管理人：国金基金管理有限公司 基金托管人：平安银行股份有限公司 清算报告出具日：2024 年 4 月 30 日 清算报告公告日：2024 年 5 月 9 日 1 一、重要提示 国金鑫新灵活配置混合型证券投资基金（LOF），基金代码：501000，基金简 称“ 国金鑫新灵活配置（LOF）”，场内简称为“国金鑫新”（以下简称“本基金”） 经中国证券监督管理委",
+    "final_trading_day": null
+   },
+   {
+    "event_key": "长信价值优选混合型证券投资基金|liquidation",
+    "fund_entity": "长信价值优选混合型证券投资基金",
+    "event_type": "liquidation",
+    "codes_in_event": [
+     "501002"
+    ],
+    "code_count": 1,
+    "announcement_count": 2,
+    "announcement_ids": [
+     "AN202407191638079082",
+     "AN202407191638076328"
+    ],
+    "first_announcement_date": "2024-07-19",
+    "last_announcement_date": "2024-07-19",
+    "announcement_id": "AN202407191638076328",
+    "announcement_title": "长信价值优选混合型证券投资基金基金清算报告提示性公告",
+    "announcement_date": "2024-07-19",
+    "all_titles": [
+     "长信价值优选混合型证券投资基金清算报告",
+     "长信价值优选混合型证券投资基金基金清算报告提示性公告"
+    ],
+    "announcement_url": "http://pdf.dfcfw.com/pdf/H2_AN202407191638076328_1.pdf",
+    "doc_format": "pdf",
+    "doc_ok": true,
+    "fund_full_name": "长信基金管理有限责任公司关于长信价值优选混合型证券投资基金",
+    "established_date": null,
+    "last_trading_date": null,
+    "liquidation_start": "2024-06-29",
+    "delisting_date": null,
+    "event_date": "2024-06-29",
+    "successor_name": null,
+    "successor_code": null,
+    "evidence_level": "A",
+    "missing_fields": [
+     "established_date",
+     "successor_name"
+    ],
+    "doc_excerpt": " 临时公告 1 长信基金管理有限责任公司 关于长信价值优选混合型证券投资基金 基金清算报告提示性公告 长信价值优选混合型证券投资基金自 2024 年 6 月 29 日起进入清算期。清算报 告全文于2024 年 7 月 19 日在本公司网站（https://www.cxfund.com.cn）和中国证 监会基金电子披露网站（http://eid.csrc.gov.cn/fund）披露，供投资者查阅。如 有疑问可拨打本公司客服电话（400-",
+    "final_trading_day": null
+   },
+   {
+    "event_key": "长信量化优选混合型证券投资基金|liquidation",
+    "fund_entity": "长信量化优选混合型证券投资基金",
+    "event_type": "liquidation",
+    "codes_in_event": [
+     "501003"
+    ],
+    "code_count": 1,
+    "announcement_count": 3,
+    "announcement_ids": [
+     "AN201809281203834240",
+     "AN201810231219040361",
+     "AN201810261222346659"
+    ],
+    "first_announcement_date": "2018-09-28",
+    "last_announcement_date": "2018-09-28",
+    "announcement_id": "AN201809281203834240",
+    "announcement_title": "长信量化优选混合型证券投资基金(LOF)清算报告",
+    "announcement_date": "2018-09-28",
+    "all_titles": [
+     "长信量化优选混合型证券投资基金(LOF)清算报告",
+     "长信基金管理有限责任公司关于长信量化优选混合型证券投资基金(LOF)终止上市公告",
+     "关于长信量化优选混合型证券投资基金(LOF)终止上市的公告"
+    ],
+    "absorbed_events": [
+     "delisting"
+    ],
+    "announcement_url": "http://pdf.dfcfw.com/pdf/H2_AN201809281203834240_1.pdf",
+    "doc_format": "pdf",
+    "doc_ok": true,
+    "fund_full_name": "长信量化优选混合型证券投资基金",
+    "established_date": null,
+    "last_trading_date": "2018-08-06",
+    "liquidation_start": "2018-08-07",
+    "delisting_date": null,
+    "event_date": "2018-08-07",
+    "successor_name": null,
+    "successor_code": null,
+    "evidence_level": "A",
+    "missing_fields": [
+     "established_date",
+     "successor_name"
+    ],
+    "doc_excerpt": "长信量化优选混合型证券投资基金 （LOF）清算报告 基金管理人：长信基金管理有限责任公司 基金托管人：国泰君安证券股份有限公司 清算报告出具日：2018 年 8 月 10 日 清算报告公告日：2018 年 9 月 28 日长信量化优选混合（LOF）清算报告 第 2 页 共8 页 §1 重要提示 长信量化优选混合型证券投资基金(LOF) (以下简称“本基金”)由长信中证上海改革发展主 题指数型证券投资基金(LOF)(以下简称“长信中证上海",
+    "final_trading_day": null
+   },
+   {
+    "event_key": "国泰中证国有企业改革指数证券投资基金|liquidation",
+    "fund_entity": "国泰中证国有企业改革指数证券投资基金",
+    "event_type": "liquidation",
+    "codes_in_event": [
+     "501020"
+    ],
+    "code_count": 1,
+    "announcement_count": 7,
+    "announcement_ids": [
+     "AN201804181124986308",
+     "AN201804191125826891",
+     "AN201804201126880162",
+     "AN201804201126875794",
+     "AN201808251182985602",
+     "AN201811091241601150",
+     "AN201811141244706666"
+    ],
+    "first_announcement_date": "2018-04-18",
+    "last_announcement_date": "2018-08-25",
+    "announcement_id": "AN201808251182985602",
+    "announcement_title": "国泰中证国有企业改革指数证券投资基金(LOF)清算报告",
+    "announcement_date": "2018-08-25",
+    "all_titles": [
+     "关于国泰中证国有企业改革指数证券投资基金(LOF)基金合同终止及基金财产清算的公告",
+     "关于国泰中证国有企业改革指数证券投资基金(LOF)基金合同终止及基金财产清算的第一次提示性公告",
+     "国泰基金管理有限公司关于国泰中证国有企业改革指数证券投资基金(LOF)基金合同终止及基金财产清算的第二次提示性公告",
+     "关于国泰中证国有企业改革指数证券投资基金(LOF)基金合同终止及基金财产清算的第二次提示性公告",
+     "国泰中证国有企业改革指数证券投资基金(LOF)清算报告",
+     "国泰中证国有企业改革指数证券投资基金(LOF)终止上市公告",
+     "关于国泰中证国有企业改革指数证券投资基金(LOF)终止上市的公告"
+    ],
+    "absorbed_events": [
+     "delisting"
+    ],
+    "announcement_url": "http://pdf.dfcfw.com/pdf/H2_AN201808251182985602_1.pdf",
+    "doc_format": "pdf",
+    "doc_ok": true,
+    "fund_full_name": "国泰中证国有企业改革指数证券投资基金（LOF）清算报告国泰中证国有企业改革指数证券投资基金",
+    "established_date": null,
+    "last_trading_date": null,
+    "liquidation_start": "2018-04-26",
+    "delisting_date": null,
+    "event_date": "2018-04-26",
+    "successor_name": null,
+    "successor_code": null,
+    "evidence_level": "A",
+    "missing_fields": [
+     "established_date",
+     "successor_name"
+    ],
+    "doc_excerpt": "国泰中证国有企业改革指数证券投资基金（LOF）清算报告 国泰中证国有企业改革指数证券投资基金（LOF）清算报 告 基金管理人：国泰基金管理有限公司 基金托管人：中国建设银行股份有限公司 公告日期：2018 年 8 月 25 日国泰中证国有企业改革指数证券投资基金（LOF）清算报告 第2页共14页 1 重要提示及目录 1.1 重要提示 国泰中证国有企业改革指数证券投资基金(LOF)(简称“本基金”)经中国证券监督管理委员会 (以下简称“中",
+    "final_trading_day": null
+   },
+   {
+    "event_key": "鹏华港股通中证香港中小企业投资主题指数证券投资基金|liquidation",
+    "fund_entity": "鹏华港股通中证香港中小企业投资主题指数证券投资基金",
+    "event_type": "liquidation",
+    "codes_in_event": [
+     "501023"
+    ],
+    "code_count": 1,
+    "announcement_count": 2,
+    "announcement_ids": [
+     "AN202112141534501167",
+     "AN202112141534500909"
+    ],
+    "first_announcement_date": "2021-12-14",
+    "last_announcement_date": "2021-12-14",
+    "announcement_id": "AN202112141534500909",
+    "announcement_title": "鹏华港股通中证香港中小企业投资主题指数证券投资基金(LOF)2021年清算报告",
+    "announcement_date": "2021-12-14",
+    "all_titles": [
+     "鹏华港股通中证香港中小企业投资主题指数证券投资基金(LOF)清算报告提示性公告",
+     "鹏华港股通中证香港中小企业投资主题指数证券投资基金(LOF)2021年清算报告"
+    ],
+    "announcement_url": "http://pdf.dfcfw.com/pdf/H2_AN202112141534500909_1.pdf",
+    "doc_format": "pdf",
+    "doc_ok": true,
+    "fund_full_name": "鹏华港股通中证香港中小企业投资主题指数证券投资基金",
+    "established_date": null,
+    "last_trading_date": "2021-10-19",
+    "liquidation_start": "2021-10-20",
+    "delisting_date": null,
+    "event_date": "2021-10-20",
+    "successor_name": null,
+    "successor_code": null,
+    "evidence_level": "A",
+    "missing_fields": [
+     "established_date",
+     "successor_name"
+    ],
+    "doc_excerpt": " 鹏华港股通中证香港中小企业投资主题指 数证券投资基金(LOF)清算报告 基金管理人：鹏华基金管理有限公司 基金托管人：中国银行股份有限公司 公告日期：2021 年 12 月 14 日 鹏华港股通中证香港中小企业投资主题指数证券投资基金(LOF)清算报告 第 2 页 共 12 页 一、重要提示 鹏华港股通中证香港中小企业投资主题指数证券投资基金(LOF)(以下简称“本 基金”)经中国证券监督管理委员会(以下简称“中国证监会”)证监许可[",
+    "final_trading_day": null
+   },
+   {
+    "event_key": "国泰融信灵活配置混合型证券投资基金|liquidation",
+    "fund_entity": "国泰融信灵活配置混合型证券投资基金",
+    "event_type": "liquidation",
+    "codes_in_event": [
+     "501027"
+    ],
+    "code_count": 1,
+    "announcement_count": 13,
+    "announcement_ids": [
+     "AN202306141590930498",
+     "AN202306301591915990",
+     "AN202307071592080284",
+     "AN202307121592202103",
+     "AN202307131592231225",
+     "AN202307141592267358",
+     "AN202307171592326093",
+     "AN202307251592606573",
+     "AN202308141594348388",
+     "AN202308141594345730",
+     "AN202308281595904033",
+     "AN202308291596256393",
+     "AN202308311596886328"
+    ],
+    "first_announcement_date": "2023-06-14",
+    "last_announcement_date": "2023-08-14",
+    "announcement_id": "AN202308141594345730",
+    "announcement_title": "国泰融信灵活配置混合型证券投资基金(LOF)清算报告",
+    "announcement_date": "2023-08-14",
+    "all_titles": [
+     "关于国泰融信灵活配置混合型证券投资基金(LOF)可能触发基金合同终止情形的提示性公告",
+     "关于国泰融信灵活配置混合型证券投资基金(LOF)可能触发基金合同终止情形的提示性公告",
+     "关于国泰融信灵活配置混合型证券投资基金(LOF)可能触发基金合同终止情形的提示性公告",
+     "关于国泰融信灵活配置混合型证券投资基金(LOF)可能触发基金合同终止情形的提示性公告",
+     "关于国泰融信灵活配置混合型证券投资基金(LOF)基金合同终止及基金财产清算的公告",
+     "关于国泰融信灵活配置混合型证券投资基金(LOF)基金合同终止及基金财产清算的提示性公告",
+     "关于国泰融信灵活配置混合型证券投资基金(LOF)基金合同终止及基金财产清算的提示性公告",
+     "关于国泰融信灵活配置混合型证券投资基金(LOF)基金合同终止及基金财产清算的提示性公告",
+     "国泰融信灵活配置混合型证券投资基金(LOF)清算报告提示性公告",
+     "国泰融信灵活配置混合型证券投资基金(LOF)清算报告",
+     "国泰融信灵活配置混合型证券投资基金(LOF)终止上市的公告",
+     "国泰融信灵活配置混合型证券投资基金(LOF)终止上市的提示性公告",
+     "关于国泰融信灵活配置混合型证券投资基金(LOF)终止上市的公告"
+    ],
+    "absorbed_events": [
+     "delisting"
+    ],
+    "announcement_url": "http://pdf.dfcfw.com/pdf/H2_AN202308141594345730_1.pdf",
+    "doc_format": "pdf",
+    "doc_ok": true,
+    "fund_full_name": "国泰融信灵活配置混合型证券投资基金（LOF）清算报告国泰融信灵活配置混合型证券投资基金",
+    "established_date": null,
+    "last_trading_date": "2023-07-25",
+    "liquidation_start": null,
+    "delisting_date": null,
+    "event_date": "2023-07-25",
+    "successor_name": null,
+    "successor_code": null,
+    "evidence_level": "A",
+    "missing_fields": [
+     "established_date",
+     "successor_name"
+    ],
+    "doc_excerpt": "国泰融信灵活配置混合型证券投资基金（LOF）清算报告 国泰融信灵活配置混合型证券投资基金（LOF）清算报告 基金管理人：国泰基金管理有限公司 基金托管人：中国银行股份有限公司 公告日期：2023 年 8 月 14 日 国泰融信灵活配置混合型证券投资基金（LOF）清算报告 第 2 页共 14 页 1 重要提示及目录 1.1 重要提示 国泰融信灵活配置混合型证券投资基金(LOF)(以下简称“本基金”)是根据《国泰融信定增灵活配 置混合型证券",
+    "final_trading_day": null,
+    "notes": [
+     "承接名与本基金同名，判为抽取误命中，置空"
+    ]
+   },
+   {
+    "event_key": "银华惠安定期开放混合型证券投资基金|liquidation",
+    "fund_entity": "银华惠安定期开放混合型证券投资基金",
+    "event_type": "liquidation",
+    "codes_in_event": [
+     "501033"
+    ],
+    "code_count": 1,
+    "announcement_count": 1,
+    "announcement_ids": [
+     "AN201906251336294362"
+    ],
+    "first_announcement_date": "2019-06-25",
+    "last_announcement_date": "2019-06-25",
+    "announcement_id": "AN201906251336294362",
+    "announcement_title": "银华惠安定期开放混合型证券投资基金清算报告",
+    "announcement_date": "2019-06-25",
+    "all_titles": [
+     "银华惠安定期开放混合型证券投资基金清算报告"
+    ],
+    "announcement_url": "http://pdf.dfcfw.com/pdf/H2_AN201906251336294362_1.pdf",
+    "doc_format": "pdf",
+    "doc_ok": true,
+    "fund_full_name": "银华惠安定期开放混合型证券投资基金清算报告银华惠安定期开放混合型证券投资基金",
+    "established_date": "2019-04-04",
+    "last_trading_date": null,
+    "liquidation_start": "2019-04-04",
+    "delisting_date": null,
+    "event_date": "2019-04-04",
+    "successor_name": null,
+    "successor_code": null,
+    "evidence_level": "A",
+    "missing_fields": [
+     "successor_name"
+    ],
+    "doc_excerpt": "银华惠安定期开放混合型证券投资基金 清算报告 银华惠安定期开放混合型证券投资基金 清算报告 基金管理人：银华基金管理股份有限公司 基金托管人：中国银行股份有限公司 清算报告公告日：2019 年 6 月 25 日银华惠安定期开放混合型证券投资基金 清算报告 目录 重要提示 ....................................................................................",
+    "final_trading_day": null
+   },
+   {
+    "event_key": "创金合信鼎鑫睿选定期开放混合型证券投资基金|liquidation",
+    "fund_entity": "创金合信鼎鑫睿选定期开放混合型证券投资基金",
+    "event_type": "liquidation",
+    "codes_in_event": [
+     "501035"
+    ],
+    "code_count": 1,
+    "announcement_count": 10,
+    "announcement_ids": [
+     "AN201901251288594994",
+     "AN201902101294031938",
+     "AN201902121294995064",
+     "AN201902121294995061",
+     "AN201902191297847026",
+     "AN201902201298297641",
+     "AN201902211298688033",
+     "AN201905061327002013",
+     "AN201906031333531247",
+     "AN201906101334218334"
+    ],
+    "first_announcement_date": "2019-01-25",
+    "last_announcement_date": "2019-05-07",
+    "announcement_id": "AN201905061327002013",
+    "announcement_title": "创金合信鼎鑫睿选定期开放混合型证券投资基金(LOF)清算报告",
+    "announcement_date": "2019-05-07",
+    "all_titles": [
+     "关于创金合信鼎鑫睿选定期开放混合型证券投资基金(LOF)可能触发基金合同终止情形的第一次提示性公告",
+     "关于创金合信鼎鑫睿选定期开放混合型证券投资基金(LOF)可能触发基金合同终止情形的第二次提示性公告",
+     "关于创金合信鼎鑫睿选定期开放混合型证券投资基金(LOF)触发基金合同终止情形的公告",
+     "关于创金合信鼎鑫睿选定期开放混合型证券投资基金(LOF)基金合同终止及基金财产清算的公告(2019/02/12)",
+     "关于创金合信鼎鑫睿选定期开放混合型证券投资基金(LOF)基金合同终止及基金财产清算的公告(2019/02/19)",
+     "关于创金合信鼎鑫睿选定期开放混合型证券投资基金(LOF)基金合同终止及基金财产清算的第一次提示性公告",
+     "关于创金合信鼎鑫睿选定期开放混合型证券投资基金(LOF)基金合同终止及基金财产清算的第二次提示性公告",
+     "创金合信鼎鑫睿选定期开放混合型证券投资基金(LOF)清算报告",
+     "创金合信鼎鑫睿选定期开放混合型证券投资基金(LOF)终止上市公告",
+     "关于创金合信鼎鑫睿选定期开放混合型证券投资基金(LOF)终止上市的公告"
+    ],
+    "absorbed_events": [
+     "delisting"
+    ],
+    "announcement_url": "http://pdf.dfcfw.com/pdf/H2_AN201905061327002013_1.pdf",
+    "doc_format": "pdf",
+    "doc_ok": true,
+    "fund_full_name": "创金合信鼎鑫睿选定期开放混合型证券投资基金",
+    "established_date": "2019-02-26",
+    "last_trading_date": "2019-02-25",
+    "liquidation_start": "2019-02-26",
+    "delisting_date": null,
+    "event_date": "2019-02-26",
+    "successor_name": null,
+    "successor_code": null,
+    "evidence_level": "A",
+    "missing_fields": [
+     "successor_name"
+    ],
+    "doc_excerpt": "创金合信鼎鑫睿选定期开放混合型证券投资基 金(LOF)清算报告 基金管理人：创金合信基金管理有限公司 基金托管人：中国工商银行股份有限公司一、重要提示 创金合信鼎鑫睿选定期开放混合型证券投资基金(LOF)（以下简称“本 基金”）经中国证券监督管理委员会(以下简称“中国证监会”)证监许可 [2017]151 号《关于准予创金合信鼎鑫睿选定期开放混合型证券投资基金 (LOF)注册的批复》准予注册。由创金合信基金管理有限公司按照《中华人 民共",
+    "final_trading_day": null
+   },
+   {
+    "event_key": "汇添富睿丰混合型证券投资基金|liquidation",
+    "fund_entity": "汇添富睿丰混合型证券投资基金",
+    "event_type": "liquidation",
+    "codes_in_event": [
+     "501039",
+     "501040"
+    ],
+    "code_count": 2,
+    "announcement_count": 15,
+    "announcement_ids": [
+     "AN202312211614650666",
+     "AN202312221614819570",
+     "AN202312261614909924",
+     "AN202312271615026885",
+     "AN202312281615161499",
+     "AN202401031616093819",
+     "AN202401031616219953",
+     "AN202401041616344555",
+     "AN202401151617494626",
+     "AN202401161617513355",
+     "AN202402081621122707",
+     "AN202402081621122623",
+     "AN202403121626381486",
+     "AN202403121626455422",
+     "AN202403191627111020"
+    ],
+    "first_announcement_date": "2023-12-22",
+    "last_announcement_date": "2024-02-08",
+    "announcement_id": "AN202402081621122623",
+    "announcement_title": "汇添富睿丰混合型证券投资基金(LOF)清算报告提示性公告",
+    "announcement_date": "2024-02-08",
+    "all_titles": [
+     "关于汇添富睿丰混合型证券投资基金(LOF)可能触发基金合同终止情形的提示性公告",
+     "关于汇添富睿丰混合型证券投资基金(LOF)可能触发基金合同终止情形的提示性公告",
+     "关于汇添富睿丰混合型证券投资基金(LOF)可能触发基金合同终止情形的提示性公告",
+     "关于汇添富睿丰混合型证券投资基金(LOF)可能触发基金合同终止情形的提示性公告",
+     "关于汇添富睿丰混合型证券投资基金(LOF)可能触发基金合同终止情形的提示性公告",
+     "关于汇添富睿丰混合型证券投资基金(LOF)进入清算期及终止基金合同的公告",
+     "关于汇添富睿丰混合型证券投资基金(LOF)进入清算期及终止基金合同的提示性公告",
+     "关于汇添富睿丰混合型证券投资基金(LOF)进入清算期及终止基金合同的提示性公告",
+     "关于汇添富睿丰混合型证券投资基金(LOF)进入清算期及终止基金合同的提示性公告",
+     "关于汇添富睿丰混合型证券投资基金(LOF)进入清算期及终止基金合同的提示性公告",
+     "汇添富睿丰混合型证券投资基金(LOF)清算报告",
+     "汇添富睿丰混合型证券投资基金(LOF)清算报告提示性公告",
+     "汇添富基金管理股份有限公司关于汇添富睿丰混合型证券投资基金(LOF)终止上市的公告",
+     "汇添富基金管理股份有限公司关于汇添富睿丰混合型证券投资基金(LOF)终止上市的提示性公告",
+     "关于汇添富睿丰混合型证券投资基金(LOF)终止上市的公告"
+    ],
+    "absorbed_events": [
+     "delisting"
+    ],
+    "announcement_url": "http://pdf.dfcfw.com/pdf/H2_AN202402081621122623_1.pdf",
+    "doc_format": "pdf",
+    "doc_ok": true,
+    "fund_full_name": "汇添富睿丰混合型证券投资基金(LOF)清算报告提示性公告汇添富睿丰混合型证券投资基金",
+    "established_date": null,
+    "last_trading_date": null,
+    "liquidation_start": "2024-01-17",
+    "delisting_date": null,
+    "event_date": "2024-01-17",
+    "successor_name": null,
+    "successor_code": null,
+    "evidence_level": "A",
+    "missing_fields": [
+     "established_date",
+     "successor_name"
+    ],
+    "doc_excerpt": "汇添富睿丰混合型证券投资基金(LOF)清算报告提示性公告 汇添富睿丰混合型证券投资基金(LOF)自 2024 年 1 月 17 日进入清算期。清 算报告全文于 2024 年 2 月 8 日在本公司网站（www.99fund.com）和中国证监 会基金电子披露网站（http://eid.csrc.gov.cn/fund）披露，供投资者查阅。如有疑 问可拨打本公司客服电话（400-888-9918）咨询。 特此公告。 汇添富基金管理股份有限",
+    "final_trading_day": null
+   },
+   {
+    "event_key": "汇添富弘安混合型证券投资基金|liquidation",
+    "fund_entity": "汇添富弘安混合型证券投资基金",
+    "event_type": "liquidation",
+    "codes_in_event": [
+     "501041",
+     "501042"
+    ],
+    "code_count": 2,
+    "announcement_count": 9,
+    "announcement_ids": [
+     "AN202401051616649804",
+     "AN202401121617322959",
+     "AN202401161617517195",
+     "AN202401171617590130",
+     "AN202401181617688064",
+     "AN202401221617910625",
+     "AN202403151626833266",
+     "AN202403151626833265",
+     "AN202403171626953782"
+    ],
+    "first_announcement_date": "2024-01-06",
+    "last_announcement_date": "2024-03-18",
+    "announcement_id": "AN202403171626953782",
+    "announcement_title": "汇添富弘安混合型证券投资基金基金合同终止及剩余财产分配的公告",
+    "announcement_date": "2024-03-18",
+    "all_titles": [
+     "关于汇添富弘安混合型证券投资基金可能触发基金合同终止情形的提示性公告",
+     "关于汇添富弘安混合型证券投资基金可能触发基金合同终止情形的提示性公告",
+     "关于汇添富弘安混合型证券投资基金可能触发基金合同终止情形的提示性公告",
+     "关于汇添富弘安混合型证券投资基金可能触发基金合同终止情形的提示性公告",
+     "关于汇添富弘安混合型证券投资基金可能触发基金合同终止情形的提示性公告",
+     "关于汇添富弘安混合型证券投资基金进入清算期及终止基金合同的公告",
+     "汇添富弘安混合型证券投资基金清算报告提示性公告",
+     "汇添富弘安混合型证券投资基金清算报告",
+     "汇添富弘安混合型证券投资基金基金合同终止及剩余财产分配的公告"
+    ],
+    "announcement_url": "http://pdf.dfcfw.com/pdf/H2_AN202403171626953782_1.pdf",
+    "doc_format": "pdf",
+    "doc_ok": true,
+    "fund_full_name": "汇添富弘安混合型证券投资基金",
+    "established_date": null,
+    "last_trading_date": null,
+    "liquidation_start": "2024-01-23",
+    "delisting_date": null,
+    "event_date": "2024-01-23",
+    "successor_name": null,
+    "successor_code": null,
+    "evidence_level": "A",
+    "missing_fields": [
+     "established_date",
+     "successor_name"
+    ],
+    "doc_excerpt": "汇添富弘安混合型证券投资基金基金合同终止 及剩余财产分配的公告 根据《中华人民共和国证券投资基金法》《公开募集证券投资基金运作管理 办法》的相关规定和《汇添富弘安混合型证券投资基金基金合同》（以下简称“《基 金合同》”）的相关约定，汇添富弘安混合型证券投资基金（基金简称：汇添富弘 安混合，A 类份额代码501041，C 类份额代码：501042，以下简称“本基金”）因 连续60 个工作日基金资产净值低于5000 万元触发《基金合同》约定",
+    "final_trading_day": null
+   },
+   {
+    "event_key": "财通多策略福佑定期开放灵活配置混合型发起式证券投资基金|liquidation",
+    "fund_entity": "财通多策略福佑定期开放灵活配置混合型发起式证券投资基金",
+    "event_type": "liquidation",
+    "codes_in_event": [
+     "501055"
+    ],
+    "code_count": 1,
+    "announcement_count": 9,
+    "announcement_ids": [
+     "AN202103201474232362",
+     "AN202103271477465653",
+     "AN202104021480666410",
+     "AN202104101483431767",
+     "AN202105151491815601",
+     "AN202105151491815600",
+     "AN202110291525753100",
+     "AN202110291525720023",
+     "AN202110301525904812"
+    ],
+    "first_announcement_date": "2021-03-20",
+    "last_announcement_date": "2021-10-30",
+    "announcement_id": "AN202110301525904812",
+    "announcement_title": "财通多策略福佑定期开放灵活配置混合型发起式证券投资基金基金合同终止公告",
+    "announcement_date": "2021-10-30",
+    "all_titles": [
+     "关于财通多策略福佑定期开放灵活配置混合型发起式证券投资基金可能触发基金合同终止情形的第一次提示性公告",
+     "关于财通多策略福佑定期开放灵活配置混合型发起式证券投资基金可能触发基金合同终止情形的第二次提示性公告",
+     "关于财通多策略福佑定期开放灵活配置混合型发起式证券投资基金可能触发基金合同终止情形的第三次提示性公告",
+     "关于财通多策略福佑定期开放灵活配置混合型发起式证券投资基金基金合同终止及基金财产清算的公告",
+     "财通多策略福佑定期开放灵活配置混合型发起式证券投资基金清算报告提示性公告",
+     "财通多策略福佑定期开放灵活配置混合型发起式证券投资基金清算报告",
+     "财通多策略福佑定期开放灵活配置混合型发起式证券投资基金第二次清算报告提示性公告",
+     "财通多策略福佑定期开放灵活配置混合型发起式证券投资基金第二次清算报告",
+     "财通多策略福佑定期开放灵活配置混合型发起式证券投资基金基金合同终止公告"
+    ],
+    "announcement_url": "http://pdf.dfcfw.com/pdf/H2_AN202110301525904812_1.pdf",
+    "doc_format": "pdf",
+    "doc_ok": true,
+    "fund_full_name": "临时公告关于财通多策略福佑定期开放灵活配置混合型发起式证券投资基金",
+    "established_date": null,
+    "last_trading_date": null,
+    "liquidation_start": null,
+    "delisting_date": null,
+    "event_date": null,
+    "successor_name": null,
+    "successor_code": null,
+    "evidence_level": "B",
+    "missing_fields": [
+     "established_date",
+     "event_date",
+     "successor_name"
+    ],
+    "doc_excerpt": " 临时公告 关于财通多策略福佑定期开放灵活配置混合型发起式证券投资 基金基金合同终止的公告 财通基金管理有限公司（以下简称“基金管理人”）旗下财通多策略福佑定 期开放灵活配置混合型发起式证券投资基金（以下简称“本基金”）已触发基金 合同自动终止的情形。 本基金自 2021 年 4 月 10 日起至 2021 年 4 月 23 日期间进行了基金财产第 一次清算。基金财产清算报告报中国证监会备案后，本基金管理人于 2021 年 5 月 15",
+    "final_trading_day": null
+   },
+   {
+    "event_key": "招商富时中国A-H50指数型证券投资基金|liquidation",
+    "fund_entity": "招商富时中国A-H50指数型证券投资基金",
+    "event_type": "liquidation",
+    "codes_in_event": [
+     "501067",
+     "501068"
+    ],
+    "code_count": 2,
+    "announcement_count": 5,
+    "announcement_ids": [
+     "AN202303041584044936",
+     "AN202303041584035459",
+     "AN202303201584399000",
+     "AN202303211584429130",
+     "AN202303241584527510"
+    ],
+    "first_announcement_date": "2023-03-04",
+    "last_announcement_date": "2023-03-04",
+    "announcement_id": "AN202303041584035459",
+    "announcement_title": "招商富时中国A-H50指数型证券投资基金(LOF)清算报告",
+    "announcement_date": "2023-03-04",
+    "all_titles": [
+     "招商富时中国A-H50指数型证券投资基金(LOF)清算报告提示性公告",
+     "招商富时中国A-H50指数型证券投资基金(LOF)清算报告",
+     "关于招商富时中国A-H50指数型证券投资基金(LOF)终止上市的公告",
+     "关于招商富时中国A-H50指数型证券投资基金(LOF)终止上市的提示性公告",
+     "关于招商富时中国A-H50指数型证券投资基金(LOF)终止上市的公告"
+    ],
+    "absorbed_events": [
+     "delisting"
+    ],
+    "announcement_url": "http://pdf.dfcfw.com/pdf/H2_AN202303041584035459_1.pdf",
+    "doc_format": "pdf",
+    "doc_ok": true,
+    "fund_full_name": "中华人民共和国证券投资基金",
+    "established_date": "2023-02-16",
+    "last_trading_date": null,
+    "liquidation_start": null,
+    "delisting_date": null,
+    "event_date": null,
+    "successor_name": null,
+    "successor_code": null,
+    "evidence_level": "B",
+    "missing_fields": [
+     "event_date",
+     "successor_name"
+    ],
+    "doc_excerpt": "招商富时中国 A-H50 指数型证券投资基金（LOF）清算报告 招商富时中国 A-H50 指数型证券投资基金（LOF） 清算报告 基金管理人：招商基金管理有限公司 基金托管人：中国银行股份有限公司 清算报告出具日：2023 年 2 月 22 日 清算报告公告日：2023 年 3 月 4 日 招商富时中国 A-H50 指数型证券投资基金（LOF）清算报告 第 1 页 共 9 页 一、 重要提示 招商富时中国 A-H50 指数型证券投资基金",
+    "final_trading_day": null
+   },
+   {
+    "event_key": "华宝标普中国A股质量价值指数证券投资基金|liquidation",
+    "fund_entity": "华宝标普中国A股质量价值指数证券投资基金",
+    "event_type": "liquidation",
+    "codes_in_event": [
+     "501069"
+    ],
+    "code_count": 1,
+    "announcement_count": 4,
+    "announcement_ids": [
+     "AN202305051586283755",
+     "AN202306121590850389",
+     "AN202306141590928764",
+     "AN202306161591016347"
+    ],
+    "first_announcement_date": "2023-05-05",
+    "last_announcement_date": "2023-05-05",
+    "announcement_id": "AN202305051586283755",
+    "announcement_title": "华宝标普中国A股质量价值指数证券投资基金(LOF)清算报告",
+    "announcement_date": "2023-05-05",
+    "all_titles": [
+     "华宝标普中国A股质量价值指数证券投资基金(LOF)清算报告",
+     "华宝基金管理有限公司关于华宝标普中国A股质量价值指数证券投资基金(LOF)终止上市的公告",
+     "华宝基金管理有限公司关于华宝标普中国A股质量价值指数证券投资基金(LOF)终止上市的提示性公告",
+     "关于华宝标普中国A股质量价值指数证券投资基金(LOF)终止上市的公告"
+    ],
+    "absorbed_events": [
+     "delisting"
+    ],
+    "announcement_url": "http://pdf.dfcfw.com/pdf/H2_AN202305051586283755_1.pdf",
+    "doc_format": "pdf",
+    "doc_ok": true,
+    "fund_full_name": "股质量价值指数证券投资基金",
+    "established_date": null,
+    "last_trading_date": null,
+    "liquidation_start": null,
+    "delisting_date": null,
+    "event_date": null,
+    "successor_name": null,
+    "successor_code": null,
+    "evidence_level": "B",
+    "missing_fields": [
+     "established_date",
+     "event_date",
+     "successor_name"
+    ],
+    "doc_excerpt": "华宝标普中国 A 股质量价值指数证券投资基金（LOF） 清算报告 基金管理人：华宝基金管理有限公司 基金托管人：中国银行股份有限公司 报告送出日期：2023年 5月一、重要提示 华宝标普中国 A股质量价值指数证券投资基金（LOF）（以下简称“本基金”）经中国 证券监督管理委员会（以下简称“中国证监会”）证监基金字【2018】1058 号准予注册， 《华宝标普中国 A 股质量价值指数证券投资基金（LOF）基金合同》（以下简称“基金合 同”",
+    "final_trading_day": null
+   },
+   {
+    "event_key": "国金标普中国A股低波红利指数增强证券投资基金|liquidation",
+    "fund_entity": "国金标普中国A股低波红利指数增强证券投资基金",
+    "event_type": "liquidation",
+    "codes_in_event": [
+     "501072"
+    ],
+    "code_count": 1,
+    "announcement_count": 5,
+    "announcement_ids": [
+     "AN202201201541479034",
+     "AN202201201541473055",
+     "AN202202231548658772",
+     "AN202202241548862548",
+     "AN202202251549048472"
+    ],
+    "first_announcement_date": "2022-01-20",
+    "last_announcement_date": "2022-01-20",
+    "announcement_id": "AN202201201541473055",
+    "announcement_title": "国金标普中国A股低波红利指数增强证券投资基金(LOF)清算报告",
+    "announcement_date": "2022-01-20",
+    "all_titles": [
+     "国金标普中国A股低波红利指数增强证券投资基金(LOF)清算报告提示性公告",
+     "国金标普中国A股低波红利指数增强证券投资基金(LOF)清算报告",
+     "国金标普中国A股低波红利指数增强证券投资基金(LOF)基金终止上市交易公告",
+     "国金标普中国A股低波红利指数增强证券投资基金(LOF)终止上市的提示性公告",
+     "关于国金标普中国A股低波红利指数增强证券投资基金(LOF)终止上市的公告"
+    ],
+    "absorbed_events": [
+     "delisting"
+    ],
+    "announcement_url": "http://pdf.dfcfw.com/pdf/H2_AN202201201541473055_1.pdf",
+    "doc_format": "pdf",
+    "doc_ok": true,
+    "fund_full_name": "股低波红利指数增强证券投资基金",
+    "established_date": null,
+    "last_trading_date": "2021-12-07",
+    "liquidation_start": "2021-12-08",
+    "delisting_date": null,
+    "event_date": "2021-12-08",
+    "successor_name": null,
+    "successor_code": null,
+    "evidence_level": "A",
+    "missing_fields": [
+     "established_date",
+     "successor_name"
+    ],
+    "doc_excerpt": " 国金基金管理有限公司 国金标普中国 A 股低波红利指数增强 证券投资基金（LOF） 清算报告 基金管理人：国金基金管理有限公司 基金托管人：招商证券股份有限公司 清算报告出具日期：2022 年 1 月 7 日 清算报告公告日期：2022 年 1 月 20 日 一、重要提示 国金标普中国 A 股低波红利指数增强证券投资基金（LOF）（以下简称“本基 金”）经中国证券监督管理委员会（以下简称“中国证监会”） 证监许可【2019】 189 ",
+    "final_trading_day": null
+   },
+   {
+    "event_key": "华宝MSCI中国A股国际通ESG通用指数证券投资基金|liquidation",
+    "fund_entity": "华宝MSCI中国A股国际通ESG通用指数证券投资基金",
+    "event_type": "liquidation",
+    "codes_in_event": [
+     "501086"
+    ],
+    "code_count": 1,
+    "announcement_count": 4,
+    "announcement_ids": [
+     "AN202311021607909332",
+     "AN202312111613707334",
+     "AN202312131614074005",
+     "AN202312181614437242"
+    ],
+    "first_announcement_date": "2023-11-02",
+    "last_announcement_date": "2023-11-02",
+    "announcement_id": "AN202311021607909332",
+    "announcement_title": "华宝MSCI中国A股国际通ESG通用指数证券投资基金(LOF)清算报告",
+    "announcement_date": "2023-11-02",
+    "all_titles": [
+     "华宝MSCI中国A股国际通ESG通用指数证券投资基金(LOF)清算报告",
+     "华宝基金管理有限公司关于华宝MSCI中国A股国际通ESG通用指数证券投资基金(LOF)A类基金份额终止上市的公告",
+     "华宝基金管理有限公司关于华宝MSCI中国A股国际通ESG通用指数证券投资基金(LOF)A类基金份额终止上市的提示性公告",
+     "关于华宝MSCI中国A股国际通ESG通用指数证券投资基金(LOF)A类基金份额终止上市的公告"
+    ],
+    "absorbed_events": [
+     "delisting"
+    ],
+    "announcement_url": "http://pdf.dfcfw.com/pdf/H2_AN202311021607909332_1.pdf",
+    "doc_format": "pdf",
+    "doc_ok": true,
+    "fund_full_name": "中华人民共和国证券投资基金",
+    "established_date": null,
+    "last_trading_date": "2023-10-11",
+    "liquidation_start": "2023-10-12",
+    "delisting_date": null,
+    "event_date": "2023-10-12",
+    "successor_name": null,
+    "successor_code": null,
+    "evidence_level": "A",
+    "missing_fields": [
+     "established_date",
+     "successor_name"
+    ],
+    "doc_excerpt": " 华宝MSCI 中国A 股国际通 ESG 通用指数证券投资基金（LOF） 清算报告 基金管理人：华宝基金管理有限公司 基金托管人：中国工商银行股份有限公司 清算报告出具日：二〇二三年十月 清算报告公告日：二〇二三年十一月 一、重要提示 华宝 MSCI 中国 A 股国际通 ESG 通用指数证券投资基金（LOF）（以下简称“本基金”） 经中国证券监督管理委员会（以下简称“中国证监会”）证监许可[2019]113 号文准予注册， 《华宝 MS",
+    "final_trading_day": null
+   },
+   {
+    "event_key": "招商中债-0-3年长三角地方政府债交易型开放式指数证券投资基金|liquidation",
+    "fund_entity": "招商中债-0-3年长三角地方政府债交易型开放式指数证券投资基金",
+    "event_type": "liquidation",
+    "codes_in_event": [
+     "511000"
+    ],
+    "code_count": 1,
+    "announcement_count": 4,
+    "announcement_ids": [
+     "AN202103291477831539",
+     "AN202104141484650335",
+     "AN202104161485524480",
+     "AN202104191486342671"
+    ],
+    "first_announcement_date": "2021-03-29",
+    "last_announcement_date": "2021-03-29",
+    "announcement_id": "AN202103291477831539",
+    "announcement_title": "招商中债-0-3年长三角地方政府债交易型开放式指数证券投资基金清算报告",
+    "announcement_date": "2021-03-29",
+    "all_titles": [
+     "招商中债-0-3年长三角地方政府债交易型开放式指数证券投资基金清算报告",
+     "关于招商中债-0-3年长三角地方政府债交易型开放式指数证券投资基金终止上市的公告",
+     "关于招商中债-0-3年长三角地方政府债交易型开放式指数证券投资基金终止上市的提示性公告",
+     "关于招商中债-0-3年长三角地方政府债交易型开放式指数证券投资基金终止上市的公告(2021/04/19)"
+    ],
+    "absorbed_events": [
+     "delisting"
+    ],
+    "announcement_url": "http://pdf.dfcfw.com/pdf/H2_AN202103291477831539_1.pdf",
+    "doc_format": "pdf",
+    "doc_ok": true,
+    "fund_full_name": "年长三角地方政府债交易型开放式指数证券投资基金",
+    "established_date": "2021-03-16",
+    "last_trading_date": null,
+    "liquidation_start": "2021-03-16",
+    "delisting_date": null,
+    "event_date": "2021-03-16",
+    "successor_name": null,
+    "successor_code": null,
+    "evidence_level": "A",
+    "missing_fields": [
+     "successor_name"
+    ],
+    "doc_excerpt": " 招商中债-0-3 年长三角地方政府债交易型开放式指数 证券投资基金清算报告 基金管理人：招商基金管理有限公司 基金托管人：浙商银行股份有限公司 清算报告出具日：2021 年 3 月 18 日 清算报告公告日：2021 年 3 月 29 日 招商中债-0-3 年长三角地方政府债交易型开放式指数证券投资基金清算报告 1 一、 重要提示 招商中债-0-3 年长三角地方政府债交易型开放式指数证券投资基金（以下简称“本基金”） 经中国证券监督管",
+    "final_trading_day": null
+   },
+   {
+    "event_key": "兴业上证1-5年期地方政府债交易型开放式指数证券投资基金|liquidation",
+    "fund_entity": "兴业上证1-5年期地方政府债交易型开放式指数证券投资基金",
+    "event_type": "liquidation",
+    "codes_in_event": [
+     "511050"
+    ],
+    "code_count": 1,
+    "announcement_count": 5,
+    "announcement_ids": [
+     "AN202107301506935430",
+     "AN202107301506930322",
+     "AN202108181510775293",
+     "AN202108271512655407",
+     "AN202108311513447091"
+    ],
+    "first_announcement_date": "2021-07-30",
+    "last_announcement_date": "2021-07-30",
+    "announcement_id": "AN202107301506930322",
+    "announcement_title": "兴业上证1-5年期地方政府债交易型开放式指数证券投资基金清算报告提示性公告",
+    "announcement_date": "2021-07-30",
+    "all_titles": [
+     "兴业上证1-5年期地方政府债交易型开放式指数证券投资基金清算报告",
+     "兴业上证1-5年期地方政府债交易型开放式指数证券投资基金清算报告提示性公告",
+     "关于兴业上证1-5年期地方政府债交易型开放式指数证券投资基金终止上市的公告",
+     "关于兴业上证1-5年期地方政府债交易型开放式指数证券投资基金终止上市的提示性公告",
+     "关于兴业上证1-5年期地方政府债交易型开放式指数证券投资基金终止上市的公告"
+    ],
+    "absorbed_events": [
+     "delisting"
+    ],
+    "announcement_url": "http://pdf.dfcfw.com/pdf/H2_AN202107301506930322_1.pdf",
+    "doc_format": "pdf",
+    "doc_ok": true,
+    "fund_full_name": "年期地方政府债交易型开放式指数证券投资基金",
+    "established_date": null,
+    "last_trading_date": null,
+    "liquidation_start": "2021-06-11",
+    "delisting_date": null,
+    "event_date": "2021-06-11",
+    "successor_name": null,
+    "successor_code": null,
+    "evidence_level": "A",
+    "missing_fields": [
+     "established_date",
+     "successor_name"
+    ],
+    "doc_excerpt": " 兴业上证 1-5 年期地方政府债交易型开放式指数证券 投资基金 清算报告提示性公告 兴业上证 1-5 年期地方政府债交易型开放式指数证券投资 基金自 2021 年 6 月 11 日起进入清算期。清算报告全文于 2021 年 7 月 30 日在本公司网站（www.cib-fund.com.cn）和中国证监 会基金电子披露网站（http://eid.csrc.gov.cn/fund）披露， 供投资者查阅。如有疑问可拨打本公司客服电话（40",
+    "final_trading_day": null
+   },
+   {
+    "event_key": "国泰金象保本增值混合证券投资基金|transformation",
+    "fund_entity": "国泰金象保本增值混合证券投资基金",
+    "event_type": "transformation",
+    "codes_in_event": [
+     "020006"
+    ],
+    "code_count": 1,
+    "announcement_count": 1,
+    "announcement_ids": [
+     "AN201202270004078823"
+    ],
+    "first_announcement_date": "2007-11-09",
+    "last_announcement_date": "2007-11-09",
+    "announcement_id": "AN201202270004078823",
+    "announcement_title": "国泰沪深300：国泰基金管理有限公司关于国泰金象保本增值混合证券投资基金保本到期转型的第二次提示性公告",
+    "announcement_date": "2007-11-09",
+    "all_titles": [
+     "国泰沪深300：国泰基金管理有限公司关于国泰金象保本增值混合证券投资基金保本到期转型的第二次提示性公告"
+    ],
+    "announcement_url": "http://pdf.dfcfw.com/pdf/H2_AN201202270004078823_1.pdf",
+    "doc_format": "html",
+    "doc_ok": true,
+    "fund_full_name": "国泰基金管理有限公司关于国泰金象保本增值混合证券投资基金",
+    "established_date": null,
+    "last_trading_date": null,
+    "liquidation_start": null,
+    "delisting_date": null,
+    "event_date": null,
+    "successor_name": "非保本型的基金",
+    "successor_code": null,
+    "evidence_level": "B",
+    "missing_fields": [
+     "established_date",
+     "event_date"
+    ],
+    "doc_excerpt": "国泰基金管理有限公司关于国泰金象保本增值混合证券投资基金保本到期转型的第二次提示性公告 国泰金象保本增值混合证券投资基金（基金代码020006，以下简称\"本基金\"）为契约型开放式证券投资基金，基金管理人和基金注册登记人为国泰基金管理有限公司（以下简称\"本公司\"），基金托管人为中国银行股份有限公司（以下简称\"中国银行\"），基金担保人为上海国有资产经营有限公司。 本基金根据中国证监会《关于同意国泰金象保本增值混合证券投资基金设立的批复》（证",
+    "final_trading_day": null
+   },
+   {
+    "event_key": "__no_name__:保本到期转型|transformation",
+    "fund_entity": "__no_name__:保本到期转型",
+    "event_type": "transformation",
+    "codes_in_event": [
+     "020006"
+    ],
+    "code_count": 1,
+    "announcement_count": 1,
+    "announcement_ids": [
+     "AN201202270004078190"
+    ],
+    "first_announcement_date": "2007-11-08",
+    "last_announcement_date": "2007-11-08",
+    "announcement_id": "AN201202270004078190",
+    "announcement_title": "国泰金象：保本到期转型的第一次提示性公告",
+    "announcement_date": "2007-11-08",
+    "all_titles": [
+     "国泰金象：保本到期转型的第一次提示性公告"
+    ],
+    "announcement_url": "http://pdf.dfcfw.com/pdf/H2_AN201202270004078190_1.pdf",
+    "doc_format": "html",
+    "doc_ok": true,
+    "fund_full_name": "国泰基金管理有限公司关于国泰金象保本增值混合证券投资基金",
+    "established_date": null,
+    "last_trading_date": null,
+    "liquidation_start": null,
+    "delisting_date": null,
+    "event_date": null,
+    "successor_name": "非保本型的基金",
+    "successor_code": null,
+    "evidence_level": "B",
+    "missing_fields": [
+     "established_date",
+     "event_date"
+    ],
+    "doc_excerpt": "国泰基金管理有限公司 关于国泰金象保本增值混合证券投资基金保本到期转型的第一次提示性公告 国泰金象保本增值混合证券投资基金（基金代码020006，以下简称\"本基金\"）为契约型开放式证券投资基金，基金管理人和基金注册登记人为国泰基金管理有限公司（以下简称\"本公司\"），基金托管人为中国银行股份有限公司（以下简称\"中国银行\"），基金担保人为上海国有资产经营有限公司。 本基金根据中国证监会《关于同意国泰金象保本增值混合证券投资基金设立的批复》（",
+    "final_trading_day": null
+   },
+   {
+    "event_key": "国泰6个月短期理财债券型证券投资基金|transformation",
+    "fund_entity": "国泰6个月短期理财债券型证券投资基金",
+    "event_type": "transformation",
+    "codes_in_event": [
+     "020030"
+    ],
+    "code_count": 1,
+    "announcement_count": 2,
+    "announcement_ids": [
+     "AN201412020007784977",
+     "AN201412290008014932"
+    ],
+    "first_announcement_date": "2014-12-02",
+    "last_announcement_date": "2014-12-29",
+    "announcement_id": "AN201412290008014932",
+    "announcement_title": "关于国泰6个月短期理财债券型证券投资基金实施转型的提示性公告",
+    "announcement_date": "2014-12-29",
+    "all_titles": [
+     "关于国泰6个月短期理财债券型证券投资基金转型为国泰创利债券型证券投资基金的提示性公告",
+     "关于国泰6个月短期理财债券型证券投资基金实施转型的提示性公告"
+    ],
+    "announcement_url": "http://pdf.dfcfw.com/pdf/H2_AN201412290008014932_1.pdf",
+    "doc_format": "html",
+    "doc_ok": true,
+    "fund_full_name": "关于国泰6个月短期理财债券型证券投资基金",
+    "established_date": null,
+    "last_trading_date": null,
+    "liquidation_start": null,
+    "delisting_date": null,
+    "event_date": null,
+    "successor_name": "国泰创利债券型证券投资基金",
+    "successor_code": null,
+    "evidence_level": "B",
+    "missing_fields": [
+     "established_date",
+     "event_date"
+    ],
+    "doc_excerpt": "关于国泰6个月短期理财债券型证券投资基金 实施转型的提示性公告 国泰基金管理有限公司（以下简称“我司”）旗下管理的国泰6个月短期理财债券型证券投资基金于2014年10月28日至2014年11月28日以通讯方式召开基金份额持有人大会审议基金转型事项。会议议案于2014年12月1日获表决通过，自该日起持有人大会决议生效。我司已于2014年12月2日在《中国证券报》、《上海证券报》、《证券时报》及基金管理 人网站（www.gtfund.com",
+    "final_trading_day": null
+   },
+   {
+    "event_key": "久嘉证券投资基金|transformation",
+    "fund_entity": "久嘉证券投资基金",
+    "event_type": "transformation",
+    "codes_in_event": [
+     "184722"
+    ],
+    "code_count": 1,
+    "announcement_count": 2,
+    "announcement_ids": [
+     "AN201706220662779282",
+     "AN201708010759990726"
+    ],
+    "first_announcement_date": "2017-06-22",
+    "last_announcement_date": "2017-08-01",
+    "announcement_id": "AN201708010759990726",
+    "announcement_title": "关于久嘉证券投资基金转型所得长城久嘉创新成长灵活配置混合型证券投资基金基金份额折算的公告",
+    "announcement_date": "2017-08-01",
+    "all_titles": [
+     "久嘉证券投资基金转型为长城久嘉创新成长灵活配置混合型证券投资基金的基金份额确权登记规则",
+     "关于久嘉证券投资基金转型所得长城久嘉创新成长灵活配置混合型证券投资基金基金份额折算的公告"
+    ],
+    "announcement_url": "http://pdf.dfcfw.com/pdf/H2_AN201708010759990726_1.pdf",
+    "doc_format": "pdf",
+    "doc_ok": true,
+    "fund_full_name": "关于久嘉证券投资基金转型所得长城久嘉创新成长灵活配置混合型证券投资基金",
+    "established_date": null,
+    "last_trading_date": null,
+    "liquidation_start": null,
+    "delisting_date": null,
+    "event_date": null,
+    "successor_name": null,
+    "successor_code": null,
+    "evidence_level": "B",
+    "missing_fields": [
+     "established_date",
+     "event_date",
+     "successor_name"
+    ],
+    "doc_excerpt": "关于久嘉证券投资基金转型所得长城久嘉创新成长灵 活配置混合型证券投资基金基金份额折算的公告 长城久嘉创新成长灵活配置混合型证券投资基金（以下简称“本基金”，基金代码：004666）由久嘉证券 投资基金（以下简称“基金久嘉”）转型而成。根据长城基金管理有限公司（以下简称“基金管理人”） 于 2017 年 6 月 30 日在《中国证券报》、《证券时报》及长城基金管理有限公司网站 （www.ccfund.com.cn）发布的《长城久嘉创新成长",
+    "final_trading_day": null
+   },
+   {
+    "event_key": "普惠证券投资基金|delisting",
+    "fund_entity": "普惠证券投资基金",
+    "event_type": "delisting",
+    "codes_in_event": [
+     "184689"
+    ],
+    "code_count": 1,
+    "announcement_count": 2,
+    "announcement_ids": [
+     "AN201312180004802059",
+     "AN201312200004812987"
+    ],
+    "first_announcement_date": "2013-12-18",
+    "last_announcement_date": "2013-12-20",
+    "announcement_id": "AN201312200004812987",
+    "announcement_title": "普惠证券投资基金终止上市的提示性公告",
+    "announcement_date": "2013-12-20",
+    "all_titles": [
+     "普惠证券投资基金终止上市公告",
+     "普惠证券投资基金终止上市的提示性公告"
+    ],
+    "announcement_url": "http://pdf.dfcfw.com/pdf/H2_AN201312200004812987_1.pdf",
+    "doc_format": "html",
+    "doc_ok": true,
+    "fund_full_name": "为了保护普惠证券投资基金",
+    "established_date": null,
+    "last_trading_date": null,
+    "liquidation_start": null,
+    "delisting_date": "2013-12-23",
+    "event_date": "2013-12-23",
+    "successor_name": "鹏华消费领先灵活配置混合型证券投资基金",
+    "successor_code": null,
+    "evidence_level": "A",
+    "missing_fields": [
+     "established_date"
+    ],
+    "doc_excerpt": "普惠证券投资基金终止上市的提示性公告 鹏华基金管理有限公司（以下简称“基金管理人”） 已于2013年12月18日发布了《普惠证券投资基金终止上市公告》。为了保护普惠证券投资基金（以下简称“基金普惠”）持有人的权益，现将普惠证券投资基金终止上市的相关事项提示如下： 一、 终止上市基金的基本信息 基金名称：普惠证券投资基金 场内简称：基金普惠 交易代码：184689 基金类型：契约型封闭式基金 终止上市日：2013年12月23日 终止上市的",
+    "final_trading_day": null
+   },
+   {
+    "event_key": "同益证券投资基金|delisting",
+    "fund_entity": "同益证券投资基金",
+    "event_type": "delisting",
+    "codes_in_event": [
+     "184690"
+    ],
+    "code_count": 1,
+    "announcement_count": 1,
+    "announcement_ids": [
+     "AN201404030005371483"
+    ],
+    "first_announcement_date": "2014-04-03",
+    "last_announcement_date": "2014-04-03",
+    "announcement_id": "AN201404030005371483",
+    "announcement_title": "同益证券投资基金终止上市的提示性公告",
+    "announcement_date": "2014-04-03",
+    "all_titles": [
+     "同益证券投资基金终止上市的提示性公告"
+    ],
+    "announcement_url": "http://pdf.dfcfw.com/pdf/H2_AN201404030005371483_1.pdf",
+    "doc_format": "html",
+    "doc_ok": true,
+    "fund_full_name": "中华人民共和国证券投资基金",
+    "established_date": null,
+    "last_trading_date": null,
+    "liquidation_start": null,
+    "delisting_date": "2014-04-04",
+    "event_date": "2014-04-04",
+    "successor_name": "长盛同益成长回报灵活配置混合型证券投资基金",
+    "successor_code": null,
+    "evidence_level": "A",
+    "missing_fields": [
+     "established_date"
+    ],
+    "doc_excerpt": "同益证券投资基金终止上市的提示性公告 长盛基金管理有限公司（以下简称“基金管理人”）已于2014年4月1日在《中国证券报》、《上海证券报》、《证券时报》、深圳证券交易所网站（www.szse. cn）和基金管理人网站（www.csfunds.com.cn）发布了《同益证券投资基金终止上市公告》。为保障基金份额持有人利益，现发布《同益证券投资基金终止上市的提示性公告》。 根据《中华人民共和国证券投资基金法》、《证券投资基金运作管理办法》、",
+    "final_trading_day": null
+   },
+   {
+    "event_key": "景宏证券投资基金|delisting",
+    "fund_entity": "景宏证券投资基金",
+    "event_type": "delisting",
+    "codes_in_event": [
+     "184691"
+    ],
+    "code_count": 1,
+    "announcement_count": 3,
+    "announcement_ids": [
+     "AN201404040005378861",
+     "AN201404080005388163",
+     "AN201404090005394927"
+    ],
+    "first_announcement_date": "2014-04-04",
+    "last_announcement_date": "2014-04-09",
+    "announcement_id": "AN201404090005394927",
+    "announcement_title": "景宏证券投资基金终止上市的第二次提示性公告",
+    "announcement_date": "2014-04-09",
+    "all_titles": [
+     "景宏证券投资基金终止上市的公告",
+     "景宏证券投资基金终止上市的第一次提示性公告",
+     "景宏证券投资基金终止上市的第二次提示性公告"
+    ],
+    "announcement_url": "http://pdf.dfcfw.com/pdf/H2_AN201404090005394927_1.pdf",
+    "doc_format": "html",
+    "doc_ok": true,
+    "fund_full_name": "为了保障景宏证券投资基金",
+    "established_date": null,
+    "last_trading_date": null,
+    "liquidation_start": null,
+    "delisting_date": "2014-04-10",
+    "event_date": "2014-04-10",
+    "successor_name": "大成中小盘股票型证券投资基金",
+    "successor_code": null,
+    "evidence_level": "A",
+    "missing_fields": [
+     "established_date"
+    ],
+    "doc_excerpt": "景宏证券投资基金终止上市的第二次提示性公告 大成基金管理有限公司（以下简称“基金管理人”）已于2014年4月4日在《中国证券报》、《上海证券报》、《证券时报》及深圳证券交易所网站（www.szse.cn）和基金管理人网站（www.dcfund.com.cn）发布了《景宏证券投资基金终止上市公告》，并于2014年4月8日发布了《景宏证券投资基金终止上市的第一次提示性公告》。为了保障景宏证券投资基金（以下简称“景宏基金”）持有人的权益，现发",
+    "final_trading_day": null
+   },
+   {
+    "event_key": "裕隆证券投资基金|delisting",
+    "fund_entity": "裕隆证券投资基金",
+    "event_type": "delisting",
+    "codes_in_event": [
+     "184692"
+    ],
+    "code_count": 1,
+    "announcement_count": 2,
+    "announcement_ids": [
+     "AN201405280005916657",
+     "AN201405300005944196"
+    ],
+    "first_announcement_date": "2014-05-28",
+    "last_announcement_date": "2014-05-30",
+    "announcement_id": "AN201405300005944196",
+    "announcement_title": "裕隆证券投资基金终止上市的提示性公告",
+    "announcement_date": "2014-05-30",
+    "all_titles": [
+     "裕隆证券投资基金终止上市公告",
+     "裕隆证券投资基金终止上市的提示性公告"
+    ],
+    "announcement_url": "http://pdf.dfcfw.com/pdf/H2_AN201405300005944196_1.pdf",
+    "doc_format": "html",
+    "doc_ok": true,
+    "fund_full_name": "为了保障裕隆证券投资基金",
+    "established_date": null,
+    "last_trading_date": null,
+    "liquidation_start": null,
+    "delisting_date": "2014-06-03",
+    "event_date": "2014-06-03",
+    "successor_name": "博时裕隆灵活配置混合型证券投资基金",
+    "successor_code": null,
+    "evidence_level": "A",
+    "missing_fields": [
+     "established_date"
+    ],
+    "doc_excerpt": "裕隆证券投资基金终止上市的提示性公告 博时基金管理有限公司（以下简称“基金管理人”）已于2014年5月28日在《中国证券报》、《上海证券报》、《证券时报》及深圳证券交易所网站（www.szse.cn）发布了《裕隆证券投资基金终止上市公告》。为了保障裕隆证券投资基金（以下简称“博时裕隆封闭”）持有人的权益，现发布关于博时裕隆封闭基金终止上市的提示性公告。 一、终止上市基金的基本信息 基金全称：裕隆证券投资基金 场内简称：基金裕隆 交易代码",
+    "final_trading_day": null
+   },
+   {
+    "event_key": "天元证券投资基金|delisting",
+    "fund_entity": "天元证券投资基金",
+    "event_type": "delisting",
+    "codes_in_event": [
+     "184698"
+    ],
+    "code_count": 1,
+    "announcement_count": 2,
+    "announcement_ids": [
+     "AN201406300006184269",
+     "AN201407020006208757"
+    ],
+    "first_announcement_date": "2014-06-30",
+    "last_announcement_date": "2014-07-02",
+    "announcement_id": "AN201407020006208757",
+    "announcement_title": "天元证券投资基金终止上市提示性公告",
+    "announcement_date": "2014-07-02",
+    "all_titles": [
+     "天元证券投资基金终止上市公告",
+     "天元证券投资基金终止上市提示性公告"
+    ],
+    "announcement_url": "http://pdf.dfcfw.com/pdf/H2_AN201407020006208757_1.pdf",
+    "doc_format": "html",
+    "doc_ok": true,
+    "fund_full_name": "为了保障天元证券投资基金",
+    "established_date": null,
+    "last_trading_date": null,
+    "liquidation_start": null,
+    "delisting_date": "2014-07-03",
+    "event_date": "2014-07-03",
+    "successor_name": "南方天元新产业股票型证券投资基金",
+    "successor_code": null,
+    "evidence_level": "A",
+    "missing_fields": [
+     "established_date"
+    ],
+    "doc_excerpt": "天元证券投资基金终止上市提示性公告 南方基金管理有限公司（以下简称“基金管理人”）已于2014年6月30日在《中国证券报》、《上海证券报》、《证券时报》及深圳证券交易所网站（www.szse.cn）和基金管理人网站（www.nffund.com.cn）发布了《天元证券投资基金终止上市公告》。为了保障天元证券投资基金（以下简称“基金天元”）持有人的权益，现发布关于基金天元终止上市的提示性公告。 根据《中华人民共和国证券投资基金法》、《证券",
+    "final_trading_day": null
+   },
+   {
+    "event_key": "同盛证券投资基金|delisting",
+    "fund_entity": "同盛证券投资基金",
+    "event_type": "delisting",
+    "codes_in_event": [
+     "184699"
+    ],
+    "code_count": 1,
+    "announcement_count": 2,
+    "announcement_ids": [
+     "AN201411030007519302",
+     "AN201411040007533421"
+    ],
+    "first_announcement_date": "2014-11-03",
+    "last_announcement_date": "2014-11-04",
+    "announcement_id": "AN201411040007533421",
+    "announcement_title": "同盛证券投资基金终止上市的提示性公告",
+    "announcement_date": "2014-11-04",
+    "all_titles": [
+     "同盛证券投资基金终止上市公告",
+     "同盛证券投资基金终止上市的提示性公告"
+    ],
+    "announcement_url": "http://pdf.dfcfw.com/pdf/H2_AN201411040007533421_1.pdf",
+    "doc_format": "html",
+    "doc_ok": true,
+    "fund_full_name": "中华人民共和国证券投资基金",
+    "established_date": null,
+    "last_trading_date": null,
+    "liquidation_start": null,
+    "delisting_date": "2014-11-05",
+    "event_date": "2014-11-05",
+    "successor_name": "长盛同盛成长优选灵活配置混合型证券投资基金",
+    "successor_code": null,
+    "evidence_level": "A",
+    "missing_fields": [
+     "established_date"
+    ],
+    "doc_excerpt": "同盛证券投资基金终止上市的提示性公告 长盛基金管理有限公司已于2014年11月3日在《中国证券报》、《上海证券报》、《证券时报》、深圳证券交易所网站（www.szse.cn）和基金管理人网站（www.csfunds.com.cn）发布了《同盛证券投资基金终止上市公告》。为了保障基金份额持有人利益，现发布《同盛证券投资基金终止上市的提示性公告》。 根据《中华人民共和国证券投资基金法》、《公开募集证券投资基金运作管理办法》（证监会令【第10",
+    "final_trading_day": null
+   },
+   {
+    "event_key": "__no_name__:终止上市|delisting",
+    "fund_entity": "__no_name__:终止上市",
+    "event_type": "delisting",
+    "codes_in_event": [
+     "184700",
+     "184705"
+    ],
+    "code_count": 2,
+    "announcement_count": 2,
+    "announcement_ids": [
+     "AN201202280004312277",
+     "AN201203020004795376"
+    ],
+    "first_announcement_date": "2008-04-14",
+    "last_announcement_date": "2011-04-15",
+    "announcement_id": "AN201203020004795376",
+    "announcement_title": "基金裕泽：终止上市公告",
+    "announcement_date": "2011-04-15",
+    "all_titles": [
+     "基金鸿飞：终止上市的第二次提示性公告",
+     "基金裕泽：终止上市公告"
+    ],
+    "announcement_url": "http://pdf.dfcfw.com/pdf/H2_AN201203020004795376_1.pdf",
+    "doc_format": "pdf",
+    "doc_ok": true,
+    "fund_full_name": "中华人民共和国证券投资基金",
+    "established_date": null,
+    "last_trading_date": null,
+    "liquidation_start": null,
+    "delisting_date": "2011-04-22",
+    "event_date": "2011-04-22",
+    "successor_name": "博时卓越品牌股票型证券投资基金",
+    "successor_code": null,
+    "evidence_level": "A",
+    "missing_fields": [
+     "established_date"
+    ],
+    "doc_excerpt": " 1 裕泽证券投资基金终止上市公告 根据《中华人民共和国证券投资基金法》、《证券投资基金运作管理办法》、《裕 泽证券投资基金基金合同》、《深圳证券交易所证券投资基金上市规则》、中国证监会 《关于核准裕泽证券投资基金基金份额持有人大会有关转换基金运作方式决议的批 复》（证监许可[2011]434 号）和《裕泽证券投资基金基金份额持有人大会决议生效 公告》等的有关规定，裕泽证券投资基金（以下简称“博时裕泽封闭”）基金管理人 博时基金管理有限",
+    "final_trading_day": null
+   },
+   {
+    "event_key": "景福证券投资基金|delisting",
+    "fund_entity": "景福证券投资基金",
+    "event_type": "delisting",
+    "codes_in_event": [
+     "184701"
+    ],
+    "code_count": 1,
+    "announcement_count": 3,
+    "announcement_ids": [
+     "AN201412230007975956",
+     "AN201412240007989021",
+     "AN201412250007998391"
+    ],
+    "first_announcement_date": "2014-12-23",
+    "last_announcement_date": "2014-12-25",
+    "announcement_id": "AN201412250007998391",
+    "announcement_title": "景福证券投资基金终止上市的第二次提示性公告",
+    "announcement_date": "2014-12-25",
+    "all_titles": [
+     "景福证券投资基金终止上市的公告",
+     "景福证券投资基金终止上市的第一次提示性公告",
+     "景福证券投资基金终止上市的第二次提示性公告"
+    ],
+    "announcement_url": "http://pdf.dfcfw.com/pdf/H2_AN201412250007998391_1.pdf",
+    "doc_format": "html",
+    "doc_ok": true,
+    "fund_full_name": "为了保障景福证券投资基金",
+    "established_date": null,
+    "last_trading_date": null,
+    "liquidation_start": null,
+    "delisting_date": "2014-12-26",
+    "event_date": "2014-12-26",
+    "successor_name": "大成产业升级股票型证券投资基金",
+    "successor_code": null,
+    "evidence_level": "A",
+    "missing_fields": [
+     "established_date"
+    ],
+    "doc_excerpt": "景福证券投资基金终止上市的第二次提示性公告 大成基金管理有限公司（以下简称“基金管理人”）已于2014年12月23日在《中国证券报》、《上海证券报》、《证券时报》及深圳证券交易所网站（www.szse.cn）和基金管理人网站（www.dcfund.com.cn）发布了《景福证券投资基金终止上市的公告》，并于2014年12月24日发布了《景福证券投资基金终止上市的第一次提示性公告》。为了保障景福证券投资基金（以下简称“景福基金”）持有人的",
+    "final_trading_day": null
+   },
+   {
+    "event_key": "丰和价值证券投资基金|delisting",
+    "fund_entity": "丰和价值证券投资基金",
+    "event_type": "delisting",
+    "codes_in_event": [
+     "184721"
+    ],
+    "code_count": 1,
+    "announcement_count": 2,
+    "announcement_ids": [
+     "AN201703150408153239",
+     "AN201703170414101637"
+    ],
+    "first_announcement_date": "2017-03-15",
+    "last_announcement_date": "2017-03-17",
+    "announcement_id": "AN201703170414101637",
+    "announcement_title": "丰和价值证券投资基金终止上市的提示性公告",
+    "announcement_date": "2017-03-17",
+    "all_titles": [
+     "丰和价值证券投资基金终止上市公告",
+     "丰和价值证券投资基金终止上市的提示性公告"
+    ],
+    "announcement_url": "http://pdf.dfcfw.com/pdf/H2_AN201703170414101637_1.pdf",
+    "doc_format": "pdf",
+    "doc_ok": true,
+    "fund_full_name": "为了保障丰和价值证券投资基金",
+    "established_date": null,
+    "last_trading_date": null,
+    "liquidation_start": null,
+    "delisting_date": "2017-03-20",
+    "event_date": "2017-03-20",
+    "successor_name": "嘉实丰和灵活配置混合型证券投资基金",
+    "successor_code": null,
+    "evidence_level": "A",
+    "missing_fields": [
+     "established_date"
+    ],
+    "doc_excerpt": "丰和价值证券投资基金终止上市的提示性公告 嘉实基金管理有限公司（以下简称“基金管理人”）已于 2017 年 3 月 15 日在《中国 证券报》、《上海证券报》、《证券时报》及深圳证券交易所网站（www.szse.cn） 和基金管理人网站（www.jsfund.cn）发布了《丰和价值证券投资基金终止上市公告》 。为了保障丰和价值证券投资基金（以下简称“基金丰和”）基金份额持有人的权益， 现发布《丰和价值证券投资基金终止上市的提示性公告》。",
+    "final_trading_day": null
+   },
+   {
+    "event_key": "丰和证券投资基金|delisting",
+    "fund_entity": "丰和证券投资基金",
+    "event_type": "delisting",
+    "codes_in_event": [
+     "184721"
+    ],
+    "code_count": 1,
+    "announcement_count": 1,
+    "announcement_ids": [
+     "AN201703150408364099"
+    ],
+    "first_announcement_date": "2017-03-15",
+    "last_announcement_date": "2017-03-15",
+    "announcement_id": "AN201703150408364099",
+    "announcement_title": "关于丰和证券投资基金终止上市交易的通知",
+    "announcement_date": "2017-03-15",
+    "all_titles": [
+     "关于丰和证券投资基金终止上市交易的通知"
+    ],
+    "announcement_url": "http://pdf.dfcfw.com/pdf/H2_AN201703150408364099_1.pdf",
+    "doc_format": "pdf",
+    "doc_ok": true,
+    "fund_full_name": null,
+    "established_date": null,
+    "last_trading_date": null,
+    "liquidation_start": null,
+    "delisting_date": null,
+    "event_date": null,
+    "successor_name": null,
+    "successor_code": null,
+    "evidence_level": "B",
+    "missing_fields": [
+     "established_date",
+     "event_date",
+     "successor_name"
+    ],
+    "doc_excerpt": "关于丰和证券投资基金终止上市交易的通知 日期： 2017-3-15 各会员单位： 丰和证券投资基金（证券简称：基金丰和，证券代码：184721）自 2017 年 3 月 20 日起终止上市交 易。 特此通知 深圳证券交易所 2017 年 3 月 14 日 ",
+    "final_trading_day": null
+   }
+  ],
+  "dedupe_rules": [
+   "同一 announcement_id = 同一事件（分级 A/B 共用一条公告，不得算两个）",
+   "同一事件下的多个代码合并，取最具体的类型作为事件类型",
+   "基金本体按公告标题抽取的基金全名归并",
+   "抽不出基金名时宁可多算本体，不错误合并"
+  ]
+ },
+ "fee_audit": {
+  "samples": [
+   {
+    "code": "000051",
+    "page_ok": true,
+    "has_fee": true,
+    "purchase_tiers": [
+     {
+      "condition_text": "小于100万元",
+      "lower_bound": 0.0,
+      "lower_inferred": true,
+      "lower_inclusive": true,
+      "upper_bound": 1000000.0,
+      "upper_inclusive": false,
+      "is_open_ended": false,
+      "raw_units": [
+       "小于100万元"
+      ],
+      "original_rate": 0.012,
+      "platform_rate": 0.0012
+     },
+     {
+      "condition_text": "大于等于100万元，小于500万元",
+      "lower_bound": 1000000.0,
+      "lower_inferred": false,
+      "lower_inclusive": true,
+      "upper_bound": 5000000.0,
+      "upper_inclusive": false,
+      "is_open_ended": false,
+      "raw_units": [
+       "大于等于100万元",
+       "小于500万元"
+      ],
+      "original_rate": 0.009,
+      "platform_rate": 0.0009
+     },
+     {
+      "condition_text": "大于等于500万元，小于1000万元",
+      "lower_bound": 5000000.0,
+      "lower_inferred": false,
+      "lower_inclusive": true,
+      "upper_bound": 10000000.0,
+      "upper_inclusive": false,
+      "is_open_ended": false,
+      "raw_units": [
+       "大于等于500万元",
+       "小于1000万元"
+      ],
+      "original_rate": 0.006,
+      "platform_rate": 0.0006
+     }
+    ],
+    "redeem_tiers": [
+     {
+      "condition_text": "小于7天",
+      "holding_days_min": 0,
+      "min_inclusive": true,
+      "min_inferred": true,
+      "holding_days_max": 7,
+      "max_inclusive": false,
+      "is_open_ended": false,
+      "rate": 0.015,
+      "raw_units": [
+       "小于7天"
+      ]
+     },
+     {
+      "condition_text": "大于等于7天，小于1年",
+      "holding_days_min": 7,
+      "min_inclusive": true,
+      "min_inferred": false,
+      "holding_days_max": 365,
+      "max_inclusive": false,
+      "is_open_ended": false,
+      "rate": 0.005,
+      "raw_units": [
+       "大于等于7天",
+       "小于1年"
+      ]
+     },
+     {
+      "condition_text": "大于等于1年",
+      "holding_days_min": 365,
+      "min_inclusive": true,
+      "min_inferred": false,
+      "holding_days_max": null,
+      "max_inclusive": null,
+      "is_open_ended": true,
+      "rate": 0.0,
+      "raw_units": [
+       "大于等于1年"
+      ]
+     }
+    ],
+    "annual_fees": {
+     "management_fee": 0.0015,
+     "custody_fee": 0.0005,
+     "sales_service_fee": 0.0,
+     "is_annual": true
+    },
+    "checks": {
+     "all_tiers_have_bounds": true,
+     "open_ended_tier_count": 1,
+     "exactly_one_open_ended": true,
+     "gap_count": 0,
+     "overlap_count": 0,
+     "first_tier_starts_at_zero": true,
+     "rate_monotonic_nonincreasing": true,
+     "purchase_keeps_both_rates": true,
+     "annual_fees_marked": true,
+     "sales_service_fee_is_zero_not_missing": true
+    },
+    "boundary_issues": []
+   },
+   {
+    "code": "110020",
+    "page_ok": true,
+    "has_fee": true,
+    "purchase_tiers": [
+     {
+      "condition_text": "小于100万元",
+      "lower_bound": 0.0,
+      "lower_inferred": true,
+      "lower_inclusive": true,
+      "upper_bound": 1000000.0,
+      "upper_inclusive": false,
+      "is_open_ended": false,
+      "raw_units": [
+       "小于100万元"
+      ],
+      "original_rate": 0.012,
+      "platform_rate": 0.0012
+     },
+     {
+      "condition_text": "大于等于100万元，小于500万元",
+      "lower_bound": 1000000.0,
+      "lower_inferred": false,
+      "lower_inclusive": true,
+      "upper_bound": 5000000.0,
+      "upper_inclusive": false,
+      "is_open_ended": false,
+      "raw_units": [
+       "大于等于100万元",
+       "小于500万元"
+      ],
+      "original_rate": 0.008,
+      "platform_rate": 0.0008
+     },
+     {
+      "condition_text": "大于等于500万元，小于1000万元",
+      "lower_bound": 5000000.0,
+      "lower_inferred": false,
+      "lower_inclusive": true,
+      "upper_bound": 10000000.0,
+      "upper_inclusive": false,
+      "is_open_ended": false,
+      "raw_units": [
+       "大于等于500万元",
+       "小于1000万元"
+      ],
+      "original_rate": 0.002,
+      "platform_rate": 0.0002
+     }
+    ],
+    "redeem_tiers": [
+     {
+      "condition_text": "小于等于6天",
+      "holding_days_min": 0,
+      "min_inclusive": true,
+      "min_inferred": true,
+      "holding_days_max": 6,
+      "max_inclusive": true,
+      "is_open_ended": false,
+      "rate": 0.015,
+      "raw_units": [
+       "小于等于6天"
+      ]
+     },
+     {
+      "condition_text": "大于等于7天，小于等于364天",
+      "holding_days_min": 7,
+      "min_inclusive": true,
+      "min_inferred": false,
+      "holding_days_max": 364,
+      "max_inclusive": true,
+      "is_open_ended": false,
+      "rate": 0.005,
+      "raw_units": [
+       "大于等于7天",
+       "小于等于364天"
+      ]
+     },
+     {
+      "condition_text": "大于等于365天，小于等于729天",
+      "holding_days_min": 365,
+      "min_inclusive": true,
+      "min_inferred": false,
+      "holding_days_max": 729,
+      "max_inclusive": true,
+      "is_open_ended": false,
+      "rate": 0.0025,
+      "raw_units": [
+       "大于等于365天",
+       "小于等于729天"
+      ]
+     },
+     {
+      "condition_text": "大于等于730天",
+      "holding_days_min": 730,
+      "min_inclusive": true,
+      "min_inferred": false,
+      "holding_days_max": null,
+      "max_inclusive": null,
+      "is_open_ended": true,
+      "rate": 0.0,
+      "raw_units": [
+       "大于等于730天"
+      ]
+     }
+    ],
+    "annual_fees": {
+     "management_fee": 0.0015,
+     "custody_fee": 0.0005,
+     "sales_service_fee": 0.0,
+     "is_annual": true
+    },
+    "checks": {
+     "all_tiers_have_bounds": true,
+     "open_ended_tier_count": 1,
+     "exactly_one_open_ended": true,
+     "gap_count": 0,
+     "overlap_count": 0,
+     "first_tier_starts_at_zero": true,
+     "rate_monotonic_nonincreasing": true,
+     "purchase_keeps_both_rates": true,
+     "annual_fees_marked": true,
+     "sales_service_fee_is_zero_not_missing": true
+    },
+    "boundary_issues": []
+   },
+   {
+    "code": "161725",
+    "page_ok": true,
+    "has_fee": true,
+    "purchase_tiers": [
+     {
+      "condition_text": "小于50万元",
+      "lower_bound": 0.0,
+      "lower_inferred": true,
+      "lower_inclusive": true,
+      "upper_bound": 500000.0,
+      "upper_inclusive": false,
+      "is_open_ended": false,
+      "raw_units": [
+       "小于50万元"
+      ],
+      "original_rate": 0.01,
+      "platform_rate": 0.001
+     },
+     {
+      "condition_text": "大于等于50万元，小于100万元",
+      "lower_bound": 500000.0,
+      "lower_inferred": false,
+      "lower_inclusive": true,
+      "upper_bound": 1000000.0,
+      "upper_inclusive": false,
+      "is_open_ended": false,
+      "raw_units": [
+       "大于等于50万元",
+       "小于100万元"
+      ],
+      "original_rate": 0.005,
+      "platform_rate": 0.0005
+     }
+    ],
+    "redeem_tiers": [
+     {
+      "condition_text": "小于7天",
+      "holding_days_min": 0,
+      "min_inclusive": true,
+      "min_inferred": true,
+      "holding_days_max": 7,
+      "max_inclusive": false,
+      "is_open_ended": false,
+      "rate": 0.015,
+      "raw_units": [
+       "小于7天"
+      ]
+     },
+     {
+      "condition_text": "大于等于7天，小于365天",
+      "holding_days_min": 7,
+      "min_inclusive": true,
+      "min_inferred": false,
+      "holding_days_max": 365,
+      "max_inclusive": false,
+      "is_open_ended": false,
+      "rate": 0.005,
+      "raw_units": [
+       "大于等于7天",
+       "小于365天"
+      ]
+     },
+     {
+      "condition_text": "大于等于365天，小于730天",
+      "holding_days_min": 365,
+      "min_inclusive": true,
+      "min_inferred": false,
+      "holding_days_max": 730,
+      "max_inclusive": false,
+      "is_open_ended": false,
+      "rate": 0.0025,
+      "raw_units": [
+       "大于等于365天",
+       "小于730天"
+      ]
+     },
+     {
+      "condition_text": "大于等于730天",
+      "holding_days_min": 730,
+      "min_inclusive": true,
+      "min_inferred": false,
+      "holding_days_max": null,
+      "max_inclusive": null,
+      "is_open_ended": true,
+      "rate": 0.0,
+      "raw_units": [
+       "大于等于730天"
+      ]
+     }
+    ],
+    "annual_fees": {
+     "management_fee": 0.01,
+     "custody_fee": 0.002,
+     "sales_service_fee": 0.0,
+     "is_annual": true
+    },
+    "checks": {
+     "all_tiers_have_bounds": true,
+     "open_ended_tier_count": 1,
+     "exactly_one_open_ended": true,
+     "gap_count": 0,
+     "overlap_count": 0,
+     "first_tier_starts_at_zero": true,
+     "rate_monotonic_nonincreasing": true,
+     "purchase_keeps_both_rates": true,
+     "annual_fees_marked": true,
+     "sales_service_fee_is_zero_not_missing": true
+    },
+    "boundary_issues": []
+   },
+   {
+    "code": "012414",
+    "page_ok": true,
+    "has_fee": true,
+    "purchase_tiers": [],
+    "redeem_tiers": [
+     {
+      "condition_text": "小于7天",
+      "holding_days_min": 0,
+      "min_inclusive": true,
+      "min_inferred": true,
+      "holding_days_max": 7,
+      "max_inclusive": false,
+      "is_open_ended": false,
+      "rate": 0.015,
+      "raw_units": [
+       "小于7天"
+      ]
+     },
+     {
+      "condition_text": "大于等于7天",
+      "holding_days_min": 7,
+      "min_inclusive": true,
+      "min_inferred": false,
+      "holding_days_max": null,
+      "max_inclusive": null,
+      "is_open_ended": true,
+      "rate": 0.0,
+      "raw_units": [
+       "大于等于7天"
+      ]
+     }
+    ],
+    "annual_fees": {
+     "management_fee": 0.01,
+     "custody_fee": 0.002,
+     "sales_service_fee": 0.001,
+     "is_annual": true
+    },
+    "checks": {
+     "all_tiers_have_bounds": true,
+     "open_ended_tier_count": 1,
+     "exactly_one_open_ended": true,
+     "gap_count": 0,
+     "overlap_count": 0,
+     "first_tier_starts_at_zero": true,
+     "rate_monotonic_nonincreasing": true,
+     "purchase_keeps_both_rates": null,
+     "annual_fees_marked": true,
+     "sales_service_fee_is_zero_not_missing": true
+    },
+    "boundary_issues": []
+   },
+   {
+    "code": "000015",
+    "page_ok": true,
+    "has_fee": true,
+    "purchase_tiers": [
+     {
+      "condition_text": "小于50万元",
+      "lower_bound": 0.0,
+      "lower_inferred": true,
+      "lower_inclusive": true,
+      "upper_bound": 500000.0,
+      "upper_inclusive": false,
+      "is_open_ended": false,
+      "raw_units": [
+       "小于50万元"
+      ],
+      "original_rate": 0.008,
+      "platform_rate": 0.0008
+     },
+     {
+      "condition_text": "大于等于50万元，小于200万元",
+      "lower_bound": 500000.0,
+      "lower_inferred": false,
+      "lower_inclusive": true,
+      "upper_bound": 2000000.0,
+      "upper_inclusive": false,
+      "is_open_ended": false,
+      "raw_units": [
+       "大于等于50万元",
+       "小于200万元"
+      ],
+      "original_rate": 0.006,
+      "platform_rate": 0.0006
+     },
+     {
+      "condition_text": "大于等于200万元，小于500万元",
+      "lower_bound": 2000000.0,
+      "lower_inferred": false,
+      "lower_inclusive": true,
+      "upper_bound": 5000000.0,
+      "upper_inclusive": false,
+      "is_open_ended": false,
+      "raw_units": [
+       "大于等于200万元",
+       "小于500万元"
+      ],
+      "original_rate": 0.004,
+      "platform_rate": 0.0004
+     }
+    ],
+    "redeem_tiers": [
+     {
+      "condition_text": "小于7天",
+      "holding_days_min": 0,
+      "min_inclusive": true,
+      "min_inferred": true,
+      "holding_days_max": 7,
+      "max_inclusive": false,
+      "is_open_ended": false,
+      "rate": 0.015,
+      "raw_units": [
+       "小于7天"
+      ]
+     },
+     {
+      "condition_text": "大于等于7天，小于30天",
+      "holding_days_min": 7,
+      "min_inclusive": true,
+      "min_inferred": false,
+      "holding_days_max": 30,
+      "max_inclusive": false,
+      "is_open_ended": false,
+      "rate": 0.001,
+      "raw_units": [
+       "大于等于7天",
+       "小于30天"
+      ]
+     },
+     {
+      "condition_text": "大于等于30天",
+      "holding_days_min": 30,
+      "min_inclusive": true,
+      "min_inferred": false,
+      "holding_days_max": null,
+      "max_inclusive": null,
+      "is_open_ended": true,
+      "rate": 0.0,
+      "raw_units": [
+       "大于等于30天"
+      ]
+     }
+    ],
+    "annual_fees": {
+     "management_fee": 0.003,
+     "custody_fee": 0.001,
+     "sales_service_fee": 0.0,
+     "is_annual": true
+    },
+    "checks": {
+     "all_tiers_have_bounds": true,
+     "open_ended_tier_count": 1,
+     "exactly_one_open_ended": true,
+     "gap_count": 0,
+     "overlap_count": 0,
+     "first_tier_starts_at_zero": true,
+     "rate_monotonic_nonincreasing": true,
+     "purchase_keeps_both_rates": true,
+     "annual_fees_marked": true,
+     "sales_service_fee_is_zero_not_missing": true
+    },
+    "boundary_issues": []
+   },
+   {
+    "code": "000016",
+    "page_ok": true,
+    "has_fee": true,
+    "purchase_tiers": [],
+    "redeem_tiers": [
+     {
+      "condition_text": "小于7天",
+      "holding_days_min": 0,
+      "min_inclusive": true,
+      "min_inferred": true,
+      "holding_days_max": 7,
+      "max_inclusive": false,
+      "is_open_ended": false,
+      "rate": 0.015,
+      "raw_units": [
+       "小于7天"
+      ]
+     },
+     {
+      "condition_text": "大于等于7天，小于30天",
+      "holding_days_min": 7,
+      "min_inclusive": true,
+      "min_inferred": false,
+      "holding_days_max": 30,
+      "max_inclusive": false,
+      "is_open_ended": false,
+      "rate": 0.001,
+      "raw_units": [
+       "大于等于7天",
+       "小于30天"
+      ]
+     },
+     {
+      "condition_text": "大于等于30天",
+      "holding_days_min": 30,
+      "min_inclusive": true,
+      "min_inferred": false,
+      "holding_days_max": null,
+      "max_inclusive": null,
+      "is_open_ended": true,
+      "rate": 0.0,
+      "raw_units": [
+       "大于等于30天"
+      ]
+     }
+    ],
+    "annual_fees": {
+     "management_fee": 0.003,
+     "custody_fee": 0.001,
+     "sales_service_fee": 0.004,
+     "is_annual": true
+    },
+    "checks": {
+     "all_tiers_have_bounds": true,
+     "open_ended_tier_count": 1,
+     "exactly_one_open_ended": true,
+     "gap_count": 0,
+     "overlap_count": 0,
+     "first_tier_starts_at_zero": true,
+     "rate_monotonic_nonincreasing": true,
+     "purchase_keeps_both_rates": null,
+     "annual_fees_marked": true,
+     "sales_service_fee_is_zero_not_missing": true
+    },
+    "boundary_issues": []
+   },
+   {
+    "code": "007300",
+    "page_ok": true,
+    "has_fee": true,
+    "purchase_tiers": [
+     {
+      "condition_text": "小于100万元",
+      "lower_bound": 0.0,
+      "lower_inferred": true,
+      "lower_inclusive": true,
+      "upper_bound": 1000000.0,
+      "upper_inclusive": false,
+      "is_open_ended": false,
+      "raw_units": [
+       "小于100万元"
+      ],
+      "original_rate": 0.008,
+      "platform_rate": 0.0008
+     },
+     {
+      "condition_text": "大于等于100万元，小于500万元",
+      "lower_bound": 1000000.0,
+      "lower_inferred": false,
+      "lower_inclusive": true,
+      "upper_bound": 5000000.0,
+      "upper_inclusive": false,
+      "is_open_ended": false,
+      "raw_units": [
+       "大于等于100万元",
+       "小于500万元"
+      ],
+      "original_rate": 0.006,
+      "platform_rate": 0.0006
+     }
+    ],
+    "redeem_tiers": [
+     {
+      "condition_text": "小于7天",
+      "holding_days_min": 0,
+      "min_inclusive": true,
+      "min_inferred": true,
+      "holding_days_max": 7,
+      "max_inclusive": false,
+      "is_open_ended": false,
+      "rate": 0.015,
+      "raw_units": [
+       "小于7天"
+      ]
+     },
+     {
+      "condition_text": "大于等于7天，小于365天",
+      "holding_days_min": 7,
+      "min_inclusive": true,
+      "min_inferred": false,
+      "holding_days_max": 365,
+      "max_inclusive": false,
+      "is_open_ended": false,
+      "rate": 0.005,
+      "raw_units": [
+       "大于等于7天",
+       "小于365天"
+      ]
+     },
+     {
+      "condition_text": "大于等于365天",
+      "holding_days_min": 365,
+      "min_inclusive": true,
+      "min_inferred": false,
+      "holding_days_max": null,
+      "max_inclusive": null,
+      "is_open_ended": true,
+      "rate": 0.0,
+      "raw_units": [
+       "大于等于365天"
+      ]
+     }
+    ],
+    "annual_fees": {
+     "management_fee": 0.005,
+     "custody_fee": 0.001,
+     "sales_service_fee": 0.0,
+     "is_annual": true
+    },
+    "checks": {
+     "all_tiers_have_bounds": true,
+     "open_ended_tier_count": 1,
+     "exactly_one_open_ended": true,
+     "gap_count": 0,
+     "overlap_count": 0,
+     "first_tier_starts_at_zero": true,
+     "rate_monotonic_nonincreasing": true,
+     "purchase_keeps_both_rates": true,
+     "annual_fees_marked": true,
+     "sales_service_fee_is_zero_not_missing": true
+    },
+    "boundary_issues": []
+   },
+   {
+    "code": "007301",
+    "page_ok": true,
+    "has_fee": true,
+    "purchase_tiers": [],
+    "redeem_tiers": [
+     {
+      "condition_text": "小于7天",
+      "holding_days_min": 0,
+      "min_inclusive": true,
+      "min_inferred": true,
+      "holding_days_max": 7,
+      "max_inclusive": false,
+      "is_open_ended": false,
+      "rate": 0.015,
+      "raw_units": [
+       "小于7天"
+      ]
+     },
+     {
+      "condition_text": "大于等于7天",
+      "holding_days_min": 7,
+      "min_inclusive": true,
+      "min_inferred": false,
+      "holding_days_max": null,
+      "max_inclusive": null,
+      "is_open_ended": true,
+      "rate": 0.0,
+      "raw_units": [
+       "大于等于7天"
+      ]
+     }
+    ],
+    "annual_fees": {
+     "management_fee": 0.005,
+     "custody_fee": 0.001,
+     "sales_service_fee": 0.0025,
+     "is_annual": true
+    },
+    "checks": {
+     "all_tiers_have_bounds": true,
+     "open_ended_tier_count": 1,
+     "exactly_one_open_ended": true,
+     "gap_count": 0,
+     "overlap_count": 0,
+     "first_tier_starts_at_zero": true,
+     "rate_monotonic_nonincreasing": true,
+     "purchase_keeps_both_rates": null,
+     "annual_fees_marked": true,
+     "sales_service_fee_is_zero_not_missing": true
+    },
+    "boundary_issues": []
+   },
+   {
+    "code": "110022",
+    "page_ok": true,
+    "has_fee": true,
+    "purchase_tiers": [
+     {
+      "condition_text": "小于100万元",
+      "lower_bound": 0.0,
+      "lower_inferred": true,
+      "lower_inclusive": true,
+      "upper_bound": 1000000.0,
+      "upper_inclusive": false,
+      "is_open_ended": false,
+      "raw_units": [
+       "小于100万元"
+      ],
+      "original_rate": 0.015,
+      "platform_rate": 0.0015
+     },
+     {
+      "condition_text": "大于等于100万元，小于500万元",
+      "lower_bound": 1000000.0,
+      "lower_inferred": false,
+      "lower_inclusive": true,
+      "upper_bound": 5000000.0,
+      "upper_inclusive": false,
+      "is_open_ended": false,
+      "raw_units": [
+       "大于等于100万元",
+       "小于500万元"
+      ],
+      "original_rate": 0.012,
+      "platform_rate": 0.0012
+     },
+     {
+      "condition_text": "大于等于500万元，小于1000万元",
+      "lower_bound": 5000000.0,
+      "lower_inferred": false,
+      "lower_inclusive": true,
+      "upper_bound": 10000000.0,
+      "upper_inclusive": false,
+      "is_open_ended": false,
+      "raw_units": [
+       "大于等于500万元",
+       "小于1000万元"
+      ],
+      "original_rate": 0.003,
+      "platform_rate": 0.0003
+     }
+    ],
+    "redeem_tiers": [
+     {
+      "condition_text": "小于等于6天",
+      "holding_days_min": 0,
+      "min_inclusive": true,
+      "min_inferred": true,
+      "holding_days_max": 6,
+      "max_inclusive": true,
+      "is_open_ended": false,
+      "rate": 0.015,
+      "raw_units": [
+       "小于等于6天"
+      ]
+     },
+     {
+      "condition_text": "大于等于7天，小于等于364天",
+      "holding_days_min": 7,
+      "min_inclusive": true,
+      "min_inferred": false,
+      "holding_days_max": 364,
+      "max_inclusive": true,
+      "is_open_ended": false,
+      "rate": 0.005,
+      "raw_units": [
+       "大于等于7天",
+       "小于等于364天"
+      ]
+     },
+     {
+      "condition_text": "大于等于365天，小于等于729天",
+      "holding_days_min": 365,
+      "min_inclusive": true,
+      "min_inferred": false,
+      "holding_days_max": 729,
+      "max_inclusive": true,
+      "is_open_ended": false,
+      "rate": 0.0025,
+      "raw_units": [
+       "大于等于365天",
+       "小于等于729天"
+      ]
+     },
+     {
+      "condition_text": "大于等于730天",
+      "holding_days_min": 730,
+      "min_inclusive": true,
+      "min_inferred": false,
+      "holding_days_max": null,
+      "max_inclusive": null,
+      "is_open_ended": true,
+      "rate": 0.0,
+      "raw_units": [
+       "大于等于730天"
+      ]
+     }
+    ],
+    "annual_fees": {
+     "management_fee": 0.012,
+     "custody_fee": 0.002,
+     "sales_service_fee": null,
+     "is_annual": true
+    },
+    "checks": {
+     "all_tiers_have_bounds": true,
+     "open_ended_tier_count": 1,
+     "exactly_one_open_ended": true,
+     "gap_count": 0,
+     "overlap_count": 0,
+     "first_tier_starts_at_zero": true,
+     "rate_monotonic_nonincreasing": true,
+     "purchase_keeps_both_rates": true,
+     "annual_fees_marked": true,
+     "sales_service_fee_is_zero_not_missing": false
+    },
+    "boundary_issues": [
+     "销售服务费为「---」（页面无此字段），不能当成 0"
+    ]
+   },
+   {
+    "code": "161005",
+    "page_ok": true,
+    "has_fee": true,
+    "purchase_tiers": [
+     {
+      "condition_text": "小于100万元",
+      "lower_bound": 0.0,
+      "lower_inferred": true,
+      "lower_inclusive": true,
+      "upper_bound": 1000000.0,
+      "upper_inclusive": false,
+      "is_open_ended": false,
+      "raw_units": [
+       "小于100万元"
+      ],
+      "original_rate": 0.015,
+      "platform_rate": 0.0015
+     },
+     {
+      "condition_text": "大于等于100万元，小于1000万元",
+      "lower_bound": 1000000.0,
+      "lower_inferred": false,
+      "lower_inclusive": true,
+      "upper_bound": 10000000.0,
+      "upper_inclusive": false,
+      "is_open_ended": false,
+      "raw_units": [
+       "大于等于100万元",
+       "小于1000万元"
+      ],
+      "original_rate": 0.012,
+      "platform_rate": 0.0012
+     }
+    ],
+    "redeem_tiers": [
+     {
+      "condition_text": "小于7天",
+      "holding_days_min": 0,
+      "min_inclusive": true,
+      "min_inferred": true,
+      "holding_days_max": 7,
+      "max_inclusive": false,
+      "is_open_ended": false,
+      "rate": 0.015,
+      "raw_units": [
+       "小于7天"
+      ]
+     },
+     {
+      "condition_text": "大于等于7天",
+      "holding_days_min": 7,
+      "min_inclusive": true,
+      "min_inferred": false,
+      "holding_days_max": null,
+      "max_inclusive": null,
+      "is_open_ended": true,
+      "rate": 0.005,
+      "raw_units": [
+       "大于等于7天"
+      ]
+     }
+    ],
+    "annual_fees": {
+     "management_fee": 0.012,
+     "custody_fee": 0.002,
+     "sales_service_fee": 0.0,
+     "is_annual": true
+    },
+    "checks": {
+     "all_tiers_have_bounds": true,
+     "open_ended_tier_count": 1,
+     "exactly_one_open_ended": true,
+     "gap_count": 0,
+     "overlap_count": 0,
+     "first_tier_starts_at_zero": true,
+     "rate_monotonic_nonincreasing": true,
+     "purchase_keeps_both_rates": true,
+     "annual_fees_marked": true,
+     "sales_service_fee_is_zero_not_missing": true
+    },
+    "boundary_issues": []
+   },
+   {
+    "code": "000478",
+    "page_ok": true,
+    "has_fee": true,
+    "purchase_tiers": [
+     {
+      "condition_text": "小于100万元",
+      "lower_bound": 0.0,
+      "lower_inferred": true,
+      "lower_inclusive": true,
+      "upper_bound": 1000000.0,
+      "upper_inclusive": false,
+      "is_open_ended": false,
+      "raw_units": [
+       "小于100万元"
+      ],
+      "original_rate": 0.015,
+      "platform_rate": 0.0015
+     },
+     {
+      "condition_text": "大于等于100万元，小于500万元",
+      "lower_bound": 1000000.0,
+      "lower_inferred": false,
+      "lower_inclusive": true,
+      "upper_bound": 5000000.0,
+      "upper_inclusive": false,
+      "is_open_ended": false,
+      "raw_units": [
+       "大于等于100万元",
+       "小于500万元"
+      ],
+      "original_rate": 0.01,
+      "platform_rate": 0.001
+     }
+    ],
+    "redeem_tiers": [
+     {
+      "condition_text": "小于7天",
+      "holding_days_min": 0,
+      "min_inclusive": true,
+      "min_inferred": true,
+      "holding_days_max": 7,
+      "max_inclusive": false,
+      "is_open_ended": false,
+      "rate": 0.015,
+      "raw_units": [
+       "小于7天"
+      ]
+     },
+     {
+      "condition_text": "大于等于7天，小于365天",
+      "holding_days_min": 7,
+      "min_inclusive": true,
+      "min_inferred": false,
+      "holding_days_max": 365,
+      "max_inclusive": false,
+      "is_open_ended": false,
+      "rate": 0.005,
+      "raw_units": [
+       "大于等于7天",
+       "小于365天"
+      ]
+     },
+     {
+      "condition_text": "大于等于365天，小于730天",
+      "holding_days_min": 365,
+      "min_inclusive": true,
+      "min_inferred": false,
+      "holding_days_max": 730,
+      "max_inclusive": false,
+      "is_open_ended": false,
+      "rate": 0.0025,
+      "raw_units": [
+       "大于等于365天",
+       "小于730天"
+      ]
+     },
+     {
+      "condition_text": "大于等于730天",
+      "holding_days_min": 730,
+      "min_inclusive": true,
+      "min_inferred": false,
+      "holding_days_max": null,
+      "max_inclusive": null,
+      "is_open_ended": true,
+      "rate": 0.0,
+      "raw_units": [
+       "大于等于730天"
+      ]
+     }
+    ],
+    "annual_fees": {
+     "management_fee": 0.01,
+     "custody_fee": 0.002,
+     "sales_service_fee": 0.0,
+     "is_annual": true
+    },
+    "checks": {
+     "all_tiers_have_bounds": true,
+     "open_ended_tier_count": 1,
+     "exactly_one_open_ended": true,
+     "gap_count": 0,
+     "overlap_count": 0,
+     "first_tier_starts_at_zero": true,
+     "rate_monotonic_nonincreasing": true,
+     "purchase_keeps_both_rates": true,
+     "annual_fees_marked": true,
+     "sales_service_fee_is_zero_not_missing": true
+    },
+    "boundary_issues": []
+   },
+   {
+    "code": "000198",
+    "page_ok": true,
+    "has_fee": true,
+    "purchase_tiers": [],
+    "redeem_tiers": [],
+    "annual_fees": {
+     "management_fee": 0.003,
+     "custody_fee": 0.0007,
+     "sales_service_fee": 0.0025,
+     "is_annual": true
+    },
+    "checks": {
+     "all_tiers_have_bounds": false,
+     "open_ended_tier_count": 0,
+     "exactly_one_open_ended": false,
+     "gap_count": 0,
+     "overlap_count": 0,
+     "first_tier_starts_at_zero": false,
+     "rate_monotonic_nonincreasing": true,
+     "purchase_keeps_both_rates": null,
+     "annual_fees_marked": true,
+     "sales_service_fee_is_zero_not_missing": true
+    },
+    "boundary_issues": [
+     "无上限档位数异常: 0"
+    ]
+   }
+  ],
+  "count": 12,
+  "all_have_bounds": 11,
+  "all_have_single_open_end": 11,
+  "with_gaps": 0,
+  "with_overlaps": 0,
+  "with_issues": 2
+ },
+ "unresolved": [
+  "无权威全市场已终止基金全量清单，覆盖率仍不可量化",
+  "合并（merge）事件在公告标题里极少显式出现，样本稀薄",
+  "承接基金代码公告里基本不写，只能靠名称对回 fund_master",
+  "已终止基金的历史费率不可恢复",
+  "支付宝可购买状态无公开接口"
+ ]
+}

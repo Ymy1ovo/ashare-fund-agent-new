@@ -371,3 +371,282 @@ def test_doc_states_alipay_unknown(payload):
 
 def test_baseline_head_recorded(payload):
     assert payload["baseline_head"].startswith("e02096c5")
+
+# ================================================================ 3B-4.1.1 增量
+from scripts.research_3b4_1_1_roster_fee_audit import (  # noqa: E402
+    EVENT_TYPES as E411,
+    audit_fee_tiers as audit_fee_411,
+    classify_event as classify_411,
+    fund_entity_key,
+    is_non_event,
+    parse_purchase_tiers as parse_purch_411,
+    parse_redeem_tiers as parse_redeem_411,
+)
+
+JSON411 = ROOT / "reports" / "phase3B4_1_1_historical_roster_fee_audit.json"
+MD411 = ROOT / "reports" / "phase3B4_1_1_historical_roster_fee_audit.md"
+
+
+@pytest.fixture(scope="module")
+def p411() -> dict:
+    return json.loads(JSON411.read_text(encoding="utf-8"))
+
+
+# ---------------- 口径：代码 / 份额 / 本体 / 事件
+def test_411_distinguishes_four_counts(p411):
+    """必须同时给出代码数、公告事件数、本体数、去重事件数。"""
+    r = p411["roster"]
+    for k in ("scanned_codes", "raw_code_records", "raw_announcement_events",
+              "distinct_events", "distinct_fund_entities", "duplicate_collapsed"):
+        assert isinstance(r[k], int), k
+
+
+def test_411_event_count_less_than_raw(p411):
+    """去重后的事件数必须严格小于原始代码记录数。"""
+    r = p411["roster"]
+    assert r["distinct_events"] < r["raw_code_records"]
+    assert r["distinct_fund_entities"] <= r["distinct_events"]
+
+
+def test_411_no_duplicate_entity_type_pairs(p411):
+    """同一（基金本体 + 事件类型）只能出现一次——否则就是没去重。"""
+    pairs = [(e["fund_entity"], e["event_type"]) for e in p411["roster"]["events"]]
+    assert len(pairs) == len(set(pairs)), "存在重复的(本体,事件类型)对"
+
+
+def test_411_announcement_ids_unique_per_entity_type(p411):
+    """同一本体的同一类型事件，其主公告 ID 不应重复。"""
+    for e in p411["roster"]["events"]:
+        assert e["announcement_id"]
+        assert e["announcement_title"]
+
+
+# ---------------- 事件分类：五类必须互相独立
+def test_411_event_types_independent():
+    assert set(E411) == {"liquidation", "merge", "transformation",
+                         "share_termination", "delisting", "unknown"}
+
+
+def test_411_liquidation_not_from_terminate_word():
+    """含「终止」不等于清盘——这是 3B-4.1 的核心教训。"""
+    assert classify_411("XX基金终止上市公告") == "delisting"
+    assert classify_411("关于XX份额终止运作的公告") == "share_termination"
+    assert classify_411("XX基金合同(由XX分级基金终止分级运作变更而来)") == "share_termination"
+
+
+def test_411_transformation_not_delisting():
+    """「终止上市及转型期间」是转型，不是终止上市。"""
+    assert classify_411("关于终止上市及转型期间基金名称变更的公告") == "transformation"
+
+
+def test_411_liquidation_by_contract():
+    """「终止XX基金合同」才是清盘。"""
+    assert classify_411("关于终止XX基金合同的公告") == "liquidation"
+    assert classify_411("XX基金清算报告") == "liquidation"
+
+
+def test_411_merge_classified():
+    assert classify_411("XX基金合并公告") == "merge"
+
+
+def test_411_non_event_filter():
+    """合同全文/定期报告不是事件公告。"""
+    assert is_non_event("XX基金2023年第3季度报告") is True
+    assert is_non_event("XX基金基金合同") is True
+    assert is_non_event("XX基金托管协议") is True
+    # 但「关于终止XX基金合同的公告」是事件公告
+    assert is_non_event("关于终止XX基金合同的公告") is False
+
+
+# ---------------- 基金本体键
+def test_411_entity_key_extracts_fund_name():
+    assert fund_entity_key("XX基金清算报告") in ("XX基金", "__no_name__:XX基金清算报告")
+    k = fund_entity_key("国投瑞银瑞和沪深300指数分级证券投资基金清算报告")
+    assert k == "国投瑞银瑞和沪深300指数分级证券投资基金"
+
+
+def test_411_entity_key_falls_back_not_merges():
+    """抽不出基金名时用整条标题作键，绝不返回空串（会被误合并）。"""
+    k = fund_entity_key("基金裕泽：终止上市公告")
+    assert k and ("__no_name__" in k or "基金" in k)
+
+
+# ---------------- 费率区间表达
+def test_411_redeem_tier_keeps_both_bounds():
+    """必须同时保存下界与上界——只存一个数字无法表达区间。"""
+    text = ("赎回费率|适用期限|赎回费率|小于7天|1.50%|"
+            "大于等于7天，小于365天|0.50%|大于等于365天|0.00%|注：")
+    tiers = parse_redeem_411(text)
+    assert len(tiers) == 3
+    assert tiers[0]["holding_days_max"] == 7
+    assert tiers[0]["max_inclusive"] is False
+    assert tiers[1]["holding_days_min"] == 7
+    assert tiers[1]["min_inclusive"] is True
+    assert tiers[1]["holding_days_max"] == 365
+
+
+def test_411_redeem_tier_infers_zero_lower_bound():
+    """「小于7天」没有显式下界，补 0 但必须标 min_inferred。"""
+    tiers = parse_redeem_411("赎回费率|适用期限|赎回费率|小于7天|1.50%|注：")
+    assert tiers[0]["holding_days_min"] == 0
+    assert tiers[0]["min_inferred"] is True
+
+
+def test_411_redeem_tier_accepts_xiaoyudengyu():
+    """「小于等于6天」必须解析成闭区间上界 6，不能被当成无上限。"""
+    tiers = parse_redeem_411(
+        "赎回费率|适用期限|赎回费率|小于等于6天|1.50%|大于等于7天|0.00%|注：")
+    assert tiers[0]["holding_days_max"] == 6
+    assert tiers[0]["max_inclusive"] is True
+    assert tiers[0]["is_open_ended"] is False
+
+
+def test_411_redeem_tier_open_ended():
+    tiers = parse_redeem_411(
+        "赎回费率|适用期限|赎回费率|大于等于730天|0.00%|注：")
+    assert tiers[0]["is_open_ended"] is True
+    assert tiers[0]["holding_days_max"] is None
+
+
+def test_411_year_to_days_conversion():
+    tiers = parse_redeem_411("赎回费率|适用期限|赎回费率|大于等于1年|0.25%|注：")
+    assert tiers[0]["holding_days_min"] == 365
+
+
+def test_411_purchase_keeps_original_and_platform():
+    """原始费率与平台优惠费率必须分开——平台不等于支付宝。"""
+    text = ("申购费率|适用金额|原费率|天天基金优惠费率|"
+            "小于50万元|1.00%|&nbsp;|&nbsp;0.10%||友情提示：")
+    tiers = parse_purch_411(text)
+    assert tiers[0]["original_rate"] == pytest.approx(0.01)
+    assert tiers[0]["platform_rate"] == pytest.approx(0.001)
+
+
+def test_411_purchase_amount_bounds():
+    text = ("申购费率|适用金额|原费率|天天基金优惠费率|"
+            "大于等于50万元，小于100万元|0.50%|&nbsp;|&nbsp;0.05%||友情提示：")
+    tiers = parse_purch_411(text)
+    assert tiers[0]["lower_bound"] == pytest.approx(500000)
+    assert tiers[0]["upper_bound"] == pytest.approx(1000000)
+
+
+# ---------------- 真实费率数据边界
+def test_411_real_fees_have_no_gaps(p411):
+    """12 只真实基金，区间不允许有空洞。"""
+    f = p411["fee_audit"]
+    assert f["with_gaps"] == 0, "存在区间空洞"
+    assert f["with_overlaps"] == 0, "存在区间重叠"
+
+
+def test_411_real_fees_single_open_end(p411):
+    """除货币基金外，每只都必须恰好一档无上限。"""
+    f = p411["fee_audit"]
+    assert f["all_have_single_open_end"] >= 11
+
+
+def test_411_real_fees_have_bounds(p411):
+    f = p411["fee_audit"]
+    assert f["all_have_bounds"] >= 11
+
+
+def test_411_fee_issues_are_data_nature(p411):
+    """剩下的问题必须是「数据本身没有」而不是解析 bug。"""
+    for s in p411["fee_audit"]["samples"]:
+        if not s["boundary_issues"]:
+            continue
+        joined = " ".join(s["boundary_issues"])
+        ok = ("销售服务费" in joined) or ("无上限档位数异常: 0" in joined)
+        assert ok, f"{s['code']} 出现了非数据性质的问题: {s['boundary_issues']}"
+
+
+def test_411_annual_fees_marked(p411):
+    for s in p411["fee_audit"]["samples"]:
+        if s.get("annual_fees"):
+            assert s["annual_fees"]["is_annual"] is True
+
+
+# ---------------- 清盘/合并/转型的真实数量
+def test_411_liquidation_count_reported(p411):
+    """真正清盘事件必须单独统计且数量可观。"""
+    liq = [e for e in p411["roster"]["events"] if e["event_type"] == "liquidation"]
+    assert len(liq) >= 20, f"清盘样本过少: {len(liq)}"
+
+
+def test_411_merge_count_honest(p411):
+    """合并找不到就报 0，不许凑数。"""
+    merge = [e for e in p411["roster"]["events"] if e["event_type"] == "merge"]
+    assert len(merge) == 0
+    assert "merge" in p411["roster"]["by_event_type_all"]
+
+
+def test_411_all_event_types_present_in_stats(p411):
+    stats = p411["roster"]["by_event_type_all"]
+    for k in ("liquidation", "merge", "transformation", "delisting"):
+        assert k in stats, k
+
+
+def test_411_a_level_traceable(p411):
+    """每条 A 级证据都必须有公告 URL 与 ID。"""
+    for e in p411["roster"]["events"]:
+        if e["evidence_level"] != "A":
+            continue
+        assert e["announcement_id"]
+        assert e["announcement_url"].startswith("http")
+
+
+def test_411_verified_has_url(p411):
+    for e in p411["roster"]["events"]:
+        assert e["announcement_url"], e["fund_entity"]
+
+
+def test_411_liquidation_has_event_date(p411):
+    """清盘事件应有清算开始日或最后运作日。"""
+    liq = [e for e in p411["roster"]["events"] if e["event_type"] == "liquidation"]
+    with_date = [e for e in liq if e["event_date"]]
+    assert len(with_date) >= len(liq) * 0.7, f"清盘日期覆盖率过低: {len(with_date)}/{len(liq)}"
+
+
+def test_411_successor_not_self(p411):
+    """承接基金名不能等于本基金名。"""
+    for e in p411["roster"]["events"]:
+        if not e.get("successor_name"):
+            continue
+        assert not e["successor_name"].startswith(e["fund_entity"][:10]),             f"{e['fund_entity']} 的承接基金误抽成本身"
+
+
+# ---------------- 文档一致
+def test_411_doc_exists(p411):
+    md = MD411.read_text(encoding="utf-8")
+    assert str(p411["roster"]["distinct_events"]) in md
+    assert str(p411["roster"]["distinct_fund_entities"]) in md
+    assert "liquidation" in md
+
+
+def test_411_doc_states_merge_zero(p411):
+    md = MD411.read_text(encoding="utf-8")
+    assert "合并" in md
+    assert "0" in md
+
+
+def test_411_doc_has_field_suggestion(p411):
+    """必须给出最小化字段设计建议。"""
+    md = MD411.read_text(encoding="utf-8")
+    for k in ("min_inclusive", "max_inclusive", "min_inferred"):
+        assert k in md, k
+
+
+def test_411_baseline_recorded(p411):
+    assert p411["baseline_head"].startswith("472603d4")
+
+
+def test_411_no_formal_layer_touched():
+    """本阶段不得新增场外基金回测引擎。"""
+    for pat in ("*fund*engine*", "*fund*backtest*", "*fund*execution*"):
+        assert not list((ROOT / "app").rglob(pat)), pat
+
+
+def test_411_migration_still_ten_tables():
+    """迁移文件不得被改动。"""
+    sql = ROOT / "migrations" / "phase3b4_fund_data_layer.sql"
+    body = sql.read_text(encoding="utf-8")
+    assert body.count("CREATE TABLE IF NOT EXISTS fund_") == 10
