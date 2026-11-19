@@ -221,16 +221,30 @@ def prefix_hint(codes: list[str]) -> str | None:
     return None
 
 
-def offmarket_eligible(structure: str) -> bool:
-    """是否属于「支付宝场外可买」范围内。
+# 关键口径：这是「**产品结构**是否属于场外范围」，不是「支付宝能不能买」。
+# 支付宝实际可购买状态全部是 unknown，没有任何官方或可靠接口证据。
+ALIPAY_STATUS = "unknown"
+ALIPAY_EVIDENCE = "not_obtainable"
 
-    - etf（场内）：❌ 不算场外
-    - etf_linked：✅ 联接基金在支付宝可买
-    - lof：✅ LOF 有场外份额
+
+def in_offmarket_structure(structure: str) -> bool:
+    """该产品结构是否属于**场外结构范围**。
+
+    - etf（场内）：❌ 不在场外结构范围内
+    - etf_linked：✅ 场外申购型
+    - lof：✅ 有场外份额
     - ordinary_open_ended：✅
     - other / unknown：不确定，保守算 ❌
+
+    **注意：属于场外结构 ≠ 支付宝当前可购买。**
+    这只是筛掉场内 ETF，用于确定研究对象的产品结构范围，
+    不代表这些历史清盘基金曾在支付宝上架、也不代表现在还能买。
     """
     return structure in ("etf_linked", "lof", "ordinary_open_ended")
+
+
+# 兼容旧名（测试与外部引用），语义已收窄为「结构范围」
+offmarket_eligible = in_offmarket_structure
 
 
 # ---------------------------------------------------------------- 证据分级
@@ -308,7 +322,10 @@ def main() -> dict:
                                 and structure != "etf"),
             "is_index_fund": is_index,
             "is_onshore_etf": structure == "etf",
-            "offmarket_eligible": offmarket_eligible(structure),
+            "in_offmarket_structure": in_offmarket_structure(structure),
+            "offmarket_eligible": in_offmarket_structure(structure),
+            "alipay_purchasable": ALIPAY_STATUS,
+            "alipay_evidence": ALIPAY_EVIDENCE,
             "evidence_level": level,
             "evidence_reason": level_reason,
         }
@@ -325,7 +342,7 @@ def main() -> dict:
     for r in calibrated:
         by_level[r["evidence_level"]] = by_level.get(r["evidence_level"], 0) + 1
 
-    offmarket = [r for r in calibrated if r["offmarket_eligible"]]
+    offmarket = [r for r in calibrated if r["in_offmarket_structure"]]
     onshore_etf = [r for r in calibrated if r["is_onshore_etf"]]
     unknown_type = [r for r in calibrated if r["product_structure"] == "unknown"]
 
@@ -354,6 +371,18 @@ def main() -> dict:
                 "天天基金 F10 费率 = C 级的定级。",
             ],
         },
+        "field_semantics": {
+            "offmarket_structure_count": (
+                "属于**场外产品结构范围**的清盘基金本体数量（普通开放式 + ETF联接 + LOF）。"
+                "**不是**支付宝可购买数量。"),
+            "alipay_purchasable_count": (
+                "支付宝实际可购买数量。恒为 0，因为全部状态 unknown、无官方或可靠接口证据。"),
+            "alipay_status": (
+                "支付宝可购买状态。恒为 unknown（3B-4.1 结论 not_obtainable）。"),
+            "note": (
+                "结构分类 ≠ 支付宝上架状态。ETF联接/LOF/普通开放式可以纳入场外**研究范围**，"
+                "但不代表这些历史清盘基金曾在支付宝销售，也不代表现在仍可买。"),
+        },
         "enums": {
             "product_structure": PRODUCT_STRUCTURE,
             "investment_type": INVESTMENT_TYPE,
@@ -365,7 +394,10 @@ def main() -> dict:
             "by_product_structure": by_struct,
             "by_investment_type": by_inv,
             "by_evidence_level": by_level,
-            "offmarket_count": len(offmarket),
+            "offmarket_structure_count": len(offmarket),
+            "offmarket_count": len(offmarket),   # 兼容旧名，语义 = 场外结构范围
+            "alipay_purchasable_count": 0,
+            "alipay_status": ALIPAY_STATUS,
             "onshore_etf_count": len(onshore_etf),
             "unknown_type_count": len(unknown_type),
             "name_changed_count": sum(1 for r in calibrated if r["name_changed"]),
@@ -391,6 +423,8 @@ def main() -> dict:
             "ETF 联接基金与目标 ETF 的对应关系未建立（公告未写目标 ETF 代码）。",
             "合并事件仍为 0 个。",
             "清盘名录覆盖率仍不可量化。",
+            "支付宝实际可购买状态全部 unknown：结构分类不等于平台上架状态，"
+            "41 只只是「场外结构范围」，不是「支付宝可买」。",
         ],
     }
 

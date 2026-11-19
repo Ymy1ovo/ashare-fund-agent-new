@@ -653,9 +653,10 @@ def test_411_migration_still_ten_tables():
 
 # ================================================================ 3B-4.1.1 验收修正
 from scripts.calibrate_3b4_1_1_types_evidence import (  # noqa: E402
+    ALIPAY_EVIDENCE, ALIPAY_STATUS,
     INVESTMENT_TYPE, PRODUCT_STRUCTURE, EVIDENCE_LEVELS as EV_CAL,
     classify_investment, classify_structure, extract_full_name,
-    grade_evidence, offmarket_eligible, prefix_hint,
+    grade_evidence, in_offmarket_structure, offmarket_eligible, prefix_hint,
 )
 
 JSON_CAL = ROOT / "reports" / "phase3B4_1_1_types_evidence_calibration.json"
@@ -898,3 +899,159 @@ def test_411c_enums_complete():
     for k in ("ordinary_open_ended", "etf_linked", "etf", "lof",
               "money_market", "bond", "mixed", "other", "unknown"):
         assert k in PRODUCT_STRUCTURE or k in INVESTMENT_TYPE
+
+# ================================================================ 最终验收：口径收口
+MD_MAIN = ROOT / "reports" / "phase3B4_1_1_historical_roster_fee_audit.md"
+
+
+# ---------------- 1. 场外结构数量不能被解释为支付宝可买
+def test_411c_structure_count_not_alipay(pcal):
+    """41 只能是「场外结构范围」，不能是「支付宝可购买数量」。"""
+    s = pcal["stats"]
+    assert s["offmarket_structure_count"] == 41
+    assert s["alipay_purchasable_count"] == 0
+    assert s["alipay_status"] == "unknown"
+    assert s["offmarket_structure_count"] != s["alipay_purchasable_count"]
+
+
+def test_411c_field_semantics_present(pcal):
+    """字段语义必须显式声明，防止调用方误读。"""
+    sem = pcal["field_semantics"]
+    assert "offmarket_structure_count" in sem
+    assert "alipay_purchasable_count" in sem
+    assert "不是" in sem["offmarket_structure_count"]
+    assert "unknown" in sem["alipay_status"]
+
+
+def test_411c_structure_not_equal_purchasable_fn():
+    """结构判定函数语义必须是「结构范围」，不能表达可购买。"""
+    assert in_offmarket_structure("etf_linked") is True
+    assert in_offmarket_structure("etf") is False
+    # 函数名与语义一致性：有明确的「支付宝」常量
+    assert ALIPAY_STATUS == "unknown"
+    assert ALIPAY_EVIDENCE == "not_obtainable"
+
+
+def test_411c_each_event_alipay_unknown(pcal):
+    """每条事件都必须显式标 alipay_purchasable=unknown。"""
+    for r in pcal["calibration"]:
+        assert r["alipay_purchasable"] == "unknown", r["codes_in_event"]
+        assert r["alipay_evidence"] == "not_obtainable", r["codes_in_event"]
+
+
+# ---------------- 2. 支付宝状态保持 unknown
+def test_411c_alipay_still_unknown(pcal):
+    assert pcal["stats"]["alipay_status"] == "unknown"
+    assert pcal["stats"]["alipay_purchasable_count"] == 0
+
+
+def test_411c_alipay_never_yes(pcal):
+    """任何记录都不允许出现 alipay_purchasable='yes'。"""
+    for r in pcal["calibration"]:
+        assert r["alipay_purchasable"] != "yes"
+
+
+# ---------------- 3. 511000 / 511050 仍是场内 ETF
+def test_411c_etf_still_etf(pcal):
+    cal = pcal["calibration"]
+    for code in ("511000", "511050"):
+        rec = next(r for r in cal if code in r["codes_in_event"])
+        assert rec["product_structure"] == "etf", code
+        assert rec["is_onshore_etf"] is True, code
+        assert rec["in_offmarket_structure"] is False, code
+
+
+# ---------------- 4. 联接基金身份保持
+def test_411c_linked_still_linked(pcal):
+    cal = pcal["calibration"]
+    checks = {
+        "020025": "etf_linked",
+        "020035": "etf_linked",
+        "020036": "etf_linked",
+        "000087": "etf_linked",
+        "000088": "etf_linked",
+    }
+    for code, expected in checks.items():
+        rec = next(r for r in cal if code in r["codes_in_event"])
+        assert rec["product_structure"] == expected, (code, rec["product_structure"])
+        assert "联接" in rec["fund_entity"], (code, rec["fund_entity"])
+
+
+# ---------------- 5. 43 条证据等级合计 B
+def test_411c_all_b_level(pcal):
+    levels = pcal["stats"]["by_evidence_level"]
+    assert sum(levels.values()) == 43
+    assert levels.get("B", 0) == 43
+    for k in ("A", "C", "D"):
+        assert levels.get(k, 0) == 0
+
+
+# ---------------- 6. 主报告与校准报告一致
+def test_411c_two_reports_consistent(pcal):
+    main = MD_MAIN.read_text(encoding="utf-8")
+    cal_md = MD_CAL.read_text(encoding="utf-8")
+    for md, label in ((main, "main"), (cal_md, "calibration")):
+        assert "41" in md, label
+        assert "43" in md, label
+        assert "unknown" in md, label
+
+
+def test_411c_main_report_has_calibration_ref():
+    """主报告必须显式引用校准报告。"""
+    main = MD_MAIN.read_text(encoding="utf-8")
+    assert "phase3B4_1_1_types_evidence_calibration.md" in main
+
+
+def test_411c_main_report_states_41_not_alipay():
+    main = MD_MAIN.read_text(encoding="utf-8")
+    assert "不是「支付宝可买」" in main or "不等于「支付宝可买」" in main
+
+
+def test_411c_main_report_states_b_level():
+    main = MD_MAIN.read_text(encoding="utf-8")
+    assert "B 级" in main
+
+
+def test_411c_main_report_lists_structure_numbers():
+    """主报告必须写出 27 / 3 / 11 / 2 / 41。"""
+    main = MD_MAIN.read_text(encoding="utf-8")
+    for n in ("27", "3", "11", "2", "41"):
+        assert n in main, n
+
+
+# ---------------- 7. 主报告不得残留旧结论
+def test_411c_main_report_no_old_claim():
+    """不得再出现「43 条均属于支付宝可买场外基金」这类旧结论。"""
+    main = MD_MAIN.read_text(encoding="utf-8")
+    banned = [
+        "43 个独立本体，A 级证据",
+        "A 级证据、字段完整",
+        "**这才是能代表「支付宝可买的场外公募基金」的样本结构。**",
+    ]
+    for b in banned:
+        assert b not in main, f"主报告仍残留旧结论: {b}"
+
+
+def test_411c_main_report_no_bare_a_level():
+    """主报告里 A 级只能出现在「已被纠正」的语境里。"""
+    main = MD_MAIN.read_text(encoding="utf-8")
+    for line in main.splitlines():
+        if "A 级" in line:
+            assert ("纠正" in line or "错" in line or "曾被" in line
+                    or "初版" in line), f"未标注纠正的 A 级表述: {line[:60]}"
+
+
+# ---------------- 8. 费率三个修复未回退
+def test_411c_kept_fee_fixes_final():
+    text = ("赎回费率|适用期限|赎回费率|小于等于6天|1.50%|"
+            "大于等于7天，小于等于364天|0.50%|大于等于365天|0.00%|注：")
+    tiers = parse_redeem_411(text)
+    # Bug1：比较符按长到短
+    assert tiers[0]["holding_days_max"] == 6
+    assert tiers[0]["max_inclusive"] is True
+    # Bug3：首档下界推断为 0 并标记
+    assert tiers[0]["holding_days_min"] == 0
+    assert tiers[0]["min_inferred"] is True
+    # Bug2：闭区间连续性（364 含 → 365 含 = 无空洞）
+    assert tiers[1]["holding_days_min"] == 7
+    assert tiers[2]["holding_days_min"] == 365

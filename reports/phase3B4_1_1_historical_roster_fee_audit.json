@@ -3727,7 +3727,7 @@
  "types_evidence_calibration": {
   "phase": "3B-4.1.1-calibration",
   "baseline_head": "22b8fc993cd37fce4fcc68671eb07145654c330e",
-  "generated_at": "2026-11-19T19:48:45",
+  "generated_at": "2026-11-19T19:59:15",
   "scope": "验收修正：只对已有 43 条清盘事件重新判定基金类型与证据等级。未重新扫描 844 个代码、未新增公告采集、未改数据层与迁移、未入库、未回测。",
   "corrections": {
    "what_was_wrong": [
@@ -3740,6 +3740,12 @@
     "去重规则（同公告=同事件、披露链归并、终止上市并入清盘）。",
     "天天基金 F10 费率 = C 级的定级。"
    ]
+  },
+  "field_semantics": {
+   "offmarket_structure_count": "属于**场外产品结构范围**的清盘基金本体数量（普通开放式 + ETF联接 + LOF）。**不是**支付宝可购买数量。",
+   "alipay_purchasable_count": "支付宝实际可购买数量。恒为 0，因为全部状态 unknown、无官方或可靠接口证据。",
+   "alipay_status": "支付宝可购买状态。恒为 unknown（3B-4.1 结论 not_obtainable）。",
+   "note": "结构分类 ≠ 支付宝上架状态。ETF联接/LOF/普通开放式可以纳入场外**研究范围**，但不代表这些历史清盘基金曾在支付宝销售，也不代表现在仍可买。"
   },
   "enums": {
    "product_structure": {
@@ -3795,7 +3801,10 @@
     "prefix_conflict": false,
     "is_index_fund": false,
     "is_onshore_etf": false,
+    "in_offmarket_structure": true,
     "offmarket_eligible": true,
+    "alipay_purchasable": "unknown",
+    "alipay_evidence": "not_obtainable",
     "evidence_level": "B",
     "evidence_reason": "第三方转载（pdf.dfcfw.com），原文完整可读、可追溯，但发布主体非官方"
    },
@@ -3828,7 +3837,10 @@
     "prefix_conflict": false,
     "is_index_fund": true,
     "is_onshore_etf": false,
+    "in_offmarket_structure": true,
     "offmarket_eligible": true,
+    "alipay_purchasable": "unknown",
+    "alipay_evidence": "not_obtainable",
     "evidence_level": "B",
     "evidence_reason": "第三方转载（pdf.dfcfw.com），原文完整可读、可追溯，但发布主体非官方"
    },
@@ -3861,7 +3873,10 @@
     "prefix_conflict": false,
     "is_index_fund": false,
     "is_onshore_etf": false,
+    "in_offmarket_structure": true,
     "offmarket_eligible": true,
+    "alipay_purchasable": "unknown",
+    "alipay_evidence": "not_obtainable",
     "evidence_level": "B",
     "evidence_reason": "第三方转载（pdf.dfcfw.com），原文完整可读、可追溯，但发布主体非官方"
    },
@@ -3893,7 +3908,10 @@
     "prefix_conflict": false,
     "is_index_fund": true,
     "is_onshore_etf": false,
+    "in_offmarket_structure": true,
     "offmarket_eligible": true,
+    "alipay_purchasable": "unknown",
+    "alipay_evidence": "not_obtainable",
     "evidence_level": "B",
     "evidence_reason": "第三方转载（pdf.dfcfw.com），原文完整可读、可追溯，但发布主体非官方"
    },
@@ -3926,7 +3944,10 @@
     "prefix_conflict": false,
     "is_index_fund": false,
     "is_onshore_etf": false,
+    "in_offmarket_structure": true,
     "offmarket_eligible": true,
+    "alipay_purchasable": "unknown",
+    "alipay_evidence": "not_obtainable",
     "evidence_level": "B",
     "evidence_reason": "第三方转载（pdf.dfcfw.com），原文完整可读、可追溯，但发布主体非官方"
    },
@@ -3958,7 +3979,10 @@
     "prefix_conflict": false,
     "is_index_fund": true,
     "is_onshore_etf": false,
+    "in_offmarket_structure": true,
     "offmarket_eligible": true,
+    "alipay_purchasable": "unknown",
+    "alipay_evidence": "not_obtainable",
     "evidence_level": "B",
     "evidence_reason": "第三方转载（pdf.dfcfw.com），原文完整可读、可追溯，但发布主体非官方"
    },
@@ -3990,7 +4014,10 @@
     "prefix_conflict": false,
     "is_index_fund": false,
     "is_onshore_etf": false,
+    "in_offmarket_structure": true,
     "offmarket_eligible": true,
+    "alipay_purchasable": "unknown",
+    "alipay_evidence": "not_obtainable",
     "evidence_level": "B",
     "evidence_reason": "第三方转载（pdf.dfcfw.com），原文完整可读、可追溯，但发布主体非官方"
    },
@@ -4023,7 +4050,10 @@
     "prefix_conflict": false,
     "is_index_fund": true,
     "is_onshore_etf": false,
+    "in_offmarket_structure": true,
     "offmarket_eligible": true,
+    "alipay_purchasable": "unknown",
+    "alipay_evidence": "not_obtainable",
     "evidence_level": "B",
     "evidence_reason": "第三方转载（pdf.dfcfw.com），原文完整可读、可追溯，但发布主体非官方"
    },
@@ -4057,7 +4087,10 @@
     "prefix_conflict": false,
     "is_index_fund": false,
     "is_onshore_etf": false,
+    "in_offmarket_structure": true,
     "offmarket_eligible": true,
+    "alipay_purchasable": "unknown",
+    "alipay_evidence": "not_obtainable",
     "evidence_level": "B",
     "evidence_reason": "第三方转载（pdf.dfcfw.com），原文完整可读、可追溯，但发布主体非官方"
    },
@@ -4090,7 +4123,10 @@
     "prefix_conflict": false,
     "is_index_fund": false,
     "is_onshore_etf": false,
+    "in_offmarket_structure": true,
     "offmarket_eligible": true,
+    "alipay_purchasable": "unknown",
+    "alipay_evidence": "not_obtainable",
     "evidence_level": "B",
     "evidence_reason": "第三方转载（pdf.dfcfw.com），原文完整可读、可追溯，但发布主体非官方"
    },
@@ -4123,7 +4159,10 @@
     "prefix_conflict": false,
     "is_index_fund": false,
     "is_onshore_etf": false,
+    "in_offmarket_structure": true,
     "offmarket_eligible": true,
+    "alipay_purchasable": "unknown",
+    "alipay_evidence": "not_obtainable",
     "evidence_level": "B",
     "evidence_reason": "第三方转载（pdf.dfcfw.com），原文完整可读、可追溯，但发布主体非官方"
    },
@@ -4156,7 +4195,10 @@
     "prefix_conflict": false,
     "is_index_fund": false,
     "is_onshore_etf": false,
+    "in_offmarket_structure": true,
     "offmarket_eligible": true,
+    "alipay_purchasable": "unknown",
+    "alipay_evidence": "not_obtainable",
     "evidence_level": "B",
     "evidence_reason": "第三方转载（pdf.dfcfw.com），原文完整可读、可追溯，但发布主体非官方"
    },
@@ -4188,7 +4230,10 @@
     "prefix_conflict": false,
     "is_index_fund": false,
     "is_onshore_etf": false,
+    "in_offmarket_structure": true,
     "offmarket_eligible": true,
+    "alipay_purchasable": "unknown",
+    "alipay_evidence": "not_obtainable",
     "evidence_level": "B",
     "evidence_reason": "第三方转载（pdf.dfcfw.com），原文完整可读、可追溯，但发布主体非官方"
    },
@@ -4221,7 +4266,10 @@
     "prefix_conflict": false,
     "is_index_fund": false,
     "is_onshore_etf": false,
+    "in_offmarket_structure": true,
     "offmarket_eligible": true,
+    "alipay_purchasable": "unknown",
+    "alipay_evidence": "not_obtainable",
     "evidence_level": "B",
     "evidence_reason": "第三方转载（pdf.dfcfw.com），原文完整可读、可追溯，但发布主体非官方"
    },
@@ -4254,7 +4302,10 @@
     "prefix_conflict": false,
     "is_index_fund": true,
     "is_onshore_etf": false,
+    "in_offmarket_structure": true,
     "offmarket_eligible": true,
+    "alipay_purchasable": "unknown",
+    "alipay_evidence": "not_obtainable",
     "evidence_level": "B",
     "evidence_reason": "第三方转载（pdf.dfcfw.com），原文完整可读、可追溯，但发布主体非官方"
    },
@@ -4287,7 +4338,10 @@
     "prefix_conflict": false,
     "is_index_fund": false,
     "is_onshore_etf": false,
+    "in_offmarket_structure": true,
     "offmarket_eligible": true,
+    "alipay_purchasable": "unknown",
+    "alipay_evidence": "not_obtainable",
     "evidence_level": "B",
     "evidence_reason": "第三方转载（pdf.dfcfw.com），原文完整可读、可追溯，但发布主体非官方"
    },
@@ -4320,7 +4374,10 @@
     "prefix_conflict": false,
     "is_index_fund": false,
     "is_onshore_etf": false,
+    "in_offmarket_structure": true,
     "offmarket_eligible": true,
+    "alipay_purchasable": "unknown",
+    "alipay_evidence": "not_obtainable",
     "evidence_level": "B",
     "evidence_reason": "第三方转载（pdf.dfcfw.com），原文完整可读、可追溯，但发布主体非官方"
    },
@@ -4353,7 +4410,10 @@
     "prefix_conflict": false,
     "is_index_fund": false,
     "is_onshore_etf": false,
+    "in_offmarket_structure": true,
     "offmarket_eligible": true,
+    "alipay_purchasable": "unknown",
+    "alipay_evidence": "not_obtainable",
     "evidence_level": "B",
     "evidence_reason": "第三方转载（pdf.dfcfw.com），原文完整可读、可追溯，但发布主体非官方"
    },
@@ -4385,7 +4445,10 @@
     "prefix_conflict": false,
     "is_index_fund": false,
     "is_onshore_etf": false,
+    "in_offmarket_structure": true,
     "offmarket_eligible": true,
+    "alipay_purchasable": "unknown",
+    "alipay_evidence": "not_obtainable",
     "evidence_level": "B",
     "evidence_reason": "第三方转载（pdf.dfcfw.com），原文完整可读、可追溯，但发布主体非官方"
    },
@@ -4419,7 +4482,10 @@
     "prefix_conflict": false,
     "is_index_fund": false,
     "is_onshore_etf": false,
+    "in_offmarket_structure": true,
     "offmarket_eligible": true,
+    "alipay_purchasable": "unknown",
+    "alipay_evidence": "not_obtainable",
     "evidence_level": "B",
     "evidence_reason": "第三方转载（pdf.dfcfw.com），原文完整可读、可追溯，但发布主体非官方"
    },
@@ -4451,7 +4517,10 @@
     "prefix_conflict": false,
     "is_index_fund": true,
     "is_onshore_etf": false,
+    "in_offmarket_structure": true,
     "offmarket_eligible": true,
+    "alipay_purchasable": "unknown",
+    "alipay_evidence": "not_obtainable",
     "evidence_level": "B",
     "evidence_reason": "第三方转载（pdf.dfcfw.com），原文完整可读、可追溯，但发布主体非官方"
    },
@@ -4484,7 +4553,10 @@
     "prefix_conflict": false,
     "is_index_fund": false,
     "is_onshore_etf": false,
+    "in_offmarket_structure": true,
     "offmarket_eligible": true,
+    "alipay_purchasable": "unknown",
+    "alipay_evidence": "not_obtainable",
     "evidence_level": "B",
     "evidence_reason": "第三方转载（pdf.dfcfw.com），原文完整可读、可追溯，但发布主体非官方"
    },
@@ -4516,7 +4588,10 @@
     "prefix_conflict": false,
     "is_index_fund": false,
     "is_onshore_etf": false,
+    "in_offmarket_structure": true,
     "offmarket_eligible": true,
+    "alipay_purchasable": "unknown",
+    "alipay_evidence": "not_obtainable",
     "evidence_level": "B",
     "evidence_reason": "第三方转载（pdf.dfcfw.com），原文完整可读、可追溯，但发布主体非官方"
    },
@@ -4549,7 +4624,10 @@
     "prefix_conflict": false,
     "is_index_fund": true,
     "is_onshore_etf": false,
+    "in_offmarket_structure": true,
     "offmarket_eligible": true,
+    "alipay_purchasable": "unknown",
+    "alipay_evidence": "not_obtainable",
     "evidence_level": "B",
     "evidence_reason": "第三方转载（pdf.dfcfw.com），原文完整可读、可追溯，但发布主体非官方"
    },
@@ -4582,7 +4660,10 @@
     "prefix_conflict": false,
     "is_index_fund": true,
     "is_onshore_etf": false,
+    "in_offmarket_structure": true,
     "offmarket_eligible": true,
+    "alipay_purchasable": "unknown",
+    "alipay_evidence": "not_obtainable",
     "evidence_level": "B",
     "evidence_reason": "第三方转载（pdf.dfcfw.com），原文完整可读、可追溯，但发布主体非官方"
    },
@@ -4614,7 +4695,10 @@
     "prefix_conflict": false,
     "is_index_fund": false,
     "is_onshore_etf": false,
+    "in_offmarket_structure": true,
     "offmarket_eligible": true,
+    "alipay_purchasable": "unknown",
+    "alipay_evidence": "not_obtainable",
     "evidence_level": "B",
     "evidence_reason": "第三方转载（pdf.dfcfw.com），原文完整可读、可追溯，但发布主体非官方"
    },
@@ -4646,7 +4730,10 @@
     "prefix_conflict": false,
     "is_index_fund": false,
     "is_onshore_etf": false,
+    "in_offmarket_structure": true,
     "offmarket_eligible": true,
+    "alipay_purchasable": "unknown",
+    "alipay_evidence": "not_obtainable",
     "evidence_level": "B",
     "evidence_reason": "第三方转载（pdf.dfcfw.com），原文完整可读、可追溯，但发布主体非官方"
    },
@@ -4678,7 +4765,10 @@
     "prefix_conflict": true,
     "is_index_fund": false,
     "is_onshore_etf": false,
+    "in_offmarket_structure": true,
     "offmarket_eligible": true,
+    "alipay_purchasable": "unknown",
+    "alipay_evidence": "not_obtainable",
     "evidence_level": "B",
     "evidence_reason": "第三方转载（pdf.dfcfw.com），原文完整可读、可追溯，但发布主体非官方"
    },
@@ -4710,7 +4800,10 @@
     "prefix_conflict": false,
     "is_index_fund": true,
     "is_onshore_etf": false,
+    "in_offmarket_structure": true,
     "offmarket_eligible": true,
+    "alipay_purchasable": "unknown",
+    "alipay_evidence": "not_obtainable",
     "evidence_level": "B",
     "evidence_reason": "第三方转载（pdf.dfcfw.com），原文完整可读、可追溯，但发布主体非官方"
    },
@@ -4742,7 +4835,10 @@
     "prefix_conflict": false,
     "is_index_fund": true,
     "is_onshore_etf": false,
+    "in_offmarket_structure": true,
     "offmarket_eligible": true,
+    "alipay_purchasable": "unknown",
+    "alipay_evidence": "not_obtainable",
     "evidence_level": "B",
     "evidence_reason": "第三方转载（pdf.dfcfw.com），原文完整可读、可追溯，但发布主体非官方"
    },
@@ -4774,7 +4870,10 @@
     "prefix_conflict": false,
     "is_index_fund": true,
     "is_onshore_etf": false,
+    "in_offmarket_structure": true,
     "offmarket_eligible": true,
+    "alipay_purchasable": "unknown",
+    "alipay_evidence": "not_obtainable",
     "evidence_level": "B",
     "evidence_reason": "第三方转载（pdf.dfcfw.com），原文完整可读、可追溯，但发布主体非官方"
    },
@@ -4806,7 +4905,10 @@
     "prefix_conflict": false,
     "is_index_fund": false,
     "is_onshore_etf": false,
+    "in_offmarket_structure": true,
     "offmarket_eligible": true,
+    "alipay_purchasable": "unknown",
+    "alipay_evidence": "not_obtainable",
     "evidence_level": "B",
     "evidence_reason": "第三方转载（pdf.dfcfw.com），原文完整可读、可追溯，但发布主体非官方"
    },
@@ -4838,7 +4940,10 @@
     "prefix_conflict": true,
     "is_index_fund": false,
     "is_onshore_etf": false,
+    "in_offmarket_structure": true,
     "offmarket_eligible": true,
+    "alipay_purchasable": "unknown",
+    "alipay_evidence": "not_obtainable",
     "evidence_level": "B",
     "evidence_reason": "第三方转载（pdf.dfcfw.com），原文完整可读、可追溯，但发布主体非官方"
    },
@@ -4870,7 +4975,10 @@
     "prefix_conflict": false,
     "is_index_fund": false,
     "is_onshore_etf": false,
+    "in_offmarket_structure": true,
     "offmarket_eligible": true,
+    "alipay_purchasable": "unknown",
+    "alipay_evidence": "not_obtainable",
     "evidence_level": "B",
     "evidence_reason": "第三方转载（pdf.dfcfw.com），原文完整可读、可追溯，但发布主体非官方"
    },
@@ -4903,7 +5011,10 @@
     "prefix_conflict": false,
     "is_index_fund": false,
     "is_onshore_etf": false,
+    "in_offmarket_structure": true,
     "offmarket_eligible": true,
+    "alipay_purchasable": "unknown",
+    "alipay_evidence": "not_obtainable",
     "evidence_level": "B",
     "evidence_reason": "第三方转载（pdf.dfcfw.com），原文完整可读、可追溯，但发布主体非官方"
    },
@@ -4936,7 +5047,10 @@
     "prefix_conflict": true,
     "is_index_fund": false,
     "is_onshore_etf": false,
+    "in_offmarket_structure": true,
     "offmarket_eligible": true,
+    "alipay_purchasable": "unknown",
+    "alipay_evidence": "not_obtainable",
     "evidence_level": "B",
     "evidence_reason": "第三方转载（pdf.dfcfw.com），原文完整可读、可追溯，但发布主体非官方"
    },
@@ -4968,7 +5082,10 @@
     "prefix_conflict": true,
     "is_index_fund": false,
     "is_onshore_etf": false,
+    "in_offmarket_structure": true,
     "offmarket_eligible": true,
+    "alipay_purchasable": "unknown",
+    "alipay_evidence": "not_obtainable",
     "evidence_level": "B",
     "evidence_reason": "第三方转载（pdf.dfcfw.com），原文完整可读、可追溯，但发布主体非官方"
    },
@@ -5001,7 +5118,10 @@
     "prefix_conflict": false,
     "is_index_fund": true,
     "is_onshore_etf": false,
+    "in_offmarket_structure": true,
     "offmarket_eligible": true,
+    "alipay_purchasable": "unknown",
+    "alipay_evidence": "not_obtainable",
     "evidence_level": "B",
     "evidence_reason": "第三方转载（pdf.dfcfw.com），原文完整可读、可追溯，但发布主体非官方"
    },
@@ -5033,7 +5153,10 @@
     "prefix_conflict": false,
     "is_index_fund": true,
     "is_onshore_etf": false,
+    "in_offmarket_structure": true,
     "offmarket_eligible": true,
+    "alipay_purchasable": "unknown",
+    "alipay_evidence": "not_obtainable",
     "evidence_level": "B",
     "evidence_reason": "第三方转载（pdf.dfcfw.com），原文完整可读、可追溯，但发布主体非官方"
    },
@@ -5065,7 +5188,10 @@
     "prefix_conflict": false,
     "is_index_fund": true,
     "is_onshore_etf": false,
+    "in_offmarket_structure": true,
     "offmarket_eligible": true,
+    "alipay_purchasable": "unknown",
+    "alipay_evidence": "not_obtainable",
     "evidence_level": "B",
     "evidence_reason": "第三方转载（pdf.dfcfw.com），原文完整可读、可追溯，但发布主体非官方"
    },
@@ -5097,7 +5223,10 @@
     "prefix_conflict": false,
     "is_index_fund": true,
     "is_onshore_etf": false,
+    "in_offmarket_structure": true,
     "offmarket_eligible": true,
+    "alipay_purchasable": "unknown",
+    "alipay_evidence": "not_obtainable",
     "evidence_level": "B",
     "evidence_reason": "第三方转载（pdf.dfcfw.com），原文完整可读、可追溯，但发布主体非官方"
    },
@@ -5129,7 +5258,10 @@
     "prefix_conflict": false,
     "is_index_fund": true,
     "is_onshore_etf": true,
+    "in_offmarket_structure": false,
     "offmarket_eligible": false,
+    "alipay_purchasable": "unknown",
+    "alipay_evidence": "not_obtainable",
     "evidence_level": "B",
     "evidence_reason": "第三方转载（pdf.dfcfw.com），原文完整可读、可追溯，但发布主体非官方"
    },
@@ -5161,7 +5293,10 @@
     "prefix_conflict": false,
     "is_index_fund": true,
     "is_onshore_etf": true,
+    "in_offmarket_structure": false,
     "offmarket_eligible": false,
+    "alipay_purchasable": "unknown",
+    "alipay_evidence": "not_obtainable",
     "evidence_level": "B",
     "evidence_reason": "第三方转载（pdf.dfcfw.com），原文完整可读、可追溯，但发布主体非官方"
    }
@@ -5184,7 +5319,10 @@
    "by_evidence_level": {
     "B": 43
    },
+   "offmarket_structure_count": 41,
    "offmarket_count": 41,
+   "alipay_purchasable_count": 0,
+   "alipay_status": "unknown",
    "onshore_etf_count": 2,
    "unknown_type_count": 0,
    "name_changed_count": 3,
@@ -5605,7 +5743,8 @@
    "43 条公告均来自东方财富转载，未逐条回源到基金公司官网/交易所官网，因此全部只能给 B 级；若日后回源验证可升 A。",
    "ETF 联接基金与目标 ETF 的对应关系未建立（公告未写目标 ETF 代码）。",
    "合并事件仍为 0 个。",
-   "清盘名录覆盖率仍不可量化。"
+   "清盘名录覆盖率仍不可量化。",
+   "支付宝实际可购买状态全部 unknown：结构分类不等于平台上架状态，41 只只是「场外结构范围」，不是「支付宝可买」。"
   ]
  }
 }
