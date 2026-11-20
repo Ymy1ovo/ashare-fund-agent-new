@@ -479,3 +479,213 @@ def test_source_json_untouched(calibration):
 
 def test_fee_source_untouched(fee_audit):
     assert fee_audit["count"] == 12
+
+# ================================================================ 主从标记（验收修正）
+from app.fund.ingest_3b4_2 import (  # noqa: E402
+    ShareOwnershipError, _ensure_share, _pick_primary_code,
+)
+
+
+def _primaries_of(db, fund_id: int) -> list[str]:
+    with get_connection(db) as conn:
+        rows = conn.execute(
+            "SELECT share_class_code FROM fund_share_classes "
+            "WHERE fund_id=? AND is_primary=1", (fund_id,)).fetchall()
+    return sorted(r["share_class_code"] for r in rows)
+
+
+def _all_shares_of(db, fund_id: int) -> list[dict]:
+    with get_connection(db) as conn:
+        rows = conn.execute(
+            "SELECT share_class_code, is_primary FROM fund_share_classes "
+            "WHERE fund_id=? ORDER BY share_class_code", (fund_id,)).fetchall()
+    return [dict(r) for r in rows]
+
+
+def _fund_id_by_code(db, code: str) -> int:
+    with get_connection(db) as conn:
+        return int(conn.execute(
+            "SELECT fund_id FROM fund_share_classes WHERE share_class_code=?",
+            (code,)).fetchone()[0])
+
+
+# ---------------- 1~3. 单/双/三代码本体恰好一个主份额
+def test_single_code_fund_has_one_primary(ingested):
+    fid = _fund_id_by_code(ingested["db"], "000007")
+    assert _primaries_of(ingested["db"], fid) == ["000007"]
+
+
+def test_two_code_fund_has_one_primary(ingested):
+    fid = _fund_id_by_code(ingested["db"], "000022")
+    prim = _primaries_of(ingested["db"], fid)
+    assert len(prim) == 1
+    assert prim == ["000022"]
+
+
+def test_three_code_fund_has_one_primary(ingested):
+    fid = _fund_id_by_code(ingested["db"], "000091")
+    prim = _primaries_of(ingested["db"], fid)
+    assert len(prim) == 1
+    shares = _all_shares_of(ingested["db"], fid)
+    assert len(shares) == 3
+
+
+# ---------------- 4. 主代码与 _pick_primary_code 一致
+def test_primary_matches_pick_rule(ingested):
+    with get_connection(ingested["db"]) as conn:
+        rows = conn.execute(
+            "SELECT fund_id, fund_codes FROM fund_lifecycle_events "
+            "WHERE source='dfcfw.announcement.calibrated'").fetchall()
+    for r in rows:
+        codes = [c for c in (r["fund_codes"] or "").split(",") if c]
+        expected = _pick_primary_code(codes)
+        assert _primaries_of(ingested["db"], int(r["fund_id"])) == [expected], \
+            (r["fund_codes"], expected)
+
+
+# ---------------- 5. 其他份额全部 is_primary=0
+def test_all_other_shares_non_primary(ingested):
+    with get_connection(ingested["db"]) as conn:
+        rows = conn.execute(
+            "SELECT fund_id, fund_codes FROM fund_lifecycle_events "
+            "WHERE source='dfcfw.announcement.calibrated'").fetchall()
+    checked = 0
+    for r in rows:
+        codes = [c for c in (r["fund_codes"] or "").split(",") if c]
+        if len(codes) < 2:
+            continue
+        primary = _pick_primary_code(codes)
+        for sh in _all_shares_of(ingested["db"], int(r["fund_id"])):
+            if sh["share_class_code"] == primary:
+                assert sh["is_primary"] == 1
+            else:
+                assert sh["is_primary"] == 0, (sh, primary)
+            checked += 1
+    assert checked >= 20
+
+
+# ---------------- 6. 重复导入后主从关系不变
+def test_primary_unchanged_after_reimport(ingested):
+    from app.fund.ingest_3b4_2 import ingest_lifecycle
+    before = {}
+    with get_connection(ingested["db"]) as conn:
+        for r in conn.execute(
+                "SELECT fund_id, share_class_code, is_primary "
+                "FROM fund_share_classes WHERE fund_id>=23").fetchall():
+            before[(r["fund_id"], r["share_class_code"])] = r["is_primary"]
+    ingest_lifecycle(ingested["db"])
+    after = {}
+    with get_connection(ingested["db"]) as conn:
+        for r in conn.execute(
+                "SELECT fund_id, share_class_code, is_primary "
+                "FROM fund_share_classes WHERE fund_id>=23").fetchall():
+            after[(r["fund_id"], r["share_class_code"])] = r["is_primary"]
+    assert before == after
+
+
+# ---------------- 7. 已存在且同本体的份额可复用
+def test_existing_share_same_fund_reused(fund_db):
+    with get_connection(fund_db) as conn:
+        fid = conn.execute(
+            "SELECT fund_id FROM fund_share_classes WHERE share_class_code='000051'"
+        ).fetchone()[0]
+        sid1 = _ensure_share(conn, int(fid), "000051", "测试", "2026-01-01")
+        sid2 = _ensure_share(conn, int(fid), "000051", "测试", "2026-01-01")
+    assert sid1 == sid2
+
+
+# ---------------- 8. 已存在但属于其他本体的份额必须报错
+def test_share_owned_by_other_fund_raises(fund_db):
+    with get_connection(fund_db) as conn:
+        real_fid = conn.execute(
+            "SELECT fund_id FROM fund_share_classes WHERE share_class_code='000051'"
+        ).fetchone()[0]
+        other_fid = int(real_fid) + 9999
+        conn.execute(
+            "INSERT INTO fund_master (fund_code_primary, fund_name, lifecycle_status, "
+            "source, ingested_at) VALUES ('999999','别的基金','terminated','test','2026-01-01')")
+        other_fid = conn.execute(
+            "SELECT fund_id FROM fund_master WHERE fund_code_primary='999999'"
+        ).fetchone()[0]
+        with pytest.raises(ShareOwnershipError) as ei:
+            _ensure_share(conn, int(other_fid), "000051", "测试", "2026-01-01")
+    assert ei.value.code == "000051"
+    assert ei.value.actual_fund_id == int(real_fid)
+    assert ei.value.expected_fund_id == int(other_fid)
+
+
+def test_conflict_does_not_reassign(fund_db):
+    """报错后归属不能改变。"""
+    with get_connection(fund_db) as conn:
+        original = int(conn.execute(
+            "SELECT fund_id FROM fund_share_classes WHERE share_class_code='000015'"
+        ).fetchone()[0])
+        conn.execute(
+            "INSERT INTO fund_master (fund_code_primary, fund_name, lifecycle_status, "
+            "source, ingested_at) VALUES ('888888','别的','terminated','test','2026-01-01')")
+        other = int(conn.execute(
+            "SELECT fund_id FROM fund_master WHERE fund_code_primary='888888'"
+        ).fetchone()[0])
+        with pytest.raises(ShareOwnershipError):
+            _ensure_share(conn, other, "000015", "测试", "2026-01-01")
+        still = int(conn.execute(
+            "SELECT fund_id FROM fund_share_classes WHERE share_class_code='000015'"
+        ).fetchone()[0])
+    assert still == original
+
+
+# ---------------- 9. 修复脚本幂等
+def test_primary_fix_idempotent(ingested):
+    sys.path.insert(0, str(ROOT / "scripts"))
+    import importlib
+    mod = importlib.import_module("fix_3b4_2_primary_flags")
+    from app.fund.ingest_3b4_2 import load_calibration as _lc
+    calib = _lc()
+    with get_connection(ingested["db"]) as conn:
+        fixes1, _ = mod.plan_fixes(conn, calib)
+        for f in fixes1:
+            conn.execute(
+                "UPDATE fund_share_classes SET is_primary=? WHERE share_class_id=?",
+                (f["is_primary"], f["share_class_id"]))
+    with get_connection(ingested["db"]) as conn:
+        fixes2, _ = mod.plan_fixes(conn, calib)
+        need = sum(1 for f in fixes2 if conn.execute(
+            "SELECT is_primary FROM fund_share_classes WHERE share_class_id=?",
+            (f["share_class_id"],)).fetchone()[0] != f["is_primary"])
+    assert need == 0
+
+
+# ---------------- 10. 修复不动其他基金本体
+def test_primary_fix_only_touches_41_funds(ingested):
+    sys.path.insert(0, str(ROOT / "scripts"))
+    import importlib
+    mod = importlib.import_module("fix_3b4_2_primary_flags")
+    from app.fund.ingest_3b4_2 import load_calibration as _lc
+
+    # 先记下 12 只预置存续基金的主从
+    with get_connection(ingested["db"]) as conn:
+        seeded = {r["share_class_code"]: r["is_primary"]
+                  for r in conn.execute(
+                      "SELECT share_class_code, is_primary FROM fund_share_classes "
+                      "WHERE source='test.seed'").fetchall()}
+
+    calib = _lc()
+    with get_connection(ingested["db"]) as conn:
+        fixes, _ = mod.plan_fixes(conn, calib)
+        touched_ids = {f["share_class_id"] for f in fixes}
+        for f in fixes:
+            conn.execute(
+                "UPDATE fund_share_classes SET is_primary=? WHERE share_class_id=?",
+                (f["is_primary"], f["share_class_id"]))
+        # 预置基金未被列入修复计划
+        seeded_ids = {r["share_class_id"] for r in conn.execute(
+            "SELECT share_class_id FROM fund_share_classes "
+            "WHERE source='test.seed'").fetchall()}
+        assert not (touched_ids & seeded_ids)
+
+    with get_connection(ingested["db"]) as conn:
+        after = {r["share_class_code"]: r["is_primary"]
+                 for r in conn.execute(
+                     "SELECT share_class_code, is_primary FROM fund_share_classes "
+                     "WHERE source='test.seed'").fetchall()}
+    assert after == seeded

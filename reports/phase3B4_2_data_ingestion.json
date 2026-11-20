@@ -362,5 +362,219 @@
  "data_sources": {
   "lifecycle": "reports\\phase3B4_1_1_types_evidence_calibration.json",
   "fees": "reports/phase3B4_1_1_historical_roster_fee_audit.json#fee_audit"
+ },
+ "primary_fix": {
+  "phase": "3B-4.2-primary-fix",
+  "baseline_head": "5965ae7f923e5249cce6664605a003fd47678d1f",
+  "generated_at": "2026-11-20T10:59:18",
+  "scope": "只修正 41 个清盘事件涉及基金本体的 is_primary 主从关系；不改费率、不改迁移、不改其他基金本体。",
+  "planned_share_updates": 63,
+  "affected_fund_ids": [
+   23,
+   24,
+   25,
+   26,
+   27,
+   28,
+   29,
+   30,
+   31,
+   32,
+   33,
+   34,
+   35,
+   36,
+   37,
+   38,
+   39,
+   40,
+   41,
+   42,
+   43,
+   44,
+   45,
+   46,
+   47,
+   48,
+   49,
+   50,
+   51,
+   52,
+   53,
+   54,
+   55,
+   56,
+   57,
+   58,
+   59,
+   60,
+   61,
+   62,
+   63
+  ],
+  "conflicts": [],
+  "before": {
+   "funds": 41,
+   "shares": 63,
+   "primary_ok": 21,
+   "primaries": 63,
+   "non_primary": 0,
+   "violations": [
+    {
+     "fund_id": 24,
+     "primaries": 2,
+     "total": 2
+    },
+    {
+     "fund_id": 25,
+     "primaries": 2,
+     "total": 2
+    },
+    {
+     "fund_id": 27,
+     "primaries": 2,
+     "total": 2
+    },
+    {
+     "fund_id": 30,
+     "primaries": 2,
+     "total": 2
+    },
+    {
+     "fund_id": 31,
+     "primaries": 3,
+     "total": 3
+    },
+    {
+     "fund_id": 32,
+     "primaries": 2,
+     "total": 2
+    },
+    {
+     "fund_id": 33,
+     "primaries": 2,
+     "total": 2
+    },
+    {
+     "fund_id": 34,
+     "primaries": 2,
+     "total": 2
+    },
+    {
+     "fund_id": 36,
+     "primaries": 2,
+     "total": 2
+    },
+    {
+     "fund_id": 37,
+     "primaries": 2,
+     "total": 2
+    },
+    {
+     "fund_id": 38,
+     "primaries": 2,
+     "total": 2
+    },
+    {
+     "fund_id": 39,
+     "primaries": 2,
+     "total": 2
+    },
+    {
+     "fund_id": 40,
+     "primaries": 2,
+     "total": 2
+    },
+    {
+     "fund_id": 42,
+     "primaries": 3,
+     "total": 3
+    },
+    {
+     "fund_id": 44,
+     "primaries": 2,
+     "total": 2
+    },
+    {
+     "fund_id": 46,
+     "primaries": 2,
+     "total": 2
+    },
+    {
+     "fund_id": 47,
+     "primaries": 2,
+     "total": 2
+    },
+    {
+     "fund_id": 57,
+     "primaries": 2,
+     "total": 2
+    },
+    {
+     "fund_id": 58,
+     "primaries": 2,
+     "total": 2
+    },
+    {
+     "fund_id": 60,
+     "primaries": 2,
+     "total": 2
+    }
+   ]
+  },
+  "after": {
+   "funds": 41,
+   "shares": 63,
+   "primary_ok": 41,
+   "primaries": 41,
+   "non_primary": 22,
+   "violations": []
+  },
+  "rows_changed": 22,
+  "idempotent_remaining_updates": 0,
+  "lifecycle_count": 41,
+  "fee_rules_count": 90,
+  "integrity_check": "ok",
+  "foreign_key_violations": 0,
+  "backup": {
+   "path": "D:\\ymy\\jj-agent\\data\\backups\\fund_agent_before_primary_fix_20261120_105913.db",
+   "size_bytes": 283930624
+  },
+  "changed_codes": [
+   "000023",
+   "000027",
+   "000052",
+   "000088",
+   "000092",
+   "000093",
+   "010002",
+   "010007",
+   "010047",
+   "010061",
+   "010067",
+   "010071",
+   "010075",
+   "010079",
+   "010097",
+   "010098",
+   "020028",
+   "020036",
+   "020049",
+   "501040",
+   "501042",
+   "501068"
+  ],
+  "audit": {
+   "checked_funds": 41,
+   "checked_shares": 63,
+   "primary_shares": 41,
+   "non_primary_shares": 22,
+   "each_fund_exactly_one_primary": true,
+   "primary_matches_pick_rule": true,
+   "primary_mismatch": [],
+   "conflicts": [],
+   "seeded_funds_unchanged": true,
+   "seeded_share_count": 12
+  }
  }
 }

@@ -54,6 +54,7 @@ class IngestStat:
     failed: int = 0
     by_type: dict[str, int] = field(default_factory=dict)
     notes: list[str] = field(default_factory=list)
+    conflicts: list[dict] = field(default_factory=list)
 
     def as_dict(self) -> dict:
         return {
@@ -64,6 +65,7 @@ class IngestStat:
             "failed": self.failed,
             "by_type": dict(self.by_type),
             "notes": list(self.notes),
+            "conflicts": list(self.conflicts),
         }
 
 
@@ -127,6 +129,7 @@ def _ensure_master(conn, code: str, name: str, structure: str,
          1,                       # 类型兜底未细分股/债 → 待人工复核
          LIFECYCLE_SOURCE, now, "fund-v1"))
     fid = int(cur.lastrowid)
+    # 主代码 → is_primary=1（每个本体恰好一个）
     conn.execute(
         """INSERT OR IGNORE INTO fund_share_classes
            (fund_id, share_class_code, share_class_name, share_class_type,
@@ -136,18 +139,42 @@ def _ensure_master(conn, code: str, name: str, structure: str,
     return fid
 
 
-def _ensure_share(conn, fund_id: int, code: str, name: str, now: str) -> int:
+class ShareOwnershipError(RuntimeError):
+    """份额代码已被其他基金本体占用。
+
+    绝不静默重新关联，也不直接覆盖——抛错交上层记录冲突。
+    """
+
+    def __init__(self, code: str, expected_fund_id: int, actual_fund_id: int) -> None:
+        self.code = code
+        self.expected_fund_id = expected_fund_id
+        self.actual_fund_id = actual_fund_id
+        super().__init__(
+            f"份额代码 {code} 已属于 fund_id={actual_fund_id}，"
+            f"与传入的 fund_id={expected_fund_id} 不一致")
+
+
+def _ensure_share(conn, fund_id: int, code: str, name: str, now: str,
+                  *, is_primary: int = 0) -> int:
+    """幂等登记非主份额。
+
+    - 已存在且 fund_id 一致：直接返回，不改归属；
+    - 已存在但 fund_id 不一致：抛 ShareOwnershipError，不静默重连；
+    - 不存在：以 is_primary=0 新建（主份额只由 _ensure_master 创建）。
+    """
     row = conn.execute(
-        "SELECT share_class_id FROM fund_share_classes WHERE share_class_code=?",
-        (code,)).fetchone()
+        "SELECT share_class_id, fund_id FROM fund_share_classes "
+        "WHERE share_class_code=?", (code,)).fetchone()
     if row:
+        if int(row["fund_id"]) != int(fund_id):
+            raise ShareOwnershipError(code, fund_id, int(row["fund_id"]))
         return int(row["share_class_id"])
     cur = conn.execute(
         """INSERT INTO fund_share_classes
            (fund_id, share_class_code, share_class_name, share_class_type,
             is_primary, source, ingested_at)
            VALUES (?,?,?,?,?,?,?)""",
-        (fund_id, code, name, "plain", 1, LIFECYCLE_SOURCE, now))
+        (fund_id, code, name, "plain", is_primary, LIFECYCLE_SOURCE, now))
     return int(cur.lastrowid)
 
 
@@ -204,7 +231,9 @@ def ingest_lifecycle(db_path: Path | None = None,
                 # 其余份额代码也登记为份额，但不新建本体
                 for other in codes:
                     if other != primary:
-                        _ensure_share(conn, fid, other, rec["fund_entity"], now)
+                        # 非主份额：is_primary=0
+                        _ensure_share(conn, fid, other, rec["fund_entity"], now,
+                                      is_primary=0)
 
                 detail = json.dumps({
                     "fund_entity": rec.get("fund_entity"),
@@ -243,6 +272,14 @@ def ingest_lifecycle(db_path: Path | None = None,
                 stat.inserted += 1
                 et = rec.get("product_structure") or "unknown"
                 stat.by_type[et] = stat.by_type.get(et, 0) + 1
+            except ShareOwnershipError as exc:
+                stat.failed += 1
+                stat.conflicts.append({
+                    "code": exc.code,
+                    "expected_fund_id": exc.expected_fund_id,
+                    "actual_fund_id": exc.actual_fund_id,
+                })
+                stat.notes.append(f"{primary} 冲突: {exc}")
             except Exception as exc:  # noqa: BLE001
                 stat.failed += 1
                 stat.notes.append(f"{primary} 失败: {type(exc).__name__}: {exc}")

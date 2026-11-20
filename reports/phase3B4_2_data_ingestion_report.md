@@ -371,7 +371,7 @@ detail 里同时保存结构化的可追溯字段（JSON）：
 
 ```
 $ pytest tests/test_ingest_3b4_2.py -q
-41 passed in 14.74s
+52 passed in 18.81s
 ```
 
 **全量测试结果**：
@@ -383,12 +383,12 @@ $ pytest -q
 
 | 项 | 数量 |
 | --- | ---: |
-| 专项测试 | **41** |
-| 全量测试 | **1040** |
+| 专项测试 | **52** |
+| 全量测试 | **1051** |
 | 失败 | 0 |
 | 跳过 | 0 |
 
-1040 = 3B-4.1.1 的 999 + 本轮 41。
+1051 = 3B-4.1.1 的 999 + 3B-4.2 的 41 + 主从修正 11。
 
 ### 8.1 覆盖矩阵
 
@@ -467,3 +467,117 @@ assert effective_from is None and fetched_at is not None
 > **41 个场外结构清盘事件（全 B 级）、90 条费率规则（全 C 级）已正式入库，
 > 幂等、完整性、外键全部通过，支付宝状态与 12 条缺失清盘日期都老老实实留在 NULL / unknown。
 > 没有为了填满数据库制造任何一条数据。**
+
+---
+
+## 12. 验收修正：多份额基金主从标记（is_primary）
+
+### 12.1 发现的 Bug
+
+`app/fund/ingest_3b4_2.py` 的 `_ensure_share()` 在为同一基金本体创建**非主份额**时，
+也用了 `is_primary=1`。结果：**同一基金本体出现多个主份额**。
+
+| 项 | 修复前 |
+| --- | ---: |
+| 涉及基金本体 | 41 |
+| 份额记录 | 63 |
+| 主份额（`is_primary=1`） | **63** |
+| 非主份额 | **0** |
+| 恰好一个主份额的本体 | **21 / 41** |
+| 违规本体 | **20** |
+
+违规本体（主份额数 > 1）共 20 个，最多一个有 3 个主份额。
+
+另一个问题：`_ensure_share()` 遇到已存在的份额代码时直接返回，
+**没有校验该份额是否属于传入的 `fund_id`**——可能静默返回错误关联。
+
+### 12.2 函数修复
+
+| 项 | 修复前 | 修复后 |
+| --- | --- | --- |
+| 非主份额 `is_primary` | **1**（错） | **0** |
+| 已存在份额归属校验 | 无 | **校验 `fund_id`，不一致抛 `ShareOwnershipError`** |
+| 冲突处理 | 静默返回 | **抛错 + 记录到 `stat.conflicts`** |
+| 主份额创建者 | 两处都可建 | **只由 `_ensure_master()` 建，唯一 `is_primary=1`** |
+
+新增异常类 `ShareOwnershipError`，携带 `code` / `expected_fund_id` / `actual_fund_id`。
+
+`_ensure_share()` 新签名：`_ensure_share(conn, fund_id, code, name, now, *, is_primary=0)`
+
+### 12.3 正式数据库修复
+
+修复脚本：`scripts/fix_3b4_2_primary_flags.py`
+
+范围严格受限：
+
+- 只处理 3B-4.2 那 **41 个**清盘事件涉及的基金本体；
+- 用校准 JSON 的 `codes_in_event` + 原始 `_pick_primary_code()` 规则重算主代码；
+- 份额代码若已属于其他本体 → 记录冲突、跳过、不覆盖；
+- 不碰 3B-4.0 的 12 只存续基金。
+
+**修复前后对比**：
+
+| 项 | 修复前 | 修复后 |
+| --- | ---: | ---: |
+| 检查的基金本体 | 41 | 41 |
+| 份额记录 | 63 | 63 |
+| 主份额 | 63 | **41** |
+| 非主份额 | 0 | **22** |
+| 恰好一个主份额的本体 | 21 | **41** |
+| 违规本体 | 20 | **0** |
+| 实际变更行数 | — | **22** |
+
+变更的 22 个份额代码（全部由 1 改为 0）：
+
+`000023`、`000027`、`000052`、`000088`、`000092`、`000093`、`010002`、`010007` 等。
+
+### 12.4 修复后审计
+
+| 检查项 | 结果 |
+| --- | --- |
+| 每个本体恰好一个主份额 | ✅ True |
+| 主份额代码与 `_pick_primary_code()` 一致 | ✅ True |
+| 其余份额全部 `is_primary=0` | ✅ 22 条 |
+| 跨本体错误关联 | ✅ 0 |
+| 冲突数量 | **0** |
+| 3B-4.0 的 12 只存续基金主从 | ✅ 未变（`seeded_funds_unchanged=True`） |
+| 41 个清盘事件数量 | ✅ 41（不变） |
+| 90 条费率规则 | ✅ 90（不变） |
+| `integrity_check` | ✅ ok |
+| `foreign_key_check` 违规 | ✅ 0 |
+
+### 12.5 幂等
+
+| 执行 | 变更行数 | 幂等剩余待改 |
+| --- | ---: | ---: |
+| 第 1 次（修复） | **22** | 0 |
+| 第 2 次（验证） | **0** | 0 |
+
+备份：`D:\ymy\jj-agent\data\backups\fund_agent_before_primary_fix_20261120_105913.db`（283,930,624 字节）
+
+### 12.6 新增测试
+
+`tests/test_ingest_3b4_2.py` 新增 **11 项**（41 → 52）：
+
+| # | 要求 | 测试 |
+| ---: | --- | --- |
+| 1 | 单代码本体一个主份额 | `test_single_code_fund_has_one_primary` |
+| 2 | 双代码本体恰好一个主份额 | `test_two_code_fund_has_one_primary` |
+| 3 | 三代码本体恰好一个主份额 | `test_three_code_fund_has_one_primary` |
+| 4 | 主代码与 `_pick_primary_code()` 一致 | `test_primary_matches_pick_rule` |
+| 5 | 其他份额全部 `is_primary=0` | `test_all_other_shares_non_primary` |
+| 6 | 重复导入后主从不变 | `test_primary_unchanged_after_reimport` |
+| 7 | 同本体已存在份额可复用 | `test_existing_share_same_fund_reused` |
+| 8 | 属于他本体的份额报错 | `test_share_owned_by_other_fund_raises`、`test_conflict_does_not_reassign` |
+| 9 | 修复脚本幂等 | `test_primary_fix_idempotent` |
+| 10 | 不改变其他基金本体 | `test_primary_fix_only_touches_41_funds` |
+
+---
+
+## 13. 一句话（修正后补充）
+
+> **主从关系修复前 41 个本体里只有 21 个合规、共 63 个主份额；
+> 修复后 41 个全部恰好一个主份额（41 主 + 22 非主），
+> 变更 22 行，二次执行 0 变更，3B-4.0 的 12 只存续基金主从完全未动。**
+
+---
