@@ -1,0 +1,581 @@
+{
+ "phase": "3B-4.3",
+ "baseline_head": "93c920cc66196610838e3dad21d9b9d45216dbe6",
+ "generated_at": "2026-11-20T11:15:59",
+ "scope": "只读审计：不改正式库、不改已验收模块、不重新采集数据、不开发策略、不做回测。",
+ "evidence_levels": {
+  "A": "官方原始来源，可追溯原始公告或正式文件",
+  "B": "可信第三方转载或整理，但未逐条回源官方原文",
+  "C": "第三方数据平台信息，尚未与合同或官方数据逐条核验",
+  "D": "推断、代理或人工假设",
+  "unknown": "无法确认"
+ },
+ "lifecycle": {
+  "total_events": 41,
+  "distinct_funds": 41,
+  "by_product_structure": {
+   "ordinary_open_ended": 27,
+   "etf_linked": 3,
+   "lof": 11
+  },
+  "by_evidence_level": {
+   "B": 41
+  },
+  "event_date_null": 12,
+  "event_date_range": [
+   "2015-07-30",
+   "2026-01-20"
+  ],
+  "announcement_date_range": [
+   "2015-11-06",
+   "2026-07-31"
+  ],
+  "announcement_years": [
+   "2015",
+   "2017",
+   "2018",
+   "2019",
+   "2020",
+   "2021",
+   "2022",
+   "2023",
+   "2024",
+   "2025",
+   "2026"
+  ],
+  "duplicate_events": [],
+  "code_conflicts": [],
+  "all_have_url": true,
+  "all_have_ann_id": true,
+  "master_active": 0,
+  "master_terminated": 41,
+  "master_lifecycle_status_distribution": {
+   "terminated": 41,
+   "unknown": 9
+  },
+  "master_status_note": "存续的 12 只样本基金 lifecycle_status 为 'unknown' 而非 'active'——因为本项目从未取得「该基金当前仍在运作」的正式证据。这是**如实记录**，不是缺失，也不应为了好看改成 active。",
+  "coverage_quantifiable": false,
+  "survivorship_bias_status": "not_eliminated"
+ },
+ "nav": {
+  "per_fund": [
+   {
+    "code": "000015",
+    "nav_kind": "net_value",
+    "is_primary": 1,
+    "rows": 3310,
+    "date_min": "2013-03-08",
+    "date_max": "2026-11-18",
+    "duplicate_dates": 0,
+    "null_unit_nav": 0,
+    "null_acc_nav": 0,
+    "null_per_10k": 3310,
+    "nonpositive_unit_nav": 0,
+    "max_gap_days": 11,
+    "max_gap_at": [
+     "2020-01-23",
+     "2020-02-03"
+    ],
+    "gaps_over_30d": [],
+    "gaps_over_30d_count": 0,
+    "max_gap_note": "最大间隔通常是春节/国庆长假（如 2020-01-23→02-03、2006-01-25→02-06、2023-09-28→10-09），属正常休市，**不是数据缺失**——但也不能据此断言净值一定已在该日公布。"
+   },
+   {
+    "code": "000016",
+    "nav_kind": "net_value",
+    "is_primary": 0,
+    "rows": 3310,
+    "date_min": "2013-03-08",
+    "date_max": "2026-11-18",
+    "duplicate_dates": 0,
+    "null_unit_nav": 0,
+    "null_acc_nav": 0,
+    "null_per_10k": 3310,
+    "nonpositive_unit_nav": 0,
+    "max_gap_days": 11,
+    "max_gap_at": [
+     "2020-01-23",
+     "2020-02-03"
+    ],
+    "gaps_over_30d": [],
+    "gaps_over_30d_count": 0,
+    "max_gap_note": "最大间隔通常是春节/国庆长假（如 2020-01-23→02-03、2006-01-25→02-06、2023-09-28→10-09），属正常休市，**不是数据缺失**——但也不能据此断言净值一定已在该日公布。"
+   },
+   {
+    "code": "000051",
+    "nav_kind": "net_value",
+    "is_primary": 1,
+    "rows": 4220,
+    "date_min": "2009-07-10",
+    "date_max": "2026-11-18",
+    "duplicate_dates": 0,
+    "null_unit_nav": 0,
+    "null_acc_nav": 0,
+    "null_per_10k": 4220,
+    "nonpositive_unit_nav": 0,
+    "max_gap_days": 11,
+    "max_gap_at": [
+     "2020-01-23",
+     "2020-02-03"
+    ],
+    "gaps_over_30d": [],
+    "gaps_over_30d_count": 0,
+    "max_gap_note": "最大间隔通常是春节/国庆长假（如 2020-01-23→02-03、2006-01-25→02-06、2023-09-28→10-09），属正常休市，**不是数据缺失**——但也不能据此断言净值一定已在该日公布。"
+   },
+   {
+    "code": "000198",
+    "nav_kind": "money_yield",
+    "is_primary": 1,
+    "rows": 4919,
+    "date_min": "2013-05-30",
+    "date_max": "2026-11-18",
+    "duplicate_dates": 0,
+    "null_unit_nav": 0,
+    "null_acc_nav": 4919,
+    "null_per_10k": 0,
+    "nonpositive_unit_nav": 0,
+    "max_gap_days": 3,
+    "max_gap_at": [
+     "2013-05-30",
+     "2013-06-02"
+    ],
+    "gaps_over_30d": [],
+    "gaps_over_30d_count": 0,
+    "max_gap_note": "最大间隔通常是春节/国庆长假（如 2020-01-23→02-03、2006-01-25→02-06、2023-09-28→10-09），属正常休市，**不是数据缺失**——但也不能据此断言净值一定已在该日公布。"
+   },
+   {
+    "code": "000478",
+    "nav_kind": "net_value",
+    "is_primary": 1,
+    "rows": 3096,
+    "date_min": "2014-01-27",
+    "date_max": "2026-11-18",
+    "duplicate_dates": 0,
+    "null_unit_nav": 0,
+    "null_acc_nav": 0,
+    "null_per_10k": 3096,
+    "nonpositive_unit_nav": 0,
+    "max_gap_days": 11,
+    "max_gap_at": [
+     "2020-01-23",
+     "2020-02-03"
+    ],
+    "gaps_over_30d": [],
+    "gaps_over_30d_count": 0,
+    "max_gap_note": "最大间隔通常是春节/国庆长假（如 2020-01-23→02-03、2006-01-25→02-06、2023-09-28→10-09），属正常休市，**不是数据缺失**——但也不能据此断言净值一定已在该日公布。"
+   },
+   {
+    "code": "007300",
+    "nav_kind": "net_value",
+    "is_primary": 1,
+    "rows": 1799,
+    "date_min": "2019-06-26",
+    "date_max": "2026-11-18",
+    "duplicate_dates": 0,
+    "null_unit_nav": 0,
+    "null_acc_nav": 0,
+    "null_per_10k": 1799,
+    "nonpositive_unit_nav": 0,
+    "max_gap_days": 11,
+    "max_gap_at": [
+     "2020-01-23",
+     "2020-02-03"
+    ],
+    "gaps_over_30d": [],
+    "gaps_over_30d_count": 0,
+    "max_gap_note": "最大间隔通常是春节/国庆长假（如 2020-01-23→02-03、2006-01-25→02-06、2023-09-28→10-09），属正常休市，**不是数据缺失**——但也不能据此断言净值一定已在该日公布。"
+   },
+   {
+    "code": "007301",
+    "nav_kind": "net_value",
+    "is_primary": 0,
+    "rows": 1799,
+    "date_min": "2019-06-26",
+    "date_max": "2026-11-18",
+    "duplicate_dates": 0,
+    "null_unit_nav": 0,
+    "null_acc_nav": 0,
+    "null_per_10k": 1799,
+    "nonpositive_unit_nav": 0,
+    "max_gap_days": 11,
+    "max_gap_at": [
+     "2020-01-23",
+     "2020-02-03"
+    ],
+    "gaps_over_30d": [],
+    "gaps_over_30d_count": 0,
+    "max_gap_note": "最大间隔通常是春节/国庆长假（如 2020-01-23→02-03、2006-01-25→02-06、2023-09-28→10-09），属正常休市，**不是数据缺失**——但也不能据此断言净值一定已在该日公布。"
+   },
+   {
+    "code": "012414",
+    "nav_kind": "net_value",
+    "is_primary": 0,
+    "rows": 1338,
+    "date_min": "2021-05-18",
+    "date_max": "2026-11-18",
+    "duplicate_dates": 0,
+    "null_unit_nav": 0,
+    "null_acc_nav": 0,
+    "null_per_10k": 1338,
+    "nonpositive_unit_nav": 0,
+    "max_gap_days": 11,
+    "max_gap_at": [
+     "2023-09-28",
+     "2023-10-09"
+    ],
+    "gaps_over_30d": [],
+    "gaps_over_30d_count": 0,
+    "max_gap_note": "最大间隔通常是春节/国庆长假（如 2020-01-23→02-03、2006-01-25→02-06、2023-09-28→10-09），属正常休市，**不是数据缺失**——但也不能据此断言净值一定已在该日公布。"
+   },
+   {
+    "code": "110020",
+    "nav_kind": "net_value",
+    "is_primary": 1,
+    "rows": 4186,
+    "date_min": "2009-08-26",
+    "date_max": "2026-11-18",
+    "duplicate_dates": 0,
+    "null_unit_nav": 0,
+    "null_acc_nav": 0,
+    "null_per_10k": 4186,
+    "nonpositive_unit_nav": 0,
+    "max_gap_days": 11,
+    "max_gap_at": [
+     "2020-01-23",
+     "2020-02-03"
+    ],
+    "gaps_over_30d": [],
+    "gaps_over_30d_count": 0,
+    "max_gap_note": "最大间隔通常是春节/国庆长假（如 2020-01-23→02-03、2006-01-25→02-06、2023-09-28→10-09），属正常休市，**不是数据缺失**——但也不能据此断言净值一定已在该日公布。"
+   },
+   {
+    "code": "110022",
+    "nav_kind": "net_value",
+    "is_primary": 1,
+    "rows": 3927,
+    "date_min": "2010-08-20",
+    "date_max": "2026-11-18",
+    "duplicate_dates": 0,
+    "null_unit_nav": 0,
+    "null_acc_nav": 0,
+    "null_per_10k": 3927,
+    "nonpositive_unit_nav": 0,
+    "max_gap_days": 11,
+    "max_gap_at": [
+     "2020-01-23",
+     "2020-02-03"
+    ],
+    "gaps_over_30d": [],
+    "gaps_over_30d_count": 0,
+    "max_gap_note": "最大间隔通常是春节/国庆长假（如 2020-01-23→02-03、2006-01-25→02-06、2023-09-28→10-09），属正常休市，**不是数据缺失**——但也不能据此断言净值一定已在该日公布。"
+   },
+   {
+    "code": "161005",
+    "nav_kind": "net_value",
+    "is_primary": 1,
+    "rows": 5124,
+    "date_min": "2005-11-16",
+    "date_max": "2026-11-18",
+    "duplicate_dates": 0,
+    "null_unit_nav": 0,
+    "null_acc_nav": 0,
+    "null_per_10k": 5124,
+    "nonpositive_unit_nav": 0,
+    "max_gap_days": 12,
+    "max_gap_at": [
+     "2006-01-25",
+     "2006-02-06"
+    ],
+    "gaps_over_30d": [],
+    "gaps_over_30d_count": 0,
+    "max_gap_note": "最大间隔通常是春节/国庆长假（如 2020-01-23→02-03、2006-01-25→02-06、2023-09-28→10-09），属正常休市，**不是数据缺失**——但也不能据此断言净值一定已在该日公布。"
+   },
+   {
+    "code": "161725",
+    "nav_kind": "net_value",
+    "is_primary": 1,
+    "rows": 2794,
+    "date_min": "2015-05-27",
+    "date_max": "2026-11-18",
+    "duplicate_dates": 0,
+    "null_unit_nav": 0,
+    "null_acc_nav": 0,
+    "null_per_10k": 2794,
+    "nonpositive_unit_nav": 0,
+    "max_gap_days": 11,
+    "max_gap_at": [
+     "2020-01-23",
+     "2020-02-03"
+    ],
+    "gaps_over_30d": [],
+    "gaps_over_30d_count": 0,
+    "max_gap_note": "最大间隔通常是春节/国庆长假（如 2020-01-23→02-03、2006-01-25→02-06、2023-09-28→10-09），属正常休市，**不是数据缺失**——但也不能据此断言净值一定已在该日公布。"
+   }
+  ],
+  "fund_count": 12,
+  "nav_kind_distribution": {
+   "net_value": 11,
+   "money_yield": 1
+  },
+  "net_value_rows": 34903,
+  "money_yield_rows": 4919,
+  "mixed_kind_net_value": 0,
+  "mixed_kind_money_yield": 0,
+  "duplicate_date_total": 0,
+  "null_unit_nav_total": 0,
+  "nonpositive_unit_nav_total": 0,
+  "calendar_role": "proxy_not_fund_calendar",
+  "calendar_statement": "A 股交易日历只是代理，不代表每只基金真实净值公布日历。因此**无法**判定某个 A 股交易日缺净值就是数据缺失，也**无法**判定周末无净值是异常。",
+  "continuity_verification_level": "cannot_verify",
+  "continuity_note": "没有可靠的基金实际净值公布日历，净值连续性一律标记 verification_level=cannot_verify，不产出「连续/不连续」结论。"
+ },
+ "dividend": {
+  "total": 44,
+  "by_code": [
+   {
+    "code": "000015",
+    "rows": 13,
+    "null_record_date": 0,
+    "null_ex_date": 0,
+    "null_pay_date": 0,
+    "null_per_10_raw": 0
+   },
+   {
+    "code": "000016",
+    "rows": 9,
+    "null_record_date": 0,
+    "null_ex_date": 0,
+    "null_pay_date": 0,
+    "null_per_10_raw": 0
+   },
+   {
+    "code": "012414",
+    "rows": 3,
+    "null_record_date": 0,
+    "null_ex_date": 0,
+    "null_pay_date": 0,
+    "null_per_10_raw": 0
+   },
+   {
+    "code": "161005",
+    "rows": 16,
+    "null_record_date": 0,
+    "null_ex_date": 0,
+    "null_pay_date": 0,
+    "null_per_10_raw": 0
+   },
+   {
+    "code": "161725",
+    "rows": 3,
+    "null_record_date": 0,
+    "null_ex_date": 0,
+    "null_pay_date": 0,
+    "null_per_10_raw": 0
+   }
+  ],
+  "funds_with_dividends": 5,
+  "duplicate_groups": 0,
+  "per10_conversion_mismatch": 0,
+  "per10_conversion_checked": 44,
+  "sources": {
+   "akshare.fund_open_fund_info_em": 44
+  },
+  "completeness_statement": "分红接口单次返回不完整（3B-3.1 已实测同一基金不同请求结果不同）。当前 44 条**不能**当成完整历史分红数量。",
+  "usable_for_return_adjustment": false,
+  "usable_reason": "未验证除息/到账口径，不能用于修正历史收益"
+ },
+ "fee": {
+  "total": 90,
+  "by_fee_type": {
+   "custody": 12,
+   "management": 12,
+   "purchase": 20,
+   "redemption": 34,
+   "sales_service": 12
+  },
+  "by_evidence_level": {
+   "C": 90
+  },
+  "rate_original_null": 1,
+  "rate_original_present": 89,
+  "effective_from_all_null": true,
+  "effective_to_all_null": true,
+  "holding_days_basis_all_null": true,
+  "with_platform_rate": 20,
+  "alipay_platform_rows": 0,
+  "inferred_lower_bound": 19,
+  "bounds_known": 54,
+  "bounds_unknown": 36,
+  "usable_for_historical_cost": false,
+  "usable_conditions": [
+   "只能用于**当前**费率情景下的成本估算，不能用于历史区间",
+   "必须标注证据等级 C（天天基金 F10，非合同原文）",
+   "平台优惠费率仅代表天天基金，不代表支付宝",
+   "持有期按自然日还是交易日未确认，计算时必须显式标注假设",
+   "rate_original 为 NULL 的必须跳过，不得填 0"
+  ],
+  "forbidden_uses": [
+   "当作支付宝实际费率",
+   "当作历史生效费率",
+   "把 platform_rate 当合同费率",
+   "对 NULL 费率填 0 或行业平均"
+  ]
+ },
+ "manager_aum": {
+  "manager_records": 8,
+  "funds_with_manager": 8,
+  "manager_start_date_null": 8,
+  "manager_end_date_null": 8,
+  "aum_records": 8,
+  "aum_distinct_dates": [
+   "2026-11-19"
+  ],
+  "aum_snapshot_count": 1,
+  "aum_multi_period": false,
+  "backfill_forbidden": true,
+  "backfill_statement": "经理任职起止日期全部为 NULL；规模只有单一报告日快照。**禁止**用当前基金经理回填历史区间，**禁止**用当前规模代表历史规模。",
+  "usable_for_backtest": false,
+  "usable_reason": "无时间序列，只有当前快照，回填即引入未来信息"
+ },
+ "share_relation": {
+  "fund_entities": 50,
+  "share_records": 75,
+  "multi_primary_funds": [],
+  "no_primary_funds": [],
+  "duplicate_share_codes": 0,
+  "terminated_entities": 41,
+  "terminated_with_exactly_one_primary": 41,
+  "money_fund_codes": [
+   "000198"
+  ],
+  "money_isolated": true
+ },
+ "alipay": {
+  "alipay_status": "unknown",
+  "distribution": {
+   "unknown": 12
+  },
+  "all_unknown": true,
+  "statement": "支付宝可购买状态全部 unknown。天天基金开放申购状态不代表支付宝，天天基金优惠费率不能推断支付宝实际费率，不得逆向 APP 或伪造购买状态。",
+  "trading_rule_categories": {
+   "industry_convention": "行业通则（如 T+1 确认），非强制，各基金可不同",
+   "fund_contract": "基金合同规定（申赎开放日、巨额赎回等）",
+   "platform_execution": "销售平台实际执行规则（如 15:00 截止）",
+   "unverified": "尚未核实的规则"
+  },
+  "unverified_rules": [
+   "15:00 申购赎回截止时间（行业惯例，非所有平台统一）",
+   "T+1 份额确认（不同基金/平台可能不同）",
+   "赎回到账时间（货币基金 T+0/T+1，股基 T+1~T+7）",
+   "限购金额与单日额度"
+  ],
+  "cannot_apply_uniformly": true
+ },
+ "usage_matrix": {
+  "tier_1_direct_use": [
+   {
+    "data": "历史单位净值（net_value）",
+    "evidence": "C（akshare.fund_open_fund_info_em）",
+    "condition": "只看单只基金自身时间序列，不做跨基金日期对齐",
+    "known_limit": "共 34903 行，0 处重复日期，0 处空值"
+   },
+   {
+    "data": "清盘事件清单（41 条）",
+    "evidence": "B",
+    "condition": "只能用于「已知清盘」的剔除，不能声称覆盖完整",
+    "known_limit": "证据 B，12 条缺事件日期，覆盖率不可量化"
+   }
+  ],
+  "tier_2_conditional": [
+   {
+    "data": "累计净值（acc_nav）",
+    "evidence": "C",
+    "condition": "不得与单位净值混用；收益计算必须明确用哪一个",
+    "blocker": "需确认分红再投资口径"
+   },
+   {
+    "data": "申购费 / 赎回费阶梯",
+    "evidence": "C",
+    "condition": "只能做当前费率情景估算，必须标 C 级",
+    "blocker": "effective_from 全 NULL，历史费率不可用；持有期自然日/交易日未确认"
+   },
+   {
+    "data": "管理费 / 托管费 / 销售服务费",
+    "evidence": "C",
+    "condition": "年化费率，可从净值中已扣除部分不重复计",
+    "blocker": "12 条销售服务费中有 NULL（页面 ---），不得填 0"
+   },
+   {
+    "data": "分红记录",
+    "evidence": "C",
+    "condition": "只能作为辅助核对，不得用于修正历史收益",
+    "blocker": "44 条不完整（接口单次返回不全）"
+   }
+  ],
+  "tier_3_auxiliary_only": [
+   {
+    "data": "基金经理历史",
+    "evidence": "C",
+    "condition": "只能了解「谁在管」，不能作为时点特征",
+    "blocker": "8 条起止日期全 NULL，回填即未来信息"
+   },
+   {
+    "data": "基金规模历史",
+    "evidence": "C",
+    "condition": "只有单一快照，不能当时间序列",
+    "blocker": "仅 1 个报告日"
+   }
+  ],
+  "tier_4_forbidden": [
+   {
+    "data": "支付宝可购买状态",
+    "reason": "全部 unknown，无公开合法数据源"
+   },
+   {
+    "data": "支付宝实际费率",
+    "reason": "无法获取，天天基金费率不能冒充"
+   },
+   {
+    "data": "历史生效费率",
+    "reason": "effective_from 全 NULL，当前费率不是历史费率"
+   },
+   {
+    "data": "净值连续性结论",
+    "reason": "无基金净值公布日历，只能 cannot_verify"
+   },
+   {
+    "data": "完整历史清盘名录",
+    "reason": "41 条只是已知清单，覆盖率不可量化"
+   }
+  ]
+ },
+ "conclusions": {
+  "q1_data_credibility": "净值 C（第三方接口，自身时间序列可用，跨基金对齐不可用）；清盘 B（东财转载，未回源官方）；费率 C（F10 非合同）；分红 C 且不完整；经理/规模 C 但只有当前快照",
+  "q2_missing_and_bias": [
+   "净值 0 处空值、0 处重复日期",
+   "清盘 12 条缺事件日期",
+   "费率 1 条 rate 为 NULL、19 条下界为推断",
+   "经理 8 条起止日期 NULL",
+   "规模只有 1 个报告日",
+   "分红 44 条且接口返回不完整"
+  ],
+  "q3_survivorship_bias": "存在。41 条已知清盘 + 12 只存续，清盘覆盖率不可量化，**未消除**幸存者偏差",
+  "q4_sufficient_for_backtest": "不足以支撑正式历史回测。净值可用但只能单序列；费率无历史生效时间；清盘名录不完整；经理与规模无时间序列",
+  "q5_what_can_be_used": "见 usage_matrix 四档分层",
+  "q6_must_resolve_before_strategy": [
+   "费率历史生效时间（effective_from）",
+   "净值公布日历或明确接受 cannot_verify",
+   "清盘名录覆盖率的量化方法",
+   "分红完整性验证",
+   "支付宝可购买状态的合法获取途径或明确放弃"
+  ]
+ },
+ "stage_gate": {
+  "ready_for_next_stage": false,
+  "reason": "数据基础设施可支撑研究性分析，但不足以支撑正式回测成本模拟",
+  "allowed_next": "3B-4.4 数据缺口补强 或 研究性分析（非回测）",
+  "blocked": [
+   "3B-5 场外基金回测"
+  ]
+ }
+}
