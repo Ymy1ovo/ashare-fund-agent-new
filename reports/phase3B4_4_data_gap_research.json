@@ -1,0 +1,555 @@
+{
+ "phase": "3B-4.4",
+ "baseline_head": "2294b4aa8f79dcb921c5fa00b1d2e12548477072",
+ "generated_at": "2026-11-20T13:48:58",
+ "scope": "只做有边界的数据缺口补强：补有官方公告证据的费率生效日、经理任职日期、规模报告期序列；分红做跨来源核验并记录差异；清盘名录只提高可追溯性不追求覆盖率。不做策略、不做回测。",
+ "evidence_levels": {
+  "A": "官方原始来源，可追溯原始公告或正式文件",
+  "A-": "基金管理人正式公告原文，经第三方公告库转发；公告 ID 可回源，但未直接访问管理人官网原件",
+  "B": "可信第三方转载或整理，但未逐条回源官方原文",
+  "C": "第三方数据平台信息，尚未与合同或官方数据逐条核验",
+  "D": "推断、代理或人工假设",
+  "unknown": "无法确认"
+ },
+ "fee": {
+  "total_rules": 90,
+  "with_effective_from": 11,
+  "without_effective_from": 79,
+  "coverage_ratio": 0.1222,
+  "by_evidence_level": {
+   "A-": 11,
+   "C": 79
+  },
+  "annual_rules_total": 36,
+  "annual_rules_with_effective_from": 11,
+  "annual_rule_coverage": 0.3056,
+  "sample_funds": 12,
+  "sample_funds_with_effective_from": 8,
+  "per_fund": [
+   {
+    "code": "000015",
+    "rules": 9,
+    "with_effective_from": 1,
+    "effective_items": [
+     {
+      "fee_type": "custody",
+      "effective_from": "2024-09-12",
+      "announcement_id": "AN202409091639788444"
+     }
+    ]
+   },
+   {
+    "code": "000016",
+    "rules": 6,
+    "with_effective_from": 1,
+    "effective_items": [
+     {
+      "fee_type": "custody",
+      "effective_from": "2024-09-12",
+      "announcement_id": "AN202409091639788444"
+     }
+    ]
+   },
+   {
+    "code": "000051",
+    "rules": 9,
+    "with_effective_from": 2,
+    "effective_items": [
+     {
+      "fee_type": "custody",
+      "effective_from": "2024-11-22",
+      "announcement_id": "AN202411191640969182"
+     },
+     {
+      "fee_type": "management",
+      "effective_from": "2024-11-22",
+      "announcement_id": "AN202411191640969182"
+     }
+    ]
+   },
+   {
+    "code": "000198",
+    "rules": 3,
+    "with_effective_from": 1,
+    "effective_items": [
+     {
+      "fee_type": "custody",
+      "effective_from": "2025-09-23",
+      "announcement_id": "AN202509231748927229"
+     }
+    ]
+   },
+   {
+    "code": "000478",
+    "rules": 9,
+    "with_effective_from": 0,
+    "effective_items": []
+   },
+   {
+    "code": "007300",
+    "rules": 8,
+    "with_effective_from": 0,
+    "effective_items": []
+   },
+   {
+    "code": "007301",
+    "rules": 5,
+    "with_effective_from": 0,
+    "effective_items": []
+   },
+   {
+    "code": "012414",
+    "rules": 5,
+    "with_effective_from": 1,
+    "effective_items": [
+     {
+      "fee_type": "custody",
+      "effective_from": "2023-07-10",
+      "announcement_id": "AN202307081592119207"
+     }
+    ]
+   },
+   {
+    "code": "110020",
+    "rules": 10,
+    "with_effective_from": 0,
+    "effective_items": []
+   },
+   {
+    "code": "110022",
+    "rules": 10,
+    "with_effective_from": 2,
+    "effective_items": [
+     {
+      "fee_type": "custody",
+      "effective_from": "2023-07-10",
+      "announcement_id": "AN202307081592118526"
+     },
+     {
+      "fee_type": "management",
+      "effective_from": "2023-07-10",
+      "announcement_id": "AN202307081592118526"
+     }
+    ]
+   },
+   {
+    "code": "161005",
+    "rules": 7,
+    "with_effective_from": 2,
+    "effective_items": [
+     {
+      "fee_type": "custody",
+      "effective_from": "2023-07-10",
+      "announcement_id": "AN202307081592116736"
+     },
+     {
+      "fee_type": "management",
+      "effective_from": "2023-07-10",
+      "announcement_id": "AN202307081592116736"
+     }
+    ]
+   },
+   {
+    "code": "161725",
+    "rules": 9,
+    "with_effective_from": 1,
+    "effective_items": [
+     {
+      "fee_type": "custody",
+      "effective_from": "2023-07-10",
+      "announcement_id": "AN202307081592119207"
+     }
+    ]
+   }
+  ],
+  "backfilled_from_current_rate": 0,
+  "note": "只补年化费率（管理费/托管费/销售服务费）的生效日期，因为只有这类费率有官方『调低费率并修订基金合同』公告明确记载生效日。申购费、赎回费是合同固定档位，没有『某天起生效』的官方公告，继续保留 effective_from=NULL，不倒填。",
+  "evidence_level_upgraded": "C → A-（有官方公告原文支持生效日的 11 条）",
+  "still_c_level": "79 条（含全部申购/赎回阶梯与无公告的年化费率）"
+ },
+ "dividend": {
+  "total_records": 44,
+  "crosschecked_funds": 5,
+  "crosscheck_scope": "12 只样本中实际有分红记录的 5 只（000015/000016/012414/161005/161725）",
+  "per_code": [
+   {
+    "code": "000015",
+    "db_count": 13,
+    "announcement_count": 9,
+    "matched": 10,
+    "db_unmatched": 3,
+    "announcement_missing_in_db": []
+   },
+   {
+    "code": "000016",
+    "db_count": 9,
+    "announcement_count": 9,
+    "matched": 9,
+    "db_unmatched": 0,
+    "announcement_missing_in_db": []
+   },
+   {
+    "code": "012414",
+    "db_count": 3,
+    "announcement_count": 3,
+    "matched": 3,
+    "db_unmatched": 0,
+    "announcement_missing_in_db": []
+   },
+   {
+    "code": "161005",
+    "db_count": 16,
+    "announcement_count": 14,
+    "matched": 10,
+    "db_unmatched": 6,
+    "announcement_missing_in_db": [
+     "2006-10-18",
+     "2007-01-08",
+     "2008-03-06",
+     "2026-03-19"
+    ]
+   },
+   {
+    "code": "161725",
+    "db_count": 3,
+    "announcement_count": 3,
+    "matched": 3,
+    "db_unmatched": 0,
+    "announcement_missing_in_db": []
+   }
+  ],
+  "matched_total": 35,
+  "db_unmatched_total": 9,
+  "announcement_missing_in_db": 4,
+  "new_records_added": 0,
+  "date_conflicts": 0,
+  "amount_conflicts": 0,
+  "unverifiable": 9,
+  "new_records_reason": "个别公告日期与 DB 除息日无法在 45 天窗口内配对（如 161005 2006-10-18 公告 / 2026-03-19 公告，000015 2024-11 至 2026-11 的 4 条）。差异原因可能是：公告标题口径不同（分红 vs 收益分配）、DB 记录的 ex_date 与公告披露的权益登记日不同、或公告库本身不全。在无法判断哪一方正确之前，**不补入、不删改**，只记录差异。",
+  "completeness_verdict": "不完整且不可量化（公告库与净值接口覆盖区间不同）",
+  "usable_for_return_adjustment": false,
+  "usable_reason": "未通过完整性验证，禁止用于修正历史收益"
+ },
+ "manager": {
+  "total_records": 21,
+  "with_start_date": 12,
+  "with_end_date": 4,
+  "snapshot_only_records": 9,
+  "by_evidence_level": {
+   "(null)": 8,
+   "A-": 13
+  },
+  "non_terminated_funds": 9,
+  "funds_with_dated_history": 7,
+  "funds_still_snapshot_only": 2,
+  "backfill_violations": 0,
+  "usable_as_point_in_time": false,
+  "usable_reason": "有了任职起止日期，但覆盖不完整：部分经理仍是快照（无起始日），且没有『某时点在任经理名单』的完整序列。不能用当前经理名单回填历史，也不能简单用起始日当唯一时点特征。"
+ },
+ "aum": {
+  "total_records": 683,
+  "records_with_evidence": 675,
+  "snapshot_only_records": 8,
+  "distinct_report_dates": 138,
+  "share_classes_with_series": 12,
+  "per_share": [
+   {
+    "code": "000015",
+    "periods": 62,
+    "date_min": "2013-03-15",
+    "date_max": "2026-09-30"
+   },
+   {
+    "code": "000016",
+    "periods": 62,
+    "date_min": "2013-03-15",
+    "date_max": "2026-09-30"
+   },
+   {
+    "code": "000051",
+    "periods": 69,
+    "date_min": "2009-09-30",
+    "date_max": "2026-09-30"
+   },
+   {
+    "code": "000198",
+    "periods": 58,
+    "date_min": "2013-05-30",
+    "date_max": "2026-09-30"
+   },
+   {
+    "code": "000478",
+    "periods": 58,
+    "date_min": "2014-01-30",
+    "date_max": "2026-09-30"
+   },
+   {
+    "code": "007300",
+    "periods": 31,
+    "date_min": "2019-06-26",
+    "date_max": "2026-09-30"
+   },
+   {
+    "code": "007301",
+    "periods": 31,
+    "date_min": "2019-06-26",
+    "date_max": "2026-09-30"
+   },
+   {
+    "code": "012414",
+    "periods": 22,
+    "date_min": "2021-06-30",
+    "date_max": "2026-09-30"
+   },
+   {
+    "code": "110020",
+    "periods": 70,
+    "date_min": "2009-12-31",
+    "date_max": "2026-09-30"
+   },
+   {
+    "code": "110022",
+    "periods": 100,
+    "date_min": "2010-08-23",
+    "date_max": "2026-09-30"
+   },
+   {
+    "code": "161005",
+    "periods": 84,
+    "date_min": "2005-12-31",
+    "date_max": "2026-09-30"
+   },
+   {
+    "code": "161725",
+    "periods": 28,
+    "date_min": "2015-12-31",
+    "date_max": "2026-09-30"
+   }
+  ],
+  "report_date_is_period_end": true,
+  "publication_date_recorded": false,
+  "publication_date_note": "本轮**只记录报告期末日期**，未逐份下载定期报告确认公告发布日期；disclosed_at 保持 NULL。",
+  "by_evidence_level": {
+   "C": 675,
+   "(null)": 8
+  },
+  "usable_as_point_in_time": true,
+  "usable_reason": "规模已有按报告期的真实时间序列（最早 2005-12-31，最新 2026-09-30），可按报告期回溯使用；但必须按报告期末日对齐，不能用相邻期插值或把当期当历史。",
+  "usable_conditions": [
+   "只能用报告期末日期对齐（不是公告日）",
+   "中间期缺失就是缺失，不得插值",
+   "C 级证据：来自天天基金规模变动页，原始出处是定期报告",
+   "货币基金规模单位是亿元但量级巨大（余额宝），注意单位"
+  ]
+ },
+ "coverage": {
+  "known_events": 41,
+  "by_product_structure": {
+   "etf_linked": 3,
+   "lof": 11,
+   "ordinary_open_ended": 27
+  },
+  "by_announcement_year": {
+   "2015": 2,
+   "2017": 2,
+   "2018": 9,
+   "2019": 2,
+   "2020": 1,
+   "2021": 2,
+   "2022": 3,
+   "2023": 10,
+   "2024": 6,
+   "2025": 2,
+   "2026": 2
+  },
+  "earliest_announcement": "2015-11-06",
+  "latest_announcement": "2026-07-31",
+  "event_date_null": 12,
+  "all_evidence_level": "B",
+  "scan_scope": {
+   "scanned_codes": 844,
+   "raw_code_records": 310,
+   "raw_announcement_events": 216,
+   "deduped_fund_entities": 58,
+   "offmarket_structure_entities": 41,
+   "onshore_etf_entities": 2,
+   "source": "reports/phase3B4_1_1_historical_roster_fee_audit.json",
+   "rule": "从非存续代码清单出发，逐只查清盘/终止上市/份额终止公告，按公告去重后归并成基金本体",
+   "limitation": "起点是「已知的非存续代码清单」，不是权威全量清盘名录。清单本身可能漏掉从未被收录的已清盘基金。"
+  },
+  "coverage_quantifiable": false,
+  "coverage_status": "not_quantifiable",
+  "coverage_reason": "中国公募基金没有公开、可批量下载的『已终止基金全量清单』。基金业协会与证监会均不提供。因此无法计算『41 / 全部清盘数』。",
+  "long_term_limit": true,
+  "survivorship_bias_status": "not_eliminated",
+  "official_cross_reference": null,
+  "official_cross_reference_note": "本轮尝试检索证监会基金电子披露网站（eid.csrc.gov.cn）与巨潮资讯，均未取得可按『基金终止/清盘』批量筛选的官方历史名录。不把第三方搜索结果的条数当作全市场清盘总数。"
+ },
+ "alipay": {
+  "status": "unknown",
+  "distribution": {
+   "unknown": 12
+  },
+  "all_unknown": true
+ },
+ "decisions": {
+  "alipay_purchasable": {
+   "status": "unknown",
+   "decision": "正式放弃自动采集，转为人工核验",
+   "rationale": "支付宝无公开、合法、稳定的基金可购买状态接口。逆向 APP、绕过登录、伪造状态均被明确禁止。",
+   "manual_verification_flow": {
+    "fields": [
+     "fund_code",
+     "share_class_code",
+     "verified_at",
+     "result",
+     "evidence_type",
+     "evidence_note"
+    ],
+    "validity": "必须带核验时间，超过 90 天视为过期需复核",
+    "storage": "fund_subscription_status，alipay_evidence='manual_verified'",
+    "status": "流程已设计，本轮未录入任何人工核验结果"
+   },
+   "no_further_development": true
+  },
+  "nav_publishing_calendar": {
+   "status": "cannot_verify",
+   "decision": "接受 cannot_verify，不再追逐",
+   "rationale": "没有合法、可靠、可批量获取的逐基金净值公布日历。A 股交易日历只是代理，不能升级为真实基金公布日历。",
+   "rules": [
+    "不得仅凭某个 A 股交易日没有净值就判定数据缺失",
+    "不得把周末/节假日无净值判定为异常",
+    "净值连续性结论一律 cannot_verify",
+    "trade_calendar 的代理身份必须保留并显式标注"
+   ],
+   "no_further_development": true
+  },
+  "liquidation_roster_completeness": {
+   "status": "not_quantifiable",
+   "decision": "正式记录为长期数据限制，不设为无限期开发任务",
+   "rationale": "无权威全量清盘名录，覆盖率不可量化。继续追逐不会提高可信度，只会消耗资源。",
+   "survivorship_bias": "not_eliminated",
+   "no_further_development": true
+  }
+ },
+ "usage_matrix": {
+  "tier_1_direct_use": [
+   {
+    "data": "历史单位净值（单序列）",
+    "evidence": "C",
+    "condition": "只看单只基金自身时间序列，不做跨基金日期对齐"
+   },
+   {
+    "data": "已知清盘事件清单（41 条）",
+    "evidence": "B",
+    "condition": "只用于剔除已知清盘，不得声称覆盖完整"
+   },
+   {
+    "data": "基金规模历史（按报告期）",
+    "evidence": "C",
+    "condition": "138 个报告期末，最早 2005-12-31；必须按报告期末对齐，缺失不插值"
+   },
+   {
+    "data": "基金经理任职起止（有公告部分）",
+    "evidence": "A-",
+    "condition": "12 条有起始日、4 条有结束日；只能用于已知日期区间的判断，不得回填"
+   }
+  ],
+  "tier_2_conditional": [
+   {
+    "data": "年化费率（有生效日的 11 条）",
+    "evidence": "A-",
+    "condition": "可用于该生效日之后的成本估算；生效日之前必须用调整前费率",
+    "blocker": "仍有 25 条年化费率无生效日"
+   },
+   {
+    "data": "申购费 / 赎回费阶梯",
+    "evidence": "C",
+    "condition": "只能做当前费率情景估算",
+    "blocker": "无历史生效时间；持有期自然日/交易日未确认"
+   },
+   {
+    "data": "累计净值",
+    "evidence": "C",
+    "condition": "不得与单位净值混用",
+    "blocker": "分红再投资口径未确认"
+   },
+   {
+    "data": "分红记录",
+    "evidence": "C",
+    "condition": "仅作辅助核对",
+    "blocker": "44 条未通过完整性验证"
+   }
+  ],
+  "tier_3_auxiliary_only": [
+   {
+    "data": "无起始日的经理快照",
+    "evidence": "C",
+    "condition": "只能了解『谁在管』",
+    "blocker": "9 条无任职日期"
+   },
+   {
+    "data": "规模公告发布日期",
+    "evidence": "unknown",
+    "condition": "本轮未采集",
+    "blocker": "disclosed_at 全 NULL"
+   }
+  ],
+  "tier_4_forbidden": [
+   {
+    "data": "支付宝可购买状态",
+    "reason": "全部 unknown，无合法数据源，转人工核验"
+   },
+   {
+    "data": "支付宝实际费率",
+    "reason": "无法获取，天天基金费率不能冒充"
+   },
+   {
+    "data": "历史生效费率（79 条无生效日）",
+    "reason": "不能用当前费率倒填历史"
+   },
+   {
+    "data": "净值连续性结论",
+    "reason": "无基金公布日历，只能 cannot_verify"
+   },
+   {
+    "data": "完整历史清盘名录",
+    "reason": "覆盖率 not_quantifiable"
+   },
+   {
+    "data": "用当前经理/规模回填历史",
+    "reason": "未来信息泄漏"
+   }
+  ]
+ },
+ "summary": {
+  "improved": [
+   "费率生效时间：11 条年化费率补到官方生效日（A- 级），覆盖 8 只基金",
+   "经理任职历史：新增 12 条有起始日的记录（A- 级）",
+   "规模历史：从 1 个快照扩展到 138 个报告期末（C 级），覆盖 12 个份额"
+  ],
+  "still_open": [
+   "费率：79 条仍无生效日（全部申购/赎回阶梯 + 无公告的年化费率）",
+   "分红：44 条未通过完整性验证，9 条无法与公告配对",
+   "经理：9 条仍只有快照（无任职日期）",
+   "规模：公告发布日期（disclosed_at）未采集",
+   "清盘名录：覆盖率 not_quantifiable",
+   "支付宝：全部 unknown"
+  ],
+  "abandoned": [
+   "支付宝可购买状态自动采集（转人工核验）",
+   "净值公布日历（接受 cannot_verify）",
+   "清盘名录完整性（记录为长期限制）"
+  ]
+ },
+ "stage_gate": {
+  "ready_for_next_stage": false,
+  "ready_for_backtest": false,
+  "reason": "本轮实际改善了费率生效日、经理任职日、规模时序三项；但费率仍有 79 条无生效日（含全部申购赎回阶梯）、分红完整性未验证、清盘名录覆盖率不可量化、支付宝状态全 unknown。不足以支撑正式回测。",
+  "allowed_next": "3B-4.5 补充研究 或 研究性分析（非回测）",
+  "blocked": [
+   "3B-5 场外基金正式回测"
+  ],
+  "must_not_relax_gate": true
+ }
+}
