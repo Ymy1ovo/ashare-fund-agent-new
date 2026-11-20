@@ -696,3 +696,104 @@ def test_fee_rate_equals_announcement_after(payload):
 
 def test_fee_verification_mismatch_count_zero(payload):
     assert payload["fee"]["verification_mismatch"] == 0
+
+# ================================================================ 文档一致性（最终收口）
+def test_md_test_count_consistent():
+    """报告内专项测试数必须与汇总表一致，不得出现两组矛盾数字。"""
+    import re
+    md = MD_PATH.read_text(encoding="utf-8")
+    # 专项运行日志里的 passed 数
+    m = re.search(r"pytest tests/test_3b4_4_data_gap\.py -q\s*\n(\d+) passed", md)
+    assert m, "缺少专项运行日志"
+    log_count = int(m.group(1))
+    # 汇总表里的专项通过数
+    m2 = re.search(r"\| 专项通过 \| \*\*(\d+)\*\* \|", md)
+    assert m2, "缺少专项通过汇总行"
+    table_count = int(m2.group(1))
+    assert log_count == table_count == 76
+
+    # 不得残留旧的 49 passed 运行记录
+    assert "49 passed in" not in md
+    assert "| 专项通过 | **49** |" not in md
+
+
+def test_md_full_test_count_consistent():
+    md = MD_PATH.read_text(encoding="utf-8")
+    assert "1199 passed" in md
+    assert "| 全量通过 | **1199** |" in md
+    # 算术关系
+    assert 1123 + 76 == 1199
+
+
+def test_json_scope_no_report_period_wording(payload):
+    """JSON scope 不得把规模说成报告期序列。"""
+    scope = payload["scope"]
+    assert "平台观测日期" in scope
+    assert "不是经过验证的报告期序列" in scope
+    assert "规模报告期序列" not in scope
+
+
+def test_json_aum_scope_note(payload):
+    """JSON 必须有独立的规模口径说明。"""
+    note = payload["aum_scope_note"]
+    assert note["total_records"] == 683
+    assert note["records_with_evidence"] == 675
+    assert note["distinct_platform_observation_dates"] == 138
+    assert note["is_verified_period_series"] is False
+    assert note["point_in_time_usable"] is False
+    assert "不是经过验证的基金报告期序列" in note["statement"]
+
+
+def test_md_no_claim_138_verified_periods():
+    """MD 不得出现「138 个已验证报告期」这类表述。"""
+    md = MD_PATH.read_text(encoding="utf-8")
+    for bad in ("138 个已验证报告期", "138 个报告期末", "138 个已验证"):
+        assert bad not in md, bad
+
+
+def test_fix_json_rows_changed_not_inflated():
+    """修正脚本真实结果 rows_changed=0，不得夸大。"""
+    p = ROOT / "reports" / "phase3B4_4_aum_semantics_fix.json"
+    d = json.loads(p.read_text(encoding="utf-8"))
+    assert d["records_total"] == 683
+    assert d["records_with_evidence"] == 675
+    assert d["rows_changed"] == 0
+    assert d["stale_detail_before"] == 0
+    assert d["needs_fix_before"] == 0
+    assert d["business_fields_unchanged"] is True
+    assert d["integrity_check"] == "ok"
+    assert d["foreign_key_violations"] == 0
+
+
+def test_md_states_rows_changed_zero():
+    """MD 必须如实说明 rows_changed=0，不能写成本次修正了 675 条。"""
+    md = MD_PATH.read_text(encoding="utf-8")
+    assert "rows_changed" in md
+    assert "不能表述为「本次修正了 675 条」" in md or "不能表述为" in md
+
+
+def test_fee_verification_unchanged(payload):
+    """11 条费率核验结果不得变化。"""
+    v = payload["fee"]["verification"]
+    assert len(v) == 11
+    for x in v:
+        assert x["rate_match"] is True
+        assert x["eff_match"] is True
+        assert x["ann_id_match"] is True
+    assert payload["fee"]["verification_mismatch"] == 0
+
+
+def test_fee_boundaries_preserved(payload):
+    """费率使用边界必须保留。"""
+    f = payload["fee"]
+    assert f["with_effective_from"] == 11
+    assert f["without_effective_from"] == 79
+    names = " ".join(x["data"] for x in payload["usage_matrix"]["tier_4_forbidden"])
+    assert "历史生效费率" in names
+
+
+def test_gate_unchanged(payload):
+    """门禁不得被擅自放开。"""
+    g = payload["stage_gate"]
+    assert g["ready_for_backtest"] is False
+    assert g["ready_for_next_stage"] is False

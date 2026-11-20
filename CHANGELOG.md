@@ -17,10 +17,13 @@
 - `point_in_time_usable` = **false**
 - `disclosed_at` 仍全 NULL
 
-**数据修正**：只改 675 条记录的 `detail` 元数据，
+**数据修正**：只改 `detail` 元数据，
 `report_date` / `aum_total` / `shares_total` / `source` / `evidence_level`
-逐行比对**完全一致**。修正脚本 `scripts/fix_3b4_4_aum_semantics.py` 幂等，
-二次执行 0 变更。
+逐行比对**完全一致**。
+
+修正脚本 `scripts/fix_3b4_4_aum_semantics.py` 幂等。需如实说明：
+**脚本执行时 `rows_changed = 0`**——语义已在同轮工作内通过重新导入完成，
+脚本执行时数据库已无待修正记录，不能表述为「本次修正了 675 条」。
 
 **审计与报告修正**：`distinct_report_dates` → `distinct_dates`
 （单位标 `platform_observation_date`）；新增 `quarter_end_date_count=84`、
@@ -38,11 +41,12 @@
 核验结果落 `reports/evidence/phase3b4_4/fee_verification.json`。
 注意：`rate_original` = 调整后费率，生效日**之前**必须用 `detail.rate_before`。
 
-**测试**：新增 17 项（49 → 66），覆盖非季末日期不得标记已验证、
+**测试**：新增 17 项（49 → 66）覆盖规模语义，再加 10 项文档一致性收口（→ **76**）；
+覆盖非季末日期不得标记已验证、
 DB 无残留旧语义、业务字段修正前后一致、`disclosed_at` 为 NULL 时
 `point_in_time_usable` 必须 false、报告不得称 138 个已验证报告期、
 幂等、费率逐条核验。
-全量 **1189 passed / 0 failed**，279.46 秒。
+全量 **1199 passed / 0 failed**，365.53 秒。
 
 **完整性**：`integrity_check` = ok，外键违规 0，其他历史数据未动。
 
@@ -67,9 +71,10 @@ DB 无残留旧语义、业务字段修正前后一致、`disclosed_at` 为 NULL
 2. **经理任职历史 12 条（A- 级）**：从基金经理变更公告原文提取任职/离任日期。
    原有 9 条 akshare 快照（无日期）**未删除、未编造日期**。
 
-3. **规模历史 675 条 / 138 个报告期（C 级）**：从 1 个快照扩展到
-   2005-12-31 ~ 2026-09-30 的完整序列。只记录报告期末/披露时点，
-   `disclosed_at`（公告发布日期）保持 NULL。页面 `---` 的期次跳过，不填 0。
+3. **规模历史 675 条 / 138 个平台观测日期（C 级）**：从 1 个快照扩展到
+   2005-12-31 ~ 2026-09-30 的序列。日期语义是 `platform_observation_date`，
+   **不是验证过的报告期末**，`disclosed_at`（公告发布日期）保持 NULL。
+   页面 `---` 的期次跳过，不填 0。
 
 **分红：核验了但没补。** 44 条中 35 条与公告匹配，4 条公告在 DB 缺失；
 差异无法判定哪一方正确时**不补入、不删改、只记录**。仍禁止用于修正历史收益。

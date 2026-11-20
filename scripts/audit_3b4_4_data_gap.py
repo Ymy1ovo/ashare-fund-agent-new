@@ -486,7 +486,9 @@ def main() -> dict:
         "baseline_head": "2294b4aa8f79dcb921c5fa00b1d2e12548477072",
         "generated_at": NOW.isoformat(timespec="seconds"),
         "scope": ("只做有边界的数据缺口补强：补有官方公告证据的费率生效日、"
-                  "经理任职日期、规模报告期序列；分红做跨来源核验并记录差异；"
+                  "经理任职日期、基金规模的**平台观测日期序列**"
+                  "（不是经过验证的报告期序列，不可作为历史时点特征或正式回测输入）；"
+                  "分红做跨来源核验并记录差异；"
                   "清盘名录只提高可追溯性不追求覆盖率。不做策略、不做回测。"),
         "evidence_levels": {
             "A": "官方原始来源，可追溯原始公告或正式文件",
@@ -509,6 +511,18 @@ def main() -> dict:
         },
         "decisions": decisions,
         "usage_matrix": matrix,
+        "aum_scope_note": {
+            "total_records": aum["total_records"],
+            "records_with_evidence": aum["records_with_evidence"],
+            "distinct_platform_observation_dates": aum["distinct_dates"],
+            "is_verified_period_series": False,
+            "point_in_time_usable": False,
+            "statement": (
+                f"规模数据是 {aum['distinct_dates']} 个不同平台观测日期的序列"
+                f"（{aum['records_with_evidence']} 条有证据记录，"
+                f"共 {aum['total_records']} 条）；不是经过验证的基金报告期序列，"
+                "不得作为历史时点特征或正式回测输入。"),
+        },
         "summary": {
             "improved": improved,
             "still_open": still_open,
