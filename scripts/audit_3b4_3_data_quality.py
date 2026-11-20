@@ -97,9 +97,36 @@ def audit_lifecycle(conn) -> dict:
     alive = status_dist.get("active", 0)
     terminated = status_dist.get("terminated", 0)
 
+    # ---- 统一的「本体 / 份额」两套口径统计（本阶段修正重点）----
+    # 绝不把份额数当成本体数，也不把本体数当份额数。
+    def _scope_counts(status):
+        r = conn.execute(
+            """SELECT COUNT(DISTINCT m.fund_id) AS funds,
+                      COUNT(s.share_class_id) AS shares
+               FROM fund_master m
+               JOIN fund_share_classes s ON s.fund_id = m.fund_id
+               WHERE m.lifecycle_status = ?""", (status,)).fetchone()
+        return int(r["funds"]), int(r["shares"])
+
+    live_funds, live_shares = _scope_counts("unknown")
+    term_funds, term_shares = _scope_counts("terminated")
+    act_funds, act_shares = _scope_counts("active")
+
     return {
         "total_events": len(rows),
         "distinct_funds": len(set(fund_ids)),
+        # 两套口径，字段名自带单位，避免调用方混淆
+        "non_terminated_fund_count": live_funds,
+        "non_terminated_share_count": live_shares,
+        "known_terminated_fund_count": term_funds,
+        "known_terminated_share_count": term_shares,
+        "confirmed_active_fund_count": act_funds,
+        "confirmed_active_share_count": act_shares,
+        "unit_note": (
+            "fund = 基金本体（fund_master 一行）；share = 份额类别"
+            "（fund_share_classes 一行）。A/C 是同一本体的两个份额，"
+            "分级 A/B 同理。**比较必须在同一口径内进行**："
+            "本体比本体、份额比份额，不得 12 份额 vs 41 本体。"),
         "by_product_structure": dict(by_structure),
         "by_evidence_level": dict(by_level),
         "event_date_null": null_event_date,
@@ -114,9 +141,12 @@ def audit_lifecycle(conn) -> dict:
         "master_terminated": terminated,
         "master_lifecycle_status_distribution": status_dist,
         "master_status_note": (
-            "存续的 12 只样本基金 lifecycle_status 为 'unknown' 而非 'active'——"
-            "因为本项目从未取得「该基金当前仍在运作」的正式证据。"
-            "这是**如实记录**，不是缺失，也不应为了好看改成 active。"),
+            f"当前有 {live_funds} 个**基金本体**（不是 {live_shares} 个——"
+            f"{live_shares} 是这 {live_funds} 个本体下的份额数量）的 "
+            f"lifecycle_status 为 'unknown'，而非 'active'。"
+            "原因是本项目从未取得「该基金当前仍在运作」的正式证据。"
+            "**unknown 不等于已确认仍在运作，也不等于已清盘**——它只是没证据。"
+            "这是如实记录，不是缺失，不应为了好看改成 active。"),
         "coverage_quantifiable": False,
         "survivorship_bias_status": "not_eliminated",
     }
@@ -206,9 +236,25 @@ def audit_nav(conn) -> dict:
     for v in out.values():
         kinds[v["nav_kind"]] += 1
 
+    # 净值是按**份额**存储的：12 个份额 → 9 个本体。
+    # 必须分别给出两个口径，不能把 12 个份额说成 12 只基金。
+    nav_share_codes = sorted(out.keys())
+    nav_fund_count = conn.execute(
+        """SELECT COUNT(DISTINCT s.fund_id) FROM fund_share_classes s
+           WHERE s.share_class_code IN ({})""".format(
+            ",".join("?" * len(nav_share_codes))),
+        tuple(nav_share_codes)).fetchone()[0] if nav_share_codes else 0
+
     return {
         "per_fund": per_fund,
-        "fund_count": len(out),
+        # 语义修正：nav 是按份额存的，两个口径都要显式给出
+        "share_count_with_nav": len(out),
+        "fund_count_with_nav": int(nav_fund_count),
+        "unit_note": (
+            "净值表 fund_nav_daily 的主键是 share_class_id，"
+            "因此 {0} 是**份额**数量，对应 {1} 个**基金本体**。"
+            "两者的差异就是 A/C 双份额的本体。").format(
+                len(out), int(nav_fund_count)),
         "nav_kind_distribution": dict(kinds),
         "net_value_rows": conn.execute(
             "SELECT COUNT(*) FROM fund_nav_daily WHERE nav_kind='net_value'").fetchone()[0],

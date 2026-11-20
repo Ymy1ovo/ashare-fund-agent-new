@@ -1,7 +1,7 @@
 {
  "phase": "3B-4.3",
  "baseline_head": "93c920cc66196610838e3dad21d9b9d45216dbe6",
- "generated_at": "2026-11-20T11:15:59",
+ "generated_at": "2026-11-20T13:04:27",
  "scope": "只读审计：不改正式库、不改已验收模块、不重新采集数据、不开发策略、不做回测。",
  "evidence_levels": {
   "A": "官方原始来源，可追溯原始公告或正式文件",
@@ -13,6 +13,13 @@
  "lifecycle": {
   "total_events": 41,
   "distinct_funds": 41,
+  "non_terminated_fund_count": 9,
+  "non_terminated_share_count": 12,
+  "known_terminated_fund_count": 41,
+  "known_terminated_share_count": 63,
+  "confirmed_active_fund_count": 0,
+  "confirmed_active_share_count": 0,
+  "unit_note": "fund = 基金本体（fund_master 一行）；share = 份额类别（fund_share_classes 一行）。A/C 是同一本体的两个份额，分级 A/B 同理。**比较必须在同一口径内进行**：本体比本体、份额比份额，不得 12 份额 vs 41 本体。",
   "by_product_structure": {
    "ordinary_open_ended": 27,
    "etf_linked": 3,
@@ -53,7 +60,7 @@
    "terminated": 41,
    "unknown": 9
   },
-  "master_status_note": "存续的 12 只样本基金 lifecycle_status 为 'unknown' 而非 'active'——因为本项目从未取得「该基金当前仍在运作」的正式证据。这是**如实记录**，不是缺失，也不应为了好看改成 active。",
+  "master_status_note": "当前有 9 个**基金本体**（不是 12 个——12 是这 9 个本体下的份额数量）的 lifecycle_status 为 'unknown'，而非 'active'。原因是本项目从未取得「该基金当前仍在运作」的正式证据。**unknown 不等于已确认仍在运作，也不等于已清盘**——它只是没证据。这是如实记录，不是缺失，不应为了好看改成 active。",
   "coverage_quantifiable": false,
   "survivorship_bias_status": "not_eliminated"
  },
@@ -312,7 +319,9 @@
     "max_gap_note": "最大间隔通常是春节/国庆长假（如 2020-01-23→02-03、2006-01-25→02-06、2023-09-28→10-09），属正常休市，**不是数据缺失**——但也不能据此断言净值一定已在该日公布。"
    }
   ],
-  "fund_count": 12,
+  "share_count_with_nav": 12,
+  "fund_count_with_nav": 9,
+  "unit_note": "净值表 fund_nav_daily 的主键是 share_class_id，因此 12 是**份额**数量，对应 9 个**基金本体**。两者的差异就是 A/C 双份额的本体。",
   "nav_kind_distribution": {
    "net_value": 11,
    "money_yield": 1

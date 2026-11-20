@@ -489,3 +489,132 @@ def test_3b4_2_migration_unchanged():
     assert sql.is_file()
     body = sql.read_text(encoding="utf-8")
     assert "ALTER TABLE fund_lifecycle_events ADD COLUMN announcement_id" in body
+
+# ================================================================ 统计口径：本体 vs 份额
+def test_scope_fields_present(payload):
+    """JSON 必须显式区分本体数与份额数，不能只给一个模糊计数。"""
+    L = payload["lifecycle"]
+    for k in ("non_terminated_fund_count", "non_terminated_share_count",
+              "known_terminated_fund_count", "known_terminated_share_count",
+              "confirmed_active_fund_count", "confirmed_active_share_count"):
+        assert k in L, k
+        assert isinstance(L[k], int), k
+
+
+def test_scope_9_funds_12_shares(payload):
+    """非清盘样本：9 个本体 / 12 个份额。"""
+    L = payload["lifecycle"]
+    assert L["non_terminated_fund_count"] == 9
+    assert L["non_terminated_share_count"] == 12
+    # 9 != 12，说明确实区分了两个口径
+    assert L["non_terminated_fund_count"] != L["non_terminated_share_count"]
+
+
+def test_scope_41_terminated_funds(payload):
+    """已知清盘：41 个本体 / 63 个份额。"""
+    L = payload["lifecycle"]
+    assert L["known_terminated_fund_count"] == 41
+    assert L["known_terminated_share_count"] == 63
+
+
+def test_scope_no_confirmed_active(payload):
+    """没有任何本体被确认存续（active），因为从未取得该证据。"""
+    L = payload["lifecycle"]
+    assert L["confirmed_active_fund_count"] == 0
+
+
+def test_scope_matches_database(payload):
+    """JSON 口径必须与数据库实际查询一致。"""
+    from app.database.db import get_connection, settings
+    with get_connection() as conn:
+        def cnt(status):
+            r = conn.execute(
+                """SELECT COUNT(DISTINCT m.fund_id), COUNT(s.share_class_id)
+                   FROM fund_master m JOIN fund_share_classes s
+                     ON s.fund_id = m.fund_id
+                   WHERE m.lifecycle_status = ?""", (status,)).fetchone()
+            return int(r[0]), int(r[1])
+        unknown_f, unknown_s = cnt("unknown")
+        term_f, term_s = cnt("terminated")
+        act_f, act_s = cnt("active")
+    L = payload["lifecycle"]
+    assert (L["non_terminated_fund_count"],
+            L["non_terminated_share_count"]) == (unknown_f, unknown_s)
+    assert (L["known_terminated_fund_count"], L["known_terminated_share_count"]) == \
+        (term_f, term_s)
+    assert (L["confirmed_active_fund_count"], L["confirmed_active_share_count"]) == \
+        (act_f, act_s)
+
+
+def test_scope_unit_note_explains_difference(payload):
+    """unit_note 必须解释 fund 与 share 的区别，并禁止混用比较。"""
+    note = payload["lifecycle"]["unit_note"]
+    assert "fund_master" in note
+    assert "fund_share_classes" in note
+    assert "本体比本体" in note or "同一口径" in note
+
+
+def test_scope_nav_has_both_counts(payload):
+    """净值是按份额存的：必须同时给出份额数与本体数。"""
+    N = payload["nav"]
+    assert N["share_count_with_nav"] == 12
+    assert N["fund_count_with_nav"] == 9
+    assert "份额" in N["unit_note"]
+    assert "本体" in N["unit_note"]
+
+
+def test_scope_master_note_not_confusing(payload):
+    """master_status_note 不能把 12 说成基金数量，也不能把 unknown 说成存续。"""
+    note = payload["lifecycle"]["master_status_note"]
+    assert "9 个" in note or "9个" in note
+    assert "份额" in note
+    assert "不等于" in note
+
+
+# ---------------- Markdown 口径一致性
+def _md_text() -> str:
+    return MD_PATH.read_text(encoding="utf-8")
+
+
+def test_md_no_12_vs_41_comparison():
+    """报告不得把 12 个份额与 41 个本体直接比较。"""
+    md = _md_text()
+    banned = ["12 : 41", "12:41", "12 （存续", "12（存续"]
+    for b in banned:
+        assert b not in md, f"发现跨口径比较: {b}"
+
+
+def test_md_uses_fund_unit_for_comparison():
+    """存续 vs 清盘比较必须用本体口径 9 : 41。"""
+    md = _md_text()
+    assert "9 : 41" in md or "9 : **41**" in md or "**9** : **41**" in md
+
+
+def test_md_states_share_vs_fund_rule():
+    md = _md_text()
+    assert "份额" in md
+    assert "本体" in md
+    assert "同一口径" in md or "单位不同" in md
+
+
+def test_md_nav_section_separates_units():
+    """§3.1 净值总览必须同时给出份额数与本体数。"""
+    md = _md_text()
+    assert "有净值的份额数" in md
+    assert "对应基金本体数" in md
+
+
+def test_md_unknown_not_called_confirmed_alive():
+    """不得无证据把 unknown 称为「已确认存续」。"""
+    md = _md_text()
+    for line in md.splitlines():
+        if "存续" in line and "unknown" in line:
+            # 允许「未取得仍在运作证据」这类否定表述
+            assert ("未取得" in line or "未确认" in line or "不等于" in line
+                    or "非清盘" in line or "待" in line), line[:80]
+
+
+def test_md_13_status_table_uses_fund_unit():
+    """§1.3 状态分布表 unknown 行必须标为本体数。"""
+    md = _md_text()
+    assert "非清盘样本基金本体" in md
