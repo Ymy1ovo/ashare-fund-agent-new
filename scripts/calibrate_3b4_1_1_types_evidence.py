@@ -375,8 +375,12 @@ def main() -> dict:
             "offmarket_structure_count": (
                 "属于**场外产品结构范围**的清盘基金本体数量（普通开放式 + ETF联接 + LOF）。"
                 "**不是**支付宝可购买数量。"),
-            "alipay_purchasable_count": (
-                "支付宝实际可购买数量。恒为 0，因为全部状态 unknown、无官方或可靠接口证据。"),
+            "alipay_confirmed_yes_count": (
+                "**已确认**支付宝可购买的数量，恒为 0。"
+                "注意：0 只表示「没有任何一条被确认可购买」，"
+                "**不代表实际可购买数量为零**。unknown 不等于 no。"),
+            "alipay_unknown_count": (
+                "支付宝可购买状态为 unknown 的数量（= 全部事件数）。"),
             "alipay_status": (
                 "支付宝可购买状态。恒为 unknown（3B-4.1 结论 not_obtainable）。"),
             "note": (
@@ -396,7 +400,8 @@ def main() -> dict:
             "by_evidence_level": by_level,
             "offmarket_structure_count": len(offmarket),
             "offmarket_count": len(offmarket),   # 兼容旧名，语义 = 场外结构范围
-            "alipay_purchasable_count": 0,
+            "alipay_confirmed_yes_count": 0,
+            "alipay_unknown_count": len(calibrated),
             "alipay_status": ALIPAY_STATUS,
             "onshore_etf_count": len(onshore_etf),
             "unknown_type_count": len(unknown_type),

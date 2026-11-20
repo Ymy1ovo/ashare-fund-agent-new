@@ -1,7 +1,7 @@
 {
  "phase": "3B-4.1.1-calibration",
  "baseline_head": "22b8fc993cd37fce4fcc68671eb07145654c330e",
- "generated_at": "2026-11-19T19:59:15",
+ "generated_at": "2026-11-20T08:34:17",
  "scope": "验收修正：只对已有 43 条清盘事件重新判定基金类型与证据等级。未重新扫描 844 个代码、未新增公告采集、未改数据层与迁移、未入库、未回测。",
  "corrections": {
   "what_was_wrong": [
@@ -17,7 +17,8 @@
  },
  "field_semantics": {
   "offmarket_structure_count": "属于**场外产品结构范围**的清盘基金本体数量（普通开放式 + ETF联接 + LOF）。**不是**支付宝可购买数量。",
-  "alipay_purchasable_count": "支付宝实际可购买数量。恒为 0，因为全部状态 unknown、无官方或可靠接口证据。",
+  "alipay_confirmed_yes_count": "**已确认**支付宝可购买的数量，恒为 0。注意：0 只表示「没有任何一条被确认可购买」，**不代表实际可购买数量为零**。unknown 不等于 no。",
+  "alipay_unknown_count": "支付宝可购买状态为 unknown 的数量（= 全部事件数）。",
   "alipay_status": "支付宝可购买状态。恒为 unknown（3B-4.1 结论 not_obtainable）。",
   "note": "结构分类 ≠ 支付宝上架状态。ETF联接/LOF/普通开放式可以纳入场外**研究范围**，但不代表这些历史清盘基金曾在支付宝销售，也不代表现在仍可买。"
  },
@@ -1595,7 +1596,8 @@
   },
   "offmarket_structure_count": 41,
   "offmarket_count": 41,
-  "alipay_purchasable_count": 0,
+  "alipay_confirmed_yes_count": 0,
+  "alipay_unknown_count": 43,
   "alipay_status": "unknown",
   "onshore_etf_count": 2,
   "unknown_type_count": 0,

@@ -909,16 +909,19 @@ def test_411c_structure_count_not_alipay(pcal):
     """41 只能是「场外结构范围」，不能是「支付宝可购买数量」。"""
     s = pcal["stats"]
     assert s["offmarket_structure_count"] == 41
-    assert s["alipay_purchasable_count"] == 0
+    # 旧字段必须已废弃，防止被误读为「实际可购买总数=0」
+    assert "alipay_purchasable_count" not in s
+    assert s["alipay_confirmed_yes_count"] == 0
+    assert s["alipay_unknown_count"] == 43
     assert s["alipay_status"] == "unknown"
-    assert s["offmarket_structure_count"] != s["alipay_purchasable_count"]
 
 
 def test_411c_field_semantics_present(pcal):
     """字段语义必须显式声明，防止调用方误读。"""
     sem = pcal["field_semantics"]
     assert "offmarket_structure_count" in sem
-    assert "alipay_purchasable_count" in sem
+    assert "alipay_confirmed_yes_count" in sem
+    assert "alipay_unknown_count" in sem
     assert "不是" in sem["offmarket_structure_count"]
     assert "unknown" in sem["alipay_status"]
 
@@ -942,7 +945,8 @@ def test_411c_each_event_alipay_unknown(pcal):
 # ---------------- 2. 支付宝状态保持 unknown
 def test_411c_alipay_still_unknown(pcal):
     assert pcal["stats"]["alipay_status"] == "unknown"
-    assert pcal["stats"]["alipay_purchasable_count"] == 0
+    assert pcal["stats"]["alipay_confirmed_yes_count"] == 0
+    assert pcal["stats"]["alipay_unknown_count"] == 43
 
 
 def test_411c_alipay_never_yes(pcal):
@@ -1055,3 +1059,100 @@ def test_411c_kept_fee_fixes_final():
     # Bug2：闭区间连续性（364 含 → 365 含 = 无空洞）
     assert tiers[1]["holding_days_min"] == 7
     assert tiers[2]["holding_days_min"] == 365
+
+# ---------------- 最终收口：0 的语义
+def test_411c_zero_means_not_confirmed(pcal):
+    """alipay_confirmed_yes_count=0 只表示「没有一条被确认」，不是「实际可购买为 0」。"""
+    s = pcal["stats"]
+    assert s["alipay_confirmed_yes_count"] == 0
+    # 全部事件都是 unknown，说明 0 是「未确认」而不是「确认没有」
+    assert s["alipay_unknown_count"] == s["liquidation_total"]
+    assert s["alipay_unknown_count"] == 43
+
+
+def test_411c_field_semantics_says_not_total(pcal):
+    """字段语义说明必须写明 0 不代表实际可购买数量。"""
+    sem = pcal["field_semantics"]
+    assert "alipay_confirmed_yes_count" in sem
+    text = sem["alipay_confirmed_yes_count"]
+    assert "已确认" in text
+    assert "不代表" in text or "不等于" in text
+    assert "unknown" in sem["alipay_status"]
+    assert "unknown" in sem["alipay_unknown_count"]
+
+
+def test_411c_no_purchasable_count_field(pcal):
+    """旧的 alipay_purchasable_count 必须被废弃，不得残留。"""
+    assert "alipay_purchasable_count" not in pcal["stats"]
+    assert "alipay_purchasable_count" not in pcal["field_semantics"]
+
+
+def test_411c_md_explains_unknown_not_no():
+    """校准报告必须明确写出 unknown ≠ no。"""
+    md = MD_CAL.read_text(encoding="utf-8")
+    assert "unknown" in md
+    assert ("不等于" in md) or ("≠" in md)
+
+
+# ---------------- 主报告 §2.1 逐条表与校准 JSON 一致
+def _main_table_rows() -> list[tuple[str, str, str]]:
+    """从主报告 §2.1 解析 (代码, 名称, 证据等级) 三元组。"""
+    md = MD_MAIN.read_text(encoding="utf-8")
+    start = md.find("### 2.1 全部清盘事件")
+    end = md.find("### 2.2 覆盖类型")
+    assert start > 0 and end > start
+    rows = []
+    for line in md[start:end].splitlines():
+        line = line.strip()
+        if not line.startswith("| ") or line.startswith("| #") or line.startswith("| ---"):
+            continue
+        cells = [c.strip() for c in line.strip("|").split("|")]
+        if len(cells) < 7:
+            continue
+        code = cells[1].strip("`")
+        name = cells[2]
+        level = cells[-1].strip("*").strip()
+        rows.append((code, name, level))
+    return rows
+
+
+def test_411c_main_table_row_count(pcal):
+    rows = _main_table_rows()
+    assert len(rows) == 43, f"主报告表格行数 {len(rows)}"
+
+
+def test_411c_main_table_matches_calibration(pcal):
+    """主报告 43 条表的名称与证据等级必须与校准 JSON 逐条一致。"""
+    cal = pcal["calibration"]
+    rows = _main_table_rows()
+    assert len(rows) == len(cal)
+    for (code, name, level), rec in zip(rows, cal):
+        expected_code = "/".join(rec["codes_in_event"])
+        assert code == expected_code, (code, expected_code)
+        assert name == rec["fund_entity"], (name, rec["fund_entity"])
+        assert level == rec["evidence_level"], (code, level, rec["evidence_level"])
+
+
+def test_411c_main_table_all_b(pcal):
+    rows = _main_table_rows()
+    assert all(r[2] == "B" for r in rows), [r for r in rows if r[2] != "B"]
+    assert sum(1 for r in rows if r[2] == "B") == 43
+
+
+def test_411c_main_table_has_full_lianjie_name(pcal):
+    """主报告表里 4 只联接基金必须显示完整「联接基金」名称。"""
+    rows = {r[0]: r[1] for r in _main_table_rows()}
+    for code in ("020025", "020035/020036", "000087/000088"):
+        assert code in rows, code
+        assert "联接基金" in rows[code], (code, rows[code])
+
+
+def test_411c_main_table_etf_marked(pcal):
+    """511000、511050 在主报告表里必须标为场内 ETF。"""
+    md = MD_MAIN.read_text(encoding="utf-8")
+    start = md.find("### 2.1 全部清盘事件")
+    end = md.find("### 2.2 覆盖类型")
+    block = md[start:end]
+    for code in ("511000", "511050"):
+        line = next(l for l in block.splitlines() if f"`{code}`" in l)
+        assert "场内 ETF" in line, (code, line)
