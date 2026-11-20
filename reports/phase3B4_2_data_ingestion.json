@@ -1,0 +1,366 @@
+{
+ "phase": "3B-4.2",
+ "baseline_head": "e90a2b38f851c5cf79ddbd5f6dc4240bdf45c426",
+ "generated_at": "2026-11-20T10:00:33",
+ "scope": "只把 3B-4.1.1 已审计的清盘事件与费率阶梯正式入库；未重新采集、未开始回测、未开发策略。",
+ "plan": {
+  "lifecycle_planned": 41,
+  "lifecycle_excluded_etf": 2,
+  "lifecycle_excluded_codes": [
+   "511000",
+   "511050"
+  ],
+  "fee_samples": 12,
+  "fee_rows_planned": 90
+ },
+ "migration": {
+  "file": "migrations/phase3b4_2_lifecycle_fee_ingestion.sql",
+  "added_columns": {
+   "fund_lifecycle_events": [
+    "announcement_id",
+    "product_structure",
+    "fund_codes",
+    "event_fingerprint",
+    "fetched_at"
+   ],
+   "fund_fee_rules": [
+    "lower_inclusive",
+    "upper_inclusive",
+    "lower_inferred",
+    "holding_days_min_inclusive",
+    "holding_days_max_inclusive",
+    "holding_days_min_inferred",
+    "rate_original",
+    "rate_platform",
+    "platform_name",
+    "is_annual",
+    "holding_days_basis",
+    "source_name",
+    "source_url",
+    "fetched_at",
+    "detail"
+   ]
+  },
+  "schema": {
+   "fund_lifecycle_events": {
+    "columns": [
+     "event_id",
+     "fund_id",
+     "event_type",
+     "event_date",
+     "announcement_date",
+     "announcement_url",
+     "detail",
+     "successor_fund_id",
+     "evidence_level",
+     "source",
+     "ingested_at",
+     "announcement_id",
+     "product_structure",
+     "fund_codes",
+     "event_fingerprint",
+     "fetched_at"
+    ],
+    "indexes": [
+     "idx_fund_life_structure",
+     "idx_fund_life_announcement",
+     "uq_fund_life_fingerprint",
+     "uq_fund_life_natural",
+     "idx_fund_life_fund"
+    ]
+   },
+   "fund_fee_rules": {
+    "columns": [
+     "fee_rule_id",
+     "share_class_id",
+     "fee_type",
+     "tier_order",
+     "lower_bound",
+     "upper_bound",
+     "rate",
+     "holding_days_min",
+     "holding_days_max",
+     "effective_from",
+     "effective_to",
+     "source",
+     "evidence_level",
+     "ingested_at",
+     "lower_inclusive",
+     "upper_inclusive",
+     "lower_inferred",
+     "holding_days_min_inclusive",
+     "holding_days_max_inclusive",
+     "holding_days_min_inferred",
+     "rate_original",
+     "rate_platform",
+     "platform_name",
+     "is_annual",
+     "holding_days_basis",
+     "source_name",
+     "source_url",
+     "fetched_at",
+     "detail"
+    ],
+    "indexes": [
+     "idx_fund_fee_platform",
+     "idx_fund_fee_type",
+     "uq_fund_fee_natural",
+     "idx_fund_fee_class"
+    ]
+   }
+  }
+ },
+ "run1": {
+  "migration_added": {
+   "fund_lifecycle_events": [
+    "announcement_id",
+    "product_structure",
+    "fund_codes",
+    "event_fingerprint",
+    "fetched_at"
+   ],
+   "fund_fee_rules": [
+    "lower_inclusive",
+    "upper_inclusive",
+    "lower_inferred",
+    "holding_days_min_inclusive",
+    "holding_days_max_inclusive",
+    "holding_days_min_inferred",
+    "rate_original",
+    "rate_platform",
+    "platform_name",
+    "is_annual",
+    "holding_days_basis",
+    "source_name",
+    "source_url",
+    "fetched_at",
+    "detail"
+   ]
+  },
+  "lifecycle": {
+   "stat": {
+    "planned": 41,
+    "inserted": 41,
+    "skipped_existing": 0,
+    "excluded": 2,
+    "failed": 0,
+    "by_type": {
+     "ordinary_open_ended": 27,
+     "etf_linked": 3,
+     "lof": 11
+    },
+    "notes": []
+   },
+   "excluded": [
+    {
+     "codes": [
+      "511000"
+     ],
+     "name": "招商中债-0-3年长三角地方政府债交易型开放式指数证券投资基金",
+     "structure": "etf",
+     "reason": "场内 ETF，不属于场外研究样本"
+    },
+    {
+     "codes": [
+      "511050"
+     ],
+     "name": "兴业上证1-5年期地方政府债交易型开放式指数证券投资基金",
+     "structure": "etf",
+     "reason": "场内 ETF，不属于场外研究样本"
+    }
+   ]
+  },
+  "fees": {
+   "stat": {
+    "planned": 90,
+    "inserted": 90,
+    "skipped_existing": 0,
+    "excluded": 0,
+    "failed": 0,
+    "by_type": {
+     "management": 12,
+     "custody": 12,
+     "sales_service": 12,
+     "purchase": 20,
+     "redemption": 34
+    },
+    "notes": []
+   }
+  }
+ },
+ "run2_idempotent": {
+  "migration_added": {
+   "fund_lifecycle_events": [],
+   "fund_fee_rules": []
+  },
+  "lifecycle": {
+   "stat": {
+    "planned": 41,
+    "inserted": 0,
+    "skipped_existing": 41,
+    "excluded": 2,
+    "failed": 0,
+    "by_type": {},
+    "notes": []
+   },
+   "excluded": [
+    {
+     "codes": [
+      "511000"
+     ],
+     "name": "招商中债-0-3年长三角地方政府债交易型开放式指数证券投资基金",
+     "structure": "etf",
+     "reason": "场内 ETF，不属于场外研究样本"
+    },
+    {
+     "codes": [
+      "511050"
+     ],
+     "name": "兴业上证1-5年期地方政府债交易型开放式指数证券投资基金",
+     "structure": "etf",
+     "reason": "场内 ETF，不属于场外研究样本"
+    }
+   ]
+  },
+  "fees": {
+   "stat": {
+    "planned": 90,
+    "inserted": 0,
+    "skipped_existing": 90,
+    "excluded": 0,
+    "failed": 0,
+    "by_type": {},
+    "notes": []
+   }
+  }
+ },
+ "counts_before": {
+  "fund_master": 9,
+  "fund_share_classes": 12,
+  "fund_nav_daily": 39822,
+  "fund_dividends": 44,
+  "fund_manager_history": 8,
+  "fund_aum_history": 8,
+  "fund_fee_rules": 0,
+  "fund_subscription_status": 12,
+  "fund_lifecycle_events": 8,
+  "fund_data_quality": 31,
+  "etf_pool": 46,
+  "etf_daily_prices": 116609,
+  "etf_indicator_daily": 350292,
+  "backtest_runs": 507,
+  "backtest_orders": 29255,
+  "backtest_trades": 26100,
+  "validation_runs": 64,
+  "validation_grid": 440,
+  "validation_windows": 486,
+  "validation_backtest_runs": 854,
+  "corporate_actions": 166,
+  "corporate_action_applications": 8873,
+  "dividend_receivables": 4947
+ },
+ "counts_after_run1": {
+  "fund_master": 50,
+  "fund_share_classes": 75,
+  "fund_nav_daily": 39822,
+  "fund_dividends": 44,
+  "fund_manager_history": 8,
+  "fund_aum_history": 8,
+  "fund_fee_rules": 90,
+  "fund_subscription_status": 12,
+  "fund_lifecycle_events": 49,
+  "fund_data_quality": 31,
+  "etf_pool": 46,
+  "etf_daily_prices": 116609,
+  "etf_indicator_daily": 350292,
+  "backtest_runs": 507,
+  "backtest_orders": 29255,
+  "backtest_trades": 26100,
+  "validation_runs": 64,
+  "validation_grid": 440,
+  "validation_windows": 486,
+  "validation_backtest_runs": 854,
+  "corporate_actions": 166,
+  "corporate_action_applications": 8873,
+  "dividend_receivables": 4947
+ },
+ "counts_after_run2": {
+  "fund_master": 50,
+  "fund_share_classes": 75,
+  "fund_nav_daily": 39822,
+  "fund_dividends": 44,
+  "fund_manager_history": 8,
+  "fund_aum_history": 8,
+  "fund_fee_rules": 90,
+  "fund_subscription_status": 12,
+  "fund_lifecycle_events": 49,
+  "fund_data_quality": 31,
+  "etf_pool": 46,
+  "etf_daily_prices": 116609,
+  "etf_indicator_daily": 350292,
+  "backtest_runs": 507,
+  "backtest_orders": 29255,
+  "backtest_trades": 26100,
+  "validation_runs": 64,
+  "validation_grid": 440,
+  "validation_windows": 486,
+  "validation_backtest_runs": 854,
+  "corporate_actions": 166,
+  "corporate_action_applications": 8873,
+  "dividend_receivables": 4947
+ },
+ "idempotent": true,
+ "integrity": {
+  "integrity_check": "ok",
+  "foreign_key_violations": 0,
+  "foreign_key_samples": []
+ },
+ "lifecycle": {
+  "total": 41,
+  "by_structure": {
+   "etf_linked": 3,
+   "lof": 11,
+   "ordinary_open_ended": 27
+  },
+  "evidence_b": 41,
+  "event_date_null": 12,
+  "with_url_and_id": 41,
+  "onshore_etf_leaked": 0,
+  "with_disclaimer": 41
+ },
+ "fees": {
+  "total": 90,
+  "by_type": {
+   "custody": 12,
+   "management": 12,
+   "purchase": 20,
+   "redemption": 34,
+   "sales_service": 12
+  },
+  "rate_null": 1,
+  "effective_from_null": 90,
+  "with_platform_rate": 20,
+  "inferred_lower_bound": 19,
+  "annual_rows": 36,
+  "holding_days_basis_null": 90
+ },
+ "alipay_status": {
+  "distribution": {
+   "unknown": 12
+  },
+  "all_unknown": true
+ },
+ "backup": {
+  "path": "D:\\ymy\\jj-agent\\data\\backups\\fund_agent_before_ingest_3b4_2_20261120_100028.db",
+  "size_bytes": 283824128
+ },
+ "excluded_onshore_etf": [
+  "511000",
+  "511050"
+ ],
+ "source_declaration": "来源为东方财富转载，未经基金管理人官网或交易所官网逐条回源验证，证据等级B。",
+ "data_sources": {
+  "lifecycle": "reports\\phase3B4_1_1_types_evidence_calibration.json",
+  "fees": "reports/phase3B4_1_1_historical_roster_fee_audit.json#fee_audit"
+ }
+}

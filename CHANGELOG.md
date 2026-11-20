@@ -1,5 +1,45 @@
 # 变更日志
 
+## 2026-11-20 — 阶段3B-4.2 场外基金关键历史数据正式入库
+
+把 3B-4.1.1 已审计的清盘事件与费率阶梯正式写入数据库。不重新采集、不开始回测、不开发策略。
+
+**迁移（只补列，不重构）**：`migrations/phase3b4_2_lifecycle_fee_ingestion.sql`
+给 `fund_lifecycle_events` 补 5 列（announcement_id / product_structure / fund_codes /
+event_fingerprint / fetched_at），给 `fund_fee_rules` 补 15 列（区间开闭、推断标记、
+rate_original / rate_platform 分列、platform_name、is_annual、holding_days_basis、
+来源追溯、detail）。保留全部旧列，旧 Repository 方法不改一行仍可用。
+SQLite 不支持 `ADD COLUMN IF NOT EXISTS`，实际由 `app/fund/migration_3b4_2.py`
+先查 `PRAGMA table_info` 再逐列补，可重复执行。
+
+**清盘事件入库 41 条**（普通开放式 27 + LOF 11 + ETF 联接 3），
+`511000` / `511050` 两只场内 ETF 排除，泄漏 0。
+证据等级全 **B**，41 条 URL + announcement_id 齐全，detail 全部写明
+「来源为东方财富转载，未经基金管理人官网或交易所官网逐条回源验证，证据等级B。」
+12 条缺清算开始日的保持 NULL——**没有一条**把公告日期复制成事件日期。
+多份额代码（如 `000091/000092/000093`）只建一个基金本体，不重复。
+
+**费率入库 90 条**：申购 20 / 赎回 34 / 管理 12 / 托管 12 / 销售服务 12。
+证据等级全 **C**（天天基金 F10）。`rate_original` 与 `rate_platform` 分列，
+`platform_name` 全 `eastmoney`（**0 条 alipay**）。
+`effective_from` 全部 NULL（抓取日期不冒充历史生效日期），
+`holding_days_basis` 全部 NULL（自然日/交易日未确认）。
+19 条推断下界标 `*_inferred=1`。
+`110022` 销售服务费页面是 `---`，存 NULL 不当 0（1 条 NULL 费率）。
+`000198` 货币基金赎回阶梯 0 行，不伪造。
+闭区间能准确表达：`max=6, inclusive=1` 与 `max=7, inclusive=0` 不再混淆。
+
+**幂等**：二次导入 0 新增、跳过 41+90。生命周期用 `event_fingerprint`
+= `life:{announcement_id}:{fund_code}` + UNIQUE 索引兜底。
+
+**完整性**：`integrity_check` = ok，外键违规 0，ETF 侧 13 张表行数 0 变化，
+原有净值/分红/经理/规模/质量表未动。支付宝状态全部保持 `unknown`。
+
+**备份**：导入前用 `sqlite3` backup API 快照到 `data/backups/`（`.gitignore` 已排除）。
+
+**测试**：新增 41 项；全量 **1040 passed / 0 failed**，299.81 秒。
+
+
 ## 2026-11-20 — 阶段3B-4.1.1 最终收口：支付宝数量语义与逐条表修正
 
 只改报告与统计口径。不重新采集、不改费率解析器、不改数据层。

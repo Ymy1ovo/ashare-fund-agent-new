@@ -2441,7 +2441,8 @@ if (basis != ACCOUNTING_FORMAL
 | 3B-4.0 | 场外基金数据层基础设施落地 | 856 | `phase3B4_fund_data_layer.md` |
 | 3B-4.1 | 场外基金关键历史数据源补齐审计 | 905 | `phase3B4_1_critical_data_sources.md` |
 | 3B-4.1.1 | 历史终止样本代表性修正与费率边界审计 | 942 | `phase3B4_1_1_historical_roster_fee_audit.md` |
-| 3B-4.1.1-c | 类型分类、证据等级与支付宝口径收口 | **990** | `phase3B4_1_1_types_evidence_calibration.md` |
+| 3B-4.1.1-c | 类型分类、证据等级与支付宝口径收口 | 990 | `phase3B4_1_1_types_evidence_calibration.md` |
+| 3B-4.2 | 关键历史数据正式入库（清盘 41 + 费率 90） | **1040** | `phase3B4_2_data_ingestion_report.md` |
 
 当前正式会计版本：`ca-v2-receivable`；正式会计基础：`formal_receivable`；正式估值标记：`formal_valuation=True`。
 
@@ -4446,4 +4447,166 @@ C 免申购费、销售服务费 0.10~0.40%；管理费两者相同。
 新增 17 项覆盖本轮 8 项要求：场外结构数不等于可买数、支付宝保持 unknown、
 511000/511050 仍是场内 ETF、020025 等仍是联接、43 条全 B 级、两份报告一致、
 主报告无旧结论、费率三修复未回退。
+
+## 60. 阶段3B-4.2 场外基金关键历史数据正式入库
+
+### 60.1 结论
+
+| 项 | 结果 |
+| --- | --- |
+| 生命周期事件 | **41** 条（场内 ETF 2 条排除） |
+| 费率规则 | **90** 条 |
+| 证据等级 | 生命周期 **B** / 费率 **C** |
+| 幂等 | ✅ 二次导入 0 新增 |
+| SQLite 完整性 | **ok**，外键违规 0 |
+| 支付宝状态 | ✅ 全部 unknown，未改变 |
+| ETF 侧数据 | ✅ 前后行数完全一致 |
+
+> **核心原则：宁可保留 NULL 和 unknown，也不为填满数据库制造数据。**
+
+### 60.2 迁移（只补列，不重构）
+
+`migrations/phase3b4_2_lifecycle_fee_ingestion.sql`
+
+| 表 | 新增列 | 用途 |
+| --- | ---: | --- |
+| `fund_lifecycle_events` | +5 | `announcement_id` / `product_structure` / `fund_codes` / `event_fingerprint` / `fetched_at` |
+| `fund_fee_rules` | +15 | 区间开闭、推断标记、原始/平台费率分列、平台名、年化、持有期口径、来源追溯、detail |
+
+新增索引：`uq_fund_life_fingerprint`（UNIQUE）、`idx_fund_life_announcement`、
+`idx_fund_life_structure`、`idx_fund_fee_type`、`idx_fund_fee_platform`。
+
+SQLite 的 `ALTER TABLE ADD COLUMN` 不支持 `IF NOT EXISTS`，
+实际执行由 `app/fund/migration_3b4_2.py` 先查 `PRAGMA table_info` 再逐列补。
+
+**兼容性**：保留全部旧列，旧 Repository 方法不改一行仍可用。
+
+### 60.3 生命周期事件入库
+
+| 项 | 数量 |
+| --- | ---: |
+| 清盘事件总数（校准 JSON） | 43 |
+| 排除（场内 ETF） | 2（`511000`、`511050`） |
+| **实际入库** | **41** |
+
+| 结构 | 数量 |
+| --- | ---: |
+| 普通开放式 | 27 |
+| LOF | 11 |
+| ETF 联接 | 3 |
+
+| 检查 | 结果 |
+| --- | --- |
+| 场内 ETF 泄漏 | **0** |
+| 证据等级 B | **41 / 41** |
+| URL + ID 齐全 | **41 / 41** |
+| detail 含来源声明 | **41 / 41** |
+| `event_date` 为 NULL | 12（公告未写清算开始日） |
+| 多份额→多本体 | **0**（每事件唯一 fund_id） |
+
+每条 detail 写明：
+
+```
+来源为东方财富转载，未经基金管理人官网或交易所官网逐条回源验证，证据等级B。
+```
+
+**关键验证**：12 条 `event_date IS NULL` 的记录，`announcement_date` 都有值，
+且**没有一条**把公告日期复制成事件日期。
+
+### 60.4 费率阶梯入库
+
+| 费率类型 | 数量 |
+| --- | ---: |
+| `purchase` 申购（金额阶梯） | 20 |
+| `redemption` 赎回（持有期阶梯） | 34 |
+| `management` 管理费 | 12 |
+| `custody` 托管费 | 12 |
+| `sales_service` 销售服务费 | 12 |
+| **合计** | **90** |
+
+| 边界保护 | 结果 |
+| --- | --- |
+| 原始/平台费率分列 | ✅ `rate_original` / `rate_platform` |
+| `platform_name` = alipay | **0**（全部 eastmoney） |
+| 推断下界已标记 | 19 条 `*_inferred = 1` |
+| `rate_original` 为 NULL | 1（`110022` 销售服务费 `---`，不当 0） |
+| `effective_from` 为 NULL | **90 / 90**（抓取日期不冒充生效日期） |
+| `holding_days_basis` 为 NULL | **90 / 90**（自然日/交易日未确认） |
+| 货币基金伪造赎回阶梯 | **0**（`000198` 赎回 0 行） |
+| 证据等级 | **C**（天天基金 F10，非合同原文） |
+
+**闭区间可表达**（3B-4.0 做不到的）：
+
+| 档 | min | min含 | max | max含 | 推断 | 费率 |
+| ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| 0 | 0 | 1 | 6 | 1 | **1** | 1.50% |
+| 1 | 7 | 1 | 364 | 1 | 0 | 0.50% |
+| 2 | 365 | 1 | 729 | 1 | 0 | 0.25% |
+| 3 | 730 | 1 | NULL | NULL | 0 | 0.00% |
+
+`max=6, inclusive=1` 与 `max=7, inclusive=0` 是两种不同含义，单列 `holding_days_max` 无法区分。
+
+### 60.5 幂等验证
+
+| 表 | 导入前 | 第1次后 | 第2次后 |
+| --- | ---: | ---: | ---: |
+| `fund_lifecycle_events` | 8 | 49 | **49** |
+| `fund_fee_rules` | 0 | 90 | **90** |
+| `fund_master` | 9 | 50 | **50** |
+
+第二次导入：新增 **0**，跳过 41 + 90，失败 0。
+
+幂等键：
+
+| 表 | 键 | 兜底 |
+| --- | --- | --- |
+| 生命周期 | `event_fingerprint` = `life:{announcement_id}:{fund_code}` | UNIQUE 索引 |
+| 费率 | `(share_class_id, fee_type, tier_order, effective_from)` | UNIQUE 索引 |
+
+### 60.6 备份
+
+| 项 | 值 |
+| --- | --- |
+| 路径 | `data/backups/fund_agent_before_ingest_3b4_2_*.db` |
+| 方式 | `sqlite3` backup API（一致性快照） |
+| 时机 | 迁移与导入**之前** |
+| 是否入 Git | ❌ `.gitignore` 已排除 `data/backups/` |
+
+### 60.7 专项测试
+
+`tests/test_ingest_3b4_2.py`，**41 项**，独立临时库 + JSON 数据源，不联网。
+
+| 类别 | 测试数 |
+| --- | ---: |
+| 迁移 | 5 |
+| 范围筛选 | 4 |
+| 生命周期 | 9 |
+| 费率 | 15 |
+| 数据库 | 6 |
+| 数据源不变 | 2 |
+
+### 60.8 产物
+
+| 项 | 路径 |
+| --- | --- |
+| 迁移 SQL | `migrations/phase3b4_2_lifecycle_fee_ingestion.sql` |
+| 迁移模块 | `app/fund/migration_3b4_2.py` |
+| 导入模块 | `app/fund/ingest_3b4_2.py` |
+| 导入脚本 | `scripts/ingest_3b4_2.py` |
+| 专项测试 | `tests/test_ingest_3b4_2.py`（41 项） |
+| 报告 | `reports/phase3B4_2_data_ingestion_report.md` |
+| 统计 JSON | `reports/phase3B4_2_data_ingestion.json` |
+
+### 60.9 仍未解决
+
+| # | 问题 |
+| ---: | --- |
+| 1 | 43 条清盘公告仅 B 级（东财转载，未回源官方） |
+| 2 | 12 条清盘记录缺 `event_date`（公告未写清算开始日） |
+| 3 | 费率仅 C 级（天天基金 F10 非合同原文） |
+| 4 | `effective_from` 全 NULL，无法做历史费率模拟 |
+| 5 | `holding_days_basis` 全 NULL，自然日/交易日未确认 |
+| 6 | 支付宝可购买状态全 unknown |
+| 7 | 合并事件 0 个 |
+| 8 | 清盘名录覆盖率不可量化 |
 
