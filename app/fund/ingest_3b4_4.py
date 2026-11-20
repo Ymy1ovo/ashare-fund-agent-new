@@ -33,13 +33,20 @@ DISCLAIMER_MANAGER = (
     "（东方财富公告库转发，公告 ID 可回源）。公告正文明确记载任职日期或"
     "离任日期；因未直接访问管理人官网原件，证据等级记 A-。")
 DISCLAIMER_AUM = (
-    "基金规模（期末净资产）取自天天基金规模变动页，"
-    "原始出处为基金定期报告（季报/半年报/年报）披露的期末净资产。"
-    "本表记录的日期是**披露对应的时点**，不是公告发布日期。"
-    "2013 年以后的记录基本都是季末/半年末/年末；"
-    "2013 年以前部分记录是月频或周频披露（如 2013-03-15、2010-08-23），"
-    "日期本身来自页面，未做任何归并或推测。"
-    "因未逐份下载定期报告原文核对，证据等级记 C。")
+    "基金规模取自天天基金规模变动页。页面提供的日期是"
+    "**平台观测日期（platform_observation_date）**，"
+    "不保证等于基金定期报告的报告期末日，也不等于公告发布日期。"
+    "页面中 2013 年前后都存在周频/月频等非季末日期"
+    "（如 2013-03-15、2013-03-22、2010-08-23），"
+    "说明平台日期并非按报告期整齐切分。"
+    "本表**未逐条核实**该日期对应的真实报告期末，"
+    "也**未取得**公告发布日期与实际公开可见时间。"
+    "因此这些记录只能作为**带时间语义限制的描述性历史规模数据**，"
+    "不得作为「投资者在该日已经知道该规模」的时点特征使用。"
+    "证据等级记 C。")
+
+# 日期语义常量
+DATE_SEMANTICS = "platform_observation_date"
 
 # 证据等级：官方公告原文经聚合平台转发
 LEVEL_OFFICIAL_TEXT = "A-"      # 官方原文，但经第三方公告库
@@ -294,8 +301,9 @@ def load_aum_json() -> dict:
 def ingest_aum(db_path=None) -> dict:
     """把已采集的规模历史写入 fund_aum_history。
 
-    数据来自天天基金规模变动页，原始出处为定期报告期末净资产。
-    只记录 report_date（报告期末），不冒充公告发布日期。
+    数据来自天天基金规模变动页。report_date 是**平台观测日期**，
+    未逐条核实是否等于报告期末，也未取得公告发布日期。
+    disclosed_at 保持 NULL，point_in_time_usable=false。
     """
     data = load_aum_json()
     stat = IngestStat()
@@ -329,7 +337,11 @@ def ingest_aum(db_path=None) -> dict:
                     stat.skipped_existing += 1
                     continue
                 detail = json.dumps({
-                    "report_date_is_period_end": True,
+                    "date_semantics": DATE_SEMANTICS,
+                    "period_end_verified": False,
+                    "publication_date_verified": False,
+                    "point_in_time_usable": False,
+                    "disclosed_at_null_reason": "公告发布日期与实际公开可见时间均未取得",
                     "not_publication_date": True,
                     "disclaimer": DISCLAIMER_AUM,
                 }, ensure_ascii=False)

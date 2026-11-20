@@ -1,7 +1,7 @@
 {
  "phase": "3B-4.4",
  "baseline_head": "2294b4aa8f79dcb921c5fa00b1d2e12548477072",
- "generated_at": "2026-11-20T13:48:58",
+ "generated_at": "2026-11-20T14:12:58",
  "scope": "只做有边界的数据缺口补强：补有官方公告证据的费率生效日、经理任职日期、规模报告期序列；分红做跨来源核验并记录差异；清盘名录只提高可追溯性不追求覆盖率。不做策略、不做回测。",
  "evidence_levels": {
   "A": "官方原始来源，可追溯原始公告或正式文件",
@@ -162,6 +162,154 @@
     ]
    }
   ],
+  "verification": [
+   {
+    "code": "000015",
+    "fee_type": "custody",
+    "db_rate": 0.001,
+    "ann_rate_after": 0.001,
+    "rate_match": true,
+    "db_eff": "2024-09-12",
+    "ann_eff": "2024-09-12",
+    "eff_match": true,
+    "ann_id_match": true,
+    "detail_rate_after_match": true,
+    "fund_id": 21
+   },
+   {
+    "code": "000016",
+    "fee_type": "custody",
+    "db_rate": 0.001,
+    "ann_rate_after": 0.001,
+    "rate_match": true,
+    "db_eff": "2024-09-12",
+    "ann_eff": "2024-09-12",
+    "eff_match": true,
+    "ann_id_match": true,
+    "detail_rate_after_match": true,
+    "fund_id": 21
+   },
+   {
+    "code": "000051",
+    "fee_type": "management",
+    "db_rate": 0.0015,
+    "ann_rate_after": 0.0015,
+    "rate_match": true,
+    "db_eff": "2024-11-22",
+    "ann_eff": "2024-11-22",
+    "eff_match": true,
+    "ann_id_match": true,
+    "detail_rate_after_match": true,
+    "fund_id": 14
+   },
+   {
+    "code": "000051",
+    "fee_type": "custody",
+    "db_rate": 0.0005,
+    "ann_rate_after": 0.0005,
+    "rate_match": true,
+    "db_eff": "2024-11-22",
+    "ann_eff": "2024-11-22",
+    "eff_match": true,
+    "ann_id_match": true,
+    "detail_rate_after_match": true,
+    "fund_id": 14
+   },
+   {
+    "code": "000198",
+    "fee_type": "custody",
+    "db_rate": 0.0007,
+    "ann_rate_after": 0.0007,
+    "rate_match": true,
+    "db_eff": "2025-09-23",
+    "ann_eff": "2025-09-23",
+    "eff_match": true,
+    "ann_id_match": true,
+    "detail_rate_after_match": true,
+    "fund_id": 22
+   },
+   {
+    "code": "110022",
+    "fee_type": "management",
+    "db_rate": 0.012,
+    "ann_rate_after": 0.012,
+    "rate_match": true,
+    "db_eff": "2023-07-10",
+    "ann_eff": "2023-07-10",
+    "eff_match": true,
+    "ann_id_match": true,
+    "detail_rate_after_match": true,
+    "fund_id": 18
+   },
+   {
+    "code": "110022",
+    "fee_type": "custody",
+    "db_rate": 0.002,
+    "ann_rate_after": 0.002,
+    "rate_match": true,
+    "db_eff": "2023-07-10",
+    "ann_eff": "2023-07-10",
+    "eff_match": true,
+    "ann_id_match": true,
+    "detail_rate_after_match": true,
+    "fund_id": 18
+   },
+   {
+    "code": "161005",
+    "fee_type": "management",
+    "db_rate": 0.012,
+    "ann_rate_after": 0.012,
+    "rate_match": true,
+    "db_eff": "2023-07-10",
+    "ann_eff": "2023-07-10",
+    "eff_match": true,
+    "ann_id_match": true,
+    "detail_rate_after_match": true,
+    "fund_id": 19
+   },
+   {
+    "code": "161005",
+    "fee_type": "custody",
+    "db_rate": 0.002,
+    "ann_rate_after": 0.002,
+    "rate_match": true,
+    "db_eff": "2023-07-10",
+    "ann_eff": "2023-07-10",
+    "eff_match": true,
+    "ann_id_match": true,
+    "detail_rate_after_match": true,
+    "fund_id": 19
+   },
+   {
+    "code": "161725",
+    "fee_type": "custody",
+    "db_rate": 0.002,
+    "ann_rate_after": 0.002,
+    "rate_match": true,
+    "db_eff": "2023-07-10",
+    "ann_eff": "2023-07-10",
+    "eff_match": true,
+    "ann_id_match": true,
+    "detail_rate_after_match": true,
+    "fund_id": 16
+   },
+   {
+    "code": "012414",
+    "fee_type": "custody",
+    "db_rate": 0.002,
+    "ann_rate_after": 0.002,
+    "rate_match": true,
+    "db_eff": "2023-07-10",
+    "ann_eff": "2023-07-10",
+    "eff_match": true,
+    "ann_id_match": true,
+    "detail_rate_after_match": true,
+    "fund_id": 16
+   }
+  ],
+  "verification_count": 11,
+  "verification_mismatch": 0,
+  "verification_note": "逐条核验：rate_original 是否等于公告调整后费率、effective_from 是否等于公告生效日、announcement_id 是否对应、同一公告多份额时归属是否正确。不一致的必须标为不可用于成本模拟。",
   "backfilled_from_current_rate": 0,
   "note": "只补年化费率（管理费/托管费/销售服务费）的生效日期，因为只有这类费率有官方『调低费率并修订基金合同』公告明确记载生效日。申购费、赎回费是合同固定档位，没有『某天起生效』的官方公告，继续保留 effective_from=NULL，不倒填。",
   "evidence_level_upgraded": "C → A-（有官方公告原文支持生效日的 11 条）",
@@ -250,96 +398,139 @@
   "total_records": 683,
   "records_with_evidence": 675,
   "snapshot_only_records": 8,
-  "distinct_report_dates": 138,
+  "distinct_dates": 138,
+  "distinct_dates_unit": "platform_observation_date",
+  "date_min": "2005-12-31",
+  "date_max": "2026-09-30",
+  "quarter_end_date_count": 84,
+  "non_quarter_end_date_count": 54,
+  "non_quarter_end_sample": [
+   "2010-08-23",
+   "2010-08-24",
+   "2010-08-25",
+   "2010-08-26",
+   "2010-09-03",
+   "2010-09-06",
+   "2010-09-07",
+   "2010-09-08",
+   "2010-09-09",
+   "2010-09-10",
+   "2010-09-13",
+   "2010-09-14"
+  ],
   "share_classes_with_series": 12,
   "per_share": [
    {
     "code": "000015",
-    "periods": 62,
+    "records": 62,
     "date_min": "2013-03-15",
-    "date_max": "2026-09-30"
+    "date_max": "2026-09-30",
+    "non_quarter_end_dates": 8
    },
    {
     "code": "000016",
-    "periods": 62,
+    "records": 62,
     "date_min": "2013-03-15",
-    "date_max": "2026-09-30"
+    "date_max": "2026-09-30",
+    "non_quarter_end_dates": 8
    },
    {
     "code": "000051",
-    "periods": 69,
+    "records": 69,
     "date_min": "2009-09-30",
-    "date_max": "2026-09-30"
+    "date_max": "2026-09-30",
+    "non_quarter_end_dates": 0
    },
    {
     "code": "000198",
-    "periods": 58,
+    "records": 58,
     "date_min": "2013-05-30",
-    "date_max": "2026-09-30"
+    "date_max": "2026-09-30",
+    "non_quarter_end_dates": 4
    },
    {
     "code": "000478",
-    "periods": 58,
+    "records": 58,
     "date_min": "2014-01-30",
-    "date_max": "2026-09-30"
+    "date_max": "2026-09-30",
+    "non_quarter_end_dates": 7
    },
    {
     "code": "007300",
-    "periods": 31,
+    "records": 31,
     "date_min": "2019-06-26",
-    "date_max": "2026-09-30"
+    "date_max": "2026-09-30",
+    "non_quarter_end_dates": 1
    },
    {
     "code": "007301",
-    "periods": 31,
+    "records": 31,
     "date_min": "2019-06-26",
-    "date_max": "2026-09-30"
+    "date_max": "2026-09-30",
+    "non_quarter_end_dates": 1
    },
    {
     "code": "012414",
-    "periods": 22,
+    "records": 22,
     "date_min": "2021-06-30",
-    "date_max": "2026-09-30"
+    "date_max": "2026-09-30",
+    "non_quarter_end_dates": 0
    },
    {
     "code": "110020",
-    "periods": 70,
+    "records": 70,
     "date_min": "2009-12-31",
-    "date_max": "2026-09-30"
+    "date_max": "2026-09-30",
+    "non_quarter_end_dates": 2
    },
    {
     "code": "110022",
-    "periods": 100,
+    "records": 100,
     "date_min": "2010-08-23",
-    "date_max": "2026-09-30"
+    "date_max": "2026-09-30",
+    "non_quarter_end_dates": 35
    },
    {
     "code": "161005",
-    "periods": 84,
+    "records": 84,
     "date_min": "2005-12-31",
-    "date_max": "2026-09-30"
+    "date_max": "2026-09-30",
+    "non_quarter_end_dates": 0
    },
    {
     "code": "161725",
-    "periods": 28,
+    "records": 28,
     "date_min": "2015-12-31",
-    "date_max": "2026-09-30"
+    "date_max": "2026-09-30",
+    "non_quarter_end_dates": 1
    }
   ],
-  "report_date_is_period_end": true,
-  "publication_date_recorded": false,
-  "publication_date_note": "本轮**只记录报告期末日期**，未逐份下载定期报告确认公告发布日期；disclosed_at 保持 NULL。",
+  "date_semantics": "platform_observation_date",
+  "period_end_verified": false,
+  "publication_date_verified": false,
+  "point_in_time_usable": false,
+  "disclosed_at_non_null_count": 0,
+  "disclosed_at_all_null": true,
+  "stale_semantics_rows": 0,
   "by_evidence_level": {
    "C": 675,
    "(null)": 8
   },
-  "usable_as_point_in_time": true,
-  "usable_reason": "规模已有按报告期的真实时间序列（最早 2005-12-31，最新 2026-09-30），可按报告期回溯使用；但必须按报告期末日对齐，不能用相邻期插值或把当期当历史。",
+  "usable_as_point_in_time": false,
+  "usable_as_descriptive_history": true,
+  "usable_reason": "页面日期是平台观测日期，未逐条核实其对应的真实报告期末，也未取得公告发布日期与实际公开可见时间。因此只能作为**带时间语义限制的描述性历史规模数据**，不得作为「投资者在该日已经知道该规模」的时点特征。",
   "usable_conditions": [
-   "只能用报告期末日期对齐（不是公告日）",
-   "中间期缺失就是缺失，不得插值",
-   "C 级证据：来自天天基金规模变动页，原始出处是定期报告",
+   "仅可用于描述性统计（如『该基金在某段时间的规模量级』）",
+   "不得作为回测的时点已知信息（会引入未来信息）",
+   "不得把平台日期当作报告期末或公告日",
+   "中间缺失就是缺失，不得插值",
+   "C 级证据：来自天天基金规模变动页",
    "货币基金规模单位是亿元但量级巨大（余额宝），注意单位"
+  ],
+  "blocked_uses": [
+   "作为历史时点因子（规模因子、规模择时等）",
+   "作为正式回测的已知信息",
+   "作为『某日规模』的精确断言"
   ]
  },
  "coverage": {
@@ -445,11 +636,6 @@
     "condition": "只用于剔除已知清盘，不得声称覆盖完整"
    },
    {
-    "data": "基金规模历史（按报告期）",
-    "evidence": "C",
-    "condition": "138 个报告期末，最早 2005-12-31；必须按报告期末对齐，缺失不插值"
-   },
-   {
     "data": "基金经理任职起止（有公告部分）",
     "evidence": "A-",
     "condition": "12 条有起始日、4 条有结束日；只能用于已知日期区间的判断，不得回填"
@@ -482,6 +668,12 @@
    }
   ],
   "tier_3_auxiliary_only": [
+   {
+    "data": "基金规模历史",
+    "evidence": "C",
+    "condition": "只能做描述性历史规模分析",
+    "blocker": "138 个平台观测日期中 54 个不是季末；报告期末未逐条核实、公告发布日期未取得、公开可见时间 unknown，不能作为时点已知信息"
+   },
    {
     "data": "无起始日的经理快照",
     "evidence": "C",
@@ -519,6 +711,10 @@
    {
     "data": "用当前经理/规模回填历史",
     "reason": "未来信息泄漏"
+   },
+   {
+    "data": "规模记录作为历史时点因子/回测已知信息",
+    "reason": "日期是平台观测日期，报告期末与公开可见时间均未验证，当作当时已知就是未来信息泄漏"
    }
   ]
  },
@@ -526,13 +722,13 @@
   "improved": [
    "费率生效时间：11 条年化费率补到官方生效日（A- 级），覆盖 8 只基金",
    "经理任职历史：新增 12 条有起始日的记录（A- 级）",
-   "规模历史：从 1 个快照扩展到 138 个报告期末（C 级），覆盖 12 个份额"
+   "规模历史：从 1 个快照扩展到 138 个平台观测日期（C 级），覆盖 12 个份额；但日期语义未验证，只能做描述性分析"
   ],
   "still_open": [
    "费率：79 条仍无生效日（全部申购/赎回阶梯 + 无公告的年化费率）",
    "分红：44 条未通过完整性验证，9 条无法与公告配对",
    "经理：9 条仍只有快照（无任职日期）",
-   "规模：公告发布日期（disclosed_at）未采集",
+   "规模：日期是平台观测日期，未逐条核实报告期末；公告发布日期与公开可见时间均 unknown",
    "清盘名录：覆盖率 not_quantifiable",
    "支付宝：全部 unknown"
   ],
@@ -545,7 +741,7 @@
  "stage_gate": {
   "ready_for_next_stage": false,
   "ready_for_backtest": false,
-  "reason": "本轮实际改善了费率生效日、经理任职日、规模时序三项；但费率仍有 79 条无生效日（含全部申购赎回阶梯）、分红完整性未验证、清盘名录覆盖率不可量化、支付宝状态全 unknown。不足以支撑正式回测。",
+  "reason": "本轮实际改善了费率生效日、经理任职日、规模时序三项（规模日期语义未验证，只算描述性历史）；但费率仍有 79 条无生效日（含全部申购赎回阶梯）、分红完整性未验证、清盘名录覆盖率不可量化、支付宝状态全 unknown。不足以支撑正式回测。",
   "allowed_next": "3B-4.5 补充研究 或 研究性分析（非回测）",
   "blocked": [
    "3B-5 场外基金正式回测"

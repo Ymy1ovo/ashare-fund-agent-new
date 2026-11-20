@@ -2444,7 +2444,7 @@ if (basis != ACCOUNTING_FORMAL
 | 3B-4.1.1-c | 类型分类、证据等级与支付宝口径收口 | 990 | `phase3B4_1_1_types_evidence_calibration.md` |
 | 3B-4.2 | 关键历史数据正式入库（清盘 41 + 费率 90） | 1051 | `phase3B4_2_data_ingestion_report.md` |
 | 3B-4.3 | 数据质量与幸存者偏差验收 | 1123 | `phase3B4_3_data_quality_report.md` |
-| 3B-4.4 | 数据缺口补强与来源收口 | **1172** | `phase3B4_4_data_gap_research.md` |
+| 3B-4.4 | 数据缺口补强与来源收口 | **1189** | `phase3B4_4_data_gap_research.md` |
 
 当前正式会计版本：`ca-v2-receivable`；正式会计基础：`formal_receivable`；正式估值标记：`formal_valuation=True`。
 
@@ -4921,4 +4921,57 @@ A/C 是同一本体的两个份额。**比较必须同口径：本体比本体�
 | 报告 | `reports/phase3B4_4_data_gap_research.md` |
 | JSON | `reports/phase3B4_4_data_gap_research.json` |
 | 证据 | `reports/evidence/phase3b4_4/` |
+
+### 62.11 验收修正：规模日期语义
+
+**问题**：原报告把 675 条规模记录的日期一律当成「报告期末」，
+并宣称可作为历史时点特征。但平台页面里存在大量非季末日期：
+
+| 日期 | 类型 |
+| --- | --- |
+| `2010-08-23` ~ `2010-09-08` | 周频/日频（连续多日同值） |
+| `2013-03-08` / `2013-03-15` / `2013-03-22` / `2013-03-29` | 周频 |
+| `2013-04-03` / `2013-04-12` | 非标准季度末 |
+
+138 个不同日期中，**84 个是季末、54 个不是**。
+
+**修正后的语义**：
+
+| 项 | 修正前 | 修正后 |
+| --- | --- | --- |
+| 日期语义 | `report_date_is_period_end=true` | **`platform_observation_date`** |
+| 报告期末已核实 | true | **false** |
+| 公告发布日期已核实 | false | **false** |
+| 可作为时点特征 | true | **false** |
+| `disclosed_at` | 全 NULL | 全 NULL（不变） |
+
+**修正范围**：只改 675 条记录的 `detail` 元数据，
+`report_date` / `aum_total` / `shares_total` / `source` / `evidence_level` **全部不变**（有逐行比对验证）。
+
+**使用门槛**：规模历史**留在第三档**（辅助研究），不升第一档。
+
+| 用途 | 是否允许 |
+| --- | --- |
+| 描述性统计 | ✅ |
+| 历史时点因子 | ❌ 未来信息泄漏 |
+| 回测已知信息 | ❌ |
+
+核心问题：**即使该日期是报告期末，也不代表投资者在该日已经知道这个数据。**
+`disclosed_at` 全 NULL，公开可见时间 unknown。
+
+### 62.12 11 条费率逐条核验
+
+| 核验项 | 结果 |
+| --- | --- |
+| `rate_original` = 公告调整后费率 | **11 / 11** ✅ |
+| `effective_from` = 公告生效日 | **11 / 11** ✅ |
+| `announcement_id` 对应正确 | **11 / 11** ✅ |
+| 同一公告多份额归属 | ✅ 正确 |
+
+**重要**：数据库 `rate_original` 恰好等于公告「调整后」费率，
+说明天天基金 F10 展示的是**当前有效费率**。所以：
+
+- ✅ 可用于该生效日**之后**的成本模拟
+- ❌ 生效日**之前**必须用 `detail.rate_before` 的调整前费率
+- ⚠️ 直接把 `rate_original` 用于整个历史区间 = 把降费后费率倒填到降费前
 

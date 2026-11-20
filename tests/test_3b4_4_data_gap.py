@@ -380,10 +380,12 @@ def test_manager_has_dates(payload):
 
 
 def test_aum_series(payload):
+    """规模是多日期序列，但日期语义是平台观测日，非验证报告期。"""
     a = payload["aum"]
-    assert a["distinct_report_dates"] > 1
-    assert a["report_date_is_period_end"] is True
-    assert a["publication_date_recorded"] is False
+    assert a["distinct_dates"] > 1
+    assert a["date_semantics"] == "platform_observation_date"
+    assert a["period_end_verified"] is False
+    assert a["publication_date_verified"] is False
 
 
 def test_coverage_not_quantifiable(payload):
@@ -445,9 +447,10 @@ def test_usage_matrix_four_tiers(payload):
         assert isinstance(m[k], list)
 
 
-def test_aum_in_tier1(payload):
+def test_aum_not_direct_use(payload):
+    """规模已从第一档降级：日期语义未验证，不能直接用于研究。"""
     names = " ".join(x["data"] for x in payload["usage_matrix"]["tier_1_direct_use"])
-    assert "规模历史" in names
+    assert "规模" not in names
 
 
 def test_backfill_forbidden(payload):
@@ -495,3 +498,201 @@ def test_report_no_false_completion():
 
 def test_baseline_recorded(payload):
     assert payload["baseline_head"].startswith("2294b4aa")
+
+# ================================================================ 规模日期语义（验收修正）
+def test_aum_non_quarter_dates_not_marked_verified(gapdb):
+    """1. 非季末日期不得被标记为已验证报告期末。"""
+    from app.fund.ingest_3b4_4 import ingest_aum
+    ingest_aum(gapdb)
+    with get_connection(gapdb) as conn:
+        rows = conn.execute(
+            """SELECT report_date, detail FROM fund_aum_history
+               WHERE evidence_level IS NOT NULL""").fetchall()
+    assert rows
+    for r in rows:
+        d = json.loads(r["detail"])
+        assert d.get("period_end_verified") is False, r["report_date"]
+        assert d.get("date_semantics") == "platform_observation_date"
+
+
+def test_aum_db_no_period_end_true(gapdb):
+    """2. 数据库不得残留 report_date_is_period_end=true。"""
+    from app.fund.ingest_3b4_4 import ingest_aum
+    ingest_aum(gapdb)
+    with get_connection(gapdb) as conn:
+        stale = conn.execute(
+            "SELECT COUNT(*) FROM fund_aum_history "
+            "WHERE detail LIKE '%report_date_is_period_end%'").fetchone()[0]
+        truthy = conn.execute(
+            """SELECT COUNT(*) FROM fund_aum_history
+               WHERE detail LIKE '%"period_end_verified": true%'""").fetchone()[0]
+    assert stale == 0
+    assert truthy == 0
+
+
+def test_aum_point_in_time_false(gapdb):
+    """4. disclosed_at 未验证时 point_in_time_usable 必须为 false。"""
+    from app.fund.ingest_3b4_4 import ingest_aum
+    ingest_aum(gapdb)
+    with get_connection(gapdb) as conn:
+        rows = conn.execute(
+            """SELECT detail, disclosed_at FROM fund_aum_history
+               WHERE evidence_level IS NOT NULL""").fetchall()
+    assert rows
+    for r in rows:
+        assert r["disclosed_at"] is None
+        d = json.loads(r["detail"])
+        assert d.get("point_in_time_usable") is False
+        assert d.get("publication_date_verified") is False
+
+
+def test_aum_business_fields_stable(gapdb):
+    """3. 元数据修正前后 report_date / aum_total / shares_total 不变。"""
+    from app.fund.ingest_3b4_4 import ingest_aum
+    ingest_aum(gapdb)
+    with get_connection(gapdb) as conn:
+        before = [tuple(r) for r in conn.execute(
+            """SELECT aum_id, report_date, aum_total, shares_total, source,
+                      evidence_level FROM fund_aum_history ORDER BY aum_id""").fetchall()]
+    # 模拟元数据修正（重写 detail）
+    from app.fund.ingest_3b4_4 import DISCLAIMER_AUM, DATE_SEMANTICS
+    new_detail = json.dumps({
+        "date_semantics": DATE_SEMANTICS,
+        "period_end_verified": False,
+        "publication_date_verified": False,
+        "point_in_time_usable": False,
+        "disclaimer": DISCLAIMER_AUM,
+    }, ensure_ascii=False)
+    with get_connection(gapdb) as conn:
+        conn.execute(
+            "UPDATE fund_aum_history SET detail=? WHERE evidence_level IS NOT NULL",
+            (new_detail,))
+        after = [tuple(r) for r in conn.execute(
+            """SELECT aum_id, report_date, aum_total, shares_total, source,
+                      evidence_level FROM fund_aum_history ORDER BY aum_id""").fetchall()]
+    assert before == after
+
+
+def test_aum_fix_idempotent(gapdb):
+    """8. 修正脚本重复执行不产生变化。"""
+    from app.fund.ingest_3b4_4 import DATE_SEMANTICS, DISCLAIMER_AUM, ingest_aum
+    ingest_aum(gapdb)
+    detail = json.dumps({
+        "date_semantics": DATE_SEMANTICS,
+        "period_end_verified": False,
+        "publication_date_verified": False,
+        "point_in_time_usable": False,
+        "disclaimer": DISCLAIMER_AUM,
+    }, ensure_ascii=False)
+
+    def apply() -> int:
+        with get_connection(gapdb) as conn:
+            cur = conn.execute(
+                """UPDATE fund_aum_history SET detail=?
+                   WHERE evidence_level IS NOT NULL
+                     AND (detail NOT LIKE '%point_in_time_usable%'
+                          OR detail LIKE '%report_date_is_period_end%')""",
+                (detail,))
+            return cur.rowcount
+
+    first = apply()
+    second = apply()
+    assert second == 0
+    with get_connection(gapdb) as conn:
+        n = conn.execute(
+            "SELECT COUNT(*) FROM fund_aum_history").fetchone()[0]
+    assert n > 0
+
+
+# ---------------- 包装在真实库上的检查
+def test_real_db_no_stale_period_end(payload):
+    """真实库不得残留 report_date_is_period_end。"""
+    from app.database.db import get_connection, settings
+    with get_connection() as conn:
+        stale = conn.execute(
+            "SELECT COUNT(*) FROM fund_aum_history "
+            "WHERE detail LIKE '%report_date_is_period_end%'").fetchone()[0]
+    assert stale == 0
+
+
+def test_real_db_point_in_time_false(payload):
+    from app.database.db import get_connection
+    with get_connection() as conn:
+        bad = conn.execute(
+            """SELECT COUNT(*) FROM fund_aum_history
+               WHERE evidence_level IS NOT NULL
+                 AND detail LIKE '%"point_in_time_usable": true%'""").fetchone()[0]
+    assert bad == 0
+
+
+def test_payload_aum_semantics(payload):
+    """6. 报告 JSON 与审计脚本的规模日期语义一致。"""
+    a = payload["aum"]
+    assert a["date_semantics"] == "platform_observation_date"
+    assert a["period_end_verified"] is False
+    assert a["publication_date_verified"] is False
+    assert a["point_in_time_usable"] is False
+    assert a["usable_as_point_in_time"] is False
+    assert a["usable_as_descriptive_history"] is True
+    assert a["disclosed_at_all_null"] is True
+
+
+def test_payload_distinct_dates_not_periods(payload):
+    """138 是平台观测日期数，不是已验证报告期数。"""
+    a = payload["aum"]
+    assert a["distinct_dates"] == 138
+    assert a["distinct_dates_unit"] == "platform_observation_date"
+    assert "distinct_report_dates" not in a
+    assert a["non_quarter_end_date_count"] > 0
+    assert a["quarter_end_date_count"] + a["non_quarter_end_date_count"] == 138
+
+
+def test_payload_aum_not_tier1(payload):
+    """7. 规模不得出现在第一档（可直接用于研究）。"""
+    names = " ".join(x["data"] for x in payload["usage_matrix"]["tier_1_direct_use"])
+    assert "规模" not in names
+
+
+def test_payload_aum_in_tier3(payload):
+    names = " ".join(x["data"] for x in payload["usage_matrix"]["tier_3_auxiliary_only"])
+    assert "规模" in names
+
+
+def test_payload_aum_forbidden_as_point_in_time(payload):
+    names = " ".join(x["data"] for x in payload["usage_matrix"]["tier_4_forbidden"])
+    assert "时点" in names or "规模" in names
+
+
+def test_md_no_138_periods():
+    """5. 报告不得把 138 个不同日期称为 138 个已验证报告期。"""
+    md = MD_PATH.read_text(encoding="utf-8")
+    for bad in ("138 个报告期末", "138 个报告期", "138 个已验证报告期"):
+        assert bad not in md, bad
+    assert "平台观测日期" in md
+
+
+def test_md_states_point_in_time_false():
+    md = MD_PATH.read_text(encoding="utf-8")
+    assert "point_in_time_usable = false" in md or "`point_in_time_usable` = **`false`**" in md or "point_in_time_usable" in md
+    assert "platform_observation_date" in md
+
+
+# ================================================================ 费率核验
+def test_fee_verification_all_pass(payload):
+    """11 条费率记录逐条核验全部一致。"""
+    rows = payload["fee"]["verification"]
+    assert len(rows) == 11
+    for x in rows:
+        assert x["rate_match"] is True, x["code"]
+        assert x["eff_match"] is True, x["code"]
+        assert x["ann_id_match"] is True, x["code"]
+
+
+def test_fee_rate_equals_announcement_after(payload):
+    rows = payload["fee"]["verification"]
+    for x in rows:
+        assert abs(x["db_rate"] - x["ann_rate_after"]) < 1e-9, x["code"]
+
+
+def test_fee_verification_mismatch_count_zero(payload):
+    assert payload["fee"]["verification_mismatch"] == 0

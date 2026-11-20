@@ -72,6 +72,14 @@ def audit_fee(conn) -> dict:
 
     funds_with_eff = sum(1 for x in per_fund if x["with_effective_from"] > 0)
 
+    # 11 条已补生效日的记录逐条核验：DB 费率是否等于公告调整后费率
+    verification = []
+    vp = EVIDENCE / "fee_verification.json"
+    if vp.is_file():
+        verification = json.loads(vp.read_text(encoding="utf-8"))
+    v_mismatch = sum(1 for x in verification
+                     if not (x["rate_match"] and x["eff_match"] and x["ann_id_match"]))
+
     return {
         "total_rules": total,
         "with_effective_from": with_eff,
@@ -84,6 +92,13 @@ def audit_fee(conn) -> dict:
         "sample_funds": len(per_fund),
         "sample_funds_with_effective_from": funds_with_eff,
         "per_fund": per_fund,
+        "verification": verification,
+        "verification_count": len(verification),
+        "verification_mismatch": v_mismatch,
+        "verification_note": (
+            "逐条核验：rate_original 是否等于公告调整后费率、"
+            "effective_from 是否等于公告生效日、announcement_id 是否对应、"
+            "同一公告多份额时归属是否正确。不一致的必须标为不可用于成本模拟。"),
         "backfilled_from_current_rate": 0,
         "note": (
             "只补年化费率（管理费/托管费/销售服务费）的生效日期，因为只有这类费率"
@@ -180,45 +195,88 @@ def audit_manager(conn) -> dict:
 
 
 def audit_aum(conn) -> dict:
+    """规模历史审计。
+
+    关键语义修正（3B-4.4 验收）：
+    页面日期是**平台观测日期**，不是经过核实的报告期末日。
+    平台页面里 2013 年前后都存在周频/月频等非季末日期，
+    因此不能自动把它当成「报告期末」，也不能当成「投资者已经知道」的时点。
+    """
     total = conn.execute("SELECT COUNT(*) FROM fund_aum_history").fetchone()[0]
     with_level = conn.execute(
         "SELECT COUNT(*) FROM fund_aum_history WHERE evidence_level IS NOT NULL"
     ).fetchone()[0]
-    periods = conn.execute(
-        "SELECT COUNT(DISTINCT report_date) FROM fund_aum_history "
-        "WHERE evidence_level IS NOT NULL").fetchone()[0]
+
+    dates = [r[0] for r in conn.execute(
+        """SELECT DISTINCT report_date FROM fund_aum_history
+           WHERE evidence_level IS NOT NULL ORDER BY report_date""").fetchall()]
+    quarter_ends = [d for d in dates
+                    if d[5:] in ("03-31", "06-30", "09-30", "12-31")]
+    non_quarter = [d for d in dates if d[5:] not in
+                   ("03-31", "06-30", "09-30", "12-31")]
+
     per_share = []
     for r in conn.execute(
             """SELECT s.share_class_code, COUNT(*) n, MIN(a.report_date) dmin,
-                      MAX(a.report_date) dmax
+                      MAX(a.report_date) dmax,
+                      SUM(CASE WHEN substr(a.report_date,6)
+                               NOT IN ('03-31','06-30','09-30','12-31')
+                          THEN 1 ELSE 0 END) non_qe
                FROM fund_aum_history a
                JOIN fund_share_classes s ON s.share_class_id=a.share_class_id
                WHERE a.evidence_level IS NOT NULL GROUP BY 1 ORDER BY 1""").fetchall():
-        per_share.append({"code": r["share_class_code"], "periods": r["n"],
-                          "date_min": r["dmin"], "date_max": r["dmax"]})
+        per_share.append({"code": r["share_class_code"], "records": r["n"],
+                          "date_min": r["dmin"], "date_max": r["dmax"],
+                          "non_quarter_end_dates": int(r["non_qe"] or 0)})
+
+    disclosed_non_null = conn.execute(
+        "SELECT COUNT(*) FROM fund_aum_history WHERE disclosed_at IS NOT NULL"
+    ).fetchone()[0]
+
+    stale_semantics = conn.execute(
+        """SELECT COUNT(*) FROM fund_aum_history
+           WHERE detail LIKE '%report_date_is_period_end%'""").fetchone()[0]
+
     return {
         "total_records": total,
         "records_with_evidence": with_level,
         "snapshot_only_records": total - with_level,
-        "distinct_report_dates": periods,
+        "distinct_dates": len(dates),
+        "distinct_dates_unit": "platform_observation_date",
+        "date_min": dates[0] if dates else None,
+        "date_max": dates[-1] if dates else None,
+        "quarter_end_date_count": len(quarter_ends),
+        "non_quarter_end_date_count": len(non_quarter),
+        "non_quarter_end_sample": non_quarter[:12],
         "share_classes_with_series": len(per_share),
         "per_share": per_share,
-        "report_date_is_period_end": True,
-        "publication_date_recorded": False,
-        "publication_date_note": (
-            "本轮**只记录报告期末日期**，未逐份下载定期报告确认公告发布日期；"
-            "disclosed_at 保持 NULL。"),
+        "date_semantics": "platform_observation_date",
+        "period_end_verified": False,
+        "publication_date_verified": False,
+        "point_in_time_usable": False,
+        "disclosed_at_non_null_count": disclosed_non_null,
+        "disclosed_at_all_null": disclosed_non_null == 0,
+        "stale_semantics_rows": stale_semantics,
         "by_evidence_level": {"C": with_level, "(null)": total - with_level},
-        "usable_as_point_in_time": True,
+        "usable_as_point_in_time": False,
+        "usable_as_descriptive_history": True,
         "usable_reason": (
-            "规模已有按报告期的真实时间序列（最早 2005-12-31，最新 2026-09-30），"
-            "可按报告期回溯使用；但必须按报告期末日对齐，"
-            "不能用相邻期插值或把当期当历史。"),
+            "页面日期是平台观测日期，未逐条核实其对应的真实报告期末，"
+            "也未取得公告发布日期与实际公开可见时间。"
+            "因此只能作为**带时间语义限制的描述性历史规模数据**，"
+            "不得作为「投资者在该日已经知道该规模」的时点特征。"),
         "usable_conditions": [
-            "只能用报告期末日期对齐（不是公告日）",
-            "中间期缺失就是缺失，不得插值",
-            "C 级证据：来自天天基金规模变动页，原始出处是定期报告",
+            "仅可用于描述性统计（如『该基金在某段时间的规模量级』）",
+            "不得作为回测的时点已知信息（会引入未来信息）",
+            "不得把平台日期当作报告期末或公告日",
+            "中间缺失就是缺失，不得插值",
+            "C 级证据：来自天天基金规模变动页",
             "货币基金规模单位是亿元但量级巨大（余额宝），注意单位",
+        ],
+        "blocked_uses": [
+            "作为历史时点因子（规模因子、规模择时等）",
+            "作为正式回测的已知信息",
+            "作为『某日规模』的精确断言",
         ],
     }
 
@@ -329,9 +387,7 @@ def build_usage_matrix(fee: dict, div: dict, mgr: dict, aum: dict,
              "condition": "只看单只基金自身时间序列，不做跨基金日期对齐"},
             {"data": "已知清盘事件清单（41 条）", "evidence": "B",
              "condition": "只用于剔除已知清盘，不得声称覆盖完整"},
-            {"data": "基金规模历史（按报告期）", "evidence": "C",
-             "condition": f"{aum['distinct_report_dates']} 个报告期末，"
-                          "最早 2005-12-31；必须按报告期末对齐，缺失不插值"},
+
             {"data": "基金经理任职起止（有公告部分）", "evidence": "A-",
              "condition": f"{mgr['with_start_date']} 条有起始日、"
                           f"{mgr['with_end_date']} 条有结束日；"
@@ -352,6 +408,12 @@ def build_usage_matrix(fee: dict, div: dict, mgr: dict, aum: dict,
              "blocker": f"{div['total_records']} 条未通过完整性验证"},
         ],
         "tier_3_auxiliary_only": [
+            {"data": "基金规模历史", "evidence": "C",
+             "condition": "只能做描述性历史规模分析",
+             "blocker": (f"{aum['distinct_dates']} 个平台观测日期中 "
+                         f"{aum['non_quarter_end_date_count']} 个不是季末；"
+                         "报告期末未逐条核实、公告发布日期未取得、"
+                         "公开可见时间 unknown，不能作为时点已知信息")},
             {"data": "无起始日的经理快照", "evidence": "C",
              "condition": "只能了解『谁在管』",
              "blocker": f"{mgr['snapshot_only_records']} 条无任职日期"},
@@ -365,6 +427,9 @@ def build_usage_matrix(fee: dict, div: dict, mgr: dict, aum: dict,
             {"data": "净值连续性结论", "reason": "无基金公布日历，只能 cannot_verify"},
             {"data": "完整历史清盘名录", "reason": "覆盖率 not_quantifiable"},
             {"data": "用当前经理/规模回填历史", "reason": "未来信息泄漏"},
+            {"data": "规模记录作为历史时点因子/回测已知信息",
+             "reason": ("日期是平台观测日期，报告期末与公开可见时间均未验证，"
+                        "当作当时已知就是未来信息泄漏")},
         ],
     }
 
@@ -394,10 +459,11 @@ def main() -> dict:
     if mgr["with_start_date"] > 0:
         improved.append(
             f"经理任职历史：新增 {mgr['with_start_date']} 条有起始日的记录（A- 级）")
-    if aum["distinct_report_dates"] > 1:
+    if aum["distinct_dates"] > 1:
         improved.append(
-            f"规模历史：从 1 个快照扩展到 {aum['distinct_report_dates']} 个报告期末"
-            f"（C 级），覆盖 {aum['share_classes_with_series']} 个份额")
+            f"规模历史：从 1 个快照扩展到 {aum['distinct_dates']} 个平台观测日期"
+            f"（C 级），覆盖 {aum['share_classes_with_series']} 个份额；"
+            "但日期语义未验证，只能做描述性分析")
 
     still_open.append(
         f"费率：{fee['without_effective_from']} 条仍无生效日"
@@ -405,7 +471,9 @@ def main() -> dict:
     still_open.append(f"分红：{div['total_records']} 条未通过完整性验证，"
                       f"{div['unverifiable']} 条无法与公告配对")
     still_open.append(f"经理：{mgr['snapshot_only_records']} 条仍只有快照（无任职日期）")
-    still_open.append("规模：公告发布日期（disclosed_at）未采集")
+    still_open.append(
+        "规模：日期是平台观测日期，未逐条核实报告期末；"
+        "公告发布日期与公开可见时间均 unknown")
     still_open.append("清盘名录：覆盖率 not_quantifiable")
     still_open.append("支付宝：全部 unknown")
 
@@ -450,7 +518,8 @@ def main() -> dict:
             "ready_for_next_stage": False,
             "ready_for_backtest": False,
             "reason": (
-                "本轮实际改善了费率生效日、经理任职日、规模时序三项；"
+                "本轮实际改善了费率生效日、经理任职日、规模时序三项"
+                "（规模日期语义未验证，只算描述性历史）；"
                 "但费率仍有 79 条无生效日（含全部申购赎回阶梯）、"
                 "分红完整性未验证、清盘名录覆盖率不可量化、"
                 "支付宝状态全 unknown。不足以支撑正式回测。"),
@@ -468,5 +537,5 @@ if __name__ == "__main__":
     print("JSON ->", out)
     print("费率:", p["fee"]["with_effective_from"], "/", p["fee"]["total_rules"])
     print("经理:", p["manager"]["with_start_date"], "/", p["manager"]["total_records"])
-    print("规模报告期:", p["aum"]["distinct_report_dates"])
+    print("规模平台观测日期:", p["aum"]["distinct_dates"])
     print("改善:", len(p["summary"]["improved"]), "仍缺:", len(p["summary"]["still_open"]))

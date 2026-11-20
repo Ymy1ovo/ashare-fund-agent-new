@@ -1,0 +1,26 @@
+{
+ "phase": "3B-4.4-aum-semantics-fix",
+ "baseline_head": "3307a9befe64cba925f9f258491c10049115767e",
+ "generated_at": "2026-11-20T14:10:32",
+ "scope": "只修正规模记录的 detail 日期语义元数据；不改 report_date / aum_total / shares_total / source / evidence_level。",
+ "records_total": 683,
+ "records_with_evidence": 675,
+ "stale_detail_before": 0,
+ "needs_fix_before": 0,
+ "rows_changed": 0,
+ "stale_detail_after": 0,
+ "needs_fix_after": 0,
+ "business_fields_unchanged": true,
+ "date_semantics": "platform_observation_date",
+ "period_end_verified": false,
+ "publication_date_verified": false,
+ "point_in_time_usable": false,
+ "disclosed_at_all_null": true,
+ "integrity_check": "ok",
+ "foreign_key_violations": 0,
+ "backup": {
+  "path": "D:\\ymy\\jj-agent\\data\\backups\\fund_agent_before_aum_meta_fix_20261120_141028.db",
+  "size_bytes": 284954624
+ },
+ "disclosed_at_non_null_count": 0
+}

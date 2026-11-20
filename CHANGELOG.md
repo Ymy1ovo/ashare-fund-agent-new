@@ -1,5 +1,52 @@
 # 变更日志
 
+## 2026-11-20 — 阶段3B-4.4 验收修正：规模日期语义与时点可用性
+
+只修规模日期语义 + 输出费率核验结果，不重采集、不改数值。
+
+**阻断问题**：原报告把 675 条规模记录的日期一律当成「报告期末」，
+并宣称可作为历史时点特征（`report_date_is_period_end = true`、
+`usable_as_point_in_time = true`）。但 `aum_history.json` 里存在大量
+非季末日期：`2010-08-23`~`2010-09-08` 周频、`2013-03-08/15/22/29` 周频、
+`2013-04-03`/`2013-04-12` 非标准季末。138 个日期中 84 个季末、**54 个不是**。
+
+**语义修正**：
+- `date_semantics` = `platform_observation_date`（平台观测日期）
+- `period_end_verified` = **false**
+- `publication_date_verified` = **false**
+- `point_in_time_usable` = **false**
+- `disclosed_at` 仍全 NULL
+
+**数据修正**：只改 675 条记录的 `detail` 元数据，
+`report_date` / `aum_total` / `shares_total` / `source` / `evidence_level`
+逐行比对**完全一致**。修正脚本 `scripts/fix_3b4_4_aum_semantics.py` 幂等，
+二次执行 0 变更。
+
+**审计与报告修正**：`distinct_report_dates` → `distinct_dates`
+（单位标 `platform_observation_date`）；新增 `quarter_end_date_count=84`、
+`non_quarter_end_date_count=54`、`usable_as_descriptive_history=true`、
+`blocked_uses`。报告新增 §4.3「这是平台观测日期，不是验证过的报告期末」
+与 §4.4 表格明确禁止三类用法。
+
+**使用矩阵降级**：基金规模历史从**第一档降到第三档**（辅助研究），
+禁止档新增「规模记录作为历史时点因子/回测已知信息」。
+理由：即使日期是报告期末，也不代表投资者在该日已知晓该数据。
+
+**费率核验**：11 条逐条核验 `rate_original` 是否等于公告调整后费率、
+`effective_from` 是否等于公告生效日、`announcement_id` 是否对应、
+多份额归属是否正确 —— **11/11 全部一致**。
+核验结果落 `reports/evidence/phase3b4_4/fee_verification.json`。
+注意：`rate_original` = 调整后费率，生效日**之前**必须用 `detail.rate_before`。
+
+**测试**：新增 17 项（49 → 66），覆盖非季末日期不得标记已验证、
+DB 无残留旧语义、业务字段修正前后一致、`disclosed_at` 为 NULL 时
+`point_in_time_usable` 必须 false、报告不得称 138 个已验证报告期、
+幂等、费率逐条核验。
+全量 **1189 passed / 0 failed**，279.46 秒。
+
+**完整性**：`integrity_check` = ok，外键违规 0，其他历史数据未动。
+
+
 ## 2026-11-20 — 阶段3B-4.4 数据缺口补强与数据来源收口
 
 对 3B-4.3 识别的缺口做有边界补强。不重建数据层、不做策略、不做回测。
