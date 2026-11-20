@@ -35,10 +35,11 @@ PRODUCT_TAXONOMY = {
         "label": "普通开放式指数基金",
         "in_default_pool": True,
         "rationale": "跟踪指数、费率低、长期可持有，是场外核心研究对象",
-        "identity_fields": ["is_index_fund", "tracking_index", "benchmark"],
+        "identity_fields": ["is_index_fund=1", "非 ETF 联接", "非 LOF"],
         "subgroups": ["宽基指数", "行业主题指数", "策略指数"],
         "comparison_rule": ("宽基与行业主题必须分开比较；"
-                            "不同跟踪指数不得混排"),
+                            "不同跟踪指数不得混排；"
+                            "**指数型 LOF 不算此类**，它归 LOF"),
     },
     "etf_linked": {
         "label": "ETF 联接基金",
@@ -93,10 +94,16 @@ PRODUCT_TAXONOMY = {
     "lof": {
         "label": "LOF 基金",
         "in_default_pool": True,
-        "rationale": "场外可申购（虽也场内交易），属场外研究对象",
+        "rationale": ("场外可申购（虽也场内交易），属场外研究对象。"
+                      "**LOF 是产品结构类别，优先级高于「是否跟踪指数」**"),
         "identity_fields": ["fund_name 含 (LOF)", "或 product_structure='lof'"],
+        "structure_dimension": "product_structure",
+        "investment_subtypes": ["index（指数型 LOF）", "active（主动型 LOF）"],
         "subgroups": ["指数型 LOF", "主动型 LOF"],
-        "comparison_rule": "按底层是主动还是指数再分组",
+        "comparison_rule": ("作为独立产品结构类别；"
+                            "**内部**再按 investment_subtype 分 index / active 两组比较；"
+                            "**不得**把指数型 LOF 与普通开放式指数基金归入同一类别"),
+        "forbidden": "不得因为 LOF 跟踪指数就把它改判成普通开放式指数基金",
     },
     "onshore_etf": {
         "label": "场内 ETF",
@@ -148,6 +155,7 @@ def audit_taxonomy(conn) -> dict:
             "share_count": int(r["shares"]),
             "primaries": int(r["primaries"]),
             "product_class": t["product_class"],
+            "investment_subtype": t.get("investment_subtype"),
             "in_default_pool": t["in_default_pool"],
             "classification_basis": t["basis"],
             "classification_confidence": t["confidence"],
@@ -172,16 +180,43 @@ def audit_taxonomy(conn) -> dict:
            JOIN fund_master m ON m.fund_id = l.fund_id
            WHERE l.source = ?""", (LIFECYCLE_SOURCE,)).fetchone()
 
+    # 校准 JSON 的 43 条公告候选 vs 场外 41 个本体：两个口径
     calibration = {}
+    calib_scope = {}
     if CALIB.is_file():
         cal = json.loads(CALIB.read_text(encoding="utf-8"))
+        records = cal.get("calibration") or []
         by_type = defaultdict(int)
         by_struct = defaultdict(int)
-        for x in cal.get("calibration") or []:
+        onshore_etf = 0
+        for x in records:
             by_type[x.get("investment_type")] += 1
             by_struct[x.get("product_structure")] += 1
+            if x.get("is_onshore_etf"):
+                onshore_etf += 1
         calibration = {"investment_type": dict(by_type),
                        "product_structure": dict(by_struct)}
+        calib_scope = {
+            "announcement_candidates": len(records),
+            "onshore_etf_candidates": onshore_etf,
+            "offmarket_fund_entities": len(records) - onshore_etf,
+            "unit_note": ("announcement_candidates 是**公告候选事件**口径"
+                          "（含场内 ETF 候选）；"
+                          "offmarket_fund_entities 是**场外清盘本体**口径（已排除场内 ETF）。"
+                          "两者单位不同，不得混用。"),
+            "investment_type_distribution_scope": "announcement_candidates",
+            "investment_type_scope_warning": (
+                    "investment_type 分布是对 %d 条**公告候选**统计的，"
+                    "**包含 %d 条场内 ETF 候选**；校准 JSON 未提供"
+                    "「投资类型 × 是否场内 ETF」交叉表，"
+                    "因此**无法**准确拆分出「%d 个场外本体的投资类型分布」。"
+                    "本阶段不做推断式拆分。"
+                    % (len(records), onshore_etf, len(records) - onshore_etf)),
+            "product_structure_distribution_scope": "all_candidates",
+            "product_structure_note": (
+                "product_structure 分布含 etf=2（场内 ETF），"
+                "排除后才是场外 41：27 + 3 + 11。"),
+        }
 
     return {
         "taxonomy": PRODUCT_TAXONOMY,
@@ -214,6 +249,7 @@ def audit_taxonomy(conn) -> dict:
                 "total": int(cov["n"]),
             },
             "calibration_type_distribution": calibration,
+            "calibration_scope": calib_scope,
             "warning": ("41 个清盘本体的 fund_type_l1 / is_index_fund / benchmark / "
                         "established_date **全部为 NULL**，分类只能依赖 3B-4.1.1 校准 JSON；"
                         "不得当作已有完整分类字段"),
@@ -230,35 +266,48 @@ def classify_one(r) -> dict:
 
     if "货币" in l1:
         return {"product_class": "money_market", "in_default_pool": True,
+                "investment_subtype": "money_market",
                 "basis": "fund_type_l1 含「货币型」", "confidence": "high"}
     if "QDII" in l1.upper():
         return {"product_class": "qdii", "in_default_pool": False,
+                "investment_subtype": "qdii",
                 "basis": "fund_type_l1 含 QDII", "confidence": "high"}
     if "ETF联接" in name or "ETF联接" in name.replace(" ", ""):
         return {"product_class": "etf_linked", "in_default_pool": True,
-                "basis": "基金名称含「ETF联接」", "confidence": "high"}
+                "investment_subtype": "index",
+                "basis": "基金名称含「ETF联接」→ 产品结构=ETF联接",
+                "confidence": "high"}
+    # LOF 是**产品结构**类别，优先于「是否跟踪指数」判定。
+    # 指数型 LOF 仍然是 LOF，只是底层策略子类型为 index，
+    # 绝不能被降级成普通开放式指数基金。
     if "(LOF)" in name or "（LOF）" in name:
-        if is_idx == 1:
-            return {"product_class": "ordinary_index", "in_default_pool": True,
-                    "basis": "名称含 (LOF) 且 is_index_fund=1（指数型 LOF）",
-                    "confidence": "high"}
+        subtype = "index" if is_idx == 1 else "active"
+        basis = ("名称含 (LOF) → 产品结构=LOF；"
+                 + ("is_index_fund=1 → 底层策略=index" if subtype == "index"
+                    else "is_index_fund!=1 → 底层策略=active"))
         return {"product_class": "lof", "in_default_pool": True,
-                "basis": "名称含 (LOF) 且非指数型", "confidence": "high"}
+                "investment_subtype": subtype, "basis": basis,
+                "confidence": "high"}
     if is_idx == 1:
         return {"product_class": "ordinary_index", "in_default_pool": True,
-                "basis": "is_index_fund=1 且非 ETF 联接/LOF",
+                "investment_subtype": "index",
+                "basis": "is_index_fund=1 且非 ETF 联接、非 LOF（普通开放式指数）",
                 "confidence": "high"}
     if "债券" in l1:
         if "二级" in l2 or "转债" in l2:
             return {"product_class": "bond_mixed", "in_default_pool": True,
+                    "investment_subtype": "bond_mixed",
                     "basis": "债券型 + l2 含二级/转债", "confidence": "medium"}
         return {"product_class": "bond_pure", "in_default_pool": True,
+                "investment_subtype": "bond_pure",
                 "basis": "fund_type_l1 含「债券型」", "confidence": "high"}
     if "股票" in l1 or "混合" in l1:
         return {"product_class": "active_equity", "in_default_pool": True,
+                "investment_subtype": "active",
                 "basis": "fund_type_l1 为股票型/混合型且非指数",
                 "confidence": "high"}
     return {"product_class": "unknown", "in_default_pool": False,
+            "investment_subtype": None,
             "basis": "库内分类字段不足以判定", "confidence": "none"}
 
 
@@ -548,6 +597,12 @@ def build_comparison_rules() -> dict:
         "rules": [
             {"group": "指数基金", "rule": "宽基指数与行业主题指数**必须分开**",
              "reason": "波动率与收益分布差异极大，混排会得出错误结论"},
+            {"group": "LOF",
+             "rule": ("LOF 是**独立的产品结构类别**，内部再按 "
+                      "`investment_subtype` 分 index / active 两组；"
+                      "**不得**把指数型 LOF 与普通开放式指数基金归入同一类别"),
+             "reason": ("LOF 可场内交易、存在折溢价与套利机制，"
+                        "与普通开放式申赎机制不同，费用与流动性特征也不同"),},
             {"group": "主动权益", "rule": "必须按可验证的业绩基准分组",
              "reason": "无基准则无法判断是能力还是风格暴露"},
             {"group": "债券基金", "rule": "按久期、信用风险、转债暴露分层",
@@ -707,6 +762,12 @@ def main() -> dict:
             "known_terminated_fund_count": conn.execute(
                 """SELECT COUNT(*) FROM fund_master
                    WHERE lifecycle_status='terminated'""").fetchone()[0],
+            "announcement_candidate_count": 43,
+            "unit_note": (
+                "non_terminated_fund_count=9 / non_terminated_share_count=12 / "
+                "known_terminated_fund_count=41 / "
+                "announcement_candidate_count=43（含 2 条场内 ETF 候选）。"
+                "**本体与份额、公告候选与本体，单位不同，不得混用**。"),
         }
 
     indicators = build_indicators()

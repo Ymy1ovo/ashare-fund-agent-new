@@ -484,3 +484,183 @@ def test_no_fund_level_single_label(fw):
     """禁止给整只基金一个笼统可信度标签。"""
     for f in fw["product_taxonomy"]["current_sample"]["funds"]:
         assert "confidence" not in f or "tier" not in f
+
+# ================================================================ LOF 分类优先级（验收修正）
+def _find_fund(fw, code: str) -> dict:
+    for f in fw["product_taxonomy"]["current_sample"]["funds"]:
+        if f["code"] == code:
+            return f
+    raise AssertionError(f"缺少基金 {code}")
+
+
+def test_161725_is_lof_not_ordinary_index(fw):
+    """LOF 是产品结构类别，优先于「是否跟踪指数」。"""
+    f = _find_fund(fw, "161725")
+    assert f["product_class"] == "lof", f["product_class"]
+    assert f["product_class"] != "ordinary_index"
+
+
+def test_161725_subtype_is_index(fw):
+    """指数型 LOF 的底层策略子类型必须是 index。"""
+    f = _find_fund(fw, "161725")
+    assert f["investment_subtype"] == "index"
+
+
+def test_161005_is_lof(fw):
+    f = _find_fund(fw, "161005")
+    assert f["product_class"] == "lof"
+
+
+def test_161005_subtype_is_active(fw):
+    f = _find_fund(fw, "161005")
+    assert f["investment_subtype"] == "active"
+
+
+def test_ordinary_index_excludes_lof(fw):
+    """普通开放式指数基金只含非 ETF 联接、非 LOF 的普通开放式指数。"""
+    for f in fw["product_taxonomy"]["current_sample"]["funds"]:
+        if f["product_class"] == "ordinary_index":
+            assert "(LOF)" not in (f["name"] or ""), f["code"]
+            assert "ETF联接" not in (f["name"] or ""), f["code"]
+    # 当前唯一样本是 000478
+    idx_codes = {f["code"] for f in fw["product_taxonomy"]["current_sample"]["funds"]
+                 if f["product_class"] == "ordinary_index"}
+    assert idx_codes == {"000478"}, idx_codes
+
+
+def test_etf_linked_unaffected(fw):
+    """LOF 修正不得影响 ETF 联接分类。"""
+    linked = {f["code"] for f in fw["product_taxonomy"]["current_sample"]["funds"]
+              if f["product_class"] == "etf_linked"}
+    assert linked == {"000051", "007300", "110020"}, linked
+    for code in linked:
+        assert _find_fund(fw, code)["investment_subtype"] == "index"
+
+
+def test_lof_count_is_two(fw):
+    """当前样本里 LOF 恰好 2 只。"""
+    lofs = [f for f in fw["product_taxonomy"]["current_sample"]["funds"]
+            if f["product_class"] == "lof"]
+    assert len(lofs) == 2
+    assert {x["code"] for x in lofs} == {"161005", "161725"}
+
+
+def test_taxonomy_lof_has_subtypes(fw):
+    """taxonomy 的 LOF 类必须声明 investment_subtypes。"""
+    lof = fw["product_taxonomy"]["taxonomy"]["lof"]
+    assert "investment_subtypes" in lof
+    joined = " ".join(lof["investment_subtypes"])
+    assert "index" in joined and "active" in joined
+    assert "forbidden" in lof
+
+
+def test_taxonomy_lof_rule_forbids_reclass(fw):
+    lof = fw["product_taxonomy"]["taxonomy"]["lof"]
+    assert "不得因为 LOF 跟踪指数" in lof["forbidden"]
+    assert "不得" in lof["comparison_rule"]
+
+
+def test_comparison_rules_have_lof_group(fw):
+    groups = [r["group"] for r in fw["comparison_rules"]["rules"]]
+    assert "LOF" in groups
+    lof_rule = next(r for r in fw["comparison_rules"]["rules"] if r["group"] == "LOF")
+    assert "investment_subtype" in lof_rule["rule"]
+    assert "不得" in lof_rule["rule"]
+
+
+def test_ordinary_index_taxonomy_excludes_lof(fw):
+    oi = fw["product_taxonomy"]["taxonomy"]["ordinary_index"]
+    assert "非 LOF" in " ".join(oi["identity_fields"])
+    assert "指数型 LOF 不算此类" in oi["comparison_rule"]
+
+
+def test_all_funds_have_subtype(fw):
+    """每个可分类基金都必须有 investment_subtype。"""
+    for f in fw["product_taxonomy"]["current_sample"]["funds"]:
+        assert f.get("investment_subtype"), f["code"]
+
+
+# ================================================================ 份额统计口径（验收修正）
+def test_share_counts_separated(fw):
+    """9 本体 / 12 份额必须分开，不得混用。"""
+    ps = fw["pool_summary"]
+    assert ps["non_terminated_fund_count"] == 9
+    assert ps["non_terminated_share_count"] == 12
+    assert ps["known_terminated_fund_count"] == 41
+    assert ps["non_terminated_fund_count"] != ps["non_terminated_share_count"]
+
+
+def test_pool_summary_unit_note(fw):
+    note = fw["pool_summary"]["unit_note"]
+    assert "9" in note and "12" in note and "41" in note and "43" in note
+    assert "不得混用" in note
+
+
+def test_current_sample_counts(fw):
+    cs = fw["product_taxonomy"]["current_sample"]
+    assert cs["non_terminated_funds"] == 9
+    assert cs["share_records"] == 12
+    assert len(cs["funds"]) == 9
+    assert sum(f["share_count"] for f in cs["funds"]) == 12
+
+
+def test_md_share_count_correct():
+    """报告不得写「11 个非清盘份额」。"""
+    md = FW_MD.read_text(encoding="utf-8")
+    assert "11 个非清盘份额" not in md
+    assert "9 个非清盘基金本体" in md
+    assert "12 个非清盘基金份额" in md
+
+
+# ================================================================ 43 vs 41 口径（验收修正）
+def test_calibration_scope_fields(fw):
+    cs = fw["product_taxonomy"]["terminated_funds"]["calibration_scope"]
+    assert cs["announcement_candidates"] == 43
+    assert cs["onshore_etf_candidates"] == 2
+    assert cs["offmarket_fund_entities"] == 41
+    assert cs["announcement_candidates"] - cs["onshore_etf_candidates"] == \
+        cs["offmarket_fund_entities"]
+
+
+def test_calibration_scope_unit_note(fw):
+    cs = fw["product_taxonomy"]["terminated_funds"]["calibration_scope"]
+    assert "公告候选事件" in cs["unit_note"]
+    assert "场外清盘本体" in cs["unit_note"]
+    assert "不得混用" in cs["unit_note"]
+
+
+def test_investment_type_scope_warning(fw):
+    """必须声明投资类型分布是 43 条公告候选口径，不能当 41 本体口径。"""
+    cs = fw["product_taxonomy"]["terminated_funds"]["calibration_scope"]
+    assert cs["investment_type_distribution_scope"] == "announcement_candidates"
+    warning = cs["investment_type_scope_warning"]
+    assert "43" in warning
+    assert "2 条场内 ETF" in warning
+    assert "无法" in warning
+    assert "不做推断式拆分" in warning
+
+
+def test_investment_type_sum_is_43(fw):
+    """投资类型分布之和必须是 43，不是 41。"""
+    dist = fw["product_taxonomy"]["terminated_funds"][
+        "calibration_type_distribution"]["investment_type"]
+    assert sum(dist.values()) == 43
+
+
+def test_product_structure_sum_is_43(fw):
+    """产品结构分布之和是 43（含 etf=2），排除后才是 41。"""
+    dist = fw["product_taxonomy"]["terminated_funds"][
+        "calibration_type_distribution"]["product_structure"]
+    assert sum(dist.values()) == 43
+    assert dist["etf"] == 2
+    offmarket = sum(v for k, v in dist.items() if k != "etf")
+    assert offmarket == 41
+
+
+def test_md_states_43_vs_41():
+    """报告必须明确 43 与 41 是两个口径。"""
+    md = FW_MD.read_text(encoding="utf-8")
+    assert "43" in md and "41" in md
+    assert "公告候选" in md
+    assert "统计口径限制" in md
+    assert "不做这种拆分" in md or "不做推断式拆分" in md

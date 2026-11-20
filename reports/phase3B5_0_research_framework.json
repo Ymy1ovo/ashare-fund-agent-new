@@ -1,7 +1,7 @@
 {
  "phase": "3B-5.0",
  "baseline_head": "8b78b6fbcd292d5530e923c4678b0bc605f37e44",
- "generated_at": "2026-11-20T14:54:30",
+ "generated_at": "2026-11-20T15:42:04",
  "scope": "只做研究性分析框架设计与数据准入审计；不写库、不采集、不计排名、不出信号、不开回测门禁。",
  "product_taxonomy": {
   "taxonomy": {
@@ -10,16 +10,16 @@
     "in_default_pool": true,
     "rationale": "跟踪指数、费率低、长期可持有，是场外核心研究对象",
     "identity_fields": [
-     "is_index_fund",
-     "tracking_index",
-     "benchmark"
+     "is_index_fund=1",
+     "非 ETF 联接",
+     "非 LOF"
     ],
     "subgroups": [
      "宽基指数",
      "行业主题指数",
      "策略指数"
     ],
-    "comparison_rule": "宽基与行业主题必须分开比较；不同跟踪指数不得混排"
+    "comparison_rule": "宽基与行业主题必须分开比较；不同跟踪指数不得混排；**指数型 LOF 不算此类**，它归 LOF"
    },
    "etf_linked": {
     "label": "ETF 联接基金",
@@ -105,16 +105,22 @@
    "lof": {
     "label": "LOF 基金",
     "in_default_pool": true,
-    "rationale": "场外可申购（虽也场内交易），属场外研究对象",
+    "rationale": "场外可申购（虽也场内交易），属场外研究对象。**LOF 是产品结构类别，优先级高于「是否跟踪指数」**",
     "identity_fields": [
      "fund_name 含 (LOF)",
      "或 product_structure='lof'"
+    ],
+    "structure_dimension": "product_structure",
+    "investment_subtypes": [
+     "index（指数型 LOF）",
+     "active（主动型 LOF）"
     ],
     "subgroups": [
      "指数型 LOF",
      "主动型 LOF"
     ],
-    "comparison_rule": "按底层是主动还是指数再分组"
+    "comparison_rule": "作为独立产品结构类别；**内部**再按 investment_subtype 分 index / active 两组比较；**不得**把指数型 LOF 与普通开放式指数基金归入同一类别",
+    "forbidden": "不得因为 LOF 跟踪指数就把它改判成普通开放式指数基金"
    },
    "onshore_etf": {
     "label": "场内 ETF",
@@ -163,6 +169,7 @@
      "share_count": 2,
      "primaries": 1,
      "product_class": "bond_pure",
+     "investment_subtype": "bond_pure",
      "in_default_pool": true,
      "classification_basis": "fund_type_l1 含「债券型」",
      "classification_confidence": "high"
@@ -176,8 +183,9 @@
      "share_count": 1,
      "primaries": 1,
      "product_class": "etf_linked",
+     "investment_subtype": "index",
      "in_default_pool": true,
-     "classification_basis": "基金名称含「ETF联接」",
+     "classification_basis": "基金名称含「ETF联接」→ 产品结构=ETF联接",
      "classification_confidence": "high"
     },
     {
@@ -189,6 +197,7 @@
      "share_count": 1,
      "primaries": 1,
      "product_class": "money_market",
+     "investment_subtype": "money_market",
      "in_default_pool": true,
      "classification_basis": "fund_type_l1 含「货币型」",
      "classification_confidence": "high"
@@ -202,8 +211,9 @@
      "share_count": 1,
      "primaries": 1,
      "product_class": "ordinary_index",
+     "investment_subtype": "index",
      "in_default_pool": true,
-     "classification_basis": "is_index_fund=1 且非 ETF 联接/LOF",
+     "classification_basis": "is_index_fund=1 且非 ETF 联接、非 LOF（普通开放式指数）",
      "classification_confidence": "high"
     },
     {
@@ -215,8 +225,9 @@
      "share_count": 2,
      "primaries": 1,
      "product_class": "etf_linked",
+     "investment_subtype": "index",
      "in_default_pool": true,
-     "classification_basis": "基金名称含「ETF联接」",
+     "classification_basis": "基金名称含「ETF联接」→ 产品结构=ETF联接",
      "classification_confidence": "high"
     },
     {
@@ -228,8 +239,9 @@
      "share_count": 1,
      "primaries": 1,
      "product_class": "etf_linked",
+     "investment_subtype": "index",
      "in_default_pool": true,
-     "classification_basis": "基金名称含「ETF联接」",
+     "classification_basis": "基金名称含「ETF联接」→ 产品结构=ETF联接",
      "classification_confidence": "high"
     },
     {
@@ -241,6 +253,7 @@
      "share_count": 1,
      "primaries": 1,
      "product_class": "active_equity",
+     "investment_subtype": "active",
      "in_default_pool": true,
      "classification_basis": "fund_type_l1 为股票型/混合型且非指数",
      "classification_confidence": "high"
@@ -254,8 +267,9 @@
      "share_count": 1,
      "primaries": 1,
      "product_class": "lof",
+     "investment_subtype": "active",
      "in_default_pool": true,
-     "classification_basis": "名称含 (LOF) 且非指数型",
+     "classification_basis": "名称含 (LOF) → 产品结构=LOF；is_index_fund!=1 → 底层策略=active",
      "classification_confidence": "high"
     },
     {
@@ -266,9 +280,10 @@
      "is_index_fund": 1,
      "share_count": 2,
      "primaries": 1,
-     "product_class": "ordinary_index",
+     "product_class": "lof",
+     "investment_subtype": "index",
      "in_default_pool": true,
-     "classification_basis": "名称含 (LOF) 且 is_index_fund=1（指数型 LOF）",
+     "classification_basis": "名称含 (LOF) → 产品结构=LOF；is_index_fund=1 → 底层策略=index",
      "classification_confidence": "high"
     }
    ]
@@ -302,6 +317,16 @@
      "lof": 11,
      "etf": 2
     }
+   },
+   "calibration_scope": {
+    "announcement_candidates": 43,
+    "onshore_etf_candidates": 2,
+    "offmarket_fund_entities": 41,
+    "unit_note": "announcement_candidates 是**公告候选事件**口径（含场内 ETF 候选）；offmarket_fund_entities 是**场外清盘本体**口径（已排除场内 ETF）。两者单位不同，不得混用。",
+    "investment_type_distribution_scope": "announcement_candidates",
+    "investment_type_scope_warning": "investment_type 分布是对 43 条**公告候选**统计的，**包含 2 条场内 ETF 候选**；校准 JSON 未提供「投资类型 × 是否场内 ETF」交叉表，因此**无法**准确拆分出「41 个场外本体的投资类型分布」。本阶段不做推断式拆分。",
+    "product_structure_distribution_scope": "all_candidates",
+    "product_structure_note": "product_structure 分布含 etf=2（场内 ETF），排除后才是场外 41：27 + 3 + 11。"
    },
    "warning": "41 个清盘本体的 fund_type_l1 / is_index_fund / benchmark / established_date **全部为 NULL**，分类只能依赖 3B-4.1.1 校准 JSON；不得当作已有完整分类字段"
   }
@@ -834,6 +859,11 @@
     "reason": "波动率与收益分布差异极大，混排会得出错误结论"
    },
    {
+    "group": "LOF",
+    "rule": "LOF 是**独立的产品结构类别**，内部再按 `investment_subtype` 分 index / active 两组；**不得**把指数型 LOF 与普通开放式指数基金归入同一类别",
+    "reason": "LOF 可场内交易、存在折溢价与套利机制，与普通开放式申赎机制不同，费用与流动性特征也不同"
+   },
+   {
     "group": "主动权益",
     "rule": "必须按可验证的业绩基准分组",
     "reason": "无基准则无法判断是能力还是风格暴露"
@@ -1020,7 +1050,9 @@
  "pool_summary": {
   "non_terminated_fund_count": 9,
   "non_terminated_share_count": 12,
-  "known_terminated_fund_count": 41
+  "known_terminated_fund_count": 41,
+  "announcement_candidate_count": 43,
+  "unit_note": "non_terminated_fund_count=9 / non_terminated_share_count=12 / known_terminated_fund_count=41 / announcement_candidate_count=43（含 2 条场内 ETF 候选）。**本体与份额、公告候选与本体，单位不同，不得混用**。"
  },
  "gate": {
   "ready_for_backtest": false,
