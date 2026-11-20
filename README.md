@@ -2445,7 +2445,8 @@ if (basis != ACCOUNTING_FORMAL
 | 3B-4.2 | 关键历史数据正式入库（清盘 41 + 费率 90） | 1051 | `phase3B4_2_data_ingestion_report.md` |
 | 3B-4.3 | 数据质量与幸存者偏差验收 | 1123 | `phase3B4_3_data_quality_report.md` |
 | 3B-4.4 | 数据缺口补强与来源收口 | 1199 | `phase3B4_4_data_gap_research.md` |
-| 3B-5.0 | 研究性分析框架设计 | **1283** | `phase3B5_0_research_framework.md` |
+| 3B-5.0 | 研究性分析框架设计 | 1283 | `phase3B5_0_research_framework.md` |
+| 3B-5.1 | 研究性分析引擎 V1.0 | **1340** | `phase3B5_1_research_engine_report.md` |
 
 当前正式会计版本：`ca-v2-receivable`；正式会计基础：`formal_receivable`；正式估值标记：`formal_valuation=True`。
 
@@ -5141,4 +5142,72 @@ ETF 联接分类不受影响：`000051` / `007300` / `110020` 仍为 `etf_linked
 因此**无法**准确拆出「41 个场外本体的投资类型分布」。
 强行拆分就是把 2 条 ETF 的投资类型随意摊到某一类上，属于**编造**。
 **本阶段不做这种拆分，只标注口径限制。**
+
+## 64. 阶段3B-5.1 研究性分析引擎 V1.0
+
+### 64.1 用法
+
+```bash
+python -m app.fund.research --list            # 列出研究池
+python -m app.fund.research --code 110022     # 单只基金完整报告
+python -m app.fund.research --all             # 全部研究池
+python -m app.fund.research --all --json out.json
+```
+
+**只读**：不写库、不采集、不排名、不出信号。
+
+### 64.2 模块
+
+| 模块 | 职责 |
+| --- | --- |
+| `app/fund/research/data_access.py` | 研究池加载、净值序列、货币序列、费率、质量审计 |
+| `app/fund/research/indicators.py` | 窗口收益、年化、回撤、波动率、滚动稳定性 |
+| `app/fund/research/classification.py` | 九类产品、LOF 独立结构、宽基/行业、同类组键 |
+| `app/fund/research/fees.py` | 费率边界、阶梯费率、份额成本对比 |
+| `app/fund/research/engine.py` | 单基金报告、A/C 归并、同类分析 |
+| `app/fund/research/__main__.py` | CLI 入口 |
+
+### 64.3 关键口径
+
+| 项 | 口径 |
+| --- | --- |
+| 窗口收益 | 自然日窗口，**端点必须精确命中**，不向前后找近似值 |
+| 缺口 | 超过 15 天拒绝计算，**不跨越缺口** |
+| 年化收益 | `(end/start)^(365.25/span_days) - 1`，不足 1 年不输出 |
+| 波动率年化 | 需「1 天间隔 ≥60% + 无超阈值缺口 + 跨度 ≥1 年」，按**观测频率**年化，**不硬套 252** |
+| 回撤修复 | 谷底到恢复前高的自然日数；未恢复标 `ongoing` |
+| Sharpe | **不输出**（无风险利率缺失）；可输出 `zero_hurdle_sharpe` 并标注 |
+| 货币基金 | 独立口径（万份收益/7日年化），**不参与净值型指标** |
+| 缺失值 | **不填 0**，返回 `insufficient_data` + 原因 |
+
+### 64.4 实测结果（真实运行）
+
+| 项 | 值 |
+| --- | --- |
+| 研究池 | 12 份额 / 9 本体 |
+| 同类组 | 8 个 |
+| 场内 ETF 混入 | **否** |
+| 生成排名 | **否** |
+| `ready_for_research_analysis` | **True** |
+| `ready_for_backtest` | **False** |
+| `ready_for_formal_ranking` | **False** |
+
+### 64.5 不可算指标
+
+| 指标 | 原因 |
+| --- | --- |
+| 超额收益 / IR / Beta | 无基准收益序列 |
+| 风格稳定性 | 无持仓数据 |
+| 常规 Sharpe / Sortino | 无风险利率缺失 |
+| 完整历史成本模拟 | 79 条费率无生效日 + 阶梯不完整 |
+| 支付宝费率 / 可购买状态 | 无公开合法数据源 |
+
+### 64.6 产物
+
+| 项 | 路径 |
+| --- | --- |
+| 引擎报告 | `reports/phase3B5_1_research_engine_report.md` |
+| 引擎 JSON | `reports/phase3B5_1_research_engine_report.json` |
+| 样本运行结果 | `reports/phase3B5_1_sample_run.json` |
+| 专项测试 | `tests/test_3b5_1_fund_research.py`（57 项） |
 

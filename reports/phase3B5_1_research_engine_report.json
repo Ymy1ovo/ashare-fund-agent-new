@@ -1,0 +1,147 @@
+{
+ "phase": "3B-5.1",
+ "baseline_head": "28e2448cfa97f62ab813dd093119d6b1d256f2e6",
+ "generated_at": "2026-11-20T17:01:36",
+ "engine": {
+  "package": "app/fund/research",
+  "cli": "python -m app.fund.research",
+  "modules": {
+   "data_access.py": "研究池加载 / 净值序列 / 货币序列 / 费率 / 质量审计",
+   "indicators.py": "窗口收益 / 年化 / 回撤 / 波动率 / 滚动稳定性",
+   "classification.py": "九类产品 / LOF 独立结构 / 宽基行业 / 同类组键",
+   "fees.py": "年化费率边界 / 阶梯费率 / 份额成本对比",
+   "engine.py": "单基金报告 / A-C 归并 / 同类分析",
+   "__main__.py": "CLI 入口"
+  },
+  "read_only": true,
+  "writes_database": false,
+  "collects_remote_data": false
+ },
+ "implemented": [
+  "净值型基金窗口收益（1/3/6/12/36 月 + 成立以来）",
+  "自然日口径年化收益",
+  "最大回撤 + 修复天数 + ongoing 标记",
+  "日波动率与下行波动率（条件不满足时不年化）",
+  "滚动 90 天正收益比例",
+  "zero_hurdle_sharpe（明确标注不是常规 Sharpe）",
+  "Calmar",
+  "货币基金独立口径（累计万份收益、7 日年化统计）",
+  "A/C 份额按 fund_id 归并表现、按份额比较费用",
+  "九类产品分类 + LOF 独立产品结构 + 宽基/行业隔离",
+  "字段级数据准入等级",
+  "单基金可追溯研究报告",
+  "同类描述性对照（不排名）"
+ ],
+ "not_implemented": {
+  "excess_return": "无基准收益序列",
+  "benchmark_deviation": "无基准收益序列",
+  "information_ratio": "无基准收益序列",
+  "beta": "无基准收益序列",
+  "style_stability": "无持仓数据",
+  "sharpe": "无风险利率无可靠数据源，不输出常规 Sharpe",
+  "sortino": "同上",
+  "full_historical_cost_simulation": "79 条费率无 effective_from、阶梯不完整、持有期口径未确认、支付宝费率 unknown",
+  "alipay_purchasable": "无公开合法数据源，保持 unknown",
+  "formal_ranking": "样本量小、连续性 cannot_verify、缺基准与无风险利率"
+ },
+ "formulas": {
+  "window_return": "acc_nav_end / acc_nav_start - 1，端点必须精确命中",
+  "annualized_return": "(acc_nav_end/acc_nav_start)^(365.25/span_days) - 1",
+  "window_days": {
+   "ret_1m": 30,
+   "ret_3m": 91,
+   "ret_6m": 182,
+   "ret_12m": 365,
+   "ret_36m": 1095
+  },
+  "max_drawdown": "max(1 - NAV_t / max(NAV_0..t))",
+  "recovery_days": "谷底到再次达到前高的自然日数；未恢复标 ongoing",
+  "volatility": "daily_std，满足条件才乘 sqrt(observed_per_year)",
+  "downside_volatility": "负收益样本的 std，同样条件年化",
+  "zero_hurdle_sharpe": "(年化收益 - 0) / 年化波动率",
+  "calmar": "年化收益 / 最大回撤",
+  "money_cumulative": "Σ 每日每万份收益；折收益率 ≈ 累计/10000"
+ },
+ "data_rules": {
+  "no_zero_fill": true,
+  "no_gap_crossing": true,
+  "max_gap_days_for_return": 15,
+  "no_dividend_repair": true,
+  "no_forward_fill": true,
+  "annualization_requires": [
+   "1 天间隔占比 >= 60%",
+   "无超过 15 天缺口",
+   "跨度 >= 365 天"
+  ],
+  "risk_free_rate_available": false,
+  "benchmark_series_available": false,
+  "holding_data_available": false
+ },
+ "admission_levels": {
+  "unit_nav": "A/B",
+  "acc_nav": "A/B",
+  "per_10k_yield": "A",
+  "seven_day_annual": "A",
+  "annual_fee_with_effective_from": "B",
+  "annual_fee_without_effective_from": "C",
+  "purchase_redemption_tiers": "C",
+  "dividend": "C",
+  "aum": "C",
+  "manager_history": "B",
+  "termination_events": "B",
+  "alipay_purchasable": "unknown",
+  "note": "同一基金不同字段等级不同，不给整只基金一个笼统标签"
+ },
+ "sample_run": {
+  "share_count": 12,
+  "fund_count": 9,
+  "by_product_class": {
+   "bond_pure": 2,
+   "etf_linked": 4,
+   "money_market": 1,
+   "ordinary_index": 1,
+   "active_equity": 1,
+   "lof": 3
+  },
+  "peer_group_count": 8,
+  "peer_groups": {
+   "bond_pure|unknown": 2,
+   "etf_linked|broad": 2,
+   "money_market": 1,
+   "ordinary_index|broad": 1,
+   "etf_linked|sector": 2,
+   "active_equity|has_text": 1,
+   "lof|active": 1,
+   "lof|index": 2
+  },
+  "onshore_etf_included": false,
+  "ranking_generated": false,
+  "cross_group_comparison_allowed": false
+ },
+ "known_limitations": [
+  "净值连续性 cannot_verify",
+  "无基准收益序列，超额收益类指标不可算",
+  "无风险利率缺失，常规 Sharpe/Sortino 不输出",
+  "无持仓数据，风格稳定性不可算",
+  "债券久期/信用/转债字段缺失，同类组只能标 unknown",
+  "79 条费率无生效日，历史成本模拟不可算",
+  "支付宝费率与可购买状态 unknown",
+  "规模日期是平台观测日期，禁止作时点因子",
+  "分红不完整，禁止修正历史收益",
+  "41 条清盘非全量名录，幸存者偏差未消除"
+ ],
+ "gate": {
+  "ready_for_research_analysis": true,
+  "ready_for_backtest": false,
+  "ready_for_formal_ranking": false,
+  "reason": "研究性描述分析可用；正式回测与真实排名仍不具备条件（净值连续性 cannot_verify、无风险利率与基准序列缺失、费率无历史生效日、支付宝状态 unknown）"
+ },
+ "tests": {
+  "special_file": "tests/test_3b5_1_fund_research.py",
+  "special_passed": 57,
+  "full_passed": 1340,
+  "full_failed": 0,
+  "full_duration_seconds": 289.22,
+  "note": "1340 = 3B-5.0 的 1283 + 本轮 57"
+ }
+}
