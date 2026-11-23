@@ -1,13 +1,33 @@
 {
- "phase": "3B-5.5",
+ "phase": "3B-5.5.1",
  "report": "peer_comparison",
- "baseline_head": "8c42dec82bcb35393193b70ab033dbda41a6c143",
- "generated_at": "2026-11-23T14:35:00",
- "grouping_unchanged": true,
- "grouping_module": "app/fund/research/classification.py",
+ "baseline_head": "e8132fc914eeeef6e6cbcd32b15f346701831a42",
+ "generated_at": "2026-11-23T15:05:00",
+ "fixes": {
+  "P1_peer_verifiability": {
+   "problem": "grade_peer_comparison() 读取 verifiable_group 但未真正使用；组键仅判断是否以 unknown 开头，导致 bond_pure|unknown 被当有效",
+   "solution": "新增 _peer_key_family_unknown() 解析组键最后一段；判定顺序改为「先可验证性、后样本量」",
+   "order": [
+    "① money_market → 产品类型独立分组，跳过基准检查",
+    "② verifiable_group is False → D",
+    "③ 组键缺失 → D",
+    "④ 基准/指数族 unknown（含 bond_pure|unknown / active_equity|unknown）→ D",
+    "⑤ 组键以 unknown 开头 → D",
+    "⑥ 依据通过后才看样本量：1→D，2~4→C，≥5→B"
+   ],
+   "verifiable_false_overrides_sample_size": true,
+   "bond_pure_unknown_now_d": true,
+   "active_equity_unknown_now_d": true,
+   "money_market_exempt_from_benchmark": true,
+   "money_market_still_isolated": true,
+   "classification_module_changed": false,
+   "never_A": true,
+   "ranking_generated": false
+  }
+ },
  "universe": {
   "fund_count": 19,
-  "share_count": 6,
+  "share_count": 26,
   "group_count": 13
  },
  "groups": {
@@ -16,7 +36,11 @@
    "fund_ids": [
     21,
     73
-   ]
+   ],
+   "family": "unknown",
+   "verifiable": false,
+   "level": "D",
+   "status": "no_verifiable_group"
   },
   "etf_linked|broad|沪深300": {
    "member_count": 3,
@@ -24,95 +48,127 @@
     14,
     15,
     66
-   ]
+   ],
+   "family": "沪深300",
+   "verifiable": true,
+   "level": "C",
+   "status": "small_sample"
   },
   "money_market": {
    "member_count": 2,
    "fund_ids": [
     22,
     74
-   ]
+   ],
+   "family": "money_market",
+   "verifiable": "product_type",
+   "level": "C",
+   "status": "small_sample"
   },
   "ordinary_index|broad|中证500": {
    "member_count": 1,
    "fund_ids": [
     20
-   ]
+   ],
+   "family": "中证500",
+   "verifiable": true,
+   "level": "D",
+   "status": "insufficient_peer_sample"
   },
   "etf_linked|broad|中证500": {
    "member_count": 1,
    "fund_ids": [
     70
-   ]
+   ],
+   "family": "中证500",
+   "verifiable": true,
+   "level": "D",
+   "status": "insufficient_peer_sample"
   },
   "etf_linked|broad|上证50": {
    "member_count": 1,
    "fund_ids": [
     75
-   ]
+   ],
+   "family": "上证50",
+   "verifiable": true,
+   "level": "D",
+   "status": "insufficient_peer_sample"
   },
   "active_equity|中证500": {
    "member_count": 2,
    "fund_ids": [
     67,
     71
-   ]
+   ],
+   "family": "中证500",
+   "verifiable": true,
+   "level": "C",
+   "status": "small_sample"
   },
   "etf_linked|sector|中证全指半导体": {
    "member_count": 1,
    "fund_ids": [
     17
-   ]
+   ],
+   "family": "中证全指半导体",
+   "verifiable": true,
+   "level": "D",
+   "status": "insufficient_peer_sample"
   },
   "active_equity|unknown": {
    "member_count": 2,
    "fund_ids": [
     18,
     68
-   ]
+   ],
+   "family": "unknown",
+   "verifiable": false,
+   "level": "D",
+   "status": "no_verifiable_group"
   },
   "ordinary_index|broad|沪深300": {
    "member_count": 1,
    "fund_ids": [
     69
-   ]
+   ],
+   "family": "沪深300",
+   "verifiable": true,
+   "level": "D",
+   "status": "insufficient_peer_sample"
   },
   "lof|active|unknown": {
    "member_count": 1,
    "fund_ids": [
     19
-   ]
+   ],
+   "family": "unknown",
+   "verifiable": false,
+   "level": "D",
+   "status": "no_verifiable_group"
   },
   "lof|index|sector|中证白酒": {
    "member_count": 1,
    "fund_ids": [
     16
-   ]
+   ],
+   "family": "中证白酒",
+   "verifiable": true,
+   "level": "D",
+   "status": "insufficient_peer_sample"
   },
   "active_equity|中证800": {
    "member_count": 1,
    "fund_ids": [
     72
-   ]
+   ],
+   "family": "中证800",
+   "verifiable": true,
+   "level": "D",
+   "status": "insufficient_peer_sample"
   }
  },
- "grade_rules": {
-  "no_verifiable_group": "D",
-  "insufficient_peer_sample": "D（本体数 < 2）",
-  "weak_grouping": "C",
-  "small_sample": "C（本体数 2~4）",
-  "usable": "B（本体数 ≥ 5 且分组可靠）",
-  "never_A_reason": "净值连续性 cannot_verify 是结构性限制，不会因样本多而消失"
- },
- "anti_traps": {
-  "name_similarity_not_used": true,
-  "unknown_benchmark_not_ranked": true,
-  "money_separate_group": true,
-  "ac_deduped_by_fund_id": true,
-  "cross_group_comparison_allowed": false,
-  "ranking_generated": false
- },
- "real_results": {
+ "real_samples": {
   "050002": {
    "label": "普通指数基金",
    "peer_key": "ordinary_index|broad|沪深300",
@@ -138,15 +194,15 @@
    "label": "债券基金",
    "peer_key": "bond_pure|unknown",
    "member_count": 2,
-   "level": "C",
-   "status": "small_sample"
+   "level": "D",
+   "status": "no_verifiable_group"
   },
   "000509": {
    "label": "货币基金",
    "peer_key": "money_market",
    "member_count": 2,
    "level": "C",
-   "status": "weak_grouping"
+   "status": "small_sample"
   },
   "001548": {
    "label": "ETF联接 A/C 组（A 类）",
@@ -163,14 +219,21 @@
    "status": "insufficient_peer_sample"
   }
  },
- "missing_for_real_comparison": [
-  "基准收益序列",
-  "无风险利率",
-  "完整历史规模",
-  "完整历史经理",
-  "真实净值公布日历",
-  "完整费率"
- ],
+ "changed_results": {
+  "000032": {
+   "before": "C small_sample",
+   "after": "D no_verifiable_group",
+   "reason": "bond_pure|unknown 基准族未知，久期/信用暴露无可靠数据"
+  }
+ },
+ "anti_traps": {
+  "name_similarity_not_used": true,
+  "unknown_benchmark_not_ranked": true,
+  "money_separate_group": true,
+  "ac_deduped_by_fund_id": true,
+  "cross_group_comparison_allowed": false,
+  "ranking_generated": false
+ },
  "gate": {
   "ready_for_research_analysis": true,
   "ready_for_backtest": false,

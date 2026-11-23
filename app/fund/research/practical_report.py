@@ -101,6 +101,39 @@ def _money_section(report: dict) -> dict:
     }
 
 
+def _annualized_with_interval(ind: dict, report: dict) -> dict:
+    """给年化收益补上**真实计算区间**。
+
+    ``indicators._annualized()`` 只返回 span_days/years/method，
+    不带 start_date/end_date。这里用质量报告里的真实净值起止日期补充。
+
+    依据：``_annualized()`` 取的是 ``series.points[0].nav_date`` 与
+    ``series.points[-1].nav_date``，而 ``QualityReport.date_min/date_max``
+    正是这两个值（data_access 里 q.date_min = points[0].nav_date）。
+
+    不构造任何日期：拿不到就是 None，并标记来源。
+    """
+    node = dict(ind.get("annualized_return") or {})
+    if not node:
+        return node
+
+    q = report.get("quality") or {}
+    start = node.get("start_date") or q.get("date_min")
+    end = node.get("end_date") or q.get("date_max")
+    node["start_date"] = start
+    node["end_date"] = end
+    node["interval_source"] = (
+        "node" if (node.get("start_date") and node.get("end_date")
+                   and node.get("start_date") != q.get("date_min"))
+        else ("quality_report" if (start and end) else "none"))
+    node["interval_note"] = (
+        "计算区间取自净值序列首尾，与质量报告 date_min/date_max 一致；"
+        "未构造日期"
+        if (start and end) else
+        "缺少可验证的计算起止日期，不构造日期")
+    return node
+
+
 def _conclusions(report: dict, fund_grade: dict, grades: dict,
                  peer_ctx: dict) -> dict:
     """生成三类结论。严禁把推断写成事实。"""
@@ -313,7 +346,7 @@ def build_practical_report(code: str, db_path: Path | None = None, *,
             _money_section(report) if report.get("is_money_fund") else {
                 "caliber": "acc_nav",
                 "returns": ind.get("returns"),
-                "annualized_return": ind.get("annualized_return"),
+                "annualized_return": _annualized_with_interval(ind, report),
                 "risk": ind.get("risk"),
                 "risk_adjusted": ind.get("risk_adjusted"),
                 "stability": ind.get("stability"),

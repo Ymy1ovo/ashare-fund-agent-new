@@ -1,8 +1,8 @@
 {
- "phase": "3B-5.5",
+ "phase": "3B-5.5.1",
  "report": "practical_report_examples",
- "baseline_head": "8c42dec82bcb35393193b70ab033dbda41a6c143",
- "generated_at": "2026-11-23T14:35:00",
+ "baseline_head": "e8132fc914eeeef6e6cbcd32b15f346701831a42",
+ "generated_at": "2026-11-23T15:05:00",
  "data_source": "data/fund_agent.db（只读，真实数据）",
  "simulated_data_used": false,
  "samples": {
@@ -11,6 +11,11 @@
    "product_class": "ordinary_index",
    "is_money_fund": false,
    "fund_quality_level": "B",
+   "peer_key": "ordinary_index|broad|沪深300",
+   "peer_level": "D",
+   "peer_status": "insufficient_peer_sample",
+   "annualized_level": "D",
+   "annualized_evidence": "区间内存在超过阈值的缺口或样本不足",
    "indicator_levels": {
     "A": 6,
     "D": 5,
@@ -20,21 +25,19 @@
    "computable": 7,
    "not_applicable": 1,
    "not_computable": 5,
-   "peer_key": "ordinary_index|broad|沪深300",
-   "peer_level": "D",
    "share_cost_level": "not_applicable",
-   "buy_sell_conclusion": null,
-   "conclusions": {
-    "facts": 4,
-    "conditional": 3,
-    "cannot_prove": 7
-   }
+   "buy_sell_conclusion": null
   },
   "001052": {
    "label": "ETF联接基金",
    "product_class": "etf_linked",
    "is_money_fund": false,
    "fund_quality_level": "B",
+   "peer_key": "etf_linked|broad|中证500",
+   "peer_level": "D",
+   "peer_status": "insufficient_peer_sample",
+   "annualized_level": "A",
+   "annualized_evidence": "成立以来年化 -0.025595，按实际自然日间隔复合年化；计算区间 2015-05-05 → 2026-11-20，跨度 4217 天（计算区间取自净值序列首尾，与质量报告一致）",
    "indicator_levels": {
     "A": 9,
     "D": 3,
@@ -43,21 +46,19 @@
    "computable": 9,
    "not_applicable": 1,
    "not_computable": 3,
-   "peer_key": "etf_linked|broad|中证500",
-   "peer_level": "D",
    "share_cost_level": "not_applicable",
-   "buy_sell_conclusion": null,
-   "conclusions": {
-    "facts": 4,
-    "conditional": 3,
-    "cannot_prove": 7
-   }
+   "buy_sell_conclusion": null
   },
   "001938": {
    "label": "主动权益基金",
    "product_class": "active_equity",
    "is_money_fund": false,
    "fund_quality_level": "B",
+   "peer_key": "active_equity|中证500",
+   "peer_level": "C",
+   "peer_status": "small_sample",
+   "annualized_level": "A",
+   "annualized_evidence": "成立以来年化 0.102562，按实际自然日间隔复合年化；计算区间 2015-11-03 → 2026-11-20，跨度 4035 天（计算区间取自净值序列首尾，与质量报告一致）",
    "indicator_levels": {
     "A": 9,
     "D": 2,
@@ -67,44 +68,39 @@
    "computable": 10,
    "not_applicable": 1,
    "not_computable": 2,
-   "peer_key": "active_equity|中证500",
-   "peer_level": "C",
    "share_cost_level": "not_applicable",
-   "buy_sell_conclusion": null,
-   "conclusions": {
-    "facts": 4,
-    "conditional": 3,
-    "cannot_prove": 6
-   }
+   "buy_sell_conclusion": null
   },
   "000032": {
    "label": "债券基金",
    "product_class": "bond_pure",
    "is_money_fund": false,
    "fund_quality_level": "B",
+   "peer_key": "bond_pure|unknown",
+   "peer_level": "D",
+   "peer_status": "no_verifiable_group",
+   "annualized_level": "A",
+   "annualized_evidence": "成立以来年化 0.038121，按实际自然日间隔复合年化；计算区间 2013-04-24 → 2026-11-20，跨度 4958 天（计算区间取自净值序列首尾，与质量报告一致）",
    "indicator_levels": {
     "A": 9,
-    "D": 3,
-    "C": 1
+    "D": 4
    },
-   "computable": 10,
+   "computable": 9,
    "not_applicable": 0,
-   "not_computable": 3,
-   "peer_key": "bond_pure|unknown",
-   "peer_level": "C",
+   "not_computable": 4,
    "share_cost_level": "D",
-   "buy_sell_conclusion": null,
-   "conclusions": {
-    "facts": 4,
-    "conditional": 3,
-    "cannot_prove": 7
-   }
+   "buy_sell_conclusion": null
   },
   "000509": {
    "label": "货币基金",
    "product_class": "money_market",
    "is_money_fund": true,
    "fund_quality_level": "B",
+   "peer_key": "money_market",
+   "peer_level": "C",
+   "peer_status": "small_sample",
+   "annualized_level": "not_applicable",
+   "annualized_evidence": "货币基金不使用净值口径，年化收益不适用",
    "indicator_levels": {
     "not_applicable": 12,
     "C": 1
@@ -112,21 +108,19 @@
    "computable": 1,
    "not_applicable": 12,
    "not_computable": 0,
-   "peer_key": "money_market",
-   "peer_level": "C",
    "share_cost_level": "not_applicable",
-   "buy_sell_conclusion": null,
-   "conclusions": {
-    "facts": 3,
-    "conditional": 2,
-    "cannot_prove": 6
-   }
+   "buy_sell_conclusion": null
   },
   "001548": {
    "label": "ETF联接 A/C 组（A 类）",
    "product_class": "etf_linked",
    "is_money_fund": false,
    "fund_quality_level": "B",
+   "peer_key": "etf_linked|broad|上证50",
+   "peer_level": "D",
+   "peer_status": "insufficient_peer_sample",
+   "annualized_level": "A",
+   "annualized_evidence": "成立以来年化 0.032862，按实际自然日间隔复合年化；计算区间 2015-07-16 → 2026-11-20，跨度 4145 天（计算区间取自净值序列首尾，与质量报告一致）",
    "indicator_levels": {
     "A": 9,
     "D": 4
@@ -134,21 +128,19 @@
    "computable": 9,
    "not_applicable": 0,
    "not_computable": 4,
-   "peer_key": "etf_linked|broad|上证50",
-   "peer_level": "D",
    "share_cost_level": "D",
-   "buy_sell_conclusion": null,
-   "conclusions": {
-    "facts": 4,
-    "conditional": 3,
-    "cannot_prove": 8
-   }
+   "buy_sell_conclusion": null
   },
   "001549": {
    "label": "ETF联接 A/C 组（C 类）",
    "product_class": "etf_linked",
    "is_money_fund": false,
    "fund_quality_level": "B",
+   "peer_key": "etf_linked|broad|上证50",
+   "peer_level": "D",
+   "peer_status": "insufficient_peer_sample",
+   "annualized_level": "A",
+   "annualized_evidence": "成立以来年化 0.032862，按实际自然日间隔复合年化；计算区间 2015-07-16 → 2026-11-20，跨度 4145 天（计算区间取自净值序列首尾，与质量报告一致）",
    "indicator_levels": {
     "A": 9,
     "D": 4
@@ -156,15 +148,8 @@
    "computable": 9,
    "not_applicable": 0,
    "not_computable": 4,
-   "peer_key": "etf_linked|broad|上证50",
-   "peer_level": "D",
    "share_cost_level": "D",
-   "buy_sell_conclusion": null,
-   "conclusions": {
-    "facts": 4,
-    "conditional": 3,
-    "cannot_prove": 8
-   }
+   "buy_sell_conclusion": null
   }
  },
  "coverage": {

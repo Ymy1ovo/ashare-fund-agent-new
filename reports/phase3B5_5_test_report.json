@@ -1,62 +1,67 @@
 {
- "phase": "3B-5.5",
+ "phase": "3B-5.5.1",
  "report": "tests",
- "baseline_head": "8c42dec82bcb35393193b70ab033dbda41a6c143",
- "generated_at": "2026-11-23T14:35:00",
+ "baseline_head": "e8132fc914eeeef6e6cbcd32b15f346701831a42",
+ "generated_at": "2026-11-23T15:05:00",
  "executed": true,
  "new_suite": {
-  "file": "tests/test_3b5_5_quality_framework.py",
-  "passed": 60,
+  "file": "tests/test_3b5_5_1_peer_annualized.py",
+  "passed": 51,
   "failed": 0,
-  "seconds": 72.06
+  "seconds": 57.34
+ },
+ "phase_3b5_5_suite": {
+  "files": [
+   "tests/test_3b5_5_quality_framework.py",
+   "tests/test_3b5_5_1_peer_annualized.py"
+  ],
+  "passed": 112,
+  "seconds": 121.0,
+  "breakdown": {
+   "test_3b5_5_quality_framework.py": 61,
+   "test_3b5_5_1_peer_annualized.py": 51
+  }
  },
  "regression": {
   "3b5_1_5_2": {
-   "files": [
-    "tests/test_3b5_1_fund_research.py",
-    "tests/test_3b5_2_code_lookup.py"
-   ],
    "passed": 135,
-   "seconds": 63.13
+   "seconds": 65.76
   },
   "3b5_3_5_4": {
-   "files": [
-    "tests/test_3b5_3_2_fk_serialization.py",
-    "tests/test_3b5_3_1_atomic.py",
-    "tests/test_3b5_3_user_ingest.py",
-    "tests/test_3b5_4_multi_type.py"
-   ],
    "passed": 99,
-   "seconds": 95.36
+   "seconds": 104.58
   }
  },
  "full": {
   "command": "pytest -q",
-  "passed": 1577,
+  "passed": 1629,
   "failed": 0,
   "errors": 0,
-  "seconds": 520.63
+  "seconds": 577.58
  },
  "evolution": {
-  "3B-5.3.2": 1482,
   "3B-5.4": 1517,
-  "3B-5.5": 1577
+  "3B-5.5": 1577,
+  "3B-5.5.1": 1629
+ },
+ "test_adjustment_note": {
+  "file": "tests/test_3b5_5_quality_framework.py",
+  "test": "test_peer_small_sample_is_c",
+  "change": "原用 bond_pure|unknown 作为「有效分组」样本；修正后该组键必须 D，故改用 etf_linked|broad|沪深300，并新增 test_peer_bond_unknown_is_d",
+  "weakened": false,
+  "assertions_removed": 0
  },
  "static_checks_excluded": [
   "python -m compileall 语法检查",
   "报告数据与库查询比对"
  ],
- "environment": {
-  "temp_db": "自建 schema",
-  "production_db": "只读",
-  "network": "单元测试不联网",
-  "production_writes": 0
- },
  "code_changes": {
-  "new": [
+  "modified": [
    "app/fund/research/quality.py",
-   "app/fund/research/practical_report.py",
-   "tests/test_3b5_5_quality_framework.py"
+   "app/fund/research/practical_report.py"
+  ],
+  "new": [
+   "tests/test_3b5_5_1_peer_annualized.py"
   ],
   "unchanged": [
    "app/fund/research/engine.py",

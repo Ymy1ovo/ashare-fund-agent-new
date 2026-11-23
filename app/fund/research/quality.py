@@ -239,20 +239,69 @@ def _ret_cell(node: dict | None, label: str, *, quality: dict) -> dict:
         reason=n.get("reason") or "窗口数据不足")
 
 
-def grade_annualized(node: dict | None) -> dict:
+def grade_annualized(node: dict | None,
+                     quality: dict | None = None) -> dict:
+    """年化收益评级。
+
+    **3B-5.5.1 修正点**：``_annualized()`` 返回的节点不含
+    ``start_date`` / ``end_date``（只带 span_days/years/method），
+    因此旧实现在证据里写的是 ``None``，等于没有可复核区间。
+
+    修正策略（不伪造日期）：
+
+    1. 优先用节点自带的 ``start_date`` / ``end_date``；
+    2. 节点没有时，用**质量信息里的真实净值起止日期**补充 ——
+       这是等价替换，不是编造：``_annualized()`` 取的是
+       ``series.points[0].nav_date`` 与 ``series.points[-1].nav_date``，
+       而 ``QualityReport.date_min/date_max`` 正是这两个值
+       （见 ``data_access.load_nav_series``：``q.date_min = points[0].nav_date``）；
+    3. 两者都拿不到日期 → 不给 A，降为 D 并标证据不足，绝不编造区间；
+    4. ``status == "ok"`` 但 ``value is None`` → 降为 D ``invalid_result``，
+       绝不给 A。
+    """
     n = node or {}
-    if n.get("status") == "ok":
+    q = quality or {}
+
+    if n.get("status") != "ok":
         return _cell(
-            LEVEL_A, status="ok", value=n.get("value"),
-            evidence=(f"成立以来年化，按实际自然日间隔；"
-                      f"起始 {n.get('start_date')}，结束 {n.get('end_date')}"),
-            limitation="年化是折算值，不等于未来可实现收益",
-            reason=None)
+            LEVEL_D, status=n.get("status") or "insufficient_data", value=None,
+            evidence="区间内存在超过阈值的缺口或样本不足",
+            limitation="不跨越缺口折算年化",
+            reason=n.get("reason") or "样本不足")
+
+    value = n.get("value")
+    if value is None:
+        return _cell(
+            LEVEL_D, status="invalid_result", value=None,
+            evidence="状态为 ok 但年化值为空",
+            limitation="空值不得当作可计算结果对外展示",
+            reason="年化结果无效（status=ok 但 value=None）")
+
+    # ---- 取真实计算区间 ----
+    start = n.get("start_date") or q.get("date_min")
+    end = n.get("end_date") or q.get("date_max")
+    date_source = "node" if (n.get("start_date") and n.get("end_date")) else (
+        "quality_report" if (start and end) else "none")
+
+    if not start or not end:
+        return _cell(
+            LEVEL_D, status="insufficient_evidence", value=value,
+            evidence=("年化值可算，但缺少可验证的计算起止日期"
+                      f"（节点日期 {n.get('start_date')} ~ {n.get('end_date')}，"
+                      f"质量信息日期 {q.get('date_min')} ~ {q.get('date_max')}）"),
+            limitation="无起止日期则无法复核区间，不按 A 级展示",
+            reason="缺少可验证的日期证据，拒绝给高等级")
+
+    span = n.get("span_days")
+    span_txt = f"，跨度 {span} 天" if span is not None else ""
+    source_txt = ("（计算区间取自净值序列首尾，与质量报告一致）"
+                  if date_source == "quality_report" else "")
     return _cell(
-        LEVEL_D, status=n.get("status") or "insufficient_data", value=None,
-        evidence="区间内存在超过阈值的缺口或样本不足",
-        limitation="不跨越缺口折算年化",
-        reason=n.get("reason") or "样本不足")
+        LEVEL_A, status="ok", value=value,
+        evidence=(f"成立以来年化 {value:.6f}，按实际自然日间隔复合年化；"
+                  f"计算区间 {start} → {end}{span_txt}{source_txt}"),
+        limitation="年化是折算值，不等于未来可实现收益",
+        reason=None)
 
 
 def grade_max_drawdown(node: dict | None) -> dict:
@@ -357,11 +406,38 @@ def grade_excess_return(not_computed: dict | None) -> dict:
         reason=reason)
 
 
+def _peer_key_family_unknown(peer_key: str | None) -> str | None:
+    """从同类组键里取出「基准/指数族」那一段。
+
+    组键格式（与 classification.peer_group_key 一致）：
+    - 指数类：``<product>|<scope>|<family>``（family 在最后一段）
+    - LOF 指数：``lof|index|<scope>|<family>``
+    - LOF 主动：``lof|active|<family>``
+    - 主动权益：``active_equity|<family>``
+    - 债券：``bond_pure|unknown`` / ``bond_mixed|unknown``
+    - 货币：``money_market``（无 family）
+
+    返回最后一段；无法解析返回 None。
+    """
+    if not peer_key:
+        return None
+    parts = str(peer_key).split("|")
+    return parts[-1].strip() if parts else None
+
+
 def grade_peer_comparison(peer_ctx: dict | None) -> dict:
     """同类比较评级。
 
     peer_ctx: {peer_key, member_count, grouping_source, benchmark_confidence,
                verifiable_group, index_scope}
+
+    **判定顺序（3B-5.5.1 修正）**：
+    1. 分组依据是否可验证 —— 不可验证直接 D，**不再因为样本多而放行**；
+    2. 组键里的基准/指数族是否为 unknown —— 是则 D；
+    3. 只有依据通过后，才判断样本量（1 → D，2~4 → C，≥5 → B）。
+
+    货币基金 ``money_market`` 是特例：按产品类型独立分组，
+    不要求指数或业绩基准，但永远不与净值型基金混组。
     """
     c = peer_ctx or {}
     key = c.get("peer_key")
@@ -369,13 +445,67 @@ def grade_peer_comparison(peer_ctx: dict | None) -> dict:
     src = c.get("grouping_source")
     conf = c.get("benchmark_confidence")
     verifiable = c.get("verifiable_group")
+    family = _peer_key_family_unknown(key)
 
-    if not key or key.startswith("unknown"):
+    # ---- 货币基金：产品类型独立分组，不要求基准 ----
+    if key == "money_market":
+        if n < 2:
+            return _cell(
+                LEVEL_D, status="insufficient_peer_sample", value=None,
+                evidence=f"货币基金同类组只有 {n} 个本体",
+                limitation="样本不足拒绝比较；且永远不与净值型基金同榜",
+                reason="同类样本不足")
+        if n < 5:
+            return _cell(
+                LEVEL_C, status="small_sample", value=n,
+                evidence=(f"货币基金同类组 {n} 个本体，"
+                          f"按产品类型独立分组（不依赖指数或业绩基准）"),
+                limitation=("样本量小于 5，只能描述性对照；"
+                            "**禁止**与净值型基金混合比较"),
+                reason="样本量小于 5")
+        return _cell(
+            LEVEL_B, status="usable", value=n,
+            evidence=(f"货币基金同类组 {n} 个本体，"
+                      f"按产品类型独立分组（不依赖指数或业绩基准）"),
+            limitation=("仅描述性并列；仍不与净值型基金混合；"
+                        "本项目不开放正式排名"),
+            reason=None)
+
+    # ---- 分组依据不可验证 → 直接 D（样本再多也不放行）----
+    if verifiable is False:
+        return _cell(
+            LEVEL_D, status="no_verifiable_group", value=None,
+            evidence=(f"同类组键 {key!r} 的分组依据不可验证"
+                      f"（verifiable_group=False，来源 {src}，"
+                      f"基准族 {family}）；样本 {n} 个不改变这一结论"),
+            limitation="不得仅凭基金名称相似或类型相同判定同类",
+            reason="分组依据不可验证，拒绝比较")
+
+    if not key:
+        return _cell(
+            LEVEL_D, status="no_verifiable_group", value=None,
+            evidence="同类组键缺失",
+            limitation="不得仅凭基金名称相似判定同类",
+            reason="分组不可验证")
+
+    # ---- 组键里的基准/指数族为 unknown → D ----
+    if family in (None, "", "unknown") or str(key).endswith("|unknown"):
+        return _cell(
+            LEVEL_D, status="no_verifiable_group", value=None,
+            evidence=(f"同类组键 {key!r} 的基准/指数族为 unknown"
+                      f"（来源 {src}，置信度 {conf}）"),
+            limitation=("缺少可验证的跟踪指数或业绩基准；"
+                        "债券久期/信用暴露无可靠数据，不解释成相同风险"),
+            reason="基准或指数族未知，拒绝比较")
+
+    if str(key).startswith("unknown"):
         return _cell(
             LEVEL_D, status="no_verifiable_group", value=None,
             evidence=f"同类组键为 {key!r}，无可验证基准或跟踪指数",
             limitation="不得仅凭基金名称相似判定同类",
             reason="分组不可验证")
+
+    # ---- 依据通过后，才判断样本量 ----
     if n < 2:
         return _cell(
             LEVEL_D, status="insufficient_peer_sample", value=None,
@@ -385,7 +515,7 @@ def grade_peer_comparison(peer_ctx: dict | None) -> dict:
     if src == "unknown" or conf == "none":
         return _cell(
             LEVEL_C, status="weak_grouping", value=n,
-            evidence=f"同类组 {key}，{n} 个本体，但分组依据不可靠（{src}）",
+            evidence=f"同类组 {key}，{n} 个本体，但分组来源不可靠（{src}）",
             limitation="分组依据弱，只做描述性并列，不做强弱判断",
             reason="分组依据弱")
     if n < 5:
@@ -488,7 +618,8 @@ def build_indicator_grades(report: dict, *, peer_ctx: dict | None = None,
             if key in ("ret_1m", "ret_3m", "ret_6m", "ret_12m", "ret_36m"):
                 out[key] = _ret_cell(rets.get(key), label, quality=quality)
             elif key == "annualized_return":
-                out[key] = grade_annualized(ind.get("annualized_return"))
+                out[key] = grade_annualized(ind.get("annualized_return"),
+                                            quality=quality)
             elif key == "max_drawdown":
                 out[key] = grade_max_drawdown(risk.get("max_drawdown"))
             elif key == "daily_volatility":

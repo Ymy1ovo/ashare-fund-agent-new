@@ -1,180 +1,94 @@
 {
- "phase": "3B-5.5",
+ "phase": "3B-5.5.1",
  "report": "indicator_quality",
- "baseline_head": "8c42dec82bcb35393193b70ab033dbda41a6c143",
- "generated_at": "2026-11-23T14:35:00",
- "indicator_count": 13,
- "indicators": [
-  "ret_1m",
-  "ret_3m",
-  "ret_6m",
-  "ret_12m",
-  "ret_36m",
-  "annualized_return",
-  "max_drawdown",
-  "daily_volatility",
-  "annualized_volatility",
-  "sharpe",
-  "excess_return",
-  "peer_comparison",
-  "share_cost_comparison"
- ],
- "grade_rules": {
-  "range_returns": {
-   "A": "端点精确命中且窗口内无超阈值缺口",
-   "D": "端点未命中或窗口内有缺口",
-   "no_zero_fill": true,
-   "no_interpolation": true
-  },
-  "annualized_return": {
-   "A": "全区间无超阈值缺口",
-   "D": "有缺口"
-  },
-  "max_drawdown": {
-   "A": "degraded=false 且 complete_interval=true",
-   "B": "degraded=true，分段可观测，可能低估",
-   "D": "无连续段"
-  },
-  "daily_volatility": {
-   "field": "daily_vol",
-   "A": "能算即 A",
-   "trap": "volatility.value 可能是年化值，必须取 daily_vol"
-  },
-  "annualized_volatility": {
-   "A": "annualized=true",
-   "D": "annualized=false（blocked）"
-  },
-  "sharpe": {
-   "B": "有可靠无风险利率",
-   "D": "无（本项目恒 D）",
-   "never_zero_filled": true
-  },
-  "excess_return": {
-   "B": "有基准收益序列",
-   "D": "无（本项目恒 D）"
-  },
-  "peer_comparison": {
-   "never_A": true,
-   "D": [
-    "no_verifiable_group",
-    "insufficient_peer_sample"
+ "baseline_head": "e8132fc914eeeef6e6cbcd32b15f346701831a42",
+ "generated_at": "2026-11-23T15:05:00",
+ "fixes": {
+  "P2_annualized_evidence_dates": {
+   "problem": "真实样本 001052 年化状态 ok、等级 A，但证据起止日期均为 None（_annualized() 不返回 start_date/end_date）",
+   "solution": "grade_annualized(node, quality) 支持从质量报告 date_min/date_max 补充；新增 value=None 与无日期两种降级",
+   "date_priority": [
+    "node.start_date/end_date",
+    "quality.date_min/date_max"
    ],
-   "C": [
-    "weak_grouping",
-    "small_sample"
-   ],
-   "B": "usable（≥5 个本体且分组可靠）"
-  },
-  "share_cost_comparison": {
-   "never_A_or_B": true,
-   "D": "insufficient_fee_evidence",
-   "C": "partial_evidence",
-   "not_applicable": "single_share"
+   "equivalence_justification": "_annualized() 取 series.points[0].nav_date 与 series.points[-1].nav_date，而 QualityReport.date_min/date_max 正是这两个值（data_access: q.date_min = points[0].nav_date）",
+   "fabricated_dates": false,
+   "ok_but_value_none_becomes": {
+    "level": "D",
+    "status": "invalid_result"
+   },
+   "no_dates_becomes": {
+    "level": "D",
+    "status": "insufficient_evidence"
+   },
+   "gap_block_unchanged": true,
+   "formula_changed": false,
+   "window_rules_changed": false
   }
  },
- "real_distribution": {
+ "real_samples": {
   "050002": {
-   "levels": {
-    "A": 6,
-    "D": 5,
-    "B": 1,
-    "not_applicable": 1
-   },
-   "computable": 7,
-   "not_applicable": 1,
-   "not_computable": 5,
-   "blocked_keys": [
-    "annualized_return",
-    "annualized_volatility",
-    "sharpe",
-    "excess_return",
-    "peer_comparison"
-   ]
+   "label": "普通指数基金",
+   "annualized_level": "D",
+   "annualized_status": "insufficient_data",
+   "annualized_value": null,
+   "annualized_evidence": "区间内存在超过阈值的缺口或样本不足",
+   "quality_date_min": "2003-08-26",
+   "quality_date_max": "2026-11-20"
   },
   "001052": {
-   "levels": {
-    "A": 9,
-    "D": 3,
-    "not_applicable": 1
-   },
-   "computable": 9,
-   "not_applicable": 1,
-   "not_computable": 3,
-   "blocked_keys": [
-    "sharpe",
-    "excess_return",
-    "peer_comparison"
-   ]
+   "label": "ETF联接基金",
+   "annualized_level": "A",
+   "annualized_status": "ok",
+   "annualized_value": -0.025595,
+   "annualized_evidence": "成立以来年化 -0.025595，按实际自然日间隔复合年化；计算区间 2015-05-05 → 2026-11-20，跨度 4217 天（计算区间取自净值序列首尾，与质量报告一致）",
+   "quality_date_min": "2015-05-05",
+   "quality_date_max": "2026-11-20"
   },
   "001938": {
-   "levels": {
-    "A": 9,
-    "D": 2,
-    "C": 1,
-    "not_applicable": 1
-   },
-   "computable": 10,
-   "not_applicable": 1,
-   "not_computable": 2,
-   "blocked_keys": [
-    "sharpe",
-    "excess_return"
-   ]
+   "label": "主动权益基金",
+   "annualized_level": "A",
+   "annualized_status": "ok",
+   "annualized_value": 0.102562,
+   "annualized_evidence": "成立以来年化 0.102562，按实际自然日间隔复合年化；计算区间 2015-11-03 → 2026-11-20，跨度 4035 天（计算区间取自净值序列首尾，与质量报告一致）",
+   "quality_date_min": "2015-11-03",
+   "quality_date_max": "2026-11-20"
   },
   "000032": {
-   "levels": {
-    "A": 9,
-    "D": 3,
-    "C": 1
-   },
-   "computable": 10,
-   "not_applicable": 0,
-   "not_computable": 3,
-   "blocked_keys": [
-    "sharpe",
-    "excess_return",
-    "share_cost_comparison"
-   ]
+   "label": "债券基金",
+   "annualized_level": "A",
+   "annualized_status": "ok",
+   "annualized_value": 0.038121,
+   "annualized_evidence": "成立以来年化 0.038121，按实际自然日间隔复合年化；计算区间 2013-04-24 → 2026-11-20，跨度 4958 天（计算区间取自净值序列首尾，与质量报告一致）",
+   "quality_date_min": "2013-04-24",
+   "quality_date_max": "2026-11-20"
   },
   "000509": {
-   "levels": {
-    "not_applicable": 12,
-    "C": 1
-   },
-   "computable": 1,
-   "not_applicable": 12,
-   "not_computable": 0,
-   "blocked_keys": []
+   "label": "货币基金",
+   "annualized_level": "not_applicable",
+   "annualized_status": "not_applicable",
+   "annualized_value": null,
+   "annualized_evidence": "货币基金不使用净值口径，年化收益不适用",
+   "quality_date_min": "2014-01-15",
+   "quality_date_max": "2026-11-22"
   },
   "001548": {
-   "levels": {
-    "A": 9,
-    "D": 4
-   },
-   "computable": 9,
-   "not_applicable": 0,
-   "not_computable": 4,
-   "blocked_keys": [
-    "sharpe",
-    "excess_return",
-    "peer_comparison",
-    "share_cost_comparison"
-   ]
+   "label": "ETF联接 A/C 组（A 类）",
+   "annualized_level": "A",
+   "annualized_status": "ok",
+   "annualized_value": 0.032862,
+   "annualized_evidence": "成立以来年化 0.032862，按实际自然日间隔复合年化；计算区间 2015-07-16 → 2026-11-20，跨度 4145 天（计算区间取自净值序列首尾，与质量报告一致）",
+   "quality_date_min": "2015-07-16",
+   "quality_date_max": "2026-11-20"
   },
   "001549": {
-   "levels": {
-    "A": 9,
-    "D": 4
-   },
-   "computable": 9,
-   "not_applicable": 0,
-   "not_computable": 4,
-   "blocked_keys": [
-    "sharpe",
-    "excess_return",
-    "peer_comparison",
-    "share_cost_comparison"
-   ]
+   "label": "ETF联接 A/C 组（C 类）",
+   "annualized_level": "A",
+   "annualized_status": "ok",
+   "annualized_value": 0.032862,
+   "annualized_evidence": "成立以来年化 0.032862，按实际自然日间隔复合年化；计算区间 2015-07-16 → 2026-11-20，跨度 4145 天（计算区间取自净值序列首尾，与质量报告一致）",
+   "quality_date_min": "2015-07-16",
+   "quality_date_max": "2026-11-20"
   }
  },
  "money_fund_policy": {
@@ -183,8 +97,7 @@
    "per_10k_yield",
    "seven_day_annual"
   ],
-  "comparable_with_net_value_funds": false,
-  "usable_for_net_value_comparison": false
+  "comparable_with_net_value_funds": false
  },
  "gate": {
   "ready_for_research_analysis": true,

@@ -1,5 +1,84 @@
 # 变更日志
 
+## 2026-11-23 — 阶段3B-5.5.1 同类分组可验证性与年化收益证据修正
+
+窄范围修复验收发现的两个问题，**只动评级层，不动计算逻辑**。
+
+**问题1（阻断）：同类分组可验证性漏洞**
+
+`grade_peer_comparison()` 读取了 `verifiable_group` 但没有真正使用；
+组键只判断字符串是否以 `unknown` 开头，导致 `bond_pure|unknown`
+（基准族未知）被当作有效分组，评成 C。
+
+修正：
+
+1. 新增 `_peer_key_family_unknown()`，从组键最后一段解析基准/指数族；
+2. 判定顺序改为**先可验证性、后样本量**：
+   - `money_market` → 产品类型独立分组，免基准检查；
+   - `verifiable_group is False` → **D**（样本 6 个、50 个也不放行）；
+   - 组键缺失 → **D**；
+   - 基准/指数族 unknown → **D**（覆盖 `bond_pure|unknown`、
+     `active_equity|unknown`、`lof|active|unknown`）；
+   - 依据通过后才看样本量：1 → D，2~4 → C，≥5 → B。
+3. 货币基金仍隔离，永不与净值型基金混组。
+4. `classification.py` **未改**（分组逻辑本身是对的）。
+
+实测变化：
+
+| 样本 | 修复前 | 修复后 | 原因 |
+| --- | --- | --- | --- |
+| `000032` | C small_sample | **D no_verifiable_group** | `bond_pure\|unknown` 基准族未知 |
+| `001938` | C | C small_sample | `active_equity\|中证500` 有效，2 个本体 |
+| `000509` | C | C small_sample | 货币基金按产品类型分组 |
+
+**问题2：年化收益证据日期缺失**
+
+真实样本 `001052` 年化状态 `ok`、等级 `A`，但证据里起止日期均为 `None`。
+根因：`indicators._annualized()` 只返回 `span_days/years/method`，
+不返回 `start_date/end_date`。
+
+修正：
+
+| 情况 | 处理 |
+| --- | --- |
+| 节点自带日期 | 优先使用 |
+| 节点无日期 | 用质量报告 `date_min/date_max` 补充 |
+| 无任何可验证日期 | **D** `insufficient_evidence`，不编造 |
+| `status=ok` 但 `value=None` | **D** `invalid_result`，不给 A |
+
+补充日期的合法性：`_annualized()` 取 `series.points[0].nav_date` 与
+`series.points[-1].nav_date`，而 `QualityReport.date_min/date_max`
+正是这两个值（`data_access`：`q.date_min = points[0].nav_date`），
+属于等价替换，不是构造。
+
+`practical_report.py` 同步新增 `_annualized_with_interval()`，
+在 `7_return_risk.annualized_return` 里输出 `start_date` / `end_date` /
+`interval_source` / `interval_note`。
+
+修复后 `001052` 证据：
+
+```
+成立以来年化 -0.025595，按实际自然日间隔复合年化；
+计算区间 2015-05-05 → 2026-11-20，跨度 4217 天
+（计算区间取自净值序列首尾，与质量报告一致）
+```
+
+**未改动**：`engine.py` / `indicators.py` / `classification.py` 零改动，
+收益率公式、窗口规则、缺口阈值全部不变，不重新采集、不写正式库。
+
+**测试**：新增 `tests/test_3b5_5_1_peer_annualized.py` 51 项；
+`test_3b5_5_quality_framework.py` 的 `test_peer_small_sample_is_c`
+原用 `bond_pure|unknown` 作有效分组样本，修正后该组键必须 D，
+故改用 `etf_linked|broad|沪深300`，并新增 `test_peer_bond_unknown_is_d`
+（**未删除或弱化任何断言**）。
+
+全量 **1629 passed / 0 failed / 577.58 秒**（1577 + 51 + 1 = 1629）。
+
+**报告重生成**：`phase3B5_5_peer_comparison`、`phase3B5_5_indicator_quality`、
+`phase3B5_5_practical_report_examples`、`phase3B5_5_test_report`
+（md + json 全部重生成）。
+
+
 ## 2026-11-23 — 阶段3B-5.5 数据质量分级与指标可信度 V1.0
 
 解决的问题不是「生成更多指标」，而是「这些指标的证据有多强」。

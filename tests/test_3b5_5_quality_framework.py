@@ -275,11 +275,26 @@ def test_peer_no_verifiable_group():
 
 
 def test_peer_small_sample_is_c():
-    r = grade_peer_comparison({"peer_key": "bond_pure|unknown", "member_count": 2,
+    """有效分组 + 2~4 个本体 → C（3B-5.5.1 起改用可验证组键）。"""
+    r = grade_peer_comparison({"peer_key": "etf_linked|broad|沪深300",
+                               "member_count": 2,
                                "grouping_source": "benchmark",
-                               "benchmark_confidence": "medium"})
+                               "benchmark_confidence": "medium",
+                               "verifiable_group": True})
     assert r["quality_level"] == LEVEL_C
     assert r["status"] == "small_sample"
+
+
+def test_peer_bond_unknown_is_d():
+    """3B-5.5.1：bond_pure|unknown 基准族未知 → D，不看样本量。"""
+    r = grade_peer_comparison({"peer_key": "bond_pure|unknown",
+                               "member_count": 6,
+                               "grouping_source": "benchmark",
+                               "benchmark_confidence": "high",
+                               "verifiable_group": True})
+    assert r["quality_level"] == LEVEL_D
+    assert r["status"] == "no_verifiable_group"
+    assert r["value"] is None
 
 
 def test_peer_usable_needs_five():

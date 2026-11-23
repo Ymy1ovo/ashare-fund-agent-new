@@ -2452,7 +2452,8 @@ if (basis != ACCOUNTING_FORMAL
 | 3B-5.3.1 | 事务原子性与内容指纹修复 | 1465 | `phase3B5_3_1_atomic_fix_report.md` |
 | 3B-5.3.2 | 外键约束与指纹序列化修正 | 1482 | `phase3B5_3_2_fk_serialization_report.md` |
 | 3B-5.4 | 多类型场外基金真实接入验证 | 1517 | `phase3B5_4_ingestion_report.md` |
-| 3B-5.5 | 数据质量分级与指标可信度 | **1577** | `phase3B5_5_quality_framework.md` |
+| 3B-5.5 | 数据质量分级与指标可信度 | 1577 | `phase3B5_5_quality_framework.md` |
+| 3B-5.5.1 | 同类可验证性与年化证据修正 | **1629** | `phase3B5_5_test_report.md` |
 
 当前正式会计版本：`ca-v2-receivable`；正式会计基础：`formal_receivable`；正式估值标记：`formal_valuation=True`。
 
@@ -5642,6 +5643,10 @@ json.dumps([list(_stable_value(v)) for v in values],
 | Sharpe 无利率则拒算 | 恒 `D` / `not_available`，`value=null` |
 | 超额收益无基准则拒算 | 恒 `D` / `not_computed` |
 | 同类样本不足则拒比 | 本体 < 2 → `D`；2~4 → `C`；**永远不到 A** |
+| 分组依据不可验证则拒比 | `verifiable_group=False` → **`D`**，样本再多也不放行 |
+| 基准族 unknown 则拒比 | `bond_pure|unknown` / `active_equity|unknown` → **`D`** |
+| 货币基金免基准检查 | `money_market` 按产品类型分组，但**永不与净值型混组** |
+| 年化证据必须有真实区间 | 节点无日期时用质量报告 `date_min/date_max` 补充；无日期 → `D` |
 | A/C 成本不给结论 | 费率不全 → `D`；齐全也只能 `C`；`buy_sell_conclusion=null` |
 | 货币基金独立 | 12 项 `not_applicable`，`money_market` 独立分组 |
 
@@ -5669,4 +5674,56 @@ json.dumps([list(_stable_value(v)) for v in values],
 | 分级模块 | `app/fund/research/quality.py` |
 | 报告组装 | `app/fund/research/practical_report.py` |
 | 专项测试 | `tests/test_3b5_5_quality_framework.py`（60 项） |
+
+### 68.8 修正轮 3B-5.5.1
+
+修正验收发现的两个问题，只动评级层，不动计算。
+
+**问题1：同类分组可验证性漏洞（阻断）**
+
+`grade_peer_comparison()` 读了 `verifiable_group` 却没用；组键只判是否以
+`unknown` 开头，导致 `bond_pure|unknown` 被当有效分组（评 C）。
+
+修正后判定顺序：
+
+```
+① money_market → 产品类型独立分组，跳过基准检查
+② verifiable_group is False → D（样本再多也不放行）
+③ 组键缺失 → D
+④ 基准/指数族 unknown（含 bond_pure|unknown / active_equity|unknown）→ D
+⑤ 依据通过后才看样本量：1→D，2~4→C，≥5→B
+```
+
+| 样本 | 修复前 | 修复后 |
+| --- | --- | --- |
+| `000032`（`bond_pure|unknown`） | C | **D** `no_verifiable_group` |
+| `active_equity|unknown` | 可能被当有效 | **D** |
+| `money_market` | 与其他指标同路径 | C（<5）/ B（≥5），免基准检查 |
+
+**问题2：年化收益证据日期缺失**
+
+`001052` 年化状态 ok、等级 A，但证据写的是 `起始 None，结束 None`。
+
+原因：`_annualized()` 只返回 `span_days/years/method`，不返回 `start_date/end_date`。
+
+修正：
+
+| 情况 | 处理 |
+| --- | --- |
+| 节点有日期 | 优先用节点 |
+| 节点无日期 | 用质量报告 `date_min/date_max` 补充 |
+| 无任何可验证日期 | **D** `insufficient_evidence`，不编造 |
+| `status=ok` 但 `value=None` | **D** `invalid_result`，不给 A |
+
+**为什么可用质量报告日期**：`_annualized()` 取 `points[0].nav_date` 与
+`points[-1].nav_date`，而 `QualityReport.date_min/date_max` 正是这两个值，
+属于等价替换，不是编造。
+
+修复后 `001052`：
+
+```
+成立以来年化 -0.025595，按实际自然日间隔复合年化；
+计算区间 2015-05-05 → 2026-11-20，跨度 4217 天
+（计算区间取自净值序列首尾，与质量报告一致）
+```
 
