@@ -2448,7 +2448,8 @@ if (basis != ACCOUNTING_FORMAL
 | 3B-5.0 | 研究性分析框架设计 | 1283 | `phase3B5_0_research_framework.md` |
 | 3B-5.1 | 研究性分析引擎 V1.0 | 1386 | `phase3B5_1_research_engine_report.md` |
 | 3B-5.2 | 自选基金代码查询 | 1418 | `phase3B5_2_code_lookup_report.md` |
-| 3B-5.3 | 自选基金受控接入 | **1445** | `phase3B5_3_user_ingest_report.md` |
+| 3B-5.3 | 自选基金受控接入 | 1445 | `phase3B5_3_user_ingest_report.md` |
+| 3B-5.3.1 | 事务原子性与内容指纹修复 | **1465** | `phase3B5_3_1_atomic_fix_report.md` |
 
 当前正式会计版本：`ca-v2-receivable`；正式会计基础：`formal_receivable`；正式估值标记：`formal_valuation=True`。
 
@@ -5383,7 +5384,7 @@ python -m app.fund.ingest_user_funds --code 012346 --dry-run
 | 接入前备份 | `data/backups/fund_agent_before_3b5_3_*.db` |
 | 前后指纹 | `fingerprint_before` / `fingerprint_after` |
 | 幂等 | 已存在返回 `already_present` |
-| 不留半成品 | 先全取到内存，失败直接 return |
+| 不留半成品 | 先全取到内存，再由**同一 SQLite 事务**写入，失败整体 ROLLBACK |
 | 无 Schema 变更 | 复用现有列 |
 | 不删历史 | 只追加质量警告 |
 
@@ -5405,4 +5406,62 @@ python -m app.fund.ingest_user_funds --code 012346 --dry-run
 | 报告 | `reports/phase3B5_3_user_ingest_report.md` |
 | 报告 JSON | `reports/phase3B5_3_user_ingest_report.json` |
 | 专项测试 | `tests/test_3b5_3_user_ingest.py`（27 项） |
+
+### 66.7 修正轮 3B-5.3.1：事务原子性与内容指纹
+
+### 真正的原子事务
+
+原实现 5 个仓储各自开连接、各自 commit，某步失败会留下已提交的部分写入。
+
+修正：
+
+```python
+# app/fund/repo_base.py
+@contextmanager
+def use_conn(db_path=None, conn=None):
+    if conn is not None:
+        yield conn          # 复用外部连接，不 commit/rollback
+        return
+    with get_connection(db_path) as own:
+        yield own
+```
+
+5 个写入方法（`upsert_master` / `upsert_share_class` / `upsert_nav_batch` /
+`upsert_dividend_batch` / `record`）增加可选 `conn` 参数。
+接入器自己 `BEGIN IMMEDIATE` → 全部成功才 `COMMIT` → 任一异常 `ROLLBACK`。
+
+**不传 `conn` 时行为完全不变**，其他模块事务语义未受影响。
+
+### 真实内容指纹
+
+旧实现只算「行数 + 字段长度之和」，同长度修改会漏检。
+新实现逐行逐列稳定序列化后算 SHA256：
+
+| 值 | 序列化 |
+| --- | --- |
+| `None` | `@NULL` |
+| `1` | `int:1` |
+| `1.0` | `float:1.0` |
+| `"1"` | `str:1` |
+
+覆盖全部 10 张 `fund_*` 表；排除 `ingested_at` 等采集时间列。
+**行数不变、字段长度不变、只改一个值**，指纹也会变。
+
+### A/C 归组收紧
+
+| 场景 | 结果 |
+| --- | --- |
+| 同名 + 同公司 | 合并 |
+| 同名 + 不同公司 | **不合并** |
+| 同名 + 一方公司为空 | **不合并**，标「需人工核验」 |
+
+### 修复前后数据一致
+
+| 时点 | 内容指纹 |
+| --- | --- |
+| 修复前 | `0c867be4…b9658` |
+| 修复后 | `0c867be4…b9658` |
+| 备份库 | `0c867be4…b9658` |
+
+**三者完全一致** → 代码修复未触碰任何正式数据。
 

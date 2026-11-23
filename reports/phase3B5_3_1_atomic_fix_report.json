@@ -1,0 +1,138 @@
+{
+ "phase": "3B-5.3.1",
+ "baseline_head": "9e2a1176f090b7aae57b2475b46da0678dcd43a0",
+ "generated_at": "2026-11-23T11:12:00",
+ "fixes": {
+  "P0-1_atomic_transaction": {
+   "problem": "5 个仓储各自独立连接，无整体回滚",
+   "solution": "use_conn() 连接选择器 + 可选 conn 参数 + BEGIN IMMEDIATE/COMMIT/ROLLBACK",
+   "repos_modified": {
+    "app/fund/repository.py": [
+     "upsert_master",
+     "upsert_share_class"
+    ],
+    "app/fund/repo_nav.py": [
+     "upsert_nav_batch",
+     "upsert_dividend_batch"
+    ],
+    "app/fund/repo_quality.py": [
+     "record"
+    ]
+   },
+   "conn_shared_across_all_writes": true,
+   "outer_wrapper_only": false,
+   "no_false_success": true,
+   "other_modules_semantics_unchanged": true,
+   "schema_changed": false
+  },
+  "P0-2_content_fingerprint": {
+   "problem": "行数 + 字段长度摘要，无法识别同长度内容变化",
+   "solution": "逐行逐列稳定序列化后 SHA256",
+   "algorithm": "sha256(stable_serialized_rows)",
+   "tables_covered": [
+    "fund_master",
+    "fund_share_classes",
+    "fund_nav_daily",
+    "fund_dividends",
+    "fund_manager_history",
+    "fund_aum_history",
+    "fund_fee_rules",
+    "fund_subscription_status",
+    "fund_lifecycle_events",
+    "fund_data_quality"
+   ],
+   "stable_ordering": true,
+   "type_distinguishing": [
+    "NULL",
+    "bool",
+    "int",
+    "float",
+    "bytes",
+    "str"
+   ],
+   "excluded_columns": [
+    "ingested_at",
+    "fetched_at",
+    "checked_at",
+    "source_updated_at"
+   ],
+   "excluded_reason": "采集时间列每次写入都变，计入会误判内容变化",
+   "detects_same_length_edit": true,
+   "detects_row_count_unchanged_edit": true
+  },
+  "P1-1_ac_grouping_tightened": {
+   "problem": "公司信息缺失时可能仅凭同名合并不同基金",
+   "rules": [
+    "基础名必须完全一致（无模糊匹配）",
+    "双方公司必须均非空且完全一致才允许自动归组",
+    "任一方公司缺失 → 不合并，标记需人工核验",
+    "公司不一致 → 绝不合并"
+   ],
+   "returns": "(fund_id | None, reason)",
+   "reason_surfaced_in_warnings": true
+  },
+  "P1-2_dry_run_test_fixed": {
+   "problem": "旧测试只算两次指纹，未调用 dry-run 流程",
+   "solution": "真跑 _make_ingestor(dry_run=True) 与 CLI main()",
+   "asserts": [
+    "不调用外部抓取接口",
+    "所有 fund_* 表内容指纹前后一致",
+    "不创建本体/份额/净值/分红/质量记录"
+   ],
+   "covers_single_and_batch": true
+  }
+ },
+ "fault_injection": {
+  "master_write_failure": "rolled_back",
+  "nav_write_failure": "rolled_back",
+  "dividend_write_failure": "rolled_back",
+  "quality_write_failure": "rolled_back",
+  "retry_after_failure": "succeeded",
+  "no_false_success": true,
+  "residual_records": 0,
+  "fingerprint_identical_after_rollback": true
+ },
+ "production_db": {
+  "backup_created": "data/backups/fund_agent_before_3b5_3_1_before_20261123_110917.db",
+  "integrity_check": "ok",
+  "foreign_key_violations": 0,
+  "terminated_funds": 41,
+  "lifecycle_events": 49,
+  "original_12_shares_present": 12,
+  "original_9_funds_present": 9,
+  "new_5_shares_present": 5,
+  "new_3_funds_present": 3,
+  "etf_fingerprint_unchanged": "d54727c0a76a1b09531accd04b3d66ff4ea2374592b1d4a8cb8381602cbbac49",
+  "content_fingerprint_before": "0c867be4960f4f29ebfe03725c292fac82aad40bcfd7781a2cf476c0eb8b9658",
+  "content_fingerprint_after": "0c867be4960f4f29ebfe03725c292fac82aad40bcfd7781a2cf476c0eb8b9658",
+  "content_fingerprint_backup": "0c867be4960f4f29ebfe03725c292fac82aad40bcfd7781a2cf476c0eb8b9658",
+  "all_three_identical": true,
+  "row_counts": {
+   "fund_master": 53,
+   "fund_share_classes": 80,
+   "fund_nav_daily": 47718,
+   "fund_dividends": 44,
+   "fund_manager_history": 21,
+   "fund_aum_history": 683,
+   "fund_fee_rules": 90,
+   "fund_subscription_status": 12,
+   "fund_lifecycle_events": 49,
+   "fund_data_quality": 31
+  }
+ },
+ "tests": {
+  "new_file": "tests/test_3b5_3_1_atomic.py",
+  "new_passed": 20,
+  "regression_3b5_3": 27,
+  "regression_3b5_1_5_2": 135,
+  "full_passed": 1465,
+  "full_failed": 0,
+  "full_duration_seconds": 391.04,
+  "note": "1465 = 3B-5.3 的 1445 + 本轮 20"
+ },
+ "gate": {
+  "ready_for_research_analysis": true,
+  "ready_for_backtest": false,
+  "ready_for_formal_ranking": false
+ }
+}

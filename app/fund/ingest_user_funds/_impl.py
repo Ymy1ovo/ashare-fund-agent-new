@@ -61,26 +61,92 @@ MAX_GAP_DAYS = 15
 
 
 # ---------------------------------------------------------------- 指纹工具
-def db_fingerprint(db_path: Path | None = None) -> dict:
-    """库级行数 + 内容指纹（不含本模块新增之外的写操作）。"""
-    p = Path(db_path or settings.database_path)
-    with get_connection(p) as conn:
-        counts = {}
-        for r in conn.execute(
-                "SELECT name FROM sqlite_master WHERE type='table' "
-                "AND name LIKE 'fund%' ORDER BY name").fetchall():
-            t = r["name"]
-            counts[t] = conn.execute(f"SELECT COUNT(*) FROM {t}").fetchone()[0]
-        nav_fp = conn.execute(
-            "SELECT COUNT(*), SUM(LENGTH(CAST(unit_nav AS TEXT))), "
-            "SUM(LENGTH(CAST(nav_date AS TEXT))) FROM fund_nav_daily").fetchone()
+_FP_TABLES = (
+    "fund_master", "fund_share_classes", "fund_nav_daily", "fund_dividends",
+    "fund_manager_history", "fund_aum_history", "fund_fee_rules",
+    "fund_subscription_status", "fund_lifecycle_events", "fund_data_quality",
+)
+
+_FP_ORDER = {
+    "fund_master": ("fund_id",),
+    "fund_share_classes": ("share_class_id",),
+    "fund_nav_daily": ("share_class_id", "nav_date", "nav_kind"),
+    "fund_dividends": ("dividend_id",),
+    "fund_manager_history": ("manager_id",),
+    "fund_aum_history": ("aum_id",),
+    "fund_fee_rules": ("fee_rule_id",),
+    "fund_subscription_status": ("status_id",),
+    "fund_lifecycle_events": ("event_id",),
+    "fund_data_quality": ("quality_id",),
+}
+
+# 采集时间类列不参与内容指纹：每次写入都会变，计入会误判「内容变了」
+_FP_SKIP_COLUMNS = {"ingested_at", "fetched_at", "checked_at",
+                    "source_updated_at"}
+
+
+def _stable_value(v) -> str:
+    """稳定序列化：NULL / bool / int / float / bytes / str 可区分。"""
+    if v is None:
+        return "@NULL"
+    if isinstance(v, bool):
+        return f"bool:{int(v)}"
+    if isinstance(v, int):
+        return f"int:{v}"
+    if isinstance(v, float):
+        return f"float:{v!r}"
+    if isinstance(v, bytes):
+        return "bytes:" + v.hex()
+    return "str:" + str(v)
+
+
+def _table_digest(conn, table: str) -> tuple[str, int]:
+    """单表**真实内容指纹**：逐行逐列稳定序列化后 SHA256。"""
+    cols = [r[1] for r in conn.execute(f"PRAGMA table_info({table})")]
+    if not cols:
+        return hashlib.sha256(b"@no-table").hexdigest(), 0
+    use_cols = [c for c in cols if c not in _FP_SKIP_COLUMNS]
+    order = [c for c in _FP_ORDER.get(table, ()) if c in cols]
+    order_sql = (" ORDER BY " + ", ".join(order)) if order else ""
+    sql = "SELECT " + ", ".join(use_cols) + f" FROM {table}{order_sql}"
+
     h = hashlib.sha256()
-    for k in sorted(counts):
-        h.update(f"{k}={counts[k]};".encode())
-    h.update(str(tuple(nav_fp)).encode())
-    return {"row_counts": counts,
-            "nav_digest": str(tuple(nav_fp)),
-            "sha256": h.hexdigest()}
+    h.update(("@cols:" + ",".join(use_cols)).encode())
+    n = 0
+    for row in conn.execute(sql):
+        h.update(("@row:" + "|".join(_stable_value(row[i])
+                                     for i in range(len(use_cols)))).encode())
+        n += 1
+    return h.hexdigest(), n
+
+
+def db_fingerprint(db_path: Path | None = None) -> dict:
+    """**真实内容指纹**，覆盖全部 fund_* 表。
+
+    旧实现只汇总行数与字段文本长度，无法识别「同长度内容变化」。
+    现在逐行逐列稳定序列化后算 SHA256，因此
+    行数不变、字段长度不变、只改一个值，指纹也会变。
+    """
+    p = Path(db_path or settings.database_path)
+    tables: dict[str, dict] = {}
+    with get_connection(p) as conn:
+        for t in _FP_TABLES:
+            digest, rows = _table_digest(conn, t)
+            tables[t] = {"rows": rows, "sha256": digest}
+
+    total = hashlib.sha256()
+    for t in _FP_TABLES:
+        total.update(f"@{t}:{tables[t]['rows']}:{tables[t]['sha256']};".encode())
+
+    return {
+        "row_counts": {t: tables[t]["rows"] for t in _FP_TABLES},
+        "table_digests": tables,
+        "total_rows": sum(tables[t]["rows"] for t in _FP_TABLES),
+        "sha256": total.hexdigest(),
+        "algorithm": "sha256(stable_serialized_rows)",
+        "note": ("真实内容指纹：逐行逐列稳定序列化后 SHA256；覆盖全部 fund_* 表；"
+                 "排除 ingested_at 等采集时间列"),
+    }
 
 
 def backup_database(db_path: Path | None = None, tag: str = "3b5_3") -> Path:
@@ -202,13 +268,23 @@ class IngestResult:
 
 # ---------------------------------------------------------------- 质量审计
 def audit_new_nav(db_path: Path | None, share_class_id: int,
-                  *, nav_kind: str = "net_value") -> dict:
-    """接入后质量审计（只读）。"""
-    with get_connection(db_path) as conn:
+                  *, nav_kind: str = "net_value",
+                  conn: "sqlite3.Connection | None" = None) -> dict:
+    """接入后质量审计（只读）。
+
+    conn 非空时复用该连接（在同一事务内读取，能看到未提交的写入）。
+    """
+    if conn is not None:
         rows = [dict(r) for r in conn.execute(
             """SELECT nav_date, unit_nav, acc_nav, per_10k_yield FROM fund_nav_daily
                WHERE share_class_id=? AND nav_kind=? ORDER BY nav_date""",
             (share_class_id, nav_kind)).fetchall()]
+    else:
+        with get_connection(db_path) as own:
+            rows = [dict(r) for r in own.execute(
+                """SELECT nav_date, unit_nav, acc_nav, per_10k_yield FROM fund_nav_daily
+                   WHERE share_class_id=? AND nav_kind=? ORDER BY nav_date""",
+                (share_class_id, nav_kind)).fetchall()]
     if not rows:
         return {"rows": 0, "status": "no_data", "nav_kind": nav_kind,
                 "continuity_verification": "cannot_verify"}
@@ -264,6 +340,8 @@ def audit_new_nav(db_path: Path | None, share_class_id: int,
 class UserFundIngestor:
     """单基金受控接入。所有外部访问可注入，便于测试。"""
 
+    _tx: "sqlite3.Connection | None" = None
+
     def __init__(self, db_path: Path | None = None, *,
                  fetch_basic: Callable[[str], dict] | None = None,
                  fetch_nav: Callable[[str, str], list[dict]] | None = None,
@@ -290,8 +368,59 @@ class UserFundIngestor:
         return ST_INGESTED, ""
 
     # ---------- 主流程 ----------
+    # ---------- 事务辅助 ----------
+    def _open_tx(self):
+        """打开接入专用连接，并关闭 SQLite 自动提交，由本类掌控事务边界。"""
+        p = Path(self.db_path or settings.database_path)
+        conn = sqlite3.connect(str(p), timeout=10, isolation_level=None)
+        conn.row_factory = sqlite3.Row
+        conn.execute("PRAGMA temp_store = MEMORY")
+        conn.execute("PRAGMA busy_timeout = 5000")
+        conn.execute("BEGIN IMMEDIATE")
+        return conn
+
+    def _commit_tx(self) -> None:
+        if self._tx is not None:
+            self._tx.execute("COMMIT")
+            self._tx.close()
+            self._tx = None
+
+    def _rollback_tx(self) -> None:
+        if self._tx is not None:
+            try:
+                self._tx.execute("ROLLBACK")
+            except Exception:
+                pass
+            self._tx.close()
+            self._tx = None
+
     def ingest_one(self, code: str, *,
                    allow_update: bool = True) -> IngestResult:
+        """公开入口：保证写入阶段是**真正的单基金原子事务**。
+
+        写入阶段任一异常 → 整只基金 ROLLBACK，并如实返回 failed，
+        **不**用「捕获异常后继续返回成功」掩盖写入失败。
+        """
+        self._tx = None
+        try:
+            return self._ingest_impl(code, allow_update=allow_update)
+        except Exception as exc:
+            self._rollback_tx()
+            res = IngestResult(code=str(code or "").strip(), status=ST_FAILED)
+            res.reason = (f"写入失败，事务已回滚，未留下半成品："
+                          f"{type(exc).__name__}: {exc}")
+            try:
+                res.fingerprint_after = db_fingerprint(self.db_path)
+            except Exception:
+                pass
+            return res
+        finally:
+            # 任何遗漏的未提交事务都不允许悬挂
+            if self._tx is not None:
+                self._rollback_tx()
+
+    def _ingest_impl(self, code: str, *,
+                     allow_update: bool = True) -> IngestResult:
         code = str(code or "").strip()
         res = IngestResult(code=code, status=ST_INGESTED)
 
@@ -382,14 +511,17 @@ class UserFundIngestor:
             res.fingerprint_after = db_fingerprint(self.db_path)
             return res
 
-        # ---- 写入（单事务意图：先建 master/share，再写净值） ----
+        # ---- 写入阶段：先开启真实事务，所有写入共用同一 conn ----
+        # 任一环节异常 → 整体 ROLLBACK，不留新建本体/份额/净值/分红/质量记录。
         ts = now_iso()
+        self._tx = self._open_tx()
+        conn = self._tx
         res.sources.append(SOURCE_BASIC)
         res.evidence_levels.append(EVIDENCE_THIRD_PARTY)
-
         # ---- A/C/E 归组：基础名相同 → 挂到已存在本体，不新建重复本体 ----
         base_name = base_fund_name(name) or name
-        existing_fund_id = self._find_same_entity(base_name, basic.get("company"))
+        existing_fund_id, entity_reason = self._find_same_entity(
+            base_name, basic.get("company"))
         if existing_fund_id is not None:
             share = FundShareClassRecord(
                 share_class_code=code,
@@ -400,7 +532,7 @@ class UserFundIngestor:
                 is_primary=0,   # 后接入的份额不是主份额
                 source_updated_at=ts,
             )
-            sc_id = self.funds.upsert_share_class(existing_fund_id, share)
+            sc_id = self.funds.upsert_share_class(existing_fund_id, share, conn=conn)
             res.fund_id = existing_fund_id
             res.share_ids = [sc_id]
             res.share_codes = [code]
@@ -408,9 +540,8 @@ class UserFundIngestor:
             res.investment_subtype = cls["investment_subtype"]
             res.sources.extend([SOURCE_BASIC, SOURCE_NAV if not money else SOURCE_MONEY])
             res.evidence_levels.append(EVIDENCE_THIRD_PARTY)
-            res.warnings.append(
-                f"按基础名「{base_name}」归入已存在本体 fund_id={existing_fund_id}"
-                "（A/C/E 同一组合，表现不重复计数）")
+            res.warnings.append(entity_reason +
+                                "（A/C/E 同一组合，表现不重复计数）")
 
             written = 0
             if money:
@@ -424,7 +555,7 @@ class UserFundIngestor:
                         nav_date=d, nav_kind="money_yield", per_10k_yield=p10,
                         seven_day_annual=to_float(r.get("seven_day_annual")),
                         source=SOURCE_MONEY, ingested_at=ts))
-                st_nav = self.nav.upsert_nav_batch(sc_id, recs)
+                st_nav = self.nav.upsert_nav_batch(sc_id, recs, conn=conn)
                 written = st_nav["inserted"] + st_nav["updated"]
                 res.nav_kind = "money_yield"
             else:
@@ -443,19 +574,25 @@ class UserFundIngestor:
                                   unit_nav=unit_map[d], acc_nav=acc_map.get(d),
                                   source=SOURCE_NAV, ingested_at=ts)
                         for d in sorted(unit_map)]
-                st_nav = self.nav.upsert_nav_batch(sc_id, recs)
+                st_nav = self.nav.upsert_nav_batch(sc_id, recs, conn=conn)
                 written = st_nav["inserted"] + st_nav["updated"]
                 res.nav_kind = "net_value"
 
             res.nav_rows_written = written
-            res.quality = audit_new_nav(self.db_path, sc_id, nav_kind=res.nav_kind)
+            res.quality = audit_new_nav(self.db_path, sc_id,
+                                        nav_kind=res.nav_kind, conn=conn)
             res.nav_rows_total = res.quality.get("rows", 0)
             res.date_min = res.quality.get("date_min")
             res.date_max = res.quality.get("date_max")
+            self._commit_tx()
             res.fingerprint_after = db_fingerprint(self.db_path)
             res.status = ST_INGESTED
             res.reason = "接入成功（归入已存在本体）"
             return res
+
+        # 未自动归组时保留判定说明，供人工核验
+        if any(k in entity_reason for k in ("人工核验", "不一致", "不自动归组")):
+            res.warnings.append(entity_reason)
 
         master = FundMasterRecord(
             fund_code_primary=code,
@@ -477,7 +614,7 @@ class UserFundIngestor:
             needs_review=0,
             source_updated_at=ts,
         )
-        fund_id = self.funds.upsert_master(master)
+        fund_id = self.funds.upsert_master(master, conn=conn)
         res.fund_id = fund_id
 
         share = FundShareClassRecord(
@@ -489,7 +626,7 @@ class UserFundIngestor:
             is_primary=1,
             source_updated_at=ts,
         )
-        sc_id = self.funds.upsert_share_class(fund_id, share)
+        sc_id = self.funds.upsert_share_class(fund_id, share, conn=conn)
         res.share_ids = [sc_id]
         res.share_codes = [code]
         res.product_class = cls["product_class"]
@@ -511,7 +648,7 @@ class UserFundIngestor:
                     per_10k_yield=p10,
                     seven_day_annual=to_float(r.get("seven_day_annual")),
                     source=SOURCE_MONEY, ingested_at=ts))
-            st_nav = self.nav.upsert_nav_batch(sc_id, recs)
+            st_nav = self.nav.upsert_nav_batch(sc_id, recs, conn=conn)
             written = st_nav["inserted"] + st_nav["updated"]
             res.nav_kind = "money_yield"
             res.sources.append(SOURCE_MONEY)
@@ -533,7 +670,7 @@ class UserFundIngestor:
                     nav_date=d, nav_kind="net_value",
                     unit_nav=unit_map[d], acc_nav=acc_map.get(d),
                     source=SOURCE_NAV, ingested_at=ts))
-            st_nav = self.nav.upsert_nav_batch(sc_id, recs)
+            st_nav = self.nav.upsert_nav_batch(sc_id, recs, conn=conn)
             written = st_nav["inserted"] + st_nav["updated"]
             res.nav_kind = "net_value"
             res.sources.append(SOURCE_NAV)
@@ -556,12 +693,13 @@ class UserFundIngestor:
                     source=SOURCE_DIVIDEND, ingested_at=ts))
             drecs = [x for x in drecs if x.ex_date]
             if drecs:
-                dr = self.nav.upsert_dividend_batch(sc_id, drecs)
+                dr = self.nav.upsert_dividend_batch(sc_id, drecs, conn=conn)
                 res.dividend_rows = dr.get("inserted", 0)
                 res.sources.append(SOURCE_DIVIDEND)
 
-        # 质量审计
-        res.quality = audit_new_nav(self.db_path, sc_id, nav_kind=res.nav_kind)
+        # 质量审计（在同一事务内读取，能看到尚未提交的写入）
+        res.quality = audit_new_nav(self.db_path, sc_id,
+                                    nav_kind=res.nav_kind, conn=conn)
         res.nav_rows_total = res.quality.get("rows", 0)
         res.date_min = res.quality.get("date_min")
         res.date_max = res.quality.get("date_max")
@@ -577,35 +715,65 @@ class UserFundIngestor:
                 detail=f"接入时发现 {res.quality['gap_count_over_15d']} 处 >15 天缺口",
                 severity="warning",
                 checked_at=ts,
-            ))
+            ), conn=conn)
             res.warnings.append(
                 f"存在 {res.quality['gap_count_over_15d']} 处 >15 天缺口，"
                 "不得视为连续历史")
 
+        # 全部写入成功 → 提交
+        self._commit_tx()
         res.fingerprint_after = db_fingerprint(self.db_path)
         res.status = ST_INGESTED
         res.reason = "接入成功"
         return res
 
     def _find_same_entity(self, base_name: str,
-                          company: str | None) -> int | None:
-        """按**基础名相同**查找已存在本体，用于 A/C/E 归组。
+                          company: str | None) -> tuple[int | None, str]:
+        """按**基础名 + 基金公司**查找已存在本体，用于 A/C/E 归组。
 
-        只在名称归一后完全一致时才合并；不做模糊匹配。
+        收紧规则（3B-5.3.1）：
+        1. 基础名必须**完全一致**，不做模糊匹配；
+        2. 双方公司信息必须**均非空且完全一致**才允许自动归组；
+        3. 任一方公司缺失 → **不合并**，标记需人工核验；
+        4. 公司不一致 → 绝不合并。
+
+        返回 (fund_id | None, 判定说明)。
         """
         if not base_name:
-            return None
+            return None, "基础名为空，不自动归组"
+
+        name_norm = base_name.strip()
+        company_norm = (company or "").strip()
+
         with get_connection(self.db_path) as conn:
             rows = conn.execute(
                 """SELECT fund_id, fund_name, fund_company FROM fund_master
                    WHERE lifecycle_status <> 'terminated'""").fetchall()
-        for r in rows:
-            if (r["fund_name"] or "").strip() != base_name.strip():
-                continue
-            if company and r["fund_company"] and company != r["fund_company"]:
-                continue   # 公司不一致 → 不合并
-            return int(r["fund_id"])
-        return None
+
+        same_name = [r for r in rows
+                     if (r["fund_name"] or "").strip() == name_norm]
+        if not same_name:
+            return None, f"库内无同名本体「{name_norm}」，不自动归组"
+
+        if not company_norm:
+            return None, (f"库内有同名本体 {len(same_name)} 个，但本次接入"
+                          "公司信息缺失，按规则不自动归组，需人工核验")
+
+        matched = [r for r in same_name
+                   if (r["fund_company"] or "").strip() == company_norm]
+        if matched:
+            return int(matched[0]["fund_id"]), (
+                f"基础名「{name_norm}」+ 公司「{company_norm}」完全一致 → "
+                f"归入 fund_id={int(matched[0]['fund_id'])}")
+
+        missing = [r for r in same_name if not (r["fund_company"] or "").strip()]
+        if missing:
+            return None, ("库内有同名本体但库内公司信息缺失"
+                          f"（fund_id={int(missing[0]['fund_id'])}），"
+                          "按规则不自动归组，需人工核验")
+
+        return None, (f"同名本体 {len(same_name)} 个，但基金公司不一致"
+                      f"（本次「{company_norm}」），绝不自动归组")
 
     def _existing_fund(self, code: str) -> dict | None:
         with get_connection(self.db_path) as conn:

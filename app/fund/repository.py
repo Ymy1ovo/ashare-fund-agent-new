@@ -5,13 +5,14 @@
 """
 from __future__ import annotations
 
+import sqlite3
 from pathlib import Path
 
 from app.fund.models import (
     AumRecord, FundMasterRecord, FundShareClassRecord,
     LifecycleEventRecord, ManagerRecord,
 )
-from app.fund.repo_base import get_conn, now_iso, should_overwrite
+from app.fund.repo_base import get_conn, now_iso, should_overwrite, use_conn
 
 
 class FundRepository:
@@ -19,9 +20,13 @@ class FundRepository:
         self.db_path = db_path
 
     # ------------------------------------------------------------ master
-    def upsert_master(self, rec: FundMasterRecord) -> int:
-        """按主代码幂等写入基金本体，返回 fund_id。"""
-        with get_conn(self.db_path) as conn:
+    def upsert_master(self, rec: FundMasterRecord, *,
+                      conn: sqlite3.Connection | None = None) -> int:
+        """按主代码幂等写入基金本体，返回 fund_id。
+
+        conn 非空时复用该连接（不自行 commit/rollback），用于调用方掌控事务。
+        """
+        with use_conn(self.db_path, conn) as conn:
             row = conn.execute(
                 "SELECT fund_id, source FROM fund_master WHERE fund_code_primary=?",
                 (rec.fund_code_primary,)).fetchone()
@@ -78,9 +83,13 @@ class FundRepository:
             return conn.execute("SELECT COUNT(*) FROM fund_master").fetchone()[0]
 
     # ------------------------------------------------------------ share classes
-    def upsert_share_class(self, fund_id: int, rec: FundShareClassRecord) -> int:
-        """按份额代码幂等写入，返回 share_class_id。"""
-        with get_conn(self.db_path) as conn:
+    def upsert_share_class(self, fund_id: int, rec: FundShareClassRecord, *,
+                           conn: sqlite3.Connection | None = None) -> int:
+        """按份额代码幂等写入，返回 share_class_id。
+
+        conn 非空时复用该连接（不自行 commit/rollback）。
+        """
+        with use_conn(self.db_path, conn) as conn:
             row = conn.execute(
                 "SELECT share_class_id, source FROM fund_share_classes "
                 "WHERE share_class_code=?", (rec.share_class_code,)).fetchone()

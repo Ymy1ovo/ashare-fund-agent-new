@@ -137,7 +137,8 @@ def test_ac_shares_grouped(tmp_path):
     assert c.status == ST_INGESTED
     # 基础名相同 → 同一本体
     assert a.fund_id == c.fund_id
-    assert c.warnings and "归入已存在本体" in c.warnings[0]
+    assert c.warnings
+    assert "完全一致" in c.warnings[0] and "归入 fund_id=" in c.warnings[0]
 
     with sqlite3.connect(db) as conn:
         n_fund = conn.execute("SELECT COUNT(*) FROM fund_master").fetchone()[0]

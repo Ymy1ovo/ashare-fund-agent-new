@@ -1,6 +1,8 @@
 """场外基金仓储公共部分：连接、时间戳、幂等冲突规则。"""
 from __future__ import annotations
 
+import sqlite3
+from contextlib import contextmanager
 from datetime import datetime
 from pathlib import Path
 
@@ -14,6 +16,20 @@ def now_iso() -> str:
 def get_conn(db_path: Path | None = None):
     """复用项目连接上下文（自动 commit/rollback）。"""
     return get_connection(db_path)
+
+
+@contextmanager
+def use_conn(db_path: Path | None = None, conn: sqlite3.Connection | None = None):
+    """连接选择器：外部传入 conn 时**直接复用**且不 commit/rollback（由调用方掌控事务），
+    否则退回 get_conn() 独立事务。
+
+    用于「多仓储写入必须处于同一事务」的场景（如 3B-5.3.1 受控接入）。
+    """
+    if conn is not None:
+        yield conn            # 事务边界由调用方掌握
+        return
+    with get_connection(db_path) as own:
+        yield own
 
 
 def _row_to_dict(row) -> dict:

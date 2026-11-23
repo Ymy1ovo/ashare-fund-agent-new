@@ -5,10 +5,11 @@
 """
 from __future__ import annotations
 
+import sqlite3
 from pathlib import Path
 
 from app.fund.models import DividendRecord, NavRecord
-from app.fund.repo_base import get_conn, should_overwrite
+from app.fund.repo_base import get_conn, use_conn, should_overwrite
 
 
 class NavRepository:
@@ -17,7 +18,8 @@ class NavRepository:
 
     # ------------------------------------------------------------ 净值
     def upsert_nav_batch(self, share_class_id: int,
-                         records: list[NavRecord]) -> dict:
+                         records: list[NavRecord], *,
+                         conn: sqlite3.Connection | None = None) -> dict:
         """批量写入净值，返回统计。
 
         幂等键：(share_class_id, nav_date, nav_kind)。
@@ -30,7 +32,7 @@ class NavRepository:
                  "skipped_lower_source": 0}
         if not records:
             return stats
-        with get_conn(self.db_path) as conn:
+        with use_conn(self.db_path, conn) as conn:
             for rec in records:
                 existing = conn.execute(
                     """SELECT source FROM fund_nav_daily
@@ -102,7 +104,8 @@ class NavRepository:
 
     # ------------------------------------------------------------ 分红
     def upsert_dividend_batch(self, share_class_id: int,
-                              records: list[DividendRecord]) -> dict:
+                              records: list[DividendRecord], *,
+                              conn: sqlite3.Connection | None = None) -> dict:
         """批量写入分红。
 
         幂等键：(share_class_id, ex_date, source)。
@@ -111,7 +114,7 @@ class NavRepository:
         stats = {"inserted": 0, "updated": 0, "skipped": 0}
         if not records:
             return stats
-        with get_conn(self.db_path) as conn:
+        with use_conn(self.db_path, conn) as conn:
             for rec in records:
                 existing = conn.execute(
                     """SELECT dividend_id, cash_per_share, per_10_raw

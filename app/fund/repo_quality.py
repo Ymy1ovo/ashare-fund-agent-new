@@ -1,22 +1,25 @@
 """数据质量记录仓储。"""
 from __future__ import annotations
 
+import sqlite3
 from pathlib import Path
 
 from app.fund.models import DataQualityRecord
-from app.fund.repo_base import get_conn
+from app.fund.repo_base import get_conn, use_conn
 
 
 class QualityRepository:
     def __init__(self, db_path: Path | None = None) -> None:
         self.db_path = db_path
 
-    def record(self, rec: DataQualityRecord) -> int:
+    def record(self, rec: DataQualityRecord, *,
+               conn: sqlite3.Connection | None = None) -> int:
         """按 (table_name, record_key, check_name) 幂等写入。
 
         同一检查项重复执行只更新结果，不产生重复行。
+        conn 非空时复用该连接（不自行 commit/rollback）。
         """
-        with get_conn(self.db_path) as conn:
+        with use_conn(self.db_path, conn) as conn:
             row = conn.execute(
                 """SELECT quality_id FROM fund_data_quality
                    WHERE table_name=? AND record_key=? AND check_name=?""",
