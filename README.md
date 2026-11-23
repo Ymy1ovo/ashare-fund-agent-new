@@ -2451,7 +2451,8 @@ if (basis != ACCOUNTING_FORMAL
 | 3B-5.3 | 自选基金受控接入 | 1445 | `phase3B5_3_user_ingest_report.md` |
 | 3B-5.3.1 | 事务原子性与内容指纹修复 | 1465 | `phase3B5_3_1_atomic_fix_report.md` |
 | 3B-5.3.2 | 外键约束与指纹序列化修正 | 1482 | `phase3B5_3_2_fk_serialization_report.md` |
-| 3B-5.4 | 多类型场外基金真实接入验证 | **1517** | `phase3B5_4_ingestion_report.md` |
+| 3B-5.4 | 多类型场外基金真实接入验证 | 1517 | `phase3B5_4_ingestion_report.md` |
+| 3B-5.5 | 数据质量分级与指标可信度 | **1577** | `phase3B5_5_quality_framework.md` |
 
 当前正式会计版本：`ca-v2-receivable`；正式会计基础：`formal_receivable`；正式估值标记：`formal_valuation=True`。
 
@@ -5594,4 +5595,78 @@ json.dumps([list(_stable_value(v)) for v in values],
 
 实测差异（`050002` 近1年）：`acc_nav` = -4.0993%，`unit_nav` = -8.9623%，
 两者相差 4.8630 个百分点 —— 代码确实是各走各的，未混用。
+
+## 68. 阶段3B-5.5 数据质量分级与指标可信度 V1.0
+
+### 68.1 三条铁律
+
+| # | 规则 |
+| ---: | --- |
+| 1 | 质量等级**只看数据**，绝不看收益（函数不接收收益率参数） |
+| 2 | 指标级评级**独立**于基金级（13 项各自评级） |
+| 3 | 算不出来就标 D / `not_available`，**绝不填 0** |
+
+### 68.2 四级定义
+
+| 级别 | 含义 |
+| --- | --- |
+| A | 数据质量较好，可支持常规描述性研究 |
+| B | 有条件可用，存在明确限制 |
+| C | 证据不足，只能展示有限描述性信息 |
+| D | 数据不合格，不应生成相关研究结论 |
+| `not_applicable` | 产品类型上不适用（如货币基金 × 净值型指标），**不等于 D** |
+
+### 68.3 三个概念必须分开
+
+| 概念 | 体现位置 |
+| --- | --- |
+| 基金本身表现差 | 只在 `7_return_risk` 数值，**不影响任何等级** |
+| 基金数据质量差 | `4_data_quality_level` |
+| 指标计算条件不足 | `5_indicator_grades` 各指标的 D / `not_available` |
+
+### 68.4 13 项指标
+
+`ret_1m` / `ret_3m` / `ret_6m` / `ret_12m` / `ret_36m` /
+`annualized_return` / `max_drawdown` / `daily_volatility` /
+`annualized_volatility` / `sharpe` / `excess_return` /
+`peer_comparison` / `share_cost_comparison`
+
+每项输出 `value` / `status` / `quality_level` / `evidence` / `limitation` / `reason`。
+
+### 68.5 关键约束
+
+| 约束 | 实现 |
+| --- | --- |
+| 分段回撤不冒充全区间回撤 | `degraded=true` + `complete_interval=false`，评 **B** 并注明可能低估 |
+| 日波动取 `daily_vol` | 不能用 `value`（可能是年化值） |
+| Sharpe 无利率则拒算 | 恒 `D` / `not_available`，`value=null` |
+| 超额收益无基准则拒算 | 恒 `D` / `not_computed` |
+| 同类样本不足则拒比 | 本体 < 2 → `D`；2~4 → `C`；**永远不到 A** |
+| A/C 成本不给结论 | 费率不全 → `D`；齐全也只能 `C`；`buy_sell_conclusion=null` |
+| 货币基金独立 | 12 项 `not_applicable`，`money_market` 独立分组 |
+
+### 68.6 真实样本结果
+
+| 代码 | 类型 | 数据质量 | 可算 | 不适用 | 算不出 |
+| --- | --- | --- | ---: | ---: | ---: |
+| `050002` | 普通指数 | **B** | 7 | 1 | 5 |
+| `001052` | ETF联接 | **B** | 9 | 1 | 3 |
+| `001938` | 主动权益 | **B** | 10 | 1 | 2 |
+| `000032` | 债券 | **B** | 10 | 0 | 3 |
+| `000509` | 货币 | **B** | 1 | 12 | 0 |
+| `001548` | ETF联接A | **B** | 9 | 0 | 4 |
+| `001549` | ETF联接C | **B** | 9 | 0 | 4 |
+
+### 68.7 产物
+
+| 文档 | 路径 |
+| --- | --- |
+| 质量框架 | `reports/phase3B5_5_quality_framework.md` |
+| 指标可信度 | `reports/phase3B5_5_indicator_quality.md` |
+| 同类比较 | `reports/phase3B5_5_peer_comparison.md` |
+| 报告示例 | `reports/phase3B5_5_practical_report_examples.md` |
+| 测试报告 | `reports/phase3B5_5_test_report.md` |
+| 分级模块 | `app/fund/research/quality.py` |
+| 报告组装 | `app/fund/research/practical_report.py` |
+| 专项测试 | `tests/test_3b5_5_quality_framework.py`（60 项） |
 

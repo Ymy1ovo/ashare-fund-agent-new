@@ -1,0 +1,179 @@
+{
+ "phase": "3B-5.5",
+ "report": "peer_comparison",
+ "baseline_head": "8c42dec82bcb35393193b70ab033dbda41a6c143",
+ "generated_at": "2026-11-23T14:35:00",
+ "grouping_unchanged": true,
+ "grouping_module": "app/fund/research/classification.py",
+ "universe": {
+  "fund_count": 19,
+  "share_count": 6,
+  "group_count": 13
+ },
+ "groups": {
+  "bond_pure|unknown": {
+   "member_count": 2,
+   "fund_ids": [
+    21,
+    73
+   ]
+  },
+  "etf_linked|broad|沪深300": {
+   "member_count": 3,
+   "fund_ids": [
+    14,
+    15,
+    66
+   ]
+  },
+  "money_market": {
+   "member_count": 2,
+   "fund_ids": [
+    22,
+    74
+   ]
+  },
+  "ordinary_index|broad|中证500": {
+   "member_count": 1,
+   "fund_ids": [
+    20
+   ]
+  },
+  "etf_linked|broad|中证500": {
+   "member_count": 1,
+   "fund_ids": [
+    70
+   ]
+  },
+  "etf_linked|broad|上证50": {
+   "member_count": 1,
+   "fund_ids": [
+    75
+   ]
+  },
+  "active_equity|中证500": {
+   "member_count": 2,
+   "fund_ids": [
+    67,
+    71
+   ]
+  },
+  "etf_linked|sector|中证全指半导体": {
+   "member_count": 1,
+   "fund_ids": [
+    17
+   ]
+  },
+  "active_equity|unknown": {
+   "member_count": 2,
+   "fund_ids": [
+    18,
+    68
+   ]
+  },
+  "ordinary_index|broad|沪深300": {
+   "member_count": 1,
+   "fund_ids": [
+    69
+   ]
+  },
+  "lof|active|unknown": {
+   "member_count": 1,
+   "fund_ids": [
+    19
+   ]
+  },
+  "lof|index|sector|中证白酒": {
+   "member_count": 1,
+   "fund_ids": [
+    16
+   ]
+  },
+  "active_equity|中证800": {
+   "member_count": 1,
+   "fund_ids": [
+    72
+   ]
+  }
+ },
+ "grade_rules": {
+  "no_verifiable_group": "D",
+  "insufficient_peer_sample": "D（本体数 < 2）",
+  "weak_grouping": "C",
+  "small_sample": "C（本体数 2~4）",
+  "usable": "B（本体数 ≥ 5 且分组可靠）",
+  "never_A_reason": "净值连续性 cannot_verify 是结构性限制，不会因样本多而消失"
+ },
+ "anti_traps": {
+  "name_similarity_not_used": true,
+  "unknown_benchmark_not_ranked": true,
+  "money_separate_group": true,
+  "ac_deduped_by_fund_id": true,
+  "cross_group_comparison_allowed": false,
+  "ranking_generated": false
+ },
+ "real_results": {
+  "050002": {
+   "label": "普通指数基金",
+   "peer_key": "ordinary_index|broad|沪深300",
+   "member_count": 1,
+   "level": "D",
+   "status": "insufficient_peer_sample"
+  },
+  "001052": {
+   "label": "ETF联接基金",
+   "peer_key": "etf_linked|broad|中证500",
+   "member_count": 1,
+   "level": "D",
+   "status": "insufficient_peer_sample"
+  },
+  "001938": {
+   "label": "主动权益基金",
+   "peer_key": "active_equity|中证500",
+   "member_count": 2,
+   "level": "C",
+   "status": "small_sample"
+  },
+  "000032": {
+   "label": "债券基金",
+   "peer_key": "bond_pure|unknown",
+   "member_count": 2,
+   "level": "C",
+   "status": "small_sample"
+  },
+  "000509": {
+   "label": "货币基金",
+   "peer_key": "money_market",
+   "member_count": 2,
+   "level": "C",
+   "status": "weak_grouping"
+  },
+  "001548": {
+   "label": "ETF联接 A/C 组（A 类）",
+   "peer_key": "etf_linked|broad|上证50",
+   "member_count": 1,
+   "level": "D",
+   "status": "insufficient_peer_sample"
+  },
+  "001549": {
+   "label": "ETF联接 A/C 组（C 类）",
+   "peer_key": "etf_linked|broad|上证50",
+   "member_count": 1,
+   "level": "D",
+   "status": "insufficient_peer_sample"
+  }
+ },
+ "missing_for_real_comparison": [
+  "基准收益序列",
+  "无风险利率",
+  "完整历史规模",
+  "完整历史经理",
+  "真实净值公布日历",
+  "完整费率"
+ ],
+ "gate": {
+  "ready_for_research_analysis": true,
+  "ready_for_backtest": false,
+  "ready_for_formal_ranking": false
+ }
+}

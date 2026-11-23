@@ -1,0 +1,194 @@
+{
+ "phase": "3B-5.5",
+ "report": "indicator_quality",
+ "baseline_head": "8c42dec82bcb35393193b70ab033dbda41a6c143",
+ "generated_at": "2026-11-23T14:35:00",
+ "indicator_count": 13,
+ "indicators": [
+  "ret_1m",
+  "ret_3m",
+  "ret_6m",
+  "ret_12m",
+  "ret_36m",
+  "annualized_return",
+  "max_drawdown",
+  "daily_volatility",
+  "annualized_volatility",
+  "sharpe",
+  "excess_return",
+  "peer_comparison",
+  "share_cost_comparison"
+ ],
+ "grade_rules": {
+  "range_returns": {
+   "A": "端点精确命中且窗口内无超阈值缺口",
+   "D": "端点未命中或窗口内有缺口",
+   "no_zero_fill": true,
+   "no_interpolation": true
+  },
+  "annualized_return": {
+   "A": "全区间无超阈值缺口",
+   "D": "有缺口"
+  },
+  "max_drawdown": {
+   "A": "degraded=false 且 complete_interval=true",
+   "B": "degraded=true，分段可观测，可能低估",
+   "D": "无连续段"
+  },
+  "daily_volatility": {
+   "field": "daily_vol",
+   "A": "能算即 A",
+   "trap": "volatility.value 可能是年化值，必须取 daily_vol"
+  },
+  "annualized_volatility": {
+   "A": "annualized=true",
+   "D": "annualized=false（blocked）"
+  },
+  "sharpe": {
+   "B": "有可靠无风险利率",
+   "D": "无（本项目恒 D）",
+   "never_zero_filled": true
+  },
+  "excess_return": {
+   "B": "有基准收益序列",
+   "D": "无（本项目恒 D）"
+  },
+  "peer_comparison": {
+   "never_A": true,
+   "D": [
+    "no_verifiable_group",
+    "insufficient_peer_sample"
+   ],
+   "C": [
+    "weak_grouping",
+    "small_sample"
+   ],
+   "B": "usable（≥5 个本体且分组可靠）"
+  },
+  "share_cost_comparison": {
+   "never_A_or_B": true,
+   "D": "insufficient_fee_evidence",
+   "C": "partial_evidence",
+   "not_applicable": "single_share"
+  }
+ },
+ "real_distribution": {
+  "050002": {
+   "levels": {
+    "A": 6,
+    "D": 5,
+    "B": 1,
+    "not_applicable": 1
+   },
+   "computable": 7,
+   "not_applicable": 1,
+   "not_computable": 5,
+   "blocked_keys": [
+    "annualized_return",
+    "annualized_volatility",
+    "sharpe",
+    "excess_return",
+    "peer_comparison"
+   ]
+  },
+  "001052": {
+   "levels": {
+    "A": 9,
+    "D": 3,
+    "not_applicable": 1
+   },
+   "computable": 9,
+   "not_applicable": 1,
+   "not_computable": 3,
+   "blocked_keys": [
+    "sharpe",
+    "excess_return",
+    "peer_comparison"
+   ]
+  },
+  "001938": {
+   "levels": {
+    "A": 9,
+    "D": 2,
+    "C": 1,
+    "not_applicable": 1
+   },
+   "computable": 10,
+   "not_applicable": 1,
+   "not_computable": 2,
+   "blocked_keys": [
+    "sharpe",
+    "excess_return"
+   ]
+  },
+  "000032": {
+   "levels": {
+    "A": 9,
+    "D": 3,
+    "C": 1
+   },
+   "computable": 10,
+   "not_applicable": 0,
+   "not_computable": 3,
+   "blocked_keys": [
+    "sharpe",
+    "excess_return",
+    "share_cost_comparison"
+   ]
+  },
+  "000509": {
+   "levels": {
+    "not_applicable": 12,
+    "C": 1
+   },
+   "computable": 1,
+   "not_applicable": 12,
+   "not_computable": 0,
+   "blocked_keys": []
+  },
+  "001548": {
+   "levels": {
+    "A": 9,
+    "D": 4
+   },
+   "computable": 9,
+   "not_applicable": 0,
+   "not_computable": 4,
+   "blocked_keys": [
+    "sharpe",
+    "excess_return",
+    "peer_comparison",
+    "share_cost_comparison"
+   ]
+  },
+  "001549": {
+   "levels": {
+    "A": 9,
+    "D": 4
+   },
+   "computable": 9,
+   "not_applicable": 0,
+   "not_computable": 4,
+   "blocked_keys": [
+    "sharpe",
+    "excess_return",
+    "peer_comparison",
+    "share_cost_comparison"
+   ]
+  }
+ },
+ "money_fund_policy": {
+  "nav_indicators": "not_applicable",
+  "usable_metrics": [
+   "per_10k_yield",
+   "seven_day_annual"
+  ],
+  "comparable_with_net_value_funds": false,
+  "usable_for_net_value_comparison": false
+ },
+ "gate": {
+  "ready_for_research_analysis": true,
+  "ready_for_backtest": false,
+  "ready_for_formal_ranking": false
+ }
+}

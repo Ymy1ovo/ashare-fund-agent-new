@@ -1,0 +1,224 @@
+{
+ "phase": "3B-5.5",
+ "report": "practical_report_examples",
+ "baseline_head": "8c42dec82bcb35393193b70ab033dbda41a6c143",
+ "generated_at": "2026-11-23T14:35:00",
+ "data_source": "data/fund_agent.db（只读，真实数据）",
+ "simulated_data_used": false,
+ "samples": {
+  "050002": {
+   "label": "普通指数基金",
+   "product_class": "ordinary_index",
+   "is_money_fund": false,
+   "fund_quality_level": "B",
+   "indicator_levels": {
+    "A": 6,
+    "D": 5,
+    "B": 1,
+    "not_applicable": 1
+   },
+   "computable": 7,
+   "not_applicable": 1,
+   "not_computable": 5,
+   "peer_key": "ordinary_index|broad|沪深300",
+   "peer_level": "D",
+   "share_cost_level": "not_applicable",
+   "buy_sell_conclusion": null,
+   "conclusions": {
+    "facts": 4,
+    "conditional": 3,
+    "cannot_prove": 7
+   }
+  },
+  "001052": {
+   "label": "ETF联接基金",
+   "product_class": "etf_linked",
+   "is_money_fund": false,
+   "fund_quality_level": "B",
+   "indicator_levels": {
+    "A": 9,
+    "D": 3,
+    "not_applicable": 1
+   },
+   "computable": 9,
+   "not_applicable": 1,
+   "not_computable": 3,
+   "peer_key": "etf_linked|broad|中证500",
+   "peer_level": "D",
+   "share_cost_level": "not_applicable",
+   "buy_sell_conclusion": null,
+   "conclusions": {
+    "facts": 4,
+    "conditional": 3,
+    "cannot_prove": 7
+   }
+  },
+  "001938": {
+   "label": "主动权益基金",
+   "product_class": "active_equity",
+   "is_money_fund": false,
+   "fund_quality_level": "B",
+   "indicator_levels": {
+    "A": 9,
+    "D": 2,
+    "C": 1,
+    "not_applicable": 1
+   },
+   "computable": 10,
+   "not_applicable": 1,
+   "not_computable": 2,
+   "peer_key": "active_equity|中证500",
+   "peer_level": "C",
+   "share_cost_level": "not_applicable",
+   "buy_sell_conclusion": null,
+   "conclusions": {
+    "facts": 4,
+    "conditional": 3,
+    "cannot_prove": 6
+   }
+  },
+  "000032": {
+   "label": "债券基金",
+   "product_class": "bond_pure",
+   "is_money_fund": false,
+   "fund_quality_level": "B",
+   "indicator_levels": {
+    "A": 9,
+    "D": 3,
+    "C": 1
+   },
+   "computable": 10,
+   "not_applicable": 0,
+   "not_computable": 3,
+   "peer_key": "bond_pure|unknown",
+   "peer_level": "C",
+   "share_cost_level": "D",
+   "buy_sell_conclusion": null,
+   "conclusions": {
+    "facts": 4,
+    "conditional": 3,
+    "cannot_prove": 7
+   }
+  },
+  "000509": {
+   "label": "货币基金",
+   "product_class": "money_market",
+   "is_money_fund": true,
+   "fund_quality_level": "B",
+   "indicator_levels": {
+    "not_applicable": 12,
+    "C": 1
+   },
+   "computable": 1,
+   "not_applicable": 12,
+   "not_computable": 0,
+   "peer_key": "money_market",
+   "peer_level": "C",
+   "share_cost_level": "not_applicable",
+   "buy_sell_conclusion": null,
+   "conclusions": {
+    "facts": 3,
+    "conditional": 2,
+    "cannot_prove": 6
+   }
+  },
+  "001548": {
+   "label": "ETF联接 A/C 组（A 类）",
+   "product_class": "etf_linked",
+   "is_money_fund": false,
+   "fund_quality_level": "B",
+   "indicator_levels": {
+    "A": 9,
+    "D": 4
+   },
+   "computable": 9,
+   "not_applicable": 0,
+   "not_computable": 4,
+   "peer_key": "etf_linked|broad|上证50",
+   "peer_level": "D",
+   "share_cost_level": "D",
+   "buy_sell_conclusion": null,
+   "conclusions": {
+    "facts": 4,
+    "conditional": 3,
+    "cannot_prove": 8
+   }
+  },
+  "001549": {
+   "label": "ETF联接 A/C 组（C 类）",
+   "product_class": "etf_linked",
+   "is_money_fund": false,
+   "fund_quality_level": "B",
+   "indicator_levels": {
+    "A": 9,
+    "D": 4
+   },
+   "computable": 9,
+   "not_applicable": 0,
+   "not_computable": 4,
+   "peer_key": "etf_linked|broad|上证50",
+   "peer_level": "D",
+   "share_cost_level": "D",
+   "buy_sell_conclusion": null,
+   "conclusions": {
+    "facts": 4,
+    "conditional": 3,
+    "cannot_prove": 8
+   }
+  }
+ },
+ "coverage": {
+  "ordinary_index": [
+   "050002"
+  ],
+  "etf_linked": [
+   "001052",
+   "001548",
+   "001549"
+  ],
+  "active_equity": [
+   "001938"
+  ],
+  "bond_pure": [
+   "000032"
+  ],
+  "money_market": [
+   "000509"
+  ],
+  "ac_pair": [
+   "001548",
+   "001549"
+  ]
+ },
+ "report_sections": [
+  "1_basic_info",
+  "2_product_classification",
+  "3_data_source",
+  "4_data_quality_level",
+  "5_indicator_grades",
+  "5_indicator_grades_summary",
+  "6_gaps_and_anomalies",
+  "7_return_risk",
+  "8_peer_comparability",
+  "9_share_cost_evidence",
+  "10_not_computable",
+  "11_conclusions",
+  "12_limitations"
+ ],
+ "conclusion_boundary": {
+  "is_forecast": false,
+  "is_investment_advice": false,
+  "can_be_used_as": "描述性历史观察",
+  "cannot_be_used_as": [
+   "未来收益预测",
+   "买入或卖出建议",
+   "跨类别正式排名依据",
+   "单一年度收益推导长期结论"
+  ]
+ },
+ "gate": {
+  "ready_for_research_analysis": true,
+  "ready_for_backtest": false,
+  "ready_for_formal_ranking": false
+ }
+}

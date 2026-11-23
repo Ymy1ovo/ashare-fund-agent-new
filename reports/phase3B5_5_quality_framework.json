@@ -1,0 +1,108 @@
+{
+ "phase": "3B-5.5",
+ "report": "quality_framework",
+ "baseline_head": "8c42dec82bcb35393193b70ab033dbda41a6c143",
+ "generated_at": "2026-11-23T14:35:00",
+ "module": "app/fund/research/quality.py",
+ "readonly": true,
+ "database_written": false,
+ "schema_changed": false,
+ "engine_logic_changed": false,
+ "levels": {
+  "A": "数据质量较好，可支持常规描述性研究",
+  "B": "有条件可用，存在明确限制",
+  "C": "证据不足，只能展示有限描述性信息",
+  "D": "数据不合格，不应生成相关研究结论",
+  "not_applicable": "该指标在产品类型上不适用，不参与质量评定"
+ },
+ "level_triggers": {
+  "A": "覆盖 ≥ 3 年、无重复/空值/非正、无超阈值缺口、来源可信",
+  "B": "有超阈值缺口，或覆盖 < 3 年",
+  "C": "有结构性异常（重复/空值/非正），或覆盖 < 1 年",
+  "D": "0 条记录、来源缺失、样本不足"
+ },
+ "three_rules": {
+  "quality_ignores_returns": true,
+  "indicator_levels_independent": true,
+  "never_fill_numbers": true
+ },
+ "fund_level_composition": {
+  "inputs": [
+   "rows",
+   "date_min",
+   "date_max",
+   "gap_count_over_threshold",
+   "null_unit_nav",
+   "null_acc_nav",
+   "duplicate_dates",
+   "nonpositive_unit_nav",
+   "source"
+  ],
+  "explicitly_excluded_inputs": [
+   "returns",
+   "annualized_return",
+   "max_drawdown",
+   "volatility"
+  ],
+  "not_in_fund_level": [
+   "fee_missing",
+   "manager_missing",
+   "aum_missing"
+  ],
+  "not_in_fund_level_reason": "费率/经理/规模只影响对应指标，混入总等级会让「费率缺失」看起来像「净值不可用」"
+ },
+ "real_samples": {
+  "050002": {
+   "label": "普通指数基金",
+   "overall_level": "B",
+   "series_level": "B",
+   "source_level": "B"
+  },
+  "001052": {
+   "label": "ETF联接基金",
+   "overall_level": "B",
+   "series_level": "A",
+   "source_level": "B"
+  },
+  "001938": {
+   "label": "主动权益基金",
+   "overall_level": "B",
+   "series_level": "A",
+   "source_level": "B"
+  },
+  "000032": {
+   "label": "债券基金",
+   "overall_level": "B",
+   "series_level": "A",
+   "source_level": "B"
+  },
+  "000509": {
+   "label": "货币基金",
+   "overall_level": "B",
+   "series_level": "A",
+   "source_level": "B"
+  },
+  "001548": {
+   "label": "ETF联接 A/C 组（A 类）",
+   "overall_level": "B",
+   "series_level": "A",
+   "source_level": "B"
+  },
+  "001549": {
+   "label": "ETF联接 A/C 组（C 类）",
+   "overall_level": "B",
+   "series_level": "A",
+   "source_level": "B"
+  }
+ },
+ "three_way_separation": {
+  "fund_performance": "只体现在 7_return_risk 数值，不影响任何等级",
+  "data_quality": "体现在 4_data_quality_level",
+  "indicator_condition": "体现在 5_indicator_grades 的 D / not_available"
+ },
+ "gate": {
+  "ready_for_research_analysis": true,
+  "ready_for_backtest": false,
+  "ready_for_formal_ranking": false
+ }
+}

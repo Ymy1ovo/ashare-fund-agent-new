@@ -1,0 +1,73 @@
+{
+ "phase": "3B-5.5",
+ "report": "tests",
+ "baseline_head": "8c42dec82bcb35393193b70ab033dbda41a6c143",
+ "generated_at": "2026-11-23T14:35:00",
+ "executed": true,
+ "new_suite": {
+  "file": "tests/test_3b5_5_quality_framework.py",
+  "passed": 60,
+  "failed": 0,
+  "seconds": 72.06
+ },
+ "regression": {
+  "3b5_1_5_2": {
+   "files": [
+    "tests/test_3b5_1_fund_research.py",
+    "tests/test_3b5_2_code_lookup.py"
+   ],
+   "passed": 135,
+   "seconds": 63.13
+  },
+  "3b5_3_5_4": {
+   "files": [
+    "tests/test_3b5_3_2_fk_serialization.py",
+    "tests/test_3b5_3_1_atomic.py",
+    "tests/test_3b5_3_user_ingest.py",
+    "tests/test_3b5_4_multi_type.py"
+   ],
+   "passed": 99,
+   "seconds": 95.36
+  }
+ },
+ "full": {
+  "command": "pytest -q",
+  "passed": 1577,
+  "failed": 0,
+  "errors": 0,
+  "seconds": 520.63
+ },
+ "evolution": {
+  "3B-5.3.2": 1482,
+  "3B-5.4": 1517,
+  "3B-5.5": 1577
+ },
+ "static_checks_excluded": [
+  "python -m compileall 语法检查",
+  "报告数据与库查询比对"
+ ],
+ "environment": {
+  "temp_db": "自建 schema",
+  "production_db": "只读",
+  "network": "单元测试不联网",
+  "production_writes": 0
+ },
+ "code_changes": {
+  "new": [
+   "app/fund/research/quality.py",
+   "app/fund/research/practical_report.py",
+   "tests/test_3b5_5_quality_framework.py"
+  ],
+  "unchanged": [
+   "app/fund/research/engine.py",
+   "app/fund/research/indicators.py",
+   "app/fund/research/classification.py"
+  ],
+  "schema_changed": false
+ },
+ "gate": {
+  "ready_for_research_analysis": true,
+  "ready_for_backtest": false,
+  "ready_for_formal_ranking": false
+ }
+}
