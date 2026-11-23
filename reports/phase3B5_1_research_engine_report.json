@@ -134,16 +134,17 @@
   "ready_for_research_analysis": true,
   "ready_for_backtest": false,
   "ready_for_formal_ranking": false,
-  "reason": "修正后同类分析按 fund_id 去重、分组依据可验证基准、全部时间序列指标统一缺口安全检查；正式回测与真实排名仍不具备条件"
+  "reason": "最终修正后：回撤各段独立不跨段重算、滚动窗口用区间相交判断、指数类优先 tracking_index；正式回测与真实排名仍不具备条件"
  },
  "tests": {
   "special_file": "tests/test_3b5_1_fund_research.py",
-  "special_passed": 83,
-  "full_passed": 1366,
+  "special_passed": 103,
+  "full_passed": 1386,
   "full_failed": 0,
-  "full_duration_seconds": 289.12,
-  "note": "1366 = 3B-5.0 的 1283 + 本轮 83",
-  "acceptance_fix_tests_added": 26
+  "full_duration_seconds": 279.82,
+  "note": "1386 = 3B-5.0 的 1283 + 本轮 103",
+  "acceptance_fix_tests_added": 26,
+  "final_fix_tests_added": 20
  },
  "acceptance_fix": {
   "round": "3B-5.1 验收修正",
@@ -194,6 +195,57 @@
    "recovery": "只在同一连续段内找恢复点，不跨越缺口",
    "calmar": "继承年化与回撤可用性，底层降级则一并降级",
    "threshold": 15
+  }
+ },
+ "final_acceptance_fix": {
+  "round": "3B-5.1 最终验收修正",
+  "problems_fixed": 3,
+  "fix_A_drawdown_no_cross_segment_recompute": {
+   "issue": "切段后又把 segments 拼回 pts 重算 peak/worst，前段高点污染后段回撤",
+   "fix": "各段独立计算，全区间值 = max(各段最大回撤)，不拼接重算",
+   "tie_break": "并列最大时取时间最早的段（稳定可复现）",
+   "detail_source": "严格来自产生最大回撤的那一段",
+   "recovery": "只在同一段内找恢复点，不跨段；未恢复标 ongoing",
+   "new_fields": [
+    "segment_count",
+    "selected_segment",
+    "selection_rule"
+   ],
+   "regression_case": "段1峰值2.0→1.5（25%）、段2从1.0→0.8（20%）；正确值 25%，错误拼接会得 60%"
+  },
+  "fix_B_rolling_gap_intersection": {
+   "issue": "旧判断 gap.from>=start AND gap.to<=end 只覆盖缺口完全在窗口内的情况",
+   "fix": "提取 _gap_intersects_window(gap,start,end)：gap.from < end AND gap.to > start",
+   "covered_cases": [
+    "缺口完全在窗口内",
+    "缺口从外延伸到窗内",
+    "缺口从内延伸到窗外",
+    "缺口完全覆盖窗口",
+    "缺口与窗口不相交（应保留）"
+   ],
+   "strict_inequality_note": "缺口终点 == 窗口起点时不算相交"
+  },
+  "fix_C_tracking_index_priority": {
+   "issue": "normalize_benchmark(benchmark or tracking_index) 实际是 benchmark 优先，与注释矛盾",
+   "fix": "指数类（普通指数/ETF联接/指数型LOF）tracking_index 优先；不可识别时回落 benchmark；主动权益只用 benchmark",
+   "new_fields": [
+    "grouping_source",
+    "tracking_fallback_reason",
+    "tracking_family"
+   ],
+   "no_name_guessing": "不得根据基金名称猜测跟踪指数；无 tracking_index 且 benchmark 不可识别 → unknown",
+   "real_db_note": "库内 tracking_index 全部为 NULL，6 个指数类分组均走 benchmark 回落路径"
+  },
+  "real_sample": {
+   "share_count": 12,
+   "fund_count": 9,
+   "peer_member_total": 9,
+   "mdd_value_equals_selected_segment": "11/11 全部一致",
+   "mdd_degraded_false": "11 个净值型份额全部 false（无超阈值缺口）",
+   "recovery_ongoing": [
+    "110022",
+    "012414"
+   ]
   }
  }
 }

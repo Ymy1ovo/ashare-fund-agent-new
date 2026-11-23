@@ -264,24 +264,61 @@ def peer_group_key(classification: dict, fund_name: str | None,
     pc = classification.get("product_class")
     base = {"product_class": pc,
             "investment_subtype": classification.get("investment_subtype")}
-    norm = normalize_benchmark(benchmark or tracking_index)
+
+    # 指数类（普通指数 / ETF联接 / 指数型LOF）：**tracking_index 优先**，
+    # 缺失或不可识别时才回落 benchmark。主动权益只用 benchmark。
+    index_like = (pc in ("ordinary_index", "etf_linked")
+                  or (pc == "lof"
+                      and classification.get("investment_subtype") == "index"))
+
+    tracking_norm = None
+    if index_like:
+        ti_norm = normalize_benchmark(tracking_index)
+        base["tracking_family"] = ti_norm["family"]
+        base["tracking_confidence"] = ti_norm["confidence"]
+        base["tracking_reason"] = ti_norm["reason"]
+        if ti_norm["family"] != "unknown":
+            norm = ti_norm
+            base["grouping_source"] = "tracking_index"
+        else:
+            bm_norm = normalize_benchmark(benchmark)
+            norm = bm_norm
+            base["grouping_source"] = (
+                "benchmark" if bm_norm["family"] != "unknown"
+                else "unknown")
+            if (tracking_index and bm_norm["family"] != "unknown"
+                    and ti_norm["family"] == "unknown"):
+                base["tracking_fallback_reason"] = (
+                    f"tracking_index「{str(tracking_index)[:30]}」无法识别，"
+                    "按明确规则回落 benchmark；不使用未验证的名称推断")
+            elif tracking_index:
+                base["tracking_fallback_reason"] = (
+                    "tracking_index 与 benchmark 均无法识别，标 unknown")
+            else:
+                base["tracking_fallback_reason"] = (
+                    "无 tracking_index，使用可识别 benchmark"
+                    if bm_norm["family"] != "unknown"
+                    else "无 tracking_index 且 benchmark 不可识别，标 unknown")
+    else:
+        bm_norm = normalize_benchmark(benchmark)
+        norm = bm_norm
+        base["tracking_family"] = None
+        base["grouping_source"] = (
+            "benchmark" if bm_norm["family"] != "unknown" else "unknown")
+
     base["benchmark_family"] = norm["family"]
     base["benchmark_confidence"] = norm["confidence"]
     base["benchmark_reason"] = norm["reason"]
 
     if pc in ("ordinary_index", "etf_linked"):
         base["index_scope"] = index_scope(fund_name)
-        # 跟踪指数优先；没有 tracking_index 就用基准族
         idx_family = norm["family"]
-        base["tracking_family"] = idx_family
         key = f"{pc}|{base['index_scope']}|{idx_family}"
     elif pc == "lof":
         base["index_scope"] = index_scope(fund_name)
         if base["investment_subtype"] == "index":
-            base["tracking_family"] = norm["family"]
             key = f"lof|index|{base['index_scope']}|{norm['family']}"
         else:
-            base["tracking_family"] = None
             key = f"lof|active|{norm['family']}"
     elif pc in ("bond_pure", "bond_mixed"):
         # 久期/信用/转债暴露无可靠数据 → unknown，不解释成相同风险

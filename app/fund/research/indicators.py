@@ -388,56 +388,62 @@ def _max_drawdown(series: NavSeries, *, field_name: str) -> dict:
                    status="insufficient_data",
                    gaps=gaps[:3], null_count=nulls)
 
-    # 报告值是**可观测连续段内**的最大回撤（降级结果，不是全区间完整回撤）
-    best = max(seg_results, key=lambda x: x["max_drawdown"])
+    # ---- 全区间报告值 = 各**独立连续段**最大回撤的最大值 ----
+    # 绝不把连续段重新拼接后再算一次：那样前一段的高峰会污染后一段的回撤。
+    # 并列最大时的稳定规则：取**时间最早**的段（seg_results 已按时间顺序生成）。
+    best_idx = 0
+    for i, sr in enumerate(seg_results):
+        if sr["max_drawdown"] > seg_results[best_idx]["max_drawdown"]:
+            best_idx = i
+    best = seg_results[best_idx]
     worst = best["max_drawdown"]
     worst_info = best["detail"]
-    pts = [(d, v) for seg in segments for d, v in seg]
+    # 只取产生最大回撤的那一个连续段，修复时间不得跨段
+    seg_candidates = [seg for seg in segments if len(seg) >= 2]
+    best_seg = seg_candidates[best_idx]
 
-    peak = pts[0][1]
-    peak_date = pts[0][0]
-    worst = 0.0
-    worst_info = None
-    for d, v in pts[1:]:
-        if v > peak:
-            peak, peak_date = v, d
-            continue
-        dd = 1 - v / peak
-        if dd > worst:
-            worst = dd
-            worst_info = {"peak_value": peak, "peak_date": peak_date.isoformat(),
-                          "trough_value": v, "trough_date": d.isoformat()}
+    selection_rule = ("全区间最大回撤 = max(各连续段最大回撤)；"
+                      "并列时取时间最早的一段；detail 与 recovery 均取自该段")
 
-    # 修复时间：从谷底恢复到前高，**不跨越缺口 / 空值**
+    # 修复时间：从谷底恢复到**同一连续段内**的前高，不跨段
     recovery = _na("无回撤")
     if worst_info:
         trough_d = datetime.strptime(worst_info["trough_date"], "%Y-%m-%d").date()
         peak_v = worst_info["peak_value"]
-        seg = next((x for x in segments
-                    if x and x[0][0].isoformat() == best["segment_start"]
-                    and x[-1][0].isoformat() == best["segment_end"]), pts)
         recovered_at = None
-        for d, v in seg:
+        for d, v in best_seg:
             if d > trough_d and v >= peak_v:
                 recovered_at = d
                 break
         if recovered_at is None:
-            recovery = {"value": (max(pts[-1][0], trough_d) - trough_d).days,
+            last_d = best_seg[-1][0]
+            recovery = {"value": (max(last_d, trough_d) - trough_d).days,
                         "status": "ongoing",
-                        "reason": "尚未恢复至前高，标记 ongoing，不能当作已修复",
+                        "reason": ("该连续段内尚未恢复至前高，标记 ongoing，"
+                                   "不能当作已修复；未跨段寻找恢复点"),
                         "trough_date": trough_d.isoformat(),
-                        "days_elapsed": (pts[-1][0] - trough_d).days}
+                        "days_elapsed": (last_d - trough_d).days,
+                        "segment_end": last_d.isoformat()}
         else:
             recovery = _ok((recovered_at - trough_d).days,
                            unit="自然日", trough_date=trough_d.isoformat(),
                            recovered_date=recovered_at.isoformat(),
-                           status="ok")
+                           status="ok",
+                           within_same_segment=True)
 
     out = _ok(round(worst, 6), value_pct=_pct(worst),
               detail=worst_info, recovery=recovery,
               gap_count_over_threshold=len(gaps),
               null_count=nulls,
               segments=seg_results,
+              segment_count=len(seg_results),
+              selected_segment={
+                  "index": best_idx,
+                  "segment_start": best["segment_start"],
+                  "segment_end": best["segment_end"],
+                  "max_drawdown": best["max_drawdown"],
+              },
+              selection_rule=selection_rule,
               complete_interval=False if degraded else True,
               caveat="净值连续性 cannot_verify")
     if degraded:
@@ -514,6 +520,21 @@ def _risk_adjusted(series: NavSeries, *, field_name: str) -> dict:
 
 
 # ---------------------------------------------------------------- 滚动稳定性
+def _gap_intersects_window(gap: dict, start_iso: str, end_iso: str) -> bool:
+    """缺口区间与窗口区间是否相交（闭区间视为相交，端点相接不算）。
+
+    [gap_from, gap_to] × [start, end] 相交 ⇔ gap_from < end AND gap_to > start
+
+    覆盖：
+    - 缺口完全在窗口内     gap_from > start, gap_to < end     → 相交
+    - 缺口从外延伸到窗内    gap_from < start, gap_to < end     → 相交
+    - 缺口从内延伸到窗外    gap_from > start, gap_to > end     → 相交
+    - 缺口完全覆盖窗口      gap_from < start, gap_to > end     → 相交
+    - 缺口与窗口不相交      gap_to <= start 或 gap_from >= end → 不相交
+    """
+    return gap["from"] < end_iso and gap["to"] > start_iso
+
+
 def _rolling_stability(series: NavSeries, *, field_name: str,
                        window_days: int = 90) -> dict:
     """滚动 window_days 自然日窗口的正收益比例。
@@ -546,8 +567,10 @@ def _rolling_stability(series: NavSeries, *, field_name: str,
             skipped_endpoint += 1
             continue
         s_iso, e_iso = target.isoformat(), d.isoformat()
-        # 窗口内部（含端点）缺口
-        if any(g["from"] >= s_iso and g["to"] <= e_iso for g in all_gaps):
+        # 区间**相交**判断：只要缺口与 [start, end] 有交集就跳过。
+        # 用严格不等号，端点相接不算相交（缺口终点 == 窗口起点 时
+        # 缺口已在窗口之外，不污染窗口内相邻收益）。
+        if any(_gap_intersects_window(g, s_iso, e_iso) for g in all_gaps):
             skipped_gap += 1
             continue
         # 窗口内部空值

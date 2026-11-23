@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-23T08:49:45",
+ "generated_at": "2026-11-23T09:06:02",
  "universe": {
   "share_count": 12,
   "fund_count": 9,
@@ -38,6 +38,8 @@
    "peer_group": {
     "product_class": "bond_pure",
     "investment_subtype": "bond_pure",
+    "tracking_family": null,
+    "grouping_source": "benchmark",
     "benchmark_family": "中债综合",
     "benchmark_confidence": "high",
     "benchmark_reason": "基准文本与已知写法完全一致：中债综合指数",
@@ -178,7 +180,7 @@
       "value": 0.041017,
       "status": "ok",
       "reason": null,
-      "value_pct": 4.101723,
+      "value_pct": 4.1017,
       "detail": {
        "peak_value": 1.219,
        "peak_date": "2016-10-21",
@@ -191,7 +193,8 @@
        "reason": null,
        "unit": "自然日",
        "trough_date": "2016-12-20",
-       "recovered_date": "2018-03-30"
+       "recovered_date": "2018-03-30",
+       "within_same_segment": true
       },
       "gap_count_over_threshold": 0,
       "null_count": 0,
@@ -209,6 +212,14 @@
         }
        }
       ],
+      "segment_count": 1,
+      "selected_segment": {
+       "index": 0,
+       "segment_start": "2013-03-08",
+       "segment_end": "2026-11-18",
+       "max_drawdown": 0.041017
+      },
+      "selection_rule": "全区间最大回撤 = max(各连续段最大回撤)；并列时取时间最早的一段；detail 与 recovery 均取自该段",
       "complete_interval": true,
       "caveat": "净值连续性 cannot_verify",
       "degraded": false
@@ -475,6 +486,8 @@
    "peer_group": {
     "product_class": "bond_pure",
     "investment_subtype": "bond_pure",
+    "tracking_family": null,
+    "grouping_source": "benchmark",
     "benchmark_family": "中债综合",
     "benchmark_confidence": "high",
     "benchmark_reason": "基准文本与已知写法完全一致：中债综合指数",
@@ -615,7 +628,7 @@
       "value": 0.041597,
       "status": "ok",
       "reason": null,
-      "value_pct": 4.159734,
+      "value_pct": 4.1597,
       "detail": {
        "peak_value": 1.202,
        "peak_date": "2016-10-24",
@@ -628,7 +641,8 @@
        "reason": null,
        "unit": "自然日",
        "trough_date": "2016-12-20",
-       "recovered_date": "2018-04-18"
+       "recovered_date": "2018-04-18",
+       "within_same_segment": true
       },
       "gap_count_over_threshold": 0,
       "null_count": 0,
@@ -646,6 +660,14 @@
         }
        }
       ],
+      "segment_count": 1,
+      "selected_segment": {
+       "index": 0,
+       "segment_start": "2013-03-08",
+       "segment_end": "2026-11-18",
+       "max_drawdown": 0.041597
+      },
+      "selection_rule": "全区间最大回撤 = max(各连续段最大回撤)；并列时取时间最早的一段；detail 与 recovery 均取自该段",
       "complete_interval": true,
       "caveat": "净值连续性 cannot_verify",
       "degraded": false
@@ -908,11 +930,15 @@
    "peer_group": {
     "product_class": "etf_linked",
     "investment_subtype": "index",
+    "tracking_family": "unknown",
+    "tracking_confidence": "none",
+    "tracking_reason": "benchmark 为空，无法建立可比组",
+    "grouping_source": "benchmark",
+    "tracking_fallback_reason": "无 tracking_index，使用可识别 benchmark",
     "benchmark_family": "沪深300",
     "benchmark_confidence": "medium",
     "benchmark_reason": "从基准文本提取到唯一指数族「沪深300」；该基准为加权复合表述，按主基准归组",
     "index_scope": "broad",
-    "tracking_family": "沪深300",
     "peer_key": "etf_linked|broad|沪深300",
     "verifiable_group": true
    },
@@ -1047,7 +1073,7 @@
       "value": 0.434343,
       "status": "ok",
       "reason": null,
-      "value_pct": 43.434343,
+      "value_pct": 43.4343,
       "detail": {
        "peak_value": 1.584,
        "peak_date": "2015-06-08",
@@ -1060,7 +1086,8 @@
        "reason": null,
        "unit": "自然日",
        "trough_date": "2016-01-28",
-       "recovered_date": "2020-07-08"
+       "recovered_date": "2020-07-08",
+       "within_same_segment": true
       },
       "gap_count_over_threshold": 0,
       "null_count": 0,
@@ -1078,6 +1105,14 @@
         }
        }
       ],
+      "segment_count": 1,
+      "selected_segment": {
+       "index": 0,
+       "segment_start": "2009-07-10",
+       "segment_end": "2026-11-18",
+       "max_drawdown": 0.434343
+      },
+      "selection_rule": "全区间最大回撤 = max(各连续段最大回撤)；并列时取时间最早的一段；detail 与 recovery 均取自该段",
       "complete_interval": true,
       "caveat": "净值连续性 cannot_verify",
       "degraded": false
@@ -1344,6 +1379,8 @@
    "peer_group": {
     "product_class": "money_market",
     "investment_subtype": "money_market",
+    "tracking_family": null,
+    "grouping_source": "unknown",
     "benchmark_family": "unknown",
     "benchmark_confidence": "none",
     "benchmark_reason": "benchmark 为空，无法建立可比组",
@@ -1525,11 +1562,15 @@
    "peer_group": {
     "product_class": "ordinary_index",
     "investment_subtype": "index",
+    "tracking_family": "unknown",
+    "tracking_confidence": "none",
+    "tracking_reason": "benchmark 为空，无法建立可比组",
+    "grouping_source": "benchmark",
+    "tracking_fallback_reason": "无 tracking_index，使用可识别 benchmark",
     "benchmark_family": "中证500",
     "benchmark_confidence": "medium",
     "benchmark_reason": "从基准文本提取到唯一指数族「中证500」；该基准为加权复合表述，按主基准归组",
     "index_scope": "broad",
-    "tracking_family": "中证500",
     "peer_key": "ordinary_index|broad|中证500",
     "verifiable_group": true
    },
@@ -1664,7 +1705,7 @@
       "value": 0.513152,
       "status": "ok",
       "reason": null,
-      "value_pct": 51.315237,
+      "value_pct": 51.3152,
       "detail": {
        "peak_value": 3.0983,
        "peak_date": "2015-06-12",
@@ -1677,7 +1718,8 @@
        "reason": null,
        "unit": "自然日",
        "trough_date": "2015-09-15",
-       "recovered_date": "2021-08-11"
+       "recovered_date": "2021-08-11",
+       "within_same_segment": true
       },
       "gap_count_over_threshold": 0,
       "null_count": 0,
@@ -1695,6 +1737,14 @@
         }
        }
       ],
+      "segment_count": 1,
+      "selected_segment": {
+       "index": 0,
+       "segment_start": "2014-01-27",
+       "segment_end": "2026-11-18",
+       "max_drawdown": 0.513152
+      },
+      "selection_rule": "全区间最大回撤 = max(各连续段最大回撤)；并列时取时间最早的一段；detail 与 recovery 均取自该段",
       "complete_interval": true,
       "caveat": "净值连续性 cannot_verify",
       "degraded": false
@@ -1961,11 +2011,15 @@
    "peer_group": {
     "product_class": "etf_linked",
     "investment_subtype": "index",
+    "tracking_family": "unknown",
+    "tracking_confidence": "none",
+    "tracking_reason": "benchmark 为空，无法建立可比组",
+    "grouping_source": "benchmark",
+    "tracking_fallback_reason": "无 tracking_index，使用可识别 benchmark",
     "benchmark_family": "中证全指半导体",
     "benchmark_confidence": "medium",
     "benchmark_reason": "从基准文本提取到唯一指数族「中证全指半导体」；该基准为加权复合表述，按主基准归组",
     "index_scope": "sector",
-    "tracking_family": "中证全指半导体",
     "peer_key": "etf_linked|sector|中证全指半导体",
     "verifiable_group": true
    },
@@ -2100,7 +2154,7 @@
       "value": 0.594181,
       "status": "ok",
       "reason": null,
-      "value_pct": 59.418133,
+      "value_pct": 59.4181,
       "detail": {
        "peak_value": 2.956,
        "peak_date": "2021-07-30",
@@ -2113,7 +2167,8 @@
        "reason": null,
        "unit": "自然日",
        "trough_date": "2024-02-05",
-       "recovered_date": "2025-09-24"
+       "recovered_date": "2025-09-24",
+       "within_same_segment": true
       },
       "gap_count_over_threshold": 0,
       "null_count": 0,
@@ -2131,6 +2186,14 @@
         }
        }
       ],
+      "segment_count": 1,
+      "selected_segment": {
+       "index": 0,
+       "segment_start": "2019-06-26",
+       "segment_end": "2026-11-18",
+       "max_drawdown": 0.594181
+      },
+      "selection_rule": "全区间最大回撤 = max(各连续段最大回撤)；并列时取时间最早的一段；detail 与 recovery 均取自该段",
       "complete_interval": true,
       "caveat": "净值连续性 cannot_verify",
       "degraded": false
@@ -2397,11 +2460,15 @@
    "peer_group": {
     "product_class": "etf_linked",
     "investment_subtype": "index",
+    "tracking_family": "unknown",
+    "tracking_confidence": "none",
+    "tracking_reason": "benchmark 为空，无法建立可比组",
+    "grouping_source": "benchmark",
+    "tracking_fallback_reason": "无 tracking_index，使用可识别 benchmark",
     "benchmark_family": "中证全指半导体",
     "benchmark_confidence": "medium",
     "benchmark_reason": "从基准文本提取到唯一指数族「中证全指半导体」；该基准为加权复合表述，按主基准归组",
     "index_scope": "sector",
-    "tracking_family": "中证全指半导体",
     "peer_key": "etf_linked|sector|中证全指半导体",
     "verifiable_group": true
    },
@@ -2536,7 +2603,7 @@
       "value": 0.596727,
       "status": "ok",
       "reason": null,
-      "value_pct": 59.672746,
+      "value_pct": 59.6727,
       "detail": {
        "peak_value": 2.9335,
        "peak_date": "2021-07-30",
@@ -2549,7 +2616,8 @@
        "reason": null,
        "unit": "自然日",
        "trough_date": "2024-02-05",
-       "recovered_date": "2025-09-24"
+       "recovered_date": "2025-09-24",
+       "within_same_segment": true
       },
       "gap_count_over_threshold": 0,
       "null_count": 0,
@@ -2567,6 +2635,14 @@
         }
        }
       ],
+      "segment_count": 1,
+      "selected_segment": {
+       "index": 0,
+       "segment_start": "2019-06-26",
+       "segment_end": "2026-11-18",
+       "max_drawdown": 0.596727
+      },
+      "selection_rule": "全区间最大回撤 = max(各连续段最大回撤)；并列时取时间最早的一段；detail 与 recovery 均取自该段",
       "complete_interval": true,
       "caveat": "净值连续性 cannot_verify",
       "degraded": false
@@ -2829,11 +2905,15 @@
    "peer_group": {
     "product_class": "etf_linked",
     "investment_subtype": "index",
+    "tracking_family": "unknown",
+    "tracking_confidence": "none",
+    "tracking_reason": "benchmark 为空，无法建立可比组",
+    "grouping_source": "benchmark",
+    "tracking_fallback_reason": "无 tracking_index，使用可识别 benchmark",
     "benchmark_family": "沪深300",
     "benchmark_confidence": "medium",
     "benchmark_reason": "从基准文本提取到唯一指数族「沪深300」；该基准为加权复合表述，按主基准归组",
     "index_scope": "broad",
-    "tracking_family": "沪深300",
     "peer_key": "etf_linked|broad|沪深300",
     "verifiable_group": true
    },
@@ -2968,7 +3048,7 @@
       "value": 0.436093,
       "status": "ok",
       "reason": null,
-      "value_pct": 43.609342,
+      "value_pct": 43.6093,
       "detail": {
        "peak_value": 1.6485,
        "peak_date": "2015-06-08",
@@ -2981,7 +3061,8 @@
        "reason": null,
        "unit": "自然日",
        "trough_date": "2016-01-28",
-       "recovered_date": "2020-07-08"
+       "recovered_date": "2020-07-08",
+       "within_same_segment": true
       },
       "gap_count_over_threshold": 0,
       "null_count": 0,
@@ -2999,6 +3080,14 @@
         }
        }
       ],
+      "segment_count": 1,
+      "selected_segment": {
+       "index": 0,
+       "segment_start": "2009-08-26",
+       "segment_end": "2026-11-18",
+       "max_drawdown": 0.436093
+      },
+      "selection_rule": "全区间最大回撤 = max(各连续段最大回撤)；并列时取时间最早的一段；detail 与 recovery 均取自该段",
       "complete_interval": true,
       "caveat": "净值连续性 cannot_verify",
       "degraded": false
@@ -3265,6 +3354,8 @@
    "peer_group": {
     "product_class": "active_equity",
     "investment_subtype": "active",
+    "tracking_family": null,
+    "grouping_source": "unknown",
     "benchmark_family": "unknown",
     "benchmark_confidence": "none",
     "benchmark_reason": "基准文本含多个指数族 ['中证内地消费主题', '中债总']，无法确定单一主基准，标 unknown 不强行归组",
@@ -3402,7 +3493,7 @@
       "value": 0.573177,
       "status": "ok",
       "reason": null,
-      "value_pct": 57.31767,
+      "value_pct": 57.3177,
       "detail": {
        "peak_value": 6.129,
        "peak_date": "2021-02-10",
@@ -3412,9 +3503,10 @@
       "recovery": {
        "value": 145,
        "status": "ongoing",
-       "reason": "尚未恢复至前高，标记 ongoing，不能当作已修复",
+       "reason": "该连续段内尚未恢复至前高，标记 ongoing，不能当作已修复；未跨段寻找恢复点",
        "trough_date": "2026-06-26",
-       "days_elapsed": 145
+       "days_elapsed": 145,
+       "segment_end": "2026-11-18"
       },
       "gap_count_over_threshold": 0,
       "null_count": 0,
@@ -3432,6 +3524,14 @@
         }
        }
       ],
+      "segment_count": 1,
+      "selected_segment": {
+       "index": 0,
+       "segment_start": "2010-08-20",
+       "segment_end": "2026-11-18",
+       "max_drawdown": 0.573177
+      },
+      "selection_rule": "全区间最大回撤 = max(各连续段最大回撤)；并列时取时间最早的一段；detail 与 recovery 均取自该段",
       "complete_interval": true,
       "caveat": "净值连续性 cannot_verify",
       "degraded": false
@@ -3698,11 +3798,12 @@
    "peer_group": {
     "product_class": "lof",
     "investment_subtype": "active",
+    "tracking_family": null,
+    "grouping_source": "unknown",
     "benchmark_family": "unknown",
     "benchmark_confidence": "none",
     "benchmark_reason": "基准文本含多个指数族 ['中债综合全价', '沪深300']，无法确定单一主基准，标 unknown 不强行归组",
     "index_scope": "unknown",
-    "tracking_family": null,
     "peer_key": "lof|active|unknown",
     "verifiable_group": false
    },
@@ -3837,7 +3938,7 @@
       "value": 0.336047,
       "status": "ok",
       "reason": null,
-      "value_pct": 33.604692,
+      "value_pct": 33.6047,
       "detail": {
        "peak_value": 3.4272,
        "peak_date": "2008-01-14",
@@ -3850,7 +3951,8 @@
        "reason": null,
        "unit": "自然日",
        "trough_date": "2008-11-07",
-       "recovered_date": "2010-12-13"
+       "recovered_date": "2010-12-13",
+       "within_same_segment": true
       },
       "gap_count_over_threshold": 0,
       "null_count": 0,
@@ -3868,6 +3970,14 @@
         }
        }
       ],
+      "segment_count": 1,
+      "selected_segment": {
+       "index": 0,
+       "segment_start": "2005-11-16",
+       "segment_end": "2026-11-18",
+       "max_drawdown": 0.336047
+      },
+      "selection_rule": "全区间最大回撤 = max(各连续段最大回撤)；并列时取时间最早的一段；detail 与 recovery 均取自该段",
       "complete_interval": true,
       "caveat": "净值连续性 cannot_verify",
       "degraded": false
@@ -4134,11 +4244,15 @@
    "peer_group": {
     "product_class": "lof",
     "investment_subtype": "index",
+    "tracking_family": "unknown",
+    "tracking_confidence": "none",
+    "tracking_reason": "benchmark 为空，无法建立可比组",
+    "grouping_source": "benchmark",
+    "tracking_fallback_reason": "无 tracking_index，使用可识别 benchmark",
     "benchmark_family": "中证白酒",
     "benchmark_confidence": "medium",
     "benchmark_reason": "从基准文本提取到唯一指数族「中证白酒」；该基准为加权复合表述，按主基准归组",
     "index_scope": "sector",
-    "tracking_family": "中证白酒",
     "peer_key": "lof|index|sector|中证白酒",
     "verifiable_group": true
    },
@@ -4273,7 +4387,7 @@
       "value": 0.64867,
       "status": "ok",
       "reason": null,
-      "value_pct": 64.866999,
+      "value_pct": 64.867,
       "detail": {
        "peak_value": 1.6466,
        "peak_date": "2021-06-07",
@@ -4283,9 +4397,10 @@
       "recovery": {
        "value": 132,
        "status": "ongoing",
-       "reason": "尚未恢复至前高，标记 ongoing，不能当作已修复",
+       "reason": "该连续段内尚未恢复至前高，标记 ongoing，不能当作已修复；未跨段寻找恢复点",
        "trough_date": "2026-07-09",
-       "days_elapsed": 132
+       "days_elapsed": 132,
+       "segment_end": "2026-11-18"
       },
       "gap_count_over_threshold": 0,
       "null_count": 0,
@@ -4303,6 +4418,14 @@
         }
        }
       ],
+      "segment_count": 1,
+      "selected_segment": {
+       "index": 0,
+       "segment_start": "2021-05-18",
+       "segment_end": "2026-11-18",
+       "max_drawdown": 0.64867
+      },
+      "selection_rule": "全区间最大回撤 = max(各连续段最大回撤)；并列时取时间最早的一段；detail 与 recovery 均取自该段",
       "complete_interval": true,
       "caveat": "净值连续性 cannot_verify",
       "degraded": false
@@ -4565,11 +4688,15 @@
    "peer_group": {
     "product_class": "lof",
     "investment_subtype": "index",
+    "tracking_family": "unknown",
+    "tracking_confidence": "none",
+    "tracking_reason": "benchmark 为空，无法建立可比组",
+    "grouping_source": "benchmark",
+    "tracking_fallback_reason": "无 tracking_index，使用可识别 benchmark",
     "benchmark_family": "中证白酒",
     "benchmark_confidence": "medium",
     "benchmark_reason": "从基准文本提取到唯一指数族「中证白酒」；该基准为加权复合表述，按主基准归组",
     "index_scope": "sector",
-    "tracking_family": "中证白酒",
     "peer_key": "lof|index|sector|中证白酒",
     "verifiable_group": true
    },
@@ -4704,7 +4831,7 @@
       "value": 0.360111,
       "status": "ok",
       "reason": null,
-      "value_pct": 36.01108,
+      "value_pct": 36.0111,
       "detail": {
        "peak_value": 1.083,
        "peak_date": "2015-06-15",
@@ -4717,7 +4844,8 @@
        "reason": null,
        "unit": "自然日",
        "trough_date": "2015-08-25",
-       "recovered_date": "2016-07-12"
+       "recovered_date": "2016-07-12",
+       "within_same_segment": true
       },
       "gap_count_over_threshold": 0,
       "null_count": 0,
@@ -4735,6 +4863,14 @@
         }
        }
       ],
+      "segment_count": 1,
+      "selected_segment": {
+       "index": 0,
+       "segment_start": "2015-05-27",
+       "segment_end": "2026-11-18",
+       "max_drawdown": 0.360111
+      },
+      "selection_rule": "全区间最大回撤 = max(各连续段最大回撤)；并列时取时间最早的一段；detail 与 recovery 均取自该段",
       "complete_interval": true,
       "caveat": "净值连续性 cannot_verify",
       "degraded": false
@@ -4999,6 +5135,8 @@
    "peer_group": {
     "product_class": "bond_pure",
     "investment_subtype": "bond_pure",
+    "tracking_family": null,
+    "grouping_source": "benchmark",
     "benchmark_family": "中债综合",
     "benchmark_confidence": "high",
     "benchmark_reason": "基准文本与已知写法完全一致：中债综合指数",
@@ -5112,7 +5250,7 @@
       "value": 0.041017,
       "status": "ok",
       "reason": null,
-      "value_pct": 4.101723,
+      "value_pct": 4.1017,
       "detail": {
        "peak_value": 1.219,
        "peak_date": "2016-10-21",
@@ -5125,7 +5263,8 @@
        "reason": null,
        "unit": "自然日",
        "trough_date": "2016-12-20",
-       "recovered_date": "2018-03-30"
+       "recovered_date": "2018-03-30",
+       "within_same_segment": true
       },
       "gap_count_over_threshold": 0,
       "null_count": 0,
@@ -5143,6 +5282,14 @@
         }
        }
       ],
+      "segment_count": 1,
+      "selected_segment": {
+       "index": 0,
+       "segment_start": "2013-03-08",
+       "segment_end": "2026-11-18",
+       "max_drawdown": 0.041017
+      },
+      "selection_rule": "全区间最大回撤 = max(各连续段最大回撤)；并列时取时间最早的一段；detail 与 recovery 均取自该段",
       "complete_interval": true,
       "caveat": "净值连续性 cannot_verify",
       "degraded": false
@@ -5408,11 +5555,15 @@
    "peer_group": {
     "product_class": "etf_linked",
     "investment_subtype": "index",
+    "tracking_family": "unknown",
+    "tracking_confidence": "none",
+    "tracking_reason": "benchmark 为空，无法建立可比组",
+    "grouping_source": "benchmark",
+    "tracking_fallback_reason": "无 tracking_index，使用可识别 benchmark",
     "benchmark_family": "沪深300",
     "benchmark_confidence": "medium",
     "benchmark_reason": "从基准文本提取到唯一指数族「沪深300」；该基准为加权复合表述，按主基准归组",
     "index_scope": "broad",
-    "tracking_family": "沪深300",
     "peer_key": "etf_linked|broad|沪深300",
     "verifiable_group": true
    },
@@ -5520,7 +5671,7 @@
       "value": 0.434343,
       "status": "ok",
       "reason": null,
-      "value_pct": 43.434343,
+      "value_pct": 43.4343,
       "detail": {
        "peak_value": 1.584,
        "peak_date": "2015-06-08",
@@ -5533,7 +5684,8 @@
        "reason": null,
        "unit": "自然日",
        "trough_date": "2016-01-28",
-       "recovered_date": "2020-07-08"
+       "recovered_date": "2020-07-08",
+       "within_same_segment": true
       },
       "gap_count_over_threshold": 0,
       "null_count": 0,
@@ -5551,6 +5703,14 @@
         }
        }
       ],
+      "segment_count": 1,
+      "selected_segment": {
+       "index": 0,
+       "segment_start": "2009-07-10",
+       "segment_end": "2026-11-18",
+       "max_drawdown": 0.434343
+      },
+      "selection_rule": "全区间最大回撤 = max(各连续段最大回撤)；并列时取时间最早的一段；detail 与 recovery 均取自该段",
       "complete_interval": true,
       "caveat": "净值连续性 cannot_verify",
       "degraded": false
@@ -5739,6 +5899,8 @@
    "peer_group": {
     "product_class": "money_market",
     "investment_subtype": "money_market",
+    "tracking_family": null,
+    "grouping_source": "unknown",
     "benchmark_family": "unknown",
     "benchmark_confidence": "none",
     "benchmark_reason": "benchmark 为空，无法建立可比组",
@@ -5920,11 +6082,15 @@
    "peer_group": {
     "product_class": "ordinary_index",
     "investment_subtype": "index",
+    "tracking_family": "unknown",
+    "tracking_confidence": "none",
+    "tracking_reason": "benchmark 为空，无法建立可比组",
+    "grouping_source": "benchmark",
+    "tracking_fallback_reason": "无 tracking_index，使用可识别 benchmark",
     "benchmark_family": "中证500",
     "benchmark_confidence": "medium",
     "benchmark_reason": "从基准文本提取到唯一指数族「中证500」；该基准为加权复合表述，按主基准归组",
     "index_scope": "broad",
-    "tracking_family": "中证500",
     "peer_key": "ordinary_index|broad|中证500",
     "verifiable_group": true
    },
@@ -6032,7 +6198,7 @@
       "value": 0.513152,
       "status": "ok",
       "reason": null,
-      "value_pct": 51.315237,
+      "value_pct": 51.3152,
       "detail": {
        "peak_value": 3.0983,
        "peak_date": "2015-06-12",
@@ -6045,7 +6211,8 @@
        "reason": null,
        "unit": "自然日",
        "trough_date": "2015-09-15",
-       "recovered_date": "2021-08-11"
+       "recovered_date": "2021-08-11",
+       "within_same_segment": true
       },
       "gap_count_over_threshold": 0,
       "null_count": 0,
@@ -6063,6 +6230,14 @@
         }
        }
       ],
+      "segment_count": 1,
+      "selected_segment": {
+       "index": 0,
+       "segment_start": "2014-01-27",
+       "segment_end": "2026-11-18",
+       "max_drawdown": 0.513152
+      },
+      "selection_rule": "全区间最大回撤 = max(各连续段最大回撤)；并列时取时间最早的一段；detail 与 recovery 均取自该段",
       "complete_interval": true,
       "caveat": "净值连续性 cannot_verify",
       "degraded": false
@@ -6251,11 +6426,15 @@
    "peer_group": {
     "product_class": "etf_linked",
     "investment_subtype": "index",
+    "tracking_family": "unknown",
+    "tracking_confidence": "none",
+    "tracking_reason": "benchmark 为空，无法建立可比组",
+    "grouping_source": "benchmark",
+    "tracking_fallback_reason": "无 tracking_index，使用可识别 benchmark",
     "benchmark_family": "中证全指半导体",
     "benchmark_confidence": "medium",
     "benchmark_reason": "从基准文本提取到唯一指数族「中证全指半导体」；该基准为加权复合表述，按主基准归组",
     "index_scope": "sector",
-    "tracking_family": "中证全指半导体",
     "peer_key": "etf_linked|sector|中证全指半导体",
     "verifiable_group": true
    },
@@ -6363,7 +6542,7 @@
       "value": 0.594181,
       "status": "ok",
       "reason": null,
-      "value_pct": 59.418133,
+      "value_pct": 59.4181,
       "detail": {
        "peak_value": 2.956,
        "peak_date": "2021-07-30",
@@ -6376,7 +6555,8 @@
        "reason": null,
        "unit": "自然日",
        "trough_date": "2024-02-05",
-       "recovered_date": "2025-09-24"
+       "recovered_date": "2025-09-24",
+       "within_same_segment": true
       },
       "gap_count_over_threshold": 0,
       "null_count": 0,
@@ -6394,6 +6574,14 @@
         }
        }
       ],
+      "segment_count": 1,
+      "selected_segment": {
+       "index": 0,
+       "segment_start": "2019-06-26",
+       "segment_end": "2026-11-18",
+       "max_drawdown": 0.594181
+      },
+      "selection_rule": "全区间最大回撤 = max(各连续段最大回撤)；并列时取时间最早的一段；detail 与 recovery 均取自该段",
       "complete_interval": true,
       "caveat": "净值连续性 cannot_verify",
       "degraded": false
@@ -6659,11 +6847,15 @@
    "peer_group": {
     "product_class": "etf_linked",
     "investment_subtype": "index",
+    "tracking_family": "unknown",
+    "tracking_confidence": "none",
+    "tracking_reason": "benchmark 为空，无法建立可比组",
+    "grouping_source": "benchmark",
+    "tracking_fallback_reason": "无 tracking_index，使用可识别 benchmark",
     "benchmark_family": "沪深300",
     "benchmark_confidence": "medium",
     "benchmark_reason": "从基准文本提取到唯一指数族「沪深300」；该基准为加权复合表述，按主基准归组",
     "index_scope": "broad",
-    "tracking_family": "沪深300",
     "peer_key": "etf_linked|broad|沪深300",
     "verifiable_group": true
    },
@@ -6771,7 +6963,7 @@
       "value": 0.436093,
       "status": "ok",
       "reason": null,
-      "value_pct": 43.609342,
+      "value_pct": 43.6093,
       "detail": {
        "peak_value": 1.6485,
        "peak_date": "2015-06-08",
@@ -6784,7 +6976,8 @@
        "reason": null,
        "unit": "自然日",
        "trough_date": "2016-01-28",
-       "recovered_date": "2020-07-08"
+       "recovered_date": "2020-07-08",
+       "within_same_segment": true
       },
       "gap_count_over_threshold": 0,
       "null_count": 0,
@@ -6802,6 +6995,14 @@
         }
        }
       ],
+      "segment_count": 1,
+      "selected_segment": {
+       "index": 0,
+       "segment_start": "2009-08-26",
+       "segment_end": "2026-11-18",
+       "max_drawdown": 0.436093
+      },
+      "selection_rule": "全区间最大回撤 = max(各连续段最大回撤)；并列时取时间最早的一段；detail 与 recovery 均取自该段",
       "complete_interval": true,
       "caveat": "净值连续性 cannot_verify",
       "degraded": false
@@ -6990,6 +7191,8 @@
    "peer_group": {
     "product_class": "active_equity",
     "investment_subtype": "active",
+    "tracking_family": null,
+    "grouping_source": "unknown",
     "benchmark_family": "unknown",
     "benchmark_confidence": "none",
     "benchmark_reason": "基准文本含多个指数族 ['中证内地消费主题', '中债总']，无法确定单一主基准，标 unknown 不强行归组",
@@ -7100,7 +7303,7 @@
       "value": 0.573177,
       "status": "ok",
       "reason": null,
-      "value_pct": 57.31767,
+      "value_pct": 57.3177,
       "detail": {
        "peak_value": 6.129,
        "peak_date": "2021-02-10",
@@ -7110,9 +7313,10 @@
       "recovery": {
        "value": 145,
        "status": "ongoing",
-       "reason": "尚未恢复至前高，标记 ongoing，不能当作已修复",
+       "reason": "该连续段内尚未恢复至前高，标记 ongoing，不能当作已修复；未跨段寻找恢复点",
        "trough_date": "2026-06-26",
-       "days_elapsed": 145
+       "days_elapsed": 145,
+       "segment_end": "2026-11-18"
       },
       "gap_count_over_threshold": 0,
       "null_count": 0,
@@ -7130,6 +7334,14 @@
         }
        }
       ],
+      "segment_count": 1,
+      "selected_segment": {
+       "index": 0,
+       "segment_start": "2010-08-20",
+       "segment_end": "2026-11-18",
+       "max_drawdown": 0.573177
+      },
+      "selection_rule": "全区间最大回撤 = max(各连续段最大回撤)；并列时取时间最早的一段；detail 与 recovery 均取自该段",
       "complete_interval": true,
       "caveat": "净值连续性 cannot_verify",
       "degraded": false
@@ -7310,11 +7522,12 @@
    "peer_group": {
     "product_class": "lof",
     "investment_subtype": "active",
+    "tracking_family": null,
+    "grouping_source": "unknown",
     "benchmark_family": "unknown",
     "benchmark_confidence": "none",
     "benchmark_reason": "基准文本含多个指数族 ['中债综合全价', '沪深300']，无法确定单一主基准，标 unknown 不强行归组",
     "index_scope": "unknown",
-    "tracking_family": null,
     "peer_key": "lof|active|unknown",
     "verifiable_group": false
    },
@@ -7422,7 +7635,7 @@
       "value": 0.336047,
       "status": "ok",
       "reason": null,
-      "value_pct": 33.604692,
+      "value_pct": 33.6047,
       "detail": {
        "peak_value": 3.4272,
        "peak_date": "2008-01-14",
@@ -7435,7 +7648,8 @@
        "reason": null,
        "unit": "自然日",
        "trough_date": "2008-11-07",
-       "recovered_date": "2010-12-13"
+       "recovered_date": "2010-12-13",
+       "within_same_segment": true
       },
       "gap_count_over_threshold": 0,
       "null_count": 0,
@@ -7453,6 +7667,14 @@
         }
        }
       ],
+      "segment_count": 1,
+      "selected_segment": {
+       "index": 0,
+       "segment_start": "2005-11-16",
+       "segment_end": "2026-11-18",
+       "max_drawdown": 0.336047
+      },
+      "selection_rule": "全区间最大回撤 = max(各连续段最大回撤)；并列时取时间最早的一段；detail 与 recovery 均取自该段",
       "complete_interval": true,
       "caveat": "净值连续性 cannot_verify",
       "degraded": false
@@ -7641,11 +7863,15 @@
    "peer_group": {
     "product_class": "lof",
     "investment_subtype": "index",
+    "tracking_family": "unknown",
+    "tracking_confidence": "none",
+    "tracking_reason": "benchmark 为空，无法建立可比组",
+    "grouping_source": "benchmark",
+    "tracking_fallback_reason": "无 tracking_index，使用可识别 benchmark",
     "benchmark_family": "中证白酒",
     "benchmark_confidence": "medium",
     "benchmark_reason": "从基准文本提取到唯一指数族「中证白酒」；该基准为加权复合表述，按主基准归组",
     "index_scope": "sector",
-    "tracking_family": "中证白酒",
     "peer_key": "lof|index|sector|中证白酒",
     "verifiable_group": true
    },
@@ -7753,7 +7979,7 @@
       "value": 0.360111,
       "status": "ok",
       "reason": null,
-      "value_pct": 36.01108,
+      "value_pct": 36.0111,
       "detail": {
        "peak_value": 1.083,
        "peak_date": "2015-06-15",
@@ -7766,7 +7992,8 @@
        "reason": null,
        "unit": "自然日",
        "trough_date": "2015-08-25",
-       "recovered_date": "2016-07-12"
+       "recovered_date": "2016-07-12",
+       "within_same_segment": true
       },
       "gap_count_over_threshold": 0,
       "null_count": 0,
@@ -7784,6 +8011,14 @@
         }
        }
       ],
+      "segment_count": 1,
+      "selected_segment": {
+       "index": 0,
+       "segment_start": "2015-05-27",
+       "segment_end": "2026-11-18",
+       "max_drawdown": 0.360111
+      },
+      "selection_rule": "全区间最大回撤 = max(各连续段最大回撤)；并列时取时间最早的一段；detail 与 recovery 均取自该段",
       "complete_interval": true,
       "caveat": "净值连续性 cannot_verify",
       "degraded": false

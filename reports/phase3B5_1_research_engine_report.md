@@ -340,16 +340,144 @@ ChatGPT 静态验收发现 3 项阻断问题，本轮窄范围修正。
 
 ---
 
+## 5.5 最终验收修正（本轮）
+
+ChatGPT 最终验收发现 3 项问题，本轮窄范围修正。
+
+### 修正 A：最大回撤不能重新跨越连续段
+
+**问题**：上一版虽已按空值/缺口切段并对每段算出 `seg_results`，
+但随后又把所有段拼回 `pts` **重算一遍** peak/worst，
+导致前一段的历史高点污染后一段（例如前段峰值 2.0、后段从 1.0 跌到 0.8，
+会被错误算成 `1 - 0.8/2.0 = 60%`）。
+
+**修正**：
+
+| 项 | 修正后 |
+| --- | --- |
+| 每段回撤 | **各段独立**计算，互不影响 |
+| 全区间报告值 | `max(各段最大回撤)`，**不再拼接重算** |
+| 并列规则 | 取**时间最早**的段（`seg_results` 按时间顺序，稳定可复现） |
+| `detail` | 严格来自产生最大回撤的那一段 |
+| `recovery` | 只在**该段内**找恢复点，不跨段 |
+| 未恢复 | `status=ongoing`，`reason` 注明「未跨段寻找恢复点」 |
+| 新增字段 | `segment_count` / `selected_segment` / `selection_rule` |
+| 降级标记 | 保留 `degraded` / `complete_interval` / `segments` / `degraded_reason` |
+
+**反例验证**（人工构造）：
+
+| 场景 | 段 1 回撤 | 段 2 回撤 | 正确结果 | 错误拼接会得到 |
+| --- | ---: | ---: | ---: | ---: |
+| 段1峰值2.0→1.5，段2从1.0→0.8 | 25% | 20% | **25%**（段 1） | 60%（把 0.8 比 2.0） |
+| 段1 1.0→1.2→1.1，段2 1.0→0.5 | 8.33% | 50% | **50%**（段 2） | — |
+| 两段都 50% | 50% | 50% | **50%**，取段 1 | — |
+
+### 修正 B：滚动窗口缺口改为区间相交判断
+
+**问题**：旧判断 `gap.from >= window.start AND gap.to <= window.end`
+只覆盖「缺口完全在窗口内」。缺口与窗口**部分相交**时会漏检。
+
+**修正**：提取 `_gap_intersects_window(gap, start, end)`：
+
+```python
+return gap["from"] < end_iso and gap["to"] > start_iso
+```
+
+严格不等号：缺口终点 == 窗口起点时不算相交（缺口已在窗口外）。
+
+**五种位置关系全部覆盖**：
+
+| 位置关系 | 示例 | 是否相交 |
+| --- | --- | --- |
+| 缺口完全在窗口内 | `[03-01,04-01]` vs `[01-01,06-01]` | ✅ |
+| 缺口从外延伸到窗内 | `[2019-12-01,2020-02-01]` vs `[01-01,06-01]` | ✅ |
+| 缺口从内延伸到窗外 | `[2020-05-01,2020-08-01]` vs `[01-01,06-01]` | ✅ |
+| 缺口完全覆盖窗口 | `[2019-01-01,2021-01-01]` vs `[01-01,06-01]` | ✅ |
+| 与窗口不相交 | `[2019-01,2019-12]` 或 `[2020-07,2020-08]` | ❌ |
+
+保留：每窗口独立检查、端点精确命中、空值检查、
+有效窗口 < 5 → `insufficient_data`、`skipped_gap`/`skipped_null`/`skipped_endpoint` 计数。
+
+### 修正 C：指数基金 tracking_index 优先级
+
+**问题**：代码写的是 `normalize_benchmark(benchmark or tracking_index)`，
+实际是 **benchmark 优先**，与注释「跟踪指数优先」矛盾。
+
+**修正**：
+
+| 产品类 | 分组依据 |
+| --- | --- |
+| 普通指数 / ETF联接 / 指数型LOF | **`tracking_index` 优先**；不可识别时回落 `benchmark` |
+| 主动权益 | 只用 `benchmark`（不看 `tracking_index`） |
+| 货币 / 债券 | 维持原逻辑 |
+
+新增 `grouping_source` 与 `tracking_fallback_reason` 记录实际依据与降级原因：
+
+| 场景 | `grouping_source` | 说明 |
+| --- | --- | --- |
+| `tracking_index`=沪深300，`benchmark`=中证500 | `tracking_index` | 以沪深300为准 |
+| `tracking_index` 缺失 | `benchmark` | 原因：「无 tracking_index，使用可识别 benchmark」 |
+| `tracking_index` 不可识别 | `benchmark` | 原因：「tracking_index 无法识别，按明确规则回落」 |
+| 两者都不可识别 | `unknown` | 原因：「均无法识别，标 unknown」 |
+| 主动权益 | `benchmark` / `unknown` | `tracking_family` 恒为 `None` |
+
+**不得根据名称猜测跟踪指数**：`华夏沪深300ETF联接` 名称含沪深300，
+但无 `tracking_index` 且 benchmark 不可识别时，`benchmark_family=unknown`
+（`index_scope=broad` 仅作为附加维度保留，不冒充跟踪指数）。
+
+### 实测（真实数据库，12 份额 / 9 本体）
+
+| 检查项 | 结果 |
+| --- | --- |
+| 同类成员总数 | **9**（= 本体数） |
+| 每本体只出现一次 | ✅ |
+| 最大回撤 `value` == `selected_segment.max_drawdown` | **11/11 全部一致** |
+| 回撤 `detail` 与所属段一致 | ✅ |
+| 回撤 `recovery` 未跨段 | ✅（`110022` / `012414` 为 `ongoing`） |
+| `2005-2026` 实测 `degraded` | 11 个净值型份额全 `false`（无超阈值缺口） |
+
+| 份额 | 最大回撤 | 段数 | 降级 | 修复 |
+| --- | ---: | ---: | --- | --- |
+| `000015` | 4.10% | 1 | false | ok |
+| `000016` | 4.16% | 1 | false | ok |
+| `000051` | 43.43% | 1 | false | ok |
+| `000478` | 51.32% | 1 | false | ok |
+| `007300` | 59.42% | 1 | false | ok |
+| `007301` | 59.67% | 1 | false | ok |
+| `110020` | 43.61% | 1 | false | ok |
+| `110022` | 57.32% | 1 | false | **ongoing** |
+| `161005` | 33.60% | 1 | false | ok |
+| `012414` | 64.87% | 1 | false | **ongoing** |
+| `161725` | 36.01% | 1 | false | ok |
+
+### 实测分组（8 组，含分组来源）
+
+| 同类组 | 成员 | 分组来源 |
+| --- | ---: | --- |
+| `etf_linked\|broad\|沪深300` | 2 | benchmark（无 tracking_index） |
+| `etf_linked\|sector\|中证全指半导体` | 1 | benchmark |
+| `ordinary_index\|broad\|中证500` | 1 | benchmark |
+| `lof\|index\|sector\|中证白酒` | 1 | benchmark |
+| `lof\|active\|unknown` | 1 | unknown |
+| `active_equity\|unknown` | 1 | unknown |
+| `bond_pure\|unknown` | 1 | benchmark（久期仍 unknown） |
+| `money_market` | 1 | unknown |
+
+> 实测库内 `tracking_index` 全部为 NULL，因此 6 个指数类分组均走
+> benchmark 回落路径，`tracking_fallback_reason` 如实记录「无 tracking_index」。
+
+---
+
 ## 6. 测试结果
 
 ### 6.1 专项测试（真实运行）
 
 ```
 $ pytest tests/test_3b5_1_fund_research.py -q
-83 passed
+103 passed
 ```
 
-覆盖 24 项要求 + 本轮验收修正 26 项：
+覆盖 24 项要求 + 上轮修正 26 项 + 本轮最终修正 20 项：
 
 | # | 要求 | 对应测试 |
 | ---: | --- | --- |
@@ -382,7 +510,7 @@ $ pytest tests/test_3b5_1_fund_research.py -q
 
 ```
 $ pytest -q
-1366 passed, 1 warning in 289.12s (0:04:49)
+1386 passed, 1 warning in 279.82s (0:04:39)
 ```
 
 ---

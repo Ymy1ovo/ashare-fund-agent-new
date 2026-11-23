@@ -1,5 +1,57 @@
 # 变更日志
 
+## 2026-11-23 — 阶段3B-5.1 最终验收修正：回撤分段、窗口相交与 tracking_index
+
+窄范围修正 3 项。不改数据库、不改阈值、不重采集。
+
+**A. 最大回撤不再跨段重算**
+
+上一版虽已切段，但随后把 segments 拼回 `pts` 重算 peak/worst，
+前一段历史高点会污染后一段（前段峰值 2.0、后段 1.0→0.8 会被算成 60%）。
+
+- 各段**独立**计算，互不影响；
+- 全区间报告值 = `max(各段最大回撤)`，**绝不拼接重算**；
+- 并列时取**时间最早**的段（稳定可复现）；
+- `detail` 严格来自产生最大回撤的那段；`recovery` 只在**同一段内**找；
+- 未恢复标 `ongoing`，`reason` 注明「未跨段寻找恢复点」；
+- 新增 `segment_count` / `selected_segment` / `selection_rule`。
+
+**B. 滚动窗口缺口改为区间相交判断**
+
+旧判断 `gap.from >= start AND gap.to <= end` 只覆盖「缺口完全在窗口内」，
+缺口与窗口部分相交时漏检。
+
+提取 `_gap_intersects_window()`：`gap['from'] < end AND gap['to'] > start`。
+用严格不等号（缺口终点 == 窗口起点不算相交）。覆盖五种位置关系：
+
+1. 缺口完全在窗口内；2. 从窗口外延伸到窗内；3. 从窗内延伸到窗外；
+4. 缺口完全覆盖窗口；5. 与窗口不相交（保留，不误杀）。
+
+**C. 指数类 tracking_index 优先**
+
+原 `normalize_benchmark(benchmark or tracking_index)` 实际是 benchmark 优先，
+与注释矛盾。
+
+- 普通指数 / ETF联接 / 指数型LOF：**tracking_index 优先**，
+  缺失或不可识别时才回落 benchmark；
+- 主动权益：只用 benchmark，`tracking_family` 恒 `None`；
+- 新增 `grouping_source`（`tracking_index`/`benchmark`/`unknown`）
+  与 `tracking_fallback_reason` 记录实际依据与降级原因；
+- **不得根据基金名称猜测跟踪指数**：无 tracking_index 且 benchmark
+  不可识别时标 `unknown`，`index_scope` 仅作附加维度。
+
+实测库内 `tracking_index` 全为 NULL，6 个指数类分组均走 benchmark 回落路径，
+`tracking_fallback_reason` 如实记录「无 tracking_index」。
+
+**测试**：新增 20 项（83 → 103）。全量 **1386 passed / 0 failed**，279.82 秒。
+
+**实测验证**：12 份额 / 9 本体；同类成员 9（按 fund_id 去重）；
+最大回撤 `value == selected_segment.max_drawdown` **11/11 一致**；
+`110022` 与 `012414` 回撤 `ongoing`。
+
+**数据库**：未做任何修改（integrity ok、外键 0 违规、行数与指纹不变）。
+
+
 ## 2026-11-23 — 阶段3B-5.1 验收修正：份额归并、同类分组与缺口安全
 
 窄范围修正 ChatGPT 静态验收发现的 3 项阻断问题。不改数据库、不重采集、不开回测。

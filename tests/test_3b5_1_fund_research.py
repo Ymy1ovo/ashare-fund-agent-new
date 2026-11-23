@@ -1019,3 +1019,226 @@ def test_sample_dedup_by_fund_id_real():
     for g in pa["groups"].values():
         seen.extend(g["fund_ids"])
     assert len(seen) == len(set(seen)) == 9
+
+
+# ================================================================ 最终验收修正 A：回撤不跨段
+def test_drawdown_segment_not_contaminated_by_previous_peak():
+    """第二段回撤必须按自己的峰值算，不能继承第一段的 2.0 峰值。
+
+    第一段：1.0 → 2.0 → 1.5（回撤 25%）
+    缺口后在第二段重新从 1.0 开始，回撤到 0.8（回撤 20%）
+    若被错误拼接，会把 0.8 拿去比 2.0，得到 60% 的假回撤。
+    """
+    seg1 = piecewise_daily([("2020-01-01", 1.0), ("2020-02-01", 2.0),
+                            ("2020-03-01", 1.5)])
+    seg2 = piecewise_daily([("2021-01-01", 1.0), ("2021-03-01", 0.8)])
+    s = make_series(seg1 + seg2)
+    assert s.quality.gap_count_over_threshold >= 1
+
+    mdd = compute_nav_indicators(s)["risk"]["max_drawdown"]
+    assert mdd["degraded"] is True
+    assert mdd["complete_interval"] is False
+    assert mdd["segment_count"] == 2
+
+    # 全区间值 = 两段最大值 = 25%（第一段）
+    assert abs(mdd["value"] - 0.25) < 1e-9
+    # 绝不能出现 60%（把 0.8 拿去比第一段的 2.0）
+    assert mdd["value"] < 0.5
+
+    # detail 必须来自第一段，且峰值是 2.0 不是别的
+    assert mdd["detail"]["peak_value"] == 2.0
+    assert mdd["selected_segment"]["segment_start"] == seg1[0][0]
+
+    # 逐段结果独立
+    per = {x["max_drawdown"] for x in mdd["segments"]}
+    assert round(0.25, 6) in per
+    assert round(0.2, 6) in per
+
+
+def test_drawdown_detail_switches_to_second_segment():
+    """第二段回撤更大时，detail 必须切换到第二段。"""
+    # 第一段 1.0→1.2→1.1（回撤 8.33%）
+    seg1 = piecewise_daily([("2020-01-01", 1.0), ("2020-02-01", 1.2),
+                            ("2020-03-01", 1.1)])
+    # 第二段 1.0→1.0→0.5（回撤 50%）
+    seg2 = piecewise_daily([("2021-01-01", 1.0), ("2021-02-01", 1.0),
+                            ("2021-03-01", 0.5)])
+    s = make_series(seg1 + seg2)
+    mdd = compute_nav_indicators(s)["risk"]["max_drawdown"]
+
+    assert abs(mdd["value"] - 0.5) < 1e-9
+    assert mdd["selected_segment"]["segment_start"] == seg2[0][0]
+    assert mdd["detail"]["peak_value"] == 1.0
+    assert mdd["detail"]["trough_value"] == 0.5
+
+
+def test_drawdown_tie_break_is_earliest_segment():
+    """并列最大时取时间最早的段（稳定规则）。"""
+    seg1 = piecewise_daily([("2020-01-01", 1.0), ("2020-02-01", 2.0),
+                            ("2020-03-01", 1.0)])   # 50%
+    seg2 = piecewise_daily([("2021-01-01", 1.0), ("2021-02-01", 2.0),
+                            ("2021-03-01", 1.0)])   # 50%
+    s = make_series(seg1 + seg2)
+    mdd = compute_nav_indicators(s)["risk"]["max_drawdown"]
+    assert abs(mdd["value"] - 0.5) < 1e-9
+    assert mdd["selected_segment"]["segment_start"] == seg1[0][0]
+    assert "并列" in mdd["selection_rule"] or "最早" in mdd["selection_rule"]
+
+
+def test_recovery_within_same_segment_only():
+    """回撤修复只能在同一段内找，不能跨段。"""
+    # 第一段：跌到 1.0 后未恢复（段尾 1.0 < 峰值 2.0）
+    # 第二段开头 3.0 高于 2.0，但绝不能算作第一段的修复
+    seg1 = piecewise_daily([("2020-01-01", 1.0), ("2020-02-01", 2.0),
+                            ("2020-03-01", 1.0)])
+    seg2 = piecewise_daily([("2021-01-01", 3.0), ("2021-02-01", 3.5)])
+    s = make_series(seg1 + seg2)
+    mdd = compute_nav_indicators(s)["risk"]["max_drawdown"]
+    assert abs(mdd["value"] - 0.5) < 1e-9
+    rec = mdd["recovery"]
+    assert rec["status"] == "ongoing", rec
+    assert "未跨段寻找恢复点" in rec["reason"]
+    assert rec["segment_end"] == seg1[-1][0]
+
+
+def test_recovery_ok_within_segment():
+    """同一段内恢复时正常给出修复天数。"""
+    seg = piecewise_daily([("2020-01-01", 1.0), ("2020-02-01", 2.0),
+                           ("2020-03-01", 1.0), ("2020-04-01", 2.0)])
+    s = make_series(seg)
+    mdd = compute_nav_indicators(s)["risk"]["max_drawdown"]
+    assert mdd["degraded"] is False
+    assert mdd["recovery"]["status"] == "ok"
+    assert mdd["recovery"]["within_same_segment"] is True
+
+
+# ================================================================ 最终验收修正 B：窗口缺口相交
+def _gap(f, t):
+    return {"from": f, "to": t}
+
+
+def test_gap_intersect_inside_window():
+    from app.fund.research.indicators import _gap_intersects_window
+    assert _gap_intersects_window(_gap("2020-03-01", "2020-04-01"),
+                                  "2020-01-01", "2020-06-01") is True
+
+
+def test_gap_intersect_from_outside_left():
+    from app.fund.research.indicators import _gap_intersects_window
+    assert _gap_intersects_window(_gap("2019-12-01", "2020-02-01"),
+                                  "2020-01-01", "2020-06-01") is True
+
+
+def test_gap_intersect_to_outside_right():
+    from app.fund.research.indicators import _gap_intersects_window
+    assert _gap_intersects_window(_gap("2020-05-01", "2020-08-01"),
+                                  "2020-01-01", "2020-06-01") is True
+
+
+def test_gap_covers_window():
+    from app.fund.research.indicators import _gap_intersects_window
+    assert _gap_intersects_window(_gap("2019-01-01", "2021-01-01"),
+                                  "2020-01-01", "2020-06-01") is True
+
+
+def test_gap_no_intersect_left():
+    from app.fund.research.indicators import _gap_intersects_window
+    assert _gap_intersects_window(_gap("2019-01-01", "2019-12-01"),
+                                  "2020-01-01", "2020-06-01") is False
+
+
+def test_gap_no_intersect_right():
+    from app.fund.research.indicators import _gap_intersects_window
+    assert _gap_intersects_window(_gap("2020-07-01", "2020-08-01"),
+                                  "2020-01-01", "2020-06-01") is False
+
+
+def test_gap_touching_window_endpoint_not_intersect():
+    from app.fund.research.indicators import _gap_intersects_window
+    # 缺口终点 == 窗口起点 → 缺口在窗口外，不算相交
+    assert _gap_intersects_window(_gap("2019-11-01", "2020-01-01"),
+                                  "2020-01-01", "2020-06-01") is False
+    # 缺口起点 == 窗口终点 → 同理
+    assert _gap_intersects_window(_gap("2020-06-01", "2020-07-01"),
+                                  "2020-01-01", "2020-06-01") is False
+
+
+def test_rolling_skips_gap_partially_outside_window():
+    """缺口从窗口外延伸到窗口内时必须跳过该窗口。"""
+    # 构造：缺口 20 天，其终点落在某窗口内部
+    left = piecewise_daily([("2020-01-01", 1.0), ("2020-03-10", 1.05)])
+    right = piecewise_daily([("2020-04-01", 1.1), ("2021-06-30", 1.3)])
+    s = make_series(left + right)
+    assert s.quality.gap_count_over_threshold >= 1
+    r = compute_nav_indicators(s)["stability"]["rolling_positive_ratio_90d"]
+    assert r["status"] == "ok"
+    assert r["skipped_gap"] > 0
+
+
+# ================================================================ 最终验收修正 C：tracking_index 优先
+def test_tracking_index_wins_over_benchmark():
+    """tracking_index=沪深300 且 benchmark=中证500 时以沪深300为准。"""
+    c = classify_fund({"fund_name": "某沪深300ETF联接", "is_index_fund": 1})
+    pg = peer_group_key(c, "某沪深300ETF联接",
+                        "中证500指数收益率×95%", tracking_index="沪深300指数")
+    assert "沪深300" in pg["peer_key"]
+    assert "中证500" not in pg["peer_key"]
+    assert pg["grouping_source"] == "tracking_index"
+
+
+def test_tracking_index_missing_uses_benchmark():
+    c = classify_fund({"fund_name": "某沪深300ETF联接", "is_index_fund": 1})
+    pg = peer_group_key(c, "某沪深300ETF联接",
+                        "沪深300指数收益率×95%", tracking_index=None)
+    assert "沪深300" in pg["peer_key"]
+    assert pg["grouping_source"] == "benchmark"
+    assert "无 tracking_index" in pg["tracking_fallback_reason"]
+
+
+def test_tracking_index_unrecognizable_falls_back_explicitly():
+    """tracking_index 无法识别时按明确规则回落 benchmark，并记录原因。"""
+    c = classify_fund({"fund_name": "某指数基金", "is_index_fund": 1})
+    pg = peer_group_key(c, "某指数基金", "中证500指数收益率×95%",
+                        tracking_index="CNY9999 未知定制指数")
+    assert "中证500" in pg["peer_key"]
+    assert pg["grouping_source"] == "benchmark"
+    assert "无法识别" in pg["tracking_fallback_reason"]
+
+
+def test_tracking_index_and_benchmark_both_unknown():
+    c = classify_fund({"fund_name": "某指数基金", "is_index_fund": 1})
+    pg = peer_group_key(c, "某指数基金", "某个没人认识的基准",
+                        tracking_index="CNY9999 未知")
+    assert pg["benchmark_family"] == "unknown"
+    assert pg["grouping_source"] == "unknown"
+    assert "均无法识别" in pg["tracking_fallback_reason"]
+
+
+def test_active_equity_uses_benchmark_not_tracking():
+    c = classify_fund({"fund_name": "易方达消费行业股票",
+                       "fund_type_l1": "股票型", "is_index_fund": None})
+    pg = peer_group_key(c, "易方达消费行业股票",
+                        "沪深300指数收益率×70%+中债综合全价指数收益率×25%",
+                        tracking_index="中证白酒指数")
+    # 主动权益不看 tracking_index
+    assert pg["grouping_source"] in ("benchmark", "unknown")
+    assert pg["tracking_family"] is None
+
+
+def test_lof_index_uses_tracking_priority():
+    c = classify_fund({"fund_name": "某指数(LOF)", "is_index_fund": 1})
+    pg = peer_group_key(c, "某指数(LOF)", "中证500指数收益率×95%",
+                        tracking_index="中证白酒指数")
+    assert pg["peer_key"].startswith("lof|index")
+    assert "中证白酒" in pg["peer_key"]
+    assert pg["grouping_source"] == "tracking_index"
+
+
+def test_active_fund_name_never_guessed_as_index():
+    """不得根据基金名称猜测跟踪指数。"""
+    c = classify_fund({"fund_name": "华夏沪深300ETF联接", "is_index_fund": 1})
+    pg = peer_group_key(c, "华夏沪深300ETF联接", "某个没人认识的基准",
+                        tracking_index=None)
+    # 名称里有沪深300，但没有 tracking_index 也没有可识别 benchmark → unknown
+    assert pg["benchmark_family"] == "unknown"
+    assert pg["index_scope"] == "broad"  # 宽基信息保留，但不冒充跟踪指数

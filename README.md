@@ -2446,7 +2446,7 @@ if (basis != ACCOUNTING_FORMAL
 | 3B-4.3 | 数据质量与幸存者偏差验收 | 1123 | `phase3B4_3_data_quality_report.md` |
 | 3B-4.4 | 数据缺口补强与来源收口 | 1199 | `phase3B4_4_data_gap_research.md` |
 | 3B-5.0 | 研究性分析框架设计 | 1283 | `phase3B5_0_research_framework.md` |
-| 3B-5.1 | 研究性分析引擎 V1.0 | **1366** | `phase3B5_1_research_engine_report.md` |
+| 3B-5.1 | 研究性分析引擎 V1.0 | **1386** | `phase3B5_1_research_engine_report.md` |
 
 当前正式会计版本：`ca-v2-receivable`；正式会计基础：`formal_receivable`；正式估值标记：`formal_valuation=True`。
 
@@ -5246,10 +5246,45 @@ python -m app.fund.research --all --json out.json
 | 指标 | 修正 |
 | --- | --- |
 | 年化收益 | 查区间缺口 + 空值，命中即 `insufficient_data` |
-| 滚动稳定性 | 每窗口独立查缺口/空值，跳过并计数 |
-| 最大回撤 | 按空值/缺口切段，标 `degraded` + `complete_interval=false` |
+| 滚动稳定性 | 每窗口独立查缺口/空值（缺口用**区间相交**判断），跳过并计数 |
+| 最大回撤 | 各段**独立**算，全区间 = `max(各段)`；标 `degraded` + `complete_interval=false` |
 | 回撤修复 | 只在同一连续段内找 |
 | Calmar | 继承底层状态，底层降级则降级 |
 
 阈值仍为 `MAX_GAP_DAYS_FOR_RETURN = 15`，全部指标共用同一入口。
+
+### 64.8 最终验收修正（3B-5.1 终轮）
+
+### 最大回撤不再跨段重算
+
+上一版切段后又把 segments 拼回 `pts` 重算 peak/worst，前段高点会污染后段。
+
+| 项 | 修正后 |
+| --- | --- |
+| 每段回撤 | **独立**计算 |
+| 全区间值 | `max(各段最大回撤)`，**不拼接重算** |
+| 并列规则 | 取**时间最早**的段 |
+| `detail` | 严格来自产生最大回撤的那段 |
+| `recovery` | 只在**同一段内**找，不跨段 |
+
+反例：段1 峰值 2.0→1.5（25%）、段2 从 1.0→0.8（20%）→ 正确 **25%**，
+错误拼接会得到 60%。
+
+### 滚动窗口缺口用区间相交
+
+```python
+gap['from'] < window_end and gap['to'] > window_start
+```
+
+覆盖：完全在窗内 / 从外延伸到窗内 / 从内延伸到窗外 / 完全覆盖窗口 / 不相交（保留）。
+
+### 指数类 tracking_index 优先
+
+| 产品类 | 分组依据 |
+| --- | --- |
+| 普通指数 / ETF联接 / 指数型LOF | **tracking_index 优先**，不可识别才回落 benchmark |
+| 主动权益 | 只用 benchmark |
+
+新增 `grouping_source` 与 `tracking_fallback_reason` 记录实际依据。
+**不根据基金名称猜测跟踪指数**。
 
