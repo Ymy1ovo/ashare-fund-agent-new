@@ -1,0 +1,119 @@
+{
+ "phase": "3B-6.0.2",
+ "report": "tests",
+ "baseline_head": "4f5d3add205dfc5370d04cda19e3f42dd0e1ece7",
+ "generated_at": "2026-11-23T18:00:00",
+ "executed": true,
+ "new_suite": {
+  "file": "tests/test_3b6_0_2_index_layer.py",
+  "passed": 46,
+  "failed": 0,
+  "seconds": 16.06
+ },
+ "regression": {
+  "3b6_series": {
+   "files": [
+    "tests/test_3b6_0_2_index_layer.py",
+    "tests/test_3b6_0_1_benchmark_audit.py",
+    "tests/test_3b6_0_1_1_index_verify.py"
+   ],
+   "passed": 107,
+   "seconds": 54.55
+  },
+  "3b5_5_series": {
+   "passed": 112,
+   "seconds": 115.14
+  }
+ },
+ "full": {
+  "command": "pytest -q",
+  "passed": 1736,
+  "failed": 0,
+  "errors": 0,
+  "seconds": 549.17
+ },
+ "evolution": {
+  "3B-6.0.1.1": 1690,
+  "3B-6.0.2": 1736
+ },
+ "assertions_removed": 0,
+ "source_actual_calls": {
+  "interface": "akshare.stock_zh_index_hist_csindex",
+  "invocations": 10,
+  "success": 10,
+  "failed": 0,
+  "retry_attempts": 6,
+  "retry_sleep_sec": 45,
+  "rate_limit_observed": "403 反爬，冷却约 6 分钟"
+ },
+ "static_checks_excluded": [
+  "compileall 语法检查",
+  "迁移 SQL 计数",
+  "报告数据与库查询比对"
+ ],
+ "migration": {
+  "file": "migrations/phase3b6_0_2_index_data_layer.sql",
+  "new_tables": 6,
+  "new_indexes": 12,
+  "existing_tables_modified": 0,
+  "backup_before_migration": true
+ },
+ "fund_layer_conservation": {
+  "fund_master": {
+   "before": 60,
+   "after": 60
+  },
+  "fund_share_classes": {
+   "before": 89,
+   "after": 89
+  },
+  "fund_nav_daily": {
+   "before": 80083,
+   "after": 80083
+  },
+  "fund_lifecycle_events": {
+   "before": 49,
+   "after": 49
+  },
+  "etf_daily_prices": {
+   "before": 116609,
+   "after": 116609
+  },
+  "content_fingerprint_before": "11c56eba1489976fa35be92586a99bc21a27e20c06e95cacab5c8ca553c05116",
+  "content_fingerprint_after": "11c56eba1489976fa35be92586a99bc21a27e20c06e95cacab5c8ca553c05116",
+  "etf_fingerprint_before": "d54727c0a76a1b09531accd04b3d66ff4ea2374592b1d4a8cb8381602cbbac49",
+  "etf_fingerprint_after": "d54727c0a76a1b09531accd04b3d66ff4ea2374592b1d4a8cb8381602cbbac49",
+  "integrity_check": "ok",
+  "foreign_key_violations": 0,
+  "unchanged": true
+ },
+ "code_changes": {
+  "new": [
+   "migrations/phase3b6_0_2_index_data_layer.sql",
+   "app/fund/index_layer.py",
+   "app/fund/index_ingest.py",
+   "app/fund/index_returns.py",
+   "app/fund/composite_benchmark.py",
+   "app/fund/benchmark_component_spec.py",
+   "scripts/build_3b6_0_2_index_layer.py",
+   "scripts/build_3b6_0_2_composite.py",
+   "tests/test_3b6_0_2_index_layer.py"
+  ],
+  "modified": [
+   "app/fund/research/index_verify.py"
+  ],
+  "modified_reason": "新增可选 calendar_conn 参数，避免采集持锁时另开连接降级日历",
+  "unchanged": [
+   "app/database/db.py",
+   "app/fund/research/engine.py",
+   "app/fund/research/indicators.py",
+   "app/fund/research/quality.py"
+  ],
+  "schema_changed": "only_new_index_tables"
+ },
+ "gate": {
+  "ready_for_research_analysis": true,
+  "ready_for_backtest": false,
+  "ready_for_formal_ranking": false
+ }
+}

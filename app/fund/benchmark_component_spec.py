@@ -1,0 +1,78 @@
+"""阶段3B-6.0.2 复合基准成分规格（来自 3B-6.0.1 审计的真实解析结果）。
+
+每条记录对应库内 ``fund_master.benchmark`` 的原始文字，
+成分与权重按 ``benchmark_audit.parse_benchmark`` 的解析结果录入。
+
+**证据等级：platform** —— 这些文字来自第三方接口转述，
+未经基金合同原文核对。历史权重无证据，不得补造。
+"""
+from __future__ import annotations
+
+BENCHMARK_SPECS = [
+    {"fund_code": "000051", "fund_name": "华夏沪深300ETF联接",
+     "benchmark_raw": "沪深300指数收益率×95%＋1%（指年收益率，评价时应按期间折算）",
+     "components": [{"component_type": "index", "family": "沪深300", "weight": 0.95},
+                    {"component_type": "fixed_rate", "weight": 0.01}]},
+    {"fund_code": "110020", "fund_name": "易方达沪深300ETF联接",
+     "benchmark_raw": "沪深300指数收益率×95%+活期存款利率(税后)×5%",
+     "components": [{"component_type": "index", "family": "沪深300", "weight": 0.95},
+                    {"component_type": "cash", "weight": 0.05}]},
+    {"fund_code": "161725", "fund_name": "招商中证白酒指数(LOF)",
+     "benchmark_raw": "中证白酒指数收益率×95%+活期存款利率(税后)×5%",
+     "components": [{"component_type": "index", "family": "中证白酒", "weight": 0.95},
+                    {"component_type": "cash", "weight": 0.05}]},
+    {"fund_code": "007300", "fund_name": "国联安中证半导体ETF联接",
+     "benchmark_raw": "中证全指半导体产品与设备指数收益率×95%+银行活期存款利率(税后)×5%",
+     "components": [{"component_type": "index", "family": "中证全指半导体", "weight": 0.95},
+                    {"component_type": "cash", "weight": 0.05}]},
+    {"fund_code": "000478", "fund_name": "建信中证500指数增强",
+     "benchmark_raw": "中证500指数收益率×95%+银行活期存款利率(税后)×5%",
+     "components": [{"component_type": "index", "family": "中证500", "weight": 0.95},
+                    {"component_type": "cash", "weight": 0.05}]},
+    {"fund_code": "000961", "fund_name": "天弘沪深300ETF联接",
+     "benchmark_raw": "沪深300指数收益率×95%+银行活期存款利率(税后)×5%",
+     "components": [{"component_type": "index", "family": "沪深300", "weight": 0.95},
+                    {"component_type": "cash", "weight": 0.05}]},
+    {"fund_code": "050002", "fund_name": "博时裕富沪深300指数",
+     "benchmark_raw": "沪深300指数收益率×95%+银行活期存款利率(税后)×5%",
+     "components": [{"component_type": "index", "family": "沪深300", "weight": 0.95},
+                    {"component_type": "cash", "weight": 0.05}]},
+    {"fund_code": "001052", "fund_name": "华夏中证500ETF联接",
+     "benchmark_raw": "中证500指数收益率×95%+银行活期存款利率(税后)×5%",
+     "components": [{"component_type": "index", "family": "中证500", "weight": 0.95},
+                    {"component_type": "cash", "weight": 0.05}]},
+    {"fund_code": "001548", "fund_name": "天弘上证50ETF联接",
+     "benchmark_raw": "上证50指数收益率×95%+银行活期存款利率(税后)×5%",
+     "components": [{"component_type": "index", "family": "上证50", "weight": 0.95},
+                    {"component_type": "cash", "weight": 0.05}]},
+    {"fund_code": "110022", "fund_name": "易方达消费行业股票",
+     "benchmark_raw": "中证内地消费主题指数收益率×85%+中债总指数收益率×15%",
+     "components": [{"component_type": "index", "family": "中证内地消费主题", "weight": 0.85},
+                    {"component_type": "bond_index", "family": "中债总", "weight": 0.15}]},
+    {"fund_code": "161005", "fund_name": "富国天惠成长混合(LOF)",
+     "benchmark_raw": "沪深300指数收益率×70%+中债综合全价指数收益率×25%+同业存款利率×5%",
+     "components": [{"component_type": "index", "family": "沪深300", "weight": 0.70},
+                    {"component_type": "bond_index", "family": "中债综合全价", "weight": 0.25},
+                    {"component_type": "cash", "weight": 0.05}]},
+    {"fund_code": "001938", "fund_name": "中欧时代先锋",
+     "benchmark_raw": "中证500指数收益率×90%+中证综合债券指数收益率×10%",
+     "components": [{"component_type": "index", "family": "中证500", "weight": 0.90},
+                    {"component_type": "bond_index", "family": "中证综合债券", "weight": 0.10}]},
+    {"fund_code": "012346", "fund_name": "易方达港股通成长混合",
+     "benchmark_raw": "中证港股通综合指数(人民币)收益率×75%+中证500指数收益率×10%"
+                      "+中债-总全价(总值)指数收益率×15%",
+     "components": [{"component_type": "index", "family": "中证港股通综合", "weight": 0.75},
+                    {"component_type": "index", "family": "中证500", "weight": 0.10},
+                    {"component_type": "bond_index", "family": "中债-总全价", "weight": 0.15}]},
+    {"fund_code": "012344", "fund_name": "嘉实领先优势混合",
+     "benchmark_raw": "沪深300指数收益率×60%+恒生指数收益率（人民币计价）×30%"
+                      "+中债综合财富指数收益率×10%",
+     "components": [{"component_type": "index", "family": "沪深300", "weight": 0.60},
+                    {"component_type": "index", "family": "恒生指数", "weight": 0.30},
+                    {"component_type": "bond_index", "family": "中债综合财富", "weight": 0.10}]},
+    {"fund_code": "519066", "fund_name": "汇添富蓝筹稳健混合",
+     "benchmark_raw": "中证800指数收益率×70%+上证国债指数收益率×25%+活期存款基准利率×5%",
+     "components": [{"component_type": "index", "family": "中证800", "weight": 0.70},
+                    {"component_type": "index", "family": "上证国债", "weight": 0.25},
+                    {"component_type": "cash", "weight": 0.05}]},
+]

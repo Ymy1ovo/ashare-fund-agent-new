@@ -144,18 +144,29 @@ def _to_date(v):
     return None
 
 
-def _load_trade_calendar(date_min: str, date_max: str) -> set[str] | None:
+def _load_trade_calendar(date_min: str, date_max: str,
+                         conn=None) -> set[str] | None:
     """读项目内 `trade_calendar` 表作为**日历代理**（只读）。
 
     读不到（无表 / 无数据 / 区间不覆盖）返回 None，调用方降级为工作日代理。
+
+    ``conn`` 可传入已打开的连接：采集时外层持有写事务，
+    再开新连接读同一 SQLite 文件会锁等待失败并静默降级为工作日代理，
+    导致缺口统计口径不一致。
     """
     try:
-        from app.database.db import get_connection
-        with get_connection() as conn:
+        if conn is not None:
             rows = conn.execute(
                 "SELECT trade_date FROM trade_calendar "
                 "WHERE trade_date BETWEEN ? AND ?",
                 (date_min, date_max)).fetchall()
+        else:
+            from app.database.db import get_connection
+            with get_connection() as own:
+                rows = own.execute(
+                    "SELECT trade_date FROM trade_calendar "
+                    "WHERE trade_date BETWEEN ? AND ?",
+                    (date_min, date_max)).fetchall()
     except Exception:
         return None
     days = {str(r[0])[:10] for r in rows}
@@ -275,7 +286,8 @@ def _gap_scan(have: set[str], date_min: str, date_max: str,
 
 
 def check_history_quality(df, *, calendar_proxy: str = CALENDAR_PROXY,
-                          use_trade_calendar: bool = True) -> dict:
+                          use_trade_calendar: bool = True,
+                          calendar_conn=None) -> dict:
     """对历史序列做质量检查。
 
     **不填充、不插值、不把缺失日当 0 收益、不把缺口判定为真实缺失。**
@@ -379,7 +391,8 @@ def check_history_quality(df, *, calendar_proxy: str = CALENDAR_PROXY,
 
     _cal_for_baseline = None
     if use_trade_calendar and len(valid) >= 2:
-        _cal_for_baseline = _load_trade_calendar(valid[0], valid[-1])
+        _cal_for_baseline = _load_trade_calendar(valid[0], valid[-1],
+                                                 calendar_conn)
     _baseline_for_range = detect_baseline_row(valid, _cal_for_baseline)
     _real = valid[1:] if _baseline_for_range["detected"] else valid
     checks["range_sane"] = {
@@ -401,7 +414,8 @@ def check_history_quality(df, *, calendar_proxy: str = CALENDAR_PROXY,
     gap_cell = None
     if len(scan_dates) >= 2:
         dmin, dmax = scan_dates[0], scan_dates[-1]
-        cal = _load_trade_calendar(dmin, dmax) if use_trade_calendar else None
+        cal = (_load_trade_calendar(dmin, dmax, calendar_conn)
+               if use_trade_calendar else None)
         if cal:
             gap_cell = _gap_scan(have, dmin, dmax, cal,
                                  calendar_name=CALENDAR_TRADE_TABLE,

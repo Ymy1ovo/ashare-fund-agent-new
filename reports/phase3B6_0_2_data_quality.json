@@ -1,0 +1,173 @@
+{
+ "phase": "3B-6.0.2",
+ "report": "data_quality",
+ "baseline_head": "4f5d3add205dfc5370d04cda19e3f42dd0e1ece7",
+ "generated_at": "2026-11-23T17:45:00",
+ "checks": {
+  "hard": [
+   "date_parsed",
+   "date_ascending",
+   "no_duplicate_dates",
+   "no_null_dates",
+   "no_null_close",
+   "numeric_values_sane",
+   "range_sane",
+   "baseline_row"
+  ],
+  "warning": [
+   "no_null_ohlc",
+   "gap_checked"
+  ],
+  "rules_unchanged_from": "3B-6.0.1.1"
+ },
+ "quality_level_distribution": {
+  "A": 0,
+  "B": 10,
+  "C": 0,
+  "D": 0
+ },
+ "per_index": [
+  {
+   "index_code": "000012",
+   "quality_level": "B",
+   "is_complete": 1,
+   "ohlc_complete": 0,
+   "suspected_gap_count": 0,
+   "suspected_gap_days": 0,
+   "calendar_proxy": "trade_calendar_table_proxy",
+   "gap_is_real_missing": null,
+   "row_count": 5558
+  },
+  {
+   "index_code": "000016",
+   "quality_level": "B",
+   "is_complete": 1,
+   "ohlc_complete": 0,
+   "suspected_gap_count": 0,
+   "suspected_gap_days": 0,
+   "calendar_proxy": "trade_calendar_table_proxy",
+   "gap_is_real_missing": null,
+   "row_count": 5559
+  },
+  {
+   "index_code": "000300",
+   "quality_level": "B",
+   "is_complete": 1,
+   "ohlc_complete": 0,
+   "suspected_gap_count": 0,
+   "suspected_gap_days": 0,
+   "calendar_proxy": "trade_calendar_table_proxy",
+   "gap_is_real_missing": null,
+   "row_count": 5558
+  },
+  {
+   "index_code": "000905",
+   "quality_level": "B",
+   "is_complete": 1,
+   "ohlc_complete": 0,
+   "suspected_gap_count": 0,
+   "suspected_gap_days": 0,
+   "calendar_proxy": "trade_calendar_table_proxy",
+   "gap_is_real_missing": null,
+   "row_count": 5317
+  },
+  {
+   "index_code": "000906",
+   "quality_level": "B",
+   "is_complete": 1,
+   "ohlc_complete": 0,
+   "suspected_gap_count": 0,
+   "suspected_gap_days": 0,
+   "calendar_proxy": "trade_calendar_table_proxy",
+   "gap_is_real_missing": null,
+   "row_count": 5317
+  },
+  {
+   "index_code": "000922",
+   "quality_level": "B",
+   "is_complete": 1,
+   "ohlc_complete": 0,
+   "suspected_gap_count": 0,
+   "suspected_gap_days": 0,
+   "calendar_proxy": "trade_calendar_table_proxy",
+   "gap_is_real_missing": null,
+   "row_count": 5317
+  },
+  {
+   "index_code": "000942",
+   "quality_level": "B",
+   "is_complete": 1,
+   "ohlc_complete": 0,
+   "suspected_gap_count": 0,
+   "suspected_gap_days": 0,
+   "calendar_proxy": "trade_calendar_table_proxy",
+   "gap_is_real_missing": null,
+   "row_count": 5317
+  },
+  {
+   "index_code": "399997",
+   "quality_level": "B",
+   "is_complete": 1,
+   "ohlc_complete": 0,
+   "suspected_gap_count": 0,
+   "suspected_gap_days": 0,
+   "calendar_proxy": "trade_calendar_table_proxy",
+   "gap_is_real_missing": null,
+   "row_count": 4345
+  },
+  {
+   "index_code": "930930",
+   "quality_level": "B",
+   "is_complete": 1,
+   "ohlc_complete": 0,
+   "suspected_gap_count": 56,
+   "suspected_gap_days": 62,
+   "calendar_proxy": "trade_calendar_table_proxy",
+   "gap_is_real_missing": null,
+   "row_count": 2999
+  },
+  {
+   "index_code": "H30184",
+   "quality_level": "B",
+   "is_complete": 1,
+   "ohlc_complete": 0,
+   "suspected_gap_count": 0,
+   "suspected_gap_days": 0,
+   "calendar_proxy": "trade_calendar_table_proxy",
+   "gap_is_real_missing": null,
+   "row_count": 5316
+  }
+ ],
+ "ohlc_null_notes": {
+  "000300": "开盘/最高/最低 早期 244 条为空（2004 年），收盘完整",
+  "000905": "开盘/最高/最低 3 条为空，收盘完整",
+  "000906": "开盘/最高/最低 3 条为空，收盘完整",
+  "000016": "开盘/最高/最低 1 条为空，收盘完整",
+  "399997": "开盘/最高/最低 1 条为空，收盘完整",
+  "H30184": "开盘/最高/最低 1407 条为空，收盘完整",
+  "000942": "开盘/最高/最低 3 条为空，收盘完整",
+  "000012": "开盘 2106 条、最高 2106 条、最低 4577 条为空，收盘完整",
+  "000922": "开盘/最高/最低 3 条为空，收盘完整",
+  "930930": "开盘/最高/最低 569 条为空，收盘完整"
+ },
+ "completeness": {
+  "close_complete": 10,
+  "ohlc_complete": 0,
+  "no_suspected_gap": 9,
+  "quality_level_b": 10
+ },
+ "gap_policy": {
+  "calendar_proxy": "trade_calendar 表（A 股交易日）",
+  "is_official_index_calendar": false,
+  "gap_is_real_missing_always_null": true,
+  "filled": false,
+  "interpolated": false,
+  "zero_return": false,
+  "hk_caveat": "930930 港股通指数交易日与 A 股不同，缺口可能只是日历不匹配"
+ },
+ "gate": {
+  "ready_for_research_analysis": true,
+  "ready_for_backtest": false,
+  "ready_for_formal_ranking": false
+ }
+}
