@@ -1,8 +1,8 @@
 {
- "phase": "3B-6.0.1",
+ "phase": "3B-6.0.1.1",
  "report": "index_data_source_audit",
  "baseline_head": "c34d867b95db71cd82e16edfb4bbdaeaa530e594",
- "generated_at": "2026-11-23T15:31:39",
+ "generated_at": "2026-11-23T16:15:03",
  "script": "scripts/audit_3b6_0_1_index_sources.py",
  "real_invocation": true,
  "not_just_urls": true,
@@ -394,5 +394,1647 @@
   "ready_for_research_analysis": true,
   "ready_for_backtest": false,
   "ready_for_formal_ranking": false
- }
+ },
+ "correction_round": "3B-6.0.1.1",
+ "verification_scope_correction": {
+  "original_problem": "原报告登记 10 个指数代码，但只对其中 6 个执行过历史调用，其余靠「代码已登记」推断",
+  "fixed": "对 INDEX_CATALOG 全部 10 个代码逐一实调，执行 映射/接口/质量 三步验证",
+  "no_more_inference_from_catalog": true
+ },
+ "state_meaning": {
+  "code_mapping_verified": "代码与指数名称映射已核实（仅此而已）",
+  "history_api_verified": "历史数据接口已实际调用成功（尚未做质量检查）",
+  "history_quality_verified": "历史数据通过日期/重复/空值/数值/缺口质量检查",
+  "unknown": "证据不足，不得宣称任何验证通过"
+ },
+ "per_index_verification": [
+  {
+   "family": "沪深300",
+   "code": "000300",
+   "source": "akshare.stock_zh_index_hist_csindex",
+   "checked_at": "2026-11-23T16:12:56",
+   "code_mapping_verified": true,
+   "history_api_verified": true,
+   "history_quality_verified": true,
+   "rows": 5558,
+   "date_min": "2004-01-02",
+   "date_max": "2026-11-20",
+   "ohlc_available": true,
+   "quality": {
+    "status": "history_quality_verified",
+    "all_passed": false,
+    "hard_passed": true,
+    "warning_checks": [
+     "no_null_ohlc"
+    ],
+    "hard_check_note": "硬性检查只看**收盘价**序列完整性——指数基准只能用于计算收盘收益，因此收盘价必须完整；OHLC 部分缺失只影响日内分析，记为警告而不阻断",
+    "checks": {
+     "date_parsed": {
+      "ok": true,
+      "total": 5558,
+      "null_count": 0,
+      "reason": null
+     },
+     "no_null_dates": {
+      "ok": true,
+      "null_count": 0
+     },
+     "date_ascending": {
+      "ok": true,
+      "out_of_order_count": 0,
+      "reason": null
+     },
+     "no_duplicate_dates": {
+      "ok": true,
+      "duplicate_count": 0,
+      "reason": null
+     },
+     "no_null_ohlc": {
+      "ok": false,
+      "severity": "warning",
+      "has_ohlc_columns": true,
+      "null_counts": {
+       "开盘": 244,
+       "最高": 244,
+       "最低": 244,
+       "收盘": 0
+      },
+      "reason": "OHLC 部分列存在空值（不影响收盘收益计算，记为警告）"
+     },
+     "no_null_close": {
+      "ok": true,
+      "close_col": "收盘",
+      "null_count": 0,
+      "reason": null
+     },
+     "numeric_values_sane": {
+      "ok": true,
+      "non_numeric": 0,
+      "negative_close": 0,
+      "reason": null
+     },
+     "range_sane": {
+      "ok": true,
+      "date_min": "2004-01-02",
+      "date_max": "2026-11-20",
+      "raw_date_min": "2004-01-01",
+      "raw_date_max": "2026-11-20",
+      "baseline_row_excluded": true
+     },
+     "baseline_row": {
+      "ok": true,
+      "detected": true,
+      "first_date": "2004-01-01",
+      "second_date": "2004-01-02",
+      "gap_days": 1,
+      "threshold_days": 365,
+      "reasons": [
+       "首行 2004-01-01 不在交易日历中（非交易日）"
+      ],
+      "reason": "首行 2004-01-01 不在交易日历中（非交易日），判定为接口基线占位行，不计入缺口统计与区间起点"
+     },
+     "gap_checked": {
+      "ok": true,
+      "calendar": "trade_calendar_table_proxy",
+      "calendar_note": "日历代理 = 本项目 `trade_calendar` 表（A 股交易日），仅用于发现疑似缺口；**仍不是指数官方公布日历**（指数可能有停编、临时调整等情形），因此缺口一律保留 `is_real_missing=null`（无法确定）",
+      "gap_count": 0,
+      "gaps_sample": [],
+      "total_missing_days": 0,
+      "dates_outside_calendar": 0,
+      "dates_outside_calendar_sample": [],
+      "is_real_missing": null,
+      "severity": "warning"
+     }
+    },
+    "rows": 5558,
+    "date_min": "2004-01-02",
+    "date_max": "2026-11-20",
+    "reason": null
+   },
+   "final_state": "history_quality_verified",
+   "failure_reason": null,
+   "official_name": "沪深300指数",
+   "official_short_name": "沪深300",
+   "code_mapping_evidence": {
+    "verified": true,
+    "official_full_name": "沪深300指数",
+    "official_short_name": "沪深300",
+    "matched_tokens": [
+     "沪深300"
+    ],
+    "reason": null
+   },
+   "ohlc_complete": false,
+   "quality_warnings": [
+    "no_null_ohlc"
+   ]
+  },
+  {
+   "family": "中证500",
+   "code": "000905",
+   "source": "akshare.stock_zh_index_hist_csindex",
+   "checked_at": "2026-11-23T16:13:11",
+   "code_mapping_verified": true,
+   "history_api_verified": true,
+   "history_quality_verified": true,
+   "rows": 5317,
+   "date_min": "2004-12-31",
+   "date_max": "2026-11-20",
+   "ohlc_available": true,
+   "quality": {
+    "status": "history_quality_verified",
+    "all_passed": false,
+    "hard_passed": true,
+    "warning_checks": [
+     "no_null_ohlc"
+    ],
+    "hard_check_note": "硬性检查只看**收盘价**序列完整性——指数基准只能用于计算收盘收益，因此收盘价必须完整；OHLC 部分缺失只影响日内分析，记为警告而不阻断",
+    "checks": {
+     "date_parsed": {
+      "ok": true,
+      "total": 5317,
+      "null_count": 0,
+      "reason": null
+     },
+     "no_null_dates": {
+      "ok": true,
+      "null_count": 0
+     },
+     "date_ascending": {
+      "ok": true,
+      "out_of_order_count": 0,
+      "reason": null
+     },
+     "no_duplicate_dates": {
+      "ok": true,
+      "duplicate_count": 0,
+      "reason": null
+     },
+     "no_null_ohlc": {
+      "ok": false,
+      "severity": "warning",
+      "has_ohlc_columns": true,
+      "null_counts": {
+       "开盘": 3,
+       "最高": 3,
+       "最低": 3,
+       "收盘": 0
+      },
+      "reason": "OHLC 部分列存在空值（不影响收盘收益计算，记为警告）"
+     },
+     "no_null_close": {
+      "ok": true,
+      "close_col": "收盘",
+      "null_count": 0,
+      "reason": null
+     },
+     "numeric_values_sane": {
+      "ok": true,
+      "non_numeric": 0,
+      "negative_close": 0,
+      "reason": null
+     },
+     "range_sane": {
+      "ok": true,
+      "date_min": "2004-12-31",
+      "date_max": "2026-11-20",
+      "raw_date_min": "2004-01-01",
+      "raw_date_max": "2026-11-20",
+      "baseline_row_excluded": true
+     },
+     "baseline_row": {
+      "ok": true,
+      "detected": true,
+      "first_date": "2004-01-01",
+      "second_date": "2004-12-31",
+      "gap_days": 365,
+      "threshold_days": 365,
+      "reasons": [
+       "首行与第二行间隔 365 天 ≥ 365",
+       "首行 2004-01-01 不在交易日历中（非交易日）"
+      ],
+      "reason": "首行与第二行间隔 365 天 ≥ 365；首行 2004-01-01 不在交易日历中（非交易日），判定为接口基线占位行，不计入缺口统计与区间起点"
+     },
+     "gap_checked": {
+      "ok": true,
+      "calendar": "trade_calendar_table_proxy",
+      "calendar_note": "日历代理 = 本项目 `trade_calendar` 表（A 股交易日），仅用于发现疑似缺口；**仍不是指数官方公布日历**（指数可能有停编、临时调整等情形），因此缺口一律保留 `is_real_missing=null`（无法确定）",
+      "gap_count": 0,
+      "gaps_sample": [],
+      "total_missing_days": 0,
+      "dates_outside_calendar": 1,
+      "dates_outside_calendar_sample": [
+       "2018-06-18"
+      ],
+      "is_real_missing": null,
+      "severity": "warning"
+     }
+    },
+    "rows": 5317,
+    "date_min": "2004-12-31",
+    "date_max": "2026-11-20",
+    "reason": null
+   },
+   "final_state": "history_quality_verified",
+   "failure_reason": null,
+   "official_name": "中证小盘500指数",
+   "official_short_name": "中证500",
+   "code_mapping_evidence": {
+    "verified": true,
+    "official_full_name": "中证小盘500指数",
+    "official_short_name": "中证500",
+    "matched_tokens": [
+     "中证500"
+    ],
+    "reason": null
+   },
+   "ohlc_complete": false,
+   "quality_warnings": [
+    "no_null_ohlc"
+   ]
+  },
+  {
+   "family": "中证800",
+   "code": "000906",
+   "source": "akshare.stock_zh_index_hist_csindex",
+   "checked_at": "2026-11-23T16:13:23",
+   "code_mapping_verified": true,
+   "history_api_verified": true,
+   "history_quality_verified": true,
+   "rows": 5317,
+   "date_min": "2004-12-31",
+   "date_max": "2026-11-20",
+   "ohlc_available": true,
+   "quality": {
+    "status": "history_quality_verified",
+    "all_passed": false,
+    "hard_passed": true,
+    "warning_checks": [
+     "no_null_ohlc"
+    ],
+    "hard_check_note": "硬性检查只看**收盘价**序列完整性——指数基准只能用于计算收盘收益，因此收盘价必须完整；OHLC 部分缺失只影响日内分析，记为警告而不阻断",
+    "checks": {
+     "date_parsed": {
+      "ok": true,
+      "total": 5317,
+      "null_count": 0,
+      "reason": null
+     },
+     "no_null_dates": {
+      "ok": true,
+      "null_count": 0
+     },
+     "date_ascending": {
+      "ok": true,
+      "out_of_order_count": 0,
+      "reason": null
+     },
+     "no_duplicate_dates": {
+      "ok": true,
+      "duplicate_count": 0,
+      "reason": null
+     },
+     "no_null_ohlc": {
+      "ok": false,
+      "severity": "warning",
+      "has_ohlc_columns": true,
+      "null_counts": {
+       "开盘": 3,
+       "最高": 3,
+       "最低": 3,
+       "收盘": 0
+      },
+      "reason": "OHLC 部分列存在空值（不影响收盘收益计算，记为警告）"
+     },
+     "no_null_close": {
+      "ok": true,
+      "close_col": "收盘",
+      "null_count": 0,
+      "reason": null
+     },
+     "numeric_values_sane": {
+      "ok": true,
+      "non_numeric": 0,
+      "negative_close": 0,
+      "reason": null
+     },
+     "range_sane": {
+      "ok": true,
+      "date_min": "2004-12-31",
+      "date_max": "2026-11-20",
+      "raw_date_min": "2004-01-01",
+      "raw_date_max": "2026-11-20",
+      "baseline_row_excluded": true
+     },
+     "baseline_row": {
+      "ok": true,
+      "detected": true,
+      "first_date": "2004-01-01",
+      "second_date": "2004-12-31",
+      "gap_days": 365,
+      "threshold_days": 365,
+      "reasons": [
+       "首行与第二行间隔 365 天 ≥ 365",
+       "首行 2004-01-01 不在交易日历中（非交易日）"
+      ],
+      "reason": "首行与第二行间隔 365 天 ≥ 365；首行 2004-01-01 不在交易日历中（非交易日），判定为接口基线占位行，不计入缺口统计与区间起点"
+     },
+     "gap_checked": {
+      "ok": true,
+      "calendar": "trade_calendar_table_proxy",
+      "calendar_note": "日历代理 = 本项目 `trade_calendar` 表（A 股交易日），仅用于发现疑似缺口；**仍不是指数官方公布日历**（指数可能有停编、临时调整等情形），因此缺口一律保留 `is_real_missing=null`（无法确定）",
+      "gap_count": 0,
+      "gaps_sample": [],
+      "total_missing_days": 0,
+      "dates_outside_calendar": 1,
+      "dates_outside_calendar_sample": [
+       "2018-06-18"
+      ],
+      "is_real_missing": null,
+      "severity": "warning"
+     }
+    },
+    "rows": 5317,
+    "date_min": "2004-12-31",
+    "date_max": "2026-11-20",
+    "reason": null
+   },
+   "final_state": "history_quality_verified",
+   "failure_reason": null,
+   "official_name": "中证800指数",
+   "official_short_name": "中证800",
+   "code_mapping_evidence": {
+    "verified": true,
+    "official_full_name": "中证800指数",
+    "official_short_name": "中证800",
+    "matched_tokens": [
+     "中证800"
+    ],
+    "reason": null
+   },
+   "ohlc_complete": false,
+   "quality_warnings": [
+    "no_null_ohlc"
+   ]
+  },
+  {
+   "family": "上证50",
+   "code": "000016",
+   "source": "akshare.stock_zh_index_hist_csindex",
+   "checked_at": "2026-11-23T16:13:33",
+   "code_mapping_verified": true,
+   "history_api_verified": true,
+   "history_quality_verified": true,
+   "rows": 5559,
+   "date_min": "2004-01-02",
+   "date_max": "2026-11-20",
+   "ohlc_available": true,
+   "quality": {
+    "status": "history_quality_verified",
+    "all_passed": false,
+    "hard_passed": true,
+    "warning_checks": [
+     "no_null_ohlc"
+    ],
+    "hard_check_note": "硬性检查只看**收盘价**序列完整性——指数基准只能用于计算收盘收益，因此收盘价必须完整；OHLC 部分缺失只影响日内分析，记为警告而不阻断",
+    "checks": {
+     "date_parsed": {
+      "ok": true,
+      "total": 5559,
+      "null_count": 0,
+      "reason": null
+     },
+     "no_null_dates": {
+      "ok": true,
+      "null_count": 0
+     },
+     "date_ascending": {
+      "ok": true,
+      "out_of_order_count": 0,
+      "reason": null
+     },
+     "no_duplicate_dates": {
+      "ok": true,
+      "duplicate_count": 0,
+      "reason": null
+     },
+     "no_null_ohlc": {
+      "ok": false,
+      "severity": "warning",
+      "has_ohlc_columns": true,
+      "null_counts": {
+       "开盘": 1,
+       "最高": 1,
+       "最低": 1,
+       "收盘": 0
+      },
+      "reason": "OHLC 部分列存在空值（不影响收盘收益计算，记为警告）"
+     },
+     "no_null_close": {
+      "ok": true,
+      "close_col": "收盘",
+      "null_count": 0,
+      "reason": null
+     },
+     "numeric_values_sane": {
+      "ok": true,
+      "non_numeric": 0,
+      "negative_close": 0,
+      "reason": null
+     },
+     "range_sane": {
+      "ok": true,
+      "date_min": "2004-01-02",
+      "date_max": "2026-11-20",
+      "raw_date_min": "2004-01-01",
+      "raw_date_max": "2026-11-20",
+      "baseline_row_excluded": true
+     },
+     "baseline_row": {
+      "ok": true,
+      "detected": true,
+      "first_date": "2004-01-01",
+      "second_date": "2004-01-02",
+      "gap_days": 1,
+      "threshold_days": 365,
+      "reasons": [
+       "首行 2004-01-01 不在交易日历中（非交易日）"
+      ],
+      "reason": "首行 2004-01-01 不在交易日历中（非交易日），判定为接口基线占位行，不计入缺口统计与区间起点"
+     },
+     "gap_checked": {
+      "ok": true,
+      "calendar": "trade_calendar_table_proxy",
+      "calendar_note": "日历代理 = 本项目 `trade_calendar` 表（A 股交易日），仅用于发现疑似缺口；**仍不是指数官方公布日历**（指数可能有停编、临时调整等情形），因此缺口一律保留 `is_real_missing=null`（无法确定）",
+      "gap_count": 0,
+      "gaps_sample": [],
+      "total_missing_days": 0,
+      "dates_outside_calendar": 1,
+      "dates_outside_calendar_sample": [
+       "2018-06-18"
+      ],
+      "is_real_missing": null,
+      "severity": "warning"
+     }
+    },
+    "rows": 5559,
+    "date_min": "2004-01-02",
+    "date_max": "2026-11-20",
+    "reason": null
+   },
+   "final_state": "history_quality_verified",
+   "failure_reason": null,
+   "official_name": "上证50指数",
+   "official_short_name": "上证50",
+   "code_mapping_evidence": {
+    "verified": true,
+    "official_full_name": "上证50指数",
+    "official_short_name": "上证50",
+    "matched_tokens": [
+     "上证50"
+    ],
+    "reason": null
+   },
+   "ohlc_complete": false,
+   "quality_warnings": [
+    "no_null_ohlc"
+   ]
+  },
+  {
+   "family": "中证白酒",
+   "code": "399997",
+   "source": "akshare.stock_zh_index_hist_csindex",
+   "checked_at": "2026-11-23T16:13:48",
+   "code_mapping_verified": true,
+   "history_api_verified": true,
+   "history_quality_verified": true,
+   "rows": 4345,
+   "date_min": "2009-01-05",
+   "date_max": "2026-11-20",
+   "ohlc_available": true,
+   "quality": {
+    "status": "history_quality_verified",
+    "all_passed": false,
+    "hard_passed": true,
+    "warning_checks": [
+     "no_null_ohlc"
+    ],
+    "hard_check_note": "硬性检查只看**收盘价**序列完整性——指数基准只能用于计算收盘收益，因此收盘价必须完整；OHLC 部分缺失只影响日内分析，记为警告而不阻断",
+    "checks": {
+     "date_parsed": {
+      "ok": true,
+      "total": 4345,
+      "null_count": 0,
+      "reason": null
+     },
+     "no_null_dates": {
+      "ok": true,
+      "null_count": 0
+     },
+     "date_ascending": {
+      "ok": true,
+      "out_of_order_count": 0,
+      "reason": null
+     },
+     "no_duplicate_dates": {
+      "ok": true,
+      "duplicate_count": 0,
+      "reason": null
+     },
+     "no_null_ohlc": {
+      "ok": false,
+      "severity": "warning",
+      "has_ohlc_columns": true,
+      "null_counts": {
+       "开盘": 1,
+       "最高": 1,
+       "最低": 1,
+       "收盘": 0
+      },
+      "reason": "OHLC 部分列存在空值（不影响收盘收益计算，记为警告）"
+     },
+     "no_null_close": {
+      "ok": true,
+      "close_col": "收盘",
+      "null_count": 0,
+      "reason": null
+     },
+     "numeric_values_sane": {
+      "ok": true,
+      "non_numeric": 0,
+      "negative_close": 0,
+      "reason": null
+     },
+     "range_sane": {
+      "ok": true,
+      "date_min": "2009-01-05",
+      "date_max": "2026-11-20",
+      "raw_date_min": "2004-01-01",
+      "raw_date_max": "2026-11-20",
+      "baseline_row_excluded": true
+     },
+     "baseline_row": {
+      "ok": true,
+      "detected": true,
+      "first_date": "2004-01-01",
+      "second_date": "2009-01-05",
+      "gap_days": 1831,
+      "threshold_days": 365,
+      "reasons": [
+       "首行与第二行间隔 1831 天 ≥ 365",
+       "首行 2004-01-01 不在交易日历中（非交易日）"
+      ],
+      "reason": "首行与第二行间隔 1831 天 ≥ 365；首行 2004-01-01 不在交易日历中（非交易日），判定为接口基线占位行，不计入缺口统计与区间起点"
+     },
+     "gap_checked": {
+      "ok": true,
+      "calendar": "trade_calendar_table_proxy",
+      "calendar_note": "日历代理 = 本项目 `trade_calendar` 表（A 股交易日），仅用于发现疑似缺口；**仍不是指数官方公布日历**（指数可能有停编、临时调整等情形），因此缺口一律保留 `is_real_missing=null`（无法确定）",
+      "gap_count": 0,
+      "gaps_sample": [],
+      "total_missing_days": 0,
+      "dates_outside_calendar": 1,
+      "dates_outside_calendar_sample": [
+       "2018-06-18"
+      ],
+      "is_real_missing": null,
+      "severity": "warning"
+     }
+    },
+    "rows": 4345,
+    "date_min": "2009-01-05",
+    "date_max": "2026-11-20",
+    "reason": null
+   },
+   "final_state": "history_quality_verified",
+   "failure_reason": null,
+   "official_name": "中证白酒指数",
+   "official_short_name": "中证白酒",
+   "code_mapping_evidence": {
+    "verified": true,
+    "official_full_name": "中证白酒指数",
+    "official_short_name": "中证白酒",
+    "matched_tokens": [
+     "白酒"
+    ],
+    "reason": null
+   },
+   "ohlc_complete": false,
+   "quality_warnings": [
+    "no_null_ohlc"
+   ]
+  },
+  {
+   "family": "中证全指半导体",
+   "code": "H30184",
+   "source": "akshare.stock_zh_index_hist_csindex",
+   "checked_at": "2026-11-23T16:14:03",
+   "code_mapping_verified": true,
+   "history_api_verified": true,
+   "history_quality_verified": true,
+   "rows": 5316,
+   "date_min": "2005-01-04",
+   "date_max": "2026-11-20",
+   "ohlc_available": true,
+   "quality": {
+    "status": "history_quality_verified",
+    "all_passed": false,
+    "hard_passed": true,
+    "warning_checks": [
+     "no_null_ohlc"
+    ],
+    "hard_check_note": "硬性检查只看**收盘价**序列完整性——指数基准只能用于计算收盘收益，因此收盘价必须完整；OHLC 部分缺失只影响日内分析，记为警告而不阻断",
+    "checks": {
+     "date_parsed": {
+      "ok": true,
+      "total": 5316,
+      "null_count": 0,
+      "reason": null
+     },
+     "no_null_dates": {
+      "ok": true,
+      "null_count": 0
+     },
+     "date_ascending": {
+      "ok": true,
+      "out_of_order_count": 0,
+      "reason": null
+     },
+     "no_duplicate_dates": {
+      "ok": true,
+      "duplicate_count": 0,
+      "reason": null
+     },
+     "no_null_ohlc": {
+      "ok": false,
+      "severity": "warning",
+      "has_ohlc_columns": true,
+      "null_counts": {
+       "开盘": 1407,
+       "最高": 1407,
+       "最低": 1407,
+       "收盘": 0
+      },
+      "reason": "OHLC 部分列存在空值（不影响收盘收益计算，记为警告）"
+     },
+     "no_null_close": {
+      "ok": true,
+      "close_col": "收盘",
+      "null_count": 0,
+      "reason": null
+     },
+     "numeric_values_sane": {
+      "ok": true,
+      "non_numeric": 0,
+      "negative_close": 0,
+      "reason": null
+     },
+     "range_sane": {
+      "ok": true,
+      "date_min": "2005-01-04",
+      "date_max": "2026-11-20",
+      "raw_date_min": "2004-01-01",
+      "raw_date_max": "2026-11-20",
+      "baseline_row_excluded": true
+     },
+     "baseline_row": {
+      "ok": true,
+      "detected": true,
+      "first_date": "2004-01-01",
+      "second_date": "2005-01-04",
+      "gap_days": 369,
+      "threshold_days": 365,
+      "reasons": [
+       "首行与第二行间隔 369 天 ≥ 365",
+       "首行 2004-01-01 不在交易日历中（非交易日）"
+      ],
+      "reason": "首行与第二行间隔 369 天 ≥ 365；首行 2004-01-01 不在交易日历中（非交易日），判定为接口基线占位行，不计入缺口统计与区间起点"
+     },
+     "gap_checked": {
+      "ok": true,
+      "calendar": "trade_calendar_table_proxy",
+      "calendar_note": "日历代理 = 本项目 `trade_calendar` 表（A 股交易日），仅用于发现疑似缺口；**仍不是指数官方公布日历**（指数可能有停编、临时调整等情形），因此缺口一律保留 `is_real_missing=null`（无法确定）",
+      "gap_count": 0,
+      "gaps_sample": [],
+      "total_missing_days": 0,
+      "dates_outside_calendar": 1,
+      "dates_outside_calendar_sample": [
+       "2018-06-18"
+      ],
+      "is_real_missing": null,
+      "severity": "warning"
+     }
+    },
+    "rows": 5316,
+    "date_min": "2005-01-04",
+    "date_max": "2026-11-20",
+    "reason": null
+   },
+   "final_state": "history_quality_verified",
+   "failure_reason": null,
+   "official_name": "中证全指半导体产品与设备指数",
+   "official_short_name": "半导体",
+   "code_mapping_evidence": {
+    "verified": true,
+    "official_full_name": "中证全指半导体产品与设备指数",
+    "official_short_name": "半导体",
+    "matched_tokens": [
+     "半导体"
+    ],
+    "reason": null
+   },
+   "ohlc_complete": false,
+   "quality_warnings": [
+    "no_null_ohlc"
+   ]
+  },
+  {
+   "family": "中证内地消费主题",
+   "code": "000942",
+   "source": "akshare.stock_zh_index_hist_csindex",
+   "checked_at": "2026-11-23T16:14:09",
+   "code_mapping_verified": true,
+   "history_api_verified": true,
+   "history_quality_verified": true,
+   "rows": 5317,
+   "date_min": "2004-12-31",
+   "date_max": "2026-11-20",
+   "ohlc_available": true,
+   "quality": {
+    "status": "history_quality_verified",
+    "all_passed": false,
+    "hard_passed": true,
+    "warning_checks": [
+     "no_null_ohlc"
+    ],
+    "hard_check_note": "硬性检查只看**收盘价**序列完整性——指数基准只能用于计算收盘收益，因此收盘价必须完整；OHLC 部分缺失只影响日内分析，记为警告而不阻断",
+    "checks": {
+     "date_parsed": {
+      "ok": true,
+      "total": 5317,
+      "null_count": 0,
+      "reason": null
+     },
+     "no_null_dates": {
+      "ok": true,
+      "null_count": 0
+     },
+     "date_ascending": {
+      "ok": true,
+      "out_of_order_count": 0,
+      "reason": null
+     },
+     "no_duplicate_dates": {
+      "ok": true,
+      "duplicate_count": 0,
+      "reason": null
+     },
+     "no_null_ohlc": {
+      "ok": false,
+      "severity": "warning",
+      "has_ohlc_columns": true,
+      "null_counts": {
+       "开盘": 3,
+       "最高": 3,
+       "最低": 3,
+       "收盘": 0
+      },
+      "reason": "OHLC 部分列存在空值（不影响收盘收益计算，记为警告）"
+     },
+     "no_null_close": {
+      "ok": true,
+      "close_col": "收盘",
+      "null_count": 0,
+      "reason": null
+     },
+     "numeric_values_sane": {
+      "ok": true,
+      "non_numeric": 0,
+      "negative_close": 0,
+      "reason": null
+     },
+     "range_sane": {
+      "ok": true,
+      "date_min": "2004-12-31",
+      "date_max": "2026-11-20",
+      "raw_date_min": "2004-01-01",
+      "raw_date_max": "2026-11-20",
+      "baseline_row_excluded": true
+     },
+     "baseline_row": {
+      "ok": true,
+      "detected": true,
+      "first_date": "2004-01-01",
+      "second_date": "2004-12-31",
+      "gap_days": 365,
+      "threshold_days": 365,
+      "reasons": [
+       "首行与第二行间隔 365 天 ≥ 365",
+       "首行 2004-01-01 不在交易日历中（非交易日）"
+      ],
+      "reason": "首行与第二行间隔 365 天 ≥ 365；首行 2004-01-01 不在交易日历中（非交易日），判定为接口基线占位行，不计入缺口统计与区间起点"
+     },
+     "gap_checked": {
+      "ok": true,
+      "calendar": "trade_calendar_table_proxy",
+      "calendar_note": "日历代理 = 本项目 `trade_calendar` 表（A 股交易日），仅用于发现疑似缺口；**仍不是指数官方公布日历**（指数可能有停编、临时调整等情形），因此缺口一律保留 `is_real_missing=null`（无法确定）",
+      "gap_count": 0,
+      "gaps_sample": [],
+      "total_missing_days": 0,
+      "dates_outside_calendar": 1,
+      "dates_outside_calendar_sample": [
+       "2018-06-18"
+      ],
+      "is_real_missing": null,
+      "severity": "warning"
+     }
+    },
+    "rows": 5317,
+    "date_min": "2004-12-31",
+    "date_max": "2026-11-20",
+    "reason": null
+   },
+   "final_state": "history_quality_verified",
+   "failure_reason": null,
+   "official_name": "中证内地消费主题指数",
+   "official_short_name": "内地消费",
+   "code_mapping_evidence": {
+    "verified": true,
+    "official_full_name": "中证内地消费主题指数",
+    "official_short_name": "内地消费",
+    "matched_tokens": [
+     "消费"
+    ],
+    "reason": null
+   },
+   "ohlc_complete": false,
+   "quality_warnings": [
+    "no_null_ohlc"
+   ]
+  },
+  {
+   "family": "上证国债",
+   "code": "000012",
+   "source": "akshare.stock_zh_index_hist_csindex",
+   "checked_at": "2026-11-23T16:14:39",
+   "code_mapping_verified": true,
+   "history_api_verified": true,
+   "history_quality_verified": true,
+   "rows": 5558,
+   "date_min": "2004-01-02",
+   "date_max": "2026-11-20",
+   "ohlc_available": true,
+   "quality": {
+    "status": "history_quality_verified",
+    "all_passed": false,
+    "hard_passed": true,
+    "warning_checks": [
+     "no_null_ohlc"
+    ],
+    "hard_check_note": "硬性检查只看**收盘价**序列完整性——指数基准只能用于计算收盘收益，因此收盘价必须完整；OHLC 部分缺失只影响日内分析，记为警告而不阻断",
+    "checks": {
+     "date_parsed": {
+      "ok": true,
+      "total": 5558,
+      "null_count": 0,
+      "reason": null
+     },
+     "no_null_dates": {
+      "ok": true,
+      "null_count": 0
+     },
+     "date_ascending": {
+      "ok": true,
+      "out_of_order_count": 0,
+      "reason": null
+     },
+     "no_duplicate_dates": {
+      "ok": true,
+      "duplicate_count": 0,
+      "reason": null
+     },
+     "no_null_ohlc": {
+      "ok": false,
+      "severity": "warning",
+      "has_ohlc_columns": true,
+      "null_counts": {
+       "开盘": 2106,
+       "最高": 2106,
+       "最低": 4577,
+       "收盘": 0
+      },
+      "reason": "OHLC 部分列存在空值（不影响收盘收益计算，记为警告）"
+     },
+     "no_null_close": {
+      "ok": true,
+      "close_col": "收盘",
+      "null_count": 0,
+      "reason": null
+     },
+     "numeric_values_sane": {
+      "ok": true,
+      "non_numeric": 0,
+      "negative_close": 0,
+      "reason": null
+     },
+     "range_sane": {
+      "ok": true,
+      "date_min": "2004-01-02",
+      "date_max": "2026-11-20",
+      "raw_date_min": "2004-01-01",
+      "raw_date_max": "2026-11-20",
+      "baseline_row_excluded": true
+     },
+     "baseline_row": {
+      "ok": true,
+      "detected": true,
+      "first_date": "2004-01-01",
+      "second_date": "2004-01-02",
+      "gap_days": 1,
+      "threshold_days": 365,
+      "reasons": [
+       "首行 2004-01-01 不在交易日历中（非交易日）"
+      ],
+      "reason": "首行 2004-01-01 不在交易日历中（非交易日），判定为接口基线占位行，不计入缺口统计与区间起点"
+     },
+     "gap_checked": {
+      "ok": true,
+      "calendar": "trade_calendar_table_proxy",
+      "calendar_note": "日历代理 = 本项目 `trade_calendar` 表（A 股交易日），仅用于发现疑似缺口；**仍不是指数官方公布日历**（指数可能有停编、临时调整等情形），因此缺口一律保留 `is_real_missing=null`（无法确定）",
+      "gap_count": 0,
+      "gaps_sample": [],
+      "total_missing_days": 0,
+      "dates_outside_calendar": 0,
+      "dates_outside_calendar_sample": [],
+      "is_real_missing": null,
+      "severity": "warning"
+     }
+    },
+    "rows": 5558,
+    "date_min": "2004-01-02",
+    "date_max": "2026-11-20",
+    "reason": null
+   },
+   "final_state": "history_quality_verified",
+   "failure_reason": null,
+   "official_name": "上证国债指数",
+   "official_short_name": "国债指数",
+   "code_mapping_evidence": {
+    "verified": true,
+    "official_full_name": "上证国债指数",
+    "official_short_name": "国债指数",
+    "matched_tokens": [
+     "国债"
+    ],
+    "reason": null
+   },
+   "ohlc_complete": false,
+   "quality_warnings": [
+    "no_null_ohlc"
+   ]
+  },
+  {
+   "family": "中证红利",
+   "code": "000922",
+   "source": "akshare.stock_zh_index_hist_csindex",
+   "checked_at": "2026-11-23T16:14:50",
+   "code_mapping_verified": true,
+   "history_api_verified": true,
+   "history_quality_verified": true,
+   "rows": 5317,
+   "date_min": "2004-12-31",
+   "date_max": "2026-11-20",
+   "ohlc_available": true,
+   "quality": {
+    "status": "history_quality_verified",
+    "all_passed": false,
+    "hard_passed": true,
+    "warning_checks": [
+     "no_null_ohlc"
+    ],
+    "hard_check_note": "硬性检查只看**收盘价**序列完整性——指数基准只能用于计算收盘收益，因此收盘价必须完整；OHLC 部分缺失只影响日内分析，记为警告而不阻断",
+    "checks": {
+     "date_parsed": {
+      "ok": true,
+      "total": 5317,
+      "null_count": 0,
+      "reason": null
+     },
+     "no_null_dates": {
+      "ok": true,
+      "null_count": 0
+     },
+     "date_ascending": {
+      "ok": true,
+      "out_of_order_count": 0,
+      "reason": null
+     },
+     "no_duplicate_dates": {
+      "ok": true,
+      "duplicate_count": 0,
+      "reason": null
+     },
+     "no_null_ohlc": {
+      "ok": false,
+      "severity": "warning",
+      "has_ohlc_columns": true,
+      "null_counts": {
+       "开盘": 3,
+       "最高": 3,
+       "最低": 3,
+       "收盘": 0
+      },
+      "reason": "OHLC 部分列存在空值（不影响收盘收益计算，记为警告）"
+     },
+     "no_null_close": {
+      "ok": true,
+      "close_col": "收盘",
+      "null_count": 0,
+      "reason": null
+     },
+     "numeric_values_sane": {
+      "ok": true,
+      "non_numeric": 0,
+      "negative_close": 0,
+      "reason": null
+     },
+     "range_sane": {
+      "ok": true,
+      "date_min": "2004-12-31",
+      "date_max": "2026-11-20",
+      "raw_date_min": "2004-01-01",
+      "raw_date_max": "2026-11-20",
+      "baseline_row_excluded": true
+     },
+     "baseline_row": {
+      "ok": true,
+      "detected": true,
+      "first_date": "2004-01-01",
+      "second_date": "2004-12-31",
+      "gap_days": 365,
+      "threshold_days": 365,
+      "reasons": [
+       "首行与第二行间隔 365 天 ≥ 365",
+       "首行 2004-01-01 不在交易日历中（非交易日）"
+      ],
+      "reason": "首行与第二行间隔 365 天 ≥ 365；首行 2004-01-01 不在交易日历中（非交易日），判定为接口基线占位行，不计入缺口统计与区间起点"
+     },
+     "gap_checked": {
+      "ok": true,
+      "calendar": "trade_calendar_table_proxy",
+      "calendar_note": "日历代理 = 本项目 `trade_calendar` 表（A 股交易日），仅用于发现疑似缺口；**仍不是指数官方公布日历**（指数可能有停编、临时调整等情形），因此缺口一律保留 `is_real_missing=null`（无法确定）",
+      "gap_count": 0,
+      "gaps_sample": [],
+      "total_missing_days": 0,
+      "dates_outside_calendar": 1,
+      "dates_outside_calendar_sample": [
+       "2018-06-18"
+      ],
+      "is_real_missing": null,
+      "severity": "warning"
+     }
+    },
+    "rows": 5317,
+    "date_min": "2004-12-31",
+    "date_max": "2026-11-20",
+    "reason": null
+   },
+   "final_state": "history_quality_verified",
+   "failure_reason": null,
+   "official_name": "中证红利指数",
+   "official_short_name": "中证红利",
+   "code_mapping_evidence": {
+    "verified": true,
+    "official_full_name": "中证红利指数",
+    "official_short_name": "中证红利",
+    "matched_tokens": [
+     "红利"
+    ],
+    "reason": null
+   },
+   "ohlc_complete": false,
+   "quality_warnings": [
+    "no_null_ohlc"
+   ]
+  },
+  {
+   "family": "中证港股通综合",
+   "code": "930930",
+   "source": "akshare.stock_zh_index_hist_csindex",
+   "checked_at": "2026-11-23T16:14:56",
+   "code_mapping_verified": true,
+   "history_api_verified": true,
+   "history_quality_verified": true,
+   "rows": 2999,
+   "date_min": "2014-11-14",
+   "date_max": "2026-11-20",
+   "ohlc_available": true,
+   "quality": {
+    "status": "history_quality_verified",
+    "all_passed": false,
+    "hard_passed": true,
+    "warning_checks": [
+     "no_null_ohlc"
+    ],
+    "hard_check_note": "硬性检查只看**收盘价**序列完整性——指数基准只能用于计算收盘收益，因此收盘价必须完整；OHLC 部分缺失只影响日内分析，记为警告而不阻断",
+    "checks": {
+     "date_parsed": {
+      "ok": true,
+      "total": 2999,
+      "null_count": 0,
+      "reason": null
+     },
+     "no_null_dates": {
+      "ok": true,
+      "null_count": 0
+     },
+     "date_ascending": {
+      "ok": true,
+      "out_of_order_count": 0,
+      "reason": null
+     },
+     "no_duplicate_dates": {
+      "ok": true,
+      "duplicate_count": 0,
+      "reason": null
+     },
+     "no_null_ohlc": {
+      "ok": false,
+      "severity": "warning",
+      "has_ohlc_columns": true,
+      "null_counts": {
+       "开盘": 569,
+       "最高": 569,
+       "最低": 569,
+       "收盘": 0
+      },
+      "reason": "OHLC 部分列存在空值（不影响收盘收益计算，记为警告）"
+     },
+     "no_null_close": {
+      "ok": true,
+      "close_col": "收盘",
+      "null_count": 0,
+      "reason": null
+     },
+     "numeric_values_sane": {
+      "ok": true,
+      "non_numeric": 0,
+      "negative_close": 0,
+      "reason": null
+     },
+     "range_sane": {
+      "ok": true,
+      "date_min": "2014-11-14",
+      "date_max": "2026-11-20",
+      "raw_date_min": "2004-01-01",
+      "raw_date_max": "2026-11-20",
+      "baseline_row_excluded": true
+     },
+     "baseline_row": {
+      "ok": true,
+      "detected": true,
+      "first_date": "2004-01-01",
+      "second_date": "2014-11-14",
+      "gap_days": 3970,
+      "threshold_days": 365,
+      "reasons": [
+       "首行与第二行间隔 3970 天 ≥ 365",
+       "首行 2004-01-01 不在交易日历中（非交易日）"
+      ],
+      "reason": "首行与第二行间隔 3970 天 ≥ 365；首行 2004-01-01 不在交易日历中（非交易日），判定为接口基线占位行，不计入缺口统计与区间起点"
+     },
+     "gap_checked": {
+      "ok": true,
+      "calendar": "trade_calendar_table_proxy",
+      "calendar_note": "日历代理 = 本项目 `trade_calendar` 表（A 股交易日），仅用于发现疑似缺口；**仍不是指数官方公布日历**（指数可能有停编、临时调整等情形），因此缺口一律保留 `is_real_missing=null`（无法确定）",
+      "gap_count": 56,
+      "gaps_sample": [
+       {
+        "from": "2017-04-14",
+        "to": "2017-04-14",
+        "missing_count": 1,
+        "is_real_missing": null,
+        "reason": "日历代理发现缺口，无法确认是否为真实缺失（可能是指数停编/临时调整）"
+       },
+       {
+        "from": "2017-04-17",
+        "to": "2017-04-17",
+        "missing_count": 1,
+        "is_real_missing": null,
+        "reason": "日历代理发现缺口，无法确认是否为真实缺失（可能是指数停编/临时调整）"
+       },
+       {
+        "from": "2017-05-03",
+        "to": "2017-05-03",
+        "missing_count": 1,
+        "is_real_missing": null,
+        "reason": "日历代理发现缺口，无法确认是否为真实缺失（可能是指数停编/临时调整）"
+       },
+       {
+        "from": "2017-12-25",
+        "to": "2017-12-26",
+        "missing_count": 2,
+        "is_real_missing": null,
+        "reason": "日历代理发现缺口，无法确认是否为真实缺失（可能是指数停编/临时调整）"
+       },
+       {
+        "from": "2018-03-30",
+        "to": "2018-03-30",
+        "missing_count": 1,
+        "is_real_missing": null,
+        "reason": "日历代理发现缺口，无法确认是否为真实缺失（可能是指数停编/临时调整）"
+       },
+       {
+        "from": "2018-04-02",
+        "to": "2018-04-02",
+        "missing_count": 1,
+        "is_real_missing": null,
+        "reason": "日历代理发现缺口，无法确认是否为真实缺失（可能是指数停编/临时调整）"
+       },
+       {
+        "from": "2018-05-22",
+        "to": "2018-05-22",
+        "missing_count": 1,
+        "is_real_missing": null,
+        "reason": "日历代理发现缺口，无法确认是否为真实缺失（可能是指数停编/临时调整）"
+       },
+       {
+        "from": "2018-07-02",
+        "to": "2018-07-02",
+        "missing_count": 1,
+        "is_real_missing": null,
+        "reason": "日历代理发现缺口，无法确认是否为真实缺失（可能是指数停编/临时调整）"
+       },
+       {
+        "from": "2018-09-25",
+        "to": "2018-09-25",
+        "missing_count": 1,
+        "is_real_missing": null,
+        "reason": "日历代理发现缺口，无法确认是否为真实缺失（可能是指数停编/临时调整）"
+       },
+       {
+        "from": "2018-10-17",
+        "to": "2018-10-17",
+        "missing_count": 1,
+        "is_real_missing": null,
+        "reason": "日历代理发现缺口，无法确认是否为真实缺失（可能是指数停编/临时调整）"
+       }
+      ],
+      "total_missing_days": 62,
+      "dates_outside_calendar": 139,
+      "dates_outside_calendar_sample": [
+       "2015-01-01",
+       "2015-01-02",
+       "2015-02-18",
+       "2015-02-19",
+       "2015-02-20"
+      ],
+      "is_real_missing": null,
+      "severity": "warning"
+     }
+    },
+    "rows": 2999,
+    "date_min": "2014-11-14",
+    "date_max": "2026-11-20",
+    "reason": null
+   },
+   "final_state": "history_quality_verified",
+   "failure_reason": null,
+   "official_name": "中证港股通综合指数",
+   "official_short_name": "港股综合",
+   "code_mapping_evidence": {
+    "verified": true,
+    "official_full_name": "中证港股通综合指数",
+    "official_short_name": "港股综合",
+    "matched_tokens": [
+     "港股通"
+    ],
+    "reason": null
+   },
+   "ohlc_complete": false,
+   "quality_warnings": [
+    "no_null_ohlc"
+   ]
+  }
+ ],
+ "external_verification": [
+  {
+   "family": "恒生指数",
+   "code": "HSI",
+   "source": "akshare.stock_hk_index_daily_sina",
+   "checked_at": "2026-11-23T16:15:01",
+   "code_mapping_verified": false,
+   "history_api_verified": true,
+   "history_quality_verified": true,
+   "rows": 3263,
+   "date_min": "2013-08-20",
+   "date_max": "2026-11-20",
+   "ohlc_available": true,
+   "quality": {
+    "status": "history_quality_verified",
+    "all_passed": true,
+    "hard_passed": true,
+    "warning_checks": [],
+    "hard_check_note": "硬性检查只看**收盘价**序列完整性——指数基准只能用于计算收盘收益，因此收盘价必须完整；OHLC 部分缺失只影响日内分析，记为警告而不阻断",
+    "checks": {
+     "date_parsed": {
+      "ok": true,
+      "total": 3263,
+      "null_count": 0,
+      "reason": null
+     },
+     "no_null_dates": {
+      "ok": true,
+      "null_count": 0
+     },
+     "date_ascending": {
+      "ok": true,
+      "out_of_order_count": 0,
+      "reason": null
+     },
+     "no_duplicate_dates": {
+      "ok": true,
+      "duplicate_count": 0,
+      "reason": null
+     },
+     "no_null_ohlc": {
+      "ok": true,
+      "severity": "warning",
+      "has_ohlc_columns": true,
+      "null_counts": {
+       "open": 0,
+       "high": 0,
+       "low": 0,
+       "close": 0
+      },
+      "reason": null
+     },
+     "no_null_close": {
+      "ok": true,
+      "close_col": "close",
+      "null_count": 0,
+      "reason": null
+     },
+     "numeric_values_sane": {
+      "ok": true,
+      "non_numeric": 0,
+      "negative_close": 0,
+      "reason": null
+     },
+     "range_sane": {
+      "ok": true,
+      "date_min": "2013-08-20",
+      "date_max": "2026-11-20",
+      "raw_date_min": "2013-08-20",
+      "raw_date_max": "2026-11-20",
+      "baseline_row_excluded": false
+     },
+     "baseline_row": {
+      "ok": true,
+      "detected": false,
+      "first_date": "2013-08-20",
+      "second_date": "2013-08-21",
+      "gap_days": 1,
+      "threshold_days": 365,
+      "reasons": [],
+      "reason": null
+     },
+     "gap_checked": {
+      "ok": true,
+      "calendar": "trade_calendar_table_proxy",
+      "calendar_note": "日历代理 = 本项目 `trade_calendar` 表（A 股交易日），仅用于发现疑似缺口；**仍不是指数官方公布日历**（指数可能有停编、临时调整等情形），因此缺口一律保留 `is_real_missing=null`（无法确定）",
+      "gap_count": 84,
+      "gaps_sample": [
+       {
+        "from": "2013-10-14",
+        "to": "2013-10-14",
+        "missing_count": 1,
+        "is_real_missing": null,
+        "reason": "日历代理发现缺口，无法确认是否为真实缺失（可能是指数停编/临时调整）"
+       },
+       {
+        "from": "2013-12-25",
+        "to": "2013-12-26",
+        "missing_count": 2,
+        "is_real_missing": null,
+        "reason": "日历代理发现缺口，无法确认是否为真实缺失（可能是指数停编/临时调整）"
+       },
+       {
+        "from": "2014-04-18",
+        "to": "2014-04-18",
+        "missing_count": 1,
+        "is_real_missing": null,
+        "reason": "日历代理发现缺口，无法确认是否为真实缺失（可能是指数停编/临时调整）"
+       },
+       {
+        "from": "2014-04-21",
+        "to": "2014-04-21",
+        "missing_count": 1,
+        "is_real_missing": null,
+        "reason": "日历代理发现缺口，无法确认是否为真实缺失（可能是指数停编/临时调整）"
+       },
+       {
+        "from": "2014-05-06",
+        "to": "2014-05-06",
+        "missing_count": 1,
+        "is_real_missing": null,
+        "reason": "日历代理发现缺口，无法确认是否为真实缺失（可能是指数停编/临时调整）"
+       },
+       {
+        "from": "2014-07-01",
+        "to": "2014-07-01",
+        "missing_count": 1,
+        "is_real_missing": null,
+        "reason": "日历代理发现缺口，无法确认是否为真实缺失（可能是指数停编/临时调整）"
+       },
+       {
+        "from": "2014-09-09",
+        "to": "2014-09-09",
+        "missing_count": 1,
+        "is_real_missing": null,
+        "reason": "日历代理发现缺口，无法确认是否为真实缺失（可能是指数停编/临时调整）"
+       },
+       {
+        "from": "2014-12-25",
+        "to": "2014-12-26",
+        "missing_count": 2,
+        "is_real_missing": null,
+        "reason": "日历代理发现缺口，无法确认是否为真实缺失（可能是指数停编/临时调整）"
+       },
+       {
+        "from": "2015-04-03",
+        "to": "2015-04-03",
+        "missing_count": 1,
+        "is_real_missing": null,
+        "reason": "日历代理发现缺口，无法确认是否为真实缺失（可能是指数停编/临时调整）"
+       },
+       {
+        "from": "2015-04-07",
+        "to": "2015-04-07",
+        "missing_count": 1,
+        "is_real_missing": null,
+        "reason": "日历代理发现缺口，无法确认是否为真实缺失（可能是指数停编/临时调整）"
+       }
+      ],
+      "total_missing_days": 95,
+      "dates_outside_calendar": 137,
+      "dates_outside_calendar_sample": [
+       "2013-09-19",
+       "2013-10-02",
+       "2013-10-03",
+       "2013-10-04",
+       "2013-10-07"
+      ],
+      "is_real_missing": null,
+      "severity": "warning"
+     }
+    },
+    "rows": 3263,
+    "date_min": "2013-08-20",
+    "date_max": "2026-11-20",
+    "reason": null
+   },
+   "final_state": "history_quality_verified",
+   "failure_reason": null,
+   "catalog": "external_partial",
+   "code_mapping_note": "新浪港股接口不返回指数中文名，无法核实映射"
+  }
+ ],
+ "verification_summary": {
+  "total": 11,
+  "code_mapping_verified": 10,
+  "history_api_verified": 11,
+  "history_quality_verified": 11,
+  "unknown": 0
+ },
+ "quality_check_rules": {
+  "hard_checks": [
+   "date_parsed",
+   "date_ascending",
+   "no_duplicate_dates",
+   "no_null_dates",
+   "no_null_close",
+   "numeric_values_sane",
+   "range_sane",
+   "baseline_row"
+  ],
+  "soft_checks": [
+   "no_null_ohlc",
+   "gap_checked"
+  ],
+  "hard_fail_blocks_quality_verified": true,
+  "soft_fail_only_warning": true,
+  "soft_reason": "指数基准只用于收盘收益，OHLC 缺失只影响日内分析"
+ },
+ "baseline_row_finding": {
+  "discovered": true,
+  "description": "中证官网接口无论 start_date 填什么，首行常为 2004-01-01 基线值，而指数真实成立日可能晚得多",
+  "detection_rules": [
+   "首行与第二行间隔 >= 365 天",
+   "首行不在交易日历（非交易日）"
+  ],
+  "impact_if_not_excluded": "399997 会被误报为 2004~2009 缺 1214 个交易日，实际那段时间指数尚未发布",
+  "evidence": [
+   {
+    "code": "000300",
+    "first": "2004-01-01",
+    "second": "2004-01-02",
+    "gap_days": 1,
+    "detected": true,
+    "real_start": "2004-01-02"
+   },
+   {
+    "code": "000905",
+    "first": "2004-01-01",
+    "second": "2004-12-31",
+    "gap_days": 365,
+    "detected": true,
+    "real_start": "2004-12-31"
+   },
+   {
+    "code": "000906",
+    "first": "2004-01-01",
+    "second": "2004-12-31",
+    "gap_days": 365,
+    "detected": true,
+    "real_start": "2004-12-31"
+   },
+   {
+    "code": "000016",
+    "first": "2004-01-01",
+    "second": "2004-01-02",
+    "gap_days": 1,
+    "detected": true,
+    "real_start": "2004-01-02"
+   },
+   {
+    "code": "399997",
+    "first": "2004-01-01",
+    "second": "2009-01-05",
+    "gap_days": 1831,
+    "detected": true,
+    "real_start": "2009-01-05"
+   },
+   {
+    "code": "H30184",
+    "first": "2004-01-01",
+    "second": "2005-01-04",
+    "gap_days": 369,
+    "detected": true,
+    "real_start": "2005-01-04"
+   },
+   {
+    "code": "000942",
+    "first": "2004-01-01",
+    "second": "2004-12-31",
+    "gap_days": 365,
+    "detected": true,
+    "real_start": "2004-12-31"
+   },
+   {
+    "code": "000012",
+    "first": "2004-01-01",
+    "second": "2004-01-02",
+    "gap_days": 1,
+    "detected": true,
+    "real_start": "2004-01-02"
+   },
+   {
+    "code": "000922",
+    "first": "2004-01-01",
+    "second": "2004-12-31",
+    "gap_days": 365,
+    "detected": true,
+    "real_start": "2004-12-31"
+   },
+   {
+    "code": "930930",
+    "first": "2004-01-01",
+    "second": "2014-11-14",
+    "gap_days": 3970,
+    "detected": true,
+    "real_start": "2014-11-14"
+   }
+  ]
+ },
+ "gap_check_rules": {
+  "calendar_proxy": "trade_calendar 表（A 股交易日），无则降级工作日",
+  "is_official_index_calendar": false,
+  "is_real_missing_always_null": true,
+  "filling_missing_dates": false,
+  "missing_as_zero_return": false,
+  "hk_index_caveat": "港股通指数交易日与 A 股不同，缺口可能只是日历不匹配"
+ },
+ "index_verification_does_not_imply_benchmark_reproducible": {
+  "index_code_mapping_verified": 10,
+  "index_history_api_verified": 10,
+  "index_quality_verified": 10,
+  "fund_benchmark_reproducible": 0,
+  "reason": "复合基准需全部成分序列；债券成分无代码，现金序列未接入"
+ },
+ "audit_scripts": [
+  "scripts/audit_3b6_0_1_index_sources.py",
+  "scripts/audit_3b6_0_1_1_index_verify.py",
+  "scripts/audit_3b6_0_1_1_bond_coverage.py"
+ ]
 }

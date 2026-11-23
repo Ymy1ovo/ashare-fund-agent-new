@@ -1,5 +1,5 @@
 {
- "phase": "3B-6.0.1",
+ "phase": "3B-6.0.1.1",
  "report": "benchmark_coverage",
  "baseline_head": "c34d867b95db71cd82e16edfb4bbdaeaa530e594",
  "generated_at": "2026-11-23T15:30:00",
@@ -364,5 +364,133 @@
   "ready_for_research_analysis": true,
   "ready_for_backtest": false,
   "ready_for_formal_ranking": false
- }
+ },
+ "correction_round": "3B-6.0.1.1",
+ "four_layer_distinction": {
+  "layer_1_code_mapping_verified": 10,
+  "layer_2_history_api_verified": 10,
+  "layer_3_history_quality_verified": 10,
+  "layer_4_fund_benchmark_reproducible": 0,
+  "note": "前三层是**指数层面**，第四层是**基金基准层面**；指数验证通过不代表基金基准可复现",
+  "why_layer4_zero": "15 只复合基准基金：债券成分无已核实代码、现金序列未接入、多指数需同时对齐"
+ },
+ "index_verification_detail": {
+  "source": "reports/phase3B6_0_1_index_data_source_audit.json",
+  "all_codes_individually_invoked": true,
+  "entries": [
+   {
+    "family": "沪深300",
+    "code": "000300",
+    "code_mapping_verified": true,
+    "history_api_verified": true,
+    "history_quality_verified": true,
+    "final_state": "history_quality_verified",
+    "rows": 5558,
+    "date_min": "2004-01-02",
+    "date_max": "2026-11-20"
+   },
+   {
+    "family": "中证500",
+    "code": "000905",
+    "code_mapping_verified": true,
+    "history_api_verified": true,
+    "history_quality_verified": true,
+    "final_state": "history_quality_verified",
+    "rows": 5317,
+    "date_min": "2004-12-31",
+    "date_max": "2026-11-20"
+   },
+   {
+    "family": "中证800",
+    "code": "000906",
+    "code_mapping_verified": true,
+    "history_api_verified": true,
+    "history_quality_verified": true,
+    "final_state": "history_quality_verified",
+    "rows": 5317,
+    "date_min": "2004-12-31",
+    "date_max": "2026-11-20"
+   },
+   {
+    "family": "上证50",
+    "code": "000016",
+    "code_mapping_verified": true,
+    "history_api_verified": true,
+    "history_quality_verified": true,
+    "final_state": "history_quality_verified",
+    "rows": 5559,
+    "date_min": "2004-01-02",
+    "date_max": "2026-11-20"
+   },
+   {
+    "family": "中证白酒",
+    "code": "399997",
+    "code_mapping_verified": true,
+    "history_api_verified": true,
+    "history_quality_verified": true,
+    "final_state": "history_quality_verified",
+    "rows": 4345,
+    "date_min": "2009-01-05",
+    "date_max": "2026-11-20"
+   },
+   {
+    "family": "中证全指半导体",
+    "code": "H30184",
+    "code_mapping_verified": true,
+    "history_api_verified": true,
+    "history_quality_verified": true,
+    "final_state": "history_quality_verified",
+    "rows": 5316,
+    "date_min": "2005-01-04",
+    "date_max": "2026-11-20"
+   },
+   {
+    "family": "中证内地消费主题",
+    "code": "000942",
+    "code_mapping_verified": true,
+    "history_api_verified": true,
+    "history_quality_verified": true,
+    "final_state": "history_quality_verified",
+    "rows": 5317,
+    "date_min": "2004-12-31",
+    "date_max": "2026-11-20"
+   },
+   {
+    "family": "上证国债",
+    "code": "000012",
+    "code_mapping_verified": true,
+    "history_api_verified": true,
+    "history_quality_verified": true,
+    "final_state": "history_quality_verified",
+    "rows": 5558,
+    "date_min": "2004-01-02",
+    "date_max": "2026-11-20"
+   },
+   {
+    "family": "中证红利",
+    "code": "000922",
+    "code_mapping_verified": true,
+    "history_api_verified": true,
+    "history_quality_verified": true,
+    "final_state": "history_quality_verified",
+    "rows": 5317,
+    "date_min": "2004-12-31",
+    "date_max": "2026-11-20"
+   },
+   {
+    "family": "中证港股通综合",
+    "code": "930930",
+    "code_mapping_verified": true,
+    "history_api_verified": true,
+    "history_quality_verified": true,
+    "final_state": "history_quality_verified",
+    "rows": 2999,
+    "date_min": "2014-11-14",
+    "date_max": "2026-11-20"
+   }
+  ]
+ },
+ "composite_benchmark_reproducible": false,
+ "benchmark_series_in_db": 0,
+ "benchmark_series_note": "指数历史虽已验证可取，但本轮**未入库**，库内基准收益序列仍为 0 条"
 }

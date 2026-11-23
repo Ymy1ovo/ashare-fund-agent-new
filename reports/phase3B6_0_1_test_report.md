@@ -1,116 +1,125 @@
-# 阶段3B-6.0.1 测试报告
+# 阶段3B-6.0.1.1 测试报告
 
-- 基线 HEAD：`c34d867b95db71cd82e16edfb4bbdaeaa530e594`
+- 基线 HEAD：`3c2185a2f3d223d281ab1fd12e4d2b8175c6305c`
 - 执行日期：2026-11-23
-- Python 3.11.2 / pytest / SQLite
+- 修正轮：3B-6.0.1.1（指数验证范围 + 中债覆盖结论修正）
 
 > 以下全部为**实际执行**结果。静态检查单独标注，不冒充测试通过。
 
 ---
 
-## 1. 新增专项测试
+## 1. 本轮新增专项测试
 
 ```bash
-$ pytest tests/test_3b6_0_1_benchmark_audit.py -q
-33 passed in 8.81s
+$ pytest tests/test_3b6_0_1_1_index_verify.py -q
+28 passed in 9.94s
 ```
 
-| 覆盖项（任务书第四 / 七节） | 用例数 |
+| 覆盖项（任务书第五节） | 用例数 |
 | --- | ---: |
-| 四类证据严格区分 | 5 |
-| 基准解析（单指数/复合/债券/现金/权重/未识别） | 9 |
-| 指数代码映射与 unknown 不猜 | 5 |
-| 全量审计（含清盘、份额数、A/C 归并） | 5 |
-| unknown 不被提升 / 复合不退化 | 2 |
-| 状态取值合法 / 汇总自洽 | 3 |
-| 货币基金隔离 | 1 |
-| 只读守恒 + 指纹一致 + 无 Schema 变更 | 2 |
-| 门禁不变 | 1 |
+| 1. 未执行历史调用不能标 `history_api_verified` | 2 |
+| 2. 代码映射成功 ≠ 历史质量通过 | 3 |
+| 3. 日期重复必须被发现 | 1 |
+| 4. 日期倒序必须被发现 | 1 |
+| 5. OHLC 空值必须被发现（且只算警告） | 2 |
+| 6. 收盘值空值必须被发现 | 2 |
+| 7. 缺口保留不确定性标记 | 3 |
+| 8. 复合基准不能因一个成分可用就宣称可复现 | 2 |
+| 9. 中债短窗口不能推断长期覆盖 | 2 |
+| 10. 正式数据库只读 | 2 |
+| 附加：基线行探测 / 状态定义 / 门禁 | 8 |
 
 ### 1.1 关键断言
 
 | 断言 | 说明 |
 | --- | --- |
-| `test_audit_covers_all_funds` | `scanned_fund_count == len(rows)`，证明**全量**不是抽样 |
-| `test_audit_includes_terminated` | 41 个清盘本体全部在扫描范围内 |
-| `test_composite_not_reduced_to_single_index` | 复合基准 `single_index_family is None` |
-| `test_unknown_index_not_resolved` | 未知族 `index_code is None`，不猜 |
-| `test_bond_families_have_no_code` | 全部中债族无代码 |
-| `test_external_catalog_marked_partial` | 恒生走新浪，标 `external_partial` + `partial` |
-| `test_audit_unknown_never_promoted` | 无基准的基金绝不被提升为可验证基准 |
-| `test_audit_ac_shares_grouped` | fund_id 唯一，A/C 归并 |
-| `test_database_untouched_and_fingerprint_same` | 指纹 bytes 完全一致 |
-| `test_no_schema_change` | 未新增任何表 |
+| `test_mapping_does_not_imply_history_verified` | 接口失败时三个状态全 false |
+| `test_api_verified_but_quality_failed` | 有重复日期 → 停在 `history_api_verified` |
+| `test_all_pass_reaches_quality_verified` | 全通过才到 `history_quality_verified` |
+| `test_duplicate_dates_detected` | 重复 1 条即被发现 |
+| `test_out_of_order_detected` | 倒序被发现 |
+| `test_null_close_detected` | 收盘空值 → 硬性失败 |
+| `test_null_ohlc_is_warning_not_blocking` | OHLC 空值只警告 |
+| `test_gap_keeps_uncertainty_marker` | `is_real_missing is None` |
+| `test_gap_never_filled` | 行数不变，不填充 |
+| `test_baseline_row_detected_by_non_trading_day` | 元旦首行也判基线 |
+| `test_composite_not_reproducible_from_one_component` | 复合不给 `index_only` |
+| `test_index_verified_does_not_imply_benchmark_reproducible` | 当前 0 只可复现 |
+| `test_short_window_does_not_imply_long_coverage` | `history_coverage_verified=false` |
+| `test_production_db_readonly_untouched` | 指纹完全一致 |
 
 ---
 
-## 2. 回归测试
+## 2. 3B-6.0.1 原有专项回归
 
-### 2.1 3B-5.5 系列（质量分级 + 同类/年化修正）
+```bash
+$ pytest tests/test_3b6_0_1_1_index_verify.py \
+        tests/test_3b6_0_1_benchmark_audit.py -q
+61 passed in 18.16s
+```
+
+| 文件 | 用例数 |
+| --- | ---: |
+| `test_3b6_0_1_benchmark_audit.py`（原有） | 33 |
+| `test_3b6_0_1_1_index_verify.py`（本轮新增） | 28 |
+
+**原有 33 项全部保留且通过，未删除、未弱化任何断言。**
+
+---
+
+## 3. 3B-5.5 系列回归
 
 ```bash
 $ pytest tests/test_3b5_5_quality_framework.py \
         tests/test_3b5_5_1_peer_annualized.py -q
-112 passed
-```
-
-### 2.2 合并（3B-6.0.1 + 3B-5.5 全部）
-
-```bash
-$ pytest tests/test_3b6_0_1_benchmark_audit.py \
-        tests/test_3b5_5_quality_framework.py \
-        tests/test_3b5_5_1_peer_annualized.py -q
-145 passed in 160.71s (0:02:40)
+112 passed in 109.81s (0:01:49)
 ```
 
 ---
 
-## 3. 全量测试
+## 4. 全量测试
 
 ```bash
 $ pytest -q
-1662 passed, 1 warning in 549.38s (0:09:09)
+1690 passed, 1 warning in 590.78s (0:09:50)
 ```
 
 | 项 | 数值 |
 | --- | ---: |
-| 通过 | **1662** |
+| 通过 | **1690** |
 | 失败 | **0** |
 | 错误 | **0** |
-| 耗时 | **549.38 秒** |
+| 耗时 | **590.78 秒** |
 
 | 阶段 | 全量通过数 |
 | --- | ---: |
-| 3B-5.5 | 1577 |
 | 3B-5.5.1 | 1629 |
-| **3B-6.0.1** | **1662** |
+| 3B-6.0.1 | 1662 |
+| **3B-6.0.1.1** | **1690** |
 
-1629 + 33 = 1662。
+1662 + 28 = 1690。
 
 ---
 
-## 4. 数据源审计的实跑记录
+## 5. 数据源审计实跑记录
+
+本轮跑了三个脚本，全部真实调用：
 
 ```bash
-$ python scripts/audit_3b6_0_1_index_sources.py --json .tmp601/sources.json
+$ python scripts/audit_3b6_0_1_index_sources.py --json ...
+$ python scripts/audit_3b6_0_1_1_index_verify.py --json ...
+$ python scripts/audit_3b6_0_1_1_bond_coverage.py --json ...
 ```
 
-结果摘要（详见 `phase3B6_0_1_index_data_source_audit.md`）：
-
-| 数据源 | 结果 |
+| 脚本 | 用途 |
 | --- | --- |
-| 中证官网（6 个指数） | ✅ 全部可取，含 OHLC |
-| 新浪（3 个） | ✅ 可取 |
-| 中债新综合 | ✅ 6223 行，仅收盘值 |
-| 国证申万 | ✅ 6496 行 |
-| 东方财富 | ❌ `Push2RateLimitError` |
-| 中美国债收益率 | ✅ 4503 行，2/5/10/30 年 |
-| 中债曲线 | ✅ 多期限 |
-| Shibor | ✅ 2405 行 |
+| `audit_3b6_0_1_index_sources.py` | 基础连通性（原有） |
+| `audit_3b6_0_1_1_index_verify.py` | **逐指数**三步验证（本轮新增） |
+| `audit_3b6_0_1_1_bond_coverage.py` | 中债分段覆盖验证（本轮新增） |
 
 ---
 
-## 5. 正式数据库只读验证
+## 6. 正式数据库只读验证
 
 | 检查 | 结果 |
 | --- | --- |
@@ -122,48 +131,49 @@ $ python scripts/audit_3b6_0_1_index_sources.py --json .tmp601/sources.json
 | 内容指纹 | `11c56eba1489976fa35be92586a99bc21a27e20c06e95cacab5c8ca553c05116` |
 | ETF 行情指纹 | `d54727c0a76a1b09531accd04b3d66ff4ea2374592b1d4a8cb8381602cbbac49` |
 
-**与 3B-5.5.1 完全一致，本轮零写入。**
+**与 3B-6.0.1 完全一致，本轮零写入。**
 
 ---
 
-## 6. 测试环境说明
+## 7. 测试环境说明
 
 | 项 | 说明 |
 | --- | --- |
-| 单元测试 | **完全不联网**（数据源连通性由脚本单独实跑） |
+| 单元测试 | **完全不联网**（DataFrame 用 pandas 构造） |
+| 数据源验证 | 由脚本单独实跑 |
 | 正式库 | **只读** |
-| 正式库写入 | **零**（有守恒测试 + 指纹断言） |
+| 正式库写入 | **零** |
 | 数据采集 | **零** |
 
 ---
 
-## 7. 静态检查（不计入测试通过）
+## 8. 静态检查（不计入测试通过）
 
 | 项 | 性质 |
 | --- | --- |
 | `python -m compileall` 语法检查 | **静态** |
-| 报告数据与库查询比对 | **静态核对** |
+| 报告数据与实跑结果比对 | **静态核对** |
 
-**不计入 1662**。
+**不计入 1690**。
 
 ---
 
-## 8. 代码改动清单
+## 9. 代码改动清单
 
 | 文件 | 类型 | 说明 |
 | --- | --- | --- |
-| `app/fund/research/benchmark_audit.py` | **新增** | 基准解析 + 四类证据判定 + 全量审计 |
-| `scripts/audit_3b6_0_1_index_sources.py` | **新增** | 数据源连通性实跑脚本 |
-| `tests/test_3b6_0_1_benchmark_audit.py` | **新增** | 33 项专项测试 |
-| `app/fund/research/engine.py` | **未改** | — |
-| `app/fund/research/indicators.py` | **未改** | — |
-| `app/fund/research/classification.py` | **未改** | — |
-| `app/fund/research/quality.py` | **未改** | 3B-5.5 评级逻辑不变 |
+| `app/fund/research/index_verify.py` | **新增** | 三层状态验证 + 质量检查 + 基线行探测 |
+| `scripts/audit_3b6_0_1_1_index_verify.py` | **新增** | 逐指数实调脚本 |
+| `scripts/audit_3b6_0_1_1_bond_coverage.py` | **新增** | 中债分段覆盖脚本 |
+| `tests/test_3b6_0_1_1_index_verify.py` | **新增** | 28 项专项测试 |
+| `app/fund/research/benchmark_audit.py` | **未改** | — |
+| `app/fund/research/engine.py` / `indicators.py` | **未改** | — |
+| `app/fund/research/quality.py` | **未改** | 评级逻辑不变 |
 | Schema / 迁移 | **未改** | — |
 
 ---
 
-## 9. 门禁
+## 10. 门禁
 
 | 项 | 值 |
 | --- | --- |

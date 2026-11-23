@@ -1,8 +1,8 @@
 {
- "phase": "3B-6.0.1",
+ "phase": "3B-6.0.1.1",
  "report": "risk_free_rate_audit",
  "baseline_head": "c34d867b95db71cd82e16edfb4bbdaeaa530e594",
- "generated_at": "2026-11-23T15:31:39",
+ "generated_at": "2026-11-23T16:12:48",
  "real_invocation": true,
  "sharpe_logic_changed": false,
  "data_ingested": false,
@@ -163,5 +163,198 @@
   "ready_for_research_analysis": true,
   "ready_for_backtest": false,
   "ready_for_formal_ranking": false
- }
+ },
+ "correction_round": "3B-6.0.1.1",
+ "bond_history_coverage": {
+  "single_request_long_span_works": false,
+  "per_year_requests_work": true,
+  "earliest_date_observed": "2006-03-01",
+  "latest_date_observed": "2026-11-20",
+  "succeeded_year_starts": [
+   2006,
+   2010,
+   2015,
+   2020,
+   2025,
+   2026
+  ],
+  "failed_windows": [
+   "early_2005",
+   "long_span_10y"
+  ],
+  "history_coverage_verified": false,
+  "coverage_method": "必须按年分段请求后再拼接",
+  "statement": "单次长区间请求失败（返回 0 行），必须按年分段请求；分段可覆盖多个年份，但**不等同于**已验证可稳定取得连续全历史。仍标 history_coverage_verified=false",
+  "windows": [
+   {
+    "key": "early_2005",
+    "label": "早期·2005 整年",
+    "start": "20050101",
+    "end": "20051231",
+    "ok": false,
+    "rows": 0,
+    "dates": 0,
+    "date_min": null,
+    "date_max": null,
+    "curves": [],
+    "error": null
+   },
+   {
+    "key": "early_2006",
+    "label": "早期·2006 整年",
+    "start": "20060101",
+    "end": "20061231",
+    "ok": true,
+    "rows": 221,
+    "dates": 214,
+    "date_min": "2006-03-01",
+    "date_max": "2006-12-31",
+    "curves": [
+     "中债中短期票据收益率曲线(AAA)",
+     "中债国债收益率曲线"
+    ],
+    "error": null
+   },
+   {
+    "key": "early_2010",
+    "label": "早期·2010 整年",
+    "start": "20100101",
+    "end": "20101231",
+    "ok": true,
+    "rows": 750,
+    "dates": 250,
+    "date_min": "2010-01-04",
+    "date_max": "2010-12-31",
+    "curves": [
+     "中债中短期票据收益率曲线(AAA)",
+     "中债商业银行普通债收益率曲线(AAA)",
+     "中债国债收益率曲线"
+    ],
+    "error": null
+   },
+   {
+    "key": "mid_2015",
+    "label": "中期·2015 整年",
+    "start": "20150101",
+    "end": "20151231",
+    "ok": true,
+    "rows": 747,
+    "dates": 249,
+    "date_min": "2015-01-04",
+    "date_max": "2015-12-31",
+    "curves": [
+     "中债中短期票据收益率曲线(AAA)",
+     "中债商业银行普通债收益率曲线(AAA)",
+     "中债国债收益率曲线"
+    ],
+    "error": null
+   },
+   {
+    "key": "mid_2020",
+    "label": "中期·2020 整年",
+    "start": "20200101",
+    "end": "20201231",
+    "ok": true,
+    "rows": 747,
+    "dates": 249,
+    "date_min": "2020-01-02",
+    "date_max": "2020-12-31",
+    "curves": [
+     "中债中短期票据收益率曲线(AAA)",
+     "中债商业银行普通债收益率曲线(AAA)",
+     "中债国债收益率曲线"
+    ],
+    "error": null
+   },
+   {
+    "key": "recent_2025",
+    "label": "近期·2025 整年",
+    "start": "20250101",
+    "end": "20251231",
+    "ok": true,
+    "rows": 744,
+    "dates": 248,
+    "date_min": "2025-01-02",
+    "date_max": "2025-12-31",
+    "curves": [
+     "中债中短期票据收益率曲线(AAA)",
+     "中债商业银行普通债收益率曲线(AAA)",
+     "中债国债收益率曲线"
+    ],
+    "error": null
+   },
+   {
+    "key": "recent_2026",
+    "label": "近期·2026 至今",
+    "start": "20260101",
+    "end": "20261123",
+    "ok": true,
+    "rows": 657,
+    "dates": 219,
+    "date_min": "2026-01-04",
+    "date_max": "2026-11-20",
+    "curves": [
+     "中债中短期票据收益率曲线(AAA)",
+     "中债商业银行普通债收益率曲线(AAA)",
+     "中债国债收益率曲线"
+    ],
+    "error": null
+   },
+   {
+    "key": "long_span_10y",
+    "label": "长区间·11 年一次请求",
+    "start": "20100101",
+    "end": "20201231",
+    "ok": false,
+    "rows": 0,
+    "dates": 0,
+    "date_min": null,
+    "date_max": null,
+    "curves": [],
+    "error": null
+   },
+   {
+    "key": "short_probe",
+    "label": "短窗口·原 3B-6.0.1 所用",
+    "start": "20200102",
+    "end": "20200110",
+    "ok": true,
+    "rows": 21,
+    "dates": 7,
+    "date_min": "2020-01-02",
+    "date_max": "2020-01-10",
+    "curves": [
+     "中债中短期票据收益率曲线(AAA)",
+     "中债商业银行普通债收益率曲线(AAA)",
+     "中债国债收益率曲线"
+    ],
+    "error": null
+   }
+  ],
+  "original_claim_correction": {
+   "original_claim": "中债曲线可取（基于 2020-01-02 ~ 2020-01-10 的 21 行）",
+   "problem": "21 行只证明该短窗口可取，不能推断长期历史覆盖",
+   "corrected": "长期覆盖需分段验证；单次长区间请求实测返回 0 行"
+  }
+ },
+ "tenor_structure": {
+  "available_tenors": [
+   "3月",
+   "6月",
+   "1年",
+   "3年",
+   "5年",
+   "7年",
+   "10年",
+   "30年"
+  ],
+  "curve_types": [
+   "中债中短期票据收益率曲线(AAA)",
+   "中债国债收益率曲线"
+  ]
+ },
+ "audit_scripts": [
+  "scripts/audit_3b6_0_1_index_sources.py",
+  "scripts/audit_3b6_0_1_1_bond_coverage.py"
+ ]
 }
