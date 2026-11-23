@@ -258,14 +258,40 @@ def test_index_verified_does_not_imply_benchmark_reproducible():
 
 # ================================================================ 6. 中债覆盖
 def test_short_window_does_not_imply_long_coverage():
-    """短窗口调用不能自动推断长期覆盖。"""
+    """短窗口调用不能自动推断长期覆盖。
+
+    直接读取报告 JSON 的窗口记录，逐条断言：
+    - 整体覆盖未通过；
+    - 单次长区间失败；
+    - 短窗口成功；
+    - 长区间失败；
+    - 两个窗口必须真实存在，不能靠缺数据绕过。
+    """
     import json
     p = Path(ROOT) / "reports" / "phase3B6_0_1_risk_free_rate_audit.json"
     doc = json.loads(p.read_text(encoding="utf-8"))
     cov = doc.get("bond_history_coverage") or {}
+
+    # ① 整体覆盖未通过
     assert cov.get("history_coverage_verified") is False
-    assert "short_probe" in cov.get("failed_windows", []) or True
-    # 明确写出短窗口只是探针
+
+    # ② 单次长区间请求失败
+    assert cov.get("single_request_long_span_works") is False
+
+    # ③ 两个关键窗口必须真实存在
+    windows = {w["key"]: w for w in cov.get("windows") or []}
+    assert "short_probe" in windows, "报告缺少 short_probe 窗口记录"
+    assert "long_span_10y" in windows, "报告缺少 long_span_10y 窗口记录"
+
+    # ④ 短窗口成功（证明接口本身能用）
+    assert windows["short_probe"]["ok"] is True
+    assert windows["short_probe"]["rows"] > 0
+
+    # ⑤ 长区间失败（证明不能外推）
+    assert windows["long_span_10y"]["ok"] is False
+    assert windows["long_span_10y"]["rows"] == 0
+
+    # ⑥ 覆盖方法必须有说明
     assert cov.get("coverage_method")
 
 

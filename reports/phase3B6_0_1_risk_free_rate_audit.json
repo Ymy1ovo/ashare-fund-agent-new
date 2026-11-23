@@ -1,7 +1,7 @@
 {
  "phase": "3B-6.0.1.1",
  "report": "risk_free_rate_audit",
- "baseline_head": "c34d867b95db71cd82e16edfb4bbdaeaa530e594",
+ "baseline_head": "3c2185a2f3d223d281ab1fd12e4d2b8175c6305c",
  "generated_at": "2026-11-23T16:12:48",
  "real_invocation": true,
  "sharpe_logic_changed": false,
