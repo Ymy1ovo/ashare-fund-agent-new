@@ -2446,7 +2446,8 @@ if (basis != ACCOUNTING_FORMAL
 | 3B-4.3 | 数据质量与幸存者偏差验收 | 1123 | `phase3B4_3_data_quality_report.md` |
 | 3B-4.4 | 数据缺口补强与来源收口 | 1199 | `phase3B4_4_data_gap_research.md` |
 | 3B-5.0 | 研究性分析框架设计 | 1283 | `phase3B5_0_research_framework.md` |
-| 3B-5.1 | 研究性分析引擎 V1.0 | **1386** | `phase3B5_1_research_engine_report.md` |
+| 3B-5.1 | 研究性分析引擎 V1.0 | 1386 | `phase3B5_1_research_engine_report.md` |
+| 3B-5.2 | 自选基金代码查询 | **1418** | `phase3B5_2_code_lookup_report.md` |
 
 当前正式会计版本：`ca-v2-receivable`；正式会计基础：`formal_receivable`；正式估值标记：`formal_valuation=True`。
 
@@ -5152,6 +5153,7 @@ python -m app.fund.research --list            # 列出研究池
 python -m app.fund.research --code 110022     # 单只基金完整报告
 python -m app.fund.research --all             # 全部研究池
 python -m app.fund.research --all --json out.json
+python -m app.fund.research --codes-file my_funds.txt --json my.json
 ```
 
 **只读**：不写库、不采集、不排名、不出信号。
@@ -5210,7 +5212,7 @@ python -m app.fund.research --all --json out.json
 | 引擎报告 | `reports/phase3B5_1_research_engine_report.md` |
 | 引擎 JSON | `reports/phase3B5_1_research_engine_report.json` |
 | 样本运行结果 | `reports/phase3B5_1_sample_run.json` |
-| 专项测试 | `tests/test_3b5_1_fund_research.py`（57 项） |
+| 专项测试 | `tests/test_3b5_1_fund_research.py`（103 项） |
 
 ### 64.7 验收修正（3B-5.1 修正轮）
 
@@ -5287,4 +5289,59 @@ gap['from'] < window_end and gap['to'] > window_start
 
 新增 `grouping_source` 与 `tracking_fallback_reason` 记录实际依据。
 **不根据基金名称猜测跟踪指数**。
+
+## 65. 阶段3B-5.2 自选基金代码查询 V1.0
+
+### 65.1 CLI
+
+```bash
+python -m app.fund.research --code 110022     # 份额代码
+python -m app.fund.research --code 161725     # 本体代码 → 全部份额
+python -m app.fund.research --codes-file my_funds.txt --json my.json
+```
+
+`--code` 现在**直接查库**，不再限于默认 12 份额研究池。
+
+`--codes-file` 一行一个 6 位代码，支持 `#` 注释与空行；
+非法行跳过并提示；重复代码去重；**单只失败不影响其他基金**。
+
+### 65.2 查询状态
+
+| 状态 | 含义 |
+| --- | --- |
+| `found` | 命中且属于场外研究池 |
+| `not_found` | 数据库中不存在 |
+| `invalid_code` | 非 6 位数字 |
+| `excluded_product` | 场内 ETF / QDII 等排除 |
+| `terminated` | 库内标记已终止 |
+| `no_nav_data` | 有基金信息但无净值 |
+
+**没有任何状态把「没数据」伪装成「净值为 0」。**
+
+### 65.3 数据覆盖摘要
+
+每个份额都输出 `coverage`：净值记录数、起止日期、空值数、非正净值数、
+货币收益行数、费率规则数、有生效日的费率数、支付宝状态（恒 `unknown`）。
+
+### 65.4 实测
+
+| 代码 | 状态 | 份额 |
+| --- | --- | ---: |
+| `110022` | found | 1 |
+| `161725` | found | 2 |
+| `012414` | found | 2（同 161725 本体） |
+| `000007` | terminated | 1 |
+| `000198` | found（货币） | 1 |
+| `999999` | not_found | 0 |
+
+12 份额 / 9 本体回归不变。
+
+### 65.5 产物
+
+| 项 | 路径 |
+| --- | --- |
+| 查询模块 | `app/fund/research/lookup.py` |
+| 报告 | `reports/phase3B5_2_code_lookup_report.md` |
+| 报告 JSON | `reports/phase3B5_2_code_lookup_report.json` |
+| 专项测试 | `tests/test_3b5_2_code_lookup.py`（32 项） |
 

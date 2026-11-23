@@ -218,7 +218,102 @@ def _pick_representative(rs: list[dict]) -> tuple[dict | None, str]:
                   f"{best['share_code']}（{rows_map[best['share_code']]} 条）")
 
 
-def merge_by_fund(reports: list[dict]) -> list[dict]:
+def _share_coverage(entry: dict, db_path: Path | None) -> dict:
+    """数据覆盖审计摘要（不计算指标，只看数据存在性）。"""
+    from app.fund.research.lookup import fee_coverage, nav_coverage
+    sid = entry["share_class_id"]
+    nav = nav_coverage(sid, db_path)
+    fee = fee_coverage(sid, db_path)
+    return {
+        "share_code": entry["share_code"],
+        "share_name": entry["share_name"],
+        "is_primary": entry.get("is_primary"),
+        "nav_rows": nav["rows_"],
+        "nav_date_min": nav["dmin"],
+        "nav_date_max": nav["dmax"],
+        "null_unit_nav": int(nav["null_unit"] or 0),
+        "null_acc_nav": int(nav["null_acc"] or 0),
+        "nonpositive_unit_nav": int(nav["nonpositive"] or 0),
+        "money_yield_rows": nav["money_yield_rows"],
+        "fee_rules_total": fee["total"],
+        "fee_rules_with_effective_from": fee["with_effective_from"],
+        "has_historical_effective_date": fee["has_historical_effective_date"],
+        "alipay_purchasable": fee["alipay_purchasable"],
+        "alipay_note": fee["alipay_note"],
+    }
+
+
+def analyze_by_code(code: str, db_path: Path | None = None) -> dict:
+    """按代码直接查询并生成研究报告（3B-5.2）。
+
+    状态区分明确：
+    - not_found / invalid_code / excluded_product / terminated / no_nav_data / found
+    不把「没数据」伪装成「净值为 0」。
+    """
+    from app.fund.research.lookup import STATUS_FOUND, lookup_fund
+
+    res = lookup_fund(code, db_path)
+    q = res["query"]
+
+    base = {
+        "phase": "3B-5.2",
+        "query": q,
+        "status": res["status"],
+        "reason": res["reason"],
+        "fund_entity": res.get("fund_entity"),
+        "generated_at": datetime.now().isoformat(timespec="seconds"),
+    }
+
+    if res["status"] != STATUS_FOUND:
+        base["reports"] = []
+        base["merged"] = None
+        base["share_reports_available"] = False
+        base["gate"] = _gate()
+        return base
+
+    entries = res["entries"]
+    # 数据覆盖审计（每个份额一条）
+    coverage = [_share_coverage(e, db_path) for e in entries]
+
+    # 无净值 → no_nav_data（而不是算出 0 收益）
+    has_nav = any(c["nav_rows"] > 0 or c["money_yield_rows"] > 0 for c in coverage)
+    if not has_nav:
+        base["status"] = "no_nav_data"
+        base["reason"] = ("基金信息存在，但名下所有份额都没有净值/货币收益记录；"
+                          "不补录、不填 0")
+        base["coverage"] = coverage
+        base["reports"] = []
+        base["merged"] = None
+        base["share_reports_available"] = False
+        base["gate"] = _gate()
+        return base
+
+    reports = [analyze_fund(db_path, e) for e in entries]
+    merged = merge_by_fund(reports, db_path)[0] if reports else None
+
+    base.update({
+        "coverage": coverage,
+        "reports": reports,
+        "merged": merged,
+        "share_reports_available": True,
+        "share_count": len(entries),
+        "fund_count": 1,
+        "gate": _gate(),
+    })
+    return base
+
+
+def _gate() -> dict:
+    return {
+        "ready_for_research_analysis": True,
+        "ready_for_backtest": False,
+        "ready_for_formal_ranking": False,
+        "reason": ("单只基金历史描述性分析可用；正式回测与真实排名仍不具备条件"),
+    }
+
+
+def merge_by_fund(reports: list[dict],
+                  db_path: Path | None = None) -> list[dict]:
     """按 fund_id 归并 A/C/E 份额。
 
     - **同类分析与表现比较以 fund_id 为唯一统计单位**；
@@ -255,7 +350,8 @@ def merge_by_fund(reports: list[dict]) -> list[dict]:
                         "nav_rows": (r.get("quality") or {}).get("rows", 0)}
                        for r in rs],
             # 费用比较保留份额维度
-            "cost_comparison": compare_share_costs(None, fund_id=fid, shares=rs),
+            "cost_comparison": compare_share_costs(db_path, fund_id=fid,
+                                                   shares=rs),
         })
     return merged
 
@@ -329,7 +425,7 @@ def analyze_universe(db_path: Path | None = None, *,
                      include_terminated: bool = False) -> dict:
     universe = load_universe(db_path, include_terminated=include_terminated)
     reports = [analyze_fund(db_path, e) for e in universe]
-    merged = merge_by_fund(reports)
+    merged = merge_by_fund(reports, db_path)
     # 同类分析必须基于**本体级**结果，A/C/E 不能当多个独立基金
     peers = peer_analysis(merged, share_count=len(reports))
 

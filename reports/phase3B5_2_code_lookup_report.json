@@ -1,0 +1,152 @@
+{
+ "phase": "3B-5.2",
+ "baseline_head": "6db751fb12e463f8ec689d8e9956d5aa1daf8e09",
+ "generated_at": "2026-11-23T09:45:00",
+ "engine": {
+  "new_module": "app/fund/research/lookup.py",
+  "extended": [
+   "app/fund/research/engine.py",
+   "app/fund/research/__main__.py"
+  ],
+  "read_only": true,
+  "writes_database": false,
+  "collects_remote_data": false
+ },
+ "lookup_statuses": {
+  "found": "命中且属于场外研究池",
+  "not_found": "数据库中不存在该代码",
+  "invalid_code": "代码格式非法（非 6 位数字）",
+  "excluded_product": "场内 ETF / QDII 等明确排除",
+  "terminated": "库内标记为已终止（清盘事件）",
+  "no_nav_data": "基金信息存在但无净值/货币收益记录"
+ },
+ "capabilities": {
+  "lookup_by_share_code": true,
+  "lookup_by_fund_code": true,
+  "fund_code_returns_all_shares": true,
+  "share_code_maps_to_fund_entity": true,
+  "not_limited_to_default_pool": true,
+  "code_format_validation": "^[0-9]{6}$",
+  "batch_codes_file": true,
+  "batch_isolates_failures": true,
+  "dedupe_duplicates": true,
+  "skip_invalid_lines": true,
+  "comment_and_blank_lines": true
+ },
+ "coverage_fields": [
+  "share_code",
+  "share_name",
+  "is_primary",
+  "nav_rows",
+  "nav_date_min",
+  "nav_date_max",
+  "null_unit_nav",
+  "null_acc_nav",
+  "nonpositive_unit_nav",
+  "money_yield_rows",
+  "fee_rules_total",
+  "fee_rules_with_effective_from",
+  "has_historical_effective_date",
+  "alipay_purchasable"
+ ],
+ "data_absence_distinction": {
+  "no_fund_row": "not_found",
+  "fund_no_nav": "no_nav_data",
+  "nav_with_quality_issues": "found + quality_flags",
+  "indicator_not_computable": "found + status=insufficient_data"
+ },
+ "preserved_rules": {
+  "performance_unit": "fund_id",
+  "ac_shares_not_double_counted": true,
+  "cost_comparison_keeps_share_dimension": true,
+  "representative_has_reason": true,
+  "fee_diff_not_treated_as_return_diff": true,
+  "no_double_deduct_annual_fees": true,
+  "alipay_always_unknown": true
+ },
+ "cli": {
+  "preserved": [
+   "--list",
+   "--code",
+   "--all",
+   "--json"
+  ],
+  "new": [
+   "--codes-file"
+  ],
+  "code_now_queries_db_directly": true
+ },
+ "sample_run": {
+  "batch_input": [
+   "110022",
+   "161725",
+   "012414",
+   "000007",
+   "000198",
+   "999999",
+   "abc"
+  ],
+  "results": {
+   "110022": {
+    "status": "found",
+    "shares": 1
+   },
+   "161725": {
+    "status": "found",
+    "shares": 2
+   },
+   "012414": {
+    "status": "found",
+    "shares": 2,
+    "same_entity_as": "161725"
+   },
+   "000007": {
+    "status": "terminated",
+    "shares": 1
+   },
+   "000198": {
+    "status": "found",
+    "shares": 1,
+    "money_fund": true
+   },
+   "999999": {
+    "status": "not_found",
+    "shares": 0
+   },
+   "abc": {
+    "status": "skipped_invalid"
+   }
+  },
+  "not_interrupted_by_failure": true
+ },
+ "regression_12_9": {
+  "share_count": 12,
+  "fund_count": 9,
+  "peer_member_total": 9,
+  "onshore_etf_included": false
+ },
+ "tests": {
+  "new_file": "tests/test_3b5_2_code_lookup.py",
+  "new_passed": 32,
+  "previous_special_passed": 103,
+  "full_passed": 1418,
+  "full_failed": 0,
+  "full_duration_seconds": 341.79,
+  "note": "1418 = 3B-5.0 的 1283 + 3B-5.1 的 103 + 本轮 32"
+ },
+ "known_limitations": [
+  "只能查已入库基金；未入库返回 not_found，不自动补录",
+  "库内 tracking_index 全为 NULL，指数分组走 benchmark 回落",
+  "支付宝可购买状态恒 unknown",
+  "79 条费率无生效日，历史成本模拟不可算",
+  "无基准收益序列与无风险利率，超额收益 / 常规 Sharpe 不可算",
+  "净值连续性 cannot_verify",
+  "41 条清盘事件非完整名录"
+ ],
+ "gate": {
+  "ready_for_research_analysis": true,
+  "ready_for_backtest": false,
+  "ready_for_formal_ranking": false,
+  "reason": "按代码查询与研究报告能力可用；正式回测与真实排名仍不具备条件"
+ }
+}
