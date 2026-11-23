@@ -2447,7 +2447,8 @@ if (basis != ACCOUNTING_FORMAL
 | 3B-4.4 | 数据缺口补强与来源收口 | 1199 | `phase3B4_4_data_gap_research.md` |
 | 3B-5.0 | 研究性分析框架设计 | 1283 | `phase3B5_0_research_framework.md` |
 | 3B-5.1 | 研究性分析引擎 V1.0 | 1386 | `phase3B5_1_research_engine_report.md` |
-| 3B-5.2 | 自选基金代码查询 | **1418** | `phase3B5_2_code_lookup_report.md` |
+| 3B-5.2 | 自选基金代码查询 | 1418 | `phase3B5_2_code_lookup_report.md` |
+| 3B-5.3 | 自选基金受控接入 | **1445** | `phase3B5_3_user_ingest_report.md` |
 
 当前正式会计版本：`ca-v2-receivable`；正式会计基础：`formal_receivable`；正式估值标记：`formal_valuation=True`。
 
@@ -5344,4 +5345,64 @@ python -m app.fund.research --codes-file my_funds.txt --json my.json
 | 报告 | `reports/phase3B5_2_code_lookup_report.md` |
 | 报告 JSON | `reports/phase3B5_2_code_lookup_report.json` |
 | 专项测试 | `tests/test_3b5_2_code_lookup.py`（32 项） |
+
+## 66. 阶段3B-5.3 自选基金受控接入 V1.0
+
+### 66.1 查询与采集分离
+
+| 命令 | 是否写库 |
+| --- | --- |
+| `python -m app.fund.research --code` | **否**（永远只读） |
+| `python -m app.fund.ingest_user_funds --code` | **是**（唯一写入入口） |
+
+### 66.2 用法
+
+```bash
+python -m app.fund.ingest_user_funds --code 012346
+python -m app.fund.ingest_user_funds --codes-file my_funds.txt
+python -m app.fund.ingest_user_funds --codes-file f.txt --json out.json
+python -m app.fund.ingest_user_funds --code 012346 --dry-run
+```
+
+### 66.3 接入状态
+
+| 状态 | 含义 |
+| --- | --- |
+| `ingested` | 接入成功 |
+| `already_present` | 已存在，不重复写 |
+| `not_found` | 接口无该代码 |
+| `invalid_code` | 非 6 位数字 |
+| `excluded_product` | 场内 ETF / QDII 拒绝 |
+| `failed` | 失败，**不留半成品** |
+| `timeout` | 接口超时 |
+
+### 66.4 写入安全
+
+| 措施 | 实现 |
+| --- | --- |
+| 接入前备份 | `data/backups/fund_agent_before_3b5_3_*.db` |
+| 前后指纹 | `fingerprint_before` / `fingerprint_after` |
+| 幂等 | 已存在返回 `already_present` |
+| 不留半成品 | 先全取到内存，失败直接 return |
+| 无 Schema 变更 | 复用现有列 |
+| 不删历史 | 只追加质量警告 |
+
+### 66.5 实测
+
+| 代码 | 名称 | 分类 | 净值行 |
+| --- | --- | --- | ---: |
+| `000961` | 天弘沪深300ETF联接 | `etf_linked` | 2882 |
+| `012344`/`012345` | 嘉实领先优势混合 A/C | `active_equity` | 1277 |
+| `012346`/`012347` | 易方达港股通成长混合 A/C | `active_equity` | 1230 |
+
+5 份额 / 3 本体；A/C 正确归入同一本体。
+
+### 66.6 产物
+
+| 项 | 路径 |
+| --- | --- |
+| 接入包 | `app/fund/ingest_user_funds/` |
+| 报告 | `reports/phase3B5_3_user_ingest_report.md` |
+| 报告 JSON | `reports/phase3B5_3_user_ingest_report.json` |
+| 专项测试 | `tests/test_3b5_3_user_ingest.py`（27 项） |
 

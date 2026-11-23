@@ -437,13 +437,22 @@ def test_alipay_never_inferred(db):
 
 # ================================================================ 真实库回归
 def test_real_default_pool_unchanged():
-    """12 份额 / 9 本体回归：默认研究池不受本阶段影响。"""
+    """原有 12 份额 / 9 本体仍在，且同类成员仍按 fund_id 去重。"""
+    ORIGINAL_SHARES = {"000015", "000016", "000051", "000198", "000478",
+                       "007300", "007301", "110020", "110022", "161005",
+                       "012414", "161725"}
+    from app.fund.research.data_access import load_universe
     r = analyze_universe()
     u = r["universe"]
-    assert u["share_count"] == 12
-    assert u["fund_count"] == 9
-    assert sum(g["member_count"] for g in
-               r["peer_analysis"]["groups"].values()) == 9
+    codes = {e["share_code"] for e in load_universe()}
+    assert ORIGINAL_SHARES <= codes, "原有 12 份额缺失"
+    original_ids = {e["fund_id"] for e in load_universe()
+                    if e["share_code"] in ORIGINAL_SHARES}
+    assert len(original_ids) == 9
+    # 同类成员总数必须等于本体数（去重生效）
+    total = sum(g["member_count"] for g in
+                r["peer_analysis"]["groups"].values())
+    assert total == u["fund_count"]
 
 
 def test_real_lookup_161725():

@@ -454,23 +454,43 @@ def test_md_aum_not_point_in_time():
 
 # ================================================================ 数据库只读一致性
 def test_db_counts_match_json(fw):
-    """JSON 里的池规模必须与数据库真实查询一致。"""
+    """3B-5.0 封板快照的池规模必须与库中**那批原始记录**一致。
+
+    3B-5.3 起正式库允许受控接入新基金，因此活库总数会增长；
+    这里校验的是封板快照（9 本体 / 12 份额 / 41 清盘）与
+    **封板时那批具体记录**仍然一一对应，而不是要求总数恒定。
+    """
     from app.database.db import get_connection
+    ps = fw["pool_summary"]
+    funds = fw["product_taxonomy"]["current_sample"]["funds"]
+
+    # ① JSON 自身自洽：本体数 = funds 条数，份额数 = 各本体份额数之和
+    assert ps["non_terminated_fund_count"] == len(funds) == 9
+    assert ps["non_terminated_share_count"] == sum(
+        f["share_count"] for f in funds) == 12
+    assert ps["known_terminated_fund_count"] == 41
+
+    # ② 封板时那 9 个本体仍在库中，且仍是 unknown 生命周期
+    codes = [f["code"] for f in funds]
     with get_connection() as conn:
-        n1 = conn.execute(
-            "SELECT COUNT(*) FROM fund_master WHERE lifecycle_status='unknown'"
-        ).fetchone()[0]
-        n2 = conn.execute(
-            """SELECT COUNT(*) FROM fund_share_classes s
-               JOIN fund_master m ON m.fund_id=s.fund_id
-               WHERE m.lifecycle_status='unknown'""").fetchone()[0]
-        n3 = conn.execute(
+        rows = conn.execute(
+            "SELECT fund_code_primary, lifecycle_status FROM fund_master "
+            "WHERE fund_code_primary IN (%s)" % ",".join("?" * len(codes)),
+            codes).fetchall()
+        live_terminated = conn.execute(
             "SELECT COUNT(*) FROM fund_master WHERE lifecycle_status='terminated'"
         ).fetchone()[0]
-    ps = fw["pool_summary"]
-    assert ps["non_terminated_fund_count"] == n1
-    assert ps["non_terminated_share_count"] == n2
-    assert ps["known_terminated_fund_count"] == n3
+        dead_share_sum = conn.execute(
+            """SELECT COUNT(*) FROM fund_share_classes s
+               JOIN fund_master m ON m.fund_id=s.fund_id
+               WHERE m.fund_code_primary IN (%s)"""
+            % ",".join("?" * len(codes)), codes).fetchone()[0]
+
+    assert len(rows) == 9, "封板时的 9 个本体有缺失"
+    assert all(r["lifecycle_status"] == "unknown" for r in rows)
+    assert dead_share_sum == 12, "封板时的 12 个份额有缺失"
+    # 清盘事件对应的本体数不受新接入影响
+    assert live_terminated >= 41
 
 
 def test_onshore_etf_not_in_pool(fw):

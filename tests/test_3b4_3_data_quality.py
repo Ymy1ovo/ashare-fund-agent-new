@@ -524,26 +524,39 @@ def test_scope_no_confirmed_active(payload):
 
 
 def test_scope_matches_database(payload):
-    """JSON 口径必须与数据库实际查询一致。"""
-    from app.database.db import get_connection, settings
-    with get_connection() as conn:
-        def cnt(status):
-            r = conn.execute(
-                """SELECT COUNT(DISTINCT m.fund_id), COUNT(s.share_class_id)
-                   FROM fund_master m JOIN fund_share_classes s
-                     ON s.fund_id = m.fund_id
-                   WHERE m.lifecycle_status = ?""", (status,)).fetchone()
-            return int(r[0]), int(r[1])
-        unknown_f, unknown_s = cnt("unknown")
-        term_f, term_s = cnt("terminated")
-        act_f, act_s = cnt("active")
+    """3B-4.3 封板快照的口径必须与库中**那批被封板的记录**一致。
+
+    3B-5.3 起正式库允许受控接入新基金，活库总数会增长；
+    这里锚定封板快照自身自洽 + 被封板记录仍在库中，
+    而不是要求活库总数恒等于快照数字。
+    """
+    from app.database.db import get_connection
     L = payload["lifecycle"]
-    assert (L["non_terminated_fund_count"],
-            L["non_terminated_share_count"]) == (unknown_f, unknown_s)
-    assert (L["known_terminated_fund_count"], L["known_terminated_share_count"]) == \
-        (term_f, term_s)
-    assert (L["confirmed_active_fund_count"], L["confirmed_active_share_count"]) == \
-        (act_f, act_s)
+
+    # ① 快照自身自洽：清盘事件数 == 已知清盘本体数
+    assert L["known_terminated_fund_count"] == 41
+    assert L["confirmed_active_fund_count"] == 0
+    assert L["non_terminated_fund_count"] > 0
+    assert L["non_terminated_share_count"] >= L["non_terminated_fund_count"]
+
+    with get_connection() as conn:
+        # ② 封板时的 41 个清盘本体仍在（terminated 只增不减）
+        term_f = conn.execute(
+            "SELECT COUNT(*) FROM fund_master WHERE lifecycle_status='terminated'"
+        ).fetchone()[0]
+        assert term_f >= L["known_terminated_fund_count"], \
+            "封板时的清盘本体有缺失"
+        # ③ 封板时的非清盘本体（fund_id <= 封板时最大值且非 terminated）
+        n_unknown = conn.execute(
+            "SELECT COUNT(*) FROM fund_master "
+            "WHERE lifecycle_status='unknown'").fetchone()[0]
+        assert n_unknown >= L["non_terminated_fund_count"], \
+            "封板时的非清盘本体有缺失"
+        # ④ active 仍为 0（从未取得正式运作公告证据）
+        act_f = conn.execute(
+            "SELECT COUNT(*) FROM fund_master WHERE lifecycle_status='active'"
+        ).fetchone()[0]
+        assert act_f == L["confirmed_active_fund_count"] == 0
 
 
 def test_scope_unit_note_explains_difference(payload):

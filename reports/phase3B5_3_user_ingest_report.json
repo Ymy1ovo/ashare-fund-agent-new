@@ -1,0 +1,222 @@
+{
+ "phase": "3B-5.3",
+ "baseline_head": "d311260e1e9056b4176950e1a709cea7e97f3974",
+ "generated_at": "2026-11-23T10:35:00",
+ "package": "app/fund/ingest_user_funds",
+ "cli": "python -m app.fund.ingest_user_funds",
+ "query_remains_readonly": true,
+ "sources_used": {
+  "basic": "akshare.fund_individual_basic_info_xq",
+  "nav": "akshare.fund_open_fund_info_em",
+  "money": "akshare.fund_money_fund_info_em",
+  "dividend": "akshare.fund_open_fund_info_em"
+ },
+ "source_audit": {
+  "basic_info": {
+   "coverage": "当前快照",
+   "evidence": "third_party",
+   "suitable": "limited"
+  },
+  "unit_nav": {
+   "coverage": "成立以来",
+   "evidence": "third_party",
+   "disclosure_date": null,
+   "suitable": "descriptive"
+  },
+  "acc_nav": {
+   "coverage": "成立以来",
+   "evidence": "third_party",
+   "disclosure_date": null,
+   "suitable": "descriptive"
+  },
+  "money_yield": {
+   "coverage": "成立以来",
+   "evidence": "third_party",
+   "disclosure_date": null,
+   "suitable": "separate_scope"
+  },
+  "dividend": {
+   "coverage": "事件驱动，偶发返回空",
+   "evidence": "third_party",
+   "suitable": "incomplete"
+  },
+  "nav_disclosure_calendar": {
+   "available": false,
+   "note": "不可得；continuity 恒 cannot_verify；不用 A 股交易日历代理"
+  },
+  "alipay_status": {
+   "available": false,
+   "value": "unknown"
+  },
+  "alipay_fee": {
+   "available": false,
+   "note": "不接入、不推断"
+  }
+ },
+ "statuses": [
+  "ingested",
+  "already_present",
+  "not_found",
+  "invalid_code",
+  "excluded_product",
+  "failed",
+  "timeout"
+ ],
+ "write_safety": {
+  "backup_before_ingest": true,
+  "fingerprint_before_after": true,
+  "idempotent": true,
+  "no_overwrite_valid_data": true,
+  "sources_and_ingested_at_recorded": true,
+  "no_partial_write_on_failure": true,
+  "fetch_all_to_memory_first": true,
+  "no_schema_change": true,
+  "no_delete_history": true
+ },
+ "quality_audit_fields": [
+  "duplicate_dates",
+  "out_of_order",
+  "null_unit_nav",
+  "null_acc_nav",
+  "nonpositive_unit_nav",
+  "max_gap_days",
+  "gap_count_over_15d",
+  "date_min",
+  "date_max",
+  "acc_equals_unit_ratio",
+  "has_dividend_effect",
+  "continuity_verification"
+ ],
+ "real_ingest": {
+  "shares": 5,
+  "fund_entities": 3,
+  "details": [
+   {
+    "share": "000961",
+    "name": "天弘沪深300ETF联接",
+    "type": "股票型-标准指数",
+    "class": "etf_linked",
+    "nav_rows": 2882,
+    "date_min": "2015-01-20",
+    "date_max": "2026-11-20"
+   },
+   {
+    "share": "012344",
+    "name": "嘉实领先优势混合",
+    "type": "混合型-偏股",
+    "class": "active_equity",
+    "nav_rows": 1277,
+    "date_min": "2021-06-09",
+    "date_max": "2026-11-20",
+    "same_entity_as": "012345"
+   },
+   {
+    "share": "012345",
+    "name": "嘉实领先优势混合",
+    "type": "混合型-偏股",
+    "class": "active_equity",
+    "nav_rows": 1277,
+    "date_min": "2021-06-09",
+    "date_max": "2026-11-20",
+    "same_entity_as": "012344"
+   },
+   {
+    "share": "012346",
+    "name": "易方达港股通成长混合",
+    "type": "混合型-偏股",
+    "class": "active_equity",
+    "nav_rows": 1230,
+    "date_min": "2021-08-31",
+    "date_max": "2026-11-20",
+    "same_entity_as": "012347"
+   },
+   {
+    "share": "012347",
+    "name": "易方达港股通成长混合",
+    "type": "混合型-偏股",
+    "class": "active_equity",
+    "nav_rows": 1230,
+    "date_min": "2021-08-31",
+    "date_max": "2026-11-20",
+    "same_entity_as": "012346"
+   }
+  ]
+ },
+ "rejected": {
+  "511000": "excluded_product（场内 ETF）",
+  "511050": "excluded_product（场内 ETF）",
+  "006479": "excluded_product（QDII）",
+  "999999": "failed（接口无此代码，未写数据）",
+  "abc": "invalid_code"
+ },
+ "idempotency": {
+  "reingest_all": "already_present",
+  "fingerprint_unchanged": true
+ },
+ "db_state": {
+  "integrity_check": "ok",
+  "foreign_key_violations": 0,
+  "row_counts_after": {
+   "fund_aum_history": 683,
+   "fund_data_quality": 31,
+   "fund_dividends": 44,
+   "fund_fee_rules": 90,
+   "fund_lifecycle_events": 49,
+   "fund_manager_history": 21,
+   "fund_master": 53,
+   "fund_nav_daily": 47718,
+   "fund_share_classes": 80,
+   "fund_subscription_status": 12
+  },
+  "row_counts_before": {
+   "fund_master": 50,
+   "fund_share_classes": 75,
+   "fund_nav_daily": 39822,
+   "fund_dividends": 44,
+   "fund_fee_rules": 90,
+   "fund_manager_history": 21,
+   "fund_aum_history": 683,
+   "fund_lifecycle_events": 49,
+   "fund_subscription_status": 12,
+   "fund_data_quality": 31
+  },
+  "unchanged": {
+   "fund_lifecycle_events": 49,
+   "fund_dividends": 44,
+   "fund_fee_rules": 90,
+   "fund_manager_history": 21,
+   "fund_aum_history": 683,
+   "terminated_funds": 41
+  },
+  "etf_fingerprint_unchanged": "d54727c0a76a1b09531accd04b3d66ff4ea2374592b1d4a8cb8381602cbbac49"
+ },
+ "source_distribution": {
+  "dfcfw.announcement.calibrated": 41,
+  "akshare.fund_individual_basic_info_xq": 12,
+  "akshare.fund_name_em": 1
+ },
+ "tests": {
+  "new_file": "tests/test_3b5_3_user_ingest.py",
+  "new_passed": 27,
+  "full_passed": 1445,
+  "full_failed": 0,
+  "full_duration_seconds": 355.05,
+  "note": "1445 = 1418 + 27"
+ },
+ "known_limitations": [
+  "只能接入 AKShare 能返回的基金；接口无数据返回 not_found",
+  "生命周期恒 unknown（无运作公告证据）",
+  "无净值公布日历，连续性 cannot_verify",
+  "分红接口偶发返回空，不能据此判断无分红",
+  "支付宝可购买状态恒 unknown",
+  "支付宝费率不接入、不推断",
+  "未接入 QDII 与场内 ETF（明确排除）",
+  "未接入费率/经理/规模（本阶段范围只到净值与基本信息）"
+ ],
+ "gate": {
+  "ready_for_research_analysis": true,
+  "ready_for_backtest": false,
+  "ready_for_formal_ranking": false,
+  "reason": "受控数据接入可用；正式回测与真实排名仍不具备条件"
+ }
+}

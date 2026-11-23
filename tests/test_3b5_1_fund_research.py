@@ -640,14 +640,23 @@ def test_taxonomy_nine_classes():
 
 
 # ================================================================ 真实数据库只读集成（不写）
+# 3B-5.3 起正式库允许受控接入新基金，默认池会随之增长；
+# 这里锚定「3B-5.1 验收时的原始 12 份额 / 9 本体」必须始终存在。
+ORIGINAL_SHARES = {"000015", "000016", "000051", "000198", "000478",
+                   "007300", "007301", "110020", "110022", "161005",
+                   "012414", "161725"}
+ORIGINAL_FUND_COUNT = 9
+
+
 def test_real_universe_excludes_onshore_etf():
     from app.fund.research.data_access import load_universe
     u = load_universe()
     codes = {e["share_code"] for e in u}
     for c in ONSHORE_ETF_CODES:
         assert c not in codes
-    assert len({e["fund_id"] for e in u}) == 9
-    assert len(u) == 12
+    assert ORIGINAL_SHARES <= codes, "原有 12 份额缺失"
+    original_ids = {e["fund_id"] for e in u if e["share_code"] in ORIGINAL_SHARES}
+    assert len(original_ids) == ORIGINAL_FUND_COUNT
 
 
 def test_real_161725_is_lof_index():
@@ -1008,17 +1017,19 @@ def test_sample_dedup_by_fund_id_real():
                 "peer_group": e["peer_group"],
                 "quality": {"rows": 1}, "indicators": {}} for e in u]
     merged = merge_by_fund(reports)
-    assert len(merged) == 9
     pa = peer_analysis(merged, share_count=len(reports))
-    assert pa["fund_count"] == 9
-    assert pa["share_count"] == 12
+    # 成员数 == 本体数（去重生效），且每个 fund_id 只出现一次
+    assert pa["fund_count"] == len(merged)
     total_members = sum(g["member_count"] for g in pa["groups"].values())
-    assert total_members == 9, "同类成员总数必须等于本体数"
-    # 每个 fund_id 只出现一次
+    assert total_members == len(merged), "同类成员总数必须等于本体数"
     seen = []
     for g in pa["groups"].values():
         seen.extend(g["fund_ids"])
-    assert len(seen) == len(set(seen)) == 9
+    assert len(seen) == len(set(seen))
+    # 原始 12 份额仍映射到 9 个本体
+    orig_reports = [r for r in reports if r["share_code"] in ORIGINAL_SHARES]
+    assert len(orig_reports) == 12
+    assert len({r["fund_id"] for r in orig_reports}) == ORIGINAL_FUND_COUNT
 
 
 # ================================================================ 最终验收修正 A：回撤不跨段
