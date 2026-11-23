@@ -2450,7 +2450,8 @@ if (basis != ACCOUNTING_FORMAL
 | 3B-5.2 | 自选基金代码查询 | 1418 | `phase3B5_2_code_lookup_report.md` |
 | 3B-5.3 | 自选基金受控接入 | 1445 | `phase3B5_3_user_ingest_report.md` |
 | 3B-5.3.1 | 事务原子性与内容指纹修复 | 1465 | `phase3B5_3_1_atomic_fix_report.md` |
-| 3B-5.3.2 | 外键约束与指纹序列化修正 | **1482** | `phase3B5_3_2_fk_serialization_report.md` |
+| 3B-5.3.2 | 外键约束与指纹序列化修正 | 1482 | `phase3B5_3_2_fk_serialization_report.md` |
+| 3B-5.4 | 多类型场外基金真实接入验证 | **1517** | `phase3B5_4_ingestion_report.md` |
 
 当前正式会计版本：`ca-v2-receivable`；正式会计基础：`formal_receivable`；正式估值标记：`formal_valuation=True`。
 
@@ -5523,4 +5524,56 @@ json.dumps([list(_stable_value(v)) for v in values],
 | 3B-5.3.2 算法（备份库） | `f71c36f9…d635b` |
 
 **同一算法下当前库与备份库完全一致** → 数据未变，只是算法换了。
+
+## 67. 阶段3B-5.4 多类型场外基金真实接入 V1.0
+
+### 67.1 覆盖范围
+
+| 类型 | 真实样本 | 分类 | 净值行 |
+| --- | --- | --- | ---: |
+| 普通指数基金 | `050002` 博时裕富沪深300指数A | `ordinary_index` | 5644 |
+| ETF 联接基金 | `001052` 华夏中证500ETF联接 | `etf_linked` | 2802 |
+| ETF 联接 A/C | `001548`/`001549` 天弘上证50ETF联接 | `etf_linked` | 2764 |
+| 主动权益基金 | `001938` 中欧时代先锋 | `active_equity` | 2678 |
+| 混合型基金 | `519066` 汇添富蓝筹稳健混合 | `active_equity` | 4461 |
+| 债券 A/C | `000032`/`000033` 易方达信用债 | `bond_pure` | 3288 |
+| 货币基金 | `000509` 广发钱袋子货币 | `money_market` | 4676 |
+
+9 份额 / 7 本体；六类全部真实接入；两组真实 A/C 配对。
+
+### 67.2 关键口径
+
+| 检查 | 结果 |
+| --- | --- |
+| 货币基金是否混用净值口径 | **否**，`uses_unit_nav=False`，净值指标 `not_applicable` |
+| A/C 是否算成两只基金 | **否**，按 `fund_id` 去重 |
+| 数据不足是否硬算 Sharpe | **否**，`not_available`，不把 0 当无风险利率 |
+| 有缺口是否硬算年化 | **否**，`insufficient_data` |
+| 是否伪造支付宝状态 | **否**，恒 `unknown` |
+
+### 67.3 数据库
+
+| 项 | 值 |
+| --- | --- |
+| 备份 | `data/backups/fund_agent_before_3b5_4_before_20261123_132335.db` |
+| `integrity_check` | ok |
+| `foreign_key_check` | 0 违规 |
+| 清盘 41 / 事件 49 / 费率 90 / 经理 21 / 规模 683 | **全部不变** |
+
+### 67.4 产物
+
+| 文档 | 路径 |
+| --- | --- |
+| 候选审计 | `reports/phase3B5_4_candidate_audit.md` |
+| 接入报告 | `reports/phase3B5_4_ingestion_report.md` |
+| 研究验证 | `reports/phase3B5_4_research_validation_report.md` |
+| 测试报告 | `reports/phase3B5_4_test_report.md` |
+| 审计脚本 | `scripts/audit_3b5_4_candidates.py` |
+| 专项测试 | `tests/test_3b5_4_multi_type.py`（35 项） |
+
+### 67.5 顺带修复
+
+`compute_money_indicators()` 原未接收 `db_path`，导致分析临时库时
+货币统计回落到正式库（临时库货币样本统计恒为空）。
+已补 `db_path` 透传，并新增 2 项隔离回归测试。
 

@@ -1,0 +1,954 @@
+{
+ "phase": "3B-5.4",
+ "report": "research_validation",
+ "baseline_head": "a94325080a449a4a84e40b8a1bc4bbabcb0bab03",
+ "generated_at": "2026-11-23T13:50:00",
+ "engine": "app/fund/research/engine.py",
+ "data_source": "data/fund_agent.db",
+ "results": {
+  "050002": {
+   "product_class": "ordinary_index",
+   "share_count": 1,
+   "representative_share": "050002",
+   "peer_key": "ordinary_index|broad|沪深300",
+   "grouping_source": "benchmark",
+   "ret_12m": {
+    "value": -0.040993,
+    "status": "ok",
+    "reason": null,
+    "value_pct": -4.099267,
+    "start_date": "2025-11-20",
+    "end_date": "2026-11-20",
+    "start_value": 3.9812,
+    "end_value": 3.818,
+    "window_days": 365,
+    "field": "acc_nav",
+    "label": "近 12 月"
+   },
+   "max_drawdown": {
+    "value": 0.334992,
+    "status": "ok",
+    "reason": null,
+    "value_pct": 33.4992,
+    "detail": {
+     "peak_value": 1.206,
+     "peak_date": "2004-04-02",
+     "trough_value": 0.802,
+     "trough_date": "2005-06-02"
+    },
+    "recovery": {
+     "value": 341,
+     "status": "ok",
+     "reason": null,
+     "unit": "自然日",
+     "trough_date": "2005-06-02",
+     "recovered_date": "2006-05-09",
+     "within_same_segment": true
+    },
+    "gap_count_over_threshold": 1,
+    "null_count": 0,
+    "segments": [
+     {
+      "segment_start": "2003-09-26",
+      "segment_end": "2026-11-20",
+      "points": 5643,
+      "max_drawdown": 0.334992,
+      "detail": {
+       "peak_value": 1.206,
+       "peak_date": "2004-04-02",
+       "trough_value": 0.802,
+       "trough_date": "2005-06-02"
+      }
+     }
+    ],
+    "segment_count": 1,
+    "selected_segment": {
+     "index": 0,
+     "segment_start": "2003-09-26",
+     "segment_end": "2026-11-20",
+     "max_drawdown": 0.334992
+    },
+    "selection_rule": "全区间最大回撤 = max(各连续段最大回撤)；并列时取时间最早的一段；detail 与 recovery 均取自该段",
+    "complete_interval": false,
+    "caveat": "净值连续性 cannot_verify",
+    "degraded": true,
+    "degraded_reason": "区间内存在 1 处超过 15 天的缺口；缺口与空值两端不视为连续路径。本值只是**可观测连续段内**的最大回撤，**不是全区间完整最大回撤**，可能被低估",
+    "note": "已降级为分段可观测结果，不输出无警告的完整最大回撤"
+   },
+   "annualized_return": {
+    "value": null,
+    "status": "insufficient_data",
+    "reason": "首尾区间内存在 1 处超过 15 天的缺口，不跨越缺口计算年化收益",
+    "gaps": [
+     {
+      "from": "2003-08-26",
+      "to": "2003-09-26",
+      "days": 31
+     }
+    ]
+   },
+   "volatility": {
+    "sample_size": 5642,
+    "skipped_points": 1,
+    "daily_vol": 0.00693535,
+    "gap_profile": {
+     "one_day_ratio": 0.7886,
+     "weekend_ratio": 0.196,
+     "holiday_ratio": 0.0154,
+     "irregular_ratio": 0.0
+    },
+    "observed_per_year": 243.79,
+    "value": 0.00693535,
+    "value_pct": 0.693535,
+    "status": "ok",
+    "reason": null,
+    "annualized": false,
+    "annualization_blocked_reason": "存在 1 处超过 15 天的缺口；只输出未年化日波动，不乘任何年化因子"
+   },
+   "is_money_fund": false,
+   "money_stats": null,
+   "sharpe": {
+    "value": null,
+    "status": "not_available",
+    "reason": "无风险利率无可靠数据源，不输出常规 Sharpe",
+    "note": "避免把 0 冒充真实无风险利率"
+   },
+   "not_computed": {
+    "excess_return": "无基准收益序列，禁止计算超额收益",
+    "style_stability": "无持仓数据，无法计算风格稳定性",
+    "information_ratio": "无基准序列",
+    "beta": "无基准序列"
+   },
+   "quality": {
+    "code": "050002",
+    "share_class_id": 96,
+    "fund_id": 69,
+    "share_class_name": "博时裕富沪深300指数A",
+    "nav_kind": "net_value",
+    "rows": 5644,
+    "date_min": "2003-08-26",
+    "date_max": "2026-11-20",
+    "duplicate_dates": 0,
+    "out_of_order": 0,
+    "null_unit_nav": 0,
+    "null_acc_nav": 0,
+    "nonpositive_unit_nav": 0,
+    "max_gap_days": 31,
+    "max_gap_at": [
+     "2003-08-26",
+     "2003-09-26"
+    ],
+    "gap_count_over_threshold": 1,
+    "gaps_sample": [
+     {
+      "from": "2003-08-26",
+      "to": "2003-09-26",
+      "days": 31
+     }
+    ],
+    "acc_equals_unit_ratio": 0.0291,
+    "has_dividend_effect": true,
+    "acc_usable_as_total_return": true,
+    "continuity_verification": "cannot_verify",
+    "quality_flags": [
+     "gaps_over_threshold"
+    ]
+   }
+  },
+  "001052": {
+   "product_class": "etf_linked",
+   "share_count": 1,
+   "representative_share": "001052",
+   "peer_key": "etf_linked|broad|中证500",
+   "grouping_source": "benchmark",
+   "ret_12m": {
+    "value": -0.125516,
+    "status": "ok",
+    "reason": null,
+    "value_pct": -12.55161,
+    "start_date": "2025-11-20",
+    "end_date": "2026-11-20",
+    "start_value": 0.8477,
+    "end_value": 0.7413,
+    "window_days": 365,
+    "field": "acc_nav",
+    "label": "近 12 月"
+   },
+   "max_drawdown": {
+    "value": 0.62781,
+    "status": "ok",
+    "reason": null,
+    "value_pct": 62.781,
+    "detail": {
+     "peak_value": 1.201,
+     "peak_date": "2015-06-12",
+     "trough_value": 0.447,
+     "trough_date": "2018-10-18"
+    },
+    "recovery": {
+     "value": 2955,
+     "status": "ongoing",
+     "reason": "该连续段内尚未恢复至前高，标记 ongoing，不能当作已修复；未跨段寻找恢复点",
+     "trough_date": "2018-10-18",
+     "days_elapsed": 2955,
+     "segment_end": "2026-11-20"
+    },
+    "gap_count_over_threshold": 0,
+    "null_count": 0,
+    "segments": [
+     {
+      "segment_start": "2015-05-05",
+      "segment_end": "2026-11-20",
+      "points": 2802,
+      "max_drawdown": 0.62781,
+      "detail": {
+       "peak_value": 1.201,
+       "peak_date": "2015-06-12",
+       "trough_value": 0.447,
+       "trough_date": "2018-10-18"
+      }
+     }
+    ],
+    "segment_count": 1,
+    "selected_segment": {
+     "index": 0,
+     "segment_start": "2015-05-05",
+     "segment_end": "2026-11-20",
+     "max_drawdown": 0.62781
+    },
+    "selection_rule": "全区间最大回撤 = max(各连续段最大回撤)；并列时取时间最早的一段；detail 与 recovery 均取自该段",
+    "complete_interval": true,
+    "caveat": "净值连续性 cannot_verify",
+    "degraded": false
+   },
+   "annualized_return": {
+    "value": -0.025595,
+    "status": "ok",
+    "reason": null,
+    "value_pct": -2.559456,
+    "span_days": 4217,
+    "years": 11.5455,
+    "method": "自然日间隔复合年化",
+    "field": "acc_nav"
+   },
+   "volatility": {
+    "sample_size": 2801,
+    "skipped_points": 0,
+    "daily_vol": 0.01501278,
+    "gap_profile": {
+     "one_day_ratio": 0.7869,
+     "weekend_ratio": 0.196,
+     "holiday_ratio": 0.0171,
+     "irregular_ratio": 0.0
+    },
+    "observed_per_year": 242.78,
+    "value": 0.23392,
+    "value_pct": 23.392013,
+    "status": "ok",
+    "reason": null,
+    "annualized": true,
+    "annualization_factor": 242.78,
+    "annualization_basis": "观测频率：2801 个有效日收益 / 11.54 年 ≈ 242.8 次/年；1 天间隔占比 78.7%，无超阈值缺口 → 确认为逐交易日公布，按观测频率年化（参考值 252，实际用 242.8）"
+   },
+   "is_money_fund": false,
+   "money_stats": null,
+   "sharpe": {
+    "value": null,
+    "status": "not_available",
+    "reason": "无风险利率无可靠数据源，不输出常规 Sharpe",
+    "note": "避免把 0 冒充真实无风险利率"
+   },
+   "not_computed": {
+    "excess_return": "无基准收益序列，禁止计算超额收益",
+    "style_stability": "无持仓数据，无法计算风格稳定性",
+    "information_ratio": "无基准序列",
+    "beta": "无基准序列"
+   },
+   "quality": {
+    "code": "001052",
+    "share_class_id": 97,
+    "fund_id": 70,
+    "share_class_name": "华夏中证500ETF联接",
+    "nav_kind": "net_value",
+    "rows": 2802,
+    "date_min": "2015-05-05",
+    "date_max": "2026-11-20",
+    "duplicate_dates": 0,
+    "out_of_order": 0,
+    "null_unit_nav": 0,
+    "null_acc_nav": 0,
+    "nonpositive_unit_nav": 0,
+    "max_gap_days": 11,
+    "max_gap_at": [
+     "2020-01-23",
+     "2020-02-03"
+    ],
+    "gap_count_over_threshold": 0,
+    "gaps_sample": [],
+    "acc_equals_unit_ratio": 1.0,
+    "has_dividend_effect": false,
+    "acc_usable_as_total_return": false,
+    "continuity_verification": "cannot_verify",
+    "quality_flags": []
+   }
+  },
+  "001938": {
+   "product_class": "active_equity",
+   "share_count": 1,
+   "representative_share": "001938",
+   "peer_key": "active_equity|中证500",
+   "grouping_source": "benchmark",
+   "ret_12m": {
+    "value": -0.06517,
+    "status": "ok",
+    "reason": null,
+    "value_pct": -6.51704,
+    "start_date": "2025-11-20",
+    "end_date": "2026-11-20",
+    "start_value": 3.1456,
+    "end_value": 2.9406,
+    "window_days": 365,
+    "field": "acc_nav",
+    "label": "近 12 月"
+   },
+   "max_drawdown": {
+    "value": 0.292096,
+    "status": "ok",
+    "reason": null,
+    "value_pct": 29.2096,
+    "detail": {
+     "peak_value": 3.3715,
+     "peak_date": "2021-07-22",
+     "trough_value": 2.3867,
+     "trough_date": "2024-02-02"
+    },
+    "recovery": {
+     "value": 704,
+     "status": "ok",
+     "reason": null,
+     "unit": "自然日",
+     "trough_date": "2024-02-02",
+     "recovered_date": "2026-01-06",
+     "within_same_segment": true
+    },
+    "gap_count_over_threshold": 0,
+    "null_count": 0,
+    "segments": [
+     {
+      "segment_start": "2015-11-03",
+      "segment_end": "2026-11-20",
+      "points": 2678,
+      "max_drawdown": 0.292096,
+      "detail": {
+       "peak_value": 3.3715,
+       "peak_date": "2021-07-22",
+       "trough_value": 2.3867,
+       "trough_date": "2024-02-02"
+      }
+     }
+    ],
+    "segment_count": 1,
+    "selected_segment": {
+     "index": 0,
+     "segment_start": "2015-11-03",
+     "segment_end": "2026-11-20",
+     "max_drawdown": 0.292096
+    },
+    "selection_rule": "全区间最大回撤 = max(各连续段最大回撤)；并列时取时间最早的一段；detail 与 recovery 均取自该段",
+    "complete_interval": true,
+    "caveat": "净值连续性 cannot_verify",
+    "degraded": false
+   },
+   "annualized_return": {
+    "value": 0.102562,
+    "status": "ok",
+    "reason": null,
+    "value_pct": 10.256203,
+    "span_days": 4035,
+    "years": 11.0472,
+    "method": "自然日间隔复合年化",
+    "field": "acc_nav"
+   },
+   "volatility": {
+    "sample_size": 2677,
+    "skipped_points": 0,
+    "daily_vol": 0.00988028,
+    "gap_profile": {
+     "one_day_ratio": 0.7867,
+     "weekend_ratio": 0.1957,
+     "holiday_ratio": 0.0176,
+     "irregular_ratio": 0.0
+    },
+    "observed_per_year": 242.5,
+    "value": 0.15386,
+    "value_pct": 15.385974,
+    "status": "ok",
+    "reason": null,
+    "annualized": true,
+    "annualization_factor": 242.5,
+    "annualization_basis": "观测频率：2677 个有效日收益 / 11.04 年 ≈ 242.5 次/年；1 天间隔占比 78.7%，无超阈值缺口 → 确认为逐交易日公布，按观测频率年化（参考值 252，实际用 242.5）"
+   },
+   "is_money_fund": false,
+   "money_stats": null,
+   "sharpe": {
+    "value": null,
+    "status": "not_available",
+    "reason": "无风险利率无可靠数据源，不输出常规 Sharpe",
+    "note": "避免把 0 冒充真实无风险利率"
+   },
+   "not_computed": {
+    "excess_return": "无基准收益序列，禁止计算超额收益",
+    "style_stability": "无持仓数据，无法计算风格稳定性",
+    "information_ratio": "无基准序列",
+    "beta": "无基准序列"
+   },
+   "quality": {
+    "code": "001938",
+    "share_class_id": 98,
+    "fund_id": 71,
+    "share_class_name": "中欧时代先锋",
+    "nav_kind": "net_value",
+    "rows": 2678,
+    "date_min": "2015-11-03",
+    "date_max": "2026-11-20",
+    "duplicate_dates": 0,
+    "out_of_order": 0,
+    "null_unit_nav": 0,
+    "null_acc_nav": 0,
+    "nonpositive_unit_nav": 0,
+    "max_gap_days": 11,
+    "max_gap_at": [
+     "2020-01-23",
+     "2020-02-03"
+    ],
+    "gap_count_over_threshold": 0,
+    "gaps_sample": [],
+    "acc_equals_unit_ratio": 0.0071,
+    "has_dividend_effect": true,
+    "acc_usable_as_total_return": true,
+    "continuity_verification": "cannot_verify",
+    "quality_flags": []
+   }
+  },
+  "519066": {
+   "product_class": "active_equity",
+   "share_count": 1,
+   "representative_share": "519066",
+   "peer_key": "active_equity|中证800",
+   "grouping_source": "benchmark",
+   "ret_12m": {
+    "value": -0.085714,
+    "status": "ok",
+    "reason": null,
+    "value_pct": -8.571429,
+    "start_date": "2025-11-20",
+    "end_date": "2026-11-20",
+    "start_value": 4.34,
+    "end_value": 3.968,
+    "window_days": 365,
+    "field": "acc_nav",
+    "label": "近 12 月"
+   },
+   "max_drawdown": {
+    "value": 0.422377,
+    "status": "ok",
+    "reason": null,
+    "value_pct": 42.2377,
+    "detail": {
+     "peak_value": 6.042,
+     "peak_date": "2021-02-10",
+     "trough_value": 3.49,
+     "trough_date": "2024-02-02"
+    },
+    "recovery": {
+     "value": 1022,
+     "status": "ongoing",
+     "reason": "该连续段内尚未恢复至前高，标记 ongoing，不能当作已修复；未跨段寻找恢复点",
+     "trough_date": "2024-02-02",
+     "days_elapsed": 1022,
+     "segment_end": "2026-11-20"
+    },
+    "gap_count_over_threshold": 0,
+    "null_count": 0,
+    "segments": [
+     {
+      "segment_start": "2008-07-08",
+      "segment_end": "2026-11-20",
+      "points": 4461,
+      "max_drawdown": 0.422377,
+      "detail": {
+       "peak_value": 6.042,
+       "peak_date": "2021-02-10",
+       "trough_value": 3.49,
+       "trough_date": "2024-02-02"
+      }
+     }
+    ],
+    "segment_count": 1,
+    "selected_segment": {
+     "index": 0,
+     "segment_start": "2008-07-08",
+     "segment_end": "2026-11-20",
+     "max_drawdown": 0.422377
+    },
+    "selection_rule": "全区间最大回撤 = max(各连续段最大回撤)；并列时取时间最早的一段；detail 与 recovery 均取自该段",
+    "complete_interval": true,
+    "caveat": "净值连续性 cannot_verify",
+    "degraded": false
+   },
+   "annualized_return": {
+    "value": 0.077922,
+    "status": "ok",
+    "reason": null,
+    "value_pct": 7.792195,
+    "span_days": 6709,
+    "years": 18.3682,
+    "method": "自然日间隔复合年化",
+    "field": "acc_nav"
+   },
+   "volatility": {
+    "sample_size": 4460,
+    "skipped_points": 0,
+    "daily_vol": 0.01012816,
+    "gap_profile": {
+     "one_day_ratio": 0.787,
+     "weekend_ratio": 0.196,
+     "holiday_ratio": 0.017,
+     "irregular_ratio": 0.0
+    },
+    "observed_per_year": 242.92,
+    "value": 0.157856,
+    "value_pct": 15.785642,
+    "status": "ok",
+    "reason": null,
+    "annualized": true,
+    "annualization_factor": 242.92,
+    "annualization_basis": "观测频率：4460 个有效日收益 / 18.36 年 ≈ 242.9 次/年；1 天间隔占比 78.7%，无超阈值缺口 → 确认为逐交易日公布，按观测频率年化（参考值 252，实际用 242.9）"
+   },
+   "is_money_fund": false,
+   "money_stats": null,
+   "sharpe": {
+    "value": null,
+    "status": "not_available",
+    "reason": "无风险利率无可靠数据源，不输出常规 Sharpe",
+    "note": "避免把 0 冒充真实无风险利率"
+   },
+   "not_computed": {
+    "excess_return": "无基准收益序列，禁止计算超额收益",
+    "style_stability": "无持仓数据，无法计算风格稳定性",
+    "information_ratio": "无基准序列",
+    "beta": "无基准序列"
+   },
+   "quality": {
+    "code": "519066",
+    "share_class_id": 99,
+    "fund_id": 72,
+    "share_class_name": "汇添富蓝筹稳健混合",
+    "nav_kind": "net_value",
+    "rows": 4461,
+    "date_min": "2008-07-08",
+    "date_max": "2026-11-20",
+    "duplicate_dates": 0,
+    "out_of_order": 0,
+    "null_unit_nav": 0,
+    "null_acc_nav": 0,
+    "nonpositive_unit_nav": 0,
+    "max_gap_days": 11,
+    "max_gap_at": [
+     "2020-01-23",
+     "2020-02-03"
+    ],
+    "gap_count_over_threshold": 0,
+    "gaps_sample": [],
+    "acc_equals_unit_ratio": 0.039,
+    "has_dividend_effect": true,
+    "acc_usable_as_total_return": true,
+    "continuity_verification": "cannot_verify",
+    "quality_flags": []
+   }
+  },
+  "000032": {
+   "product_class": "bond_pure",
+   "share_count": 2,
+   "representative_share": "000032",
+   "peer_key": "bond_pure|unknown",
+   "grouping_source": "unknown",
+   "ret_12m": {
+    "value": 0.023151,
+    "status": "ok",
+    "reason": null,
+    "value_pct": 2.315128,
+    "start_date": "2025-11-20",
+    "end_date": "2026-11-20",
+    "start_value": 1.6241,
+    "end_value": 1.6617,
+    "window_days": 365,
+    "field": "acc_nav",
+    "label": "近 12 月"
+   },
+   "max_drawdown": {
+    "value": 0.049652,
+    "status": "ok",
+    "reason": null,
+    "value_pct": 4.9652,
+    "detail": {
+     "peak_value": 1.007,
+     "peak_date": "2013-07-08",
+     "trough_value": 0.957,
+     "trough_date": "2014-01-03"
+    },
+    "recovery": {
+     "value": 146,
+     "status": "ok",
+     "reason": null,
+     "unit": "自然日",
+     "trough_date": "2014-01-03",
+     "recovered_date": "2014-05-29",
+     "within_same_segment": true
+    },
+    "gap_count_over_threshold": 0,
+    "null_count": 0,
+    "segments": [
+     {
+      "segment_start": "2013-04-24",
+      "segment_end": "2026-11-20",
+      "points": 3288,
+      "max_drawdown": 0.049652,
+      "detail": {
+       "peak_value": 1.007,
+       "peak_date": "2013-07-08",
+       "trough_value": 0.957,
+       "trough_date": "2014-01-03"
+      }
+     }
+    ],
+    "segment_count": 1,
+    "selected_segment": {
+     "index": 0,
+     "segment_start": "2013-04-24",
+     "segment_end": "2026-11-20",
+     "max_drawdown": 0.049652
+    },
+    "selection_rule": "全区间最大回撤 = max(各连续段最大回撤)；并列时取时间最早的一段；detail 与 recovery 均取自该段",
+    "complete_interval": true,
+    "caveat": "净值连续性 cannot_verify",
+    "degraded": false
+   },
+   "annualized_return": {
+    "value": 0.038121,
+    "status": "ok",
+    "reason": null,
+    "value_pct": 3.81207,
+    "span_days": 4958,
+    "years": 13.5743,
+    "method": "自然日间隔复合年化",
+    "field": "acc_nav"
+   },
+   "volatility": {
+    "sample_size": 3287,
+    "skipped_points": 0,
+    "daily_vol": 0.00079432,
+    "gap_profile": {
+     "one_day_ratio": 0.7858,
+     "weekend_ratio": 0.1962,
+     "holiday_ratio": 0.0179,
+     "irregular_ratio": 0.0
+    },
+    "observed_per_year": 242.25,
+    "value": 0.012363,
+    "value_pct": 1.236311,
+    "status": "ok",
+    "reason": null,
+    "annualized": true,
+    "annualization_factor": 242.25,
+    "annualization_basis": "观测频率：3287 个有效日收益 / 13.57 年 ≈ 242.2 次/年；1 天间隔占比 78.6%，无超阈值缺口 → 确认为逐交易日公布，按观测频率年化（参考值 252，实际用 242.2）"
+   },
+   "is_money_fund": false,
+   "money_stats": null,
+   "sharpe": {
+    "value": null,
+    "status": "not_available",
+    "reason": "无风险利率无可靠数据源，不输出常规 Sharpe",
+    "note": "避免把 0 冒充真实无风险利率"
+   },
+   "not_computed": {
+    "excess_return": "无基准收益序列，禁止计算超额收益",
+    "style_stability": "无持仓数据，无法计算风格稳定性",
+    "information_ratio": "无基准序列",
+    "beta": "无基准序列"
+   },
+   "quality": {
+    "code": "000032",
+    "share_class_id": 100,
+    "fund_id": 73,
+    "share_class_name": "易方达信用债A",
+    "nav_kind": "net_value",
+    "rows": 3288,
+    "date_min": "2013-04-24",
+    "date_max": "2026-11-20",
+    "duplicate_dates": 0,
+    "out_of_order": 0,
+    "null_unit_nav": 0,
+    "null_acc_nav": 0,
+    "nonpositive_unit_nav": 0,
+    "max_gap_days": 11,
+    "max_gap_at": [
+     "2020-01-23",
+     "2020-02-03"
+    ],
+    "gap_count_over_threshold": 0,
+    "gaps_sample": [],
+    "acc_equals_unit_ratio": 0.4291,
+    "has_dividend_effect": true,
+    "acc_usable_as_total_return": true,
+    "continuity_verification": "cannot_verify",
+    "quality_flags": []
+   }
+  },
+  "000509": {
+   "product_class": "money_market",
+   "share_count": 1,
+   "representative_share": "000509",
+   "peer_key": "money_market",
+   "grouping_source": "unknown",
+   "ret_12m": {},
+   "max_drawdown": {},
+   "annualized_return": {},
+   "volatility": {},
+   "is_money_fund": true,
+   "money_stats": {
+    "rows": 4676,
+    "date_min": "2014-01-15",
+    "date_max": "2026-11-22",
+    "per_10k_yield": {
+     "status": "ok",
+     "sample_days": 4676,
+     "cumulative_per_10k": 3326.033,
+     "cumulative_as_return": 0.3326033,
+     "cumulative_as_return_pct": 33.26033,
+     "mean_per_day": 0.71129876,
+     "min": 0.2073,
+     "max": 12.4419,
+     "unit": "元/万份/日",
+     "definition": "累计万份收益 = Σ 每日每万份收益；累计收益率 ≈ 累计金额 / 10000，这是**近似折算**，未考虑复利与再投资",
+     "warning": "这是金额累加，不是净值、不是官方累计收益"
+    },
+    "seven_day_annual": {
+     "status": "ok",
+     "sample_days": 4676,
+     "latest": 0.902,
+     "latest_date": "2026-11-22",
+     "mean": 2.616558,
+     "min": 0.869,
+     "max": 6.702,
+     "unit": "%",
+     "warning": "7日年化是滚动换算的**参考值**，不是已实现收益，也不是承诺收益"
+    },
+    "cumulative_per_10k_近1年": {
+     "status": "ok",
+     "sample_days": 366,
+     "value": 98.2848,
+     "as_return_pct": 0.982848
+    },
+    "cumulative_per_10k_近3年": {
+     "status": "ok",
+     "sample_days": 1096,
+     "value": 397.3229,
+     "as_return_pct": 3.973229
+    },
+    "not_applicable": {
+     "max_drawdown": "货币基金用每万份收益口径，不计算净值型最大回撤",
+     "volatility": "同上，不计算净值型波动率",
+     "sharpe": "同上",
+     "unit_nav_returns": "不使用单位净值"
+    }
+   },
+   "sharpe": null,
+   "not_computed": null,
+   "quality": {
+    "code": "000509",
+    "share_class_id": 102,
+    "fund_id": 74,
+    "share_class_name": "广发钱袋子货币",
+    "nav_kind": "money_yield",
+    "rows": 4676,
+    "date_min": "2014-01-15",
+    "date_max": "2026-11-22",
+    "null_per_10k": 0,
+    "null_seven_day": 0,
+    "max_gap_days": 7,
+    "gap_count_over_threshold": 0,
+    "gaps_sample": [],
+    "continuity_verification": "cannot_verify",
+    "uses_unit_nav": false
+   }
+  },
+  "001548": {
+   "product_class": "etf_linked",
+   "share_count": 2,
+   "representative_share": "001548",
+   "peer_key": "etf_linked|broad|上证50",
+   "grouping_source": "benchmark",
+   "ret_12m": {
+    "value": -0.033548,
+    "status": "ok",
+    "reason": null,
+    "value_pct": -3.354761,
+    "start_date": "2025-11-20",
+    "end_date": "2026-11-20",
+    "start_value": 1.4934,
+    "end_value": 1.4433,
+    "window_days": 365,
+    "field": "acc_nav",
+    "label": "近 12 月"
+   },
+   "max_drawdown": {
+    "value": 0.391939,
+    "status": "ok",
+    "reason": null,
+    "value_pct": 39.1939,
+    "detail": {
+     "peak_value": 1.7342,
+     "peak_date": "2021-02-10",
+     "trough_value": 1.0545,
+     "trough_date": "2024-01-17"
+    },
+    "recovery": {
+     "value": 1038,
+     "status": "ongoing",
+     "reason": "该连续段内尚未恢复至前高，标记 ongoing，不能当作已修复；未跨段寻找恢复点",
+     "trough_date": "2024-01-17",
+     "days_elapsed": 1038,
+     "segment_end": "2026-11-20"
+    },
+    "gap_count_over_threshold": 0,
+    "null_count": 0,
+    "segments": [
+     {
+      "segment_start": "2015-07-16",
+      "segment_end": "2026-11-20",
+      "points": 2764,
+      "max_drawdown": 0.391939,
+      "detail": {
+       "peak_value": 1.7342,
+       "peak_date": "2021-02-10",
+       "trough_value": 1.0545,
+       "trough_date": "2024-01-17"
+      }
+     }
+    ],
+    "segment_count": 1,
+    "selected_segment": {
+     "index": 0,
+     "segment_start": "2015-07-16",
+     "segment_end": "2026-11-20",
+     "max_drawdown": 0.391939
+    },
+    "selection_rule": "全区间最大回撤 = max(各连续段最大回撤)；并列时取时间最早的一段；detail 与 recovery 均取自该段",
+    "complete_interval": true,
+    "caveat": "净值连续性 cannot_verify",
+    "degraded": false
+   },
+   "annualized_return": {
+    "value": 0.032862,
+    "status": "ok",
+    "reason": null,
+    "value_pct": 3.286181,
+    "span_days": 4145,
+    "years": 11.3484,
+    "method": "自然日间隔复合年化",
+    "field": "acc_nav"
+   },
+   "volatility": {
+    "sample_size": 2763,
+    "skipped_points": 0,
+    "daily_vol": 0.01140692,
+    "gap_profile": {
+     "one_day_ratio": 0.7879,
+     "weekend_ratio": 0.1958,
+     "holiday_ratio": 0.0163,
+     "irregular_ratio": 0.0
+    },
+    "observed_per_year": 243.53,
+    "value": 0.17801,
+    "value_pct": 17.801008,
+    "status": "ok",
+    "reason": null,
+    "annualized": true,
+    "annualization_factor": 243.53,
+    "annualization_basis": "观测频率：2763 个有效日收益 / 11.35 年 ≈ 243.5 次/年；1 天间隔占比 78.8%，无超阈值缺口 → 确认为逐交易日公布，按观测频率年化（参考值 252，实际用 243.5）"
+   },
+   "is_money_fund": false,
+   "money_stats": null,
+   "sharpe": {
+    "value": null,
+    "status": "not_available",
+    "reason": "无风险利率无可靠数据源，不输出常规 Sharpe",
+    "note": "避免把 0 冒充真实无风险利率"
+   },
+   "not_computed": {
+    "excess_return": "无基准收益序列，禁止计算超额收益",
+    "style_stability": "无持仓数据，无法计算风格稳定性",
+    "information_ratio": "无基准序列",
+    "beta": "无基准序列"
+   },
+   "quality": {
+    "code": "001548",
+    "share_class_id": 103,
+    "fund_id": 75,
+    "share_class_name": "天弘上证50ETF联接A",
+    "nav_kind": "net_value",
+    "rows": 2764,
+    "date_min": "2015-07-16",
+    "date_max": "2026-11-20",
+    "duplicate_dates": 0,
+    "out_of_order": 0,
+    "null_unit_nav": 0,
+    "null_acc_nav": 0,
+    "nonpositive_unit_nav": 0,
+    "max_gap_days": 11,
+    "max_gap_at": [
+     "2020-01-23",
+     "2020-02-03"
+    ],
+    "gap_count_over_threshold": 0,
+    "gaps_sample": [],
+    "acc_equals_unit_ratio": 1.0,
+    "has_dividend_effect": false,
+    "acc_usable_as_total_return": false,
+    "continuity_verification": "cannot_verify",
+    "quality_flags": []
+   }
+  }
+ },
+ "caliber_checks": {
+  "money_uses_separate_scope": true,
+  "money_not_in_net_value_ranking": true,
+  "ac_not_double_counted": true,
+  "sharpe_not_fabricated": true,
+  "excess_return_not_computed": true,
+  "insufficient_sample_rejects_annualized": true,
+  "gap_blocks_annualized": true,
+  "benchmark_grouping_by_family": true
+ },
+ "money_indicator_isolation": {
+  "uses_unit_nav": false,
+  "nav_based_status": "not_applicable",
+  "reason": "货币基金不使用 unit_nav / acc_nav，不得计算净值型收益、回撤、波动率",
+  "per_10k_usable_for_net_value": false,
+  "seven_day_annual_usable_for_net_value": false
+ },
+ "not_computed": {
+  "sharpe": "无风险利率无可靠数据源，不把 0 冒充真实利率",
+  "sortino": "同上",
+  "excess_return": "无基准收益序列",
+  "information_ratio": "无基准序列",
+  "beta": "无基准序列",
+  "style_stability": "无持仓数据"
+ },
+ "gate": {
+  "ready_for_research_analysis": true,
+  "ready_for_backtest": false,
+  "ready_for_formal_ranking": false
+ }
+}

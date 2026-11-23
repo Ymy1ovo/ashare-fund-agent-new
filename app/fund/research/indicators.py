@@ -656,7 +656,7 @@ def compute_nav_indicators(series: NavSeries, *,
 
 
 # ---------------------------------------------------------------- 货币基金
-def _money_stats(money: dict) -> dict:
+def _money_stats(money: dict, db_path=None) -> dict:
     """货币基金实际统计：累计万份收益、7日年化区间统计。
 
     注意口径：
@@ -665,7 +665,7 @@ def _money_stats(money: dict) -> dict:
     """
     from app.database.db import get_connection
 
-    with get_connection() as conn:
+    with get_connection(db_path) as conn:
         rows = [dict(r) for r in conn.execute(
             """SELECT nav_date, per_10k_yield, seven_day_annual
                FROM fund_nav_daily
@@ -737,14 +737,14 @@ def _money_stats(money: dict) -> dict:
     return out
 
 
-def compute_money_indicators(money: dict) -> dict:
+def compute_money_indicators(money: dict, db_path=None) -> dict:
     """货币基金独立口径：每万份收益 / 7日年化，绝不当净值用。"""
     if not money or not money.get("rows"):
         return {"code": money.get("code") if money else None,
                 "status": "insufficient_data",
                 "reason": "无货币收益数据"}
 
-    stats = _money_stats(money)
+    stats = _money_stats(money, db_path)
 
     return {"stats": stats,
         "code": money["code"],

@@ -1,0 +1,63 @@
+{
+ "phase": "3B-5.4",
+ "report": "tests",
+ "baseline_head": "a94325080a449a4a84e40b8a1bc4bbabcb0bab03",
+ "generated_at": "2026-11-23T13:50:00",
+ "executed": true,
+ "new_suite": {
+  "file": "tests/test_3b5_4_multi_type.py",
+  "passed": 35,
+  "failed": 0,
+  "seconds": 32.65
+ },
+ "regression": {
+  "3b5_3_series": {
+   "files": [
+    "tests/test_3b5_3_2_fk_serialization.py",
+    "tests/test_3b5_3_1_atomic.py",
+    "tests/test_3b5_3_user_ingest.py"
+   ],
+   "passed": 64
+  },
+  "3b5_1_5_2": {
+   "files": [
+    "tests/test_3b5_1_fund_research.py",
+    "tests/test_3b5_2_code_lookup.py"
+   ],
+   "passed": 135
+  },
+  "combined": {
+   "passed": 234,
+   "seconds": 279.89
+  }
+ },
+ "full": {
+  "command": "pytest -q",
+  "passed": 1517,
+  "failed": 0,
+  "errors": 0,
+  "seconds": 503.03
+ },
+ "evolution": {
+  "3B-5.2": 1418,
+  "3B-5.3": 1445,
+  "3B-5.3.1": 1465,
+  "3B-5.3.2": 1482,
+  "3B-5.4": 1517
+ },
+ "static_checks_excluded": [
+  "ast.parse 语法检查",
+  "报告数据与库查询比对"
+ ],
+ "environment": {
+  "temp_db": "tempfile.mkdtemp() 独立 SQLite",
+  "production_db": "仅真实接入与研究验证使用",
+  "network": "真实接入调 AKShare；单元测试不联网",
+  "fault_injection": "全部临时库，正式库未参与"
+ },
+ "gate": {
+  "ready_for_research_analysis": true,
+  "ready_for_backtest": false,
+  "ready_for_formal_ranking": false
+ }
+}

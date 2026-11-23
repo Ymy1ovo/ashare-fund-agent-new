@@ -75,7 +75,7 @@ def analyze_fund(db_path: Path | None, entry: dict) -> dict:
 
     if money:
         m = load_money_series(db_path, code=code)
-        ind = compute_money_indicators(m)
+        ind = compute_money_indicators(m, db_path)
         quality = {"code": code, "rows": m.get("rows", 0),
                    "date_min": m.get("date_min"), "date_max": m.get("date_max"),
                    "null_unit": 0, "null_acc": 0, "duplicate_dates": 0}

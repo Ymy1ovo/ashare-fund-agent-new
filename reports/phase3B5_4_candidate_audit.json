@@ -1,0 +1,222 @@
+{
+ "phase": "3B-5.4",
+ "report": "candidate_audit",
+ "baseline_head": "a94325080a449a4a84e40b8a1bc4bbabcb0bab03",
+ "generated_at": "2026-11-23T13:50:00",
+ "readonly": true,
+ "database_written": false,
+ "audit_script": "scripts/audit_3b5_4_candidates.py",
+ "sources": {
+  "basic": "akshare.fund_individual_basic_info_xq",
+  "nav": "akshare.fund_open_fund_info_em",
+  "money": "akshare.fund_money_fund_info_em"
+ },
+ "type_coverage": {
+  "ordinary_index": {
+   "codes": [
+    "050002"
+   ],
+   "covered": true
+  },
+  "etf_linked": {
+   "codes": [
+    "001052",
+    "001548",
+    "001549"
+   ],
+   "covered": true
+  },
+  "active_equity": {
+   "codes": [
+    "001938",
+    "519066"
+   ],
+   "covered": true
+  },
+  "bond_pure": {
+   "codes": [
+    "000032",
+    "000033"
+   ],
+   "covered": true
+  },
+  "money_market": {
+   "codes": [
+    "000509"
+   ],
+   "covered": true
+  },
+  "mixed_as_equity": {
+   "codes": [
+    "519066"
+   ],
+   "note": "3B-5.0 九类体系不单独设 mixed；归入 active_equity，类型差异保留在 fund_type_l1（混合型-灵活配置）"
+  }
+ },
+ "ac_pairs": [
+  {
+   "a": "000032",
+   "c": "000033",
+   "company": "易方达基金管理有限公司"
+  },
+  {
+   "a": "001548",
+   "c": "001549",
+   "company": "天弘基金管理有限公司"
+  }
+ ],
+ "candidates": [
+  {
+   "code": "050002",
+   "name": "博时裕富沪深300指数A",
+   "company": "博时基金管理有限公司",
+   "type_field": "股票型-标准指数",
+   "product_class": "ordinary_index",
+   "established": "2003-08-26",
+   "offmarket": true,
+   "source": "akshare.fund_individual_basic_info_xq",
+   "fetched_at": "2026-11-23T13:42:20",
+   "has_history_nav": true,
+   "ac_identifiable": true,
+   "nav_rows": 5644,
+   "money_rows": null
+  },
+  {
+   "code": "001052",
+   "name": "华夏中证500ETF联接",
+   "company": "华夏基金管理有限公司",
+   "type_field": "股票型-标准指数",
+   "product_class": "etf_linked",
+   "established": "2015-05-05",
+   "offmarket": true,
+   "source": "akshare.fund_individual_basic_info_xq",
+   "fetched_at": "2026-11-23T13:42:24",
+   "has_history_nav": true,
+   "ac_identifiable": false,
+   "nav_rows": 2802,
+   "money_rows": null
+  },
+  {
+   "code": "001938",
+   "name": "中欧时代先锋",
+   "company": "中欧基金管理公司",
+   "type_field": "股票型-普通",
+   "product_class": "active_equity",
+   "established": "2015-11-03",
+   "offmarket": true,
+   "source": "akshare.fund_individual_basic_info_xq",
+   "fetched_at": "2026-11-23T13:42:24",
+   "has_history_nav": true,
+   "ac_identifiable": false,
+   "nav_rows": 2678,
+   "money_rows": null
+  },
+  {
+   "code": "519066",
+   "name": "汇添富蓝筹稳健混合",
+   "company": "汇添富基金公司",
+   "type_field": "混合型-灵活配置",
+   "product_class": "active_equity",
+   "established": "2008-07-08",
+   "offmarket": true,
+   "source": "akshare.fund_individual_basic_info_xq",
+   "fetched_at": "2026-11-23T13:42:25",
+   "has_history_nav": true,
+   "ac_identifiable": false,
+   "nav_rows": 4461,
+   "money_rows": null
+  },
+  {
+   "code": "000032",
+   "name": "易方达信用债A",
+   "company": "易方达基金管理有限公司",
+   "type_field": "债券型-长期纯债",
+   "product_class": "bond_pure",
+   "established": "2013-04-24",
+   "offmarket": true,
+   "source": "akshare.fund_individual_basic_info_xq",
+   "fetched_at": "2026-11-23T13:42:25",
+   "has_history_nav": true,
+   "ac_identifiable": true,
+   "nav_rows": 3288,
+   "money_rows": null
+  },
+  {
+   "code": "000033",
+   "name": "易方达信用债C",
+   "company": "易方达基金管理有限公司",
+   "type_field": "债券型-长期纯债",
+   "product_class": "bond_pure",
+   "established": "2013-04-24",
+   "offmarket": true,
+   "source": "akshare.fund_individual_basic_info_xq",
+   "fetched_at": "2026-11-23T13:42:26",
+   "has_history_nav": true,
+   "ac_identifiable": true,
+   "nav_rows": 3288,
+   "money_rows": null
+  },
+  {
+   "code": "000509",
+   "name": "广发钱袋子货币",
+   "company": "广发基金管理有限公司",
+   "type_field": "货币型",
+   "product_class": "money_market",
+   "established": "2014-01-10",
+   "offmarket": true,
+   "source": "akshare.fund_individual_basic_info_xq",
+   "fetched_at": "2026-11-23T13:42:26",
+   "has_history_nav": true,
+   "ac_identifiable": false,
+   "nav_rows": null,
+   "money_rows": 4676
+  },
+  {
+   "code": "001548",
+   "name": "天弘上证50ETF联接A",
+   "company": "天弘基金管理有限公司",
+   "type_field": "股票型-标准指数",
+   "product_class": "etf_linked",
+   "established": "2015-07-16",
+   "offmarket": true,
+   "source": "akshare.fund_individual_basic_info_xq",
+   "fetched_at": "2026-11-23T13:42:56",
+   "has_history_nav": true,
+   "ac_identifiable": true,
+   "nav_rows": 2764,
+   "money_rows": null
+  },
+  {
+   "code": "001549",
+   "name": "天弘上证50ETF联接C",
+   "company": "天弘基金管理有限公司",
+   "type_field": "股票型-标准指数",
+   "product_class": "etf_linked",
+   "established": "2015-07-16",
+   "offmarket": true,
+   "source": "akshare.fund_individual_basic_info_xq",
+   "fetched_at": "2026-11-23T13:42:56",
+   "has_history_nav": true,
+   "ac_identifiable": true,
+   "nav_rows": 2764,
+   "money_rows": null
+  }
+ ],
+ "excluded": {
+  "012348": "QDII-股票，不在场外默认范围",
+  "006479": "QDII，同上（3B-5.3 已验证拒绝）",
+  "511000": "场内 ETF",
+  "511050": "场内 ETF"
+ },
+ "not_obtainable": {
+  "nav_disclosure_calendar": "不可得；continuity 恒 cannot_verify",
+  "alipay_purchasable": "不可得；恒 unknown",
+  "alipay_fee": "不可得；不接入不推断",
+  "tracking_index": "库内全 NULL；走 benchmark 回落"
+ },
+ "gate": {
+  "ready_for_research_analysis": true,
+  "ready_for_backtest": false,
+  "ready_for_formal_ranking": false
+ }
+}

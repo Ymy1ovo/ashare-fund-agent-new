@@ -1,0 +1,235 @@
+{
+ "phase": "3B-5.4",
+ "report": "ingestion",
+ "baseline_head": "a94325080a449a4a84e40b8a1bc4bbabcb0bab03",
+ "generated_at": "2026-11-23T13:50:00",
+ "entrypoint": "python -m app.fund.ingest_user_funds",
+ "real_ingestion": true,
+ "temp_db_first": true,
+ "backup": "D:\\ymy\\jj-agent\\data\\backups\\fund_agent_before_3b5_4_before_20261123_132335.db",
+ "results": [
+  {
+   "code": "050002",
+   "label": "普通指数基金",
+   "status": "ingested",
+   "product_class": "ordinary_index",
+   "fund_id": 69,
+   "share_count": 1,
+   "nav_rows_total": 5644,
+   "nav_kind": "net_value"
+  },
+  {
+   "code": "001052",
+   "label": "ETF联接基金",
+   "status": "ingested",
+   "product_class": "etf_linked",
+   "fund_id": 70,
+   "share_count": 1,
+   "nav_rows_total": 2802,
+   "nav_kind": "net_value"
+  },
+  {
+   "code": "001938",
+   "label": "主动权益基金",
+   "status": "ingested",
+   "product_class": "active_equity",
+   "fund_id": 71,
+   "share_count": 1,
+   "nav_rows_total": 2678,
+   "nav_kind": "net_value"
+  },
+  {
+   "code": "519066",
+   "label": "混合型基金",
+   "status": "ingested",
+   "product_class": "active_equity",
+   "fund_id": 72,
+   "share_count": 1,
+   "nav_rows_total": 4461,
+   "nav_kind": "net_value"
+  },
+  {
+   "code": "000032",
+   "label": "债券A",
+   "status": "ingested",
+   "product_class": "bond_pure",
+   "fund_id": 73,
+   "share_count": 1,
+   "nav_rows_total": 3288,
+   "nav_kind": "net_value"
+  },
+  {
+   "code": "000033",
+   "label": "债券C",
+   "status": "ingested",
+   "product_class": "bond_pure",
+   "fund_id": 73,
+   "share_count": 1,
+   "nav_rows_total": 3288,
+   "nav_kind": "net_value"
+  },
+  {
+   "code": "000509",
+   "label": "货币基金",
+   "status": "ingested",
+   "product_class": "money_market",
+   "fund_id": 74,
+   "share_count": 1,
+   "nav_rows_total": 4676,
+   "nav_kind": "money_yield"
+  },
+  {
+   "code": "001548",
+   "label": "ETF联接A",
+   "status": "ingested",
+   "product_class": "etf_linked",
+   "fund_id": 75,
+   "share_count": 1,
+   "nav_rows_total": 2764,
+   "nav_kind": "net_value"
+  },
+  {
+   "code": "001549",
+   "label": "ETF联接C",
+   "status": "ingested",
+   "product_class": "etf_linked",
+   "fund_id": 75,
+   "share_count": 1,
+   "nav_rows_total": 2764,
+   "nav_kind": "net_value"
+  }
+ ],
+ "type_coverage": {
+  "ordinary_index": [
+   "050002"
+  ],
+  "etf_linked": [
+   "001052",
+   "001548",
+   "001549"
+  ],
+  "active_equity": [
+   "001938",
+   "519066"
+  ],
+  "bond_pure": [
+   "000032",
+   "000033"
+  ],
+  "money_market": [
+   "000509"
+  ]
+ },
+ "ac_grouping": [
+  {
+   "a": "000032",
+   "c": "000033",
+   "fund_id": 73,
+   "grouped": true
+  },
+  {
+   "a": "001548",
+   "c": "001549",
+   "fund_id": 75,
+   "grouped": true
+  }
+ ],
+ "idempotent": {
+  "tested_in_temp_db": true,
+  "result": "9/9 already_present",
+  "production_recheck": "9/9 already_present"
+ },
+ "row_counts": {
+  "before": {
+   "fund_master": 53,
+   "fund_share_classes": 80,
+   "fund_nav_daily": 47718,
+   "fund_dividends": 44,
+   "fund_manager_history": 21,
+   "fund_aum_history": 683,
+   "fund_fee_rules": 90,
+   "fund_subscription_status": 12,
+   "fund_lifecycle_events": 49,
+   "fund_data_quality": 31
+  },
+  "after": {
+   "fund_master": 60,
+   "fund_share_classes": 89,
+   "fund_nav_daily": 80083,
+   "fund_dividends": 105,
+   "fund_manager_history": 21,
+   "fund_aum_history": 683,
+   "fund_fee_rules": 90,
+   "fund_subscription_status": 12,
+   "fund_lifecycle_events": 49,
+   "fund_data_quality": 32
+  }
+ },
+ "content_fingerprint": {
+  "before": "f71c36f9f1a5d73f9f0b1f930b6c2dfaff58cb08f985d0828feb2e4288cd635b",
+  "after": "11c56eba1489976fa35be92586a99bc21a27e20c06e95cacab5c8ca553c05116",
+  "backup_file_matches_before": true
+ },
+ "unchanged": {
+  "terminated_funds": 41,
+  "lifecycle_events": 49,
+  "fund_fee_rules": 90,
+  "fund_manager_history": 21,
+  "fund_aum_history": 683
+ },
+ "integrity": {
+  "integrity_check": "ok",
+  "foreign_key_violations": 0,
+  "etf_fingerprint": "d54727c0a76a1b09531accd04b3d66ff4ea2374592b1d4a8cb8381602cbbac49"
+ },
+ "rollback_plan": {
+  "backup_file": "D:\\ymy\\jj-agent\\data\\backups\\fund_agent_before_3b5_4_before_20261123_132335.db",
+  "steps": [
+   "停服确保无写入",
+   "备份库覆盖 data/fund_agent.db",
+   "PRAGMA integrity_check 校验"
+  ],
+  "backup_verified_ok": true
+ },
+ "evidence_boundaries": {
+  "alipay_purchasable": "unknown",
+  "alipay_fee": "not_obtainable",
+  "redemption_fee_ladder": "not_obtainable",
+  "historical_aum": "not_obtainable",
+  "historical_manager": "not_obtainable",
+  "historical_terminated_list": "cannot_verify",
+  "nav_disclosure_calendar": "cannot_verify"
+ },
+ "data_quality_issues": [
+  {
+   "fund": "050002",
+   "issue": "2003-08-26~2003-09-26 有 31 天缺口",
+   "handling": "年化收益拒绝计算；波动率不年化"
+  },
+  {
+   "fund": "all",
+   "issue": "tracking_index 全 NULL",
+   "handling": "走 benchmark 回落，标注 grouping_source=benchmark"
+  },
+  {
+   "fund": "some",
+   "issue": "分红接口偶发返回空",
+   "handling": "不写虚假分红"
+  },
+  {
+   "fund": "all",
+   "issue": "无净值公布日历",
+   "handling": "连续性恒 cannot_verify"
+  },
+  {
+   "fund": "000509",
+   "issue": "货币基金无净值",
+   "handling": "使用 per_10k_yield / seven_day_annual，与净值型隔离"
+  }
+ ],
+ "gate": {
+  "ready_for_research_analysis": true,
+  "ready_for_backtest": false,
+  "ready_for_formal_ranking": false
+ }
+}
