@@ -217,9 +217,88 @@ $ pytest -q
 
 如验收方要求重跑，可原样执行上述命令，预期结果不变。
 
+
 ---
 
-## 9. 门禁
+## 9. Git 同步证据（本轮）
+
+### 9.1 相对本轮基线 HEAD 的实际变更
+
+| 项 | 值 |
+| --- | --- |
+| 本轮基线 HEAD | `4bb2d87191e6b070e0881c1ac02cb825a378b2a5` |
+| 文档修正提交 | `76db35e04856a3f7323502dc28dd5fb7099b8ca2` |
+
+变更文件清单（`git show --stat`）：
+
+```
+ CHANGELOG.md                                       | 42 ++++++++++
+ README.md                                          | 20 ++++-
+ reports/phase3B5_4_research_validation_report.json | 35 +++++++++
+ reports/phase3B5_4_research_validation_report.md   | 89 ++++++++++++++++++++--
+ reports/phase3B5_4_test_report.md                  | 46 ++++++++++-
+ 5 files changed, 222 insertions(+), 10 deletions(-)
+```
+
+**全部为文档与 JSON**，无 `.py` 改动、无 Schema 改动、无数据库改动。
+
+### 9.2 推送顺序
+
+```
+① Gitee  → 4bb2d87..76db35e  main -> main
+② GitHub → 4bb2d87..76db35e  main -> main
+```
+
+先 Gitee 主仓，后 GitHub 同步，符合既定流程。
+
+### 9.3 两端 SHA 一致性
+
+| 端 | SHA | 读取方式 |
+| --- | --- | --- |
+| 本地 | `76db35e04856a3f7323502dc28dd5fb7099b8ca2` | `git rev-parse HEAD` |
+| Gitee | `76db35e04856a3f7323502dc28dd5fb7099b8ca2` | `git ls-remote origin refs/heads/main` |
+| GitHub | `76db35e04856a3f7323502dc28dd5fb7099b8ca2` | `git ls-remote github refs/heads/main` |
+
+**三者完全一致**，SHA 由远端 `ls-remote` 实际读回，不是本地推断。
+
+### 9.4 禁止 force push
+
+全程使用普通 `git push`，**未使用 `--force` / `--force-with-lease`**。
+远端返回均为快进更新 `4bb2d87..76db35e`（非 `+` 强制标记），可佐证为快进推送。
+
+### 9.5 未提交内容
+
+| 项 | 状态 |
+| --- | --- |
+| 正式数据库 `data/fund_agent.db` | **未提交**（`.gitignore` 覆盖） |
+| 数据库备份 `data/backups/*.db` | **未提交** |
+| API 密钥 | **无**（本项目不含密钥文件） |
+
+`git ls-files | grep -c '\.db$'` 结果为 **0**。
+
+### 9.6 关于本节所在的补充提交
+
+第 9 节的证据文字本身，是在 `76db35e` **之后**单独提交并推送的。
+
+因此：
+
+- 上文 `76db35e` 是**文档口径修正提交**，已实际推送到两端并读回校验（`ls-remote` 一致）；
+- 包含本节内容的最终提交，其 SHA 无法自引用写进本文件；
+- 最终两端 HEAD 的 SHA 与一致性，已在**交付说明**中给出，校验方式与本轮相同
+  （`git ls-remote <remote> refs/heads/main`），可对照复核。
+
+若需在仓库内自证，直接执行：
+
+```bash
+git ls-remote origin refs/heads/main
+git ls-remote https://github.com/Ymy1ovo/ashare-fund-agent-new.git refs/heads/main
+```
+
+两条命令输出必须相同，且等于 `git rev-parse HEAD`。
+
+---
+
+## 10. 门禁
 
 | 项 | 值 |
 | --- | --- |
