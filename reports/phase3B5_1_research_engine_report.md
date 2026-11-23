@@ -220,16 +220,136 @@ max_drawdown = max(drawdown_t)
 
 ---
 
+## 5.4 验收修正（本轮）
+
+ChatGPT 静态验收发现 3 项阻断问题，本轮窄范围修正。
+
+### 修正 1：同类分析按基金本体去重
+
+**问题**：`analyze_universe()` 曾把**份额级** `reports` 直接传给 `peer_analysis()`，
+导致 A/C/E 被当成多个独立基金（12 份额会被数成 12 个成员）。
+
+**修正**：
+
+| 项 | 修正后 |
+| --- | --- |
+| 统计单位 | **`fund_id`**（唯一） |
+| 传入 `peer_analysis` | `merge_by_fund()` 的结果（本体级） |
+| 双保险 | `peer_analysis` 内部再用 `seen[fund_id]` 去重 |
+| 费用比较 | **保留份额维度**，`cost_comparison.share_count` 仍是全部份额 |
+| 代表份额 | 显式规则 + `representative_reason` 记录原因 |
+| 数据不足 | `status=insufficient_data`，`performance=None`，**不静默取** |
+
+**代表份额选择规则**（`REPRESENTATIVE_RULES`）：
+
+1. 主份额（`share_code == fund_code`）且净值记录数 > 0；
+2. 否则取净值记录数最多的份额（并列取代码最小）；
+3. 全部份额无净值记录 → `insufficient_data`；
+4. 记录数未知时不当作 0，在原因中说明「数据充分性未确认」。
+
+**实测（真实数据库）**：
+
+| 项 | 值 |
+| --- | --- |
+| 份额数 | 12 |
+| 基金本体数 | 9 |
+| 同类成员总数 | **9**（等于本体数，不再重复计数） |
+| `deduped_by_fund_id` | **true** |
+
+三对 A/C 都只算一个本体：
+
+| 本体 | 份额 | 代表份额 | 原因 |
+| --- | --- | --- | --- |
+| `000015` | `000015` / `000016` | `000015` | 主份额且有 3310 条净值 |
+| `007300` | `007300` / `007301` | `007300` | 主份额且有 1799 条净值 |
+| `161725` | `161725` / `012414` | `161725` | 主份额且有 2794 条净值 |
+
+### 修正 2：同类分组依据可验证的基准/跟踪指数
+
+**问题**：主动权益只判断 `benchmark` 是否为空（`has_text`）；
+指数基金只分 `broad`/`sector`，不同跟踪指数会混组。
+
+**修正**：新增 `normalize_benchmark()`——**保守、可解释**的标准化，
+**不新增未经验证的映射表**，认不出来就 `unknown`。
+
+| 情况 | 处理 |
+| --- | --- |
+| 基准文本与已知写法完全一致 | 直接取族名，`confidence=high` |
+| 含**唯一**一个可识别指数族 | 取该族，加权复合表述降为 `medium` |
+| 含**多个**指数族 | `unknown`，**不强行归组** |
+| 认不出任何指数族 / 为空 | `unknown` |
+| 只有名称、无基准 | **不猜**（不凭基金名推断基准） |
+
+**分组键变化**：
+
+| 产品类 | 旧键 | 新键 |
+| --- | --- | --- |
+| 普通指数 / ETF联接 | `{pc}\|{broad/sector}` | `{pc}\|{scope}\|{指数族}` |
+| LOF index | `lof\|index` | `lof\|index\|{scope}\|{指数族}` |
+| LOF active | `lof\|active` | `lof\|active\|{基准族}` |
+| 主动权益 | `active_equity\|has_text` | `active_equity\|{基准族}` |
+| 债券 | `{pc}\|unknown` | 不变（久期/信用/转债全 `unknown`） |
+
+**实测分组（8 组）**：
+
+| 同类组 | 成员 | 基准族 |
+| --- | ---: | --- |
+| `etf_linked\|broad\|沪深300` | 2 | 沪深300 |
+| `etf_linked\|sector\|中证全指半导体` | 1 | 中证全指半导体 |
+| `ordinary_index\|broad\|中证500` | 1 | 中证500 |
+| `lof\|index\|sector\|中证白酒` | 1 | 中证白酒 |
+| `lof\|active\|unknown` | 1 | unknown |
+| `active_equity\|unknown` | 1 | unknown |
+| `bond_pure\|unknown` | 1 | 中债综合（但久期仍 unknown） |
+| `money_market` | 1 | unknown |
+
+> **沪深300 与 中证500 已分到不同组**。复合基准
+> 「中证内地消费主题×85% + 中债总×15%」含两个指数族 → `unknown`，
+> 不被强行塞进任一指数组。
+
+**债券**：`duration_bucket` / `credit_bucket` / `convertible_bucket` 全 `unknown`，
+**不解释成相同久期或相同风险暴露**。
+
+### 修正 3：所有时间序列指标统一缺口安全检查
+
+| 指标 | 修正前 | 修正后 |
+| --- | --- | --- |
+| 年化收益 | 只查端点有效 | 查区间缺口 + 查区间空值，命中即 `insufficient_data` |
+| 滚动稳定性 | 只查端点命中 | **每个窗口独立**查缺口/空值，不合格跳过并计数 |
+| 最大回撤 | 跳过空值继续连线 | 按空值/缺口**切段**，只报可观测连续段，明确 `degraded` |
+| 回撤修复 | 全序列找恢复点 | 只在**同一连续段内**找，不跨越缺口 |
+| Calmar | 只看底层 status | 继承年化与回撤可用性，底层降级则一并降级 |
+
+**统一缺口入口**：`_gaps_in_range()` / `_null_count_in_range()`，
+全部指标共用 `MAX_GAP_DAYS_FOR_RETURN = 15`，不再各写一套标准。
+
+**最大回撤不再输出「无警告的完整回撤」**：
+
+```json
+{
+  "degraded": true,
+  "degraded_reason": "区间内存在 N 处超过 15 天的缺口；缺口与空值两端不视为连续路径。本值只是可观测连续段内的最大回撤，不是全区间完整最大回撤，可能被低估",
+  "complete_interval": false,
+  "segments": [{"segment_start": "...", "segment_end": "...", "max_drawdown": ...}]
+}
+```
+
+**实测**：本轮 12 个份额中 11 个净值型份额均 `degraded=false`
+（实际数据无超阈值缺口），货币基金走独立口径；
+`000198` 货币基金年化/回撤/滚动/Calmar 全部 `None`（不适用）。
+
+---
+
 ## 6. 测试结果
 
 ### 6.1 专项测试（真实运行）
 
 ```
 $ pytest tests/test_3b5_1_fund_research.py -q
-57 passed
+83 passed
 ```
 
-覆盖 24 项要求：
+覆盖 24 项要求 + 本轮验收修正 26 项：
 
 | # | 要求 | 对应测试 |
 | ---: | --- | --- |
@@ -262,7 +382,7 @@ $ pytest tests/test_3b5_1_fund_research.py -q
 
 ```
 $ pytest -q
-1340 passed, 1 warning in 289.22s (0:04:49)
+1366 passed, 1 warning in 289.12s (0:04:49)
 ```
 
 ---

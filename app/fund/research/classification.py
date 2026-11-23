@@ -174,25 +174,127 @@ def index_scope(fund_name: str | None) -> str:
     return "unknown"
 
 
+# 基准标准化：只做**保守、可解释**的归一化。
+# 不新增未经验证的映射表；认不出来就 unknown，绝不强行归组。
+BENCHMARK_ALIASES = {
+    # 归一化后完全相同的写法合并（同义写法，不是推断关系）
+    "沪深300指数": "沪深300",
+    "沪深300指数收益率": "沪深300",
+    "中证500指数": "中证500",
+    "中证500指数收益率": "中证500",
+    "中证白酒指数": "中证白酒",
+    "中证白酒指数收益率": "中证白酒",
+    "中证全指半导体产品与设备指数": "中证全指半导体",
+    "中证全指半导体产品与设备指数收益率": "中证全指半导体",
+    "中证内地消费主题指数": "中证内地消费主题",
+    "中证内地消费主题指数收益率": "中证内地消费主题",
+    "中债综合指数": "中债综合",
+    "中债综合全价指数": "中债综合全价",
+    "中债总指数": "中债总",
+}
+
+# 可识别的指数族（用于从复合基准文本中提取主基准）
+_INDEX_FAMILIES = (
+    "沪深300", "中证500", "中证1000", "中证800", "中证A500",
+    "上证50", "创业板指", "科创50", "中证白酒",
+    "中证全指半导体", "中证内地消费主题",
+    "中债综合全价", "中债综合", "中债总",
+    "MSCI中国A股", "国证2000",
+)
+
+# 基准文本中的修饰：收益、加权、百分比权重等
+_NOISE_TOKENS = ("收益率", "指数", "×", "*", "x", "X",
+                 "银行活期存款利率", "活期存款利率", "税后",
+                 "金融机构人民币", "基准利率", "年收益率", "评价时",
+                 "按期", "换算")
+
+
+def normalize_benchmark(text: str | None) -> dict:
+    """把基准文本标准化成可比族名。
+
+    返回 {family, confidence, reason}。
+    认不出来 → family='unknown'，**不猜**。
+    """
+    if text is None or not str(text).strip():
+        return {"family": "unknown", "confidence": "none",
+                "reason": "benchmark 为空，无法建立可比组"}
+
+    raw = str(text).strip()
+    # 1) 完整匹配别名表
+    if raw in BENCHMARK_ALIASES:
+        return {"family": BENCHMARK_ALIASES[raw], "confidence": "high",
+                "reason": f"基准文本与已知写法完全一致：{raw}"}
+
+    # 2) 从文本中提取**唯一**一个可识别指数族
+    hits = [fam for fam in _INDEX_FAMILIES if fam in raw]
+    # 去重：中证500 与 中证500低波动 只保留更长匹配
+    hits = sorted(set(hits), key=len, reverse=True)
+    deduped = [h for h in hits if not any(h != o and h in o for o in hits)]
+
+    if len(deduped) == 1:
+        fam = deduped[0]
+        # 复合基准（含权重百分比）仍归到主基准族，但降级为 medium
+        has_weight = "%" in raw or "×" in raw or "X" in raw
+        return {"family": fam,
+                "confidence": "medium" if has_weight else "high",
+                "reason": (f"从基准文本提取到唯一指数族「{fam}」"
+                           + ("；该基准为加权复合表述，按主基准归组"
+                              if has_weight else ""))}
+
+    if len(deduped) > 1:
+        return {"family": "unknown", "confidence": "none",
+                "reason": (f"基准文本含多个指数族 {deduped}，"
+                           "无法确定单一主基准，标 unknown 不强行归组")}
+
+    return {"family": "unknown", "confidence": "none",
+            "reason": f"无法从基准文本识别出已知指数族：{raw[:40]}"}
+
+
 def peer_group_key(classification: dict, fund_name: str | None,
-                   benchmark: str | None) -> dict:
-    """同类比较分组键。产品结构与投资类型分开，宽基与行业分开。"""
+                   benchmark: str | None,
+                   tracking_index: str | None = None) -> dict:
+    """同类比较分组键。
+
+    分组依据必须是**可验证的**基准或跟踪指数：
+    - 指数/ETF联接：按跟踪指数或基准里的指数族分组；
+    - 主动权益：按标准化后的基准族分组，不同基准必须分组；
+    - 无法确认 → unknown，不强行归组。
+    宽基/行业主题（index_scope）作为**附加维度**保留。
+    """
     pc = classification.get("product_class")
     base = {"product_class": pc,
             "investment_subtype": classification.get("investment_subtype")}
+    norm = normalize_benchmark(benchmark or tracking_index)
+    base["benchmark_family"] = norm["family"]
+    base["benchmark_confidence"] = norm["confidence"]
+    base["benchmark_reason"] = norm["reason"]
+
     if pc in ("ordinary_index", "etf_linked"):
         base["index_scope"] = index_scope(fund_name)
-        key = f"{pc}|{base['index_scope']}"
+        # 跟踪指数优先；没有 tracking_index 就用基准族
+        idx_family = norm["family"]
+        base["tracking_family"] = idx_family
+        key = f"{pc}|{base['index_scope']}|{idx_family}"
     elif pc == "lof":
-        key = f"lof|{base['investment_subtype']}"
+        base["index_scope"] = index_scope(fund_name)
+        if base["investment_subtype"] == "index":
+            base["tracking_family"] = norm["family"]
+            key = f"lof|index|{base['index_scope']}|{norm['family']}"
+        else:
+            base["tracking_family"] = None
+            key = f"lof|active|{norm['family']}"
     elif pc in ("bond_pure", "bond_mixed"):
-        # 久期字段缺失，只能标 unknown
+        # 久期/信用/转债暴露无可靠数据 → unknown，不解释成相同风险
         base["duration_bucket"] = "unknown"
+        base["credit_bucket"] = "unknown"
+        base["convertible_bucket"] = "unknown"
         key = f"{pc}|unknown"
     elif pc == "active_equity":
-        base["benchmark_family"] = "unknown" if not benchmark else "has_text"
-        key = f"active_equity|{base['benchmark_family']}"
+        key = f"active_equity|{norm['family']}"
     else:
         key = str(pc)
+
     base["peer_key"] = key
+    base["verifiable_group"] = norm["family"] != "unknown" or pc in (
+        "bond_pure", "bond_mixed", "money_market")
     return base

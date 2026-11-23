@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-20T17:01:36",
+ "generated_at": "2026-11-23T08:49:45",
  "universe": {
   "share_count": 12,
   "fund_count": 9,
@@ -13,13 +13,13 @@
   },
   "by_peer_group": {
    "bond_pure|unknown": 2,
-   "etf_linked|broad": 2,
+   "etf_linked|broad|沪深300": 2,
    "money_market": 1,
-   "ordinary_index|broad": 1,
-   "etf_linked|sector": 2,
-   "active_equity|has_text": 1,
-   "lof|active": 1,
-   "lof|index": 2
+   "ordinary_index|broad|中证500": 1,
+   "etf_linked|sector|中证全指半导体": 2,
+   "active_equity|unknown": 1,
+   "lof|active|unknown": 1,
+   "lof|index|sector|中证白酒": 2
   },
   "onshore_etf_included": false,
   "terminated_included": false
@@ -38,8 +38,14 @@
    "peer_group": {
     "product_class": "bond_pure",
     "investment_subtype": "bond_pure",
+    "benchmark_family": "中债综合",
+    "benchmark_confidence": "high",
+    "benchmark_reason": "基准文本与已知写法完全一致：中债综合指数",
     "duration_bucket": "unknown",
-    "peer_key": "bond_pure|unknown"
+    "credit_bucket": "unknown",
+    "convertible_bucket": "unknown",
+    "peer_key": "bond_pure|unknown",
+    "verifiable_group": true
    },
    "index_scope": "unknown",
    "benchmark": "中债综合指数",
@@ -188,7 +194,24 @@
        "recovered_date": "2018-03-30"
       },
       "gap_count_over_threshold": 0,
-      "caveat": "净值连续性 cannot_verify，回撤为可观测区间内的保守估计"
+      "null_count": 0,
+      "segments": [
+       {
+        "segment_start": "2013-03-08",
+        "segment_end": "2026-11-18",
+        "points": 3310,
+        "max_drawdown": 0.041017,
+        "detail": {
+         "peak_value": 1.219,
+         "peak_date": "2016-10-21",
+         "trough_value": 1.169,
+         "trough_date": "2016-12-20"
+        }
+       }
+      ],
+      "complete_interval": true,
+      "caveat": "净值连续性 cannot_verify",
+      "degraded": false
      },
      "volatility": {
       "sample_size": 3309,
@@ -256,7 +279,10 @@
       "value_pct": 85.533822,
       "window_days": 90,
       "samples": 2454,
-      "note": "窗口端点必须精确命中净值，不向前后取近似值"
+      "skipped_endpoint": 856,
+      "skipped_gap": 0,
+      "skipped_null": 0,
+      "note": "每个窗口独立检查：端点精确命中、窗口内无超阈值缺口、无空值；不满足的窗口跳过并计数，不跨越缺口计算"
      }
     },
     "not_computed": {
@@ -449,8 +475,14 @@
    "peer_group": {
     "product_class": "bond_pure",
     "investment_subtype": "bond_pure",
+    "benchmark_family": "中债综合",
+    "benchmark_confidence": "high",
+    "benchmark_reason": "基准文本与已知写法完全一致：中债综合指数",
     "duration_bucket": "unknown",
-    "peer_key": "bond_pure|unknown"
+    "credit_bucket": "unknown",
+    "convertible_bucket": "unknown",
+    "peer_key": "bond_pure|unknown",
+    "verifiable_group": true
    },
    "index_scope": "unknown",
    "benchmark": "中债综合指数",
@@ -599,7 +631,24 @@
        "recovered_date": "2018-04-18"
       },
       "gap_count_over_threshold": 0,
-      "caveat": "净值连续性 cannot_verify，回撤为可观测区间内的保守估计"
+      "null_count": 0,
+      "segments": [
+       {
+        "segment_start": "2013-03-08",
+        "segment_end": "2026-11-18",
+        "points": 3310,
+        "max_drawdown": 0.041597,
+        "detail": {
+         "peak_value": 1.202,
+         "peak_date": "2016-10-24",
+         "trough_value": 1.152,
+         "trough_date": "2016-12-20"
+        }
+       }
+      ],
+      "complete_interval": true,
+      "caveat": "净值连续性 cannot_verify",
+      "degraded": false
      },
      "volatility": {
       "sample_size": 3309,
@@ -667,7 +716,10 @@
       "value_pct": 83.98533,
       "window_days": 90,
       "samples": 2454,
-      "note": "窗口端点必须精确命中净值，不向前后取近似值"
+      "skipped_endpoint": 856,
+      "skipped_gap": 0,
+      "skipped_null": 0,
+      "note": "每个窗口独立检查：端点精确命中、窗口内无超阈值缺口、无空值；不满足的窗口跳过并计数，不跨越缺口计算"
      }
     },
     "not_computed": {
@@ -856,8 +908,13 @@
    "peer_group": {
     "product_class": "etf_linked",
     "investment_subtype": "index",
+    "benchmark_family": "沪深300",
+    "benchmark_confidence": "medium",
+    "benchmark_reason": "从基准文本提取到唯一指数族「沪深300」；该基准为加权复合表述，按主基准归组",
     "index_scope": "broad",
-    "peer_key": "etf_linked|broad"
+    "tracking_family": "沪深300",
+    "peer_key": "etf_linked|broad|沪深300",
+    "verifiable_group": true
    },
    "index_scope": "broad",
    "benchmark": "沪深300指数收益率×95%＋1%（指年收益率，评价时应按期间折算）",
@@ -1006,7 +1063,24 @@
        "recovered_date": "2020-07-08"
       },
       "gap_count_over_threshold": 0,
-      "caveat": "净值连续性 cannot_verify，回撤为可观测区间内的保守估计"
+      "null_count": 0,
+      "segments": [
+       {
+        "segment_start": "2009-07-10",
+        "segment_end": "2026-11-18",
+        "points": 4220,
+        "max_drawdown": 0.434343,
+        "detail": {
+         "peak_value": 1.584,
+         "peak_date": "2015-06-08",
+         "trough_value": 0.896,
+         "trough_date": "2016-01-28"
+        }
+       }
+      ],
+      "complete_interval": true,
+      "caveat": "净值连续性 cannot_verify",
+      "degraded": false
      },
      "volatility": {
       "sample_size": 4219,
@@ -1074,7 +1148,10 @@
       "value_pct": 51.832961,
       "window_days": 90,
       "samples": 3137,
-      "note": "窗口端点必须精确命中净值，不向前后取近似值"
+      "skipped_endpoint": 1083,
+      "skipped_gap": 0,
+      "skipped_null": 0,
+      "note": "每个窗口独立检查：端点精确命中、窗口内无超阈值缺口、无空值；不满足的窗口跳过并计数，不跨越缺口计算"
      }
     },
     "not_computed": {
@@ -1267,7 +1344,11 @@
    "peer_group": {
     "product_class": "money_market",
     "investment_subtype": "money_market",
-    "peer_key": "money_market"
+    "benchmark_family": "unknown",
+    "benchmark_confidence": "none",
+    "benchmark_reason": "benchmark 为空，无法建立可比组",
+    "peer_key": "money_market",
+    "verifiable_group": true
    },
    "is_money_fund": true,
    "data_source": "akshare.fund_open_fund_info_em（天天基金）",
@@ -1444,8 +1525,13 @@
    "peer_group": {
     "product_class": "ordinary_index",
     "investment_subtype": "index",
+    "benchmark_family": "中证500",
+    "benchmark_confidence": "medium",
+    "benchmark_reason": "从基准文本提取到唯一指数族「中证500」；该基准为加权复合表述，按主基准归组",
     "index_scope": "broad",
-    "peer_key": "ordinary_index|broad"
+    "tracking_family": "中证500",
+    "peer_key": "ordinary_index|broad|中证500",
+    "verifiable_group": true
    },
    "index_scope": "broad",
    "benchmark": "95%×中证500指数收益率+5%×商业银行活期存款利率（税前）",
@@ -1594,7 +1680,24 @@
        "recovered_date": "2021-08-11"
       },
       "gap_count_over_threshold": 0,
-      "caveat": "净值连续性 cannot_verify，回撤为可观测区间内的保守估计"
+      "null_count": 0,
+      "segments": [
+       {
+        "segment_start": "2014-01-27",
+        "segment_end": "2026-11-18",
+        "points": 3096,
+        "max_drawdown": 0.513152,
+        "detail": {
+         "peak_value": 3.0983,
+         "peak_date": "2015-06-12",
+         "trough_value": 1.5084,
+         "trough_date": "2015-09-15"
+        }
+       }
+      ],
+      "complete_interval": true,
+      "caveat": "净值连续性 cannot_verify",
+      "degraded": false
      },
      "volatility": {
       "sample_size": 3095,
@@ -1662,7 +1765,10 @@
       "value_pct": 54.470126,
       "window_days": 90,
       "samples": 2293,
-      "note": "窗口端点必须精确命中净值，不向前后取近似值"
+      "skipped_endpoint": 803,
+      "skipped_gap": 0,
+      "skipped_null": 0,
+      "note": "每个窗口独立检查：端点精确命中、窗口内无超阈值缺口、无空值；不满足的窗口跳过并计数，不跨越缺口计算"
      }
     },
     "not_computed": {
@@ -1855,8 +1961,13 @@
    "peer_group": {
     "product_class": "etf_linked",
     "investment_subtype": "index",
+    "benchmark_family": "中证全指半导体",
+    "benchmark_confidence": "medium",
+    "benchmark_reason": "从基准文本提取到唯一指数族「中证全指半导体」；该基准为加权复合表述，按主基准归组",
     "index_scope": "sector",
-    "peer_key": "etf_linked|sector"
+    "tracking_family": "中证全指半导体",
+    "peer_key": "etf_linked|sector|中证全指半导体",
+    "verifiable_group": true
    },
    "index_scope": "sector",
    "benchmark": "中证全指半导体产品与设备指数收益率×95%＋银行活期存款利率（税后）×5%",
@@ -2005,7 +2116,24 @@
        "recovered_date": "2025-09-24"
       },
       "gap_count_over_threshold": 0,
-      "caveat": "净值连续性 cannot_verify，回撤为可观测区间内的保守估计"
+      "null_count": 0,
+      "segments": [
+       {
+        "segment_start": "2019-06-26",
+        "segment_end": "2026-11-18",
+        "points": 1799,
+        "max_drawdown": 0.594181,
+        "detail": {
+         "peak_value": 2.956,
+         "peak_date": "2021-07-30",
+         "trough_value": 1.1996,
+         "trough_date": "2024-02-05"
+        }
+       }
+      ],
+      "complete_interval": true,
+      "caveat": "净值连续性 cannot_verify",
+      "degraded": false
      },
      "volatility": {
       "sample_size": 1798,
@@ -2073,7 +2201,10 @@
       "value_pct": 54.934966,
       "window_days": 90,
       "samples": 1307,
-      "note": "窗口端点必须精确命中净值，不向前后取近似值"
+      "skipped_endpoint": 492,
+      "skipped_gap": 0,
+      "skipped_null": 0,
+      "note": "每个窗口独立检查：端点精确命中、窗口内无超阈值缺口、无空值；不满足的窗口跳过并计数，不跨越缺口计算"
      }
     },
     "not_computed": {
@@ -2266,8 +2397,13 @@
    "peer_group": {
     "product_class": "etf_linked",
     "investment_subtype": "index",
+    "benchmark_family": "中证全指半导体",
+    "benchmark_confidence": "medium",
+    "benchmark_reason": "从基准文本提取到唯一指数族「中证全指半导体」；该基准为加权复合表述，按主基准归组",
     "index_scope": "sector",
-    "peer_key": "etf_linked|sector"
+    "tracking_family": "中证全指半导体",
+    "peer_key": "etf_linked|sector|中证全指半导体",
+    "verifiable_group": true
    },
    "index_scope": "sector",
    "benchmark": "中证全指半导体产品与设备指数收益率×95%＋银行活期存款利率（税后）×5%",
@@ -2416,7 +2552,24 @@
        "recovered_date": "2025-09-24"
       },
       "gap_count_over_threshold": 0,
-      "caveat": "净值连续性 cannot_verify，回撤为可观测区间内的保守估计"
+      "null_count": 0,
+      "segments": [
+       {
+        "segment_start": "2019-06-26",
+        "segment_end": "2026-11-18",
+        "points": 1799,
+        "max_drawdown": 0.596727,
+        "detail": {
+         "peak_value": 2.9335,
+         "peak_date": "2021-07-30",
+         "trough_value": 1.183,
+         "trough_date": "2024-02-05"
+        }
+       }
+      ],
+      "complete_interval": true,
+      "caveat": "净值连续性 cannot_verify",
+      "degraded": false
      },
      "volatility": {
       "sample_size": 1798,
@@ -2484,7 +2637,10 @@
       "value_pct": 54.246366,
       "window_days": 90,
       "samples": 1307,
-      "note": "窗口端点必须精确命中净值，不向前后取近似值"
+      "skipped_endpoint": 492,
+      "skipped_gap": 0,
+      "skipped_null": 0,
+      "note": "每个窗口独立检查：端点精确命中、窗口内无超阈值缺口、无空值；不满足的窗口跳过并计数，不跨越缺口计算"
      }
     },
     "not_computed": {
@@ -2673,8 +2829,13 @@
    "peer_group": {
     "product_class": "etf_linked",
     "investment_subtype": "index",
+    "benchmark_family": "沪深300",
+    "benchmark_confidence": "medium",
+    "benchmark_reason": "从基准文本提取到唯一指数族「沪深300」；该基准为加权复合表述，按主基准归组",
     "index_scope": "broad",
-    "peer_key": "etf_linked|broad"
+    "tracking_family": "沪深300",
+    "peer_key": "etf_linked|broad|沪深300",
+    "verifiable_group": true
    },
    "index_scope": "broad",
    "benchmark": "沪深300指数收益率X95%+活期存款利率(税后)X5%",
@@ -2823,7 +2984,24 @@
        "recovered_date": "2020-07-08"
       },
       "gap_count_over_threshold": 0,
-      "caveat": "净值连续性 cannot_verify，回撤为可观测区间内的保守估计"
+      "null_count": 0,
+      "segments": [
+       {
+        "segment_start": "2009-08-26",
+        "segment_end": "2026-11-18",
+        "points": 4186,
+        "max_drawdown": 0.436093,
+        "detail": {
+         "peak_value": 1.6485,
+         "peak_date": "2015-06-08",
+         "trough_value": 0.9296,
+         "trough_date": "2016-01-28"
+        }
+       }
+      ],
+      "complete_interval": true,
+      "caveat": "净值连续性 cannot_verify",
+      "degraded": false
      },
      "volatility": {
       "sample_size": 4185,
@@ -2891,7 +3069,10 @@
       "value_pct": 52.009,
       "window_days": 90,
       "samples": 3111,
-      "note": "窗口端点必须精确命中净值，不向前后取近似值"
+      "skipped_endpoint": 1075,
+      "skipped_gap": 0,
+      "skipped_null": 0,
+      "note": "每个窗口独立检查：端点精确命中、窗口内无超阈值缺口、无空值；不满足的窗口跳过并计数，不跨越缺口计算"
      }
     },
     "not_computed": {
@@ -3084,8 +3265,11 @@
    "peer_group": {
     "product_class": "active_equity",
     "investment_subtype": "active",
-    "benchmark_family": "has_text",
-    "peer_key": "active_equity|has_text"
+    "benchmark_family": "unknown",
+    "benchmark_confidence": "none",
+    "benchmark_reason": "基准文本含多个指数族 ['中证内地消费主题', '中债总']，无法确定单一主基准，标 unknown 不强行归组",
+    "peer_key": "active_equity|unknown",
+    "verifiable_group": false
    },
    "index_scope": "sector",
    "benchmark": "中证内地消费主题指数收益率×85%+中债总指数收益率×15%",
@@ -3233,7 +3417,24 @@
        "days_elapsed": 145
       },
       "gap_count_over_threshold": 0,
-      "caveat": "净值连续性 cannot_verify，回撤为可观测区间内的保守估计"
+      "null_count": 0,
+      "segments": [
+       {
+        "segment_start": "2010-08-20",
+        "segment_end": "2026-11-18",
+        "points": 3927,
+        "max_drawdown": 0.573177,
+        "detail": {
+         "peak_value": 6.129,
+         "peak_date": "2021-02-10",
+         "trough_value": 2.616,
+         "trough_date": "2026-06-26"
+        }
+       }
+      ],
+      "complete_interval": true,
+      "caveat": "净值连续性 cannot_verify",
+      "degraded": false
      },
      "volatility": {
       "sample_size": 3926,
@@ -3301,7 +3502,10 @@
       "value_pct": 54.470709,
       "window_days": 90,
       "samples": 2919,
-      "note": "窗口端点必须精确命中净值，不向前后取近似值"
+      "skipped_endpoint": 1008,
+      "skipped_gap": 0,
+      "skipped_null": 0,
+      "note": "每个窗口独立检查：端点精确命中、窗口内无超阈值缺口、无空值；不满足的窗口跳过并计数，不跨越缺口计算"
      }
     },
     "not_computed": {
@@ -3494,7 +3698,13 @@
    "peer_group": {
     "product_class": "lof",
     "investment_subtype": "active",
-    "peer_key": "lof|active"
+    "benchmark_family": "unknown",
+    "benchmark_confidence": "none",
+    "benchmark_reason": "基准文本含多个指数族 ['中债综合全价', '沪深300']，无法确定单一主基准，标 unknown 不强行归组",
+    "index_scope": "unknown",
+    "tracking_family": null,
+    "peer_key": "lof|active|unknown",
+    "verifiable_group": false
    },
    "index_scope": "unknown",
    "benchmark": "沪深300指数收益率×70%+中债综合全价指数收益率×25%+同业存款利率×5%",
@@ -3643,7 +3853,24 @@
        "recovered_date": "2010-12-13"
       },
       "gap_count_over_threshold": 0,
-      "caveat": "净值连续性 cannot_verify，回撤为可观测区间内的保守估计"
+      "null_count": 0,
+      "segments": [
+       {
+        "segment_start": "2005-11-16",
+        "segment_end": "2026-11-18",
+        "points": 5124,
+        "max_drawdown": 0.336047,
+        "detail": {
+         "peak_value": 3.4272,
+         "peak_date": "2008-01-14",
+         "trough_value": 2.2755,
+         "trough_date": "2008-11-07"
+        }
+       }
+      ],
+      "complete_interval": true,
+      "caveat": "净值连续性 cannot_verify",
+      "degraded": false
      },
      "volatility": {
       "sample_size": 5123,
@@ -3711,7 +3938,10 @@
       "value_pct": 61.013849,
       "window_days": 90,
       "samples": 3827,
-      "note": "窗口端点必须精确命中净值，不向前后取近似值"
+      "skipped_endpoint": 1297,
+      "skipped_gap": 0,
+      "skipped_null": 0,
+      "note": "每个窗口独立检查：端点精确命中、窗口内无超阈值缺口、无空值；不满足的窗口跳过并计数，不跨越缺口计算"
      }
     },
     "not_computed": {
@@ -3904,7 +4134,13 @@
    "peer_group": {
     "product_class": "lof",
     "investment_subtype": "index",
-    "peer_key": "lof|index"
+    "benchmark_family": "中证白酒",
+    "benchmark_confidence": "medium",
+    "benchmark_reason": "从基准文本提取到唯一指数族「中证白酒」；该基准为加权复合表述，按主基准归组",
+    "index_scope": "sector",
+    "tracking_family": "中证白酒",
+    "peer_key": "lof|index|sector|中证白酒",
+    "verifiable_group": true
    },
    "index_scope": "sector",
    "benchmark": "中证白酒指数收益率×95%＋金融机构人民币活期存款基准利率（税后）×5%",
@@ -4052,7 +4288,24 @@
        "days_elapsed": 132
       },
       "gap_count_over_threshold": 0,
-      "caveat": "净值连续性 cannot_verify，回撤为可观测区间内的保守估计"
+      "null_count": 0,
+      "segments": [
+       {
+        "segment_start": "2021-05-18",
+        "segment_end": "2026-11-18",
+        "points": 1338,
+        "max_drawdown": 0.64867,
+        "detail": {
+         "peak_value": 1.6466,
+         "peak_date": "2021-06-07",
+         "trough_value": 0.5785,
+         "trough_date": "2026-07-09"
+        }
+       }
+      ],
+      "complete_interval": true,
+      "caveat": "净值连续性 cannot_verify",
+      "degraded": false
      },
      "volatility": {
       "sample_size": 1337,
@@ -4120,7 +4373,10 @@
       "value_pct": 38.070539,
       "window_days": 90,
       "samples": 964,
-      "note": "窗口端点必须精确命中净值，不向前后取近似值"
+      "skipped_endpoint": 374,
+      "skipped_gap": 0,
+      "skipped_null": 0,
+      "note": "每个窗口独立检查：端点精确命中、窗口内无超阈值缺口、无空值；不满足的窗口跳过并计数，不跨越缺口计算"
      }
     },
     "not_computed": {
@@ -4309,7 +4565,13 @@
    "peer_group": {
     "product_class": "lof",
     "investment_subtype": "index",
-    "peer_key": "lof|index"
+    "benchmark_family": "中证白酒",
+    "benchmark_confidence": "medium",
+    "benchmark_reason": "从基准文本提取到唯一指数族「中证白酒」；该基准为加权复合表述，按主基准归组",
+    "index_scope": "sector",
+    "tracking_family": "中证白酒",
+    "peer_key": "lof|index|sector|中证白酒",
+    "verifiable_group": true
    },
    "index_scope": "sector",
    "benchmark": "中证白酒指数收益率×95%＋金融机构人民币活期存款基准利率（税后）×5%",
@@ -4458,7 +4720,24 @@
        "recovered_date": "2016-07-12"
       },
       "gap_count_over_threshold": 0,
-      "caveat": "净值连续性 cannot_verify，回撤为可观测区间内的保守估计"
+      "null_count": 0,
+      "segments": [
+       {
+        "segment_start": "2015-05-27",
+        "segment_end": "2026-11-18",
+        "points": 2794,
+        "max_drawdown": 0.360111,
+        "detail": {
+         "peak_value": 1.083,
+         "peak_date": "2015-06-15",
+         "trough_value": 0.693,
+         "trough_date": "2015-08-25"
+        }
+       }
+      ],
+      "complete_interval": true,
+      "caveat": "净值连续性 cannot_verify",
+      "degraded": false
      },
      "volatility": {
       "sample_size": 2793,
@@ -4526,7 +4805,10 @@
       "value_pct": 54.488113,
       "window_days": 90,
       "samples": 2061,
-      "note": "窗口端点必须精确命中净值，不向前后取近似值"
+      "skipped_endpoint": 733,
+      "skipped_gap": 0,
+      "skipped_null": 0,
+      "note": "每个窗口独立检查：端点精确命中、窗口内无超阈值缺口、无空值；不满足的窗口跳过并计数，不跨越缺口计算"
      }
     },
     "not_computed": {
@@ -4717,21 +4999,20 @@
    "peer_group": {
     "product_class": "bond_pure",
     "investment_subtype": "bond_pure",
+    "benchmark_family": "中债综合",
+    "benchmark_confidence": "high",
+    "benchmark_reason": "基准文本与已知写法完全一致：中债综合指数",
     "duration_bucket": "unknown",
-    "peer_key": "bond_pure|unknown"
+    "credit_bucket": "unknown",
+    "convertible_bucket": "unknown",
+    "peer_key": "bond_pure|unknown",
+    "verifiable_group": true
    },
+   "status": "ok",
    "representative_share": "000015",
-   "share_count": 2,
-   "shares": [
-    {
-     "share_code": "000015",
-     "share_name": "华夏纯债债券A"
-    },
-    {
-     "share_code": "000016",
-     "share_name": "华夏纯债债券C"
-    }
-   ],
+   "representative_share_name": "华夏纯债债券A",
+   "representative_reason": "主份额 000015 且有 3310 条净值记录",
+   "representative_rule": "代表份额选择顺序（显式规则，不静默取不完整数据）：① 主份额且净值记录数 > 0；② 任一份额中净值记录数最多者（并列取代码最小）；③ 全部份额都无净值记录 → status=insufficient_data，performance=None。",
    "performance": {
     "code": "000015",
     "nav_kind": "net_value",
@@ -4847,7 +5128,24 @@
        "recovered_date": "2018-03-30"
       },
       "gap_count_over_threshold": 0,
-      "caveat": "净值连续性 cannot_verify，回撤为可观测区间内的保守估计"
+      "null_count": 0,
+      "segments": [
+       {
+        "segment_start": "2013-03-08",
+        "segment_end": "2026-11-18",
+        "points": 3310,
+        "max_drawdown": 0.041017,
+        "detail": {
+         "peak_value": 1.219,
+         "peak_date": "2016-10-21",
+         "trough_value": 1.169,
+         "trough_date": "2016-12-20"
+        }
+       }
+      ],
+      "complete_interval": true,
+      "caveat": "净值连续性 cannot_verify",
+      "degraded": false
      },
      "volatility": {
       "sample_size": 3309,
@@ -4915,7 +5213,10 @@
       "value_pct": 85.533822,
       "window_days": 90,
       "samples": 2454,
-      "note": "窗口端点必须精确命中净值，不向前后取近似值"
+      "skipped_endpoint": 856,
+      "skipped_gap": 0,
+      "skipped_null": 0,
+      "note": "每个窗口独立检查：端点精确命中、窗口内无超阈值缺口、无空值；不满足的窗口跳过并计数，不跨越缺口计算"
      }
     },
     "not_computed": {
@@ -4925,6 +5226,19 @@
      "beta": "无基准序列"
     }
    },
+   "share_count": 2,
+   "shares": [
+    {
+     "share_code": "000015",
+     "share_name": "华夏纯债债券A",
+     "nav_rows": 3310
+    },
+    {
+     "share_code": "000016",
+     "share_name": "华夏纯债债券C",
+     "nav_rows": 3310
+    }
+   ],
    "cost_comparison": {
     "fund_id": 21,
     "shares": [
@@ -5094,17 +5408,19 @@
    "peer_group": {
     "product_class": "etf_linked",
     "investment_subtype": "index",
+    "benchmark_family": "沪深300",
+    "benchmark_confidence": "medium",
+    "benchmark_reason": "从基准文本提取到唯一指数族「沪深300」；该基准为加权复合表述，按主基准归组",
     "index_scope": "broad",
-    "peer_key": "etf_linked|broad"
+    "tracking_family": "沪深300",
+    "peer_key": "etf_linked|broad|沪深300",
+    "verifiable_group": true
    },
+   "status": "ok",
    "representative_share": "000051",
-   "share_count": 1,
-   "shares": [
-    {
-     "share_code": "000051",
-     "share_name": "华夏沪深300ETF联接A"
-    }
-   ],
+   "representative_share_name": "华夏沪深300ETF联接A",
+   "representative_reason": "主份额 000051 且有 4220 条净值记录",
+   "representative_rule": "代表份额选择顺序（显式规则，不静默取不完整数据）：① 主份额且净值记录数 > 0；② 任一份额中净值记录数最多者（并列取代码最小）；③ 全部份额都无净值记录 → status=insufficient_data，performance=None。",
    "performance": {
     "code": "000051",
     "nav_kind": "net_value",
@@ -5220,7 +5536,24 @@
        "recovered_date": "2020-07-08"
       },
       "gap_count_over_threshold": 0,
-      "caveat": "净值连续性 cannot_verify，回撤为可观测区间内的保守估计"
+      "null_count": 0,
+      "segments": [
+       {
+        "segment_start": "2009-07-10",
+        "segment_end": "2026-11-18",
+        "points": 4220,
+        "max_drawdown": 0.434343,
+        "detail": {
+         "peak_value": 1.584,
+         "peak_date": "2015-06-08",
+         "trough_value": 0.896,
+         "trough_date": "2016-01-28"
+        }
+       }
+      ],
+      "complete_interval": true,
+      "caveat": "净值连续性 cannot_verify",
+      "degraded": false
      },
      "volatility": {
       "sample_size": 4219,
@@ -5288,7 +5621,10 @@
       "value_pct": 51.832961,
       "window_days": 90,
       "samples": 3137,
-      "note": "窗口端点必须精确命中净值，不向前后取近似值"
+      "skipped_endpoint": 1083,
+      "skipped_gap": 0,
+      "skipped_null": 0,
+      "note": "每个窗口独立检查：端点精确命中、窗口内无超阈值缺口、无空值；不满足的窗口跳过并计数，不跨越缺口计算"
      }
     },
     "not_computed": {
@@ -5298,6 +5634,14 @@
      "beta": "无基准序列"
     }
    },
+   "share_count": 1,
+   "shares": [
+    {
+     "share_code": "000051",
+     "share_name": "华夏沪深300ETF联接A",
+     "nav_rows": 4220
+    }
+   ],
    "cost_comparison": {
     "fund_id": 14,
     "shares": [
@@ -5395,16 +5739,17 @@
    "peer_group": {
     "product_class": "money_market",
     "investment_subtype": "money_market",
-    "peer_key": "money_market"
+    "benchmark_family": "unknown",
+    "benchmark_confidence": "none",
+    "benchmark_reason": "benchmark 为空，无法建立可比组",
+    "peer_key": "money_market",
+    "verifiable_group": true
    },
+   "status": "ok",
    "representative_share": "000198",
-   "share_count": 1,
-   "shares": [
-    {
-     "share_code": "000198",
-     "share_name": "天弘余额宝货币"
-    }
-   ],
+   "representative_share_name": "天弘余额宝货币",
+   "representative_reason": "主份额 000198 且有 4919 条净值记录",
+   "representative_rule": "代表份额选择顺序（显式规则，不静默取不完整数据）：① 主份额且净值记录数 > 0；② 任一份额中净值记录数最多者（并列取代码最小）；③ 全部份额都无净值记录 → status=insufficient_data，performance=None。",
    "performance": {
     "stats": {
      "rows": 4919,
@@ -5482,6 +5827,14 @@
     "gap_count_over_threshold": 0,
     "comparison_rule": "只能与其他货币基金比较，禁止与净值型基金同榜"
    },
+   "share_count": 1,
+   "shares": [
+    {
+     "share_code": "000198",
+     "share_name": "天弘余额宝货币",
+     "nav_rows": 4919
+    }
+   ],
    "cost_comparison": {
     "fund_id": 22,
     "shares": [
@@ -5567,17 +5920,19 @@
    "peer_group": {
     "product_class": "ordinary_index",
     "investment_subtype": "index",
+    "benchmark_family": "中证500",
+    "benchmark_confidence": "medium",
+    "benchmark_reason": "从基准文本提取到唯一指数族「中证500」；该基准为加权复合表述，按主基准归组",
     "index_scope": "broad",
-    "peer_key": "ordinary_index|broad"
+    "tracking_family": "中证500",
+    "peer_key": "ordinary_index|broad|中证500",
+    "verifiable_group": true
    },
+   "status": "ok",
    "representative_share": "000478",
-   "share_count": 1,
-   "shares": [
-    {
-     "share_code": "000478",
-     "share_name": "建信中证500指数增强A"
-    }
-   ],
+   "representative_share_name": "建信中证500指数增强A",
+   "representative_reason": "主份额 000478 且有 3096 条净值记录",
+   "representative_rule": "代表份额选择顺序（显式规则，不静默取不完整数据）：① 主份额且净值记录数 > 0；② 任一份额中净值记录数最多者（并列取代码最小）；③ 全部份额都无净值记录 → status=insufficient_data，performance=None。",
    "performance": {
     "code": "000478",
     "nav_kind": "net_value",
@@ -5693,7 +6048,24 @@
        "recovered_date": "2021-08-11"
       },
       "gap_count_over_threshold": 0,
-      "caveat": "净值连续性 cannot_verify，回撤为可观测区间内的保守估计"
+      "null_count": 0,
+      "segments": [
+       {
+        "segment_start": "2014-01-27",
+        "segment_end": "2026-11-18",
+        "points": 3096,
+        "max_drawdown": 0.513152,
+        "detail": {
+         "peak_value": 3.0983,
+         "peak_date": "2015-06-12",
+         "trough_value": 1.5084,
+         "trough_date": "2015-09-15"
+        }
+       }
+      ],
+      "complete_interval": true,
+      "caveat": "净值连续性 cannot_verify",
+      "degraded": false
      },
      "volatility": {
       "sample_size": 3095,
@@ -5761,7 +6133,10 @@
       "value_pct": 54.470126,
       "window_days": 90,
       "samples": 2293,
-      "note": "窗口端点必须精确命中净值，不向前后取近似值"
+      "skipped_endpoint": 803,
+      "skipped_gap": 0,
+      "skipped_null": 0,
+      "note": "每个窗口独立检查：端点精确命中、窗口内无超阈值缺口、无空值；不满足的窗口跳过并计数，不跨越缺口计算"
      }
     },
     "not_computed": {
@@ -5771,6 +6146,14 @@
      "beta": "无基准序列"
     }
    },
+   "share_count": 1,
+   "shares": [
+    {
+     "share_code": "000478",
+     "share_name": "建信中证500指数增强A",
+     "nav_rows": 3096
+    }
+   ],
    "cost_comparison": {
     "fund_id": 20,
     "shares": [
@@ -5868,21 +6251,19 @@
    "peer_group": {
     "product_class": "etf_linked",
     "investment_subtype": "index",
+    "benchmark_family": "中证全指半导体",
+    "benchmark_confidence": "medium",
+    "benchmark_reason": "从基准文本提取到唯一指数族「中证全指半导体」；该基准为加权复合表述，按主基准归组",
     "index_scope": "sector",
-    "peer_key": "etf_linked|sector"
+    "tracking_family": "中证全指半导体",
+    "peer_key": "etf_linked|sector|中证全指半导体",
+    "verifiable_group": true
    },
+   "status": "ok",
    "representative_share": "007300",
-   "share_count": 2,
-   "shares": [
-    {
-     "share_code": "007300",
-     "share_name": "国联安中证半导体ETF联接A"
-    },
-    {
-     "share_code": "007301",
-     "share_name": "国联安中证半导体ETF联接C"
-    }
-   ],
+   "representative_share_name": "国联安中证半导体ETF联接A",
+   "representative_reason": "主份额 007300 且有 1799 条净值记录",
+   "representative_rule": "代表份额选择顺序（显式规则，不静默取不完整数据）：① 主份额且净值记录数 > 0；② 任一份额中净值记录数最多者（并列取代码最小）；③ 全部份额都无净值记录 → status=insufficient_data，performance=None。",
    "performance": {
     "code": "007300",
     "nav_kind": "net_value",
@@ -5998,7 +6379,24 @@
        "recovered_date": "2025-09-24"
       },
       "gap_count_over_threshold": 0,
-      "caveat": "净值连续性 cannot_verify，回撤为可观测区间内的保守估计"
+      "null_count": 0,
+      "segments": [
+       {
+        "segment_start": "2019-06-26",
+        "segment_end": "2026-11-18",
+        "points": 1799,
+        "max_drawdown": 0.594181,
+        "detail": {
+         "peak_value": 2.956,
+         "peak_date": "2021-07-30",
+         "trough_value": 1.1996,
+         "trough_date": "2024-02-05"
+        }
+       }
+      ],
+      "complete_interval": true,
+      "caveat": "净值连续性 cannot_verify",
+      "degraded": false
      },
      "volatility": {
       "sample_size": 1798,
@@ -6066,7 +6464,10 @@
       "value_pct": 54.934966,
       "window_days": 90,
       "samples": 1307,
-      "note": "窗口端点必须精确命中净值，不向前后取近似值"
+      "skipped_endpoint": 492,
+      "skipped_gap": 0,
+      "skipped_null": 0,
+      "note": "每个窗口独立检查：端点精确命中、窗口内无超阈值缺口、无空值；不满足的窗口跳过并计数，不跨越缺口计算"
      }
     },
     "not_computed": {
@@ -6076,6 +6477,19 @@
      "beta": "无基准序列"
     }
    },
+   "share_count": 2,
+   "shares": [
+    {
+     "share_code": "007300",
+     "share_name": "国联安中证半导体ETF联接A",
+     "nav_rows": 1799
+    },
+    {
+     "share_code": "007301",
+     "share_name": "国联安中证半导体ETF联接C",
+     "nav_rows": 1799
+    }
+   ],
    "cost_comparison": {
     "fund_id": 17,
     "shares": [
@@ -6245,17 +6659,19 @@
    "peer_group": {
     "product_class": "etf_linked",
     "investment_subtype": "index",
+    "benchmark_family": "沪深300",
+    "benchmark_confidence": "medium",
+    "benchmark_reason": "从基准文本提取到唯一指数族「沪深300」；该基准为加权复合表述，按主基准归组",
     "index_scope": "broad",
-    "peer_key": "etf_linked|broad"
+    "tracking_family": "沪深300",
+    "peer_key": "etf_linked|broad|沪深300",
+    "verifiable_group": true
    },
+   "status": "ok",
    "representative_share": "110020",
-   "share_count": 1,
-   "shares": [
-    {
-     "share_code": "110020",
-     "share_name": "易方达沪深300ETF联接A"
-    }
-   ],
+   "representative_share_name": "易方达沪深300ETF联接A",
+   "representative_reason": "主份额 110020 且有 4186 条净值记录",
+   "representative_rule": "代表份额选择顺序（显式规则，不静默取不完整数据）：① 主份额且净值记录数 > 0；② 任一份额中净值记录数最多者（并列取代码最小）；③ 全部份额都无净值记录 → status=insufficient_data，performance=None。",
    "performance": {
     "code": "110020",
     "nav_kind": "net_value",
@@ -6371,7 +6787,24 @@
        "recovered_date": "2020-07-08"
       },
       "gap_count_over_threshold": 0,
-      "caveat": "净值连续性 cannot_verify，回撤为可观测区间内的保守估计"
+      "null_count": 0,
+      "segments": [
+       {
+        "segment_start": "2009-08-26",
+        "segment_end": "2026-11-18",
+        "points": 4186,
+        "max_drawdown": 0.436093,
+        "detail": {
+         "peak_value": 1.6485,
+         "peak_date": "2015-06-08",
+         "trough_value": 0.9296,
+         "trough_date": "2016-01-28"
+        }
+       }
+      ],
+      "complete_interval": true,
+      "caveat": "净值连续性 cannot_verify",
+      "degraded": false
      },
      "volatility": {
       "sample_size": 4185,
@@ -6439,7 +6872,10 @@
       "value_pct": 52.009,
       "window_days": 90,
       "samples": 3111,
-      "note": "窗口端点必须精确命中净值，不向前后取近似值"
+      "skipped_endpoint": 1075,
+      "skipped_gap": 0,
+      "skipped_null": 0,
+      "note": "每个窗口独立检查：端点精确命中、窗口内无超阈值缺口、无空值；不满足的窗口跳过并计数，不跨越缺口计算"
      }
     },
     "not_computed": {
@@ -6449,6 +6885,14 @@
      "beta": "无基准序列"
     }
    },
+   "share_count": 1,
+   "shares": [
+    {
+     "share_code": "110020",
+     "share_name": "易方达沪深300ETF联接A",
+     "nav_rows": 4186
+    }
+   ],
    "cost_comparison": {
     "fund_id": 15,
     "shares": [
@@ -6546,17 +6990,17 @@
    "peer_group": {
     "product_class": "active_equity",
     "investment_subtype": "active",
-    "benchmark_family": "has_text",
-    "peer_key": "active_equity|has_text"
+    "benchmark_family": "unknown",
+    "benchmark_confidence": "none",
+    "benchmark_reason": "基准文本含多个指数族 ['中证内地消费主题', '中债总']，无法确定单一主基准，标 unknown 不强行归组",
+    "peer_key": "active_equity|unknown",
+    "verifiable_group": false
    },
+   "status": "ok",
    "representative_share": "110022",
-   "share_count": 1,
-   "shares": [
-    {
-     "share_code": "110022",
-     "share_name": "易方达消费行业股票"
-    }
-   ],
+   "representative_share_name": "易方达消费行业股票",
+   "representative_reason": "主份额 110022 且有 3927 条净值记录",
+   "representative_rule": "代表份额选择顺序（显式规则，不静默取不完整数据）：① 主份额且净值记录数 > 0；② 任一份额中净值记录数最多者（并列取代码最小）；③ 全部份额都无净值记录 → status=insufficient_data，performance=None。",
    "performance": {
     "code": "110022",
     "nav_kind": "net_value",
@@ -6671,7 +7115,24 @@
        "days_elapsed": 145
       },
       "gap_count_over_threshold": 0,
-      "caveat": "净值连续性 cannot_verify，回撤为可观测区间内的保守估计"
+      "null_count": 0,
+      "segments": [
+       {
+        "segment_start": "2010-08-20",
+        "segment_end": "2026-11-18",
+        "points": 3927,
+        "max_drawdown": 0.573177,
+        "detail": {
+         "peak_value": 6.129,
+         "peak_date": "2021-02-10",
+         "trough_value": 2.616,
+         "trough_date": "2026-06-26"
+        }
+       }
+      ],
+      "complete_interval": true,
+      "caveat": "净值连续性 cannot_verify",
+      "degraded": false
      },
      "volatility": {
       "sample_size": 3926,
@@ -6739,7 +7200,10 @@
       "value_pct": 54.470709,
       "window_days": 90,
       "samples": 2919,
-      "note": "窗口端点必须精确命中净值，不向前后取近似值"
+      "skipped_endpoint": 1008,
+      "skipped_gap": 0,
+      "skipped_null": 0,
+      "note": "每个窗口独立检查：端点精确命中、窗口内无超阈值缺口、无空值；不满足的窗口跳过并计数，不跨越缺口计算"
      }
     },
     "not_computed": {
@@ -6749,6 +7213,14 @@
      "beta": "无基准序列"
     }
    },
+   "share_count": 1,
+   "shares": [
+    {
+     "share_code": "110022",
+     "share_name": "易方达消费行业股票",
+     "nav_rows": 3927
+    }
+   ],
    "cost_comparison": {
     "fund_id": 18,
     "shares": [
@@ -6838,16 +7310,19 @@
    "peer_group": {
     "product_class": "lof",
     "investment_subtype": "active",
-    "peer_key": "lof|active"
+    "benchmark_family": "unknown",
+    "benchmark_confidence": "none",
+    "benchmark_reason": "基准文本含多个指数族 ['中债综合全价', '沪深300']，无法确定单一主基准，标 unknown 不强行归组",
+    "index_scope": "unknown",
+    "tracking_family": null,
+    "peer_key": "lof|active|unknown",
+    "verifiable_group": false
    },
+   "status": "ok",
    "representative_share": "161005",
-   "share_count": 1,
-   "shares": [
-    {
-     "share_code": "161005",
-     "share_name": "富国天惠成长混合(LOF)A"
-    }
-   ],
+   "representative_share_name": "富国天惠成长混合(LOF)A",
+   "representative_reason": "主份额 161005 且有 5124 条净值记录",
+   "representative_rule": "代表份额选择顺序（显式规则，不静默取不完整数据）：① 主份额且净值记录数 > 0；② 任一份额中净值记录数最多者（并列取代码最小）；③ 全部份额都无净值记录 → status=insufficient_data，performance=None。",
    "performance": {
     "code": "161005",
     "nav_kind": "net_value",
@@ -6963,7 +7438,24 @@
        "recovered_date": "2010-12-13"
       },
       "gap_count_over_threshold": 0,
-      "caveat": "净值连续性 cannot_verify，回撤为可观测区间内的保守估计"
+      "null_count": 0,
+      "segments": [
+       {
+        "segment_start": "2005-11-16",
+        "segment_end": "2026-11-18",
+        "points": 5124,
+        "max_drawdown": 0.336047,
+        "detail": {
+         "peak_value": 3.4272,
+         "peak_date": "2008-01-14",
+         "trough_value": 2.2755,
+         "trough_date": "2008-11-07"
+        }
+       }
+      ],
+      "complete_interval": true,
+      "caveat": "净值连续性 cannot_verify",
+      "degraded": false
      },
      "volatility": {
       "sample_size": 5123,
@@ -7031,7 +7523,10 @@
       "value_pct": 61.013849,
       "window_days": 90,
       "samples": 3827,
-      "note": "窗口端点必须精确命中净值，不向前后取近似值"
+      "skipped_endpoint": 1297,
+      "skipped_gap": 0,
+      "skipped_null": 0,
+      "note": "每个窗口独立检查：端点精确命中、窗口内无超阈值缺口、无空值；不满足的窗口跳过并计数，不跨越缺口计算"
      }
     },
     "not_computed": {
@@ -7041,6 +7536,14 @@
      "beta": "无基准序列"
     }
    },
+   "share_count": 1,
+   "shares": [
+    {
+     "share_code": "161005",
+     "share_name": "富国天惠成长混合(LOF)A",
+     "nav_rows": 5124
+    }
+   ],
    "cost_comparison": {
     "fund_id": 19,
     "shares": [
@@ -7138,20 +7641,19 @@
    "peer_group": {
     "product_class": "lof",
     "investment_subtype": "index",
-    "peer_key": "lof|index"
+    "benchmark_family": "中证白酒",
+    "benchmark_confidence": "medium",
+    "benchmark_reason": "从基准文本提取到唯一指数族「中证白酒」；该基准为加权复合表述，按主基准归组",
+    "index_scope": "sector",
+    "tracking_family": "中证白酒",
+    "peer_key": "lof|index|sector|中证白酒",
+    "verifiable_group": true
    },
+   "status": "ok",
    "representative_share": "161725",
-   "share_count": 2,
-   "shares": [
-    {
-     "share_code": "012414",
-     "share_name": "招商中证白酒指数(LOF)C"
-    },
-    {
-     "share_code": "161725",
-     "share_name": "招商中证白酒指数(LOF)A"
-    }
-   ],
+   "representative_share_name": "招商中证白酒指数(LOF)A",
+   "representative_reason": "主份额 161725 且有 2794 条净值记录",
+   "representative_rule": "代表份额选择顺序（显式规则，不静默取不完整数据）：① 主份额且净值记录数 > 0；② 任一份额中净值记录数最多者（并列取代码最小）；③ 全部份额都无净值记录 → status=insufficient_data，performance=None。",
    "performance": {
     "code": "161725",
     "nav_kind": "net_value",
@@ -7267,7 +7769,24 @@
        "recovered_date": "2016-07-12"
       },
       "gap_count_over_threshold": 0,
-      "caveat": "净值连续性 cannot_verify，回撤为可观测区间内的保守估计"
+      "null_count": 0,
+      "segments": [
+       {
+        "segment_start": "2015-05-27",
+        "segment_end": "2026-11-18",
+        "points": 2794,
+        "max_drawdown": 0.360111,
+        "detail": {
+         "peak_value": 1.083,
+         "peak_date": "2015-06-15",
+         "trough_value": 0.693,
+         "trough_date": "2015-08-25"
+        }
+       }
+      ],
+      "complete_interval": true,
+      "caveat": "净值连续性 cannot_verify",
+      "degraded": false
      },
      "volatility": {
       "sample_size": 2793,
@@ -7335,7 +7854,10 @@
       "value_pct": 54.488113,
       "window_days": 90,
       "samples": 2061,
-      "note": "窗口端点必须精确命中净值，不向前后取近似值"
+      "skipped_endpoint": 733,
+      "skipped_gap": 0,
+      "skipped_null": 0,
+      "note": "每个窗口独立检查：端点精确命中、窗口内无超阈值缺口、无空值；不满足的窗口跳过并计数，不跨越缺口计算"
      }
     },
     "not_computed": {
@@ -7345,6 +7867,19 @@
      "beta": "无基准序列"
     }
    },
+   "share_count": 2,
+   "shares": [
+    {
+     "share_code": "012414",
+     "share_name": "招商中证白酒指数(LOF)C",
+     "nav_rows": 1338
+    },
+    {
+     "share_code": "161725",
+     "share_name": "招商中证白酒指数(LOF)A",
+     "nav_rows": 2794
+    }
+   ],
    "cost_comparison": {
     "fund_id": 16,
     "shares": [
@@ -7509,46 +8044,66 @@
  "peer_analysis": {
   "groups": {
    "bond_pure|unknown": {
-    "member_count": 2,
+    "member_count": 1,
+    "fund_ids": [
+     21
+    ],
+    "benchmark_family": "中债综合",
+    "benchmark_confidence": "high",
+    "benchmark_reason": "基准文本与已知写法完全一致：中债综合指数",
+    "index_scope": null,
+    "verifiable_group": true,
     "members": [
      {
+      "fund_id": 21,
       "fund_code": "000015",
-      "share_code": "000015",
       "fund_name": "华夏纯债债券",
+      "representative_share": "000015",
+      "representative_reason": "主份额 000015 且有 3310 条净值记录",
+      "share_count": 2,
+      "status": "ok",
       "ret_12m": 0.018701,
       "ret_12m_status": "ok",
       "max_drawdown": 0.041017,
       "mdd_status": "ok"
-     },
-     {
-      "fund_code": "000015",
-      "share_code": "000016",
-      "fund_name": "华夏纯债债券",
-      "ret_12m": 0.016232,
-      "ret_12m_status": "ok",
-      "max_drawdown": 0.041597,
-      "mdd_status": "ok"
      }
     ],
     "ranking_generated": false,
-    "note": "同类描述性对照，**不排名、不推荐**；不同 peer_group 之间不可横向比较"
+    "note": "同类描述性对照，**不排名、不推荐**；成员按 fund_id 去重（A/C/E 只算一个本体）；不同 peer_group 之间不可横向比较"
    },
-   "etf_linked|broad": {
+   "etf_linked|broad|沪深300": {
     "member_count": 2,
+    "fund_ids": [
+     14,
+     15
+    ],
+    "benchmark_family": "沪深300",
+    "benchmark_confidence": "medium",
+    "benchmark_reason": "从基准文本提取到唯一指数族「沪深300」；该基准为加权复合表述，按主基准归组",
+    "index_scope": "broad",
+    "verifiable_group": true,
     "members": [
      {
+      "fund_id": 14,
       "fund_code": "000051",
-      "share_code": "000051",
       "fund_name": "华夏沪深300ETF联接",
+      "representative_share": "000051",
+      "representative_reason": "主份额 000051 且有 4220 条净值记录",
+      "share_count": 1,
+      "status": "ok",
       "ret_12m": -0.100981,
       "ret_12m_status": "ok",
       "max_drawdown": 0.434343,
       "mdd_status": "ok"
      },
      {
+      "fund_id": 15,
       "fund_code": "110020",
-      "share_code": "110020",
       "fund_name": "易方达沪深300ETF联接",
+      "representative_share": "110020",
+      "representative_reason": "主份额 110020 且有 4186 条净值记录",
+      "share_count": 1,
+      "status": "ok",
       "ret_12m": -0.097926,
       "ret_12m_status": "ok",
       "max_drawdown": 0.436093,
@@ -7556,15 +8111,27 @@
      }
     ],
     "ranking_generated": false,
-    "note": "同类描述性对照，**不排名、不推荐**；不同 peer_group 之间不可横向比较"
+    "note": "同类描述性对照，**不排名、不推荐**；成员按 fund_id 去重（A/C/E 只算一个本体）；不同 peer_group 之间不可横向比较"
    },
    "money_market": {
     "member_count": 1,
+    "fund_ids": [
+     22
+    ],
+    "benchmark_family": "unknown",
+    "benchmark_confidence": "none",
+    "benchmark_reason": "benchmark 为空，无法建立可比组",
+    "index_scope": null,
+    "verifiable_group": true,
     "members": [
      {
+      "fund_id": 22,
       "fund_code": "000198",
-      "share_code": "000198",
       "fund_name": "天弘余额宝货币",
+      "representative_share": "000198",
+      "representative_reason": "主份额 000198 且有 4919 条净值记录",
+      "share_count": 1,
+      "status": "ok",
       "ret_12m": null,
       "ret_12m_status": null,
       "max_drawdown": null,
@@ -7572,15 +8139,27 @@
      }
     ],
     "ranking_generated": false,
-    "note": "同类描述性对照，**不排名、不推荐**；不同 peer_group 之间不可横向比较"
+    "note": "同类描述性对照，**不排名、不推荐**；成员按 fund_id 去重（A/C/E 只算一个本体）；不同 peer_group 之间不可横向比较"
    },
-   "ordinary_index|broad": {
+   "ordinary_index|broad|中证500": {
     "member_count": 1,
+    "fund_ids": [
+     20
+    ],
+    "benchmark_family": "中证500",
+    "benchmark_confidence": "medium",
+    "benchmark_reason": "从基准文本提取到唯一指数族「中证500」；该基准为加权复合表述，按主基准归组",
+    "index_scope": "broad",
+    "verifiable_group": true,
     "members": [
      {
+      "fund_id": 20,
       "fund_code": "000478",
-      "share_code": "000478",
       "fund_name": "建信中证500指数增强",
+      "representative_share": "000478",
+      "representative_reason": "主份额 000478 且有 3096 条净值记录",
+      "share_count": 1,
+      "status": "ok",
       "ret_12m": -0.113596,
       "ret_12m_status": "ok",
       "max_drawdown": 0.513152,
@@ -7588,40 +8167,55 @@
      }
     ],
     "ranking_generated": false,
-    "note": "同类描述性对照，**不排名、不推荐**；不同 peer_group 之间不可横向比较"
+    "note": "同类描述性对照，**不排名、不推荐**；成员按 fund_id 去重（A/C/E 只算一个本体）；不同 peer_group 之间不可横向比较"
    },
-   "etf_linked|sector": {
-    "member_count": 2,
+   "etf_linked|sector|中证全指半导体": {
+    "member_count": 1,
+    "fund_ids": [
+     17
+    ],
+    "benchmark_family": "中证全指半导体",
+    "benchmark_confidence": "medium",
+    "benchmark_reason": "从基准文本提取到唯一指数族「中证全指半导体」；该基准为加权复合表述，按主基准归组",
+    "index_scope": "sector",
+    "verifiable_group": true,
     "members": [
      {
+      "fund_id": 17,
       "fund_code": "007300",
-      "share_code": "007300",
       "fund_name": "国联安中证半导体ETF联接",
+      "representative_share": "007300",
+      "representative_reason": "主份额 007300 且有 1799 条净值记录",
+      "share_count": 2,
+      "status": "ok",
       "ret_12m": 0.09653,
       "ret_12m_status": "ok",
       "max_drawdown": 0.594181,
       "mdd_status": "ok"
-     },
-     {
-      "fund_code": "007300",
-      "share_code": "007301",
-      "fund_name": "国联安中证半导体ETF联接",
-      "ret_12m": 0.093772,
-      "ret_12m_status": "ok",
-      "max_drawdown": 0.596727,
-      "mdd_status": "ok"
      }
     ],
     "ranking_generated": false,
-    "note": "同类描述性对照，**不排名、不推荐**；不同 peer_group 之间不可横向比较"
+    "note": "同类描述性对照，**不排名、不推荐**；成员按 fund_id 去重（A/C/E 只算一个本体）；不同 peer_group 之间不可横向比较"
    },
-   "active_equity|has_text": {
+   "active_equity|unknown": {
     "member_count": 1,
+    "fund_ids": [
+     18
+    ],
+    "benchmark_family": "unknown",
+    "benchmark_confidence": "none",
+    "benchmark_reason": "基准文本含多个指数族 ['中证内地消费主题', '中债总']，无法确定单一主基准，标 unknown 不强行归组",
+    "index_scope": null,
+    "verifiable_group": false,
     "members": [
      {
+      "fund_id": 18,
       "fund_code": "110022",
-      "share_code": "110022",
       "fund_name": "易方达消费行业股票",
+      "representative_share": "110022",
+      "representative_reason": "主份额 110022 且有 3927 条净值记录",
+      "share_count": 1,
+      "status": "ok",
       "ret_12m": -0.154257,
       "ret_12m_status": "ok",
       "max_drawdown": 0.573177,
@@ -7629,15 +8223,27 @@
      }
     ],
     "ranking_generated": false,
-    "note": "同类描述性对照，**不排名、不推荐**；不同 peer_group 之间不可横向比较"
+    "note": "同类描述性对照，**不排名、不推荐**；成员按 fund_id 去重（A/C/E 只算一个本体）；不同 peer_group 之间不可横向比较"
    },
-   "lof|active": {
+   "lof|active|unknown": {
     "member_count": 1,
+    "fund_ids": [
+     19
+    ],
+    "benchmark_family": "unknown",
+    "benchmark_confidence": "none",
+    "benchmark_reason": "基准文本含多个指数族 ['中债综合全价', '沪深300']，无法确定单一主基准，标 unknown 不强行归组",
+    "index_scope": "unknown",
+    "verifiable_group": false,
     "members": [
      {
+      "fund_id": 19,
       "fund_code": "161005",
-      "share_code": "161005",
       "fund_name": "富国天惠成长混合(LOF)",
+      "representative_share": "161005",
+      "representative_reason": "主份额 161005 且有 5124 条净值记录",
+      "share_count": 1,
+      "status": "ok",
       "ret_12m": -0.053751,
       "ret_12m_status": "ok",
       "max_drawdown": 0.336047,
@@ -7645,24 +8251,27 @@
      }
     ],
     "ranking_generated": false,
-    "note": "同类描述性对照，**不排名、不推荐**；不同 peer_group 之间不可横向比较"
+    "note": "同类描述性对照，**不排名、不推荐**；成员按 fund_id 去重（A/C/E 只算一个本体）；不同 peer_group 之间不可横向比较"
    },
-   "lof|index": {
-    "member_count": 2,
+   "lof|index|sector|中证白酒": {
+    "member_count": 1,
+    "fund_ids": [
+     16
+    ],
+    "benchmark_family": "中证白酒",
+    "benchmark_confidence": "medium",
+    "benchmark_reason": "从基准文本提取到唯一指数族「中证白酒」；该基准为加权复合表述，按主基准归组",
+    "index_scope": "sector",
+    "verifiable_group": true,
     "members": [
      {
+      "fund_id": 16,
       "fund_code": "161725",
-      "share_code": "012414",
       "fund_name": "招商中证白酒指数(LOF)",
-      "ret_12m": -0.24595,
-      "ret_12m_status": "ok",
-      "max_drawdown": 0.64867,
-      "mdd_status": "ok"
-     },
-     {
-      "fund_code": "161725",
-      "share_code": "161725",
-      "fund_name": "招商中证白酒指数(LOF)",
+      "representative_share": "161725",
+      "representative_reason": "主份额 161725 且有 2794 条净值记录",
+      "share_count": 2,
+      "status": "ok",
       "ret_12m": -0.085978,
       "ret_12m_status": "ok",
       "max_drawdown": 0.360111,
@@ -7670,10 +8279,13 @@
      }
     ],
     "ranking_generated": false,
-    "note": "同类描述性对照，**不排名、不推荐**；不同 peer_group 之间不可横向比较"
+    "note": "同类描述性对照，**不排名、不推荐**；成员按 fund_id 去重（A/C/E 只算一个本体）；不同 peer_group 之间不可横向比较"
    }
   },
   "group_count": 8,
+  "fund_count": 9,
+  "share_count": 12,
+  "deduped_by_fund_id": true,
   "cross_group_comparison_allowed": false,
   "ranking_generated": false,
   "reason_no_ranking": "样本量小、净值连续性 cannot_verify、无风险利率与基准序列缺失，不具备生成正式排名的条件"

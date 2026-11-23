@@ -57,6 +57,20 @@ def _pct(x: float | None) -> float | None:
     return None if x is None else round(x * 100, 6)
 
 
+def _gaps_in_range(series: NavSeries, start_iso: str, end_iso: str) -> list[dict]:
+    """区间内的超阈值缺口。唯一缺口判定入口，所有指标共用同一标准。"""
+    return [g for g in series.quality.gaps
+            if g["from"] >= start_iso and g["to"] <= end_iso]
+
+
+def _null_count_in_range(series: NavSeries, start_iso: str, end_iso: str,
+                         *, field_name: str) -> int:
+    """区间内该字段的空值条数（含端点）。"""
+    return sum(1 for p in series.points
+               if start_iso <= p.nav_date <= end_iso
+               and getattr(p, field_name) is None)
+
+
 # ---------------------------------------------------------------- 窗口收益
 def _window_return(series: NavSeries, days: int, *, field_name: str) -> dict:
     """按自然日窗口算收益。端点必须精确命中。"""
@@ -110,6 +124,19 @@ def _annualized(series: NavSeries, *, field_name: str) -> dict:
     v1 = getattr(last, field_name)
     if v0 is None or v1 is None or v0 <= 0:
         return _na(f"{field_name} 缺失或非正")
+    start_iso, end_iso = first.nav_date, last.nav_date
+    gaps = _gaps_in_range(series, start_iso, end_iso)
+    if gaps:
+        return _na(
+            f"首尾区间内存在 {len(gaps)} 处超过 {MAX_GAP_DAYS_FOR_RETURN} 天的缺口，"
+            "不跨越缺口计算年化收益", status="insufficient_data",
+            gaps=gaps[:3])
+    nulls = _null_count_in_range(series, start_iso, end_iso, field_name=field_name)
+    if nulls:
+        return _na(
+            f"区间内有 {nulls} 条 {field_name} 为空，不忽略缺失后假装区间完整",
+            status="insufficient_data", null_count=nulls)
+
     span_days = (last.d - first.d).days
     if span_days < 365:
         return _na(f"实际跨度仅 {span_days} 天，不足 1 年不输出年化")
@@ -295,10 +322,77 @@ def _downside_volatility(series: NavSeries, *, field_name: str) -> dict:
 
 # ---------------------------------------------------------------- 最大回撤
 def _max_drawdown(series: NavSeries, *, field_name: str) -> dict:
-    pts = [(p.d, getattr(p, field_name)) for p in series.points]
-    pts = [(d, v) for d, v in pts if v is not None and v > 0]
-    if len(pts) < 2:
-        return _na("有效净值点不足 2 条")
+    """最大回撤。
+
+    空值与超阈值缺口都**不允许跨越**：
+    - 有空值 → 只把空值前后的**连续段**当作可观测路径，返回分段结果并降级；
+    - 有超阈值缺口 → 同理，缺口两端不视为连续路径。
+
+    不允许静默跳过缺失点后把前后两点直接连线。
+    """
+    start_iso = series.points[0].nav_date if series.points else None
+    end_iso = series.points[-1].nav_date if series.points else None
+    gaps = (_gaps_in_range(series, start_iso, end_iso)
+            if start_iso and end_iso else [])
+    nulls = (_null_count_in_range(series, start_iso, end_iso, field_name=field_name)
+             if start_iso and end_iso else 0)
+
+    # 按「空值 / 超阈值缺口」把序列切成连续可观测段
+    segments: list[list[tuple[date, float]]] = []
+    cur: list[tuple[date, float]] = []
+    prev = None
+    for p in series.points:
+        v = getattr(p, field_name)
+        broken = False
+        if prev is not None:
+            if (p.d - prev.d).days > MAX_GAP_DAYS_FOR_RETURN:
+                broken = True
+        if v is None or v <= 0:
+            broken = True
+        if broken and cur:
+            segments.append(cur)
+            cur = []
+        if v is not None and v > 0:
+            cur.append((p.d, v))
+        prev = p
+    if cur:
+        segments.append(cur)
+
+    degraded = bool(gaps) or nulls > 0
+    seg_results = []
+    for seg in segments:
+        if len(seg) < 2:
+            continue
+        seg_worst = 0.0
+        seg_peak = seg[0][1]
+        seg_peak_date = seg[0][0]
+        seg_info = None
+        for d, v in seg[1:]:
+            if v > seg_peak:
+                seg_peak, seg_peak_date = v, d
+                continue
+            dd = 1 - v / seg_peak
+            if dd > seg_worst:
+                seg_worst = dd
+                seg_info = {"peak_value": seg_peak,
+                            "peak_date": seg_peak_date.isoformat(),
+                            "trough_value": v, "trough_date": d.isoformat()}
+        seg_results.append({"segment_start": seg[0][0].isoformat(),
+                            "segment_end": seg[-1][0].isoformat(),
+                            "points": len(seg),
+                            "max_drawdown": round(seg_worst, 6),
+                            "detail": seg_info})
+
+    if not seg_results:
+        return _na("无连续可观测净值段（空值或缺口过多）",
+                   status="insufficient_data",
+                   gaps=gaps[:3], null_count=nulls)
+
+    # 报告值是**可观测连续段内**的最大回撤（降级结果，不是全区间完整回撤）
+    best = max(seg_results, key=lambda x: x["max_drawdown"])
+    worst = best["max_drawdown"]
+    worst_info = best["detail"]
+    pts = [(d, v) for seg in segments for d, v in seg]
 
     peak = pts[0][1]
     peak_date = pts[0][0]
@@ -314,13 +408,16 @@ def _max_drawdown(series: NavSeries, *, field_name: str) -> dict:
             worst_info = {"peak_value": peak, "peak_date": peak_date.isoformat(),
                           "trough_value": v, "trough_date": d.isoformat()}
 
-    # 修复时间：从谷底恢复到前高
+    # 修复时间：从谷底恢复到前高，**不跨越缺口 / 空值**
     recovery = _na("无回撤")
     if worst_info:
         trough_d = datetime.strptime(worst_info["trough_date"], "%Y-%m-%d").date()
         peak_v = worst_info["peak_value"]
+        seg = next((x for x in segments
+                    if x and x[0][0].isoformat() == best["segment_start"]
+                    and x[-1][0].isoformat() == best["segment_end"]), pts)
         recovered_at = None
-        for d, v in pts:
+        for d, v in seg:
             if d > trough_d and v >= peak_v:
                 recovered_at = d
                 break
@@ -336,13 +433,27 @@ def _max_drawdown(series: NavSeries, *, field_name: str) -> dict:
                            recovered_date=recovered_at.isoformat(),
                            status="ok")
 
-    gaps_in_range = series.quality.gap_count_over_threshold
-    return _ok(round(worst, 6), value_pct=_pct(worst),
-               detail=worst_info, recovery=recovery,
-               gap_count_over_threshold=gaps_in_range,
-               caveat=("净值连续性 cannot_verify；若区间存在缺口，"
-                       "最大回撤可能被低估") if gaps_in_range else
-                      "净值连续性 cannot_verify，回撤为可观测区间内的保守估计")
+    out = _ok(round(worst, 6), value_pct=_pct(worst),
+              detail=worst_info, recovery=recovery,
+              gap_count_over_threshold=len(gaps),
+              null_count=nulls,
+              segments=seg_results,
+              complete_interval=False if degraded else True,
+              caveat="净值连续性 cannot_verify")
+    if degraded:
+        out["degraded"] = True
+        out["degraded_reason"] = (
+            f"区间内存在 {len(gaps)} 处超过 {MAX_GAP_DAYS_FOR_RETURN} 天的缺口"
+            f"{'、' if gaps and nulls else ''}"
+            f"{f'{nulls} 条 {field_name} 空值' if nulls else ''}；"
+            "缺口与空值两端不视为连续路径。"
+            "本值只是**可观测连续段内**的最大回撤，"
+            "**不是全区间完整最大回撤**，可能被低估")
+        out["status"] = "ok"
+        out["note"] = "已降级为分段可观测结果，不输出无警告的完整最大回撤"
+    else:
+        out["degraded"] = False
+    return out
 
 
 # ---------------------------------------------------------------- 风险调整指标
@@ -405,27 +516,65 @@ def _risk_adjusted(series: NavSeries, *, field_name: str) -> dict:
 # ---------------------------------------------------------------- 滚动稳定性
 def _rolling_stability(series: NavSeries, *, field_name: str,
                        window_days: int = 90) -> dict:
-    """滚动 window_days 自然日窗口的正收益比例。"""
+    """滚动 window_days 自然日窗口的正收益比例。
+
+    每个窗口**独立**检查：
+    1. 起点与终点必须精确命中净值；
+    2. 窗口内部不得有超过阈值的缺口；
+    3. 窗口内部不得有该字段的空值。
+    不满足的窗口直接跳过并计数，**不跨越缺口**计算正收益比例。
+    """
     pts = [(p.d, getattr(p, field_name)) for p in series.points]
     pts = [(d, v) for d, v in pts if v is not None and v > 0]
     if len(pts) < 10:
         return _na("有效净值点不足 10 条")
 
+    all_gaps = series.quality.gaps
+    null_dates = {p.nav_date for p in series.points
+                  if getattr(p, field_name) is None}
     index = {d: v for d, v in pts}
+
     wins = 0
     total = 0
-    for i, (d, v) in enumerate(pts):
+    skipped_gap = 0
+    skipped_null = 0
+    skipped_endpoint = 0
+
+    for d, v in pts:
         target = d - timedelta(days=window_days)
-        if target in index:
-            total += 1
-            if v / index[target] - 1 > 0:
-                wins += 1
+        if target not in index:
+            skipped_endpoint += 1
+            continue
+        s_iso, e_iso = target.isoformat(), d.isoformat()
+        # 窗口内部（含端点）缺口
+        if any(g["from"] >= s_iso and g["to"] <= e_iso for g in all_gaps):
+            skipped_gap += 1
+            continue
+        # 窗口内部空值
+        if any(s_iso <= nd <= e_iso for nd in null_dates):
+            skipped_null += 1
+            continue
+        total += 1
+        if v / index[target] - 1 > 0:
+            wins += 1
+
     if total < 5:
-        return _na(f"可观测滚动窗口仅 {total} 个，不足 5 个")
+        return _na(
+            f"可观测滚动窗口仅 {total} 个，不足 5 个"
+            f"（跳过端点缺失 {skipped_endpoint}、跨缺口 {skipped_gap}、"
+            f"含空值 {skipped_null}）",
+            status="insufficient_data",
+            valid_windows=total, skipped_endpoint=skipped_endpoint,
+            skipped_gap=skipped_gap, skipped_null=skipped_null)
+
     ratio = wins / total
     return _ok(round(ratio, 4), value_pct=_pct(ratio),
                window_days=window_days, samples=total,
-               note="窗口端点必须精确命中净值，不向前后取近似值")
+               skipped_endpoint=skipped_endpoint,
+               skipped_gap=skipped_gap,
+               skipped_null=skipped_null,
+               note=("每个窗口独立检查：端点精确命中、窗口内无超阈值缺口、"
+                     "无空值；不满足的窗口跳过并计数，不跨越缺口计算"))
 
 
 # ---------------------------------------------------------------- 主入口（净值型）

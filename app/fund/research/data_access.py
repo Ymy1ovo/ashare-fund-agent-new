@@ -363,7 +363,8 @@ def load_universe(db_path: Path | None = None, *, include_terminated: bool = Fal
         in_pool = is_offmarket_pool(c, r["fund_code_primary"])
         if not include_onshore_etf and not in_pool:
             continue
-        pg = peer_group_key(c, r["fund_name"], r["benchmark"])
+        pg = peer_group_key(c, r["fund_name"], r["benchmark"],
+                            tracking_index=r["tracking_index"])
         out.append({
             "fund_id": int(r["fund_id"]),
             "fund_code": r["fund_code_primary"],
@@ -372,6 +373,7 @@ def load_universe(db_path: Path | None = None, *, include_terminated: bool = Fal
             "fund_type_l1": r["fund_type_l1"],
             "fund_type_l2": r["fund_type_l2"],
             "benchmark": r["benchmark"],
+            "tracking_index": r["tracking_index"],
             "established_date": r["established_date"],
             "lifecycle_status": r["lifecycle_status"],
             "share_class_id": int(r["share_class_id"]),

@@ -166,66 +166,157 @@ def analyze_fund(db_path: Path | None, entry: dict) -> dict:
     }
 
 
+REPRESENTATIVE_RULES = (
+    "代表份额选择顺序（显式规则，不静默取不完整数据）："
+    "① 主份额且净值记录数 > 0；"
+    "② 任一份额中净值记录数最多者（并列取代码最小）；"
+    "③ 全部份额都无净值记录 → status=insufficient_data，performance=None。"
+)
+
+
+def _nav_rows(r: dict) -> int | None:
+    """净值记录数。quality 缺失 → None（未知），不当 0。"""
+    q = r.get("quality")
+    if not q or "rows" not in q:
+        return None
+    return int(q.get("rows") or 0)
+
+
+def _pick_representative(rs: list[dict]) -> tuple[dict | None, str]:
+    """按显式规则挑代表份额，返回 (份额, 原因)。
+
+    不静默取不完整数据：
+    - 记录数未知时不当作 0，而是在原因里说明；
+    - 全部份额无数据时返回 None + insufficient_data。
+    """
+    rows_map = {r["share_code"]: _nav_rows(r) for r in rs}
+    known = {k: v for k, v in rows_map.items() if v is not None}
+    unknown_count = len(rows_map) - len(known)
+
+    if not known:
+        primary = next((r for r in rs if r.get("share_code") == r.get("fund_code")),
+                       min(rs, key=lambda r: r["share_code"]))
+        return primary, ("净值记录数未知（quality 缺失），"
+                         f"按主份额代码优先选择 {primary['share_code']}，"
+                         "数据充分性未确认")
+
+    with_data = [r for r in rs if (rows_map.get(r["share_code"]) or 0) > 0]
+    if not with_data:
+        return None, (f"全部 {len(rs)} 个份额均无净值记录"
+                      + (f"（{unknown_count} 个记录数未知）" if unknown_count else "")
+                      + "，标记 insufficient_data")
+
+    primaries = [r for r in with_data if r.get("share_code") == r.get("fund_code")]
+    if primaries:
+        p = max(primaries, key=lambda r: rows_map[r["share_code"]] or 0)
+        return p, (f"主份额 {p['share_code']} 且有 "
+                   f"{rows_map[p['share_code']]} 条净值记录")
+
+    best = sorted(with_data,
+                  key=lambda r: (-(rows_map[r["share_code"]] or 0), r["share_code"]))[0]
+    return best, (f"主份额数据不足或不存在，改选净值记录最多的份额 "
+                  f"{best['share_code']}（{rows_map[best['share_code']]} 条）")
+
+
 def merge_by_fund(reports: list[dict]) -> list[dict]:
-    """按 fund_id 归并 A/C/E 份额：表现归并、费用保留份额维度。"""
+    """按 fund_id 归并 A/C/E 份额。
+
+    - **同类分析与表现比较以 fund_id 为唯一统计单位**；
+    - 费用比较**保留份额维度**，不因归并丢失 A/C/E 差异；
+    - 代表份额选择有显式规则与原因记录。
+    """
     by_fund: dict[int, list[dict]] = defaultdict(list)
     for r in reports:
         by_fund[r["fund_id"]].append(r)
 
     merged = []
     for fid, rs in by_fund.items():
-        primary = next((r for r in rs if r.get("share_code") == r.get("fund_code")),
-                       rs[0])
+        rep, rep_reason = _pick_representative(rs)
+        head = rep if rep is not None else rs[0]
+        perf = rep.get("indicators") if rep is not None else None
+        status = "ok" if rep is not None else "insufficient_data"
+
         merged.append({
             "fund_id": fid,
-            "fund_code": primary["fund_code"],
-            "fund_name": primary["fund_name"],
-            "product_class": primary["product_class"],
-            "investment_subtype": primary["investment_subtype"],
-            "peer_group": primary["peer_group"],
-            "representative_share": primary["share_code"],
+            "fund_code": head["fund_code"],
+            "fund_name": head["fund_name"],
+            "product_class": head["product_class"],
+            "investment_subtype": head["investment_subtype"],
+            "peer_group": head["peer_group"],
+            "status": status,
+            "representative_share": rep["share_code"] if rep else None,
+            "representative_share_name": rep["share_name"] if rep else None,
+            "representative_reason": rep_reason,
+            "representative_rule": REPRESENTATIVE_RULES,
+            "performance": perf,
             "share_count": len(rs),
             "shares": [{"share_code": r["share_code"],
-                        "share_name": r["share_name"]} for r in rs],
-            # 表现只看代表份额（主代码优先）
-            "performance": primary.get("indicators"),
+                        "share_name": r["share_name"],
+                        "nav_rows": (r.get("quality") or {}).get("rows", 0)}
+                       for r in rs],
+            # 费用比较保留份额维度
             "cost_comparison": compare_share_costs(None, fund_id=fid, shares=rs),
         })
     return merged
 
 
-def peer_analysis(reports: list[dict]) -> dict:
-    """同类研究分析（不排名）。只按 peer_group 分组，组内给描述性统计。"""
+def peer_analysis(merged: list[dict], *, share_count: int | None = None) -> dict:
+    """同类研究分析（不排名）。
+
+    **入参必须是 merge_by_fund() 的本体级结果**：
+    每个 fund_id 在同类组里只出现一次，A/C/E 不会重复计数。
+    """
     groups: dict[str, list[dict]] = defaultdict(list)
-    for r in reports:
-        key = r.get("peer_group", {}).get("peer_key", "unknown")
+    seen: dict[str, set[int]] = defaultdict(set)
+    for r in merged:
+        key = (r.get("peer_group") or {}).get("peer_key", "unknown")
+        # 双保险：同一 fund_id 在同一组只计一次
+        if r["fund_id"] in seen[key]:
+            continue
+        seen[key].add(r["fund_id"])
         groups[key].append(r)
 
     out = {}
     for key, members in groups.items():
         entries = []
         for r in members:
-            ind = r.get("indicators") or {}
-            rets = ind.get("returns") or {}
+            perf = r.get("performance") or {}
+            rets = perf.get("returns") or {}
+            risk = perf.get("risk") or {}
             entries.append({
+                "fund_id": r["fund_id"],
                 "fund_code": r["fund_code"],
-                "share_code": r["share_code"],
                 "fund_name": r["fund_name"],
+                "representative_share": r.get("representative_share"),
+                "representative_reason": r.get("representative_reason"),
+                "share_count": r.get("share_count"),
+                "status": r.get("status"),
                 "ret_12m": (rets.get("ret_12m") or {}).get("value"),
                 "ret_12m_status": (rets.get("ret_12m") or {}).get("status"),
-                "max_drawdown": ((ind.get("risk") or {}).get("max_drawdown") or {}).get("value"),
-                "mdd_status": ((ind.get("risk") or {}).get("max_drawdown") or {}).get("status"),
+                "max_drawdown": (risk.get("max_drawdown") or {}).get("value"),
+                "mdd_status": (risk.get("max_drawdown") or {}).get("status"),
             })
+        pg = members[0].get("peer_group") or {}
         out[key] = {
             "member_count": len(members),
+            "fund_ids": sorted(m["fund_id"] for m in members),
+            "benchmark_family": pg.get("benchmark_family"),
+            "benchmark_confidence": pg.get("benchmark_confidence"),
+            "benchmark_reason": pg.get("benchmark_reason"),
+            "index_scope": pg.get("index_scope"),
+            "verifiable_group": pg.get("verifiable_group"),
             "members": entries,
             "ranking_generated": False,
             "note": ("同类描述性对照，**不排名、不推荐**；"
+                     "成员按 fund_id 去重（A/C/E 只算一个本体）；"
                      "不同 peer_group 之间不可横向比较"),
         }
     return {
         "groups": out,
         "group_count": len(out),
+        "fund_count": len(merged),
+        "share_count": share_count,
+        "deduped_by_fund_id": True,
         "cross_group_comparison_allowed": False,
         "ranking_generated": False,
         "reason_no_ranking": (
@@ -239,7 +330,8 @@ def analyze_universe(db_path: Path | None = None, *,
     universe = load_universe(db_path, include_terminated=include_terminated)
     reports = [analyze_fund(db_path, e) for e in universe]
     merged = merge_by_fund(reports)
-    peers = peer_analysis(reports)
+    # 同类分析必须基于**本体级**结果，A/C/E 不能当多个独立基金
+    peers = peer_analysis(merged, share_count=len(reports))
 
     return {
         "generated_at": datetime.now().isoformat(timespec="seconds"),

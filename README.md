@@ -2446,7 +2446,7 @@ if (basis != ACCOUNTING_FORMAL
 | 3B-4.3 | 数据质量与幸存者偏差验收 | 1123 | `phase3B4_3_data_quality_report.md` |
 | 3B-4.4 | 数据缺口补强与来源收口 | 1199 | `phase3B4_4_data_gap_research.md` |
 | 3B-5.0 | 研究性分析框架设计 | 1283 | `phase3B5_0_research_framework.md` |
-| 3B-5.1 | 研究性分析引擎 V1.0 | **1340** | `phase3B5_1_research_engine_report.md` |
+| 3B-5.1 | 研究性分析引擎 V1.0 | **1366** | `phase3B5_1_research_engine_report.md` |
 
 当前正式会计版本：`ca-v2-receivable`；正式会计基础：`formal_receivable`；正式估值标记：`formal_valuation=True`。
 
@@ -5185,7 +5185,8 @@ python -m app.fund.research --all --json out.json
 | 项 | 值 |
 | --- | --- |
 | 研究池 | 12 份额 / 9 本体 |
-| 同类组 | 8 个 |
+| 同类成员 | **9**（按 `fund_id` 去重，A/C/E 只算一个本体） |
+| 同类组 | 8 个（按跟踪指数/基准族分组） |
 | 场内 ETF 混入 | **否** |
 | 生成排名 | **否** |
 | `ready_for_research_analysis` | **True** |
@@ -5210,4 +5211,45 @@ python -m app.fund.research --all --json out.json
 | 引擎 JSON | `reports/phase3B5_1_research_engine_report.json` |
 | 样本运行结果 | `reports/phase3B5_1_sample_run.json` |
 | 专项测试 | `tests/test_3b5_1_fund_research.py`（57 项） |
+
+### 64.7 验收修正（3B-5.1 修正轮）
+
+### 同类分析按本体去重
+
+`peer_analysis()` 现在接收 `merge_by_fund()` 的**本体级**结果，
+内部再用 `seen[fund_id]` 双保险去重。**12 份额 → 9 个同类成员**。
+
+| 项 | 规则 |
+| --- | --- |
+| 代表份额 | ① 主份额且有净值 → ② 记录最多者 → ③ `insufficient_data` |
+| 记录原因 | `representative_reason` 明确写出为什么选它 |
+| 费用比较 | **保留份额维度**，`share_count` 仍是全部份额 |
+| 记录数未知 | 不当 0，原因里说明「数据充分性未确认」 |
+
+### 分组依据可验证基准
+
+新增 `normalize_benchmark()`：只做保守标准化，**不新增未验证映射表**。
+
+| 情况 | 结果 |
+| --- | --- |
+| 已知写法完全一致 | `high` |
+| 含唯一指数族 | 取该族（加权复合降 `medium`） |
+| 含多个指数族 | **`unknown`**，不强行归组 |
+| 为空 / 认不出 | `unknown` |
+
+分组键：`{产品类}|{宽基或行业}|{指数族}`。
+**沪深300 与 中证500 已分到不同组**。
+债券久期/信用/转债全 `unknown`，不解释成相同风险。
+
+### 缺口安全统一
+
+| 指标 | 修正 |
+| --- | --- |
+| 年化收益 | 查区间缺口 + 空值，命中即 `insufficient_data` |
+| 滚动稳定性 | 每窗口独立查缺口/空值，跳过并计数 |
+| 最大回撤 | 按空值/缺口切段，标 `degraded` + `complete_interval=false` |
+| 回撤修复 | 只在同一连续段内找 |
+| Calmar | 继承底层状态，底层降级则降级 |
+
+阈值仍为 `MAX_GAP_DAYS_FOR_RETURN = 15`，全部指标共用同一入口。
 

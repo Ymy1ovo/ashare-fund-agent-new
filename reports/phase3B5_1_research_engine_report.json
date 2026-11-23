@@ -134,14 +134,66 @@
   "ready_for_research_analysis": true,
   "ready_for_backtest": false,
   "ready_for_formal_ranking": false,
-  "reason": "研究性描述分析可用；正式回测与真实排名仍不具备条件（净值连续性 cannot_verify、无风险利率与基准序列缺失、费率无历史生效日、支付宝状态 unknown）"
+  "reason": "修正后同类分析按 fund_id 去重、分组依据可验证基准、全部时间序列指标统一缺口安全检查；正式回测与真实排名仍不具备条件"
  },
  "tests": {
   "special_file": "tests/test_3b5_1_fund_research.py",
-  "special_passed": 57,
-  "full_passed": 1340,
+  "special_passed": 83,
+  "full_passed": 1366,
   "full_failed": 0,
-  "full_duration_seconds": 289.22,
-  "note": "1340 = 3B-5.0 的 1283 + 本轮 57"
+  "full_duration_seconds": 289.12,
+  "note": "1366 = 3B-5.0 的 1283 + 本轮 83",
+  "acceptance_fix_tests_added": 26
+ },
+ "acceptance_fix": {
+  "round": "3B-5.1 验收修正",
+  "problems_fixed": 3,
+  "fix_1_peer_dedup": {
+   "issue": "analyze_universe 曾把份额级 reports 传给 peer_analysis，A/C/E 被当成多个独立基金",
+   "fix": "改传 merge_by_fund() 本体级结果，peer_analysis 内部再按 fund_id 双保险去重",
+   "representative_rules": [
+    "主份额（share_code == fund_code）且净值记录数 > 0",
+    "否则取净值记录数最多的份额（并列取代码最小）",
+    "全部份额无净值记录 → status=insufficient_data，performance=None",
+    "记录数未知时不当作 0，原因中说明数据充分性未确认"
+   ],
+   "cost_comparison_keeps_share_dimension": true,
+   "real_sample": {
+    "share_count": 12,
+    "fund_count": 9,
+    "peer_member_total": 9,
+    "deduped_by_fund_id": true
+   }
+  },
+  "fix_2_verifiable_benchmark_grouping": {
+   "issue": "主动权益只看 benchmark 是否为空；指数只分 broad/sector，不同跟踪指数会混组",
+   "fix": "新增 normalize_benchmark() 保守标准化；认不出就 unknown，不新增未验证映射表",
+   "rules": {
+    "exact_alias": "confidence=high",
+    "single_index_family": "取该族；加权复合表述降为 medium",
+    "multiple_index_families": "unknown，不强行归组",
+    "empty_or_unrecognizable": "unknown",
+    "name_only_no_benchmark": "不猜"
+   },
+   "group_key_changes": {
+    "ordinary_index/etf_linked": "{pc}|{scope}|{指数族}",
+    "lof_index": "lof|index|{scope}|{指数族}",
+    "lof_active": "lof|active|{基准族}",
+    "active_equity": "active_equity|{基准族}",
+    "bond": "{pc}|unknown（久期/信用/转债全 unknown，不解释成相同风险）"
+   },
+   "real_sample_groups": 8,
+   "hs300_vs_csi500_separated": true
+  },
+  "fix_3_gap_safety_unified": {
+   "issue": "_annualized/_rolling_stability/_max_drawdown 存在绕过缺口检查的路径",
+   "fix": "统一 _gaps_in_range/_null_count_in_range 入口，全部指标共用 15 天阈值",
+   "annualized": "查区间缺口 + 区间空值，命中即 insufficient_data",
+   "rolling": "每个 90 天窗口独立查缺口/空值，不合格跳过并计数",
+   "max_drawdown": "按空值/缺口切段，只报可观测连续段，明确 degraded/complete_interval/segments",
+   "recovery": "只在同一连续段内找恢复点，不跨越缺口",
+   "calmar": "继承年化与回撤可用性，底层降级则一并降级",
+   "threshold": 15
+  }
  }
 }
