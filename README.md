@@ -5574,6 +5574,24 @@ json.dumps([list(_stable_value(v)) for v in values],
 ### 67.5 顺带修复
 
 `compute_money_indicators()` 原未接收 `db_path`，导致分析临时库时
-货币统计回落到正式库（临时库货币样本统计恒为空）。
+货币统计回落到正式库（临时库货币统计恒为空）。
 已补 `db_path` 透传，并新增 2 项隔离回归测试。
+
+### 67.6 收益口径（重要）
+
+净值型基金的**收益、年化收益、最大回撤、波动率**全部使用
+**`acc_nav`（累计净值）**，不使用 `unit_nav`。
+
+| 项 | 实际取值 |
+| --- | --- |
+| `return_field` | **`acc_nav`** |
+| `unit_nav` 角色 | **独立对照**，位于 `indicators_unit_nav`，标注「不是总回报」 |
+| 分红修复 | **未使用**（`dividend_repair_used=false`），累计净值用原始数据 |
+| 货币基金 | **独立口径**：`per_10k_yield` / `seven_day_annual`，不使用任何净值口径 |
+
+依据：`engine.py` `compute_nav_indicators(series, field_name="acc_nav")`，
+`unit_nav` 单独再算一遍放在 `indicators_unit_nav` 供对照。
+
+实测差异（`050002` 近1年）：`acc_nav` = -4.0993%，`unit_nav` = -8.9623%，
+两者相差 4.8630 个百分点 —— 代码确实是各走各的，未混用。
 

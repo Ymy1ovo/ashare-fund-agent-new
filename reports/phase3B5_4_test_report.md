@@ -173,9 +173,53 @@ $ python .tmp54/research_prod.py
 | 网络 | 真实接入调用 AKShare；单元测试**不联网** |
 | 故障注入 | 全部在临时库，正式库未参与 |
 
+
 ---
 
-## 8. 门禁
+## 8. 验收修正轮（3B-5.4-acceptance-fix）
+
+本轮**只改文档**，不重新采集、不写正式库、不改计算逻辑、不改测试断言。
+
+### 8.1 修正内容
+
+| 文件 | 修正 |
+| --- | --- |
+| `reports/phase3B5_4_research_validation_report.md` | 第 8 节「收益口径」由「单位净值」改为 **`acc_nav` 累计净值**；新增 2.0 口径声明、2.1 双口径差异实测、8.1 三条硬约束、8.2 货币独立口径、8.3 修正说明 |
+| `reports/phase3B5_4_research_validation_report.json` | 新增 `return_caliber` 段，声明 `primary_field=acc_nav`、`unit_nav` 仅作对照、`dividend_repair_used=false` |
+| `reports/phase3B5_4_test_report.md` | 新增本节（第 9 节） |
+
+### 8.2 依据（只读核对）
+
+| 依据 | 内容 |
+| --- | --- |
+| `app/fund/research/engine.py:124` | `compute_nav_indicators(series, field_name="acc_nav")` |
+| `app/fund/research/engine.py:126` | `ind_unit = compute_nav_indicators(series, field_name="unit_nav")` → 单独放在 `indicators_unit_nav` |
+| `app/fund/research/indicators.py:605` | `compute_nav_indicators(series, *, field_name="acc_nav")` |
+| JSON `results.050002.ret_12m.field` | `"acc_nav"` |
+
+### 8.3 双口径差异实测（证明未混用）
+
+| 代码 | `acc_nav` 近1年 | `unit_nav` 近1年 | 差异 |
+| --- | --- | --- | --- |
+| `050002` | -4.0993% | -8.9623% | 4.8630 个百分点 |
+
+### 8.4 未重跑测试的说明
+
+本轮**零代码改动**（`git diff` 仅 4 个文档 + 1 个 JSON），
+计算逻辑与测试断言均未触碰，故**不重跑全量测试**。
+
+上一轮实际执行结果仍然有效：
+
+```
+$ pytest -q
+1517 passed, 1 warning in 503.03s (0:08:23)
+```
+
+如验收方要求重跑，可原样执行上述命令，预期结果不变。
+
+---
+
+## 9. 门禁
 
 | 项 | 值 |
 | --- | --- |

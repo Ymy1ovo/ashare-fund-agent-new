@@ -5,6 +5,41 @@
  "generated_at": "2026-11-23T13:50:00",
  "engine": "app/fund/research/engine.py",
  "data_source": "data/fund_agent.db",
+ "return_caliber": {
+  "primary_field": "acc_nav",
+  "primary_field_label": "累计净值",
+  "applies_to": [
+   "returns",
+   "annualized_return",
+   "max_drawdown",
+   "volatility"
+  ],
+  "source_code": {
+   "engine": "app/fund/research/engine.py:124 compute_nav_indicators(series, field_name=\"acc_nav\")",
+   "indicators": "app/fund/research/indicators.py _window_return / _annualized / _max_drawdown 均接收 field_name 参数"
+  },
+  "unit_nav_role": "independent_reference_only",
+  "unit_nav_location": "indicators_unit_nav",
+  "unit_nav_note": "unit_nav 口径，不含分红，不是总回报，仅供对照",
+  "dividend_repair_used": false,
+  "dividend_repair_note": "分红记录不完整（3B-4.4 已核验），未用分红数据修复历史收益；收益全部基于 acc_nav 原值",
+  "money_fund": {
+   "uses_acc_nav": false,
+   "uses_unit_nav": false,
+   "primary": [
+    "per_10k_yield",
+    "seven_day_annual"
+   ],
+   "usable_for_net_value_comparison": false
+  },
+  "documentation_fix": {
+   "phase": "3B-5.4-acceptance-fix",
+   "issue": "初版报告第 8 节把净值型收益口径误写为「单位净值」",
+   "resolution": "文档按实际代码修正为累计净值口径",
+   "code_changed": false,
+   "results_changed": false
+  }
+ },
  "results": {
   "050002": {
    "product_class": "ordinary_index",

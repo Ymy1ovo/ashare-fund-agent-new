@@ -1,5 +1,47 @@
 # 变更日志
 
+## 2026-11-23 — 阶段3B-5.4 验收修正：收益口径文档更正
+
+**只改文档，不改代码、不改数据、不改测试。**
+
+**问题**：`reports/phase3B5_4_research_validation_report.md` 第 8 节
+把净值型基金的收益口径写成「单位净值」，与 `engine.py` / `indicators.py`
+实际代码及 JSON 不一致。
+
+**实际口径**（只读核对确认）：
+
+| 项 | 实际取值 | 代码依据 |
+| --- | --- | --- |
+| 收益 | `acc_nav` | `compute_nav_indicators(series, field_name="acc_nav")` |
+| 年化收益 | `acc_nav` | `_annualized(series, field_name=...)` |
+| 最大回撤 | `acc_nav` | `_max_drawdown(series, field_name=...)` |
+| 波动率 | `acc_nav` | 同上 |
+| `unit_nav` | **独立对照** | 单独放 `indicators_unit_nav`，标注「不是总回报」 |
+| 分红修复 | **未使用** | `dividend_repair_used = false` |
+| 货币基金 | **独立口径** | `per_10k_yield` / `seven_day_annual` |
+
+**实测差异证明未混用**（`050002` 近1年）：
+
+| 口径 | 值 |
+| --- | --- |
+| `acc_nav` | -4.0993% |
+| `unit_nav` | -8.9623% |
+| 差异 | 4.8630 个百分点 |
+
+**文档修正内容**：
+
+- 第 8 节口径表：每一类净值型基金改为「`acc_nav` 累计净值」；
+- 新增 2.0 节口径声明（含代码行号依据）；
+- 新增 2.1 节双口径差异实测；
+- 新增 8.1 节三条硬约束、8.2 节货币独立口径、8.3 节修正说明；
+- JSON 新增 `return_caliber` 段，声明 `primary_field=acc_nav`、
+  `unit_nav` 仅作对照、`dividend_repair_used=false`；
+- 测试报告新增第 8 节记录本次修正与未重跑说明。
+
+**未改动**：计算代码零改动、历史结果数值零改动、测试断言零改动。
+本轮不重跑全量（`git diff` 仅 3 个文档/JSON），上轮 1517 passed 仍有效。
+
+
 ## 2026-11-23 — 阶段3B-5.4 多类型场外基金真实接入验证
 
 验证接入链路能否真实处理不同类型的场外公募基金，而非只验证少量股票型。
