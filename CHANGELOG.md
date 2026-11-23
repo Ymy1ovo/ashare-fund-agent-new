@@ -1,5 +1,80 @@
 # 变更日志
 
+## 2026-11-23 — 阶段3B-5.3.2 外键约束与指纹序列化最终修正
+
+只修两个小问题，不重构。
+
+**P0：事务连接启用外键约束**
+
+`_open_tx()` 原来用独立 `sqlite3.connect` 建连接但没执行
+`PRAGMA foreign_keys=ON`。SQLite 默认关闭外键，因此「插入不存在的
+`fund_id` 对应份额」不会被拒绝，引用完整性形同虚设。
+
+修正：在 `BEGIN IMMEDIATE` **之前**开启并读回断言：
+
+```python
+conn.execute("PRAGMA foreign_keys = ON")
+enabled = conn.execute("PRAGMA foreign_keys").fetchone()[0]
+if int(enabled) != 1:
+    conn.close()
+    raise RuntimeError("接入事务连接未能启用外键约束…拒绝继续接入")
+conn.execute("BEGIN IMMEDIATE")
+```
+
+- 必须是 BEGIN **之前**（事务内设置 PRAGMA 无效）；
+- PRAGMA 可能被静默忽略，因此**读回确认**，失败立即报错；
+- **只改本连接**，不触碰 `app/database/db.py` 全局连接；
+  全局仍为 SQLite 默认 OFF，有专门测试断言；
+- 新增故障测试：通过事务连接插入 `fund_id=999999` 的份额
+  → 触发 `sqlite3.IntegrityError`，且整只基金 ROLLBACK。
+
+**P1：消除内容指纹序列化歧义**
+
+旧实现 `"|".join(_stable_value(v) for v in row)`，字段值含 `|` 会撞库：
+
+```
+("a|b", "c")  →  str:a|b|str:c
+("a", "b|c")  →  str:a|str:b|c
+```
+
+改为 `json.dumps([[type, value], ...])`，由 JSON 负责转义引号、反斜杠、
+换行、竖线与方括号，不再依赖任何分隔符：
+
+| 值 | 序列化 |
+| --- | --- |
+| `None` | `["null",null]` |
+| `True` | `["bool",1]` |
+| `1` | `["int",1]` |
+| `1.0` | `["float","1.0"]` |
+| `"1"` | `["str","1"]` |
+| `b"1"` | `["bytes","31"]` |
+
+nan / inf 用字符串承载，保证 JSON 合法。
+
+新增测试覆盖：`("a|b","c")` vs `("a","b|c")` 指纹必须不同、
+5 种竖线变体互不相同、方括号/引号不撞库、编码结果可被 `json.loads` 还原、
+类型标签保留、重复计算一致、nan/inf 不破坏编码。
+
+**保留**原有能力：同长度修改、行数不变只改一条、重复计算一致。
+
+**正式库**：不重新采集、不重新写入，只做只读完整性检查。
+
+| 检查 | 结果 |
+| --- | --- |
+| `integrity_check` | ok |
+| `foreign_key_check` | 0 违规 |
+| 清盘 41 / 事件 49 | 不变 |
+| 原 12 份额 / 9 本体 | 完整 |
+| 本轮 5 份额 / 3 本体 | 完整 |
+| ETF 指纹 | `d54727c0…` 不变 |
+
+**指纹值变化说明**：算法变更后指纹值本身会变
+（`0c867be4…` → `f71c36f9…`），但**同一算法下当前库与备份库完全一致**，
+证明数据内容未变。
+
+**测试**：新增 17 项；全量 **1482 passed / 0 failed**，381.59 秒。
+
+
 ## 2026-11-23 — 阶段3B-5.3.1 事务原子性与内容指纹修复
 
 窄范围修正 3B-5.3 验收发现的 2 个 P0 与 2 个 P1。不改 Schema、不重采集、不重接入。

@@ -2449,7 +2449,8 @@ if (basis != ACCOUNTING_FORMAL
 | 3B-5.1 | 研究性分析引擎 V1.0 | 1386 | `phase3B5_1_research_engine_report.md` |
 | 3B-5.2 | 自选基金代码查询 | 1418 | `phase3B5_2_code_lookup_report.md` |
 | 3B-5.3 | 自选基金受控接入 | 1445 | `phase3B5_3_user_ingest_report.md` |
-| 3B-5.3.1 | 事务原子性与内容指纹修复 | **1465** | `phase3B5_3_1_atomic_fix_report.md` |
+| 3B-5.3.1 | 事务原子性与内容指纹修复 | 1465 | `phase3B5_3_1_atomic_fix_report.md` |
+| 3B-5.3.2 | 外键约束与指纹序列化修正 | **1482** | `phase3B5_3_2_fk_serialization_report.md` |
 
 当前正式会计版本：`ca-v2-receivable`；正式会计基础：`formal_receivable`；正式估值标记：`formal_valuation=True`。
 
@@ -5464,4 +5465,62 @@ def use_conn(db_path=None, conn=None):
 | 备份库 | `0c867be4…b9658` |
 
 **三者完全一致** → 代码修复未触碰任何正式数据。
+
+### 66.8 修正轮 3B-5.3.2：外键约束与序列化
+
+### 事务连接启用外键
+
+`_open_tx()` 现在在 `BEGIN IMMEDIATE` **之前**执行：
+
+```python
+conn.execute("PRAGMA foreign_keys = ON")
+enabled = conn.execute("PRAGMA foreign_keys").fetchone()[0]
+if int(enabled) != 1:
+    conn.close()
+    raise RuntimeError("未能启用外键约束，拒绝继续接入")
+conn.execute("BEGIN IMMEDIATE")
+```
+
+**只改本连接**，全局 `get_connection()` 仍为 SQLite 默认（OFF），有测试断言。
+
+验证：插入不存在的 `fund_id` 对应份额 → **`sqlite3.IntegrityError`**，
+且整只基金回滚。
+
+### 指纹序列化无歧义
+
+旧实现用 `|` 拼接，字段值含 `|` 会撞库：
+
+```
+("a|b", "c")  →  str:a|b|str:c
+("a", "b|c")  →  str:a|str:b|c
+```
+
+新实现改为 JSON 数组 + 类型标签，由 JSON 负责转义：
+
+```python
+json.dumps([list(_stable_value(v)) for v in values],
+           ensure_ascii=False, separators=(",", ":"))
+```
+
+| 值 | 序列化 |
+| --- | --- |
+| `None` | `["null",null]` |
+| `1` | `["int",1]` |
+| `1.0` | `["float","1.0"]` |
+| `"1"` | `["str","1"]` |
+| `b"1"` | `["bytes","31"]` |
+
+`("a|b","c")` 与 `("a","b|c")` 现在**必然产生不同字节串**。
+
+### 指纹值变化说明
+
+算法从 `|` 拼接改为 JSON 数组后，指纹值本身会变：
+
+| 时点 | 指纹 |
+| --- | --- |
+| 3B-5.3.1 算法 | `0c867be4…b9658` |
+| 3B-5.3.2 算法（当前库） | `f71c36f9…d635b` |
+| 3B-5.3.2 算法（备份库） | `f71c36f9…d635b` |
+
+**同一算法下当前库与备份库完全一致** → 数据未变，只是算法换了。
 

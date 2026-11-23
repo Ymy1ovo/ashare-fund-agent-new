@@ -1,0 +1,78 @@
+{
+ "phase": "3B-5.3.2",
+ "baseline_head": "35f4d3c71cc09c395d11fa23712b65bbad7acd48",
+ "generated_at": "2026-11-23T11:30:00",
+ "fixes": {
+  "P0_tx_foreign_keys": {
+   "problem": "_open_tx() 未启用 PRAGMA foreign_keys，SQLite 默认 OFF，孤儿份额可写入",
+   "solution": "BEGIN IMMEDIATE 之前 PRAGMA foreign_keys=ON，读回断言为 1，否则 raise",
+   "pragma_readback_asserted": true,
+   "before_begin_immediate": true,
+   "global_connection_unchanged": true,
+   "global_still_default_off": true,
+   "orphan_insert_raises": "sqlite3.IntegrityError",
+   "rollback_after_fk_error": true,
+   "normal_ingest_unaffected": true
+  },
+  "P1_unambiguous_serialization": {
+   "problem": "`|` 拼接字段值，值内含分隔符会导致序列化边界歧义",
+   "solution": "JSON 数组 [[type, value], ...] 编码，由 JSON 负责转义",
+   "no_separator_dependency": true,
+   "type_tags": [
+    "null",
+    "bool",
+    "int",
+    "float",
+    "bytes",
+    "str"
+   ],
+   "nan_inf_handled_as_string": true,
+   "deterministic": true,
+   "separator_cases_distinct": true
+  }
+ },
+ "production_db": {
+  "integrity_check": "ok",
+  "foreign_key_violations": 0,
+  "terminated_funds": 41,
+  "lifecycle_events": 49,
+  "original_12_shares_present": 12,
+  "original_9_funds_present": 9,
+  "new_5_shares_present": 5,
+  "etf_fingerprint_unchanged": "d54727c0a76a1b09531accd04b3d66ff4ea2374592b1d4a8cb8381602cbbac49",
+  "content_fingerprint_current": "f71c36f9f1a5d73f9f0b1f930b6c2dfaff58cb08f985d0828feb2e4288cd635b",
+  "content_fingerprint_backup": "f71c36f9f1a5d73f9f0b1f930b6c2dfaff58cb08f985d0828feb2e4288cd635b",
+  "fingerprint_identical_to_backup": true,
+  "fingerprint_algorithm_changed": true,
+  "previous_fingerprint_3b5_3_1": "0c867be4960f4f29ebfe03725c292fac82aad40bcfd7781a2cf476c0eb8b9658",
+  "row_counts": {
+   "fund_master": 53,
+   "fund_share_classes": 80,
+   "fund_nav_daily": 47718,
+   "fund_dividends": 44,
+   "fund_manager_history": 21,
+   "fund_aum_history": 683,
+   "fund_fee_rules": 90,
+   "fund_subscription_status": 12,
+   "fund_lifecycle_events": 49,
+   "fund_data_quality": 31
+  },
+  "note": "序列化算法变更后指纹值本身变化；同一算法下正式库与备份库一致，证明数据未变"
+ },
+ "tests": {
+  "new_file": "tests/test_3b5_3_2_fk_serialization.py",
+  "new_passed": 17,
+  "regression_3b5_3_1": 20,
+  "regression_3b5_3": 27,
+  "regression_3b5_1_5_2": 135,
+  "full_passed": 1482,
+  "full_failed": 0,
+  "full_duration_seconds": 381.59,
+  "note": "1482 = 3B-5.3.1 的 1465 + 本轮 17"
+ },
+ "gate": {
+  "ready_for_research_analysis": true,
+  "ready_for_backtest": false,
+  "ready_for_formal_ranking": false
+ }
+}

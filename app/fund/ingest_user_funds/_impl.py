@@ -15,6 +15,8 @@
 from __future__ import annotations
 
 import hashlib
+import json
+import math
 import sqlite3
 import time
 from dataclasses import dataclass, field
@@ -85,19 +87,41 @@ _FP_SKIP_COLUMNS = {"ingested_at", "fetched_at", "checked_at",
                     "source_updated_at"}
 
 
-def _stable_value(v) -> str:
-    """稳定序列化：NULL / bool / int / float / bytes / str 可区分。"""
+def _stable_value(v):
+    """把单个值序列化成**带类型标签的 JSON 值**，保留类型区分。
+
+    返回 (type_tag, payload) 二元组，配合 json.dumps 做无歧义编码：
+    - NULL / bool / int / float / bytes / str 互不混淆；
+    - payload 是字符串/数字本身，由 JSON 负责转义，不依赖分隔符。
+    """
     if v is None:
-        return "@NULL"
+        return ("null", None)
     if isinstance(v, bool):
-        return f"bool:{int(v)}"
+        return ("bool", int(v))
     if isinstance(v, int):
-        return f"int:{v}"
+        return ("int", v)
     if isinstance(v, float):
-        return f"float:{v!r}"
+        # repr 保精度；nan/inf 用字符串承载，避免 JSON 非法
+        if math.isnan(v):
+            return ("float", "nan")
+        if math.isinf(v):
+            return ("float", "inf" if v > 0 else "-inf")
+        return ("float", repr(v))
     if isinstance(v, bytes):
-        return "bytes:" + v.hex()
-    return "str:" + str(v)
+        return ("bytes", v.hex())
+    return ("str", str(v))
+
+
+def _encode_row(values) -> bytes:
+    """把一行值编码成**无歧义**的稳定字节串。
+
+    用 JSON 数组承载 [[type, value], ...]：
+    JSON 会转义引号、反斜杠、换行与竖线等字符，
+    因此 `("a|b", "c")` 与 `("a", "b|c")` 必然产生不同字节串。
+    同时保留 NULL / int / float / str / bytes 的类型标签。
+    """
+    return json.dumps([list(_stable_value(v)) for v in values],
+                      ensure_ascii=False, separators=(",", ":")).encode("utf-8")
 
 
 def _table_digest(conn, table: str) -> tuple[str, int]:
@@ -114,8 +138,7 @@ def _table_digest(conn, table: str) -> tuple[str, int]:
     h.update(("@cols:" + ",".join(use_cols)).encode())
     n = 0
     for row in conn.execute(sql):
-        h.update(("@row:" + "|".join(_stable_value(row[i])
-                                     for i in range(len(use_cols)))).encode())
+        h.update(_encode_row([row[i] for i in range(len(use_cols))]))
         n += 1
     return h.hexdigest(), n
 
@@ -370,12 +393,32 @@ class UserFundIngestor:
     # ---------- 主流程 ----------
     # ---------- 事务辅助 ----------
     def _open_tx(self):
-        """打开接入专用连接，并关闭 SQLite 自动提交，由本类掌控事务边界。"""
+        """打开接入专用连接，并关闭 SQLite 自动提交，由本类掌控事务边界。
+
+        必须在 BEGIN IMMEDIATE **之前**启用外键约束：
+        SQLite 默认 foreign_keys=OFF，若不显式开启，
+        写入不存在的 fund_id 也不会被拒绝，等于放弃了引用完整性保护。
+
+        这里**只**改本连接的 PRAGMA，不触碰项目全局连接行为。
+        若开启失败立即报错，绝不带着未启用的外键继续接入。
+        """
         p = Path(self.db_path or settings.database_path)
         conn = sqlite3.connect(str(p), timeout=10, isolation_level=None)
         conn.row_factory = sqlite3.Row
         conn.execute("PRAGMA temp_store = MEMORY")
         conn.execute("PRAGMA busy_timeout = 5000")
+
+        # ① 先开外键
+        conn.execute("PRAGMA foreign_keys = ON")
+        # ② 读回确认（PRAGMA 可能被静默忽略）
+        enabled = conn.execute("PRAGMA foreign_keys").fetchone()[0]
+        if int(enabled) != 1:
+            conn.close()
+            raise RuntimeError(
+                "接入事务连接未能启用外键约束（PRAGMA foreign_keys 返回 "
+                f"{enabled!r}）；拒绝继续接入，避免写入失去引用完整性保护")
+
+        # ③ 再开事务
         conn.execute("BEGIN IMMEDIATE")
         return conn
 
