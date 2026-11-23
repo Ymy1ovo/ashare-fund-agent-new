@@ -1,0 +1,167 @@
+{
+ "phase": "3B-6.0.1",
+ "report": "risk_free_rate_audit",
+ "baseline_head": "c34d867b95db71cd82e16edfb4bbdaeaa530e594",
+ "generated_at": "2026-11-23T15:31:39",
+ "real_invocation": true,
+ "sharpe_logic_changed": false,
+ "data_ingested": false,
+ "probes": [
+  {
+   "label": "中美国债收益率（2/5/10/30年）",
+   "ok": true,
+   "rows": 4503,
+   "date_min": "2010-01-04",
+   "date_max": "2026-11-20",
+   "columns": [
+    "日期",
+    "中国国债收益率2年",
+    "中国国债收益率5年",
+    "中国国债收益率10年",
+    "中国国债收益率30年",
+    "中国国债收益率10年-2年",
+    "中国GDP年增率",
+    "美国国债收益率2年",
+    "美国国债收益率5年",
+    "美国国债收益率10年",
+    "美国国债收益率30年",
+    "美国国债收益率10年-2年",
+    "美国GDP年增率"
+   ],
+   "has_ohlc": false,
+   "elapsed_sec": 1.37
+  },
+  {
+   "label": "中债收益率曲线（多期限多点）",
+   "ok": true,
+   "rows": 21,
+   "date_min": "2020-01-02",
+   "date_max": "2020-01-10",
+   "columns": [
+    "曲线名称",
+    "日期",
+    "3月",
+    "6月",
+    "1年",
+    "3年",
+    "5年",
+    "7年",
+    "10年",
+    "30年"
+   ],
+   "has_ohlc": false,
+   "elapsed_sec": 0.9
+  },
+  {
+   "label": "Shibor 全期限",
+   "ok": true,
+   "rows": 2405,
+   "date_min": "2015-05-08",
+   "date_max": "2026-11-13",
+   "columns": [
+    "日期",
+    "O/N-定价",
+    "O/N-涨跌幅",
+    "1W-定价",
+    "1W-涨跌幅",
+    "2W-定价",
+    "2W-涨跌幅",
+    "1M-定价",
+    "1M-涨跌幅",
+    "3M-定价",
+    "3M-涨跌幅",
+    "6M-定价",
+    "6M-涨跌幅",
+    "9M-定价",
+    "9M-涨跌幅",
+    "1Y-定价",
+    "1Y-涨跌幅"
+   ],
+   "has_ohlc": false,
+   "elapsed_sec": 0.35
+  }
+ ],
+ "candidates": {
+  "gov_bond_yield": {
+   "api": "akshare.bond_zh_us_rate",
+   "tenors": [
+    "2Y",
+    "5Y",
+    "10Y",
+    "30Y"
+   ],
+   "history_from": "2010-01-04",
+   "method_basis": "中国债券信息网国债收益率曲线",
+   "limitation": "只有 4 个期限点，无 1 年期"
+  },
+  "cbond_curve": {
+   "api": "akshare.bond_china_yield",
+   "tenors": [
+    "3M",
+    "6M",
+    "1Y",
+    "3Y",
+    "5Y",
+    "7Y",
+    "10Y",
+    "30Y"
+   ],
+   "method_basis": "中债金融估值中心",
+   "limitation": "返回区间内多条曲线 × 多日期，需自行整理",
+   "verdict": "期限最完整的首选源"
+  },
+  "shibor": {
+   "api": "akshare.macro_china_shibor_all",
+   "tenors": [
+    "O/N",
+    "1W",
+    "2W",
+    "1M",
+    "3M",
+    "6M",
+    "9M",
+    "1Y"
+   ],
+   "history_from": "2015-05-08",
+   "method_basis": "全国银行间同业拆借中心",
+   "limitation": "货币市场利率，非严格无风险利率"
+  }
+ },
+ "term_structure_evidence": {
+  "date": "2026-11-20",
+  "2Y": 1.233,
+  "5Y": 1.3262,
+  "10Y": 1.5803,
+  "30Y": 2.0415,
+  "spread_10y_2y": 0.3473,
+  "implication": "0.35 个百分点足以让 Sharpe 相差 10%+，禁止统一用 10 年期"
+ },
+ "term_matching_rule": {
+  "1M_window": "1 个月期",
+  "12M_window": "1 年期国债 / 1Y Shibor",
+  "36M_window": "3 年期国债或 1 年期滚动",
+  "since_inception": "按实际持有期加权",
+  "forbidden": [
+   "统一用 10 年期",
+   "用 0 代替",
+   "用活期存款代替"
+  ]
+ },
+ "recommendation_not_implemented": {
+  "primary_source": "bond_china_yield（中债国债曲线）",
+  "match_by_window": true,
+  "missing_policy": "该期限当日无数据 → 该窗口 insufficient_data",
+  "status": "只记录，本轮不实施"
+ },
+ "why_not_changed": [
+  "数据源可取但未接入库（需新建利率表 + 采集任务）",
+  "期限匹配规则需产品类型 × 评估窗口完整矩阵",
+  "Sharpe 有值会改变 3B-5.5 全部 D 级，需重新验收",
+  "任务书明确本轮不改变 Sharpe 计算逻辑"
+ ],
+ "gate": {
+  "ready_for_research_analysis": true,
+  "ready_for_backtest": false,
+  "ready_for_formal_ranking": false
+ }
+}

@@ -2453,7 +2453,8 @@ if (basis != ACCOUNTING_FORMAL
 | 3B-5.3.2 | 外键约束与指纹序列化修正 | 1482 | `phase3B5_3_2_fk_serialization_report.md` |
 | 3B-5.4 | 多类型场外基金真实接入验证 | 1517 | `phase3B5_4_ingestion_report.md` |
 | 3B-5.5 | 数据质量分级与指标可信度 | 1577 | `phase3B5_5_quality_framework.md` |
-| 3B-5.5.1 | 同类可验证性与年化证据修正 | **1629** | `phase3B5_5_test_report.md` |
+| 3B-5.5.1 | 同类可验证性与年化证据修正 | 1629 | `phase3B5_5_test_report.md` |
+| 3B-6.0.1 | 基准与指数数据源审计 | **1662** | `phase3B6_0_1_benchmark_coverage.md` |
 
 当前正式会计版本：`ca-v2-receivable`；正式会计基础：`formal_receivable`；正式估值标记：`formal_valuation=True`。
 
@@ -5726,4 +5727,91 @@ json.dumps([list(_stable_value(v)) for v in values],
 计算区间 2015-05-05 → 2026-11-20，跨度 4217 天
 （计算区间取自净值序列首尾，与质量报告一致）
 ```
+
+## 69. 阶段3B-6.0.1 业绩比较基准与指数数据源审计
+
+### 69.1 四类证据严格区分（核心规则）
+
+| 类型 | 含义 | 强度 | 库内数量 |
+| --- | --- | --- | ---: |
+| `contract_benchmark` | 合同约定的业绩比较基准 | 强 | **0** |
+| `contract_tracking_index` | 合同约定的跟踪指数 | 强 | **0**（字段全 NULL） |
+| `platform_benchmark_text` | 第三方平台展示文字 | 中 | **18** |
+| `inferred_from_name` | 仅凭名称推测 | 弱，**禁止当可验证基准** | **0** |
+
+库内 `benchmark` 来源是 `akshare.fund_individual_basic_info_xq`（第三方聚合），
+**未经合同原文核对**，因此统一标为平台转述。
+
+### 69.2 全量审计结果
+
+| 项 | 数值 |
+| --- | ---: |
+| 扫描本体 | **60**（含 41 清盘，全量非抽样） |
+| 扫描份额 | **89** |
+| 有 benchmark 文字 | 18 |
+| 有 tracking_index | **0** |
+| 指数代码可验证 | 12 |
+| 复合基准 | **15** |
+| 无任何基准 | 42 |
+
+### 69.3 复合基准绝不退化成单指数
+
+判定为复合的任一条件：
+
+1. 按 `+` 拆出 ≥2 项；
+2. 识别出 ≥2 个成分；
+3. 存在无法识别的成分。
+
+复合时 `single_index_family` 恒为 `None`。
+
+例：`161005` =「沪深300×70% + 中债综合全价×25% + 同业存款×5%」，
+只取沪深300 等于抹掉 30% 的其他成分，属口径伪造。
+
+### 69.4 指数数据源实测结论
+
+| 数据源 | 结论 |
+| --- | --- |
+| 中证官网 `stock_zh_index_hist_csindex` | ✅ **主源**，含 OHLC，2004 至今 |
+| 新浪 `stock_zh_index_daily` | ⚠️ 交叉校验（沪深300 可追到 2002） |
+| 东财 `index_zh_a_hist` | ❌ 实测 `Push2RateLimitError`，不用 |
+| 中债 `bond_new_composite_index_cbond` | ✅ 但只有收盘值 |
+| 恒生 `stock_hk_index_daily_sina` | ⚠️ **只有 2013-08-20 起** |
+
+### 69.5 无风险利率（只审计，不改 Sharpe）
+
+| 源 | 期限 | 结论 |
+| --- | --- | --- |
+| `bond_china_yield` | 3M~30Y | ✅ 期限最完整，**首选** |
+| `bond_zh_us_rate` | 2/5/10/30Y | ✅ 但无 1 年期 |
+| `macro_china_shibor_all` | O/N~1Y | ⚠️ 货币市场利率，非严格无风险 |
+
+**期限必须匹配**：2026-11-20 实测 10年-2年 利差 **0.3473 个百分点**，
+足以让 Sharpe 相差 10%+。禁止统一用 10 年期、禁止用 0 代替。
+
+Sharpe 仍保持 `not_available`，本轮不动。
+
+### 69.6 同类研究池现状
+
+| 项 | 数值 |
+| --- | ---: |
+| 研究池本体 / 份额 | **19 / 26** |
+| 同类组 | 13 |
+| **≥5 本体的组** | **0** |
+| 最大组 | 3（`etf_linked|broad|沪深300`）|
+| 库内基准收益序列 | **0** |
+
+A/C 5 组全部正确归并（26 份额 → 19 本体）。
+
+### 69.7 产物
+
+| 文档 | 路径 |
+| --- | --- |
+| 基准覆盖度 | `reports/phase3B6_0_1_benchmark_coverage.md` |
+| 指数数据源 | `reports/phase3B6_0_1_index_data_source_audit.md` |
+| 无风险利率 | `reports/phase3B6_0_1_risk_free_rate_audit.md` |
+| 研究池现状 | `reports/phase3B6_0_1_peer_universe_audit.md` |
+| 测试报告 | `reports/phase3B6_0_1_test_report.md` |
+| 审计模块 | `app/fund/research/benchmark_audit.py` |
+| 数据源脚本 | `scripts/audit_3b6_0_1_index_sources.py` |
+| 专项测试 | `tests/test_3b6_0_1_benchmark_audit.py`（33 项） |
 

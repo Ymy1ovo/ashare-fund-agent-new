@@ -1,0 +1,398 @@
+{
+ "phase": "3B-6.0.1",
+ "report": "index_data_source_audit",
+ "baseline_head": "c34d867b95db71cd82e16edfb4bbdaeaa530e594",
+ "generated_at": "2026-11-23T15:31:39",
+ "script": "scripts/audit_3b6_0_1_index_sources.py",
+ "real_invocation": true,
+ "not_just_urls": true,
+ "database_written": false,
+ "market_data_persisted": false,
+ "probes": [
+  {
+   "label": "中证官网 · 沪深300 000300",
+   "ok": true,
+   "rows": 5558,
+   "date_min": "2004-01-01",
+   "date_max": "2026-11-20",
+   "columns": [
+    "日期",
+    "指数代码",
+    "指数中文全称",
+    "指数中文简称",
+    "指数英文全称",
+    "指数英文简称",
+    "开盘",
+    "最高",
+    "最低",
+    "收盘",
+    "涨跌",
+    "涨跌幅",
+    "成交量",
+    "成交金额",
+    "样本数量",
+    "滚动市盈率"
+   ],
+   "has_ohlc": true,
+   "elapsed_sec": 0.47
+  },
+  {
+   "label": "中证官网 · 中证500 000905",
+   "ok": true,
+   "rows": 5317,
+   "date_min": "2004-01-01",
+   "date_max": "2026-11-20",
+   "columns": [
+    "日期",
+    "指数代码",
+    "指数中文全称",
+    "指数中文简称",
+    "指数英文全称",
+    "指数英文简称",
+    "开盘",
+    "最高",
+    "最低",
+    "收盘",
+    "涨跌",
+    "涨跌幅",
+    "成交量",
+    "成交金额",
+    "样本数量",
+    "滚动市盈率"
+   ],
+   "has_ohlc": true,
+   "elapsed_sec": 0.43
+  },
+  {
+   "label": "中证官网 · 上证50 000016",
+   "ok": true,
+   "rows": 5559,
+   "date_min": "2004-01-01",
+   "date_max": "2026-11-20",
+   "columns": [
+    "日期",
+    "指数代码",
+    "指数中文全称",
+    "指数中文简称",
+    "指数英文全称",
+    "指数英文简称",
+    "开盘",
+    "最高",
+    "最低",
+    "收盘",
+    "涨跌",
+    "涨跌幅",
+    "成交量",
+    "成交金额",
+    "样本数量",
+    "滚动市盈率"
+   ],
+   "has_ohlc": true,
+   "elapsed_sec": 0.37
+  },
+  {
+   "label": "中证官网 · 上证国债 000012",
+   "ok": true,
+   "rows": 5558,
+   "date_min": "2004-01-01",
+   "date_max": "2026-11-20",
+   "columns": [
+    "日期",
+    "指数代码",
+    "指数中文全称",
+    "指数中文简称",
+    "指数英文全称",
+    "指数英文简称",
+    "开盘",
+    "最高",
+    "最低",
+    "收盘",
+    "涨跌",
+    "涨跌幅",
+    "成交量",
+    "成交金额",
+    "样本数量",
+    "滚动市盈率"
+   ],
+   "has_ohlc": true,
+   "elapsed_sec": 0.3
+  },
+  {
+   "label": "中证官网 · 中证全指半导体 H30184",
+   "ok": true,
+   "rows": 5316,
+   "date_min": "2004-01-01",
+   "date_max": "2026-11-20",
+   "columns": [
+    "日期",
+    "指数代码",
+    "指数中文全称",
+    "指数中文简称",
+    "指数英文全称",
+    "指数英文简称",
+    "开盘",
+    "最高",
+    "最低",
+    "收盘",
+    "涨跌",
+    "涨跌幅",
+    "成交量",
+    "成交金额",
+    "样本数量",
+    "滚动市盈率"
+   ],
+   "has_ohlc": true,
+   "elapsed_sec": 0.97
+  },
+  {
+   "label": "中证官网 · 中证白酒 399997",
+   "ok": true,
+   "rows": 4345,
+   "date_min": "2004-01-01",
+   "date_max": "2026-11-20",
+   "columns": [
+    "日期",
+    "指数代码",
+    "指数中文全称",
+    "指数中文简称",
+    "指数英文全称",
+    "指数英文简称",
+    "开盘",
+    "最高",
+    "最低",
+    "收盘",
+    "涨跌",
+    "涨跌幅",
+    "成交量",
+    "成交金额",
+    "样本数量",
+    "滚动市盈率"
+   ],
+   "has_ohlc": true,
+   "elapsed_sec": 0.25
+  },
+  {
+   "label": "新浪 · 沪深300 sh000300",
+   "ok": true,
+   "rows": 6035,
+   "date_min": "2002-01-04",
+   "date_max": "2026-11-20",
+   "columns": [
+    "date",
+    "open",
+    "high",
+    "low",
+    "close",
+    "volume"
+   ],
+   "has_ohlc": true,
+   "elapsed_sec": 0.15
+  },
+  {
+   "label": "新浪 · 中证500 sh000905",
+   "ok": true,
+   "rows": 5314,
+   "date_min": "2005-01-04",
+   "date_max": "2026-11-20",
+   "columns": [
+    "date",
+    "open",
+    "high",
+    "low",
+    "close",
+    "volume"
+   ],
+   "has_ohlc": true,
+   "elapsed_sec": 0.2
+  },
+  {
+   "label": "新浪 · 恒生指数 HSI（港股）",
+   "ok": true,
+   "rows": 3263,
+   "date_min": "2013-08-20",
+   "date_max": "2026-11-20",
+   "columns": [
+    "date",
+    "open",
+    "high",
+    "low",
+    "close",
+    "volume",
+    "amount"
+   ],
+   "has_ohlc": true,
+   "elapsed_sec": 0.17
+  },
+  {
+   "label": "中债 · 新综合指数（财富）",
+   "ok": true,
+   "rows": 6223,
+   "date_min": "2002-01-04",
+   "date_max": "2026-11-20",
+   "columns": [
+    "date",
+    "value"
+   ],
+   "has_ohlc": false,
+   "elapsed_sec": 1.22
+  },
+  {
+   "label": "国证 · 深证系列 index_hist_sw",
+   "ok": true,
+   "rows": 6496,
+   "date_min": "1999-12-30",
+   "date_max": "2026-11-20",
+   "columns": [
+    "代码",
+    "日期",
+    "收盘",
+    "开盘",
+    "最高",
+    "最低",
+    "成交量",
+    "成交额"
+   ],
+   "has_ohlc": true,
+   "elapsed_sec": 1.32
+  },
+  {
+   "label": "东财 · index_zh_a_hist（易被限流）",
+   "ok": false,
+   "rows": 0,
+   "error_type": "Push2RateLimitError",
+   "error": "东方财富 push2 行情服务器断开了连接，通常是短时间内请求过多，当前 IP 被临时限流。首次限流一般约 5 分钟后恢复，反复触发后可能需要 40 分钟以上；等待期间不要重复调用东方财富的行情接口，否则会延长限流。",
+   "traceback_head": "akshare.utils.http.Push2RateLimitError: 东方财富 push2 行情服务器断开了连接，通常是短时间内请求过多，当前 IP 被临时限流。首次限流一般约 5 分钟后恢复，反复触发后可能需要 40 分钟以上；等待期间不要重复调用东方财富的行情接口，否则会延长限流。",
+   "elapsed_sec": 0.06
+  }
+ ],
+ "source_assessment": {
+  "csindex_official": {
+   "api": "akshare.stock_zh_index_hist_csindex",
+   "daily": true,
+   "ohlc": true,
+   "history_from": "2004-01-01",
+   "rate_limit": "中（实测 1.5s 间隔稳定）",
+   "usable_as_primary": true,
+   "verdict": "首选主源"
+  },
+  "sina": {
+   "api": "akshare.stock_zh_index_daily",
+   "daily": true,
+   "ohlc": true,
+   "history_from": "2002-01-04（沪深300）",
+   "rate_limit": "低",
+   "usable_as_primary": false,
+   "verdict": "交叉校验源；早期成交量为 0"
+  },
+  "eastmoney": {
+   "api": "akshare.index_zh_a_hist（实测被限流）",
+   "daily": false,
+   "rate_limit": "高",
+   "usable_as_primary": false,
+   "verdict": "Push2RateLimitError，不适合长期自动化"
+  },
+  "cbond": {
+   "api": "akshare.bond_new_composite_index_cbond",
+   "daily": true,
+   "ohlc": false,
+   "fields": [
+    "date",
+    "value"
+   ],
+   "history_from": "2002-01-04",
+   "verdict": "只能作总值序列；细分中债指数无法一一对应"
+  },
+  "sw": {
+   "api": "akshare.index_hist_sw",
+   "daily": true,
+   "ohlc": true,
+   "history_from": "1999-12-30",
+   "verdict": "可用，本次样本未涉及"
+  },
+  "hk_sina": {
+   "api": "akshare.stock_hk_index_daily_sina",
+   "daily": true,
+   "ohlc": true,
+   "history_from": "2013-08-20",
+   "completeness": "partial",
+   "verdict": "恒生指数早于 2013 不可得"
+  }
+ },
+ "index_code_map": {
+  "沪深300": {
+   "code": "000300",
+   "source": "akshare.stock_zh_index_hist_csindex",
+   "underlying": "中证指数有限公司"
+  },
+  "中证500": {
+   "code": "000905",
+   "source": "akshare.stock_zh_index_hist_csindex",
+   "underlying": "中证指数有限公司"
+  },
+  "中证800": {
+   "code": "000906",
+   "source": "akshare.stock_zh_index_hist_csindex",
+   "underlying": "中证指数有限公司"
+  },
+  "上证50": {
+   "code": "000016",
+   "source": "akshare.stock_zh_index_hist_csindex",
+   "underlying": "中证指数有限公司"
+  },
+  "中证白酒": {
+   "code": "399997",
+   "source": "akshare.stock_zh_index_hist_csindex",
+   "underlying": "中证指数有限公司（深证系列）"
+  },
+  "中证全指半导体": {
+   "code": "H30184",
+   "source": "akshare.stock_zh_index_hist_csindex",
+   "underlying": "中证指数有限公司"
+  },
+  "中证内地消费主题": {
+   "code": "000942",
+   "source": "akshare.stock_zh_index_hist_csindex",
+   "underlying": "中证指数有限公司"
+  },
+  "上证国债": {
+   "code": "000012",
+   "source": "akshare.stock_zh_index_hist_csindex",
+   "underlying": "中证指数有限公司（上证系列）"
+  },
+  "中证红利": {
+   "code": "000922",
+   "source": "akshare.stock_zh_index_hist_csindex",
+   "underlying": "中证指数有限公司"
+  },
+  "中证港股通综合": {
+   "code": "930930",
+   "source": "akshare.stock_zh_index_hist_csindex",
+   "underlying": "中证指数有限公司"
+  }
+ },
+ "external_index_map": {
+  "恒生指数": {
+   "code": "HSI",
+   "source": "akshare.stock_hk_index_daily_sina",
+   "underlying": "恒生指数有限公司（新浪财经转发）",
+   "start_observed": "2013-08-20",
+   "completeness": "partial",
+   "note": "新浪只提供 2013-08-20 之后的日线，早于该日期不可得；不能假定覆盖基金成立以来全区间"
+  }
+ },
+ "unresolved_families": [
+  "中债综合",
+  "中债综合全价",
+  "中债总",
+  "中债-优选投资级信用债财富",
+  "中证综合债券",
+  "中债综合财富"
+ ],
+ "unresolved_policy": "一律 unknown，不猜代码、不拿相近指数顶替",
+ "compliance_note": "本审计只验证「能否取到」，不等于已获授权批量采集；长期自动化仍需复核各站服务条款",
+ "gate": {
+  "ready_for_research_analysis": true,
+  "ready_for_backtest": false,
+  "ready_for_formal_ranking": false
+ }
+}

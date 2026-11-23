@@ -1,0 +1,368 @@
+{
+ "phase": "3B-6.0.1",
+ "report": "benchmark_coverage",
+ "baseline_head": "c34d867b95db71cd82e16edfb4bbdaeaa530e594",
+ "generated_at": "2026-11-23T15:30:00",
+ "module": "app/fund/research/benchmark_audit.py",
+ "readonly": true,
+ "database_written": false,
+ "schema_changed": false,
+ "full_scan": true,
+ "scope_note": "本审计覆盖库内**全部** 60 个基金本体（含 41 个已清盘），不是抽样",
+ "scanned_fund_count": 60,
+ "scanned_share_count": 89,
+ "evidence_types": {
+  "contract_benchmark": {
+   "label": "基金合同约定的业绩比较基准",
+   "strength": "strong",
+   "note": "库内 benchmark 字段由第三方接口转述，非合同原文影印件"
+  },
+  "contract_tracking_index": {
+   "label": "基金合同约定的跟踪指数",
+   "strength": "strong",
+   "note": "库内 tracking_index 字段"
+  },
+  "platform_benchmark_text": {
+   "label": "第三方平台展示的基准文字",
+   "strength": "medium",
+   "note": "天天基金/雪球聚合口径，可能与合同原文有出入"
+  },
+  "inferred_from_name": {
+   "label": "仅凭基金名称推测",
+   "strength": "weak",
+   "note": "**不得**当作可验证基准，只能提示人工复核"
+  },
+  "none": {
+   "label": "无任何基准证据",
+   "strength": "none",
+   "note": "只能标 unknown"
+  }
+ },
+ "evidence_type_counts": {
+  "platform_benchmark_text": 18,
+  "none": 42
+ },
+ "four_types_ruling": {
+  "contract_benchmark": 0,
+  "contract_tracking_index": 0,
+  "platform_benchmark_text": 18,
+  "inferred_from_name": 0,
+  "note": "库内 benchmark 来自第三方接口转述，未经合同原文核对，因此归为平台转述；未使用名称推测"
+ },
+ "audit_status_counts": {
+  "index_plus_cash": 9,
+  "composite_with_bond": 3,
+  "bond_index_without_code": 2,
+  "no_benchmark": 42,
+  "composite_multi_index": 3,
+  "cash_only": 1
+ },
+ "all": {
+  "fund_count": 60,
+  "share_count": 89,
+  "has_benchmark": 18,
+  "has_tracking_index": 0,
+  "index_identifiable": 12,
+  "index_only": 0,
+  "index_plus_cash": 9,
+  "index_code_verified": 12,
+  "multi_index_composite": 3,
+  "composite": 15,
+  "no_benchmark": 42,
+  "bond_without_code": 2
+ },
+ "live": {
+  "fund_count": 19,
+  "share_count": 26,
+  "has_benchmark": 18,
+  "has_tracking_index": 0,
+  "index_identifiable": 12,
+  "index_only": 0,
+  "index_plus_cash": 9,
+  "index_code_verified": 12,
+  "multi_index_composite": 3,
+  "composite": 15,
+  "no_benchmark": 1,
+  "bond_without_code": 2
+ },
+ "terminated": {
+  "fund_count": 41,
+  "share_count": 63,
+  "has_benchmark": 0,
+  "has_tracking_index": 0,
+  "index_identifiable": 0,
+  "index_only": 0,
+  "index_plus_cash": 0,
+  "index_code_verified": 0,
+  "multi_index_composite": 0,
+  "composite": 0,
+  "no_benchmark": 41,
+  "bond_without_code": 0
+ },
+ "composite_funds": [
+  {
+   "fund_id": 14,
+   "fund_code": "000051",
+   "components": [
+    "沪深300",
+    "fixed_rate"
+   ]
+  },
+  {
+   "fund_id": 15,
+   "fund_code": "110020",
+   "components": [
+    "沪深300",
+    "cash"
+   ]
+  },
+  {
+   "fund_id": 16,
+   "fund_code": "161725",
+   "components": [
+    "中证白酒",
+    "cash"
+   ]
+  },
+  {
+   "fund_id": 17,
+   "fund_code": "007300",
+   "components": [
+    "中证全指半导体",
+    "cash"
+   ]
+  },
+  {
+   "fund_id": 18,
+   "fund_code": "110022",
+   "components": [
+    "中证内地消费主题",
+    "中债总"
+   ]
+  },
+  {
+   "fund_id": 19,
+   "fund_code": "161005",
+   "components": [
+    "沪深300",
+    "中债综合全价",
+    "cash"
+   ]
+  },
+  {
+   "fund_id": 20,
+   "fund_code": "000478",
+   "components": [
+    "中证500",
+    "cash"
+   ]
+  },
+  {
+   "fund_id": 66,
+   "fund_code": "000961",
+   "components": [
+    "沪深300",
+    "cash"
+   ]
+  },
+  {
+   "fund_id": 67,
+   "fund_code": "012346",
+   "components": [
+    "中证港股通综合",
+    "中证500"
+   ]
+  },
+  {
+   "fund_id": 68,
+   "fund_code": "012344",
+   "components": [
+    "沪深300",
+    "恒生指数",
+    "中债综合财富"
+   ]
+  },
+  {
+   "fund_id": 69,
+   "fund_code": "050002",
+   "components": [
+    "沪深300",
+    "cash"
+   ]
+  },
+  {
+   "fund_id": 70,
+   "fund_code": "001052",
+   "components": [
+    "中证500",
+    "cash"
+   ]
+  },
+  {
+   "fund_id": 71,
+   "fund_code": "001938",
+   "components": [
+    "中证500",
+    "中证综合债券"
+   ]
+  },
+  {
+   "fund_id": 72,
+   "fund_code": "519066",
+   "components": [
+    "中证800",
+    "上证国债",
+    "cash"
+   ]
+  },
+  {
+   "fund_id": 75,
+   "fund_code": "001548",
+   "components": [
+    "上证50",
+    "cash"
+   ]
+  }
+ ],
+ "index_code_verified_funds": [
+  {
+   "fund_id": 14,
+   "fund_code": "000051",
+   "index_family": "沪深300",
+   "index_code": "000300",
+   "audit_status": "index_plus_cash"
+  },
+  {
+   "fund_id": 15,
+   "fund_code": "110020",
+   "index_family": "沪深300",
+   "index_code": "000300",
+   "audit_status": "index_plus_cash"
+  },
+  {
+   "fund_id": 16,
+   "fund_code": "161725",
+   "index_family": "中证白酒",
+   "index_code": "399997",
+   "audit_status": "index_plus_cash"
+  },
+  {
+   "fund_id": 17,
+   "fund_code": "007300",
+   "index_family": "中证全指半导体",
+   "index_code": "H30184",
+   "audit_status": "index_plus_cash"
+  },
+  {
+   "fund_id": 18,
+   "fund_code": "110022",
+   "index_family": "中证内地消费主题",
+   "index_code": "000942",
+   "audit_status": "composite_with_bond"
+  },
+  {
+   "fund_id": 19,
+   "fund_code": "161005",
+   "index_family": "沪深300",
+   "index_code": "000300",
+   "audit_status": "composite_with_bond"
+  },
+  {
+   "fund_id": 20,
+   "fund_code": "000478",
+   "index_family": "中证500",
+   "index_code": "000905",
+   "audit_status": "index_plus_cash"
+  },
+  {
+   "fund_id": 66,
+   "fund_code": "000961",
+   "index_family": "沪深300",
+   "index_code": "000300",
+   "audit_status": "index_plus_cash"
+  },
+  {
+   "fund_id": 69,
+   "fund_code": "050002",
+   "index_family": "沪深300",
+   "index_code": "000300",
+   "audit_status": "index_plus_cash"
+  },
+  {
+   "fund_id": 70,
+   "fund_code": "001052",
+   "index_family": "中证500",
+   "index_code": "000905",
+   "audit_status": "index_plus_cash"
+  },
+  {
+   "fund_id": 71,
+   "fund_code": "001938",
+   "index_family": "中证500",
+   "index_code": "000905",
+   "audit_status": "composite_with_bond"
+  },
+  {
+   "fund_id": 75,
+   "fund_code": "001548",
+   "index_family": "上证50",
+   "index_code": "000016",
+   "audit_status": "index_plus_cash"
+  }
+ ],
+ "multi_index_composites": [
+  {
+   "fund_id": 67,
+   "fund_code": "012346",
+   "index_families": [
+    "中证港股通综合",
+    "中证500"
+   ]
+  },
+  {
+   "fund_id": 68,
+   "fund_code": "012344",
+   "index_families": [
+    "沪深300",
+    "恒生指数"
+   ]
+  },
+  {
+   "fund_id": 72,
+   "fund_code": "519066",
+   "index_families": [
+    "中证800",
+    "上证国债"
+   ]
+  }
+ ],
+ "composite_rule": {
+  "is_composite_when": [
+   "按 +/＋ 拆出 >=2 项",
+   "识别出 >=2 个成分（指数/债券/现金）",
+   "存在无法识别的成分"
+  ],
+  "single_index_family_only_when": "唯一一项且唯一指数成分",
+  "never_degrade_to_single_index": true
+ },
+ "blocked_metrics": {
+  "excess_return": "库内 0 条基准收益序列",
+  "information_ratio": "同上",
+  "beta": "同上",
+  "tracking_error": "同上",
+  "sharpe": "无风险利率未接入（本轮只审计）",
+  "composite_benchmark_replay": "债券成分无代码 + 现金序列未接入"
+ },
+ "survivorship_bias": {
+  "known_terminated": 41,
+  "is_full_list": false,
+  "can_claim_bias_eliminated": false,
+  "alipay_purchasable_may_be_unknown": true,
+  "third_party_fee_equals_alipay": false
+ },
+ "gate": {
+  "ready_for_research_analysis": true,
+  "ready_for_backtest": false,
+  "ready_for_formal_ranking": false
+ }
+}

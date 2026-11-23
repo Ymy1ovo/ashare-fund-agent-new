@@ -1,0 +1,85 @@
+{
+ "phase": "3B-6.0.1",
+ "report": "tests",
+ "baseline_head": "c34d867b95db71cd82e16edfb4bbdaeaa530e594",
+ "generated_at": "2026-11-23T15:50:00",
+ "executed": true,
+ "new_suite": {
+  "file": "tests/test_3b6_0_1_benchmark_audit.py",
+  "passed": 33,
+  "failed": 0,
+  "seconds": 8.81
+ },
+ "regression": {
+  "3b5_5_series": {
+   "files": [
+    "tests/test_3b5_5_quality_framework.py",
+    "tests/test_3b5_5_1_peer_annualized.py"
+   ],
+   "passed": 112
+  },
+  "combined_6_0_1_plus_5_5": {
+   "passed": 145,
+   "seconds": 160.71
+  }
+ },
+ "full": {
+  "command": "pytest -q",
+  "passed": 1662,
+  "failed": 0,
+  "errors": 0,
+  "seconds": 549.38
+ },
+ "evolution": {
+  "3B-5.5": 1577,
+  "3B-5.5.1": 1629,
+  "3B-6.0.1": 1662
+ },
+ "production_db": {
+  "integrity_check": "ok",
+  "foreign_key_violations": 0,
+  "fund_master": 60,
+  "terminated": 41,
+  "lifecycle_events": 49,
+  "content_fingerprint": "11c56eba1489976fa35be92586a99bc21a27e20c06e95cacab5c8ca553c05116",
+  "etf_fingerprint": "d54727c0a76a1b09531accd04b3d66ff4ea2374592b1d4a8cb8381602cbbac49",
+  "unchanged_since": "3B-5.5.1",
+  "writes_this_round": 0
+ },
+ "source_audit_executed": {
+  "script": "scripts/audit_3b6_0_1_index_sources.py",
+  "real_invocation": true,
+  "index_probes_ok": 11,
+  "index_probes_failed": 1,
+  "risk_free_probes_ok": 3
+ },
+ "environment": {
+  "network": "单元测试不联网；数据源审计脚本单独实跑",
+  "production_db": "只读",
+  "production_writes": 0,
+  "data_collected": 0
+ },
+ "static_checks_excluded": [
+  "python -m compileall 语法检查",
+  "报告数据与库查询比对"
+ ],
+ "code_changes": {
+  "new": [
+   "app/fund/research/benchmark_audit.py",
+   "scripts/audit_3b6_0_1_index_sources.py",
+   "tests/test_3b6_0_1_benchmark_audit.py"
+  ],
+  "unchanged": [
+   "app/fund/research/engine.py",
+   "app/fund/research/indicators.py",
+   "app/fund/research/classification.py",
+   "app/fund/research/quality.py"
+  ],
+  "schema_changed": false
+ },
+ "gate": {
+  "ready_for_research_analysis": true,
+  "ready_for_backtest": false,
+  "ready_for_formal_ranking": false
+ }
+}

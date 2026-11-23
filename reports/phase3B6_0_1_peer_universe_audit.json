@@ -1,0 +1,241 @@
+{
+ "phase": "3B-6.0.1",
+ "report": "peer_universe_audit",
+ "baseline_head": "c34d867b95db71cd82e16edfb4bbdaeaa530e594",
+ "generated_at": "2026-11-23T15:30:00",
+ "readonly": true,
+ "universe": {
+  "fund_count": 19,
+  "share_count": 26,
+  "group_count": 13,
+  "groups_with_5plus_funds": 0,
+  "max_group_size": 3,
+  "max_group_key": "etf_linked|broad|沪深300"
+ },
+ "by_product_class": {
+  "active_equity": {
+   "fund_count": 5,
+   "share_count": 7
+  },
+  "bond_pure": {
+   "fund_count": 2,
+   "share_count": 4
+  },
+  "etf_linked": {
+   "fund_count": 6,
+   "share_count": 8
+  },
+  "lof": {
+   "fund_count": 2,
+   "share_count": 3
+  },
+  "money_market": {
+   "fund_count": 2,
+   "share_count": 2
+  },
+  "ordinary_index": {
+   "fund_count": 2,
+   "share_count": 2
+  }
+ },
+ "ac_merge": {
+  "share_count": 26,
+  "fund_count": 19,
+  "merged_pairs": [
+   {
+    "fund_id": 21,
+    "shares": [
+     "000015",
+     "000016"
+    ],
+    "counted_as": 1
+   },
+   {
+    "fund_id": 17,
+    "shares": [
+     "007300",
+     "007301"
+    ],
+    "counted_as": 1
+   },
+   {
+    "fund_id": 16,
+    "shares": [
+     "161725",
+     "012414"
+    ],
+    "counted_as": 1
+   },
+   {
+    "fund_id": 73,
+    "shares": [
+     "000032",
+     "000033"
+    ],
+    "counted_as": 1
+   },
+   {
+    "fund_id": 75,
+    "shares": [
+     "001548",
+     "001549"
+    ],
+    "counted_as": 1
+   }
+  ],
+  "duplicate_counted": false
+ },
+ "peer_groups": {
+  "bond_pure|unknown": {
+   "member_count": 2,
+   "fund_ids": [
+    21,
+    73
+   ]
+  },
+  "etf_linked|broad|沪深300": {
+   "member_count": 3,
+   "fund_ids": [
+    14,
+    15,
+    66
+   ]
+  },
+  "money_market": {
+   "member_count": 2,
+   "fund_ids": [
+    22,
+    74
+   ]
+  },
+  "ordinary_index|broad|中证500": {
+   "member_count": 1,
+   "fund_ids": [
+    20
+   ]
+  },
+  "etf_linked|broad|中证500": {
+   "member_count": 1,
+   "fund_ids": [
+    70
+   ]
+  },
+  "etf_linked|broad|上证50": {
+   "member_count": 1,
+   "fund_ids": [
+    75
+   ]
+  },
+  "active_equity|中证500": {
+   "member_count": 2,
+   "fund_ids": [
+    67,
+    71
+   ]
+  },
+  "etf_linked|sector|中证全指半导体": {
+   "member_count": 1,
+   "fund_ids": [
+    17
+   ]
+  },
+  "active_equity|unknown": {
+   "member_count": 2,
+   "fund_ids": [
+    18,
+    68
+   ]
+  },
+  "ordinary_index|broad|沪深300": {
+   "member_count": 1,
+   "fund_ids": [
+    69
+   ]
+  },
+  "lof|active|unknown": {
+   "member_count": 1,
+   "fund_ids": [
+    19
+   ]
+  },
+  "lof|index|sector|中证白酒": {
+   "member_count": 1,
+   "fund_ids": [
+    16
+   ]
+  },
+  "active_equity|中证800": {
+   "member_count": 1,
+   "fund_ids": [
+    72
+   ]
+  }
+ },
+ "benchmark_coverage_in_universe": {
+  "has_benchmark": 18,
+  "has_tracking_index": 0,
+  "index_identifiable": 12,
+  "index_code_verified": 12,
+  "composite": 15,
+  "no_benchmark": 1,
+  "benchmark_series_in_db": 0
+ },
+ "why_no_5plus_group": [
+  "研究池只有 19 个本体，分到 13 个组",
+  "分组维度细（产品类型 × 宽基/行业 × 指数族）",
+  "债券无法细分（久期/信用/转债全 NULL）",
+  "15 只复合基准基金没有干净的单指数组键",
+  "恒生/港股通指数数据不全"
+ ],
+ "bond_grouping_evidence": {
+  "duration_bucket": "unknown（全 NULL）",
+  "credit_bucket": "unknown（全 NULL）",
+  "convertible_bucket": "unknown（全 NULL）",
+  "consequence": "bond_pure|unknown 必须评 D，不能因「都是纯债」当同类"
+ },
+ "money_fund_isolation": {
+  "fund_count": 2,
+  "peer_key": "money_market",
+  "mixed_with_net_value": false,
+  "level": "C（small_sample）"
+ },
+ "survivorship_bias": {
+  "known_terminated": 41,
+  "is_full_list": false,
+  "universe_includes_terminated": false,
+  "universe_represents_market": false,
+  "can_claim_bias_eliminated": false,
+  "statement": "19 个本体是用户自选接入的结果，不是全市场抽样；任何统计描述只能说明这批基金本身，不能外推到公募基金整体"
+ },
+ "to_unlock_comparison": [
+  {
+   "gap": "研究池扩到每组 >=5 本体",
+   "unlocks": "同类描述性对照（最多 B 级）"
+  },
+  {
+   "gap": "指数历史序列入库",
+   "unlocks": "超额收益/信息比率/Beta/跟踪误差"
+  },
+  {
+   "gap": "期限匹配的无风险利率",
+   "unlocks": "Sharpe / Sortino"
+  },
+  {
+   "gap": "债券久期/信用/转债字段",
+   "unlocks": "债券基金细分分组"
+  },
+  {
+   "gap": "现金利率序列",
+   "unlocks": "index_plus_cash 类基准复现"
+  },
+  {
+   "gap": "合同原文核对",
+   "unlocks": "证据从平台转述升到合同基准"
+  }
+ ],
+ "gate": {
+  "ready_for_research_analysis": true,
+  "ready_for_backtest": false,
+  "ready_for_formal_ranking": false
+ }
+}
