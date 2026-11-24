@@ -1,0 +1,91 @@
+{
+ "phase": "3B-6.0.4.1",
+ "step": "02_grade_fix",
+ "baseline_head": "a31270683f1417813ad8ac650fc5ebd9be32b79f",
+ "generated_at": "2026-11-24T14:15:31",
+ "db_fingerprint": "115ac91eee7c26424952e6df23ddeeafe2435974fe5e81a8ba6bbcabfe387dd4",
+ "root_cause": {
+  "symptom": "bond_pure|unknown 被标为 C，应为 D",
+  "cause": "报告生成自建状态→等级映射表，绕过 quality.grade_peer_comparison",
+  "rule_itself_correct": true,
+  "fix": "新增 peer_engine.group_quality_grade() 只做参数组装，判定委托权威函数"
+ },
+ "quality_py_modified": false,
+ "single_source_of_truth": "quality.grade_peer_comparison",
+ "grades": {
+  "active_equity|中证800": "C",
+  "bond_mixed|unknown": "D",
+  "bond_pure|unknown": "D",
+  "active_equity|unknown": "D",
+  "etf_linked|broad|中证500": "C",
+  "money_market": "B",
+  "active_equity|中证A500": "D",
+  "active_equity|沪深300": "C",
+  "etf_linked|broad|沪深300": "B",
+  "ordinary_index|broad|沪深300": "C",
+  "ordinary_index|broad|中证500": "B",
+  "lof|active|中债综合": "D",
+  "etf_linked|broad|上证50": "C",
+  "etf_linked|broad|创业板指": "C",
+  "ordinary_index|broad|创业板指": "D",
+  "lof|active|中证800": "C",
+  "lof|active|沪深300": "D",
+  "lof|active|unknown": "D",
+  "active_equity|中证500": "C",
+  "ordinary_index|unknown|上证50": "D",
+  "ordinary_index|broad|上证50": "D",
+  "etf_linked|sector|中证全指半导体": "D",
+  "etf_linked|unknown|unknown": "D",
+  "etf_linked|broad|unknown": "D",
+  "ordinary_index|unknown|unknown": "D",
+  "etf_linked|broad|中证A500": "C",
+  "ordinary_index|broad|中证A500": "C",
+  "lof|index|sector|中证白酒": "D"
+ },
+ "grade_distribution": {
+  "D": 15,
+  "B": 3,
+  "C": 10
+ },
+ "key_fixes": {
+  "bond_pure|unknown": {
+   "before": "C",
+   "after": "D",
+   "reason": "基准族 unknown"
+  },
+  "bond_mixed|unknown": {
+   "before": "C",
+   "after": "D",
+   "reason": "基准族 unknown"
+  },
+  "active_equity|unknown": {
+   "before": "C",
+   "after": "D",
+   "reason": "基准族 unknown"
+  },
+  "money_market": {
+   "before": "B",
+   "after": "B",
+   "reason": "产品类型特例，保持"
+  }
+ },
+ "money_market_special": {
+  "peer_key": "money_market",
+  "members": 7,
+  "grade": "B",
+  "requires_benchmark": false,
+  "rule": "按产品类型独立分组，≥5 → B"
+ },
+ "md_json_consistent": true,
+ "boundaries": {
+  "grade_rule_modified": false,
+  "passed_by_sample_size": false,
+  "md_json_mismatch": false,
+  "db_modified": false
+ },
+ "gate": {
+  "ready_for_research_analysis": true,
+  "ready_for_backtest": false,
+  "ready_for_formal_ranking": false
+ }
+}

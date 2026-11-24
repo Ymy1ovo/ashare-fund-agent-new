@@ -1,0 +1,83 @@
+{
+ "phase": "3B-6.0.4.1",
+ "step": "06_tests",
+ "baseline_head": "a31270683f1417813ad8ac650fc5ebd9be32b79f",
+ "generated_at": "2026-11-24T14:32:36",
+ "full_pytest": {
+  "passed": 1902,
+  "failed": 0,
+  "errors": 0,
+  "seconds": 797.75,
+  "executed": true
+ },
+ "evolution": {
+  "3B-6.0.4": 1864,
+  "3B-6.0.4.1": 1902,
+  "delta": 38
+ },
+ "new_tests": {
+  "file": "tests/test_3b6_0_4_1_lof_and_grade.py",
+  "count": 38,
+  "seconds": 1.09
+ },
+ "regression": {
+  "classif_lof_group_peer": {
+   "passed": 202,
+   "seconds": 118.38
+  },
+  "3b6_0_4_suite": {
+   "passed": 88,
+   "seconds": 6.16
+  }
+ },
+ "existing_tests": {
+  "deleted": 0,
+  "skipped": 0,
+  "weakened": 0,
+  "modified_files": 0
+ },
+ "static_checks_excluded": [
+  "compileall",
+  "json validity"
+ ],
+ "data_source_calls": 0,
+ "database_readonly": {
+  "fingerprint_before": "115ac91eee7c26424952e6df23ddeeafe2435974fe5e81a8ba6bbcabfe387dd4",
+  "fingerprint_after": "115ac91eee7c26424952e6df23ddeeafe2435974fe5e81a8ba6bbcabfe387dd4",
+  "fingerprint_unchanged": true,
+  "etf_fingerprint": "d54727c0a76a1b09531accd04b3d66ff4ea2374592b1d4a8cb8381602cbbac49",
+  "integrity_check": "ok",
+  "foreign_key_violations": 0,
+  "table_counts": {
+   "fund_master": 120,
+   "fund_share_classes": 149,
+   "fund_nav_daily": 245656,
+   "fund_dividends": 376,
+   "fund_lifecycle_events": 49,
+   "fund_manager_history": 21,
+   "fund_aum_history": 683,
+   "fund_fee_rules": 90
+  }
+ },
+ "code_changes": {
+  "modified": [
+   "app/fund/research/classification.py",
+   "app/fund/research/data_access.py",
+   "app/fund/research/lookup.py",
+   "app/fund/ingest_user_funds/_impl.py",
+   "app/fund/research/peer_engine.py"
+  ],
+  "unchanged": [
+   "app/fund/research/quality.py"
+  ],
+  "new_tests": [
+   "tests/test_3b6_0_4_1_lof_and_grade.py"
+  ],
+  "schema_changed": false
+ },
+ "gate": {
+  "ready_for_research_analysis": true,
+  "ready_for_backtest": false,
+  "ready_for_formal_ranking": false
+ }
+}

@@ -92,10 +92,40 @@ SECTOR_KEYWORDS = ("白酒", "半导体", "消费", "医药", "军工", "新能�
                    "银行", "证券", "地产", "科技", "芯片", "food", "酿酒")
 
 
+# LOF 产品结构识别的证据优先级（3B-6.0.4.1 修正）。
+# 简称常被截断（如「中欧新动力混合」），全称才是合同级名称，
+# 两者**任一**含 LOF 即认定为 LOF 产品结构。
+LOF_TOKENS = ("(LOF)", "（LOF）")
+LOF_FULL_TOKENS = ("(LOF)", "（LOF）", "LOF)")
+
+
+def detect_lof(name: str | None, full_name: str | None) -> dict:
+    """判定是否为 LOF 产品结构，返回证据。
+
+    只认**明确的 LOF 标记**，不做模糊匹配、不猜。
+    简称与全称都没有可靠证据时返回 recognized=False。
+    """
+    n = str(name or "")
+    f = str(full_name or "")
+    name_hit = any(t in n for t in LOF_TOKENS)
+    full_hit = any(t in f for t in LOF_FULL_TOKENS)
+    if name_hit and full_hit:
+        return {"recognized": True, "evidence": "both",
+                "evidence_field": "fund_name+fund_full_name"}
+    if name_hit:
+        return {"recognized": True, "evidence": "short_name",
+                "evidence_field": "fund_name"}
+    if full_hit:
+        return {"recognized": True, "evidence": "full_name",
+                "evidence_field": "fund_full_name"}
+    return {"recognized": False, "evidence": "none", "evidence_field": None}
+
+
 def classify_fund(row) -> dict:
     """按库内字段做可解释分类；缺字段返回 unknown，不猜。
 
     row 需要具备：fund_name / fund_type_l1 / fund_type_l2 / is_index_fund
+    可选：fund_full_name（LOF 识别证据；缺失时只按简称判定并如实标注）
     """
     def g(key):
         try:
@@ -122,14 +152,25 @@ def classify_fund(row) -> dict:
                 "basis": "基金名称含「ETF联接」→ 产品结构=ETF联接",
                 "confidence": "high"}
 
-    # LOF 是产品结构，优先于「是否跟踪指数」
-    if "(LOF)" in name or "（LOF）" in name:
+    # LOF 是产品结构，优先于「是否跟踪指数」。
+    # 3B-6.0.4.1：简称常被截断，必须同时看全称，否则会漏识别。
+    full_name = g("fund_full_name")
+    lof = detect_lof(name, full_name)
+    if lof["recognized"]:
         subtype = "index" if is_idx == 1 else "active"
-        basis = ("名称含 (LOF) → 产品结构=LOF；"
+        src_label = {
+            "both": "简称与全称均含 LOF",
+            "short_name": "简称含 LOF",
+            "full_name": "**全称**含 LOF（简称被截断，本轮修正）",
+        }[lof["evidence"]]
+        basis = (f"{src_label} → 产品结构=LOF（证据字段 {lof['evidence_field']}）；"
                  + ("is_index_fund=1 → 底层策略=index" if subtype == "index"
                     else "is_index_fund!=1 → 底层策略=active"))
         return {"product_class": "lof", "investment_subtype": subtype,
-                "in_default_pool": True, "basis": basis, "confidence": "high"}
+                "in_default_pool": True, "basis": basis, "confidence": "high",
+                "lof_evidence": lof["evidence"],
+                "lof_evidence_field": lof["evidence_field"],
+                "lof_name_missing_full": full_name in (None, "")}
 
     if is_idx == 1:
         return {"product_class": "ordinary_index", "investment_subtype": "index",

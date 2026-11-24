@@ -513,7 +513,9 @@ class UserFundIngestor:
             return res
 
         # 产品分类（用与 3B-5.x 相同的规则，不按名称猜跟踪指数）
-        row = {"fund_name": name, "fund_type_l1": basic.get("type"),
+        row = {"fund_name": name,
+               "fund_full_name": basic.get("full_name"),
+               "fund_type_l1": basic.get("type"),
                "fund_type_l2": basic.get("type"), "is_index_fund":
                (1 if basic.get("type") and "指数" in str(basic.get("type"))
                 else None)}
@@ -821,8 +823,8 @@ class UserFundIngestor:
     def _existing_fund(self, code: str) -> dict | None:
         with get_connection(self.db_path) as conn:
             r = conn.execute(
-                """SELECT m.fund_id, m.fund_name, m.fund_type_l1,
-                          m.is_index_fund
+                """SELECT m.fund_id, m.fund_name, m.fund_full_name,
+                          m.fund_type_l1, m.is_index_fund
                    FROM fund_share_classes s
                    JOIN fund_master m ON m.fund_id=s.fund_id
                    WHERE s.share_class_code=?""", (code,)).fetchone()
@@ -834,6 +836,7 @@ class UserFundIngestor:
                    FROM fund_share_classes WHERE fund_id=?
                    ORDER BY share_class_code""", (fund_id,)).fetchall()
         cls = classify_fund({"fund_name": r["fund_name"],
+                             "fund_full_name": r["fund_full_name"],
                              "fund_type_l1": r["fund_type_l1"],
                              "is_index_fund": r["is_index_fund"]})
         return {

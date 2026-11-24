@@ -24,7 +24,9 @@ from app.fund.research.peer_comparison import (
     exclude_best_window, rolling_windows, series_span, window_return,
     WINDOW_1Y, WINDOW_3Y, WINDOW_5Y,
 )
-from app.fund.research.quality import LEVEL_A, LEVEL_B, LEVEL_C, LEVEL_D
+from app.fund.research.quality import (
+    LEVEL_A, LEVEL_B, LEVEL_C, LEVEL_D, grade_peer_comparison,
+)
 
 # 可验证组判定：基准族已知
 _VERIFIABLE_UNKNOWN_FAMILY = ("unknown", "", None)
@@ -59,6 +61,25 @@ def group_usability(peer_key: str, member_count: int) -> dict:
     return {"status": PEER_COMPARABLE, "reason": None, "verifiable": True}
 
 
+def group_quality_grade(peer_key: str, member_count: int,
+                        peer_ctx: dict | None = None) -> dict:
+    """组级质量等级。
+
+    **唯一权威来源**是 ``quality.grade_peer_comparison``，
+    本模块不再自建「状态→等级」映射表，避免报告口径不一致
+    （3B-6.0.4 曾因自建映射把 ``bond_pure|unknown`` 错标为 C）。
+    """
+    ctx = {"peer_key": peer_key, "member_count": member_count}
+    if peer_ctx:
+        ctx.update({
+            "grouping_source": peer_ctx.get("grouping_source"),
+            "benchmark_confidence": peer_ctx.get("benchmark_confidence"),
+            "verifiable_group": peer_ctx.get("verifiable_group"),
+            "index_scope": peer_ctx.get("index_scope"),
+        })
+    return grade_peer_comparison(ctx)
+
+
 def analyze_group(db_path: Path | None, peer_key: str,
                   fund_ids: list[int]) -> dict:
     """单个同类组的完整分析。"""
@@ -68,10 +89,20 @@ def analyze_group(db_path: Path | None, peer_key: str,
         by_fund.setdefault(e["fund_id"], e)
 
     usability = group_usability(peer_key, len(fund_ids))
+    first_entry = by_fund.get(fund_ids[0]) if fund_ids else None
+    peer_ctx = (first_entry or {}).get("peer_group") or {}
+    quality = group_quality_grade(peer_key, len(fund_ids), peer_ctx)
     result = {
         "peer_key": peer_key,
         "member_count": len(fund_ids),
         "usability": usability,
+        "quality_grade": {
+            "quality_level": quality.get("quality_level"),
+            "status": quality.get("status"),
+            "value": quality.get("value"),
+            "reason": quality.get("reason"),
+            "limitation": quality.get("limitation"),
+        },
         "funds": [],
         "common_window": None,
         "rolling": {},

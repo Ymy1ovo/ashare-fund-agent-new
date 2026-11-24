@@ -1,0 +1,251 @@
+{
+ "phase": "3B-6.0.4.1",
+ "step": "05_data_quality",
+ "baseline_head": "a31270683f1417813ad8ac650fc5ebd9be32b79f",
+ "generated_at": "2026-11-24T14:16:19",
+ "db_fingerprint": "115ac91eee7c26424952e6df23ddeeafe2435974fe5e81a8ba6bbcabfe387dd4",
+ "single_source_of_truth": "quality.grade_peer_comparison",
+ "grade_rule_modified": false,
+ "corrections": {
+  "bond_pure|unknown": {
+   "before": "C",
+   "after": "D",
+   "members": 12,
+   "reason": "基准族 unknown"
+  },
+  "bond_mixed|unknown": {
+   "before": "C",
+   "after": "D",
+   "members": 2,
+   "reason": "基准族 unknown"
+  },
+  "active_equity|unknown": {
+   "before": "C",
+   "after": "D"
+  },
+  "money_market": {
+   "before": "B",
+   "after": "B",
+   "reason": "产品类型特例"
+  }
+ },
+ "group_grades": {
+  "bond_pure|unknown": {
+   "member_count": 12,
+   "quality_level": "D",
+   "status": "no_verifiable_group"
+  },
+  "money_market": {
+   "member_count": 7,
+   "quality_level": "B",
+   "status": "usable"
+  },
+  "etf_linked|broad|沪深300": {
+   "member_count": 5,
+   "quality_level": "B",
+   "status": "usable"
+  },
+  "ordinary_index|broad|中证500": {
+   "member_count": 5,
+   "quality_level": "B",
+   "status": "usable"
+  },
+  "active_equity|unknown": {
+   "member_count": 4,
+   "quality_level": "D",
+   "status": "no_verifiable_group"
+  },
+  "ordinary_index|broad|沪深300": {
+   "member_count": 4,
+   "quality_level": "C",
+   "status": "small_sample"
+  },
+  "active_equity|中证800": {
+   "member_count": 3,
+   "quality_level": "C",
+   "status": "small_sample"
+  },
+  "etf_linked|broad|中证500": {
+   "member_count": 3,
+   "quality_level": "C",
+   "status": "small_sample"
+  },
+  "active_equity|沪深300": {
+   "member_count": 3,
+   "quality_level": "C",
+   "status": "small_sample"
+  },
+  "etf_linked|broad|上证50": {
+   "member_count": 3,
+   "quality_level": "C",
+   "status": "small_sample"
+  },
+  "etf_linked|broad|创业板指": {
+   "member_count": 3,
+   "quality_level": "C",
+   "status": "small_sample"
+  },
+  "lof|active|unknown": {
+   "member_count": 3,
+   "quality_level": "D",
+   "status": "no_verifiable_group"
+  },
+  "etf_linked|broad|中证A500": {
+   "member_count": 3,
+   "quality_level": "C",
+   "status": "small_sample"
+  },
+  "ordinary_index|broad|中证A500": {
+   "member_count": 3,
+   "quality_level": "C",
+   "status": "small_sample"
+  },
+  "bond_mixed|unknown": {
+   "member_count": 2,
+   "quality_level": "D",
+   "status": "no_verifiable_group"
+  },
+  "lof|active|中证800": {
+   "member_count": 2,
+   "quality_level": "C",
+   "status": "small_sample"
+  },
+  "active_equity|中证500": {
+   "member_count": 2,
+   "quality_level": "C",
+   "status": "small_sample"
+  },
+  "etf_linked|unknown|unknown": {
+   "member_count": 2,
+   "quality_level": "D",
+   "status": "no_verifiable_group"
+  },
+  "active_equity|中证A500": {
+   "member_count": 1,
+   "quality_level": "D",
+   "status": "insufficient_peer_sample"
+  },
+  "lof|active|中债综合": {
+   "member_count": 1,
+   "quality_level": "D",
+   "status": "insufficient_peer_sample"
+  },
+  "ordinary_index|broad|创业板指": {
+   "member_count": 1,
+   "quality_level": "D",
+   "status": "insufficient_peer_sample"
+  },
+  "lof|active|沪深300": {
+   "member_count": 1,
+   "quality_level": "D",
+   "status": "insufficient_peer_sample"
+  },
+  "ordinary_index|unknown|上证50": {
+   "member_count": 1,
+   "quality_level": "D",
+   "status": "insufficient_peer_sample"
+  },
+  "ordinary_index|broad|上证50": {
+   "member_count": 1,
+   "quality_level": "D",
+   "status": "insufficient_peer_sample"
+  },
+  "etf_linked|sector|中证全指半导体": {
+   "member_count": 1,
+   "quality_level": "D",
+   "status": "insufficient_peer_sample"
+  },
+  "etf_linked|broad|unknown": {
+   "member_count": 1,
+   "quality_level": "D",
+   "status": "no_verifiable_group"
+  },
+  "ordinary_index|unknown|unknown": {
+   "member_count": 1,
+   "quality_level": "D",
+   "status": "no_verifiable_group"
+  },
+  "lof|index|sector|中证白酒": {
+   "member_count": 1,
+   "quality_level": "D",
+   "status": "insufficient_peer_sample"
+  }
+ },
+ "grade_distribution": {
+  "D": 15,
+  "B": 3,
+  "C": 10
+ },
+ "quality_by_dimension": {
+  "nav_coverage": {
+   "value": "86/86",
+   "grade": "A"
+  },
+  "nav_continuity": {
+   "value": "3 funds >15d gap",
+   "grade": "B"
+  },
+  "nav_duplicates": {
+   "value": 0,
+   "grade": "A"
+  },
+  "acc_nav_availability": {
+   "value": "214383/214466",
+   "grade": "A"
+  },
+  "dividend": {
+   "value": "40/79",
+   "grade": "B"
+  },
+  "ac_merge": {
+   "value": "0 duplicates",
+   "grade": "A"
+  },
+  "index_return_basis": {
+   "value": "0/10",
+   "grade": "D"
+  },
+  "composite_benchmark": {
+   "value": "0/15",
+   "grade": "D"
+  },
+  "aum_time_attribute": {
+   "value": "0/683",
+   "grade": "D"
+  },
+  "manager_time_attribute": {
+   "value": "12/21",
+   "grade": "C"
+  },
+  "fee_effective_from": {
+   "value": "11/90",
+   "grade": "D"
+  },
+  "risk_free_rate": {
+   "available": false,
+   "grade": "D"
+  }
+ },
+ "count_is_not_comparability": {
+  "bond_pure|unknown": {
+   "members": 12,
+   "grade": "D"
+  },
+  "note": "3B-5.5.1 铁律：分组依据不可验证 → D，与样本量无关"
+ },
+ "fixed_this_round": [
+  "LOF 全称识别",
+  "bond_* 等级 C→D"
+ ],
+ "still_unfixed": [
+  "债券类型源不一致",
+  "41 清盘本体缺类型",
+  "000037 2498 天缺口",
+  "161725 全称缺 LOF 标记"
+ ],
+ "gate": {
+  "ready_for_research_analysis": true,
+  "ready_for_backtest": false,
+  "ready_for_formal_ranking": false
+ }
+}

@@ -1,5 +1,68 @@
 # 变更日志
 
+## 2026-11-24 — 阶段3B-6.0.4.1 LOF分类与同类质量评级窄修正
+
+修两个阻断问题。
+
+**问题1：LOF 只按简称识别，5 只漏识别**
+
+| 代码 | 简称 | 修正前 | 修正后 |
+| --- | --- | --- | --- |
+| `001883` | 中欧新动力混合 | active_equity | **lof** |
+| `001886` | 中欧成长 | active_equity | **lof** |
+| `001888` | 中欧盛世成长 | active_equity | **lof** |
+| `001889` | 中欧增强回报债券 | bond_pure | **lof** |
+| `002592` | 中欧纯债 | bond_pure | **lof** |
+
+**关键发现**：只改 `classify_fund()` 是无效的——`load_universe()` 的 SELECT
+根本没有取 `fund_full_name`，全称传不到分类器。必须连同数据通路一起修。
+
+修正文件：`classification.py`（新增 `detect_lof()`）、`data_access.py`、
+`lookup.py`、`ingest_user_funds/_impl.py`。
+
+分类变化：LOF 3→**8**，active_equity 16→**13**，bond_pure 14→**12**，
+合计仍 **79**。
+
+**问题2：`bond_pure|unknown` 错标 C**
+
+根因：3B-6.0.4 报告生成时自建映射表
+`{comparable:B, descriptive_only:C, excluded:D}`，绕过了
+`quality.grade_peer_comparison()`。而 `bond_pure|unknown` 的状态是
+`descriptive_only`，被无差别映射成 C——**完全忽略了「基准族 unknown → D」**。
+
+修正：新增 `peer_engine.group_quality_grade()`，只做参数组装，判定完全委托
+权威函数。**`quality.py` 一行未改**。
+
+| 组键 | 修正前 | 修正后 |
+| --- | --- | --- |
+| `bond_pure|unknown`（12 本体） | C | **D** |
+| `bond_mixed|unknown` | C | **D** |
+| `active_equity|unknown` | C | **D** |
+| `money_market`（7） | B | **B**（产品类型特例保持） |
+
+**重新分组结果（真实计算，非预设）**：
+
+| 项 | 3B-6.0.4 | 本版 |
+| --- | ---: | ---: |
+| 同类组 | 26 | **28** |
+| 可比较 | 4 | **3** |
+| 仅描述性 | 12 | **15** |
+| 排除 | 10 | **10** |
+| D 级组 | 2 | **15** |
+
+三个可比较组：`money_market`（7）、`etf_linked|broad|沪深300`（5）、
+`ordinary_index|broad|中证500`（5）。
+
+**`active_equity|中证800` 降级**：5 → **3 本体**，`comparable` → **`descriptive_only`**，
+B → **C**。**没有为了保住样本量合并任何基金。**
+
+**未变**：超额收益仍 `not_available`；数据指纹 `115ac91e…387dd4` 未变；
+门禁三值不变；`quality.py` 评分规则未改；正式数据库零写入。
+
+**测试**：新增 38 项，全量 **1902 passed / 0 failed / 797.75 秒**
+（1864 → 1902）。既有测试零删除、零跳过、零弱化。
+
+
 ## 2026-11-24 — 阶段3B-6.0.4 同类比较与超额收益验证
 
 建设场外基金同类比较能力。**结论先行：超额收益全线阻断。**

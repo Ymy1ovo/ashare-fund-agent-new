@@ -1,0 +1,211 @@
+{
+ "phase": "3B-6.0.4.1",
+ "step": "01_lof_fix",
+ "baseline_head": "a31270683f1417813ad8ac650fc5ebd9be32b79f",
+ "previous_phase_head": "f64b7e554d7303c523bb6ba9ee84550b2e0a7a9d",
+ "generated_at": "2026-11-24T14:15:14",
+ "db_fingerprint": "115ac91eee7c26424952e6df23ddeeafe2435974fe5e81a8ba6bbcabfe387dd4",
+ "db_modified": false,
+ "full_name_field": {
+  "column": "fund_full_name",
+  "sources": {
+   "akshare.fund_individual_basic_info_xq": 78,
+   "dfcfw.announcement.calibrated": 41
+  },
+  "coverage": "119/120",
+  "missing": [
+   "000198"
+  ],
+  "reliable": true
+ },
+ "fix": {
+  "new_function": "detect_lof",
+  "tokens": [
+   "(LOF)",
+   "（LOF）",
+   "LOF)"
+  ],
+  "data_path_changed": [
+   "data_access.load_universe SELECT +fund_full_name",
+   "lookup._SELECT +fund_full_name",
+   "ingest_user_funds._existing_fund SELECT +fund_full_name",
+   "ingest_user_funds classify_fund call +full_name"
+  ]
+ },
+ "five_funds": {
+  "001883": {
+   "name": "中欧新动力混合",
+   "full_name": "中欧新动力混合型证券投资基金(LOF)",
+   "before": "active_equity",
+   "after": "lof",
+   "evidence": "full_name",
+   "evidence_field": "fund_full_name"
+  },
+  "001886": {
+   "name": "中欧成长",
+   "full_name": "中欧行业成长混合型证券投资基金(LOF)",
+   "before": "active_equity",
+   "after": "lof",
+   "evidence": "full_name",
+   "evidence_field": "fund_full_name"
+  },
+  "001888": {
+   "name": "中欧盛世成长",
+   "full_name": "中欧盛世成长混合型证券投资基金(LOF)",
+   "before": "active_equity",
+   "after": "lof",
+   "evidence": "full_name",
+   "evidence_field": "fund_full_name"
+  },
+  "001889": {
+   "name": "中欧增强回报债券",
+   "full_name": "中欧增强回报债券型证券投资基金(LOF)",
+   "before": "bond_pure",
+   "after": "lof",
+   "evidence": "full_name",
+   "evidence_field": "fund_full_name"
+  },
+  "002592": {
+   "name": "中欧纯债",
+   "full_name": "中欧纯债债券型证券投资基金(LOF)",
+   "before": "bond_pure",
+   "after": "lof",
+   "evidence": "full_name",
+   "evidence_field": "fund_full_name"
+  }
+ },
+ "consistency_audit": {
+  "both": 2,
+  "short_only": 1,
+  "full_only": 5,
+  "neither": 71,
+  "other_mismatch": 0
+ },
+ "class_distribution": {
+  "before": {
+   "ordinary_index": 16,
+   "etf_linked": 21,
+   "active_equity": 16,
+   "bond_pure": 14,
+   "bond_mixed": 2,
+   "money_market": 7,
+   "lof": 3
+  },
+  "after": {
+   "active_equity": 13,
+   "bond_mixed": 2,
+   "bond_pure": 12,
+   "etf_linked": 21,
+   "money_market": 7,
+   "ordinary_index": 16,
+   "lof": 8
+  }
+ },
+ "lof_members": [
+  {
+   "code": "161725",
+   "name": "招商中证白酒指数(LOF)",
+   "subtype": "index",
+   "peer_key": "lof|index|sector|中证白酒",
+   "evidence": "short_name"
+  },
+  {
+   "code": "161005",
+   "name": "富国天惠成长混合(LOF)",
+   "subtype": "active",
+   "peer_key": "lof|active|unknown",
+   "evidence": "both"
+  },
+  {
+   "code": "000673",
+   "name": "融通四季添利债(LOF)",
+   "subtype": "active",
+   "peer_key": "lof|active|中债综合",
+   "evidence": "both"
+  },
+  {
+   "code": "001883",
+   "name": "中欧新动力混合",
+   "subtype": "active",
+   "peer_key": "lof|active|中证800",
+   "evidence": "full_name"
+  },
+  {
+   "code": "001886",
+   "name": "中欧成长",
+   "subtype": "active",
+   "peer_key": "lof|active|中证800",
+   "evidence": "full_name"
+  },
+  {
+   "code": "001888",
+   "name": "中欧盛世成长",
+   "subtype": "active",
+   "peer_key": "lof|active|沪深300",
+   "evidence": "full_name"
+  },
+  {
+   "code": "001889",
+   "name": "中欧增强回报债券",
+   "subtype": "active",
+   "peer_key": "lof|active|unknown",
+   "evidence": "full_name"
+  },
+  {
+   "code": "002592",
+   "name": "中欧纯债",
+   "subtype": "active",
+   "peer_key": "lof|active|unknown",
+   "evidence": "full_name"
+  }
+ ],
+ "pending_verification": [
+  {
+   "code": "161725",
+   "note": "简称含 LOF、全称不含；按简称识别，该基金确为 LOF（深交所上市），全称缺标记属数据源写法差异"
+  },
+  {
+   "code": "000198",
+   "note": "无全称；货币基金，不涉及 LOF 判定"
+  }
+ ],
+ "group_impact": {
+  "before": {
+   "groups": 26,
+   "comparable": 4,
+   "descriptive_only": 12,
+   "excluded": 10
+  },
+  "after": {
+   "groups": 28,
+   "comparable": 3,
+   "descriptive_only": 15,
+   "excluded": 10
+  }
+ },
+ "active_equity_800": {
+  "before_members": 5,
+  "before_status": "comparable",
+  "before_grade": "B",
+  "after_members": 3,
+  "after_status": "descriptive_only",
+  "after_grade": "C"
+ },
+ "boundaries": {
+  "schema_modified": false,
+  "db_modified": false,
+  "recollected": false,
+  "index_layer_modified": false,
+  "excess_rule_modified": false,
+  "indicator_formula_modified": false,
+  "backtest_modified": false,
+  "formal_ranking": false,
+  "buy_advice": false,
+  "tests_weakened": false
+ },
+ "gate": {
+  "ready_for_research_analysis": true,
+  "ready_for_backtest": false,
+  "ready_for_formal_ranking": false
+ }
+}

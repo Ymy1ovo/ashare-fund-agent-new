@@ -1,0 +1,219 @@
+{
+ "phase": "3B-6.0.4.1",
+ "step": "03_peer_comparison",
+ "baseline_head": "a31270683f1417813ad8ac650fc5ebd9be32b79f",
+ "generated_at": "2026-11-24T14:15:46",
+ "db_fingerprint": "115ac91eee7c26424952e6df23ddeeafe2435974fe5e81a8ba6bbcabfe387dd4",
+ "actually_executed": true,
+ "elapsed_sec": 159,
+ "before": {
+  "groups": 26,
+  "comparable": 4,
+  "descriptive_only": 12,
+  "excluded": 10
+ },
+ "after": {
+  "comparable": 3,
+  "descriptive_only": 15,
+  "excluded": 10
+ },
+ "group_count": 28,
+ "comparable_groups": [
+  {
+   "peer_key": "money_market",
+   "member_count": 7,
+   "quality_level": "B",
+   "common_window": {
+    "date_min": null,
+    "date_max": null
+   },
+   "group_dispersion": null
+  },
+  {
+   "peer_key": "etf_linked|broad|沪深300",
+   "member_count": 5,
+   "quality_level": "B",
+   "common_window": {
+    "date_min": "2016-07-06",
+    "date_max": "2026-11-18"
+   },
+   "group_dispersion": {
+    "count": 5,
+    "min": 0.33509676,
+    "max": 0.5661486,
+    "spread": 0.23105184,
+    "median": 0.5129666,
+    "note": "仅为区间收益离散度，不是超额收益"
+   }
+  },
+  {
+   "peer_key": "ordinary_index|broad|中证500",
+   "member_count": 5,
+   "quality_level": "B",
+   "common_window": {
+    "date_min": "2015-06-30",
+    "date_max": "2026-11-18"
+   },
+   "group_dispersion": {
+    "count": 5,
+    "min": -0.15055267,
+    "max": 0.58538283,
+    "spread": 0.7359355,
+    "median": 0.17769674,
+    "note": "仅为区间收益离散度，不是超额收益"
+   }
+  }
+ ],
+ "downgraded": {
+  "peer_key": "active_equity|中证800",
+  "before_members": 5,
+  "after_members": 3,
+  "before_status": "comparable",
+  "after_status": "descriptive_only",
+  "before_grade": "B",
+  "after_grade": "C"
+ },
+ "descriptive_only_groups": [
+  {
+   "peer_key": "bond_pure|unknown",
+   "member_count": 12,
+   "quality_level": "D",
+   "reason": "组内基准族不可验证（unknown），只能做描述性观察，不能声称同类可比"
+  },
+  {
+   "peer_key": "active_equity|unknown",
+   "member_count": 4,
+   "quality_level": "D",
+   "reason": "组内基准族不可验证（unknown），只能做描述性观察，不能声称同类可比"
+  },
+  {
+   "peer_key": "ordinary_index|broad|沪深300",
+   "member_count": 4,
+   "quality_level": "C",
+   "reason": "组内 4 个本体，样本偏小（<5）"
+  },
+  {
+   "peer_key": "active_equity|中证800",
+   "member_count": 3,
+   "quality_level": "C",
+   "reason": "组内 3 个本体，样本偏小（<5）"
+  },
+  {
+   "peer_key": "etf_linked|broad|中证500",
+   "member_count": 3,
+   "quality_level": "C",
+   "reason": "组内 3 个本体，样本偏小（<5）"
+  },
+  {
+   "peer_key": "active_equity|沪深300",
+   "member_count": 3,
+   "quality_level": "C",
+   "reason": "组内 3 个本体，样本偏小（<5）"
+  },
+  {
+   "peer_key": "etf_linked|broad|上证50",
+   "member_count": 3,
+   "quality_level": "C",
+   "reason": "组内 3 个本体，样本偏小（<5）"
+  },
+  {
+   "peer_key": "etf_linked|broad|创业板指",
+   "member_count": 3,
+   "quality_level": "C",
+   "reason": "组内 3 个本体，样本偏小（<5）"
+  },
+  {
+   "peer_key": "lof|active|unknown",
+   "member_count": 3,
+   "quality_level": "D",
+   "reason": "组内基准族不可验证（unknown），只能做描述性观察，不能声称同类可比"
+  },
+  {
+   "peer_key": "etf_linked|broad|中证A500",
+   "member_count": 3,
+   "quality_level": "C",
+   "reason": "组内 3 个本体，样本偏小（<5）"
+  },
+  {
+   "peer_key": "ordinary_index|broad|中证A500",
+   "member_count": 3,
+   "quality_level": "C",
+   "reason": "组内 3 个本体，样本偏小（<5）"
+  },
+  {
+   "peer_key": "bond_mixed|unknown",
+   "member_count": 2,
+   "quality_level": "D",
+   "reason": "组内基准族不可验证（unknown），只能做描述性观察，不能声称同类可比"
+  },
+  {
+   "peer_key": "lof|active|中证800",
+   "member_count": 2,
+   "quality_level": "C",
+   "reason": "组内 2 个本体，样本偏小（<5）"
+  },
+  {
+   "peer_key": "active_equity|中证500",
+   "member_count": 2,
+   "quality_level": "C",
+   "reason": "组内 2 个本体，样本偏小（<5）"
+  },
+  {
+   "peer_key": "etf_linked|unknown|unknown",
+   "member_count": 2,
+   "quality_level": "D",
+   "reason": "组内基准族不可验证（unknown），只能做描述性观察，不能声称同类可比"
+  }
+ ],
+ "excluded_groups": [
+  {
+   "peer_key": "active_equity|中证A500",
+   "member_count": 1
+  },
+  {
+   "peer_key": "lof|active|中债综合",
+   "member_count": 1
+  },
+  {
+   "peer_key": "ordinary_index|broad|创业板指",
+   "member_count": 1
+  },
+  {
+   "peer_key": "lof|active|沪深300",
+   "member_count": 1
+  },
+  {
+   "peer_key": "ordinary_index|unknown|上证50",
+   "member_count": 1
+  },
+  {
+   "peer_key": "ordinary_index|broad|上证50",
+   "member_count": 1
+  },
+  {
+   "peer_key": "etf_linked|sector|中证全指半导体",
+   "member_count": 1
+  },
+  {
+   "peer_key": "etf_linked|broad|unknown",
+   "member_count": 1
+  },
+  {
+   "peer_key": "ordinary_index|unknown|unknown",
+   "member_count": 1
+  },
+  {
+   "peer_key": "lof|index|sector|中证白酒",
+   "member_count": 1
+  }
+ ],
+ "excess_return_status": "not_available",
+ "no_ranking": true,
+ "no_advice": true,
+ "no_merge_to_pad": true,
+ "gate": {
+  "ready_for_research_analysis": true,
+  "ready_for_backtest": false,
+  "ready_for_formal_ranking": false
+ }
+}

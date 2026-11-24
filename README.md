@@ -2461,7 +2461,8 @@ if (basis != ACCOUNTING_FORMAL
 | 3B-6.0.2.2 | 复合基准有效行情判定 | 1782 | `phase3B6_0_2_test_report.md` |
 | 3B-6.0.2.3 | 有效行情有限正数校验 | 1814 | `phase3B6_0_2_test_report.md` |
 | 3B-6.0.3 | 研究池扩容 | 1814 | `phase3B6_0_3_universe_expansion.md` |
-| 3B-6.0.4 | 同类比较与超额收益边界 | **1864** | `phase3B6_0_4_05_peer_comparison.md` |
+| 3B-6.0.4 | 同类比较与超额收益边界 | 1864 | `phase3B6_0_4_05_peer_comparison.md` |
+| 3B-6.0.4.1 | LOF分类与等级修正 | **1902** | `phase3B6_0_4_1_01_lof_fix.md` |
 
 当前正式会计版本：`ca-v2-receivable`；正式会计基础：`formal_receivable`；正式估值标记：`formal_valuation=True`。
 
@@ -6338,4 +6339,100 @@ return math.isfinite(c) and c > 0
 | 稳定性 | `reports/phase3B6_0_4_07_stability.md` |
 | 测试 | `reports/phase3B6_0_4_08_tests.md` |
 | 数据质量 | `reports/phase3B6_0_4_09_data_quality.md` |
+
+## 73. 阶段3B-6.0.4.1 LOF 分类与同类质量评级窄修正
+
+### 73.1 修正的两个阻断问题
+
+| # | 问题 | 修正 |
+| ---: | --- | --- |
+| 1 | LOF 只按简称识别，5 只漏识别 | 综合 `fund_full_name` 判定 |
+| 2 | `bond_pure\|unknown` 错标 C | 改 D，接权威评级函数 |
+
+### 73.2 问题1：LOF 分类
+
+库内 **5 只**基金简称被截断，全称才含 LOF：
+
+| 代码 | 简称 | 修正前 | 修正后 |
+| --- | --- | --- | --- |
+| `001883` | 中欧新动力混合 | active_equity | **lof** |
+| `001886` | 中欧成长 | active_equity | **lof** |
+| `001888` | 中欧盛世成长 | active_equity | **lof** |
+| `001889` | 中欧增强回报债券 | bond_pure | **lof** |
+| `002592` | 中欧纯债 | bond_pure | **lof** |
+
+**关键发现**：只改 `classify_fund()` 无效——`load_universe()` 的 SELECT
+根本没取 `fund_full_name`，全称传不到分类器。数据通路一并修正。
+
+| 文件 | 修正 |
+| --- | --- |
+| `classification.py` | 新增 `detect_lof()`，简称/全称任一含 LOF 即识别 |
+| `data_access.py` | `load_universe()` SELECT +`fund_full_name` |
+| `lookup.py` | `_SELECT` +`fund_full_name` |
+| `ingest_user_funds/_impl.py` | 幂等查询与分类调用带全称 |
+
+### 73.3 分类变化
+
+| 产品类型 | 修正前 | 修正后 |
+| --- | ---: | ---: |
+| LOF | 3 | **8** |
+| active_equity | 16 | **13** |
+| bond_pure | 14 | **12** |
+| 其余不变 | — | — |
+| **合计** | **79** | **79** |
+
+### 73.4 问题2：质量评级
+
+**根因**：3B-6.0.4 报告生成时自建映射表 `{comparable:B, descriptive_only:C, excluded:D}`，
+绕过了 `quality.grade_peer_comparison()`。`bond_pure|unknown` 状态是
+`descriptive_only`，被无差别映射成 C。
+
+**修正**：新增 `peer_engine.group_quality_grade()`，只做参数组装，
+判定**完全委托**权威函数。`quality.py` 一行未改。
+
+| 组键 | 修正前 | 修正后 |
+| --- | --- | --- |
+| `bond_pure\|unknown`（12 本体） | C | **D** |
+| `bond_mixed\|unknown` | C | **D** |
+| `active_equity\|unknown` | C | **D** |
+| `money_market`（7） | B | **B**（特例保持） |
+
+### 73.5 重新分组结果（真实计算）
+
+| 项 | 3B-6.0.4 | 本版 |
+| --- | ---: | ---: |
+| 同类组 | 26 | **28** |
+| **可比较** | 4 | **3** |
+| 仅描述性 | 12 | **15** |
+| 排除 | 10 | **10** |
+| B 级 | 4 | **3** |
+| C 级 | 20 | **10** |
+| D 级 | 2 | **15** |
+
+**三个可比较组**：`money_market`（7）、`etf_linked|broad|沪深300`（5）、
+`ordinary_index|broad|中证500`（5）。
+
+### 73.6 `active_equity|中证800` 降级
+
+| 项 | 3B-6.0.4 | 本版 |
+| --- | ---: | ---: |
+| 本体数 | 5 | **3** |
+| 状态 | `comparable` | **`descriptive_only`** |
+| 等级 | B | **C** |
+
+**没有为了保住 5 个样本而合并其他基金。**
+
+### 73.7 未变项
+
+| 项 | 状态 |
+| --- | --- |
+| 超额收益 | 仍 `not_available` |
+| 数据质量规则 | `quality.py` 未改 |
+| 数据指纹 | `115ac91e…387dd4` **未变** |
+| 门禁 | 三值不变 |
+
+### 73.8 测试
+
+新增 **38 项**（`tests/test_3b6_0_4_1_lof_and_grade.py`）。
+全量 **1902 passed**（1864 → 1902），既有测试零删除零弱化。
 

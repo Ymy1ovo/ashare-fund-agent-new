@@ -68,7 +68,8 @@ def _row_to_entry(r: dict) -> dict:
 
 
 _SELECT = """
-    SELECT m.fund_id, m.fund_code_primary, m.fund_name, m.fund_company,
+    SELECT m.fund_id, m.fund_code_primary, m.fund_name,
+           m.fund_full_name, m.fund_company,
            m.fund_type_l1, m.fund_type_l2, m.is_index_fund,
            m.tracking_index, m.benchmark, m.established_date,
            m.lifecycle_status,
