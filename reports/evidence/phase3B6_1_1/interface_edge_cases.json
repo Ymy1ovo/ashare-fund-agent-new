@@ -1,0 +1,22 @@
+{
+ "bad_format": {
+  "status": "error",
+  "error": "ValueError: No tables found"
+ },
+ "future": {
+  "status": "ok",
+  "rows": 0
+ },
+ "inverted": {
+  "status": "ok",
+  "rows": 0
+ },
+ "too_wide": {
+  "status": "ok",
+  "rows": 0
+ },
+ "single_day": {
+  "status": "ok",
+  "rows": 3
+ }
+}

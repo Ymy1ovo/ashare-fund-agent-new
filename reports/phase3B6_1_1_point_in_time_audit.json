@@ -1,0 +1,78 @@
+{
+ "phase": "3B-6.1.1",
+ "task": "point_in_time_availability",
+ "generated_at": "2026-11-24T20:13:59",
+ "three_dates_defined": {
+  "observation_date": "收益率对应的观察日期（接口『日期』字段）",
+  "publication_date": "数据实际公开日期",
+  "available_date": "研究系统允许使用该数据的最早日期",
+  "warning": "**没有可靠证据时，不得把三者默认视为相同**"
+ },
+ "evidence_about_publication": {
+  "official_publication_time_obtained": false,
+  "searched_and_not_found": [
+   "AKShare 接口文档未声明发布时间",
+   "返回字段中无『发布日期』『版本号』『更新时间』列",
+   "未下载中债登官方《收益率曲线编制说明》或发布时刻公告"
+  ],
+  "observed_fact": "接口在返回『2026-11-24』当日数据时，该日数据已可取得——但不能据此推断当日何时可取得",
+  "field_semantics": "接口『日期』字段语义未获官方说明，默认理解为观察日期"
+ },
+ "revision_risk": {
+  "historical_revision_confirmed": false,
+  "historical_revision_ruled_out": false,
+  "evidence": "本轮对同一区间的两次独立调用返回**完全一致**（sha256 相同，跨区间同日重叠 61 天数值差异 0）；但这只能说明**短周期内未观察到修订**，不能排除更长时间跨度的历史修订",
+  "version_or_revision_date_available": false,
+  "conclusion": "**修订风险未解决，不得标记为已验证**"
+ },
+ "same_day_availability": {
+  "proven_same_day_before_close": false,
+  "proven_same_day_after_close": false,
+  "status": "UNKNOWN",
+  "reason": "无官方发布时刻证据；中债估值通常在交易日收盘后发布，但本轮**未取得可引用的官方时刻说明**"
+ },
+ "conservative_lag_recommendations": [
+  {
+   "option": "T+1",
+   "description": "观察日 T 的数据，T+1 才允许使用",
+   "rationale": "覆盖当日盘后发布、次日系统加载的最坏情况",
+   "risk": "损失 1 个交易日样本"
+  },
+  {
+   "option": "T+2",
+   "description": "保守到 T+2",
+   "rationale": "进一步覆盖数据延迟与修订窗口",
+   "risk": "损失 2 个交易日"
+  },
+  {
+   "option": "T+5（最保守）",
+   "description": "一周后才使用",
+   "rationale": "覆盖潜在的历史小幅修订",
+   "risk": "样本损失较大"
+  }
+ ],
+ "recommended_default": {
+  "value": "T+1",
+  "status": "**建议**，未设为正式口径",
+  "why": "在无官方发布时刻证据时，T+1 是能覆盖『当日盘后发布』这一最常见情形的保守选择；若后续取得官方时刻证据可调整"
+ },
+ "forward_look_bias_warning": "**在取得发布时刻与修订记录证据前，任何「观察日即可用日」的假设都属于前视偏差风险，不得为了扩大历史样本而默认成立**",
+ "cannot_do_this_round": [
+  "无法证明当日收盘前可用",
+  "无法证明当日收盘后可用",
+  "无法证明历史数据未经修订",
+  "无法取得历史版本号或修订时间"
+ ],
+ "sample_call_evidence": [
+  {
+   "file": "raw\\bond_gov_20260101_20260630.csv",
+   "last_date": "2026-06-30",
+   "n": 120
+  },
+  {
+   "file": "raw\\bond_gov_20260701_20261231.csv",
+   "last_date": "2026-11-24",
+   "n": 101
+  }
+ ]
+}

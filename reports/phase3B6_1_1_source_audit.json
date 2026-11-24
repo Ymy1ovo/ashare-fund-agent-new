@@ -1,0 +1,331 @@
+{
+ "phase": "3B-6.1.1",
+ "generated_at": "2026-11-24T20:11:53",
+ "source": "akshare.bond_china_yield",
+ "provider": "中债金融估值中心（中债登）",
+ "curve": "中债国债收益率曲线",
+ "interface_constraints": {
+  "date_format": "YYYYMMDD（YYYY-MM-DD 会 No tables found）",
+  "max_span_per_request": "约 1 年（跨 2 年返回 0 行）",
+  "tenors_actual": [
+   "3月",
+   "6月",
+   "1年",
+   "3年",
+   "5年",
+   "7年",
+   "10年",
+   "30年"
+  ],
+  "tenors_requested": [
+   "3月",
+   "6月",
+   "1年",
+   "2年",
+   "3年",
+   "5年",
+   "7年",
+   "10年",
+   "30年"
+  ],
+  "tenors_missing": [
+   "2年"
+  ],
+  "history_start_observed": "2006-03-01",
+  "years_probed_empty": [
+   2002,
+   2003,
+   2004,
+   2005
+  ]
+ },
+ "empty_probe_2002_2005": [
+  {
+   "year": 2002,
+   "status": "empty",
+   "rows": 0,
+   "error": null
+  },
+  {
+   "year": 2003,
+   "status": "empty",
+   "rows": 0,
+   "error": null
+  },
+  {
+   "year": 2004,
+   "status": "empty",
+   "rows": 0,
+   "error": null
+  },
+  {
+   "year": 2005,
+   "status": "empty",
+   "rows": 0,
+   "error": null
+  }
+ ],
+ "segments_ok": 42,
+ "segments_total": 42,
+ "rows_parsed_total": 41480,
+ "rows_after_dedup": 41480,
+ "distinct_dates": 5185,
+ "date_min": "2006-03-01",
+ "date_max": "2026-11-24",
+ "tenors_actual": [
+  "3月",
+  "6月",
+  "1年",
+  "3年",
+  "5年",
+  "7年",
+  "10年",
+  "30年"
+ ],
+ "tenors_requested_by_task": [
+  "3月",
+  "6月",
+  "1年",
+  "2年",
+  "3年",
+  "5年",
+  "7年",
+  "10年"
+ ],
+ "tenors_missing": [
+  "2年"
+ ],
+ "tenors_missing_note": "该接口返回的列中**不存在 2 年期**。任务要求的 2 年期无法从本数据源取得，如实记录，不以 3 年期替代。",
+ "evidence_grade": {
+  "level": "L3_third_party_aggregated",
+  "why": "经 AKShare 聚合获取，底层提供方为中债登；**未取得中债登官方原始发布文件**，不得称为「官方原始数据已独立核验」"
+ },
+ "raw_files": [
+  {
+   "file": "bond_gov_20060101_20060630.csv",
+   "bytes": 7073,
+   "sha256_16": "92d9c0a4f22a3dc8"
+  },
+  {
+   "file": "bond_gov_20060701_20061231.csv",
+   "bytes": 11453,
+   "sha256_16": "4c3abf32a92c2460"
+  },
+  {
+   "file": "bond_gov_20070101_20070630.csv",
+   "bytes": 10670,
+   "sha256_16": "71136bab7b8dea5e"
+  },
+  {
+   "file": "bond_gov_20070701_20071231.csv",
+   "bytes": 11413,
+   "sha256_16": "32eadc33759c18f0"
+  },
+  {
+   "file": "bond_gov_20080101_20080630.csv",
+   "bytes": 11270,
+   "sha256_16": "92d759b74847fce2"
+  },
+  {
+   "file": "bond_gov_20080701_20081231.csv",
+   "bytes": 11961,
+   "sha256_16": "bc6d3c590feae2d4"
+  },
+  {
+   "file": "bond_gov_20090101_20090630.csv",
+   "bytes": 11581,
+   "sha256_16": "5c48c6cd4a11d9b1"
+  },
+  {
+   "file": "bond_gov_20090701_20091231.csv",
+   "bytes": 12165,
+   "sha256_16": "cc58689059548bf8"
+  },
+  {
+   "file": "bond_gov_20100101_20100630.csv",
+   "bytes": 11597,
+   "sha256_16": "3137263340668e1a"
+  },
+  {
+   "file": "bond_gov_20100701_20101231.csv",
+   "bytes": 12151,
+   "sha256_16": "36ab0257308dcfef"
+  },
+  {
+   "file": "bond_gov_20110101_20110630.csv",
+   "bytes": 11594,
+   "sha256_16": "0357691e415ea627"
+  },
+  {
+   "file": "bond_gov_20110701_20111231.csv",
+   "bytes": 12197,
+   "sha256_16": "2b94c5e20536a880"
+  },
+  {
+   "file": "bond_gov_20120101_20120630.csv",
+   "bytes": 11650,
+   "sha256_16": "8136b183539bc0c2"
+  },
+  {
+   "file": "bond_gov_20120701_20121231.csv",
+   "bytes": 12130,
+   "sha256_16": "a85640948ce208a4"
+  },
+  {
+   "file": "bond_gov_20130101_20130630.csv",
+   "bytes": 11671,
+   "sha256_16": "8a278b90f419f226"
+  },
+  {
+   "file": "bond_gov_20130701_20131231.csv",
+   "bytes": 12241,
+   "sha256_16": "a372bb4d3d42b161"
+  },
+  {
+   "file": "bond_gov_20140101_20140630.csv",
+   "bytes": 11680,
+   "sha256_16": "2cca8906337f9703"
+  },
+  {
+   "file": "bond_gov_20140701_20141231.csv",
+   "bytes": 12229,
+   "sha256_16": "31fc68e307e01e8f"
+  },
+  {
+   "file": "bond_gov_20150101_20150630.csv",
+   "bytes": 11662,
+   "sha256_16": "85922b3643a7c4c6"
+  },
+  {
+   "file": "bond_gov_20150701_20151231.csv",
+   "bytes": 12143,
+   "sha256_16": "e213fc2c322e7b30"
+  },
+  {
+   "file": "bond_gov_20160101_20160630.csv",
+   "bytes": 11739,
+   "sha256_16": "e2f456c4af16341a"
+  },
+  {
+   "file": "bond_gov_20160701_20161231.csv",
+   "bytes": 12219,
+   "sha256_16": "809be05ceb9766a0"
+  },
+  {
+   "file": "bond_gov_20170101_20170630.csv",
+   "bytes": 11765,
+   "sha256_16": "09dba098e1205ade"
+  },
+  {
+   "file": "bond_gov_20170701_20171231.csv",
+   "bytes": 12207,
+   "sha256_16": "454e78c7c9892ed9"
+  },
+  {
+   "file": "bond_gov_20180101_20180630.csv",
+   "bytes": 11725,
+   "sha256_16": "966300caa06a75d4"
+  },
+  {
+   "file": "bond_gov_20180701_20181231.csv",
+   "bytes": 12244,
+   "sha256_16": "782298e1673214ae"
+  },
+  {
+   "file": "bond_gov_20190101_20190630.csv",
+   "bytes": 11611,
+   "sha256_16": "a0c4ae6263ec1600"
+  },
+  {
+   "file": "bond_gov_20190701_20191231.csv",
+   "bytes": 12231,
+   "sha256_16": "a33bbb71a94f6c04"
+  },
+  {
+   "file": "bond_gov_20200101_20200630.csv",
+   "bytes": 11510,
+   "sha256_16": "53d01f976a5ddc11"
+  },
+  {
+   "file": "bond_gov_20200701_20201231.csv",
+   "bytes": 12192,
+   "sha256_16": "e8b4102bd051bfb7"
+  },
+  {
+   "file": "bond_gov_20210101_20210630.csv",
+   "bytes": 11613,
+   "sha256_16": "7b6787c9fb66a830"
+  },
+  {
+   "file": "bond_gov_20210701_20211231.csv",
+   "bytes": 12182,
+   "sha256_16": "cebe0f1d97012565"
+  },
+  {
+   "file": "bond_gov_20220101_20220630.csv",
+   "bytes": 11597,
+   "sha256_16": "9be3aca6127ebbf6"
+  },
+  {
+   "file": "bond_gov_20220701_20221231.csv",
+   "bytes": 12187,
+   "sha256_16": "b90a98b61b226b06"
+  },
+  {
+   "file": "bond_gov_20230101_20230630.csv",
+   "bytes": 11714,
+   "sha256_16": "51c8eab129d41829"
+  },
+  {
+   "file": "bond_gov_20230701_20231231.csv",
+   "bytes": 12107,
+   "sha256_16": "2552eb45179c4b08"
+  },
+  {
+   "file": "bond_gov_20240101_20240630.csv",
+   "bytes": 11717,
+   "sha256_16": "c1d6eb7fb57252ae"
+  },
+  {
+   "file": "bond_gov_20240701_20241231.csv",
+   "bytes": 12114,
+   "sha256_16": "c8c27aa6bad0c3b6"
+  },
+  {
+   "file": "bond_gov_20250101_20250630.csv",
+   "bytes": 11348,
+   "sha256_16": "24024d6458858971"
+  },
+  {
+   "file": "bond_gov_20250701_20251231.csv",
+   "bytes": 12169,
+   "sha256_16": "7c65205b3774e71e"
+  },
+  {
+   "file": "bond_gov_20260101_20260630.csv",
+   "bytes": 11397,
+   "sha256_16": "e50f33ef2c3eebe9"
+  },
+  {
+   "file": "bond_gov_20260701_20261231.csv",
+   "bytes": 9606,
+   "sha256_16": "3711e605424d28e4"
+  }
+ ],
+ "shared_date_index": {
+  "all_identical": true,
+  "union_dates": 5185,
+  "intersection_dates": 5185,
+  "per_tenor_date_counts": {
+   "3月": 5185,
+   "6月": 5185,
+   "1年": 5185,
+   "3年": 5185,
+   "5年": 5185,
+   "7年": 5185,
+   "10年": 5185,
+   "30年": 5185
+  },
+  "note": "各期限日期索引是否完全一致；不一致说明某些期限有独立缺失"
+ }
+}

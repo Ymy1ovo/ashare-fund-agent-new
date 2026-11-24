@@ -1,0 +1,134 @@
+{
+ "1年": {
+  "rows": 5185,
+  "date_min": "2006-03-01",
+  "date_max": "2026-11-24",
+  "unit_raw": "百分数(%)",
+  "unit_converted": "小数（/100）",
+  "annual_rate_min": 0.008871,
+  "annual_rate_max": 0.042503,
+  "annual_rate_median": 0.023336,
+  "A_daily_mean": 6.578650480178597e-05,
+  "B_daily_mean": 6.493658247949869e-05,
+  "daily_diff_mean": -8.499223222872794e-07,
+  "daily_diff_max_abs": 2.4002030027723653e-06,
+  "daily_diff_pct_of_A": -1.2919402312800874,
+  "cumulative_20y_A": 0.3411030273972596,
+  "cumulative_20y_B": 0.33669618015620073,
+  "cumulative_diff": -0.004406847241058887,
+  "annual_samples": [
+   {
+    "year": "2006",
+    "annual_rate": 0.0168,
+    "A_365_cum": 0.0168,
+    "B_comp_cum": 0.0168,
+    "diff": -0.0
+   },
+   {
+    "year": "2007",
+    "annual_rate": 0.020831,
+    "A_365_cum": 0.020831,
+    "B_comp_cum": 0.020831,
+    "diff": 0.0
+   },
+   {
+    "year": "2008",
+    "annual_rate": 0.036894,
+    "A_365_cum": 0.036894,
+    "B_comp_cum": 0.036894,
+    "diff": -0.0
+   },
+   {
+    "year": "2009",
+    "annual_rate": 0.010836,
+    "A_365_cum": 0.010836,
+    "B_comp_cum": 0.010836,
+    "diff": 0.0
+   },
+   {
+    "year": "2010",
+    "annual_rate": 0.015,
+    "A_365_cum": 0.015,
+    "B_comp_cum": 0.015,
+    "diff": -0.0
+   }
+  ],
+  "formula_A": "daily = annual / 365",
+  "formula_B": "daily = (1+annual)^(1/365) - 1",
+  "note": "两种方法都是**名义占比**折算；差异随年化利率升高而放大，在 1%~5% 区间日差异量级约 1e-7 ~ 1e-6"
+ },
+ "3年": {
+  "rows": 5185,
+  "date_min": "2006-03-01",
+  "date_max": "2026-11-24",
+  "unit_raw": "百分数(%)",
+  "unit_converted": "小数（/100）",
+  "annual_rate_min": 0.01085,
+  "annual_rate_max": 0.045003,
+  "annual_rate_median": 0.026983,
+  "A_daily_mean": 7.422850741733927e-05,
+  "B_daily_mean": 7.317373279331396e-05,
+  "daily_diff_mean": -1.0547746240253181e-06,
+  "daily_diff_max_abs": 2.686545836485095e-06,
+  "daily_diff_pct_of_A": -1.4209832054078593,
+  "cumulative_20y_A": 0.38487481095890436,
+  "cumulative_20y_B": 0.37940580453333284,
+  "cumulative_diff": -0.005469006425571521,
+  "annual_samples": [
+   {
+    "year": "2006",
+    "annual_rate": 0.020052,
+    "A_365_cum": 0.020052,
+    "B_comp_cum": 0.020052,
+    "diff": -0.0
+   },
+   {
+    "year": "2007",
+    "annual_rate": 0.024178,
+    "A_365_cum": 0.024178,
+    "B_comp_cum": 0.024178,
+    "diff": 0.0
+   },
+   {
+    "year": "2008",
+    "annual_rate": 0.040098,
+    "A_365_cum": 0.040098,
+    "B_comp_cum": 0.040098,
+    "diff": -0.0
+   },
+   {
+    "year": "2009",
+    "annual_rate": 0.012796,
+    "A_365_cum": 0.012796,
+    "B_comp_cum": 0.012796,
+    "diff": 0.0
+   },
+   {
+    "year": "2010",
+    "annual_rate": 0.024374,
+    "A_365_cum": 0.024374,
+    "B_comp_cum": 0.024374,
+    "diff": -0.0
+   }
+  ],
+  "formula_A": "daily = annual / 365",
+  "formula_B": "daily = (1+annual)^(1/365) - 1",
+  "note": "两种方法都是**名义占比**折算；差异随年化利率升高而放大，在 1%~5% 区间日差异量级约 1e-7 ~ 1e-6"
+ },
+ "_weekend_holiday_policy": {
+  "data_nature": "中债收益率曲线**仅交易日发布**",
+  "weekend_rows": 0,
+  "holiday_rows": 0,
+  "reindex_to_calendar_options": [
+   "A. 保持原样，收益累乘时按交易日对齐（推荐用于日频）",
+   "B. 前向填充到自然日（**会改变日频统计量，不推荐**）",
+   "C. 置 0（**错误**，相当于无风险收益为 0）"
+  ],
+  "important": "前向填充与日度化公式是两件事，不可混谈"
+ },
+ "_sharpe_sensitivity_note": {
+  "status": "NOT_COMPUTED_IN_THIS_ROUND",
+  "reason": "本轮禁止修改 Sharpe 公式，也不做基金绩效结论；差异量级已量化（见 daily_diff_*），如需 Sharpe 敏感性演示须另立研究性临时样本并明确标注",
+  "bound_estimate": "以年化 3% 为例：A 日收益 8.219e-5，B 日收益 8.098e-5，差 1.21e-6；对日波动率约 1% 的基金，Sharpe 影响量级 < 0.001"
+ }
+}

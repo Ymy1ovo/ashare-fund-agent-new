@@ -1,0 +1,260 @@
+{
+ "phase": "3B-6.1.1",
+ "generated_at": "2026-11-24T20:11:53",
+ "reference_window": [
+  "2006-03-01",
+  "2026-12-31"
+ ],
+ "reference_window_note": "审计参考区间，**不是回测准入门槛**；coverage_ratio_vs_ref_window 以此区间计算",
+ "holiday_gap_threshold_days": 15,
+ "holiday_note": "阈值 15 天：实测法定长假最长 11 天（2020 春节因疫情延长），2020-01-23→2020-02-03。阈值 15 可容纳该异常长假，同时仍能识别真正的数据缺失。**周末与法定节假日不判定为数据缺失**。",
+ "outlier_bounds": [
+  0.0,
+  15.0
+ ],
+ "unit_identified": "百分数(%)",
+ "unit_note": "使用时须除以 100；不得直接当小数收益",
+ "tenors": {
+  "3月": {
+   "date_min": "2006-03-01",
+   "date_max": "2026-11-24",
+   "rows": 5185,
+   "valid_rows": 5185,
+   "null_values": 0,
+   "duplicate_dates": 0,
+   "conflicting_values": 0,
+   "coverage_ratio_vs_ref_window": 0.995139,
+   "max_gap_days": 11,
+   "missing_intervals": [],
+   "outlier_count": 0,
+   "outliers": [],
+   "zero_values": 0,
+   "negative_values": 0,
+   "value_min": 0.7819,
+   "value_max": 5.1132,
+   "value_median": 2.1389,
+   "unit_evidence": {
+    "observed_range": [
+     0.7819,
+     5.1132
+    ],
+    "conclusion": "百分数(%)",
+    "reason": "中债国债收益率实测值集中在 1~5 之间，若为小数表示则应为 0.01~0.05；故判定为百分数，使用时须 /100"
+   },
+   "gap_count_over_threshold": 0
+  },
+  "6月": {
+   "date_min": "2006-03-01",
+   "date_max": "2026-11-24",
+   "rows": 5185,
+   "valid_rows": 5185,
+   "null_values": 0,
+   "duplicate_dates": 0,
+   "conflicting_values": 0,
+   "coverage_ratio_vs_ref_window": 0.995139,
+   "max_gap_days": 11,
+   "missing_intervals": [],
+   "outlier_count": 0,
+   "outliers": [],
+   "zero_values": 0,
+   "negative_values": 0,
+   "value_min": 0.8183,
+   "value_max": 4.3744,
+   "value_median": 2.2475,
+   "unit_evidence": {
+    "observed_range": [
+     0.8183,
+     4.3744
+    ],
+    "conclusion": "百分数(%)",
+    "reason": "中债国债收益率实测值集中在 1~5 之间，若为小数表示则应为 0.01~0.05；故判定为百分数，使用时须 /100"
+   },
+   "gap_count_over_threshold": 0
+  },
+  "1年": {
+   "date_min": "2006-03-01",
+   "date_max": "2026-11-24",
+   "rows": 5185,
+   "valid_rows": 5185,
+   "null_values": 0,
+   "duplicate_dates": 0,
+   "conflicting_values": 0,
+   "coverage_ratio_vs_ref_window": 0.995139,
+   "max_gap_days": 11,
+   "missing_intervals": [],
+   "outlier_count": 0,
+   "outliers": [],
+   "zero_values": 0,
+   "negative_values": 0,
+   "value_min": 0.8871,
+   "value_max": 4.2503,
+   "value_median": 2.3336,
+   "unit_evidence": {
+    "observed_range": [
+     0.8871,
+     4.2503
+    ],
+    "conclusion": "百分数(%)",
+    "reason": "中债国债收益率实测值集中在 1~5 之间，若为小数表示则应为 0.01~0.05；故判定为百分数，使用时须 /100"
+   },
+   "gap_count_over_threshold": 0
+  },
+  "3年": {
+   "date_min": "2006-03-01",
+   "date_max": "2026-11-24",
+   "rows": 5185,
+   "valid_rows": 5185,
+   "null_values": 0,
+   "duplicate_dates": 0,
+   "conflicting_values": 0,
+   "coverage_ratio_vs_ref_window": 0.995139,
+   "max_gap_days": 11,
+   "missing_intervals": [],
+   "outlier_count": 0,
+   "outliers": [],
+   "zero_values": 0,
+   "negative_values": 0,
+   "value_min": 1.085,
+   "value_max": 4.5003,
+   "value_median": 2.6983,
+   "unit_evidence": {
+    "observed_range": [
+     1.085,
+     4.5003
+    ],
+    "conclusion": "百分数(%)",
+    "reason": "中债国债收益率实测值集中在 1~5 之间，若为小数表示则应为 0.01~0.05；故判定为百分数，使用时须 /100"
+   },
+   "gap_count_over_threshold": 0
+  },
+  "5年": {
+   "date_min": "2006-03-01",
+   "date_max": "2026-11-24",
+   "rows": 5185,
+   "valid_rows": 5185,
+   "null_values": 0,
+   "duplicate_dates": 0,
+   "conflicting_values": 0,
+   "coverage_ratio_vs_ref_window": 0.995139,
+   "max_gap_days": 11,
+   "missing_intervals": [],
+   "outlier_count": 0,
+   "outliers": [],
+   "zero_values": 0,
+   "negative_values": 0,
+   "value_min": 1.3053,
+   "value_max": 4.5293,
+   "value_median": 2.9437,
+   "unit_evidence": {
+    "observed_range": [
+     1.3053,
+     4.5293
+    ],
+    "conclusion": "百分数(%)",
+    "reason": "中债国债收益率实测值集中在 1~5 之间，若为小数表示则应为 0.01~0.05；故判定为百分数，使用时须 /100"
+   },
+   "gap_count_over_threshold": 0
+  },
+  "7年": {
+   "date_min": "2006-03-01",
+   "date_max": "2026-11-24",
+   "rows": 5185,
+   "valid_rows": 5185,
+   "null_values": 0,
+   "duplicate_dates": 0,
+   "conflicting_values": 0,
+   "coverage_ratio_vs_ref_window": 0.995139,
+   "max_gap_days": 11,
+   "missing_intervals": [],
+   "outlier_count": 0,
+   "outliers": [],
+   "zero_values": 0,
+   "negative_values": 0,
+   "value_min": 1.3996,
+   "value_max": 4.6698,
+   "value_median": 3.1331,
+   "unit_evidence": {
+    "observed_range": [
+     1.3996,
+     4.6698
+    ],
+    "conclusion": "百分数(%)",
+    "reason": "中债国债收益率实测值集中在 1~5 之间，若为小数表示则应为 0.01~0.05；故判定为百分数，使用时须 /100"
+   },
+   "gap_count_over_threshold": 0
+  },
+  "10年": {
+   "date_min": "2006-03-01",
+   "date_max": "2026-11-24",
+   "rows": 5185,
+   "valid_rows": 5185,
+   "null_values": 0,
+   "duplicate_dates": 0,
+   "conflicting_values": 0,
+   "coverage_ratio_vs_ref_window": 0.995139,
+   "max_gap_days": 11,
+   "missing_intervals": [],
+   "outlier_count": 0,
+   "outliers": [],
+   "zero_values": 0,
+   "negative_values": 0,
+   "value_min": 1.5755,
+   "value_max": 4.7222,
+   "value_median": 3.231,
+   "unit_evidence": {
+    "observed_range": [
+     1.5755,
+     4.7222
+    ],
+    "conclusion": "百分数(%)",
+    "reason": "中债国债收益率实测值集中在 1~5 之间，若为小数表示则应为 0.01~0.05；故判定为百分数，使用时须 /100"
+   },
+   "gap_count_over_threshold": 0
+  },
+  "30年": {
+   "date_min": "2006-03-01",
+   "date_max": "2026-11-24",
+   "rows": 5185,
+   "valid_rows": 5185,
+   "null_values": 0,
+   "duplicate_dates": 0,
+   "conflicting_values": 0,
+   "coverage_ratio_vs_ref_window": 0.995139,
+   "max_gap_days": 11,
+   "missing_intervals": [],
+   "outlier_count": 0,
+   "outliers": [],
+   "zero_values": 0,
+   "negative_values": 0,
+   "value_min": 1.799,
+   "value_max": 5.1988,
+   "value_median": 3.8488,
+   "unit_evidence": {
+    "observed_range": [
+     1.799,
+     5.1988
+    ],
+    "conclusion": "百分数(%)",
+    "reason": "中债国债收益率实测值集中在 1~5 之间，若为小数表示则应为 0.01~0.05；故判定为百分数，使用时须 /100"
+   },
+   "gap_count_over_threshold": 0
+  }
+ },
+ "summary": {
+  "tenors_available": 8,
+  "tenors_requested_by_task": 8,
+  "tenors_missing": [
+   "2年"
+  ],
+  "all_have_data": true,
+  "total_valid_rows": 41480
+ },
+ "threshold_rationale": {
+  "observed_max_holiday_gap_days": 11,
+  "observed_example": "2020-01-23 → 2020-02-03（春节+疫情延长）",
+  "chosen_threshold": 15,
+  "why_not_10": "10 天会把 2020 春节延长假期误判为数据缺失",
+  "why_not_30": "30 天会漏掉一个月级真实缺失",
+  "note": "这是**审计口径**，不是回测准入门槛"
+ }
+}
