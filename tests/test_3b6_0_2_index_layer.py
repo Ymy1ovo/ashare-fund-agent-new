@@ -111,12 +111,18 @@ def test_same_index_same_date_unique(conn):
     assert count_index_daily(conn, "000300") == 30   # 幂等，不翻倍
 
 
-def test_duplicate_dates_in_payload_deduped(conn):
-    """同一批次里重复日期必须去重，只保留一条。"""
+def test_duplicate_dates_in_payload_rejected_at_ingest(conn):
+    """【3B-6.0.2.1 收紧】原始返回重复日期 → 采集入口直接拒绝，0 行入库。
+
+    旧版此处断言「去重后入库成功」——正是本轮要修的绕过：
+    字典去重发生在质量检查之前，重复记录在检查前就被抹掉了。
+    收紧后：原始数据先质检，重复即硬性失败，绝不允许去重掩盖。
+    """
     dates = _weekdays("2020-01-02", 5) + ["2020-01-06"]   # 重复 1 条
     r = _ingest(conn, "000905", fetcher=lambda s, a, b: _df(dates))
-    assert r["ok"] is True
-    assert count_index_daily(conn, "000905") == 5
+    assert r["ok"] is False
+    assert r["quality_hard_passed"] is False
+    assert count_index_daily(conn, "000905") == 0
 
 
 def test_db_level_no_duplicate(conn):

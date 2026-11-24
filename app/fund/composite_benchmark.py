@@ -11,6 +11,10 @@ from __future__ import annotations
 import sqlite3
 from datetime import datetime
 
+from app.fund.index_returns import (
+    ReturnBasisError, assert_basis_usable_for_total_return,
+)
+
 COMPONENT_INDEX = "index"
 COMPONENT_BOND = "bond_index"
 COMPONENT_CASH = "cash"
@@ -53,6 +57,7 @@ def add_component(conn: sqlite3.Connection, composite_id: int, *,
 
     available = 0
     reason = None
+    return_basis = None
     if component_type == COMPONENT_INDEX:
         if not index_code:
             reason = "该指数尚未映射到可接入的指数代码（本阶段未接入）"
@@ -60,10 +65,25 @@ def add_component(conn: sqlite3.Connection, composite_id: int, *,
             has_data = conn.execute(
                 "SELECT COUNT(*) FROM index_daily WHERE index_code=?",
                 (index_code,)).fetchone()[0]
-            if has_data:
-                available = 1
-            else:
+            master = conn.execute(
+                "SELECT return_basis FROM index_master WHERE index_code=?",
+                (index_code,)).fetchone()
+            return_basis = master["return_basis"] if master else None
+            if not has_data:
                 reason = "该指数尚未接入历史数据"
+            elif return_basis is None:
+                reason = "指数未登记收益口径，无法用于总收益比较"
+            elif return_basis == "unknown":
+                reason = ("收益口径 unknown：只有历史行情点位，"
+                          "没有证据证明是全收益序列，不能用于严格总收益基准")
+            elif return_basis == "price_return":
+                reason = ("收益口径 price_return：价格指数不含分红再投资，"
+                          "不能冒充全收益基准")
+            elif return_basis not in ("total_return", "net_total_return"):
+                reason = f"未识别的收益口径: {return_basis}"
+            else:
+                # 口径合格，才算「有可用于总收益比较的历史序列」
+                available = 1
     else:
         reason = f"{component_type} 成分无可用收益序列（本阶段未接入）"
 
@@ -106,6 +126,26 @@ def evaluate_composite(conn: sqlite3.Connection, composite_id: int) -> dict:
         missing.append(
             f"{len(no_code)} 个指数成分未映射到代码："
             + ", ".join(str(c["component_label"]) for c in no_code[:3]))
+
+    # 收益口径校验：有历史行情 ≠ 有可用于总收益比较的序列
+    basis_fail = []
+    for c in comps:
+        if c["component_type"] != COMPONENT_INDEX or not c["index_code"]:
+            continue
+        row = conn.execute(
+            "SELECT return_basis FROM index_master WHERE index_code=?",
+            (c["index_code"],)).fetchone()
+        basis = row["return_basis"] if row else None
+        try:
+            assert_basis_usable_for_total_return(basis)
+        except ReturnBasisError as exc:
+            basis_fail.append(
+                f"{c['component_label']}({c['index_code']}): {exc}")
+    if basis_fail:
+        missing.append(
+            f"{len(basis_fail)} 个指数成分收益口径不合格："
+            + "；".join(basis_fail[:3]))
+
     no_data = [c for c in comps if not c["data_available"]]
     if no_data:
         missing.append(

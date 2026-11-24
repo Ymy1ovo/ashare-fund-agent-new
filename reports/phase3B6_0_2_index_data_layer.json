@@ -2,7 +2,7 @@
  "phase": "3B-6.0.2",
  "report": "index_data_layer",
  "baseline_head": "4f5d3add205dfc5370d04cda19e3f42dd0e1ece7",
- "generated_at": "2026-11-23T17:45:00",
+ "generated_at": "2026-11-24T09:00:00",
  "source": "akshare.stock_zh_index_hist_csindex",
  "readonly_fund_layer": true,
  "fund_tables_modified": false,
@@ -364,5 +364,35 @@
   "ready_for_research_analysis": true,
   "ready_for_backtest": false,
   "ready_for_formal_ranking": false
- }
+ },
+ "correction_round": "3B-6.0.2.1",
+ "raw_quality_order_fix": {
+  "before": [
+   "_to_rows",
+   "去重",
+   "排序",
+   "check_history_quality"
+  ],
+  "after": [
+   "_to_rows",
+   "check_history_quality(原始rows)",
+   "硬性失败则拒绝入库",
+   "去重",
+   "排序",
+   "入库"
+  ],
+  "raw_rows_preserved": true,
+  "dedup_before_quality_check": false,
+  "sort_before_quality_check": false
+ },
+ "raw_quality_order_note": "原始数据必须先质检再去重排序；否则重复日期被字典覆盖、倒序被排序抹平，质量检查形同虚设",
+ "rejected_on_hard_failure": {
+  "index_daily_rows_written": 0,
+  "audit_run_kept": true,
+  "quality_record_kept": true,
+  "master_layer_status": "degraded"
+ },
+ "database_untouched_this_round": true,
+ "indices_recolledted": false,
+ "basis_modified": false
 }

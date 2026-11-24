@@ -1,5 +1,83 @@
 # 变更日志
 
+## 2026-11-24 — 阶段3B-6.0.2.1 原始质检顺序与复合基准口径修正
+
+修复两个验收阻断。只改代码与测试，**正式库零写入**。
+
+**阻断一：原始数据质量检查被去重/排序绕过**
+
+旧流程 `_to_rows → 去重 → 排序 → check_history_quality`：
+
+| 问题 | 旧行为 | 后果 |
+| --- | --- | --- |
+| 重复日期 | 字典按日期覆盖 | `no_duplicate_dates` 永远 ok |
+| 日期倒序 | `sorted()` 先排好 | `date_ascending` 永远 ok |
+
+修正后**原始数据先质检**：
+
+```
+_to_rows（保持原始顺序、保留重复行）
+  → check_history_quality(原始 rows)
+  → 硬性失败 → 拒绝入库（index_daily 0 行）
+              → 保留 index_ingest_runs（status=partial）
+              → 保留 index_quality_checks（quality_level=D）
+              → index_master 标 degraded
+  → 硬性通过 → 去重 → 排序 → 入库
+```
+
+**阻断二：复合基准可复现性不校验收益口径**
+
+`add_component()` 只查 `index_daily` 有无记录，
+`evaluate_composite()` 只看 `data_available`/权重/成分数/代码映射，
+**完全没有检查 `index_master.return_basis`**。
+
+修正后在**两处**都强制校验：
+
+| 口径 | 可用于总收益 | data_available |
+| --- | --- | --- |
+| `total_return` | 是 | 1 |
+| `net_total_return` | 是（保留独立标识） | 1 |
+| `price_return` | 否（不含分红再投资） | **0** |
+| `unknown` | 否（口径未知） | **0** |
+
+核心区分：**「有历史行情数据」≠「有可用于总收益比较的历史序列」**。
+
+**变异验证（证明测试有约束力）**：
+
+| 变异 | 失败测试数 |
+| --- | ---: |
+| 改回旧顺序（先去重排序再质检） | **7** |
+| 去掉 `add_component` 口径检查 | 2 |
+| 去掉 `evaluate_composite` 口径检查 | 2 |
+
+验证后全部还原。
+
+**既有测试收紧一处**：
+
+`test_duplicate_dates_in_payload_deduped`
+→ `test_duplicate_dates_in_payload_rejected_at_ingest`
+
+| 项 | 旧断言 | 新断言 |
+| --- | --- | --- |
+| 重复日期 | `ok is True`，入库 5 行 | `ok is False`，入库 **0 行** |
+
+旧断言本身就是被修掉的绕过行为，**收紧不是放宽**。未删除任何测试文件。
+
+**现状态未变**：
+
+- 10 个指数仍全部 `unknown`
+- 15 条复合基准仍全部不可复现
+- `index_daily` 仍 50,603 行，零改动
+- 基金表与内容指纹零变化
+- 本轮未调用任何数据源接口
+
+**测试**：新增 22 项；全量 **1758 passed / 0 failed / 714.20 秒**。
+（1736 + 22 = 1758）
+
+**门禁不变**：`ready_for_research_analysis=true`，
+`ready_for_backtest=false`，`ready_for_formal_ranking=false`。
+
+
 ## 2026-11-23 — 阶段3B-6.0.2 指数与基准数据层建设
 
 建立独立指数数据层。**不触碰任何基金表**。

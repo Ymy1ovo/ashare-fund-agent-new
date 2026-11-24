@@ -163,8 +163,71 @@ def collect_one(conn: sqlite3.Connection, index_code: str, *,
                 layer_status=LAYER_FAILED)
         return result
 
+    # ============================================================
+    # 关键顺序：**原始数据先质检，禁止任何预处理掩盖问题**
+    #
+    # 接口返回后立刻转成原始 rows（保持原始顺序、保留重复行），
+    # 直接对原始 rows 做质量检查。
+    # 去重 / 排序只能在质量检查**之后**进行，
+    # 否则重复日期会被字典覆盖、倒序会被排序抹平，
+    # 质量检查就形同虚设。
+    # ============================================================
     rows = _to_rows(df, index_code)
-    # 去重：同日期只保留一条（后出现的覆盖前者）
+    raw_rows = len(rows)
+
+    # 传入当前连接读交易日历：外层已持写事务，另开连接会锁等待并降级
+    quality_raw = check_history_quality(_df_from_rows(rows), calendar_conn=conn)
+
+    if not quality_raw.get("hard_passed"):
+        # 原始数据硬性不合格 → 拒绝入库，但保留审计与质量记录
+        dup = (quality_raw["checks"].get("no_duplicate_dates") or {})
+        asc = (quality_raw["checks"].get("date_ascending") or {})
+        fail_kinds = []
+        if not dup.get("ok", True):
+            fail_kinds.append(f"重复日期 {dup.get('duplicate_count')} 条")
+        if not asc.get("ok", True):
+            fail_kinds.append(f"日期非升序 {asc.get('out_of_order_count')} 处")
+        others = [k for k in ("date_parsed", "no_null_dates", "no_null_close",
+                              "numeric_values_sane", "range_sane")
+                  if not (quality_raw["checks"].get(k) or {}).get("ok", True)]
+        if others:
+            fail_kinds.append("其他硬性项失败: " + ", ".join(others))
+        detail = "；".join(fail_kinds) or (quality_raw.get("reason") or "硬性检查未通过")
+
+        dmin = min((r["trade_date"] for r in rows), default=None)
+        dmax = max((r["trade_date"] for r in rows), default=None)
+        finish_ingest_run(
+            conn, run_id, status="partial", returned_rows=raw_rows,
+            actual_date_min=dmin, actual_date_max=dmax,
+            content_fp=content_fingerprint(rows),
+            note=f"原始数据硬性质量不合格，拒绝入库：{detail}")
+
+        if enable_master:
+            upsert_index_master(
+                conn, index_code=index_code, index_name=index_name,
+                index_short_name=index_short_name, index_family=index_family,
+                publisher=PUBLISHER, data_source=SOURCE_CSINDEX,
+                inception_date=None,
+                inception_date_evidence="来源未明确给出成立日，首行日期不得顶替",
+                return_basis=RETURN_BASIS_UNKNOWN,
+                return_basis_evidence="原始数据未通过质量检查，无法判定口径",
+                layer_status=LAYER_DEGRADED)
+
+        save_quality_check(conn, index_code=index_code, run_id=run_id,
+                           quality=quality_raw)
+
+        result.update({
+            "ok": False,
+            "rows_returned": raw_rows,
+            "rows_written": 0,
+            "quality_level": "D",
+            "quality_hard_passed": False,
+            "error": f"原始数据硬性质量不合格：{detail}",
+            "raw_rows": raw_rows,
+        })
+        return result
+
+    # 原始数据合格后，才允许规范化（去重 + 排序）
     dedup: dict[str, dict] = {}
     for r in rows:
         dedup[r["trade_date"]] = r
@@ -177,11 +240,9 @@ def collect_one(conn: sqlite3.Connection, index_code: str, *,
         actual_date_min=dmin, actual_date_max=dmax,
         content_fp=content_fingerprint(rows_sorted),
         note=(f"接口忽略请求区间，实返 {dmin}~{dmax}；"
-              f"原始 {len(rows)} 行去重后 {len(rows_sorted)} 行"))
+              f"原始 {raw_rows} 行，规范化后 {len(rows_sorted)} 行"))
 
-    # 传入当前连接读交易日历：外层已持写事务，另开连接会锁等待并降级
-    quality = check_history_quality(_df_from_rows(rows_sorted),
-                                    calendar_conn=conn)
+    quality = quality_raw
 
     if enable_master:
         upsert_index_master(

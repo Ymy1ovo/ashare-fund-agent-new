@@ -2456,7 +2456,8 @@ if (basis != ACCOUNTING_FORMAL
 | 3B-5.5.1 | 同类可验证性与年化证据修正 | 1629 | `phase3B5_5_test_report.md` |
 | 3B-6.0.1 | 基准与指数数据源审计 | 1662 | `phase3B6_0_1_benchmark_coverage.md` |
 | 3B-6.0.1.1 | 指数验证范围与覆盖结论修正 | 1690 | `phase3B6_0_1_test_report.md` |
-| 3B-6.0.2 | 指数与基准数据层建设 | **1736** | `phase3B6_0_2_index_data_layer.md` |
+| 3B-6.0.2 | 指数与基准数据层建设 | 1736 | `phase3B6_0_2_index_data_layer.md` |
+| 3B-6.0.2.1 | 原始质检顺序与基准口径修正 | **1758** | `phase3B6_0_2_test_report.md` |
 
 当前正式会计版本：`ca-v2-receivable`；正式会计基础：`formal_receivable`；正式估值标记：`formal_valuation=True`。
 
@@ -5989,4 +5990,50 @@ OHLC 缺失只算警告的理由：指数基准只用于**收盘收益**，收�
 | 数据质量 | `reports/phase3B6_0_2_data_quality.md` |
 | 复合基准 | `reports/phase3B6_0_2_composite_benchmark.md` |
 | 测试报告 | `reports/phase3B6_0_2_test_report.md` |
+
+### 70.10 修正轮 3B-6.0.2.1
+
+修复两个验收阻断。
+
+**阻断一：原始数据质量检查被预处理绕过**
+
+旧流程 `去重 → 排序 → 质检` 让两类问题永远查不出来：
+
+| 问题 | 旧行为 | 后果 |
+| --- | --- | --- |
+| 重复日期 | 字典按日期覆盖 | `no_duplicate_dates` 永远 ok |
+| 日期倒序 | `sorted()` 先排好 | `date_ascending` 永远 ok |
+
+修正后：
+
+```
+原始 rows（保持顺序、保留重复）→ check_history_quality
+  → 硬性失败 → 拒绝入库（index_daily 0 行，审计与质量记录保留）
+  → 硬性通过 → 去重 → 排序 → 入库
+```
+
+**阻断二：复合基准不校验收益口径**
+
+`add_component()` 只查有无行情，`evaluate_composite()` 只看 `data_available`。
+口径 unknown 的指数只要有历史点位就能通过——不允许。
+
+修正后两处都强制校验 `index_master.return_basis`：
+
+| 口径 | 可用于总收益 | `data_available` |
+| --- | --- | --- |
+| `total_return` | 是 | 1 |
+| `net_total_return` | 是（保留独立标识） | 1 |
+| `price_return` | 否（不含分红） | **0** |
+| `unknown` | 否（口径未知） | **0** |
+
+**「有历史行情数据」≠「有可用于总收益比较的历史序列」。**
+
+**变异验证**：改回旧顺序 → 7 项测试失败；去除口径检查 → 各 2 项失败。
+
+**现状态未变**：10 个指数仍全 `unknown`，15 条复合基准仍全不可复现，
+50,603 行指数历史零改动，正式库零写入。
+
+**一处既有测试收紧**：`test_duplicate_dates_in_payload_deduped`
+改为 `..._rejected_at_ingest`，从「去重后入库 5 行」改为「拒绝入库 0 行」。
+旧断言本身就是被修掉的绕过行为，**这是收紧不是放宽**。
 

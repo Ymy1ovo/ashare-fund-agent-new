@@ -2,7 +2,7 @@
  "phase": "3B-6.0.2",
  "report": "data_quality",
  "baseline_head": "4f5d3add205dfc5370d04cda19e3f42dd0e1ece7",
- "generated_at": "2026-11-23T17:45:00",
+ "generated_at": "2026-11-24T09:00:00",
  "checks": {
   "hard": [
    "date_parsed",
@@ -169,5 +169,52 @@
   "ready_for_research_analysis": true,
   "ready_for_backtest": false,
   "ready_for_formal_ranking": false
- }
+ },
+ "correction_round": "3B-6.0.2.1",
+ "raw_quality_order_fix": {
+  "before": [
+   "_to_rows",
+   "去重",
+   "排序",
+   "check_history_quality"
+  ],
+  "after": [
+   "_to_rows",
+   "check_history_quality(原始rows)",
+   "硬性失败则拒绝入库",
+   "去重",
+   "排序",
+   "入库"
+  ],
+  "raw_rows_preserved": true,
+  "dedup_before_quality_check": false,
+  "sort_before_quality_check": false
+ },
+ "proof_of_fix": {
+  "integration_tests_call_real_entry": "collect_one()",
+  "duplicate_case": {
+   "input_rows": 5,
+   "ok": false,
+   "rows_written": 0,
+   "quality_flag": "duplicate_dates_ok=0"
+  },
+  "descending_case": {
+   "input_rows": 5,
+   "ok": false,
+   "rows_written": 0,
+   "quality_flag": "date_ascending_ok=0"
+  },
+  "normal_case": {
+   "input_rows": 5,
+   "ok": true,
+   "rows_written": 5
+  },
+  "mutation_test": {
+   "action": "临时改回旧顺序（先去重排序再质检）",
+   "failed_tests": 7,
+   "conclusion": "测试对新顺序有真实约束力"
+  }
+ },
+ "quality_rules_unchanged": true,
+ "index_rows_unchanged": 50603
 }
