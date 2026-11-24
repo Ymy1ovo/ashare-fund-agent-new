@@ -2,7 +2,7 @@
  "phase": "3B-6.0.2.2",
  "report": "composite_benchmark",
  "baseline_head": "ae1dc1979bd32f85341e691405b2310b9d0ea84b",
- "generated_at": "2026-11-24T09:40:00",
+ "generated_at": "2026-11-24T10:00:00",
  "evidence_source": "platform",
  "evidence_note": "库内 benchmark 来自第三方接口转述，未核对合同原文",
  "summary": {
@@ -148,7 +148,7 @@
   "ready_for_backtest": false,
   "ready_for_formal_ranking": false
  },
- "correction_round": "3B-6.0.2.2",
+ "correction_round": "3B-6.0.2.3",
  "basis_check_added": {
   "checks_index_return_basis": true,
   "allowed_for_total_return": [
@@ -289,5 +289,33 @@
   "reason": "evaluate_composite() 每次重新计算，不信任存量标记",
   "next_action": "3B-6.0.3 等真正写库时重新执行 evaluate_composite() 刷新"
  },
- "database_written_this_round": false
+ "database_written_this_round": false,
+ "finite_positive_close_rule": {
+  "function": "_is_usable_close()",
+  "expression": "math.isfinite(value) and value > 0",
+  "counted": {
+   "finite_positive": true,
+   "plus_inf": false,
+   "minus_inf": false,
+   "nan": false,
+   "zero": false,
+   "negative": false,
+   "null": false
+  },
+  "legacy_expression": "c != c or c <= 0",
+  "legacy_defect": "只能识别 NaN，漏掉 +inf / -inf",
+  "why_isfinite": "math.isfinite 同时排除 NaN 与 ±inf；v != v 只能排除 NaN"
+ },
+ "data_issue_found": {
+  "exists": true,
+  "count": 1,
+  "index_code": "H30184",
+  "trade_date": "2013-06-28",
+  "close": 0.0,
+  "quality_status": "valid",
+  "fixed_this_round": false,
+  "reason": "任务书禁止修改 50,603 条指数行情",
+  "impact_on_conclusions": "无；该行修复前后都不被计入，且该指数口径为 unknown",
+  "recommended_action": "后续数据修补轮单独处理"
+ }
 }

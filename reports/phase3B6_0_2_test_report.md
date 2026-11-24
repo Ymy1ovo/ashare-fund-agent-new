@@ -1,109 +1,98 @@
-# 阶段3B-6.0.2 测试报告（3B-6.0.2.2 修正版）
+# 阶段3B-6.0.2 测试报告（3B-6.0.2.3 修正版）
 
-- 基线 HEAD：`ae1dc1979bd32f85341e691405b2310b9d0ea84b`
+- 基线 HEAD：`95f7d0aa4346c31b354379b7ab7fed8982764d5f`
 - 执行日期：2026-11-24
-- 修正轮：3B-6.0.2.2（复合基准有效行情判定补强）
+- 修正轮：3B-6.0.2.3（有效行情「有限正数」校验补强）
 
 > 区分：**真实执行测试** / **静态检查** / **数据源实际调用**。
 
-本轮数据源实际调用 = **0 次**（禁止重新采集）。
+本轮数据源实际调用 = **0 次**。
 
 ---
 
-## 1. 本轮新增专项（24 项）
+## 1. 本轮新增专项（32 项）
 
 ```bash
-$ pytest tests/test_3b6_0_2_2_effective_observations.py -q
-24 passed in 7.09s
+$ pytest tests/test_3b6_0_2_3_finite_positive_close.py -q
+32 passed in 6.94s
 ```
 
-### 1.1 任务书要求的场景
+### 1.1 任务书要求的数值场景
 
-| 要求 | 测试 | 断言 |
+| 值 | 测试 | 结果 |
 | --- | --- | --- |
-| A 10 条全 suspect | `test_A_all_suspect_not_available` | valid_rows=0，不可用，原因含「没有有效行情」 |
-| B 10 条全 rejected | `test_B_all_rejected_not_available` | 同上 |
-| C 只有 1 条 valid | `test_C_single_valid_not_available` | 原因含「有效行情不足」「至少需要 2」 |
-| D 2 条 valid + total_return | `test_D_two_valid_with_total_return_available` | available=1 |
-| E 2 条 valid + unknown | `test_E_two_valid_but_unknown_not_available` | valid_rows=2 但 available=0，原因含 unknown |
-| F 之后有效行情被降级 | `test_F_reevaluate_detects_degradation` | 再次评估 → 不可复现 |
-| G 15 条正式复合基准 | `test_G_production_composites_none_reproducible` | total=15, repro=0 |
-| H 10 个指数口径 + 行数 | `test_H_*` | 全 unknown，50,603 行不变 |
+| `+inf` | `test_inf_not_counted` | 不计入 ✅ |
+| `-inf` | `test_negative_inf_not_counted` | 不计入 ✅ |
+| `NaN` | `test_nan_becomes_null_and_rejected_by_schema` | 驱动转 NULL，被 NOT NULL 拒绝 ✅ |
+| `0` | `test_zero_and_negative_not_counted` | 不计入 ✅ |
+| `-1` | `test_zero_and_negative_not_counted` | 不计入 ✅ |
+| 有限正数 | `test_normal_finite_positive_counted` | 计入 ✅ |
 
-### 1.2 补充边界
+### 1.2 核心场景（`assess_index_component` 实验证）
+
+| 测试 | 构造 | 断言 |
+| --- | --- | --- |
+| `test_assess_inf_plus_normal_only_one_valid` | **2 条**：1 条 `+inf` + 1 条正常 | 总行数 2，**有效仅 1**，`available=0`，原因含「至少需要 2」|
+| `test_assess_inf_plus_two_normal_available` | 3 条：`+inf` + 2 条正常 | 有效 2，`available=1` |
+| `test_assess_only_inf_not_available` | 2 条全 `+inf` | 有效 0，原因含「没有有效行情」|
+| `test_assess_negative_inf_not_available` | 2 条全 `-inf` | 有效 0 |
+| `test_assess_inf_does_not_bypass_basis_check` | 2 正常 + 1 `inf`，口径 unknown | 有效 2 但不可用 |
+
+### 1.3 复合基准端到端
 
 | 测试 | 覆盖 |
 | --- | --- |
-| `test_B2_mixed_quality_only_valid_counted` | 混合质量只数 valid |
-| `test_C2_min_observations_is_two` | 常量 = 2 |
-| `test_C3_null_close_blocked_at_schema` | 空收盘被 NOT NULL 拒绝 |
-| `test_C4_non_positive_close_not_counted` | 0/负数不计 |
-| `test_D2_net_total_return_also_available` | net_total_return 通过 |
-| `test_E2_two_valid_but_price_return_not_available` | price_return 拒绝 |
-| `test_F2_reevaluate_detects_rows_deleted` | 行被删到 1 条 → 阻止 |
-| `test_F3_reevaluate_detects_basis_downgrade` | 口径被改 unknown → 阻止 |
-| `test_F4_stale_flag_does_not_stick` | 人为回填旧标记也无效 |
-| `test_cash_component_rule_unchanged` | 现金规则不变 |
-| `test_single_component_rule_unchanged` | 单成分规则不变 |
-| `test_weight_rule_unchanged` | 权重规则不变 |
-| `test_H3_production_all_indices_assessed_unavailable` | 10 个指数重新判定全不可用 |
-| `test_H4_stale_component_flag_does_not_leak` | 存量标记不泄漏成可复现 |
-| `test_gate_unchanged` | 门禁 |
+| `test_composite_with_inf_component_not_available` | 含 inf 的指数成分 → `data_available=0` |
+| `test_composite_reproducible_only_with_finite_positives` | 两成分各 2 条有限正数 → 可复现 |
+| `test_evaluate_reevaluates_after_inf_injected` | 先可复现，注入 inf 后再次评估 → 不可复现 |
+
+### 1.4 辅助函数与守恒
+
+| 测试 | 覆盖 |
+| --- | --- |
+| `test_is_usable_close_rejects_non_finite_or_non_positive` | 7 个非法值参数化 |
+| `test_is_usable_close_accepts_finite_positive` | 5 个合法值参数化 |
+| `test_uses_isfinite_not_self_compare` | 证明 `v != v` 抓不到 inf |
+| `test_production_no_infinite_close` | 正式库无 inf；**记录 1 条已知 0.0** |
+| `test_production_zero_close_never_counted` | 该 0.0 从未计入有效观测 |
+| `test_production_*` | 行数/口径/复合基准守恒 |
 
 ---
 
-## 2. 变异验证（证明测试有约束力）
+## 2. 变异验证
 
-| 变异 | 失败测试数 | 失败项 |
-| --- | ---: | --- |
-| 忽略 `quality_status`（退回总行数） | **5** | A、B、B2、F、F4 |
-| `MIN_VALID_OBSERVATIONS = 1` | **4** | C、C2、C4、F2 |
-| `evaluate_composite` 信任历史 `data_available` | **4** | F、F2、F3、F4 |
+把判定退回旧写法 `c == c and c > 0`（等价于 `c != c or c <= 0` 的漏洞版）：
 
-三类变异各自被独立测试守住。验证后全部还原。
+```
+9 failed, 23 passed
+```
+
+失败项覆盖 inf 全部路径：
+
+```
+test_inf_not_counted
+test_assess_inf_plus_normal_only_one_valid
+test_assess_inf_plus_two_normal_available
+test_assess_only_inf_not_available
+test_assess_inf_does_not_bypass_basis_check
+test_composite_with_inf_component_not_available
+test_evaluate_reevaluates_after_inf_injected
+```
+
+验证后已还原，`git diff` 确认 `math.isfinite(c) and c > 0` 在位。
 
 ---
 
 ## 3. 回归测试
 
-### 3.1 3B-6.0.2.1 原始质量与口径专项
-
-```bash
-$ pytest tests/test_3b6_0_2_1_raw_quality_and_basis.py -q
-22 passed
-```
-
-### 3.2 3B-6.0.2 指数数据层
-
-```bash
-$ pytest tests/test_3b6_0_2_index_layer.py -q
-46 passed
-```
-
-### 3.3 三套合并
-
-```bash
-$ pytest tests/test_3b6_0_2_2_effective_observations.py \
-        tests/test_3b6_0_2_1_raw_quality_and_basis.py \
-        tests/test_3b6_0_2_index_layer.py -q
-92 passed in 35.19s
-```
-
-### 3.4 3B-6.0.1 / 3B-6.0.1.1
-
-```bash
-$ pytest tests/test_3b6_0_1_benchmark_audit.py \
-        tests/test_3b6_0_1_1_index_verify.py -q
-61 passed in 21.19s
-```
-
-### 3.5 3B-5.5 系列
-
-```bash
-$ pytest tests/test_3b5_5_quality_framework.py \
-        tests/test_3b5_5_1_peer_annualized.py -q
-112 passed in 137.62s (0:02:17)
-```
+| 套件 | 命令 | 结果 |
+| --- | --- | --- |
+| 3B-6.0.2.2 | `pytest tests/test_3b6_0_2_2_effective_observations.py -q` | 24 passed |
+| 3B-6.0.2.1 | `pytest tests/test_3b6_0_2_1_raw_quality_and_basis.py -q` | 22 passed |
+| 3B-6.0.2 指数层 | `pytest tests/test_3b6_0_2_index_layer.py -q` | 46 passed |
+| **三套合并** | 上述三个文件 | **92 passed / 33.30s** |
+| 3B-6.0.1 系列 | `pytest tests/test_3b6_0_1_benchmark_audit.py tests/test_3b6_0_1_1_index_verify.py -q` | **61 passed / 20.84s** |
+| 3B-5.5 系列 | `pytest tests/test_3b5_5_quality_framework.py tests/test_3b5_5_1_peer_annualized.py -q` | **112 passed / 146.18s** |
 
 ---
 
@@ -111,24 +100,24 @@ $ pytest tests/test_3b5_5_quality_framework.py \
 
 ```bash
 $ pytest -q
-1782 passed, 1 warning in 673.98s (0:11:13)
+1814 passed, 1 warning in 658.73s (0:10:58)
 ```
 
 | 项 | 数值 |
 | --- | ---: |
-| 通过 | **1782** |
+| 通过 | **1814** |
 | 失败 | 0 |
 | 错误 | 0 |
-| 耗时 | 673.98 秒 |
+| 耗时 | 658.73 秒 |
 
 | 阶段 | 全量通过数 |
 | --- | ---: |
-| 3B-6.0.2.1 | 1758 |
-| **3B-6.0.2.2** | **1782** |
+| 3B-6.0.2.2 | 1782 |
+| **3B-6.0.2.3** | **1814** |
 
-1758 + 24 = 1782。
+1782 + 32 = 1814。
 
-**未删除、未弱化任何既有测试。**
+**未删除、未弱化、未修改任何历史断言。**
 
 ---
 
@@ -142,7 +131,7 @@ $ pytest -q
 
 ---
 
-## 6. 静态检查（不计入 1782）
+## 6. 静态检查（不计入 1814）
 
 | 项 | 性质 |
 | --- | --- |
@@ -175,22 +164,42 @@ $ pytest -q
 
 ---
 
-## 8. 代码改动清单
+## 8. 本轮发现的真实数据问题（如实记录）
+
+核对正式库时发现 1 条异常行：
+
+| 字段 | 值 |
+| --- | --- |
+| 指数 | `H30184` |
+| 日期 | `2013-06-28` |
+| `close` | **`0.0`** |
+| `quality_status` | `valid` |
+
+| 项 | 说明 |
+| --- | --- |
+| 本轮是否修改 | **否**（任务书禁止修改 50,603 条行情）|
+| 是否影响判定 | **否**：修复前后都不被计入（旧 `c <= 0` 排除，新 `c > 0` 排除）|
+| 该指数现状 | 有效 5,314 条，远超门槛，但口径 `unknown` 仍不可用 |
+| 建议 | 后续数据修补轮单独处理 |
+
+---
+
+## 9. 代码改动清单
 
 | 文件 | 类型 | 说明 |
 | --- | --- | --- |
-| `app/fund/composite_benchmark.py` | **修改** | 新增有效行情判定，evaluate 重新计算 |
-| `tests/test_3b6_0_2_2_effective_observations.py` | **新增** | 24 项专项 |
+| `app/fund/composite_benchmark.py` | **修改** | 新增 `_is_usable_close()`，改用 `math.isfinite` |
+| `tests/test_3b6_0_2_3_finite_positive_close.py` | **新增** | 32 项专项 |
+| `tests/test_3b6_0_2_2_*.py` | **未改** | — |
 | `tests/test_3b6_0_2_1_*.py` | **未改** | — |
 | `tests/test_3b6_0_2_index_layer.py` | **未改** | — |
-| `app/fund/index_layer.py` / `index_ingest.py` | **未改** | — |
-| `app/fund/index_returns.py` | **未改** | — |
+| `app/fund/index_layer.py` / `index_ingest.py` / `index_returns.py` | **未改** | — |
 | `engine.py` / `indicators.py` / `quality.py` | **未改** | — |
 | Schema / 迁移 | **未改** | — |
 
 ---
 
-## 9. 门禁
+## 10. 门禁
 
 | 项 | 值 |
 | --- | --- |

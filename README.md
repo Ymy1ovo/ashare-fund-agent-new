@@ -2458,7 +2458,8 @@ if (basis != ACCOUNTING_FORMAL
 | 3B-6.0.1.1 | 指数验证范围与覆盖结论修正 | 1690 | `phase3B6_0_1_test_report.md` |
 | 3B-6.0.2 | 指数与基准数据层建设 | 1736 | `phase3B6_0_2_index_data_layer.md` |
 | 3B-6.0.2.1 | 原始质检顺序与基准口径修正 | 1758 | `phase3B6_0_2_test_report.md` |
-| 3B-6.0.2.2 | 复合基准有效行情判定 | **1782** | `phase3B6_0_2_test_report.md` |
+| 3B-6.0.2.2 | 复合基准有效行情判定 | 1782 | `phase3B6_0_2_test_report.md` |
+| 3B-6.0.2.3 | 有效行情有限正数校验 | **1814** | `phase3B6_0_2_test_report.md` |
 
 当前正式会计版本：`ca-v2-receivable`；正式会计基础：`formal_receivable`；正式估值标记：`formal_valuation=True`。
 
@@ -6085,4 +6086,47 @@ SELECT COUNT(*) FROM index_daily WHERE index_code=?   -- 旧写法
 **如实记录**：正式库 `benchmark_composite_component` 有 17 条 `data_available=1`，
 是 3B-6.0.2 建表时按旧逻辑写入的历史遗留值。本轮不写库故不刷新，
 但 `evaluate_composite()` 每次重算，不会让它泄漏成可复现。
+
+### 70.12 修正轮 3B-6.0.2.3
+
+`count_effective_observations()` 声称只统计正的**有限**收盘价，
+但原实现用 `c != c or c <= 0`，**只能识别 NaN，漏掉 ±inf**。
+
+修正为：
+
+```python
+return math.isfinite(c) and c > 0
+```
+
+| 值 | 修复前 | 修复后 |
+| --- | --- | --- |
+| 有限正数 | ✅ 计入 | ✅ 计入 |
+| `+inf` | ❌ **错误计入** | ❌ 不计入 |
+| `-inf` | ❌ **错误计入** | ❌ 不计入 |
+| `NaN` / `0` / 负数 / `NULL` | 不计入 | 不计入 |
+
+为什么必须用 `math.isfinite`：
+
+- `NaN != NaN` 为真 → `v != v` 能抓 NaN
+- `inf == inf` 为真 → `v != v` **抓不到 inf**
+- `math.isfinite` 两者都能抓
+
+**核心场景验证**（直接调 `assess_index_component()`）：构造 2 条记录，
+1 条 `+inf` + 1 条正常正数 → 总行数 2，**有效仅 1**，`available=0`，
+达不到 2 条门槛。
+
+**变异验证**：退回旧判定 → **9 项测试失败**，覆盖 inf 全部路径。
+
+**顺带发现 1 条真实数据问题**（如实记录，本轮不修）：
+
+| 字段 | 值 |
+| --- | --- |
+| 指数 | `H30184` |
+| 日期 | `2013-06-28` |
+| `close` | **`0.0`** |
+| `quality_status` | `valid` |
+
+任务书禁止修改 50,603 条行情，故保留。**对结论无影响**：
+该行修复前后都不被计入（旧 `c <= 0` 排除，新 `c > 0` 同样排除），
+且该指数本就卡在 `return_basis='unknown'`。建议后续数据修补轮单独处理。
 

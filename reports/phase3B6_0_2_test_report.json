@@ -1,27 +1,31 @@
 {
- "phase": "3B-6.0.2.2",
+ "phase": "3B-6.0.2.3",
  "report": "tests",
- "baseline_head": "ae1dc1979bd32f85341e691405b2310b9d0ea84b",
- "generated_at": "2026-11-24T09:40:00",
- "correction_round": "3B-6.0.2.2",
+ "baseline_head": "95f7d0aa4346c31b354379b7ab7fed8982764d5f",
+ "generated_at": "2026-11-24T10:00:00",
+ "correction_round": "3B-6.0.2.3",
  "executed": true,
  "new_suite": {
-  "file": "tests/test_3b6_0_2_2_effective_observations.py",
-  "passed": 24,
+  "file": "tests/test_3b6_0_2_3_finite_positive_close.py",
+  "passed": 32,
   "failed": 0,
-  "seconds": 7.09
+  "seconds": 6.94
  },
  "new_suite_coverage": {
-  "A_all_suspect": true,
-  "B_all_rejected": true,
-  "C_single_valid": true,
-  "D_two_valid_total_return": true,
-  "E_two_valid_unknown": true,
-  "F_reevaluate_after_degradation": true,
-  "G_production_composites_none_reproducible": true,
-  "H_production_indices_unknown_and_rows_unchanged": true
+  "plus_inf_not_counted": true,
+  "minus_inf_not_counted": true,
+  "nan_not_counted": true,
+  "zero_not_counted": true,
+  "negative_not_counted": true,
+  "finite_positive_counted": true,
+  "assess_index_component_verified_directly": true,
+  "inf_plus_one_normal_below_threshold": true,
+  "composite_end_to_end": true
  },
  "regression": {
+  "3b6_0_2_2": {
+   "passed": 24
+  },
   "3b6_0_2_1": {
    "passed": 22
   },
@@ -30,69 +34,49 @@
   },
   "combined_three_suites": {
    "passed": 92,
-   "seconds": 35.19
+   "seconds": 33.3
   },
   "3b6_0_1_series": {
    "passed": 61,
-   "seconds": 21.19
+   "seconds": 20.84
   },
   "3b5_5_series": {
    "passed": 112,
-   "seconds": 137.62
+   "seconds": 146.18
   }
  },
  "full": {
   "command": "pytest -q",
-  "passed": 1782,
+  "passed": 1814,
   "failed": 0,
   "errors": 0,
-  "seconds": 673.98
+  "seconds": 658.73
  },
  "evolution": {
-  "3B-6.0.2.1": 1758,
-  "3B-6.0.2.2": 1782
+  "3B-6.0.2.2": 1782,
+  "3B-6.0.2.3": 1814
  },
  "assertions_removed": 0,
  "assertions_weakened": 0,
  "mutation_testing": [
   {
-   "mutation": "忽略 quality_status（退回总行数判定）",
-   "failed_tests": 5,
+   "mutation": "退回旧判定 c == c and c > 0（漏掉 inf）",
+   "failed_tests": 9,
    "failed_names": [
-    "test_A_all_suspect_not_available",
-    "test_B_all_rejected_not_available",
-    "test_B2_mixed_quality_only_valid_counted",
-    "test_F_reevaluate_detects_degradation",
-    "test_F4_stale_flag_does_not_stick"
-   ],
-   "restored": true
-  },
-  {
-   "mutation": "MIN_VALID_OBSERVATIONS = 1",
-   "failed_tests": 4,
-   "failed_names": [
-    "test_C_single_valid_not_available",
-    "test_C2_min_observations_is_two",
-    "test_C4_non_positive_close_not_counted",
-    "test_F2_reevaluate_detects_rows_deleted"
-   ],
-   "restored": true
-  },
-  {
-   "mutation": "evaluate_composite 信任历史 data_available",
-   "failed_tests": 4,
-   "failed_names": [
-    "test_F_reevaluate_detects_degradation",
-    "test_F2_reevaluate_detects_rows_deleted",
-    "test_F3_reevaluate_detects_basis_downgrade",
-    "test_F4_stale_flag_does_not_stick"
+    "test_inf_not_counted",
+    "test_assess_inf_plus_normal_only_one_valid",
+    "test_assess_inf_plus_two_normal_available",
+    "test_assess_only_inf_not_available",
+    "test_assess_inf_does_not_bypass_basis_check",
+    "test_composite_with_inf_component_not_available",
+    "test_evaluate_reevaluates_after_inf_injected"
    ],
    "restored": true
   }
  ],
  "source_actual_calls": {
   "invocations": 0,
-  "reason": "任务书禁止重新调用中证接口"
+  "reason": "任务书禁止重新采集中证指数"
  },
  "static_checks_excluded": [
   "compileall 语法检查",
@@ -137,17 +121,28 @@
   "foreign_key_violations": 0,
   "writes_this_round": 0
  },
+ "data_issue_found": {
+  "count": 1,
+  "index_code": "H30184",
+  "trade_date": "2013-06-28",
+  "close": 0.0,
+  "quality_status": "valid",
+  "fixed_this_round": false,
+  "reason": "任务书禁止修改 50,603 条指数行情",
+  "impact_on_conclusions": "无；该行修复前后都不被计入，且该指数口径为 unknown"
+ },
  "code_changes": {
   "modified": [
    "app/fund/composite_benchmark.py"
   ],
   "new": [
-   "tests/test_3b6_0_2_2_effective_observations.py"
+   "tests/test_3b6_0_2_3_finite_positive_close.py"
   ],
   "unchanged": [
    "app/fund/index_layer.py",
    "app/fund/index_ingest.py",
    "app/fund/index_returns.py",
+   "tests/test_3b6_0_2_2_effective_observations.py",
    "tests/test_3b6_0_2_1_raw_quality_and_basis.py",
    "tests/test_3b6_0_2_index_layer.py",
    "app/fund/research/engine.py",

@@ -8,6 +8,7 @@
 """
 from __future__ import annotations
 
+import math
 import sqlite3
 from datetime import datetime
 
@@ -45,14 +46,35 @@ def count_effective_observations(conn: sqlite3.Connection,
         "WHERE index_code=? AND quality_status='valid'", (index_code,))
     n = 0
     for r in rows:
-        try:
-            c = float(r[0])
-        except (TypeError, ValueError):
-            continue
-        if c != c or c <= 0:        # NaN / 非正数
-            continue
-        n += 1
+        if _is_usable_close(r[0]):
+            n += 1
     return n
+
+
+def _is_usable_close(value) -> bool:
+    """收盘价能否用于收益计算。
+
+    必须**严格有限且大于 0**：
+
+    | 值 | 计入 | 说明 |
+    | --- | --- | --- |
+    | 有限正数 | ✅ | 正常行情 |
+    | ``+inf`` / ``-inf`` | ❌ | 非有限，收益计算会得到 inf/nan |
+    | ``NaN`` | ❌ | 非有限（SQLite 通常已转 NULL 被 NOT NULL 拒绝） |
+    | ``0`` | ❌ | 收益分母为 0 |
+    | 负数 | ❌ | 指数点位不可能为负 |
+    | ``None`` | ❌ | 空值 |
+
+    用 ``math.isfinite`` 而不是 ``v != v``——后者只能识别 NaN，
+    **漏掉 ±inf**。
+    """
+    if value is None:
+        return False
+    try:
+        c = float(value)
+    except (TypeError, ValueError):
+        return False
+    return math.isfinite(c) and c > 0
 
 
 def assess_index_component(conn: sqlite3.Connection,
