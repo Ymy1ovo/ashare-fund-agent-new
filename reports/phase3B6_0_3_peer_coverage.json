@@ -1,0 +1,97 @@
+{
+ "phase": "3B-6.0.3",
+ "report": "peer_coverage",
+ "baseline_head": "4be8b044b2cc8f2d0a40c2cc8241bc66f2249dab",
+ "generated_at": "2026-11-24T11:25:00",
+ "before": {
+  "groups": 13,
+  "groups_ge_5": 0,
+  "groups_ge_10": 0,
+  "max_group": 3
+ },
+ "after": {
+  "groups": 26,
+  "groups_ge_5": 5,
+  "groups_ge_10": 1,
+  "max_group": 14,
+  "groups_below_2": 10
+ },
+ "peer_groups": {
+  "active_equity|中证800": 5,
+  "bond_mixed|unknown": 2,
+  "bond_pure|unknown": 14,
+  "active_equity|unknown": 4,
+  "etf_linked|broad|中证500": 3,
+  "money_market": 7,
+  "active_equity|中证A500": 1,
+  "active_equity|沪深300": 4,
+  "etf_linked|broad|沪深300": 5,
+  "ordinary_index|broad|沪深300": 4,
+  "ordinary_index|broad|中证500": 5,
+  "lof|active|中债综合": 1,
+  "etf_linked|broad|上证50": 3,
+  "etf_linked|broad|创业板指": 3,
+  "ordinary_index|broad|创业板指": 1,
+  "active_equity|中证500": 2,
+  "ordinary_index|unknown|上证50": 1,
+  "ordinary_index|broad|上证50": 1,
+  "etf_linked|sector|中证全指半导体": 1,
+  "etf_linked|unknown|unknown": 2,
+  "etf_linked|broad|unknown": 1,
+  "ordinary_index|unknown|unknown": 1,
+  "etf_linked|broad|中证A500": 3,
+  "ordinary_index|broad|中证A500": 3,
+  "lof|active|unknown": 1,
+  "lof|index|sector|中证白酒": 1
+ },
+ "achieved_groups": [
+  "active_equity|中证800",
+  "bond_pure|unknown",
+  "money_market",
+  "etf_linked|broad|沪深300",
+  "ordinary_index|broad|中证500"
+ ],
+ "verifiable_achieved_groups": [
+  "active_equity|中证800",
+  "etf_linked|broad|沪深300",
+  "ordinary_index|broad|中证500"
+ ],
+ "bond_pure_caveat": {
+  "member_count": 14,
+  "peer_key": "bond_pure|unknown",
+  "verifiable": false,
+  "must_grade": "D",
+  "note": "久期/信用/转债字段全 NULL，数量达标不等于可比较"
+ },
+ "short_categories": [
+  {
+   "category": "bond_mixed",
+   "count": 2,
+   "gap_to_5": 3,
+   "cause": "库内类型字段与天天基金分类不一致"
+  },
+  {
+   "category": "lof",
+   "count": 3,
+   "gap_to_5": 2,
+   "cause": "5 只 LOF 简称不含 (LOF)，分类器识别不到"
+  }
+ ],
+ "not_done_to_pad_numbers": {
+  "merge_incomparable": false,
+  "count_c_shares": false,
+  "modify_classifier": false
+ },
+ "objective_conclusion": {
+  "descriptive_peer_comparison": "partially（4 个可验证组）",
+  "formal_ranking": false,
+  "excess_return": false,
+  "backtest": false,
+  "bond_pure_direct_comparison": false
+ },
+ "gate": {
+  "ready_for_research_analysis": true,
+  "ready_for_backtest": false,
+  "ready_for_formal_ranking": false
+ }
+}

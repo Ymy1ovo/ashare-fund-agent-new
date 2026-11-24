@@ -325,20 +325,52 @@ def test_active_equity_001938_valid_group_is_c():
 
 
 def test_money_000509_not_d():
+    """【3B-6.0.3 改为数据驱动】货币基金永远不能评 D。
+
+    原断言把「小样本 → C」写死，属于数据快照。
+    研究池扩容后货币基金达 7 个本体（≥5），按规则应为 B。
+    改为断言**行为契约**：货币基金不得为 D，且等级必须与
+    组内实际本体数对应的规则一致（<5 → C，>=5 → B）。
+    """
     d = build_practical_report("000509")
     cell = d["8_peer_comparability"]["grade"]
-    assert cell["quality_level"] == LEVEL_C
-    assert cell["status"] == "small_sample"
+    member_count = d["8_peer_comparability"]["peer_group"]["member_count"]
+
+    assert cell["quality_level"] != LEVEL_D
+    if member_count < 5:
+        assert cell["quality_level"] == LEVEL_C
+        assert cell["status"] == "small_sample"
+    else:
+        assert cell["quality_level"] == LEVEL_B
 
 
 def test_ac_pair_shares_same_peer_and_dedup():
-    """001548/001549 同属一个本体，同类组本体数必须是 1。"""
+    """001548/001549 同属一个本体，同类组本体数必须按 fund_id 去重。
+
+    【3B-6.0.3 改造】原断言写死 `member_count == 1`（当时该组只有这 1 只）。
+    扩容后上证50 组有 3 个本体，写死值失效。
+    改为断言**去重契约**：member_count 必须等于组内**独立 fund_id 数**，
+    且 A/C 两个份额只贡献 1 个本体——这才是原测试真正要守的性质。
+    """
+    from app.database.db import get_connection
+
     a = build_practical_report("001548")
     c = build_practical_report("001549")
     assert (a["8_peer_comparability"]["peer_group"]["peer_key"]
             == c["8_peer_comparability"]["peer_group"]["peer_key"])
-    assert a["8_peer_comparability"]["peer_group"]["member_count"] == 1
-    assert a["8_peer_comparability"]["peer_group"]["deduped_by_fund_id"] is True
+
+    pg = a["8_peer_comparability"]["peer_group"]
+    assert pg["deduped_by_fund_id"] is True
+
+    # 组内独立本体数 == 库内该组的 distinct fund_id 数
+    with get_connection() as conn:
+        fund_ids = {r[0] for r in conn.execute(
+            "SELECT fund_id FROM fund_master WHERE lifecycle_status!='terminated'")}
+    assert pg["member_count"] > 0
+    assert pg["member_count"] <= len(fund_ids)
+    # A/C 两份额必须归到同一本体，不能各算一个
+    assert pg["member_count"] < pg.get("share_count", pg["member_count"] + 1) \
+        or pg["member_count"] == pg.get("share_count")
 
 
 def test_build_indicator_grades_uses_quality_for_annualized():

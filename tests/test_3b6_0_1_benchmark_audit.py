@@ -234,13 +234,35 @@ def test_summary_consistent():
 
 
 def test_summary_live_numbers():
+    """【3B-6.0.3 改为数据驱动】研究池扩容后存续本体从 19 增至 79。
+
+    原断言把 19 / 26 / 18 写死，属于**数据快照**而非行为契约，
+    扩容后必然失效。改为与正式库实时比对：断言审计汇总必须
+    与直接查库结果**完全一致**（这比写死数字更强，不依赖具体数量）。
+
+    同时保留「tracking_index 恒为 0」这一结构性结论。
+    """
+    from app.database.db import get_connection
+
     a = audit_all_benchmarks()
     s = summarize_audit(a)
-    assert s["live"]["fund_count"] == 19
-    assert s["live"]["share_count"] == 26
+
+    with get_connection() as conn:
+        live_ids = [r[0] for r in conn.execute(
+            "SELECT fund_id FROM fund_master WHERE lifecycle_status!='terminated'")]
+        live_shares = conn.execute(
+            "SELECT COUNT(*) FROM fund_share_classes sc "
+            "JOIN fund_master fm ON fm.fund_id=sc.fund_id "
+            "WHERE fm.lifecycle_status!='terminated'").fetchone()[0]
+
+    assert s["live"]["fund_count"] == len(live_ids)
+    assert s["live"]["share_count"] == live_shares
+    # 结构性结论：全库从未有 tracking_index
     assert s["live"]["has_tracking_index"] == 0
-    assert s["live"]["has_benchmark"] == 18
-    assert s["live"]["no_benchmark"] == 1
+    # 有基准 + 无基准 = 存续本体总数
+    assert (s["live"]["has_benchmark"] + s["live"]["no_benchmark"]
+            == s["live"]["fund_count"])
+    assert s["live"]["has_benchmark"] > 0
 
 
 def test_summary_multi_index_listed():

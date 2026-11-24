@@ -1,0 +1,132 @@
+{
+ "phase": "3B-6.0.3",
+ "report": "universe_expansion",
+ "baseline_head": "4be8b044b2cc8f2d0a40c2cc8241bc66f2249dab",
+ "generated_at": "2026-11-24T10:55:00",
+ "before": {
+  "fund_master": 60,
+  "fund_share_classes": 89,
+  "universe_funds": 19,
+  "universe_shares": 26,
+  "peer_groups": 13,
+  "groups_ge_5": 0,
+  "max_group": 3
+ },
+ "after": {
+  "fund_master": 120,
+  "fund_share_classes": 149,
+  "universe_funds": 79,
+  "universe_shares": 86,
+  "peer_groups": 26,
+  "groups_ge_5": 5,
+  "groups_ge_10": 1,
+  "max_group": 14
+ },
+ "by_product_class": {
+  "普通指数基金": 16,
+  "ETF联接基金": 21,
+  "主动权益基金": 16,
+  "纯债基金": 14,
+  "混合债券基金": 2,
+  "货币基金": 7,
+  "LOF 场外份额": 3
+ },
+ "peer_groups": {
+  "active_equity|中证800": 5,
+  "bond_mixed|unknown": 2,
+  "bond_pure|unknown": 14,
+  "active_equity|unknown": 4,
+  "etf_linked|broad|中证500": 3,
+  "money_market": 7,
+  "active_equity|中证A500": 1,
+  "active_equity|沪深300": 4,
+  "etf_linked|broad|沪深300": 5,
+  "ordinary_index|broad|沪深300": 4,
+  "ordinary_index|broad|中证500": 5,
+  "lof|active|中债综合": 1,
+  "etf_linked|broad|上证50": 3,
+  "etf_linked|broad|创业板指": 3,
+  "ordinary_index|broad|创业板指": 1,
+  "active_equity|中证500": 2,
+  "ordinary_index|unknown|上证50": 1,
+  "ordinary_index|broad|上证50": 1,
+  "etf_linked|sector|中证全指半导体": 1,
+  "etf_linked|unknown|unknown": 2,
+  "etf_linked|broad|unknown": 1,
+  "ordinary_index|unknown|unknown": 1,
+  "etf_linked|broad|中证A500": 3,
+  "ordinary_index|broad|中证A500": 3,
+  "lof|active|unknown": 1,
+  "lof|index|sector|中证白酒": 1
+ },
+ "ac_merge": {
+  "multi_share_funds": 27,
+  "duplicate_entities": 0,
+  "share_to_fund_ratio": 1.09,
+  "verified": true
+ },
+ "selection_rule": {
+  "sort_by": "fund code ascending",
+  "sort_by_recent_performance": false,
+  "sort_by_aum": false,
+  "sort_by_rating": false,
+  "ac_dedup_in_candidate": true,
+  "ac_merge_at_ingest": true
+ },
+ "ingest_result": {
+  "requested": 68,
+  "ingested": 60,
+  "already_present": 7,
+  "failed": 1,
+  "failed_codes": [
+   "000154"
+  ],
+  "failed_reason": "KeyError: 'data'（雪球接口未返回）",
+  "failed_polluted_db": false
+ },
+ "data_quality": {
+  "nav_rows": 245656,
+  "nav_min_rows_fund": 154,
+  "funds_below_250_rows": 1,
+  "benchmark_covered": 78,
+  "tracking_index_covered": 0,
+  "dividend_covered_funds": 40,
+  "aum_covered_funds": 8,
+  "manager_covered_funds": 9,
+  "fee_covered_funds": 9
+ },
+ "survivorship_bias": {
+  "known_terminated": 41,
+  "terminated_shares": 63,
+  "is_full_list": false,
+  "coverage_quantifiable": false,
+  "bias_eliminated": false,
+  "represents_all_history": false,
+  "terminated_missing_type": 41,
+  "lifecycle_event_types": {
+   "established": 8,
+   "terminated": 41
+  }
+ },
+ "objective_conclusion": {
+  "peer_comparison_sample_ready": "partially（5 组 ≥5 本体）",
+  "excess_return_validation_ready": false,
+  "backtest_ready": false,
+  "formal_ranking_ready": false,
+  "bond_mixed_lof_short_sample": true
+ },
+ "boundaries": {
+  "backtest_engine_modified": false,
+  "indicator_formula_modified": false,
+  "onshore_etf_rerun": false,
+  "ac_double_counted": false,
+  "fabricated_data": false,
+  "third_party_fee_as_alipay": false,
+  "auto_trading": false
+ },
+ "gate": {
+  "ready_for_research_analysis": true,
+  "ready_for_backtest": false,
+  "ready_for_formal_ranking": false
+ }
+}

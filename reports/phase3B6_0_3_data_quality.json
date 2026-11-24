@@ -1,0 +1,102 @@
+{
+ "phase": "3B-6.0.3",
+ "report": "data_quality",
+ "baseline_head": "4be8b044b2cc8f2d0a40c2cc8241bc66f2249dab",
+ "generated_at": "2026-11-24T11:25:00",
+ "table_counts": {
+  "before": {
+   "fund_master": 60,
+   "fund_share_classes": 89,
+   "fund_nav_daily": 80083,
+   "fund_dividends": 105,
+   "fund_lifecycle_events": 49
+  },
+  "after": {
+   "fund_master": 120,
+   "fund_share_classes": 149,
+   "fund_nav_daily": 245656,
+   "fund_dividends": 376,
+   "fund_lifecycle_events": 49
+  }
+ },
+ "nav_coverage": {
+  "total_rows": 245656,
+  "funds_covered": 79,
+  "min_rows_per_fund": 154,
+  "funds_below_250": 1,
+  "earliest": "2001-12-18",
+  "latest": "2026-11-23"
+ },
+ "nav_kind": {
+  "net_value": 214466,
+  "money_yield": 31190,
+  "money_kept_separate": true
+ },
+ "dividend": {
+  "total_records": 376,
+  "funds_covered": 40,
+  "coverage_rate": 0.506,
+  "unit_nav_substituted_for_total_return": false
+ },
+ "auxiliary_coverage": {
+  "aum_funds": 8,
+  "manager_funds": 9,
+  "fee_funds": 12,
+  "total_funds": 79,
+  "supplemented_this_round": false,
+  "reason": "禁止回填历史时点规模 / 伪装历史任职 / 第三方费率冒充支付宝费率"
+ },
+ "benchmark": {
+  "with_benchmark": 78,
+  "total": 79,
+  "with_tracking_index": 0,
+  "source": "第三方转述，未核对合同原文"
+ },
+ "ingest_quality": {
+  "temp_db_first": true,
+  "idempotent": true,
+  "atomic_transaction": true,
+  "fk_enabled": true,
+  "failed_isolated": true,
+  "ac_merged": true,
+  "failed_samples": [
+   {
+    "code": "000154",
+    "reason": "KeyError: 'data'"
+   }
+  ]
+ },
+ "known_data_issues": [
+  {
+   "issue": "债券类型源不一致",
+   "detail": "库内 fund_type_l1 与天天基金分类在 16/17 只债券基金上不同",
+   "impact": "混合债券组识别偏少（当前 2 只）",
+   "fixed": false
+  },
+  {
+   "issue": "LOF 识别依赖基金简称",
+   "detail": "5 只 LOF 简称不含 (LOF)，但全称含",
+   "impact": "LOF 组当前 3 只，偏少",
+   "fixed": false
+  },
+  {
+   "issue": "41 个清盘本体缺 fund_type_l1",
+   "detail": "全部为 NULL",
+   "impact": "无法分类",
+   "fixed": false
+  }
+ ],
+ "boundaries": {
+  "fabricated_data": false,
+  "unit_nav_as_total_return": false,
+  "aum_backfilled": false,
+  "manager_snapshot_as_history": false,
+  "third_party_fee_as_alipay": false,
+  "terminated_entities_modified": false
+ },
+ "gate": {
+  "ready_for_research_analysis": true,
+  "ready_for_backtest": false,
+  "ready_for_formal_ranking": false
+ }
+}

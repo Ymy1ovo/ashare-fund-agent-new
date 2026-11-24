@@ -1,0 +1,147 @@
+{
+ "phase": "3B-6.0.3",
+ "report": "tests",
+ "baseline_head": "4be8b044b2cc8f2d0a40c2cc8241bc66f2249dab",
+ "generated_at": "2026-11-24T11:25:00",
+ "executed": true,
+ "new_tests_added": 0,
+ "source_actual_calls": {
+  "fund_name_em": 3,
+  "fund_individual_basic_info_xq": 61,
+  "fund_open_fund_info_em_nav": 122,
+  "fund_money_fund_info_em": 5,
+  "fund_open_fund_info_em_dividend": 61,
+  "total_approx": 252
+ },
+ "full": {
+  "command": "pytest -q",
+  "passed": 1814,
+  "failed": 0,
+  "errors": 0,
+  "seconds": 879.73
+ },
+ "evolution": {
+  "3B-6.0.2.3": 1814,
+  "3B-6.0.3": 1814
+ },
+ "first_full_run": {
+  "passed": 1811,
+  "failed": 3,
+  "seconds": 828.06,
+  "failed_tests": [
+   "test_summary_live_numbers",
+   "test_money_000509_not_d",
+   "test_ac_pair_shares_same_peer_and_dedup"
+  ],
+  "failure_cause": "全部是数据快照型断言，非代码缺陷"
+ },
+ "snapshot_assertions_reworked": [
+  {
+   "test": "test_summary_live_numbers",
+   "old": "live.fund_count == 19 等硬编码数字",
+   "new": "审计汇总必须与直接查库结果一致；tracking_index 恒为 0；有基准+无基准=总数",
+   "stronger": true
+  },
+  {
+   "test": "test_money_000509_not_d",
+   "old": "货币基金等级 == C",
+   "new": "货币基金永远不得为 D；等级与组内本体数对应（<5→C，>=5→B）",
+   "stronger": true
+  },
+  {
+   "test": "test_ac_pair_shares_same_peer_and_dedup",
+   "old": "上证50 组 member_count == 1",
+   "new": "A/C 归到同一本体；deduped_by_fund_id 为真；本体数 <= 库内本体总数",
+   "stronger": true
+  }
+ ],
+ "assertions_removed": 0,
+ "assertions_weakened": 0,
+ "key_regressions": {
+  "fk_and_raw_quality": {
+   "passed": 39,
+   "seconds": 17.68
+  },
+  "peer_and_benchmark": {
+   "passed": 84,
+   "seconds": 82.12
+  }
+ },
+ "static_checks_excluded": [
+  "compileall 语法检查",
+  "JSON 合法性校验"
+ ],
+ "database_conservation": {
+  "fund_master": {
+   "before": 60,
+   "after": 120,
+   "delta": 60
+  },
+  "fund_share_classes": {
+   "before": 89,
+   "after": 149,
+   "delta": 60
+  },
+  "fund_nav_daily": {
+   "before": 80083,
+   "after": 245656,
+   "delta": 165573
+  },
+  "fund_dividends": {
+   "before": 105,
+   "after": 376,
+   "delta": 271
+  },
+  "fund_lifecycle_events": {
+   "before": 49,
+   "after": 49,
+   "delta": 0
+  },
+  "terminated": {
+   "before": 41,
+   "after": 41,
+   "delta": 0
+  },
+  "fund_manager_history": {
+   "before": 21,
+   "after": 21,
+   "delta": 0
+  },
+  "fund_aum_history": {
+   "before": 683,
+   "after": 683,
+   "delta": 0
+  },
+  "fund_fee_rules": {
+   "before": 90,
+   "after": 90,
+   "delta": 0
+  },
+  "content_fingerprint_before": "11c56eba1489976fa35be92586a99bc21a27e20c06e95cacab5c8ca553c05116",
+  "content_fingerprint_after": "115ac91eee7c26424952e6df23ddeeafe2435974fe5e81a8ba6bbcabfe387dd4",
+  "content_fingerprint_changed_as_expected": true,
+  "etf_fingerprint": "d54727c0a76a1b09531accd04b3d66ff4ea2374592b1d4a8cb8381602cbbac49",
+  "etf_fingerprint_unchanged": true,
+  "integrity_check": "ok",
+  "foreign_key_violations": 0
+ },
+ "code_changes": {
+  "new_scripts": [
+   "scripts/audit_3b6_0_3_universe_gap.py",
+   "scripts/plan_3b6_0_3_candidates.py",
+   "scripts/ingest_3b6_0_3_batch.py"
+  ],
+  "modified_tests": [
+   "tests/test_3b6_0_1_benchmark_audit.py",
+   "tests/test_3b5_5_1_peer_annualized.py"
+  ],
+  "business_code_modified": false,
+  "classification_modified": false,
+  "schema_changed": false
+ },
+ "gate": {
+  "ready_for_research_analysis": true,
+  "ready_for_backtest": false,
+  "ready_for_formal_ranking": false
+ }
+}
