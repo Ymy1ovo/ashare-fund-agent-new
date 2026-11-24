@@ -1,0 +1,584 @@
+{
+ "phase": "3B-6.0.4",
+ "step": "07_stability",
+ "baseline_head": "f64b7e554d7303c523bb6ba9ee84550b2e0a7a9d",
+ "generated_at": "2026-11-24T13:32:09",
+ "db_fingerprint": "115ac91eee7c26424952e6df23ddeeafe2435974fe5e81a8ba6bbcabfe387dd4",
+ "actually_executed": true,
+ "windows": {
+  "1y": 365,
+  "3y": 1095,
+  "step_days": 30,
+  "exact_endpoint": true,
+  "skip_gap": true,
+  "min_rolling_windows": 5
+ },
+ "market_phase_analysis": {
+  "done": false,
+  "reason": "事后选区间会制造有利结论"
+ },
+ "no_forward_guarantee": true,
+ "no_out_of_sample": true,
+ "groups": [
+  {
+   "peer_key": "active_equity|中证800",
+   "funds": [
+    {
+     "share_code": "000001",
+     "fund_name": "华夏成长混合",
+     "window_1y": {
+      "status": "ok",
+      "reason": null,
+      "window_days": 365,
+      "step_days": 30,
+      "valid_count": 152,
+      "skipped_count": 140,
+      "positive_ratio": 0.611842,
+      "median_return": 0.01833501,
+      "min_return": -0.24548416,
+      "max_return": 1.11791237,
+      "spread": 1.36339653
+     },
+     "best_window_dependency_1y": {
+      "status": "ok",
+      "best_window": {
+       "start_date": "2006-08-24",
+       "end_date": "2007-08-24",
+       "return": 1.11791237
+      },
+      "median_return": 0.01833501,
+      "excess_over_median": 1.09957736,
+      "high_dependency": true,
+      "note": "整体优势可能主要来自单一窗口，需谨慎解读"
+     },
+     "exclude_best_1y": {
+      "status": "ok",
+      "remaining_count": 151,
+      "median_return": 0.01832994,
+      "positive_ratio": 0.609272,
+      "changed_sign_from_positive_to_non_positive": false
+     }
+    },
+    {
+     "share_code": "000021",
+     "fund_name": "华夏优势增长混合",
+     "window_1y": {
+      "status": "ok",
+      "reason": null,
+      "window_days": 365,
+      "step_days": 30,
+      "valid_count": 121,
+      "skipped_count": 111,
+      "positive_ratio": 0.595041,
+      "median_return": 0.04739162,
+      "min_return": -0.4022391,
+      "max_return": 1.01318852,
+      "spread": 1.41542762
+     },
+     "best_window_dependency_1y": {
+      "status": "ok",
+      "best_window": {
+       "start_date": "2007-01-23",
+       "end_date": "2008-01-23",
+       "return": 1.01318852
+      },
+      "median_return": 0.04739162,
+      "excess_over_median": 0.9657969,
+      "high_dependency": true,
+      "note": "整体优势可能主要来自单一窗口，需谨慎解读"
+     },
+     "exclude_best_1y": {
+      "status": "ok",
+      "remaining_count": 120,
+      "median_return": 0.04739162,
+      "positive_ratio": 0.591667,
+      "changed_sign_from_positive_to_non_positive": false
+     }
+    },
+    {
+     "share_code": "001883",
+     "fund_name": "中欧新动力混合",
+     "window_1y": {
+      "status": "ok",
+      "reason": null,
+      "window_days": 365,
+      "step_days": 30,
+      "valid_count": 64,
+      "skipped_count": 60,
+      "positive_ratio": 0.671875,
+      "median_return": 0.06301778,
+      "min_return": -0.1690121,
+      "max_return": 0.43819731,
+      "spread": 0.60720941
+     },
+     "best_window_dependency_1y": {
+      "status": "ok",
+      "best_window": {
+       "start_date": "2019-10-17",
+       "end_date": "2020-10-16",
+       "return": 0.43819731
+      },
+      "median_return": 0.06301778,
+      "excess_over_median": 0.37517953,
+      "high_dependency": true,
+      "note": "整体优势可能主要来自单一窗口，需谨慎解读"
+     },
+     "exclude_best_1y": {
+      "status": "ok",
+      "remaining_count": 63,
+      "median_return": 0.06083679,
+      "positive_ratio": 0.666667,
+      "changed_sign_from_positive_to_non_positive": false
+     }
+    },
+    {
+     "share_code": "001886",
+     "fund_name": "中欧成长",
+     "window_1y": {
+      "status": "ok",
+      "reason": null,
+      "window_days": 365,
+      "step_days": 30,
+      "valid_count": 64,
+      "skipped_count": 60,
+      "positive_ratio": 0.65625,
+      "median_return": 0.09839175,
+      "min_return": -0.23395438,
+      "max_return": 0.54840454,
+      "spread": 0.78235892
+     },
+     "best_window_dependency_1y": {
+      "status": "ok",
+      "best_window": {
+       "start_date": "2019-10-17",
+       "end_date": "2020-10-16",
+       "return": 0.54840454
+      },
+      "median_return": 0.09839175,
+      "excess_over_median": 0.45001279,
+      "high_dependency": true,
+      "note": "整体优势可能主要来自单一窗口，需谨慎解读"
+     },
+     "exclude_best_1y": {
+      "status": "ok",
+      "remaining_count": 63,
+      "median_return": 0.09424221,
+      "positive_ratio": 0.650794,
+      "changed_sign_from_positive_to_non_positive": false
+     }
+    },
+    {
+     "share_code": "519066",
+     "fund_name": "汇添富蓝筹稳健混合",
+     "window_1y": {
+      "status": "ok",
+      "reason": null,
+      "window_days": 365,
+      "step_days": 30,
+      "valid_count": 108,
+      "skipped_count": 104,
+      "positive_ratio": 0.62037,
+      "median_return": 0.08306653,
+      "min_return": -0.23050542,
+      "max_return": 0.80915033,
+      "spread": 1.03965575
+     },
+     "best_window_dependency_1y": {
+      "status": "ok",
+      "best_window": {
+       "start_date": "2014-05-08",
+       "end_date": "2015-05-08",
+       "return": 0.80915033
+      },
+      "median_return": 0.08306653,
+      "excess_over_median": 0.7260838,
+      "high_dependency": true,
+      "note": "整体优势可能主要来自单一窗口，需谨慎解读"
+     },
+     "exclude_best_1y": {
+      "status": "ok",
+      "remaining_count": 107,
+      "median_return": 0.08305425,
+      "positive_ratio": 0.616822,
+      "changed_sign_from_positive_to_non_positive": false
+     }
+    }
+   ]
+  },
+  {
+   "peer_key": "etf_linked|broad|沪深300",
+   "funds": [
+    {
+     "share_code": "000051",
+     "fund_name": "华夏沪深300ETF联接",
+     "window_1y": {
+      "status": "ok",
+      "reason": null,
+      "window_days": 365,
+      "step_days": 30,
+      "valid_count": 104,
+      "skipped_count": 96,
+      "positive_ratio": 0.548077,
+      "median_return": 0.03493994,
+      "min_return": -0.36641221,
+      "max_return": 1.10582822,
+      "spread": 1.47224043
+     },
+     "best_window_dependency_1y": {
+      "status": "ok",
+      "best_window": {
+       "start_date": "2014-05-15",
+       "end_date": "2015-05-15",
+       "return": 1.10582822
+      },
+      "median_return": 0.03493994,
+      "excess_over_median": 1.07088828,
+      "high_dependency": true,
+      "note": "整体优势可能主要来自单一窗口，需谨慎解读"
+     },
+     "exclude_best_1y": {
+      "status": "ok",
+      "remaining_count": 103,
+      "median_return": 0.03434066,
+      "positive_ratio": 0.543689,
+      "changed_sign_from_positive_to_non_positive": false
+     }
+    },
+    {
+     "share_code": "000613",
+     "fund_name": "国寿安保沪深300ETF联接",
+     "window_1y": {
+      "status": "ok",
+      "reason": null,
+      "window_days": 365,
+      "step_days": 30,
+      "valid_count": 72,
+      "skipped_count": 68,
+      "positive_ratio": 0.569444,
+      "median_return": 0.04833902,
+      "min_return": -0.27368805,
+      "max_return": 1.2587,
+      "spread": 1.53238805
+     },
+     "best_window_dependency_1y": {
+      "status": "ok",
+      "best_window": {
+       "start_date": "2014-06-05",
+       "end_date": "2015-06-05",
+       "return": 1.2587
+      },
+      "median_return": 0.04833902,
+      "excess_over_median": 1.21036098,
+      "high_dependency": true,
+      "note": "整体优势可能主要来自单一窗口，需谨慎解读"
+     },
+     "exclude_best_1y": {
+      "status": "ok",
+      "remaining_count": 71,
+      "median_return": 0.04683005,
+      "positive_ratio": 0.56338,
+      "changed_sign_from_positive_to_non_positive": false
+     }
+    },
+    {
+     "share_code": "000961",
+     "fund_name": "天弘沪深300ETF联接",
+     "window_1y": {
+      "status": "ok",
+      "reason": null,
+      "window_days": 365,
+      "step_days": 30,
+      "valid_count": 69,
+      "skipped_count": 63,
+      "positive_ratio": 0.594203,
+      "median_return": 0.07123172,
+      "min_return": -0.35161621,
+      "max_return": 0.39078912,
+      "spread": 0.74240533
+     },
+     "best_window_dependency_1y": {
+      "status": "ok",
+      "best_window": {
+       "start_date": "2020-03-24",
+       "end_date": "2021-03-24",
+       "return": 0.39078912
+      },
+      "median_return": 0.07123172,
+      "excess_over_median": 0.3195574,
+      "high_dependency": false,
+      "note": "窗口分布相对均匀"
+     },
+     "exclude_best_1y": {
+      "status": "ok",
+      "remaining_count": 68,
+      "median_return": 0.07123172,
+      "positive_ratio": 0.588235,
+      "changed_sign_from_positive_to_non_positive": false
+     }
+    },
+    {
+     "share_code": "002987",
+     "fund_name": "广发沪深300ETF联接",
+     "window_1y": {
+      "status": "ok",
+      "reason": null,
+      "window_days": 365,
+      "step_days": 30,
+      "valid_count": 57,
+      "skipped_count": 58,
+      "positive_ratio": 0.578947,
+      "median_return": 0.08303431,
+      "min_return": -0.22336525,
+      "max_return": 0.37519362,
+      "spread": 0.59855887
+     },
+     "best_window_dependency_1y": {
+      "status": "ok",
+      "best_window": {
+       "start_date": "2020-03-17",
+       "end_date": "2021-03-17",
+       "return": 0.37519362
+      },
+      "median_return": 0.08303431,
+      "excess_over_median": 0.29215931,
+      "high_dependency": false,
+      "note": "窗口分布相对均匀"
+     },
+     "exclude_best_1y": {
+      "status": "ok",
+      "remaining_count": 56,
+      "median_return": 0.08303431,
+      "positive_ratio": 0.571429,
+      "changed_sign_from_positive_to_non_positive": false
+     }
+    },
+    {
+     "share_code": "110020",
+     "fund_name": "易方达沪深300ETF联接",
+     "window_1y": {
+      "status": "ok",
+      "reason": null,
+      "window_days": 365,
+      "step_days": 30,
+      "valid_count": 102,
+      "skipped_count": 96,
+      "positive_ratio": 0.519608,
+      "median_return": 0.02808395,
+      "min_return": -0.37701423,
+      "max_return": 0.90672761,
+      "spread": 1.28374184
+     },
+     "best_window_dependency_1y": {
+      "status": "ok",
+      "best_window": {
+       "start_date": "2014-07-01",
+       "end_date": "2015-07-01",
+       "return": 0.90672761
+      },
+      "median_return": 0.02808395,
+      "excess_over_median": 0.87864366,
+      "high_dependency": true,
+      "note": "整体优势可能主要来自单一窗口，需谨慎解读"
+     },
+     "exclude_best_1y": {
+      "status": "ok",
+      "remaining_count": 101,
+      "median_return": 0.02585881,
+      "positive_ratio": 0.514851,
+      "changed_sign_from_positive_to_non_positive": false
+     }
+    }
+   ]
+  },
+  {
+   "peer_key": "ordinary_index|broad|中证500",
+   "funds": [
+    {
+     "share_code": "000478",
+     "fund_name": "建信中证500指数增强",
+     "window_1y": {
+      "status": "ok",
+      "reason": null,
+      "window_days": 365,
+      "step_days": 30,
+      "valid_count": 72,
+      "skipped_count": 72,
+      "positive_ratio": 0.652778,
+      "median_return": 0.0790121,
+      "min_return": -0.30469037,
+      "max_return": 1.86907935,
+      "spread": 2.17376972
+     },
+     "best_window_dependency_1y": {
+      "status": "ok",
+      "best_window": {
+       "start_date": "2014-05-27",
+       "end_date": "2015-05-27",
+       "return": 1.86907935
+      },
+      "median_return": 0.0790121,
+      "excess_over_median": 1.79006725,
+      "high_dependency": true,
+      "note": "整体优势可能主要来自单一窗口，需谨慎解读"
+     },
+     "exclude_best_1y": {
+      "status": "ok",
+      "remaining_count": 71,
+      "median_return": 0.06614644,
+      "positive_ratio": 0.647887,
+      "changed_sign_from_positive_to_non_positive": false
+     }
+    },
+    {
+     "share_code": "000962",
+     "fund_name": "天弘中证500指数",
+     "window_1y": {
+      "status": "ok",
+      "reason": null,
+      "window_days": 365,
+      "step_days": 30,
+      "valid_count": 69,
+      "skipped_count": 64,
+      "positive_ratio": 0.565217,
+      "median_return": 0.01779153,
+      "min_return": -0.41493961,
+      "max_return": 0.52723432,
+      "spread": 0.94217393
+     },
+     "best_window_dependency_1y": {
+      "status": "ok",
+      "best_window": {
+       "start_date": "2025-01-27",
+       "end_date": "2026-01-27",
+       "return": 0.52723432
+      },
+      "median_return": 0.01779153,
+      "excess_over_median": 0.50944279,
+      "high_dependency": true,
+      "note": "整体优势可能主要来自单一窗口，需谨慎解读"
+     },
+     "exclude_best_1y": {
+      "status": "ok",
+      "remaining_count": 68,
+      "median_return": 0.01779153,
+      "positive_ratio": 0.558824,
+      "changed_sign_from_positive_to_non_positive": false
+     }
+    },
+    {
+     "share_code": "001050",
+     "fund_name": "汇添富中证500指数增强",
+     "window_1y": {
+      "status": "ok",
+      "reason": null,
+      "window_days": 365,
+      "step_days": 30,
+      "valid_count": 68,
+      "skipped_count": 64,
+      "positive_ratio": 0.647059,
+      "median_return": 0.08684636,
+      "min_return": -0.32607261,
+      "max_return": 0.469869,
+      "spread": 0.79594161
+     },
+     "best_window_dependency_1y": {
+      "status": "ok",
+      "best_window": {
+       "start_date": "2019-10-23",
+       "end_date": "2020-10-22",
+       "return": 0.469869
+      },
+      "median_return": 0.08684636,
+      "excess_over_median": 0.38302264,
+      "high_dependency": false,
+      "note": "窗口分布相对均匀"
+     },
+     "exclude_best_1y": {
+      "status": "ok",
+      "remaining_count": 67,
+      "median_return": 0.08477842,
+      "positive_ratio": 0.641791,
+      "changed_sign_from_positive_to_non_positive": false
+     }
+    },
+    {
+     "share_code": "001351",
+     "fund_name": "诺安中证500增强",
+     "window_1y": {
+      "status": "ok",
+      "reason": null,
+      "window_days": 365,
+      "step_days": 30,
+      "valid_count": 66,
+      "skipped_count": 62,
+      "positive_ratio": 0.560606,
+      "median_return": 0.00443336,
+      "min_return": -0.3326691,
+      "max_return": 0.45654309,
+      "spread": 0.78921219
+     },
+     "best_window_dependency_1y": {
+      "status": "ok",
+      "best_window": {
+       "start_date": "2025-04-17",
+       "end_date": "2026-04-17",
+       "return": 0.45654309
+      },
+      "median_return": 0.00443336,
+      "excess_over_median": 0.45210973,
+      "high_dependency": true,
+      "note": "整体优势可能主要来自单一窗口，需谨慎解读"
+     },
+     "exclude_best_1y": {
+      "status": "ok",
+      "remaining_count": 65,
+      "median_return": 0.00412471,
+      "positive_ratio": 0.553846,
+      "changed_sign_from_positive_to_non_positive": false
+     }
+    },
+    {
+     "share_code": "001556",
+     "fund_name": "天弘中证500指数增强",
+     "window_1y": {
+      "status": "ok",
+      "reason": null,
+      "window_days": 365,
+      "step_days": 30,
+      "valid_count": 67,
+      "skipped_count": 60,
+      "positive_ratio": 0.552239,
+      "median_return": 0.0220889,
+      "min_return": -0.2637,
+      "max_return": 0.67892056,
+      "spread": 0.94262056
+     },
+     "best_window_dependency_1y": {
+      "status": "ok",
+      "best_window": {
+       "start_date": "2019-08-08",
+       "end_date": "2020-08-07",
+       "return": 0.67892056
+      },
+      "median_return": 0.0220889,
+      "excess_over_median": 0.65683166,
+      "high_dependency": true,
+      "note": "整体优势可能主要来自单一窗口，需谨慎解读"
+     },
+     "exclude_best_1y": {
+      "status": "ok",
+      "remaining_count": 66,
+      "median_return": 0.0220889,
+      "positive_ratio": 0.545455,
+      "changed_sign_from_positive_to_non_positive": false
+     }
+    }
+   ]
+  }
+ ],
+ "gate": {
+  "ready_for_research_analysis": true,
+  "ready_for_backtest": false,
+  "ready_for_formal_ranking": false
+ }
+}

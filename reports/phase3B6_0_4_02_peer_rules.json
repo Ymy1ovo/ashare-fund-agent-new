@@ -1,0 +1,70 @@
+{
+ "phase": "3B-6.0.4",
+ "step": "02_peer_rules",
+ "baseline_head": "f64b7e554d7303c523bb6ba9ee84550b2e0a7a9d",
+ "generated_at": "2026-11-24T13:29:46",
+ "db_fingerprint": "115ac91eee7c26424952e6df23ddeeafe2435974fe5e81a8ba6bbcabfe387dd4",
+ "decision_tree": [
+  "member_count<2 -> excluded",
+  "family_unknown -> descriptive_only（即使数量很多）",
+  "family_known & count<5 -> descriptive_only",
+  "family_known & count>=5 -> comparable"
+ ],
+ "per_class_rules": {
+  "ordinary_index": {
+   "key": "product_class|index_scope|family",
+   "merge_different_index": false
+  },
+  "etf_linked": {
+   "key": "product_class|index_scope|family",
+   "merge_with_onshore_etf": false,
+   "merge_with_ordinary_index": false
+  },
+  "active_equity": {
+   "key": "product_class|benchmark_family",
+   "guess_by_name": false
+  },
+  "bond_pure": {
+   "key": "product_class|unknown",
+   "count_alone_sufficient": false,
+   "must_grade": "D"
+  },
+  "bond_mixed": {
+   "key": "product_class|unknown",
+   "count_alone_sufficient": false
+  },
+  "money_market": {
+   "key": "money_market",
+   "metric_basis": "money_yield",
+   "merge_with_nav_funds": false
+  },
+  "lof": {
+   "key": "lof|subtype|scope|family",
+   "merge_with_index_or_etf_linked": false
+  }
+ },
+ "ac_shares": {
+  "count_unit": "fund_id",
+  "ac_counted_as": 1,
+  "cost_analysis_unit": "share_class_id"
+ },
+ "group_verdict": {
+  "comparable": 4,
+  "descriptive_only": 12,
+  "excluded": 10
+ },
+ "forbidden": [
+  "merge_all_index_funds",
+  "mix_etf_linked_with_onshore_etf",
+  "count_ac_twice",
+  "guess_tracking_index_by_name",
+  "treat_bond_pure_14_as_comparable",
+  "merge_lof_into_ordinary_index",
+  "mix_money_market_into_nav_ranking"
+ ],
+ "gate": {
+  "ready_for_research_analysis": true,
+  "ready_for_backtest": false,
+  "ready_for_formal_ranking": false
+ }
+}

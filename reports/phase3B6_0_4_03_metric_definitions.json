@@ -1,0 +1,74 @@
+{
+ "phase": "3B-6.0.4",
+ "step": "03_metric_definitions",
+ "baseline_head": "f64b7e554d7303c523bb6ba9ee84550b2e0a7a9d",
+ "generated_at": "2026-11-24T13:30:05",
+ "db_fingerprint": "115ac91eee7c26424952e6df23ddeeafe2435974fe5e81a8ba6bbcabfe387dd4",
+ "reused_existing": [
+  "_window_return",
+  "_annualized",
+  "_volatility",
+  "_max_drawdown",
+  "_downside_volatility",
+  "_risk_adjusted",
+  "_rolling_stability"
+ ],
+ "existing_formulas_modified": false,
+ "new_tools": [
+  "series_span",
+  "common_window",
+  "window_return",
+  "annualized_from_return",
+  "rolling_windows",
+  "best_window_dependency",
+  "exclude_best_window"
+ ],
+ "required_metadata": [
+  "start_date",
+  "end_date",
+  "span_days",
+  "status",
+  "reason",
+  "field"
+ ],
+ "return_field_policy": {
+  "nav_fund_total_return": "acc_nav",
+  "unit_nav_use": "observation_only",
+  "money_fund": "money_yield",
+  "dividend_repair": false,
+  "dividend_repair_reason": "acc_nav 已含分红再投资，实测 0 只有分红但 acc==unit"
+ },
+ "gap_policy": {
+  "max_gap_days": 15,
+  "cross_gap_compute": false,
+  "fill_missing_as_zero": false,
+  "interpolate_endpoint": false
+ },
+ "annualization": {
+  "min_days": 365,
+  "basis": "natural_days",
+  "fixed_252": false,
+  "note": "从实际观测密度推导，不用美股 252 惯例"
+ },
+ "stability": {
+  "min_rolling_windows": 5,
+  "high_dependency_rule": "best - median > spread * 0.5",
+  "exclude_best_window_check": true
+ },
+ "not_computed": {
+  "excess_return": "基准口径 unknown + 无基准收益序列",
+  "information_ratio": "无基准序列",
+  "beta": "无基准序列",
+  "alpha": "无基准序列",
+  "style_stability": "无持仓数据"
+ },
+ "grade_rules": {
+  "bond_pure_unknown": "D",
+  "count_alone_insufficient": true
+ },
+ "gate": {
+  "ready_for_research_analysis": true,
+  "ready_for_backtest": false,
+  "ready_for_formal_ranking": false
+ }
+}

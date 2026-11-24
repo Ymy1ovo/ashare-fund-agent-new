@@ -1,0 +1,138 @@
+{
+ "phase": "3B-6.0.4",
+ "step": "04_benchmark_and_excess",
+ "baseline_head": "f64b7e554d7303c523bb6ba9ee84550b2e0a7a9d",
+ "generated_at": "2026-11-24T13:30:20",
+ "db_fingerprint": "115ac91eee7c26424952e6df23ddeeafe2435974fe5e81a8ba6bbcabfe387dd4",
+ "actually_executed": true,
+ "excess_return_status": "not_available",
+ "index_bases": {
+  "000300": "unknown",
+  "000905": "unknown",
+  "000906": "unknown",
+  "000016": "unknown",
+  "399997": "unknown",
+  "H30184": "unknown",
+  "000942": "unknown",
+  "000012": "unknown",
+  "000922": "unknown",
+  "930930": "unknown"
+ },
+ "index_basis_unknown_count": 10,
+ "index_total": 10,
+ "composites": 15,
+ "composite_components_by_type": [
+  {
+   "type": "bond_index",
+   "data_available": 0,
+   "count": 5
+  },
+  {
+   "type": "cash",
+   "data_available": 0,
+   "count": 10
+  },
+  {
+   "type": "fixed_rate",
+   "data_available": 0,
+   "count": 1
+  },
+  {
+   "type": "index",
+   "data_available": 0,
+   "count": 1
+  },
+  {
+   "type": "index",
+   "data_available": 1,
+   "count": 17
+  }
+ ],
+ "gates": {
+  "basis_gate": false,
+  "composite_gate": false,
+  "series_gate": false,
+  "naming_gate": true
+ },
+ "live_check_result": {
+  "excess_return_status": "not_available",
+  "block": "index_return_basis_unknown",
+  "reason": "口径 unknown：没有证据证明是全收益指数，禁止用于总收益比较",
+  "component_checks": [
+   {
+    "usable": false,
+    "block": "index_return_basis_unknown",
+    "reason": "口径 unknown：没有证据证明是全收益指数，禁止用于总收益比较"
+   },
+   {
+    "usable": false,
+    "block": "index_return_basis_unknown",
+    "reason": "口径 unknown：没有证据证明是全收益指数，禁止用于总收益比较"
+   },
+   {
+    "usable": false,
+    "block": "index_return_basis_unknown",
+    "reason": "口径 unknown：没有证据证明是全收益指数，禁止用于总收益比较"
+   },
+   {
+    "usable": false,
+    "block": "index_return_basis_unknown",
+    "reason": "口径 unknown：没有证据证明是全收益指数，禁止用于总收益比较"
+   },
+   {
+    "usable": false,
+    "block": "index_return_basis_unknown",
+    "reason": "口径 unknown：没有证据证明是全收益指数，禁止用于总收益比较"
+   },
+   {
+    "usable": false,
+    "block": "index_return_basis_unknown",
+    "reason": "口径 unknown：没有证据证明是全收益指数，禁止用于总收益比较"
+   },
+   {
+    "usable": false,
+    "block": "index_return_basis_unknown",
+    "reason": "口径 unknown：没有证据证明是全收益指数，禁止用于总收益比较"
+   },
+   {
+    "usable": false,
+    "block": "index_return_basis_unknown",
+    "reason": "口径 unknown：没有证据证明是全收益指数，禁止用于总收益比较"
+   },
+   {
+    "usable": false,
+    "block": "index_return_basis_unknown",
+    "reason": "口径 unknown：没有证据证明是全收益指数，禁止用于总收益比较"
+   },
+   {
+    "usable": false,
+    "block": "index_return_basis_unknown",
+    "reason": "口径 unknown：没有证据证明是全收益指数，禁止用于总收益比较"
+   }
+  ],
+  "unusable_count": 10,
+  "peer_relative_is_not_alpha": true
+ },
+ "peer_relative_note": {
+  "peer_relative_meaning": "同类相对表现 = 该基金在其可验证同类组内的描述性位置，**不是**相对于投资基准的超额收益",
+  "ranking_is_not_alpha": true,
+  "no_forward_guarantee": true,
+  "why_not": [
+   "同类组只保证产品类型/跟踪指数可比，不保证投资策略相同",
+   "库内无基准收益序列，无法计算超额收益",
+   "历史相对表现不构成未来收益保证"
+  ]
+ },
+ "unlock_preconditions": {
+  "index_basis_verified": "0/10",
+  "composite_components_available": "0/15",
+  "benchmark_return_series_table": false,
+  "risk_free_rate": false,
+  "started_this_phase": false
+ },
+ "gate": {
+  "ready_for_research_analysis": true,
+  "ready_for_backtest": false,
+  "ready_for_formal_ranking": false
+ }
+}

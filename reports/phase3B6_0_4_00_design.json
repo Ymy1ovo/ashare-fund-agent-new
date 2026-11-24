@@ -1,0 +1,66 @@
+{
+ "phase": "3B-6.0.4",
+ "step": "00_design",
+ "baseline_head": "f64b7e554d7303c523bb6ba9ee84550b2e0a7a9d",
+ "generated_at": "2026-11-24T13:34:21",
+ "db_fingerprint": "115ac91eee7c26424952e6df23ddeeafe2435974fe5e81a8ba6bbcabfe387dd4",
+ "new_modules": [
+  "peer_comparison.py",
+  "excess_return.py",
+  "share_cost.py",
+  "peer_engine.py"
+ ],
+ "reused_unmodified": [
+  "indicators.py",
+  "classification.py",
+  "quality.py",
+  "data_access.py",
+  "engine.py"
+ ],
+ "deliberately_not_done": [
+  "modify_indicators",
+  "modify_classifier",
+  "modify_schema",
+  "new_benchmark_return_table",
+  "risk_free_rate"
+ ],
+ "questions_answered": {
+  "peer_long_term_return": "partially(4 groups)",
+  "risk_and_drawdown": true,
+  "window_stability": true,
+  "persistence_descriptive": true,
+  "ac_cheaper": false,
+  "excess_return": false,
+  "data_quality_sufficient": "partially"
+ },
+ "results": {
+  "groups": 26,
+  "comparable": 4,
+  "descriptive_only": 12,
+  "excluded": 10,
+  "excess_computable": 0,
+  "cost_computable_funds": "7/9",
+  "elapsed_sec": 133
+ },
+ "new_tests": {
+  "test_3b6_0_4_peer_comparison.py": 32,
+  "test_3b6_0_4_share_cost_and_groups.py": 18,
+  "total": 50
+ },
+ "boundaries": {
+  "backtest_engine_modified": false,
+  "indicator_formula_modified": false,
+  "classifier_modified": false,
+  "schema_modified": false,
+  "recollected_market_data": false,
+  "fabricated_data": false,
+  "auto_trading": false,
+  "formal_ranking": false,
+  "investment_advice": false
+ },
+ "gate": {
+  "ready_for_research_analysis": true,
+  "ready_for_backtest": false,
+  "ready_for_formal_ranking": false
+ }
+}

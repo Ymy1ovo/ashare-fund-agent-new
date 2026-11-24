@@ -2460,7 +2460,8 @@ if (basis != ACCOUNTING_FORMAL
 | 3B-6.0.2.1 | 原始质检顺序与基准口径修正 | 1758 | `phase3B6_0_2_test_report.md` |
 | 3B-6.0.2.2 | 复合基准有效行情判定 | 1782 | `phase3B6_0_2_test_report.md` |
 | 3B-6.0.2.3 | 有效行情有限正数校验 | 1814 | `phase3B6_0_2_test_report.md` |
-| 3B-6.0.3 | 研究池扩容 | **1814** | `phase3B6_0_3_universe_expansion.md` |
+| 3B-6.0.3 | 研究池扩容 | 1814 | `phase3B6_0_3_universe_expansion.md` |
+| 3B-6.0.4 | 同类比较与超额收益边界 | **1864** | `phase3B6_0_4_05_peer_comparison.md` |
 
 当前正式会计版本：`ca-v2-receivable`；正式会计基础：`formal_receivable`；正式估值标记：`formal_valuation=True`。
 
@@ -6219,4 +6220,122 @@ return math.isfinite(c) and c > 0
 | 数据质量 | `reports/phase3B6_0_3_data_quality.md` |
 | 同类覆盖 | `reports/phase3B6_0_3_peer_coverage.md` |
 | 测试报告 | `reports/phase3B6_0_3_test_report.md` |
+
+## 72. 阶段3B-6.0.4 同类比较与超额收益验证
+
+### 72.1 结论先行
+
+| 项 | 数值 |
+| --- | ---: |
+| 同类组 | 26 |
+| **可比较**（基准可验证 + ≥5 本体） | **4** |
+| 仅描述性 | 12 |
+| 排除（仅 1 本体） | 10 |
+| **能算超额收益的组** | **0** |
+
+### 72.2 四个可比较组
+
+| 组键 | 本体数 |
+| --- | ---: |
+| `money_market`（独立口径） | 7 |
+| `active_equity\|中证800`（有保留，见 72.5） | 5 |
+| `etf_linked\|broad\|沪深300` | 5 |
+| `ordinary_index\|broad\|中证500` | 5 |
+
+### 72.3 超额收益：全线阻断
+
+`excess_return_status = not_available`。三道闸门任一不通过即阻断：
+
+| 闸门 | 当前 |
+| --- | --- |
+| 指数收益口径 | **10/10 unknown** |
+| 复合基准完整 | **0/15 可复现**（债券/现金/固定利率成分全缺） |
+| 基准收益序列 | **库内无此表** |
+
+**同类相对表现 ≠ 超额收益，同类排名 ≠ Alpha。**
+
+### 72.4 公平比较窗口
+
+| 方式 | 说明 |
+| --- | --- |
+| 共同历史区间 | 取所有参与者交集，不拿成立以来直接比 |
+| 滚动窗口 | 1Y / 3Y，步长 30 天，端点必须精确命中 |
+| 市场阶段 | **不做**（事后选区间会制造有利结论） |
+
+年化门槛：**不足 365 天不年化**，避免把短期涨幅外推。
+
+### 72.5 LOF 分类问题（已披露未修）
+
+7 只存续基金全称含「LOF」，但其中 **5 只简称不含**，
+`classify_fund()` 按简称判定时漏识别：
+
+若改按全称识别，`active_equity|中证800` 组从 **5 → 3**，
+降为 `descriptive_only`，可比组将从 4 个减为 **3 个**。
+
+**本轮不修**（属 3B-5.0 定稿规则，需单独立项），但已在报告中明确保留。
+
+### 72.6 A/C 成本：只给框架不给建议
+
+| 项 | 数值 |
+| --- | ---: |
+| 有费率本体 / 份额 / 规则 | 9 / 12 / 90 |
+| 成本可算本体 | **7 / 9** |
+| 真正 A/C 双份额本体 | **3** |
+| 输出购买建议 | **0** |
+
+不给结论的四条原因：第三方费率≠支付宝、有效期仅 11/90、
+不得用当前费率倒推历史、不得仅凭名称判断。
+
+### 72.7 数据质量
+
+| 维度 | 等级 |
+| --- | --- |
+| 净值覆盖 / 重复 / acc_nav | **A** |
+| 净值连续性（3 只有大缺口） | B |
+| 分红（acc_nav 已含分红，无需修补） | B |
+| 基准证据 / 复合基准 / 规模时点 / 费率有效期 | **D** |
+
+**没有 A 级组**——基准证据全 D，同类比较缺可验证基准这一环。
+
+### 72.8 新增模块与测试
+
+| 模块 | 用途 |
+| --- | --- |
+| `peer_comparison.py` | 区间收益 / 共同窗口 / 滚动 / 稳定性 |
+| `excess_return.py` | 超额收益阻断判定 |
+| `share_cost.py` | A/C 成本框架 |
+| `peer_engine.py` | 组级编排 |
+
+新增测试 **50 项**（32 + 18），既有测试零修改。
+全量 **1864 passed**（1814 → 1864）。
+
+### 72.9 正式数据库只读
+
+| 项 | 值 |
+| --- | --- |
+| 内容指纹（前后） | `115ac91e…387dd4`（**未变**） |
+| ETF 指纹 | `d54727c0…bbcac49`（未变） |
+| `integrity_check` | ok |
+| 外键违规 | 0 |
+
+| 门禁 | 值 |
+| --- | --- |
+| `ready_for_research_analysis` | **True** |
+| `ready_for_backtest` | **False** |
+| `ready_for_formal_ranking` | **False** |
+
+### 72.10 产物（10 对）
+
+| 文档 | 路径 |
+| --- | --- |
+| 研究设计 | `reports/phase3B6_0_4_00_design.md` |
+| 数据审计 | `reports/phase3B6_0_4_01_data_audit.md` |
+| 同类规则 | `reports/phase3B6_0_4_02_peer_rules.md` |
+| 指标口径 | `reports/phase3B6_0_4_03_metric_definitions.md` |
+| 基准与超额边界 | `reports/phase3B6_0_4_04_benchmark_and_excess.md` |
+| 同类比较结果 | `reports/phase3B6_0_4_05_peer_comparison.md` |
+| A/C 成本 | `reports/phase3B6_0_4_06_share_cost.md` |
+| 稳定性 | `reports/phase3B6_0_4_07_stability.md` |
+| 测试 | `reports/phase3B6_0_4_08_tests.md` |
+| 数据质量 | `reports/phase3B6_0_4_09_data_quality.md` |
 

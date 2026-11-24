@@ -1,0 +1,222 @@
+{
+ "phase": "3B-6.0.4",
+ "step": "06_share_cost",
+ "baseline_head": "f64b7e554d7303c523bb6ba9ee84550b2e0a7a9d",
+ "generated_at": "2026-11-24T13:31:44",
+ "db_fingerprint": "115ac91eee7c26424952e6df23ddeeafe2435974fe5e81a8ba6bbcabfe387dd4",
+ "actually_executed": true,
+ "fee_funds": 9,
+ "fee_shares": 12,
+ "fee_rules": 90,
+ "computable_funds": 7,
+ "not_computable_funds": 2,
+ "buy_advice_given": false,
+ "funds": [
+  {
+   "fund_code": "000051",
+   "fund_name": "华夏沪深300ETF联接",
+   "share_count": 1,
+   "rule_count": 9,
+   "status": "computed",
+   "computable_horizons": [
+    7,
+    30,
+    90,
+    180,
+    365,
+    730,
+    1095
+   ]
+  },
+  {
+   "fund_code": "110020",
+   "fund_name": "易方达沪深300ETF联接",
+   "share_count": 1,
+   "rule_count": 10,
+   "status": "computed",
+   "computable_horizons": [
+    7,
+    30,
+    90,
+    180,
+    365,
+    730,
+    1095
+   ]
+  },
+  {
+   "fund_code": "161725",
+   "fund_name": "招商中证白酒指数(LOF)",
+   "share_count": 2,
+   "rule_count": 14,
+   "status": "computed",
+   "computable_horizons": [
+    7,
+    30,
+    90,
+    180,
+    365,
+    730,
+    1095
+   ]
+  },
+  {
+   "fund_code": "007300",
+   "fund_name": "国联安中证半导体ETF联接",
+   "share_count": 2,
+   "rule_count": 13,
+   "status": "computed",
+   "computable_horizons": [
+    7,
+    30,
+    90,
+    180,
+    365,
+    730,
+    1095
+   ]
+  },
+  {
+   "fund_code": "110022",
+   "fund_name": "易方达消费行业股票",
+   "share_count": 1,
+   "rule_count": 10,
+   "status": "not_available",
+   "computable_horizons": []
+  },
+  {
+   "fund_code": "161005",
+   "fund_name": "富国天惠成长混合(LOF)",
+   "share_count": 1,
+   "rule_count": 7,
+   "status": "computed",
+   "computable_horizons": [
+    7,
+    30,
+    90,
+    180,
+    365,
+    730,
+    1095
+   ]
+  },
+  {
+   "fund_code": "000478",
+   "fund_name": "建信中证500指数增强",
+   "share_count": 1,
+   "rule_count": 9,
+   "status": "computed",
+   "computable_horizons": [
+    7,
+    30,
+    90,
+    180,
+    365,
+    730,
+    1095
+   ]
+  },
+  {
+   "fund_code": "000015",
+   "fund_name": "华夏纯债债券",
+   "share_count": 2,
+   "rule_count": 15,
+   "status": "computed",
+   "computable_horizons": [
+    7,
+    30,
+    90,
+    180,
+    365,
+    730,
+    1095
+   ]
+  },
+  {
+   "fund_code": "000198",
+   "fund_name": "天弘余额宝货币",
+   "share_count": 1,
+   "rule_count": 3,
+   "status": "not_available",
+   "computable_horizons": []
+  }
+ ],
+ "ac_pairs_detail": [
+  {
+   "fund_code": "161725",
+   "fund_name": "招商中证白酒指数(LOF)",
+   "shares": [
+    {
+     "share_code": "012414",
+     "share_class_type": "C",
+     "sales_service_fee": 0.001,
+     "redemption_tiers": 2
+    },
+    {
+     "share_code": "161725",
+     "share_class_type": "A",
+     "sales_service_fee": 0.0,
+     "redemption_tiers": 4
+    }
+   ]
+  },
+  {
+   "fund_code": "007300",
+   "fund_name": "国联安中证半导体ETF联接",
+   "shares": [
+    {
+     "share_code": "007300",
+     "share_class_type": "A",
+     "sales_service_fee": 0.0,
+     "redemption_tiers": 3
+    },
+    {
+     "share_code": "007301",
+     "share_class_type": "C",
+     "sales_service_fee": 0.0025,
+     "redemption_tiers": 2
+    }
+   ]
+  },
+  {
+   "fund_code": "000015",
+   "fund_name": "华夏纯债债券",
+   "shares": [
+    {
+     "share_code": "000015",
+     "share_class_type": "A",
+     "sales_service_fee": 0.0,
+     "redemption_tiers": 3
+    },
+    {
+     "share_code": "000016",
+     "share_class_type": "C",
+     "sales_service_fee": 0.004,
+     "redemption_tiers": 3
+    }
+   ]
+  }
+ ],
+ "cannot_conclude_reasons": [
+  "第三方费率 ≠ 支付宝实际费率",
+  "90 条规则仅 11 条有 effective_from",
+  "申购费支付宝优惠未知",
+  "赎回费阶梯部分不连续/重叠",
+  "禁止用当前费率倒推历史",
+  "禁止仅凭 A/C 名称判断",
+  "仅 3 个本体有真正的 A/C 双份额"
+ ],
+ "boundaries": {
+  "unknown_as_zero": false,
+  "backfill_history": false,
+  "judge_by_name": false,
+  "third_party_as_alipay": false,
+  "buy_advice": false,
+  "ranking": false
+ },
+ "gate": {
+  "ready_for_research_analysis": true,
+  "ready_for_backtest": false,
+  "ready_for_formal_ranking": false
+ }
+}

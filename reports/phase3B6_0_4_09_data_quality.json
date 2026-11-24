@@ -1,0 +1,118 @@
+{
+ "phase": "3B-6.0.4",
+ "step": "09_data_quality",
+ "baseline_head": "f64b7e554d7303c523bb6ba9ee84550b2e0a7a9d",
+ "generated_at": "2026-11-24T13:47:13",
+ "db_fingerprint": "115ac91eee7c26424952e6df23ddeeafe2435974fe5e81a8ba6bbcabfe387dd4",
+ "quality_by_dimension": {
+  "nav_coverage": {
+   "value": "86/86",
+   "grade": "A"
+  },
+  "nav_continuity": {
+   "value": "3 funds with >15d gap",
+   "grade": "B"
+  },
+  "nav_duplicates": {
+   "value": 0,
+   "grade": "A"
+  },
+  "acc_nav_availability": {
+   "value": "214383/214466",
+   "grade": "A"
+  },
+  "dividend": {
+   "value": "40/79",
+   "grade": "B",
+   "acc_nav_contains_dividend": true
+  },
+  "ac_merge": {
+   "value": "0 duplicates",
+   "grade": "A"
+  },
+  "index_return_basis": {
+   "value": "0/10 verified",
+   "grade": "D"
+  },
+  "composite_benchmark": {
+   "value": "0/15 reproducible",
+   "grade": "D"
+  },
+  "aum_time_attribute": {
+   "value": "0/683 disclosed_at",
+   "grade": "D"
+  },
+  "manager_time_attribute": {
+   "value": "12/21 start_date",
+   "grade": "C"
+  },
+  "fee_effective_from": {
+   "value": "11/90",
+   "grade": "D"
+  },
+  "risk_free_rate": {
+   "available": false,
+   "grade": "D"
+  }
+ },
+ "group_grades": {
+  "bond_pure|unknown": "C",
+  "money_market": "B",
+  "active_equity|中证800": "B",
+  "etf_linked|broad|沪深300": "B",
+  "ordinary_index|broad|中证500": "B",
+  "active_equity|unknown": "C",
+  "active_equity|沪深300": "C",
+  "ordinary_index|broad|沪深300": "C",
+  "etf_linked|broad|中证500": "C",
+  "etf_linked|broad|上证50": "C",
+  "etf_linked|broad|创业板指": "C",
+  "etf_linked|broad|中证A500": "C",
+  "ordinary_index|broad|中证A500": "C",
+  "bond_mixed|unknown": "C",
+  "active_equity|中证500": "C",
+  "etf_linked|unknown|unknown": "C",
+  "active_equity|中证A500": "D",
+  "lof|active|中债综合": "D",
+  "ordinary_index|broad|创业板指": "D",
+  "ordinary_index|unknown|上证50": "D",
+  "ordinary_index|broad|上证50": "D",
+  "etf_linked|sector|中证全指半导体": "D",
+  "etf_linked|broad|unknown": "D",
+  "ordinary_index|unknown|unknown": "D",
+  "lof|active|unknown": "D",
+  "lof|index|sector|中证白酒": "D"
+ },
+ "no_grade_a_group_reason": [
+  "指数收益口径未知",
+  "无基准收益序列",
+  "无风险利率缺失",
+  "久期/信用字段缺失",
+  "费率有效期不完整"
+ ],
+ "known_unfixed": [
+  {
+   "issue": "LOF 只按简称识别",
+   "fixed": false,
+   "impact": "active_equity|中证800 组 5→3"
+  },
+  {
+   "issue": "债券类型源不一致",
+   "fixed": false
+  },
+  {
+   "issue": "41 清盘本体缺 fund_type_l1",
+   "fixed": false
+  },
+  {
+   "issue": "000037 2498 天缺口",
+   "fixed": false,
+   "reason": "不伪造数据"
+  }
+ ],
+ "gate": {
+  "ready_for_research_analysis": true,
+  "ready_for_backtest": false,
+  "ready_for_formal_ranking": false
+ }
+}
