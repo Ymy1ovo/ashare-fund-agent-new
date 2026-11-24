@@ -143,5 +143,15 @@
   "ready_for_research_analysis": true,
   "ready_for_backtest": false,
   "ready_for_formal_ranking": false
+ },
+ "documentation_fix_round": {
+  "round": "3B-6.0.3-fix",
+  "fixed": [
+   "接入统计措辞"
+  ],
+  "db_modified": false,
+  "code_modified": false,
+  "tests_rerun": false,
+  "reason": "仅为文档修正，无代码与数据库变化"
  }
 }

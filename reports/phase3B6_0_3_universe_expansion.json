@@ -82,7 +82,10 @@
    "000154"
   ],
   "failed_reason": "KeyError: 'data'（雪球接口未返回）",
-  "failed_polluted_db": false
+  "failed_polluted_db": false,
+  "succeeded_or_idempotent": 67,
+  "all_candidates_processed": true,
+  "statement": "68 个候选均经过接入流程处理；67 个成功或幂等跳过（60 ingested + 7 already_present），1 个失败且未污染数据库"
  },
  "data_quality": {
   "nav_rows": 245656,
@@ -93,7 +96,98 @@
   "dividend_covered_funds": 40,
   "aum_covered_funds": 8,
   "manager_covered_funds": 9,
-  "fee_covered_funds": 9
+  "fee_covered_funds": 9,
+  "fee_covered_shares": 12,
+  "fee_coverage_detail": {
+   "rows": 90,
+   "distinct_share_class_id": 12,
+   "distinct_fund_id": 9,
+   "orphan_rows": 0,
+   "note": "fund_fee_rules 挂 share_class_id（份额维度）；distinct share_class_id=12 是份额数，JOIN fund_share_classes 后 distinct fund_id=9 是本体数；两个数字含义不同，均如实保留",
+   "detail": [
+    {
+     "fund_id": 14,
+     "fund_code": "000051",
+     "shares": [
+      "000051"
+     ],
+     "rules": 9
+    },
+    {
+     "fund_id": 15,
+     "fund_code": "110020",
+     "shares": [
+      "110020"
+     ],
+     "rules": 10
+    },
+    {
+     "fund_id": 16,
+     "fund_code": "161725",
+     "shares": [
+      "161725",
+      "012414"
+     ],
+     "rules": 14
+    },
+    {
+     "fund_id": 17,
+     "fund_code": "007300",
+     "shares": [
+      "007300",
+      "007301"
+     ],
+     "rules": 13
+    },
+    {
+     "fund_id": 18,
+     "fund_code": "110022",
+     "shares": [
+      "110022"
+     ],
+     "rules": 10
+    },
+    {
+     "fund_id": 19,
+     "fund_code": "161005",
+     "shares": [
+      "161005"
+     ],
+     "rules": 7
+    },
+    {
+     "fund_id": 20,
+     "fund_code": "000478",
+     "shares": [
+      "000478"
+     ],
+     "rules": 9
+    },
+    {
+     "fund_id": 21,
+     "fund_code": "000015",
+     "shares": [
+      "000015",
+      "000016"
+     ],
+     "rules": 15
+    },
+    {
+     "fund_id": 22,
+     "fund_code": "000198",
+     "shares": [
+      "000198"
+     ],
+     "rules": 3
+    }
+   ],
+   "sql_used": [
+    "SELECT COUNT(*) FROM fund_fee_rules",
+    "SELECT COUNT(DISTINCT share_class_id) FROM fund_fee_rules",
+    "SELECT COUNT(DISTINCT sc.fund_id) FROM fund_fee_rules f JOIN fund_share_classes sc ON sc.share_class_id=f.share_class_id",
+    "SELECT COUNT(*) FROM fund_fee_rules f LEFT JOIN fund_share_classes sc ON sc.share_class_id=f.share_class_id WHERE sc.share_class_id IS NULL"
+   ]
+  }
  },
  "survivorship_bias": {
   "known_terminated": 41,
@@ -128,5 +222,14 @@
   "ready_for_research_analysis": true,
   "ready_for_backtest": false,
   "ready_for_formal_ranking": false
+ },
+ "documentation_fix_round": {
+  "round": "3B-6.0.3-fix",
+  "fixed": [
+   "费率覆盖统一为本体 9 / 份额 12",
+   "接入统计措辞改为准确表述"
+  ],
+  "db_modified": false,
+  "code_modified": false
  }
 }
