@@ -1,0 +1,39 @@
+{
+ "phase": "3B-6.1.0",
+ "step": "00_design",
+ "baseline_head": "eeb83bc2803d56b84986dce9d1cd93f0cb8dc1d4",
+ "generated_at": "2026-11-24 15:06",
+ "db_fingerprint": "115ac91eee7c26424952e6df23ddeeafe2435974fe5e81a8ba6bbcabfe387dd4",
+ "readonly": true,
+ "objectives": [
+  "index return basis",
+  "composite benchmark reproducibility",
+  "risk-free rate sources"
+ ],
+ "method": [
+  "official methodology PDF",
+  "live API calls",
+  "numeric verification",
+  "cross validation",
+  "raw result persistence"
+ ],
+ "forbidden": [
+  "guess_by_name",
+  "code_identity_assumption",
+  "field_name_as_proof",
+  "price_as_total",
+  "net_as_total"
+ ],
+ "call_counts": {
+  "index_basis": 22,
+  "history": 18,
+  "risk_free": 12,
+  "pdf_download": 1,
+  "total_approx": 51
+ },
+ "gate": {
+  "ready_for_research_analysis": true,
+  "ready_for_backtest": false,
+  "ready_for_formal_ranking": false
+ }
+}

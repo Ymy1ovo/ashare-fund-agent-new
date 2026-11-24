@@ -1,0 +1,127 @@
+{
+ "phase": "3B-6.1.0",
+ "step": "04_source_quality",
+ "baseline_head": "eeb83bc2803d56b84986dce9d1cd93f0cb8dc1d4",
+ "generated_at": "2026-11-24 15:10",
+ "db_fingerprint": "115ac91eee7c26424952e6df23ddeeafe2435974fe5e81a8ba6bbcabfe387dd4",
+ "evidence_levels": {
+  "L1_official_raw": 0,
+  "L2_official_doc": 1,
+  "L3_third_party_aggregated": "all market data",
+  "L4_code_mapping_only": 3,
+  "L5_data_without_basis": 10
+ },
+ "max_level_achieved": "L3",
+ "api_calls": {
+  "stock_zh_index_hist_csindex": 40,
+  "bond_china_yield": 8,
+  "macro_china_shibor_all": 1,
+  "bond_zh_us_rate": 1,
+  "stock_zh_index_daily": 1,
+  "stock_zh_index_daily_em": 1,
+  "official_pdf_http": 1,
+  "total": 53
+ },
+ "call_details": {
+  "index": {
+   "params": "symbol,start_date=20040101,end_date=20261231",
+   "cols": [
+    "日期",
+    "指数代码",
+    "指数中文全称",
+    "收盘",
+    "..."
+   ],
+   "rows_range": [
+    3000,
+    5560
+   ],
+   "date_min": "2004-01-01",
+   "date_max": "2026-11-23",
+   "duplicate_dates": 0,
+   "baseline_placeholder": "首行 2004-01-01 常为基线",
+   "non_positive_close": {
+    "N00905": 1,
+    "N00906": 1,
+    "N00016": 1,
+    "H30184": 1
+   }
+  },
+  "bond_yield": {
+   "cols": [
+    "曲线名称",
+    "日期",
+    "3月",
+    "6月",
+    "1年",
+    "3年",
+    "5年",
+    "7年",
+    "10年",
+    "30年"
+   ],
+   "curves": [
+    "中债国债",
+    "中债中短期票据AAA",
+    "中债商业银行普通债AAA"
+   ],
+   "history_start": "2006-03-01",
+   "year_2002": "0 rows"
+  },
+  "shibor": {
+   "rows": 2405,
+   "date_min": "2015-05-08",
+   "date_max": "2026-11-13"
+  }
+ },
+ "cross_validation": {
+  "attempted": true,
+  "sources": {
+   "csindex": "3386.35",
+   "sina": "3386.352",
+   "em": "Push2 rate limited"
+  },
+  "diff_points": 0.002,
+  "diff_pct": 6e-05,
+  "is_truly_independent": false,
+  "why_not": "两个来源底层都来自交易所收盘价；中证是指数计算机构，新浪是行情聚合器",
+  "conclusion": "仅数值一致性验证，不构成独立来源交叉验证"
+ },
+ "known_defects": [
+  {
+   "defect": "首行 2004-01-01 基线占位",
+   "fixed": true,
+   "fixed_in": "3B-6.0.2"
+  },
+  {
+   "defect": "H30184 2013-06-28 close=0.0",
+   "fixed": false,
+   "recorded_in": "3B-6.0.2.3"
+  },
+  {
+   "defect": "N00905/N00906/N00016 各 1 个非正收盘",
+   "fixed": false,
+   "discovered": "本轮"
+  },
+  {
+   "defect": "中证 403 限流",
+   "fixed": true,
+   "fixed_in": "3B-6.0.2"
+  },
+  {
+   "defect": "东财 Push2 限流",
+   "fixed": false
+  }
+ ],
+ "not_done": [
+  "mark_L3_as_L1",
+  "treat_api_success_as_basis_proof",
+  "call_numeric_match_independent_crossval",
+  "write_data"
+ ],
+ "gate": {
+  "ready_for_research_analysis": true,
+  "ready_for_backtest": false,
+  "ready_for_formal_ranking": false
+ }
+}

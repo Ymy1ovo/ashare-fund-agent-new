@@ -1,0 +1,617 @@
+{
+ "phase": "3B-6.1.0",
+ "step": "02_composite_benchmark",
+ "baseline_head": "eeb83bc2803d56b84986dce9d1cd93f0cb8dc1d4",
+ "generated_at": "2026-11-24 15:09",
+ "db_fingerprint": "115ac91eee7c26424952e6df23ddeeafe2435974fe5e81a8ba6bbcabfe387dd4",
+ "total": 15,
+ "status_summary": {
+  "partially_reproducible": 13,
+  "not_reproducible": 2
+ },
+ "composites": [
+  {
+   "composite_id": 16,
+   "benchmark_name": "000051 华夏沪深300ETF联接",
+   "benchmark_raw": "沪深300指数收益率×95%＋1%（指年收益率，评价时应按期间折算）",
+   "evidence_source": "platform",
+   "component_count": 2,
+   "index_components": [
+    {
+     "label": "沪深300",
+     "code": "000300",
+     "weight": 0.95,
+     "data_available": 1,
+     "total_return_available": true
+    }
+   ],
+   "bond_components": [],
+   "cash_components": [],
+   "fixed_rate_components": [
+    {
+     "weight": 0.01
+    }
+   ],
+   "missing_component_count": 1,
+   "all_components_available": false,
+   "index_components_have_total_return": true,
+   "historical_weight_evidence": false,
+   "current_weight_only": true,
+   "status": "partially_reproducible",
+   "reasons": [
+    "固定利率成分 1 个无序列",
+    "历史权重生效日期无官方证据（当前权重不等于历史权重）"
+   ]
+  },
+  {
+   "composite_id": 17,
+   "benchmark_name": "110020 易方达沪深300ETF联接",
+   "benchmark_raw": "沪深300指数收益率×95%+活期存款利率(税后)×5%",
+   "evidence_source": "platform",
+   "component_count": 2,
+   "index_components": [
+    {
+     "label": "沪深300",
+     "code": "000300",
+     "weight": 0.95,
+     "data_available": 1,
+     "total_return_available": true
+    }
+   ],
+   "bond_components": [],
+   "cash_components": [
+    {
+     "weight": 0.05,
+     "data_available": 0
+    }
+   ],
+   "fixed_rate_components": [],
+   "missing_component_count": 1,
+   "all_components_available": false,
+   "index_components_have_total_return": true,
+   "historical_weight_evidence": false,
+   "current_weight_only": true,
+   "status": "partially_reproducible",
+   "reasons": [
+    "现金成分 1 个无收益序列",
+    "历史权重生效日期无官方证据（当前权重不等于历史权重）"
+   ]
+  },
+  {
+   "composite_id": 18,
+   "benchmark_name": "161725 招商中证白酒指数(LOF)",
+   "benchmark_raw": "中证白酒指数收益率×95%+活期存款利率(税后)×5%",
+   "evidence_source": "platform",
+   "component_count": 2,
+   "index_components": [
+    {
+     "label": "中证白酒",
+     "code": "399997",
+     "weight": 0.95,
+     "data_available": 1,
+     "total_return_available": false
+    }
+   ],
+   "bond_components": [],
+   "cash_components": [
+    {
+     "weight": 0.05,
+     "data_available": 0
+    }
+   ],
+   "fixed_rate_components": [],
+   "missing_component_count": 1,
+   "all_components_available": false,
+   "index_components_have_total_return": false,
+   "historical_weight_evidence": false,
+   "current_weight_only": true,
+   "status": "not_reproducible",
+   "reasons": [
+    "现金成分 1 个无收益序列",
+    "指数成分无全收益序列：中证白酒",
+    "历史权重生效日期无官方证据（当前权重不等于历史权重）"
+   ]
+  },
+  {
+   "composite_id": 19,
+   "benchmark_name": "007300 国联安中证半导体ETF联接",
+   "benchmark_raw": "中证全指半导体产品与设备指数收益率×95%+银行活期存款利率(税后)×5%",
+   "evidence_source": "platform",
+   "component_count": 2,
+   "index_components": [
+    {
+     "label": "中证全指半导体",
+     "code": "H30184",
+     "weight": 0.95,
+     "data_available": 1,
+     "total_return_available": false
+    }
+   ],
+   "bond_components": [],
+   "cash_components": [
+    {
+     "weight": 0.05,
+     "data_available": 0
+    }
+   ],
+   "fixed_rate_components": [],
+   "missing_component_count": 1,
+   "all_components_available": false,
+   "index_components_have_total_return": false,
+   "historical_weight_evidence": false,
+   "current_weight_only": true,
+   "status": "not_reproducible",
+   "reasons": [
+    "现金成分 1 个无收益序列",
+    "指数成分无全收益序列：中证全指半导体",
+    "历史权重生效日期无官方证据（当前权重不等于历史权重）"
+   ]
+  },
+  {
+   "composite_id": 20,
+   "benchmark_name": "000478 建信中证500指数增强",
+   "benchmark_raw": "中证500指数收益率×95%+银行活期存款利率(税后)×5%",
+   "evidence_source": "platform",
+   "component_count": 2,
+   "index_components": [
+    {
+     "label": "中证500",
+     "code": "000905",
+     "weight": 0.95,
+     "data_available": 1,
+     "total_return_available": true
+    }
+   ],
+   "bond_components": [],
+   "cash_components": [
+    {
+     "weight": 0.05,
+     "data_available": 0
+    }
+   ],
+   "fixed_rate_components": [],
+   "missing_component_count": 1,
+   "all_components_available": false,
+   "index_components_have_total_return": true,
+   "historical_weight_evidence": false,
+   "current_weight_only": true,
+   "status": "partially_reproducible",
+   "reasons": [
+    "现金成分 1 个无收益序列",
+    "历史权重生效日期无官方证据（当前权重不等于历史权重）"
+   ]
+  },
+  {
+   "composite_id": 21,
+   "benchmark_name": "000961 天弘沪深300ETF联接",
+   "benchmark_raw": "沪深300指数收益率×95%+银行活期存款利率(税后)×5%",
+   "evidence_source": "platform",
+   "component_count": 2,
+   "index_components": [
+    {
+     "label": "沪深300",
+     "code": "000300",
+     "weight": 0.95,
+     "data_available": 1,
+     "total_return_available": true
+    }
+   ],
+   "bond_components": [],
+   "cash_components": [
+    {
+     "weight": 0.05,
+     "data_available": 0
+    }
+   ],
+   "fixed_rate_components": [],
+   "missing_component_count": 1,
+   "all_components_available": false,
+   "index_components_have_total_return": true,
+   "historical_weight_evidence": false,
+   "current_weight_only": true,
+   "status": "partially_reproducible",
+   "reasons": [
+    "现金成分 1 个无收益序列",
+    "历史权重生效日期无官方证据（当前权重不等于历史权重）"
+   ]
+  },
+  {
+   "composite_id": 22,
+   "benchmark_name": "050002 博时裕富沪深300指数",
+   "benchmark_raw": "沪深300指数收益率×95%+银行活期存款利率(税后)×5%",
+   "evidence_source": "platform",
+   "component_count": 2,
+   "index_components": [
+    {
+     "label": "沪深300",
+     "code": "000300",
+     "weight": 0.95,
+     "data_available": 1,
+     "total_return_available": true
+    }
+   ],
+   "bond_components": [],
+   "cash_components": [
+    {
+     "weight": 0.05,
+     "data_available": 0
+    }
+   ],
+   "fixed_rate_components": [],
+   "missing_component_count": 1,
+   "all_components_available": false,
+   "index_components_have_total_return": true,
+   "historical_weight_evidence": false,
+   "current_weight_only": true,
+   "status": "partially_reproducible",
+   "reasons": [
+    "现金成分 1 个无收益序列",
+    "历史权重生效日期无官方证据（当前权重不等于历史权重）"
+   ]
+  },
+  {
+   "composite_id": 23,
+   "benchmark_name": "001052 华夏中证500ETF联接",
+   "benchmark_raw": "中证500指数收益率×95%+银行活期存款利率(税后)×5%",
+   "evidence_source": "platform",
+   "component_count": 2,
+   "index_components": [
+    {
+     "label": "中证500",
+     "code": "000905",
+     "weight": 0.95,
+     "data_available": 1,
+     "total_return_available": true
+    }
+   ],
+   "bond_components": [],
+   "cash_components": [
+    {
+     "weight": 0.05,
+     "data_available": 0
+    }
+   ],
+   "fixed_rate_components": [],
+   "missing_component_count": 1,
+   "all_components_available": false,
+   "index_components_have_total_return": true,
+   "historical_weight_evidence": false,
+   "current_weight_only": true,
+   "status": "partially_reproducible",
+   "reasons": [
+    "现金成分 1 个无收益序列",
+    "历史权重生效日期无官方证据（当前权重不等于历史权重）"
+   ]
+  },
+  {
+   "composite_id": 24,
+   "benchmark_name": "001548 天弘上证50ETF联接",
+   "benchmark_raw": "上证50指数收益率×95%+银行活期存款利率(税后)×5%",
+   "evidence_source": "platform",
+   "component_count": 2,
+   "index_components": [
+    {
+     "label": "上证50",
+     "code": "000016",
+     "weight": 0.95,
+     "data_available": 1,
+     "total_return_available": true
+    }
+   ],
+   "bond_components": [],
+   "cash_components": [
+    {
+     "weight": 0.05,
+     "data_available": 0
+    }
+   ],
+   "fixed_rate_components": [],
+   "missing_component_count": 1,
+   "all_components_available": false,
+   "index_components_have_total_return": true,
+   "historical_weight_evidence": false,
+   "current_weight_only": true,
+   "status": "partially_reproducible",
+   "reasons": [
+    "现金成分 1 个无收益序列",
+    "历史权重生效日期无官方证据（当前权重不等于历史权重）"
+   ]
+  },
+  {
+   "composite_id": 25,
+   "benchmark_name": "110022 易方达消费行业股票",
+   "benchmark_raw": "中证内地消费主题指数收益率×85%+中债总指数收益率×15%",
+   "evidence_source": "platform",
+   "component_count": 2,
+   "index_components": [
+    {
+     "label": "中证内地消费主题",
+     "code": "000942",
+     "weight": 0.85,
+     "data_available": 1,
+     "total_return_available": true
+    }
+   ],
+   "bond_components": [
+    {
+     "label": "中债总",
+     "weight": 0.15,
+     "data_available": 0
+    }
+   ],
+   "cash_components": [],
+   "fixed_rate_components": [],
+   "missing_component_count": 1,
+   "all_components_available": false,
+   "index_components_have_total_return": true,
+   "historical_weight_evidence": false,
+   "current_weight_only": true,
+   "status": "partially_reproducible",
+   "reasons": [
+    "债券指数成分 1 个无可用序列",
+    "历史权重生效日期无官方证据（当前权重不等于历史权重）"
+   ]
+  },
+  {
+   "composite_id": 26,
+   "benchmark_name": "161005 富国天惠成长混合(LOF)",
+   "benchmark_raw": "沪深300指数收益率×70%+中债综合全价指数收益率×25%+同业存款利率×5%",
+   "evidence_source": "platform",
+   "component_count": 3,
+   "index_components": [
+    {
+     "label": "沪深300",
+     "code": "000300",
+     "weight": 0.7,
+     "data_available": 1,
+     "total_return_available": true
+    }
+   ],
+   "bond_components": [
+    {
+     "label": "中债综合全价",
+     "weight": 0.25,
+     "data_available": 0
+    }
+   ],
+   "cash_components": [
+    {
+     "weight": 0.05,
+     "data_available": 0
+    }
+   ],
+   "fixed_rate_components": [],
+   "missing_component_count": 2,
+   "all_components_available": false,
+   "index_components_have_total_return": true,
+   "historical_weight_evidence": false,
+   "current_weight_only": true,
+   "status": "partially_reproducible",
+   "reasons": [
+    "现金成分 1 个无收益序列",
+    "债券指数成分 1 个无可用序列",
+    "历史权重生效日期无官方证据（当前权重不等于历史权重）"
+   ]
+  },
+  {
+   "composite_id": 27,
+   "benchmark_name": "001938 中欧时代先锋",
+   "benchmark_raw": "中证500指数收益率×90%+中证综合债券指数收益率×10%",
+   "evidence_source": "platform",
+   "component_count": 2,
+   "index_components": [
+    {
+     "label": "中证500",
+     "code": "000905",
+     "weight": 0.9,
+     "data_available": 1,
+     "total_return_available": true
+    }
+   ],
+   "bond_components": [
+    {
+     "label": "中证综合债券",
+     "weight": 0.1,
+     "data_available": 0
+    }
+   ],
+   "cash_components": [],
+   "fixed_rate_components": [],
+   "missing_component_count": 1,
+   "all_components_available": false,
+   "index_components_have_total_return": true,
+   "historical_weight_evidence": false,
+   "current_weight_only": true,
+   "status": "partially_reproducible",
+   "reasons": [
+    "债券指数成分 1 个无可用序列",
+    "历史权重生效日期无官方证据（当前权重不等于历史权重）"
+   ]
+  },
+  {
+   "composite_id": 28,
+   "benchmark_name": "012346 易方达港股通成长混合",
+   "benchmark_raw": "中证港股通综合指数(人民币)收益率×75%+中证500指数收益率×10%+中债-总全价(总值)指数收益率×15%",
+   "evidence_source": "platform",
+   "component_count": 3,
+   "index_components": [
+    {
+     "label": "中证港股通综合",
+     "code": "930930",
+     "weight": 0.75,
+     "data_available": 1,
+     "total_return_available": false
+    },
+    {
+     "label": "中证500",
+     "code": "000905",
+     "weight": 0.1,
+     "data_available": 1,
+     "total_return_available": true
+    }
+   ],
+   "bond_components": [
+    {
+     "label": "中债-总全价",
+     "weight": 0.15,
+     "data_available": 0
+    }
+   ],
+   "cash_components": [],
+   "fixed_rate_components": [],
+   "missing_component_count": 1,
+   "all_components_available": false,
+   "index_components_have_total_return": false,
+   "historical_weight_evidence": false,
+   "current_weight_only": true,
+   "status": "partially_reproducible",
+   "reasons": [
+    "债券指数成分 1 个无可用序列",
+    "指数成分无全收益序列：中证港股通综合",
+    "历史权重生效日期无官方证据（当前权重不等于历史权重）"
+   ]
+  },
+  {
+   "composite_id": 29,
+   "benchmark_name": "012344 嘉实领先优势混合",
+   "benchmark_raw": "沪深300指数收益率×60%+恒生指数收益率（人民币计价）×30%+中债综合财富指数收益率×10%",
+   "evidence_source": "platform",
+   "component_count": 3,
+   "index_components": [
+    {
+     "label": "沪深300",
+     "code": "000300",
+     "weight": 0.6,
+     "data_available": 1,
+     "total_return_available": true
+    },
+    {
+     "label": "恒生指数",
+     "code": null,
+     "weight": 0.3,
+     "data_available": 0,
+     "total_return_available": false
+    }
+   ],
+   "bond_components": [
+    {
+     "label": "中债综合财富",
+     "weight": 0.1,
+     "data_available": 0
+    }
+   ],
+   "cash_components": [],
+   "fixed_rate_components": [],
+   "missing_component_count": 2,
+   "all_components_available": false,
+   "index_components_have_total_return": true,
+   "historical_weight_evidence": false,
+   "current_weight_only": true,
+   "status": "partially_reproducible",
+   "reasons": [
+    "债券指数成分 1 个无可用序列",
+    "指数成分无全收益序列：恒生指数",
+    "历史权重生效日期无官方证据（当前权重不等于历史权重）"
+   ]
+  },
+  {
+   "composite_id": 30,
+   "benchmark_name": "519066 汇添富蓝筹稳健混合",
+   "benchmark_raw": "中证800指数收益率×70%+上证国债指数收益率×25%+活期存款基准利率×5%",
+   "evidence_source": "platform",
+   "component_count": 3,
+   "index_components": [
+    {
+     "label": "中证800",
+     "code": "000906",
+     "weight": 0.7,
+     "data_available": 1,
+     "total_return_available": true
+    },
+    {
+     "label": "上证国债",
+     "code": "000012",
+     "weight": 0.25,
+     "data_available": 1,
+     "total_return_available": true
+    }
+   ],
+   "bond_components": [],
+   "cash_components": [
+    {
+     "weight": 0.05,
+     "data_available": 0
+    }
+   ],
+   "fixed_rate_components": [],
+   "missing_component_count": 1,
+   "all_components_available": false,
+   "index_components_have_total_return": true,
+   "historical_weight_evidence": false,
+   "current_weight_only": true,
+   "status": "partially_reproducible",
+   "reasons": [
+    "现金成分 1 个无收益序列",
+    "历史权重生效日期无官方证据（当前权重不等于历史权重）"
+   ]
+  }
+ ],
+ "gaps_by_layer": {
+  "cash_component_missing": 10,
+  "bond_index_component_missing": 5,
+  "index_without_total_return": [
+   "399997",
+   "H30184",
+   "930930"
+  ],
+  "historical_weight_evidence_missing": 15,
+  "most_critical": "historical_weight"
+ },
+ "component_stats": {
+  "index": {
+   "total": 18,
+   "available": 17,
+   "unavailable": 1
+  },
+  "bond_index": {
+   "total": 5,
+   "available": 0,
+   "unavailable": 5
+  },
+  "cash": {
+   "total": 10,
+   "available": 0,
+   "unavailable": 10
+  },
+  "fixed_rate": {
+   "total": 1,
+   "available": 0,
+   "unavailable": 1
+  }
+ },
+ "current_weight_only": true,
+ "forbidden_not_done": [
+  "backfill_with_current_weight",
+  "single_component_substitute",
+  "fill_missing_as_zero",
+  "split_unknown_weight",
+  "mark_unreproducible_as_usable"
+ ],
+ "scenario": {
+  "cash_only": 0,
+  "cash_plus_bond": 0,
+  "cash_bond_index_total": 0,
+  "all_including_history_weight": 15
+ },
+ "unresolved": [
+  "历史权重变更记录无来源",
+  "中债系列指数无可用接口",
+  "税后活期利率需自行换算",
+  "恒生指数未纳入指数层"
+ ],
+ "gate": {
+  "ready_for_research_analysis": true,
+  "ready_for_backtest": false,
+  "ready_for_formal_ranking": false
+ }
+}

@@ -1,0 +1,88 @@
+{
+ "phase": "3B-6.1.0",
+ "step": "06_tests",
+ "baseline_head": "eeb83bc2803d56b84986dce9d1cd93f0cb8dc1d4",
+ "generated_at": "2026-11-24 15:11",
+ "new_tests": {
+  "file": "tests/test_3b6_1_0_audit.py",
+  "total": 17,
+  "with_cache": {
+   "passed": 17,
+   "skipped": 0,
+   "seconds": 0.52
+  },
+  "without_cache": {
+   "passed": 14,
+   "skipped": 3,
+   "seconds": 0.51
+  },
+  "skipped_tests": [
+   "test_all_10_indexes_probed",
+   "test_total_return_variants_actually_returned_by_source",
+   "test_price_and_total_are_different_series"
+  ],
+  "skip_reason": "依赖 .tmp610/raw 探测缓存，可用 --probe 重建",
+  "not_weakened": true
+ },
+ "static_checks_excluded": [
+  "compileall",
+  "json validity",
+  "pdf text extraction"
+ ],
+ "data_source_calls": 53,
+ "database_readonly": {
+  "fingerprint_before": "115ac91eee7c26424952e6df23ddeeafe2435974fe5e81a8ba6bbcabfe387dd4",
+  "fingerprint_after": "115ac91eee7c26424952e6df23ddeeafe2435974fe5e81a8ba6bbcabfe387dd4",
+  "fingerprint_unchanged": true,
+  "etf_fingerprint": "d54727c0a76a1b09531accd04b3d66ff4ea2374592b1d4a8cb8381602cbbac49",
+  "integrity_check": "ok",
+  "foreign_key_violations": 0,
+  "table_counts": {
+   "fund_master": 120,
+   "fund_share_classes": 149,
+   "fund_nav_daily": 245656,
+   "fund_dividends": 376,
+   "fund_lifecycle_events": 49,
+   "fund_fee_rules": 90,
+   "index_master": 10,
+   "index_daily": 50603,
+   "index_quality_checks": 10,
+   "benchmark_composite": 15,
+   "benchmark_composite_component": 34
+  }
+ },
+ "key_checks": {
+  "index_daily_unchanged": true,
+  "index_master_unchanged": true,
+  "benchmark_composite_unchanged": true,
+  "components_unchanged": true
+ },
+ "code_changes": {
+  "new_scripts": [
+   "scripts/audit_3b6_1_0_index_basis.py"
+  ],
+  "new_tests": [
+   "tests/test_3b6_1_0_audit.py"
+  ],
+  "business_code_modified": false,
+  "schema_changed": false,
+  "existing_tests_modified": false
+ },
+ "gate": {
+  "ready_for_research_analysis": true,
+  "ready_for_backtest": false,
+  "ready_for_formal_ranking": false
+ },
+ "full_pytest": {
+  "passed": 1919,
+  "failed": 0,
+  "errors": 0,
+  "seconds": 823.28,
+  "executed": true
+ },
+ "evolution": {
+  "3B-6.0.4.1": 1902,
+  "3B-6.1.0": 1919,
+  "delta": 17
+ }
+}

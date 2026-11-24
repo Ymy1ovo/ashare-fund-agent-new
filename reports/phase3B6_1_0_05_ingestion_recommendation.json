@@ -1,0 +1,162 @@
+{
+ "phase": "3B-6.1.0",
+ "step": "05_ingestion_recommendation",
+ "baseline_head": "eeb83bc2803d56b84986dce9d1cd93f0cb8dc1d4",
+ "generated_at": "2026-11-24 15:11",
+ "db_fingerprint": "115ac91eee7c26424952e6df23ddeeafe2435974fe5e81a8ba6bbcabfe387dd4",
+ "class_A": [
+  {
+   "data": "H00300 沪深300全收益",
+   "evidence": "L2+L3"
+  },
+  {
+   "data": "N00300 沪深300净收益",
+   "evidence": "L2+L3"
+  }
+ ],
+ "class_B": [
+  "H00905",
+  "N00905",
+  "H00906",
+  "N00906",
+  "H00016",
+  "N00016",
+  "H00942",
+  "H00922",
+  "N00012",
+  "H00012",
+  "中债国债收益率曲线",
+  "Shibor"
+ ],
+ "class_C": [
+  "399997 全收益",
+  "H30184 全收益",
+  "930930 全收益",
+  "中债系列债券指数",
+  "恒生指数",
+  "历史权重",
+  "税后活期利率序列"
+ ],
+ "priority": [
+  {
+   "order": 1,
+   "item": "指数全收益/净收益历史序列",
+   "source": "akshare.stock_zh_index_hist_csindex",
+   "difficulty": "low",
+   "coverage": "2004-01-01~now, 5318 rows/series",
+   "evidence": "medium(L3)",
+   "help": "critical",
+   "license": "none",
+   "precondition": [
+    "核验其余9指数官方方案",
+    "建立代码映射并留证"
+   ],
+   "ingest_count": 6,
+   "skip": [
+    "399997",
+    "H30184",
+    "930930"
+   ]
+  },
+  {
+   "order": 2,
+   "item": "无风险利率序列",
+   "source": "akshare.bond_china_yield",
+   "difficulty": "low",
+   "coverage": "2006-03-01~now daily",
+   "evidence": "medium(L3)",
+   "help": "indirect(Sharpe)",
+   "license": "none",
+   "precondition": [
+    "确定日度化口径",
+    "前视偏差处理",
+    "按类别选期限"
+   ]
+  },
+  {
+   "order": 3,
+   "item": "债券指数总收益序列",
+   "source": "未找到",
+   "difficulty": "high",
+   "coverage": "unknown",
+   "evidence": "none",
+   "help": "critical",
+   "license": "likely_paid"
+  },
+  {
+   "order": 4,
+   "item": "复合基准历史成分和权重",
+   "source": "基金合同/招募说明书",
+   "difficulty": "very_high",
+   "coverage": "current only",
+   "evidence": "current L3, history L0",
+   "help": "decisive",
+   "license": "free_but_history_hard"
+  },
+  {
+   "order": 5,
+   "item": "历史权重变更记录",
+   "source": "基金公司公告",
+   "difficulty": "highest",
+   "coverage": "scattered",
+   "evidence": "L2 if obtained",
+   "help": "decisive",
+   "license": "free"
+  }
+ ],
+ "expected_effect": {
+  "current": 0,
+  "index_total_only": 0,
+  "index_total_plus_riskfree": 0,
+  "plus_bond_index": 0,
+  "plus_history_weight": "possibly >0",
+  "key_judgment": "单纯接入指数全收益不会让任何基金超额收益变为可用",
+  "why": "10条含现金/5条含债券/15条全只有当前权重"
+ },
+ "not_recommended": [
+  "index_total_only_then_claim_usable",
+  "approximate_composite_with_single_index",
+  "backfill_with_current_weight",
+  "ingest_because_api_returns",
+  "shibor_as_full_history_riskfree",
+  "demand_deposit_rate_as_riskfree"
+ ],
+ "next_steps": [
+  {
+   "step": 1,
+   "work": "下载核验其余9个指数编制方案",
+   "effort": "small"
+  },
+  {
+   "step": 2,
+   "work": "建立指数代码映射表并留证",
+   "effort": "small"
+  },
+  {
+   "step": 3,
+   "work": "接入6个指数全收益序列",
+   "effort": "medium"
+  },
+  {
+   "step": 4,
+   "work": "接入中债国债收益率曲线",
+   "effort": "medium"
+  },
+  {
+   "step": 5,
+   "work": "调研中债债券指数渠道",
+   "effort": "large"
+  },
+  {
+   "step": 6,
+   "work": "回溯15条基准历史权重",
+   "effort": "very_large"
+  }
+ ],
+ "executed_ingestion": false,
+ "gate": {
+  "ready_for_research_analysis": true,
+  "ready_for_backtest": false,
+  "ready_for_formal_ranking": false
+ }
+}

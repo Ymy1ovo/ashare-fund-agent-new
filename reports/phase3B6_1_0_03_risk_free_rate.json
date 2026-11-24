@@ -1,0 +1,106 @@
+{
+ "phase": "3B-6.1.0",
+ "step": "03_risk_free_rate",
+ "baseline_head": "eeb83bc2803d56b84986dce9d1cd93f0cb8dc1d4",
+ "generated_at": "2026-11-24 15:10",
+ "db_fingerprint": "115ac91eee7c26424952e6df23ddeeafe2435974fe5e81a8ba6bbcabfe387dd4",
+ "api_calls": 12,
+ "candidates": {
+  "bond_china_yield": {
+   "provider": "中央国债登记结算有限责任公司(中债登)",
+   "interface": "akshare.bond_china_yield",
+   "curve": "中债国债收益率曲线",
+   "frequency": "daily",
+   "history_start": "2006-03-01",
+   "history_end": "latest",
+   "stable": true,
+   "official_authorized": true,
+   "via_aggregator": "akshare",
+   "daily_fund_research_suitable": true,
+   "annualization": "曲线值已是年化收益率",
+   "daily_conversion_options": [
+    "r/365",
+    "(1+r)^(1/365)-1"
+   ],
+   "holiday_handling": "forward fill，不插值不置0",
+   "lookahead_risk": "low（当日收盘可得）",
+   "recommended_for": "首选无风险利率代理"
+  },
+  "shibor": {
+   "provider": "全国银行间同业拆借中心",
+   "interface": "akshare.macro_china_shibor_all",
+   "frequency": "daily",
+   "rows": 2405,
+   "history_start": "2015-05-08",
+   "history_end": "2026-11-13",
+   "coverage_note": "仅约11年，不覆盖2004起的长历史",
+   "recommended_for": "货币基金参考、货币市场利率"
+  },
+  "bond_zh_us_rate": {
+   "provider": "东方财富(第三方聚合)",
+   "interface": "akshare.bond_zh_us_rate",
+   "rows": 770,
+   "tenors": [
+    "2年",
+    "5年",
+    "10年",
+    "30年"
+   ],
+   "has_short_end": false,
+   "recommended_for": "仅参考，不作日度无风险利率"
+  },
+  "sh_gov_bond_index_000012": {
+   "nature": "指数（点位），不是利率",
+   "variants": {
+    "000012": "全价 206.07",
+    "H00012": "净价 104.65",
+    "N00012": "利息及再投资 145.71"
+   },
+   "usable_as_risk_free": false,
+   "reason": "指数含久期风险，是债券投资收益",
+   "correct_use": "债券基准成分"
+  }
+ },
+ "concepts_not_equivalent": [
+  "无风险利率",
+  "货币市场利率",
+  "国债收益率",
+  "回购利率",
+  "基金合同业绩基准"
+ ],
+ "per_class_recommendation": {
+  "money_market": "Shibor O/N 或 7天通知存款",
+  "bond": "中债国债 1年 或 3年",
+  "equity_and_index": "中债国债 1年（统一口径）"
+ },
+ "daily_conversion": {
+  "option_a": "r/365",
+  "option_b": "(1+r)^(1/365)-1",
+  "weekend": "forward_fill",
+  "missing": "标记不补",
+  "note": "A/B 口径会改变 Sharpe，需单独审批"
+ },
+ "lookahead_risks": [
+  "当日收盘后发布",
+  "月末值回填",
+  "曲线回溯修订"
+ ],
+ "not_done": [
+  "select_single_rate_for_all",
+  "compute_formal_sharpe",
+  "modify_sharpe_block",
+  "write_rate_data",
+  "modify_schema"
+ ],
+ "unresolved": [
+  "Shibor 历史仅到 2015",
+  "中债曲线 2002-2005 返回 0 行（可能是接口限制）",
+  "曲线修订版本无记录",
+  "期限选择需按类别决策"
+ ],
+ "gate": {
+  "ready_for_research_analysis": true,
+  "ready_for_backtest": false,
+  "ready_for_formal_ranking": false
+ }
+}
