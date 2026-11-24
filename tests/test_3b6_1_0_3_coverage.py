@@ -52,8 +52,8 @@ def test_retrieved_does_not_imply_coverage(qb, r01):
                       if v.get("history_retrieved") and not v.get("history_coverage_adequate")]
     assert counterexample, "证据里应存在「取到但不覆盖达标」的实例"
     for c in counterexample:
-        assert qb[c]["coverage_ratio"] < \
-            qb[c].get("standard_ratio", 1.0) or True
+        assert qb[c]["coverage_ratio"] < 0.95, \
+            f"{c}: 覆盖未达标但比率 {qb[c]['coverage_ratio']} >= 0.95"
     # 报告里必须如实反映
     for x in r01["indexes"]:
         st = x["history_states"]
@@ -97,7 +97,6 @@ def test_no_deprecated_broad_field(r01):
 # ============================================================ 2. 重大缺口判定
 def test_major_gap_blocks_coverage(qb):
     """存在重大日期缺口时不得标记连续覆盖达标。"""
-    std = qb and next(iter(qb.values()))
     for code, v in qb.items():
         if not v.get("history_coverage_adequate"):
             continue

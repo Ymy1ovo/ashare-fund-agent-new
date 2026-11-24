@@ -1,60 +1,58 @@
 {
- "phase": "3B-6.1.0.3",
+ "phase": "3B-6.1.0.3.1",
  "step": "06_tests",
- "baseline_head": "472f4a531da250cfe301c22c4668f52ac760a470",
- "generated_at": "2026-11-24 17:39",
+ "baseline_head": "51bb73073fca0e0840e3d3b490ea893866558844",
+ "generated_at": "2026-11-24 18:51",
  "new_tests": [
   {
-   "file": "tests/test_3b6_1_0_3_coverage.py",
-   "count": 22,
-   "passed": 22,
+   "file": "tests/test_3b6_1_0_3_1_recompute.py",
+   "count": 17,
+   "passed": 17,
    "skipped": 0,
-   "seconds": 0.52
-  }
- ],
- "modified_tests": [
-  {
-   "file": "tests/test_3b6_1_0_2_consistency.py",
-   "count": 27,
-   "change": "三层->五态，仍27项，零删除零弱化"
+   "seconds": 0.52,
+   "purpose": "五态从原始字段独立复算"
   },
   {
-   "file": "tests/test_3b6_1_0_2_hist_evidence.py",
-   "count": 7,
-   "change": "改读 coverage_quality_probe，仍7项"
+   "file": "tests/test_3b6_1_0_3_1_docs.py",
+   "count": 16,
+   "passed": 16,
+   "skipped": 0,
+   "seconds": 0.62,
+   "purpose": "文档口径一致性"
   }
  ],
- "covered_items": [
-  1,
-  2,
-  3,
-  4,
-  5,
-  6,
-  7,
-  8,
-  9,
-  10,
-  11,
-  12
- ],
- "no_hardcoded_expectations": true,
+ "total_new": 33,
+ "independence": {
+  "uses_precomputed_states": false,
+  "recomputes_from_raw_fields": true,
+  "thresholds_hardcoded": [
+   0.95,
+   20,
+   "2004-01-01"
+  ],
+  "threshold_must_match_evidence": true
+ },
+ "test_hygiene": {
+  "or_true_removed": 1,
+  "unused_vars_removed": 6,
+  "guard_test": "test_no_vacuous_assertions"
+ },
  "full_pytest": {
-  "passed": 2001,
+  "passed": 2034,
   "failed": 0,
   "errors": 0,
   "skipped": 0,
-  "seconds": 778.48,
+  "seconds": 825.16,
   "executed": true
  },
  "evolution": {
-  "3B-6.1.0.2": 1979,
   "3B-6.1.0.3": 2001,
-  "delta": 22
+  "3B-6.1.0.3.1": 2034,
+  "delta": 33
  },
  "regression": {
-  "3b6_1_0_suite": {
-   "passed": 99
+  "3b6_1_0_series": {
+   "passed": 132
   },
   "3b6_0_4_1_suite": {
    "passed": 88
@@ -63,16 +61,21 @@
  "static_checks_excluded": [
   "compileall",
   "json validity",
+  "ast unused scan",
   "pdf text extraction"
  ],
  "data_source_calls": {
-  "coverage_quality_probe": 27,
-  "total": 27
+  "index_api": 0,
+  "note": "全部复用已入库证据附件"
  },
  "not_executed": [
   {
+   "item": "重新探测指数历史",
+   "reason": "复用证据附件"
+  },
+  {
    "item": "重新下载官方PDF",
-   "reason": "复用上轮文件，sha256已记录"
+   "reason": "同上"
   },
   {
    "item": "独立第二数据源交叉验证",
@@ -80,15 +83,11 @@
   },
   {
    "item": "中债债券指数接口探测",
-   "reason": "超出本轮范围"
+   "reason": "超范围"
   },
   {
    "item": "历史权重官方文件检索",
    "reason": "同上"
-  },
-  {
-   "item": "000051合同原文核验",
-   "reason": "沿用平台基准文本"
   }
  ],
  "database_readonly": {

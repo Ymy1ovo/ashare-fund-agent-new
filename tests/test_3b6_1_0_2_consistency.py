@@ -163,7 +163,6 @@ def test_markdown_five_states_match_json(r01):
 
 def test_markdown_does_not_claim_unverified_full_history(r01):
     """未达覆盖标准的指数，在 MD 与 JSON 中都不得标为覆盖达标。"""
-    md = _md(MD01)
     for x in r01["indexes"]:
         st = x["history_states"]
         if st["history_coverage_adequate"]:

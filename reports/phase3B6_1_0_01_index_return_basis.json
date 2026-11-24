@@ -402,6 +402,27 @@
     "backtest_blockers": [
      "收益口径 return_basis=unknown，未获官方确认"
     ]
+   },
+   "anomaly_by_series": {
+    "price_series": {
+     "code": "000300",
+     "non_positive_close": 0,
+     "dates": [],
+     "quality_adequate": true
+    },
+    "total_return_series": {
+     "code": "H00300",
+     "non_positive_close": 0,
+     "dates": [],
+     "quality_adequate": true
+    },
+    "net_return_series": {
+     "code": "N00300",
+     "non_positive_close": 0,
+     "dates": [],
+     "quality_adequate": true
+    },
+    "note": "**三个序列的质量必须分开看**：主分析用全收益序列，但价格/净收益序列可能有各自的非正值异常，不能因为全收益质量达标就认为整个指数无异常。"
    }
   },
   {
@@ -736,6 +757,29 @@
     "backtest_blockers": [
      "收益口径 return_basis=unknown，未获官方确认"
     ]
+   },
+   "anomaly_by_series": {
+    "price_series": {
+     "code": "000905",
+     "non_positive_close": 0,
+     "dates": [],
+     "quality_adequate": true
+    },
+    "total_return_series": {
+     "code": "H00905",
+     "non_positive_close": 0,
+     "dates": [],
+     "quality_adequate": true
+    },
+    "net_return_series": {
+     "code": "N00905",
+     "non_positive_close": 1,
+     "dates": [
+      "2013-01-25"
+     ],
+     "quality_adequate": false
+    },
+    "note": "**三个序列的质量必须分开看**：主分析用全收益序列，但价格/净收益序列可能有各自的非正值异常，不能因为全收益质量达标就认为整个指数无异常。"
    }
   },
   {
@@ -1070,6 +1114,29 @@
     "backtest_blockers": [
      "收益口径 return_basis=unknown，未获官方确认"
     ]
+   },
+   "anomaly_by_series": {
+    "price_series": {
+     "code": "000906",
+     "non_positive_close": 0,
+     "dates": [],
+     "quality_adequate": true
+    },
+    "total_return_series": {
+     "code": "H00906",
+     "non_positive_close": 0,
+     "dates": [],
+     "quality_adequate": true
+    },
+    "net_return_series": {
+     "code": "N00906",
+     "non_positive_close": 1,
+     "dates": [
+      "2013-01-25"
+     ],
+     "quality_adequate": false
+    },
+    "note": "**三个序列的质量必须分开看**：主分析用全收益序列，但价格/净收益序列可能有各自的非正值异常，不能因为全收益质量达标就认为整个指数无异常。"
    }
   },
   {
@@ -1389,6 +1456,29 @@
     "backtest_blockers": [
      "收益口径 return_basis=unknown，未获官方确认"
     ]
+   },
+   "anomaly_by_series": {
+    "price_series": {
+     "code": "000016",
+     "non_positive_close": 0,
+     "dates": [],
+     "quality_adequate": true
+    },
+    "total_return_series": {
+     "code": "H00016",
+     "non_positive_close": 0,
+     "dates": [],
+     "quality_adequate": true
+    },
+    "net_return_series": {
+     "code": "N00016",
+     "non_positive_close": 1,
+     "dates": [
+      "2013-01-25"
+     ],
+     "quality_adequate": false
+    },
+    "note": "**三个序列的质量必须分开看**：主分析用全收益序列，但价格/净收益序列可能有各自的非正值异常，不能因为全收益质量达标就认为整个指数无异常。"
    }
   },
   {
@@ -1687,6 +1777,27 @@
      "历史起点晚（2008-12-31），覆盖率 78.2%",
      "收益口径 return_basis=unknown，未获官方确认"
     ]
+   },
+   "anomaly_by_series": {
+    "price_series": {
+     "code": "399997",
+     "non_positive_close": 0,
+     "dates": [],
+     "quality_adequate": true
+    },
+    "total_return_series": {
+     "code": "H20539",
+     "non_positive_close": 0,
+     "dates": [],
+     "quality_adequate": true
+    },
+    "net_return_series": {
+     "code": "399997CNY02",
+     "non_positive_close": 0,
+     "dates": [],
+     "quality_adequate": true
+    },
+    "note": "**三个序列的质量必须分开看**：主分析用全收益序列，但价格/净收益序列可能有各自的非正值异常，不能因为全收益质量达标就认为整个指数无异常。"
    }
   },
   {
@@ -1950,6 +2061,31 @@
      "非正值 1",
      "收益口径 return_basis=unknown，未获官方确认"
     ]
+   },
+   "anomaly_by_series": {
+    "price_series": {
+     "code": "H30184",
+     "non_positive_close": 1,
+     "dates": [
+      "2013-06-28"
+     ],
+     "quality_adequate": false
+    },
+    "total_return_series": {
+     "code": "H20184",
+     "non_positive_close": 1,
+     "dates": [
+      "2013-06-28"
+     ],
+     "quality_adequate": false
+    },
+    "net_return_series": {
+     "code": null,
+     "non_positive_close": 0,
+     "dates": [],
+     "quality_adequate": null
+    },
+    "note": "**三个序列的质量必须分开看**：主分析用全收益序列，但价格/净收益序列可能有各自的非正值异常，不能因为全收益质量达标就认为整个指数无异常。"
    }
   },
   {
@@ -2199,6 +2335,27 @@
     "backtest_blockers": [
      "收益口径 return_basis=unknown，未获官方确认"
     ]
+   },
+   "anomaly_by_series": {
+    "price_series": {
+     "code": "000942",
+     "non_positive_close": 0,
+     "dates": [],
+     "quality_adequate": true
+    },
+    "total_return_series": {
+     "code": "H00942",
+     "non_positive_close": 0,
+     "dates": [],
+     "quality_adequate": true
+    },
+    "net_return_series": {
+     "code": null,
+     "non_positive_close": 0,
+     "dates": [],
+     "quality_adequate": null
+    },
+    "note": "**三个序列的质量必须分开看**：主分析用全收益序列，但价格/净收益序列可能有各自的非正值异常，不能因为全收益质量达标就认为整个指数无异常。"
    }
   },
   {
@@ -2460,6 +2617,27 @@
      "历史起点晚（2012-12-31），覆盖率 60.7%",
      "收益口径 return_basis=unknown，未获官方确认"
     ]
+   },
+   "anomaly_by_series": {
+    "price_series": {
+     "code": "000012",
+     "non_positive_close": 0,
+     "dates": [],
+     "quality_adequate": true
+    },
+    "total_return_series": {
+     "code": "N00012",
+     "non_positive_close": 0,
+     "dates": [],
+     "quality_adequate": true
+    },
+    "net_return_series": {
+     "code": null,
+     "non_positive_close": 0,
+     "dates": [],
+     "quality_adequate": null
+    },
+    "note": "**三个序列的质量必须分开看**：主分析用全收益序列，但价格/净收益序列可能有各自的非正值异常，不能因为全收益质量达标就认为整个指数无异常。"
    }
   },
   {
@@ -2790,6 +2968,27 @@
     "backtest_blockers": [
      "收益口径 return_basis=unknown，未获官方确认"
     ]
+   },
+   "anomaly_by_series": {
+    "price_series": {
+     "code": "000922",
+     "non_positive_close": 0,
+     "dates": [],
+     "quality_adequate": true
+    },
+    "total_return_series": {
+     "code": "H00922",
+     "non_positive_close": 0,
+     "dates": [],
+     "quality_adequate": true
+    },
+    "net_return_series": {
+     "code": "000922CNY020",
+     "non_positive_close": 0,
+     "dates": [],
+     "quality_adequate": true
+    },
+    "note": "**三个序列的质量必须分开看**：主分析用全收益序列，但价格/净收益序列可能有各自的非正值异常，不能因为全收益质量达标就认为整个指数无异常。"
    }
   },
   {
@@ -2970,6 +3169,27 @@
      "历史起点晚（2014-11-14），覆盖率 52.5%",
      "收益口径 return_basis=unknown，未获官方确认"
     ]
+   },
+   "anomaly_by_series": {
+    "price_series": {
+     "code": "930930",
+     "non_positive_close": 0,
+     "dates": [],
+     "quality_adequate": true
+    },
+    "total_return_series": {
+     "code": "H20930",
+     "non_positive_close": 0,
+     "dates": [],
+     "quality_adequate": true
+    },
+    "net_return_series": {
+     "code": null,
+     "non_positive_close": 0,
+     "dates": [],
+     "quality_adequate": null
+    },
+    "note": "**三个序列的质量必须分开看**：主分析用全收益序列，但价格/净收益序列可能有各自的非正值异常，不能因为全收益质量达标就认为整个指数无异常。"
    }
   }
  ],
@@ -3079,5 +3299,52 @@
    "net_return_quality"
   ],
   "backtest_usable_reason_always_false": "return_basis 全部 unknown"
+ },
+ "non_positive_anomaly_register": {
+  "total_count": 5,
+  "register": [
+   {
+    "code": "H30184",
+    "series_layer": "price",
+    "date": "2013-06-28",
+    "value": 0.0,
+    "impact": "H30184 本身是价格指数，其价格序列质量不达标",
+    "handling": "保留原始值，未删除、未插值"
+   },
+   {
+    "code": "H20184",
+    "series_layer": "total_return",
+    "date": "2013-06-28",
+    "value": 0.0,
+    "impact": "H20184 是 H30184 的全收益序列，**同日同一异常**；导致 000922? 不，是 H30184 的全收益质量不达标",
+    "handling": "保留原始值，未删除、未插值"
+   },
+   {
+    "code": "N00905",
+    "series_layer": "net_return",
+    "date": "2013-01-25",
+    "value": 0.0,
+    "impact": "中证500 净收益序列质量不达标；**但主分析用 H00905 全收益，无异常**",
+    "handling": "保留原始值"
+   },
+   {
+    "code": "N00906",
+    "series_layer": "net_return",
+    "date": "2013-01-25",
+    "value": 0.0,
+    "impact": "中证800 净收益序列质量不达标；**主分析用 H00906 全收益，无异常**",
+    "handling": "保留原始值"
+   },
+   {
+    "code": "N00016",
+    "series_layer": "net_return",
+    "date": "2013-01-25",
+    "value": 0.0,
+    "impact": "上证50 净收益序列质量不达标；**主分析用 H00016 全收益，无异常**",
+    "handling": "保留原始值"
+   }
+  ],
+  "clarification": "此前 3B-6.1.0 只列了 4 个异常序列（H30184/H20184/N00905/N00906/N00016 中的部分），容易让读者误以为其余变体都无异常。本表按「价格 / 全收益 / 净收益」三层给全 5 处异常，并标明哪一层影响主分析、哪一层不影响。",
+  "important": "**不影响主分析 ≠ 可以忽略**：净收益序列的异常仍然存在，只是当前主分析不使用净收益序列做超额收益计算。"
  }
 }

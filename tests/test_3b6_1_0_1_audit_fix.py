@@ -178,9 +178,9 @@ def test_other_composites_have_no_fixed_rate_confusion(composite_report):
     others = [x for x in composite_report["composites"]
               if x["composite_id"] != 16]
     for c in others:
-        for fa in c.get("fixed_annual_return_components") or []:
+        if c.get("fixed_annual_return_components"):
             pytest.fail(f"{c['composite_id']} 不应有固定年收益率成分")
-        for fr in c.get("fixed_rate_components") or []:
+        if c.get("fixed_rate_components"):
             pytest.fail(f"{c['composite_id']} 不应有 fixed_rate 成分")
 
 
