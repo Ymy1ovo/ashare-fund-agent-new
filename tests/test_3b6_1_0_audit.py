@@ -25,6 +25,8 @@ from app.fund.research.excess_return import (  # noqa: E402
 
 RAW = ROOT / ".tmp610" / "raw"
 REPORTS = ROOT / "reports"
+# 3B-6.1.0.1：改为读取仓库内正式证据附件（不再依赖本地 .tmp610 缓存）
+EVIDENCE = ROOT / "reports" / "evidence" / "phase3B6_1_0_index_probe_evidence.json"
 
 
 # ================================================================ 口径不可混用
@@ -91,43 +93,48 @@ def test_unknown_weight_blocks_even_if_data_available():
 
 
 # ================================================================ 实测数据校验
-@pytest.mark.skipif(not (RAW / "index_basis.json").exists(),
-                    reason="需先运行 audit_3b6_1_0_index_basis.py --probe")
+def _evidence() -> dict:
+    """读仓库内正式证据附件（已提交，不依赖本地缓存）。"""
+    assert EVIDENCE.exists(), (
+        "缺少仓库级证据附件：reports/evidence/"
+        "phase3B6_1_0_index_probe_evidence.json")
+    return json.loads(EVIDENCE.read_text(encoding="utf-8"))
+
+
 def test_all_10_indexes_probed():
-    doc = json.loads((RAW / "index_basis.json").read_text(encoding="utf-8"))
+    doc = _evidence()
     assert len(doc["indexes"]) == 10
     codes = {e["index_code"] for e in doc["indexes"]}
     assert codes == {"000300", "000905", "000906", "000016", "399997",
                      "H30184", "000942", "000012", "000922", "930930"}
 
 
-@pytest.mark.skipif(not (RAW / "index_basis.json").exists(), reason="no probe")
 def test_total_return_variants_actually_returned_by_source():
-    """全收益变体必须真的返回不同名称，不能只凭代码猜测。"""
-    doc = json.loads((RAW / "index_basis.json").read_text(encoding="utf-8"))
+    """全收益变体必须真的返回对应名称，不能只凭代码猜测。"""
+    doc = _evidence()
+    # 只要语义标签含 total，且状态 ok，名称就必须体现「全收益」或「再投资」
+    found = 0
     for e in doc["indexes"]:
         for v in e["variants"]:
-            if v.get("kind") == "total" and v.get("status") == "ok":
-                assert "全收益" in v["index_name_returned"] or \
-                       "再投资" in v["index_name_returned"]
-            if v.get("kind") == "price" and v.get("status") == "ok":
-                assert e["index_name"][:4] in v["index_name_returned"] or \
-                       v["index_name_returned"]
+            if not v["semantic"].startswith("total"):
+                continue
+            if v["status"] != "ok":
+                continue
+            found += 1
+            name = v["index_name_returned"]
+            assert ("全收益" in name) or ("利息及再投资" in name), \
+                f"{e['index_code']} 的 total 变体名称异常：{name}"
+    assert found >= 6, f"可验证的 total 变体过少：{found}"
 
 
-@pytest.mark.skipif(not (RAW / "index_basis.json").exists(), reason="no probe")
 def test_price_and_total_are_different_series():
     """价格与全收益必须是不同数值（沪深300 实测）。"""
-    doc = json.loads((RAW / "index_basis.json").read_text(encoding="utf-8"))
-    for e in doc["indexes"]:
-        if e["index_code"] != "000300":
-            continue
-        price = next(v for v in e["variants"]
-                     if v["kind"] == "price" and v["status"] == "ok")
-        total = next(v for v in e["variants"]
-                     if v["kind"] == "total" and v["status"] == "ok")
-        assert price["sample"][0]["close"] != total["sample"][0]["close"]
-        assert total["sample"][0]["close"] > price["sample"][0]["close"]
+    doc = _evidence()
+    cmp_ = doc["same_day_comparison"]["csi300_price_vs_total"]
+    p = cmp_["price"]["close"]["close"]
+    t = cmp_["total"]["close"]["close"]
+    assert p != t
+    assert t > p
 
 
 # ================================================================ 报告一致性

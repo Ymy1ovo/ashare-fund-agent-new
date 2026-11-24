@@ -1,88 +1,99 @@
 {
- "phase": "3B-6.1.0",
+ "phase": "3B-6.1.0.1",
  "step": "06_tests",
- "baseline_head": "eeb83bc2803d56b84986dce9d1cd93f0cb8dc1d4",
- "generated_at": "2026-11-24 15:11",
- "new_tests": {
-  "file": "tests/test_3b6_1_0_audit.py",
-  "total": 17,
-  "with_cache": {
-   "passed": 17,
-   "skipped": 0,
-   "seconds": 0.52
-  },
-  "without_cache": {
+ "baseline_head": "6b0dbafd1466c9def6f11b3c89fbe21122294dda",
+ "generated_at": "2026-11-24 16:23",
+ "reproducibility_fix": {
+  "issue": "3 项测试依赖本地 .tmp610 缓存，干净检出时跳过",
+  "fix": "改为读 reports/evidence/phase3B6_1_0_index_probe_evidence.json",
+  "before": {
    "passed": 14,
-   "skipped": 3,
-   "seconds": 0.51
+   "skipped": 3
   },
-  "skipped_tests": [
-   "test_all_10_indexes_probed",
-   "test_total_return_variants_actually_returned_by_source",
-   "test_price_and_total_are_different_series"
-  ],
-  "skip_reason": "依赖 .tmp610/raw 探测缓存，可用 --probe 重建",
-  "not_weakened": true
+  "after": {
+   "passed": 17,
+   "skipped": 0
+  },
+  "cache_removed_verified": true,
+  "skip_removed": true,
+  "assertions_weakened": false
+ },
+ "new_tests": {
+  "file": "tests/test_3b6_1_0_1_audit_fix.py",
+  "count": 26,
+  "passed": 26,
+  "skipped": 0,
+  "seconds": 0.76
+ },
+ "full_pytest": {
+  "passed": 1945,
+  "failed": 0,
+  "errors": 0,
+  "skipped": 0,
+  "seconds": 752.8,
+  "executed": true
+ },
+ "evolution": {
+  "3B-6.1.0": 1919,
+  "3B-6.1.0.1": 1945,
+  "delta": 26
+ },
+ "regression": {
+  "3b6_1_0_audit": {
+   "passed": 17,
+   "seconds": 0.46
+  },
+  "3b6_0_4_1_suite": {
+   "passed": 88
+  }
  },
  "static_checks_excluded": [
   "compileall",
   "json validity",
   "pdf text extraction"
  ],
- "data_source_calls": 53,
+ "data_source_calls": {
+  "index_hist": 34,
+  "pdf_http": 18,
+  "total": 52
+ },
  "database_readonly": {
   "fingerprint_before": "115ac91eee7c26424952e6df23ddeeafe2435974fe5e81a8ba6bbcabfe387dd4",
   "fingerprint_after": "115ac91eee7c26424952e6df23ddeeafe2435974fe5e81a8ba6bbcabfe387dd4",
   "fingerprint_unchanged": true,
-  "etf_fingerprint": "d54727c0a76a1b09531accd04b3d66ff4ea2374592b1d4a8cb8381602cbbac49",
   "integrity_check": "ok",
   "foreign_key_violations": 0,
   "table_counts": {
-   "fund_master": 120,
-   "fund_share_classes": 149,
-   "fund_nav_daily": 245656,
-   "fund_dividends": 376,
-   "fund_lifecycle_events": 49,
-   "fund_fee_rules": 90,
    "index_master": 10,
    "index_daily": 50603,
-   "index_quality_checks": 10,
    "benchmark_composite": 15,
-   "benchmark_composite_component": 34
+   "benchmark_composite_component": 34,
+   "fund_master": 120
   }
- },
- "key_checks": {
-  "index_daily_unchanged": true,
-  "index_master_unchanged": true,
-  "benchmark_composite_unchanged": true,
-  "components_unchanged": true
  },
  "code_changes": {
   "new_scripts": [
-   "scripts/audit_3b6_1_0_index_basis.py"
+   "scripts/build_3b6_1_0_1_evidence.py"
+  ],
+  "new_evidence": [
+   "reports/evidence/phase3B6_1_0_index_probe_evidence.json"
   ],
   "new_tests": [
+   "tests/test_3b6_1_0_1_audit_fix.py"
+  ],
+  "modified_tests": [
    "tests/test_3b6_1_0_audit.py"
   ],
+  "modified_reports": true,
   "business_code_modified": false,
   "schema_changed": false,
-  "existing_tests_modified": false
+  "tests_deleted": 0,
+  "tests_skipped": 0,
+  "assertions_weakened": 0
  },
  "gate": {
   "ready_for_research_analysis": true,
   "ready_for_backtest": false,
   "ready_for_formal_ranking": false
- },
- "full_pytest": {
-  "passed": 1919,
-  "failed": 0,
-  "errors": 0,
-  "seconds": 823.28,
-  "executed": true
- },
- "evolution": {
-  "3B-6.0.4.1": 1902,
-  "3B-6.1.0": 1919,
-  "delta": 17
  }
 }

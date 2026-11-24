@@ -35,5 +35,67 @@
   "ready_for_research_analysis": true,
   "ready_for_backtest": false,
   "ready_for_formal_ranking": false
+ },
+ "correction_round": {
+  "round": "3B-6.1.0.1",
+  "baseline_head": "6b0dbafd1466c9def6f11b3c89fbe21122294dda",
+  "generated_at": "2026-11-24 16:10",
+  "db_fingerprint": "115ac91eee7c26424952e6df23ddeeafe2435974fe5e81a8ba6bbcabfe387dd4",
+  "db_modified": false,
+  "fixed": [
+   {
+    "id": 1,
+    "issue": "H00012 净价被填进 net_total_return_index_code",
+    "type": "semantic_error",
+    "fix": "net_total_return=null; 新增 clean_price_index_code"
+   },
+   {
+    "id": 2,
+    "issue": "000051 的 1% 年收益率被当成 1% 资产权重",
+    "type": "semantic_error",
+    "fix": "fixed_annual_return, weight=null, annual_rate=0.01"
+   },
+   {
+    "id": 3,
+    "issue": "其余 9 个指数缺官方编制方案",
+    "type": "evidence_gap",
+    "fix": "补 8 份方案 + 10 份 factsheet，2 份如实标记缺失"
+   },
+   {
+    "id": 4,
+    "issue": "3 项测试依赖本地 .tmp610 缓存",
+    "type": "reproducibility",
+    "fix": "改为读仓库内 reports/evidence/*.json"
+   }
+  ],
+  "discovered_worse_error": {
+   "what": "按 H+后5位惯例猜衍生指数代码全部失败，误判 3 个指数无全收益",
+   "actual_codes": {
+    "399997": {
+     "total": "H20539",
+     "net": "399997CNY02"
+    },
+    "H30184": {
+     "total": "H20184",
+     "net": null
+    },
+    "930930": {
+     "total": "H20930",
+     "net": null
+    },
+    "000922": {
+     "net": "000922CNY020"
+    }
+   },
+   "source": "中证官方 factsheet 衍生指数栏",
+   "verified_by_call": true,
+   "lesson": "不得按代码前缀惯例推断官方衍生指数代码"
+  },
+  "still_not_done": [
+   "upgrade_return_basis",
+   "write_db",
+   "modify_schema",
+   "modify_excess_rule"
+  ]
  }
 }

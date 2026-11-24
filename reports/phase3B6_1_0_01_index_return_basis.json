@@ -19,11 +19,28 @@
   "quote": "中证指数有限公司同时计算沪深300全收益指数和净收益指数的日收盘值。沪深300全收益指数、净收益指数是沪深300指数的辅指数，沪深300全收益指数、净收益指数的计算中考虑了样本税前、税后现金红利的再投资收益"
  },
  "summary": {
-  "all_three_series": 4,
-  "price_and_total": 2,
+  "all_three_series": 5,
+  "price_and_total_only": 2,
   "special_bond": 1,
-  "price_only": 3,
-  "return_basis_upgraded": 0
+  "return_basis_upgraded": 0,
+  "detail": {
+   "all_three": [
+    "000300",
+    "000905",
+    "000906",
+    "000016",
+    "399997",
+    "000922"
+   ],
+   "price_total_only": [
+    "000942",
+    "H30184",
+    "930930"
+   ],
+   "special": [
+    "000012"
+   ]
+  }
  },
  "indexes": [
   {
@@ -60,7 +77,20 @@
    "quality_grade": "A",
    "source_grade": "official_third_party_aggregated",
    "usable_for_excess_return": false,
-   "limitation": "价格/全收益/净收益三套序列**均已实测可取得**（H00300/N00300，2004-01-01 起，各 5,318 行）；官方编制方案已验证。但**口径仍为 unknown**——本轮是审计，不执行口径升级。"
+   "limitation": "价格/全收益/净收益三套序列**均已实测可取得**（H00300/N00300，2004-01-01 起，各 5,318 行）；官方编制方案已验证。但**口径仍为 unknown**——本轮是审计，不执行口径升级。",
+   "official_document": {
+    "publisher": "中证指数有限公司",
+    "document": "沪深300指数编制方案",
+    "version": "2023年9月",
+    "url": "https://oss-ch.csindex.com.cn/static/html/csindex/public/uploads/indices/detail/files/zh_CN/000300_Index_Methodology_cn.pdf",
+    "downloaded": true,
+    "bytes": 1184619,
+    "pages": 16,
+    "sha256_16": "de6491e03e5d57ec"
+   },
+   "official_factsheet": null,
+   "official_evidence_level": "L2_document_verified",
+   "official_evidence_note": null
   },
   {
    "index_code": "000905",
@@ -89,7 +119,20 @@
    "quality_grade": "A",
    "source_grade": "official_third_party_aggregated",
    "usable_for_excess_return": false,
-   "limitation": "价格/全收益/净收益均实测可取得（H00905/N00905）。官方方案未单独下载核验（沪深300 方案已证明中证体系存在该类辅指数）。"
+   "limitation": "价格/全收益/净收益均实测可取得（H00905/N00905）。官方方案未单独下载核验（沪深300 方案已证明中证体系存在该类辅指数）。",
+   "official_document": {
+    "publisher": "中证指数有限公司",
+    "document": "中证200/500/700/800指数编制方案",
+    "version": "2022年5月 V1.2",
+    "url": "https://oss-ch.csindex.com.cn/static/html/csindex/public/uploads/indices/detail/files/zh_CN/000905_Index_Methodology_cn.pdf",
+    "downloaded": true,
+    "bytes": 185201,
+    "pages": 3,
+    "sha256_16": "6109ad8390fdad70"
+   },
+   "official_factsheet": null,
+   "official_evidence_level": "L2_document_verified",
+   "official_evidence_note": "方案正文未提及全收益/净收益；辅指数信息仅见于 factsheet"
   },
   {
    "index_code": "000906",
@@ -118,7 +161,20 @@
    "quality_grade": "A",
    "source_grade": "official_third_party_aggregated",
    "usable_for_excess_return": false,
-   "limitation": "价格/全收益/净收益均实测可取得（H00906/N00906）。同上。"
+   "limitation": "价格/全收益/净收益均实测可取得（H00906/N00906）。同上。",
+   "official_document": {
+    "publisher": "中证指数有限公司",
+    "document": "中证200/500/700/800指数编制方案",
+    "version": "2022年5月 V1.2",
+    "url": "https://oss-ch.csindex.com.cn/static/html/csindex/public/uploads/indices/detail/files/zh_CN/000906_Index_Methodology_cn.pdf",
+    "downloaded": true,
+    "bytes": 185201,
+    "pages": 3,
+    "sha256_16": "6109ad8390fdad70"
+   },
+   "official_factsheet": null,
+   "official_evidence_level": "L2_document_verified",
+   "official_evidence_note": "与 000905 同一份方案文件（中证规模指数合集）"
   },
   {
    "index_code": "000016",
@@ -147,15 +203,28 @@
    "quality_grade": "A",
    "source_grade": "official_third_party_aggregated",
    "usable_for_excess_return": false,
-   "limitation": "价格/全收益/净收益均实测可取得（H00016/N00016，5,560 行，覆盖更长）。"
+   "limitation": "价格/全收益/净收益均实测可取得（H00016/N00016，5,560 行，覆盖更长）。",
+   "official_document": {
+    "publisher": "中证指数有限公司",
+    "document": "上证50指数编制方案",
+    "version": "2020年12月 V1.1",
+    "url": "https://oss-ch.csindex.com.cn/static/html/csindex/public/uploads/indices/detail/files/zh_CN/000016_Index_Methodology_cn.pdf",
+    "downloaded": true,
+    "bytes": 138004,
+    "pages": 2,
+    "sha256_16": "e8f1ce6045b7f913"
+   },
+   "official_factsheet": null,
+   "official_evidence_level": "L2_document_verified",
+   "official_evidence_note": "方案正文未提及辅指数"
   },
   {
    "index_code": "399997",
    "index_name": "中证白酒指数",
    "provider": "中证指数有限公司",
    "price_index_code": "399997",
-   "total_return_index_code": null,
-   "net_total_return_index_code": null,
+   "total_return_index_code": "H20539",
+   "net_total_return_index_code": "399997CNY02",
    "price_index_name_returned": "中证白酒指数",
    "total_index_name_returned": null,
    "net_index_name_returned": null,
@@ -176,14 +245,29 @@
    "quality_grade": "C",
    "source_grade": "official_third_party_aggregated",
    "usable_for_excess_return": false,
-   "limitation": "**仅价格指数可取得**。H/N 变体（H39997/N39997）接口均返回空，未找到全收益/净收益序列。**必须保持 unknown/price_return**。"
+   "limitation": "**全收益/净收益序列存在且可取**（H20539 / 399997CNY02），但 3B-6.1.0 曾误判为「不存在」。编制方案正文未提及辅指数，代码来自 factsheet；`return_basis` 仍保持 unknown（本轮为审计，不做口径升级）。",
+   "official_document": {
+    "publisher": "中证指数有限公司",
+    "document": "中证白酒指数编制方案",
+    "version": "2023年12月 V1.2",
+    "url": "https://oss-ch.csindex.com.cn/static/html/csindex/public/uploads/indices/detail/files/zh_CN/20231208175434-399997_Index_Methodology_cn.pdf",
+    "downloaded": true,
+    "bytes": 334506,
+    "pages": 2,
+    "sha256_16": "62450948684c2930"
+   },
+   "official_factsheet": null,
+   "official_evidence_level": "L2_document_verified",
+   "official_evidence_note": "方案正文 752 字符，未提及辅指数；factsheet 衍生指数栏披露 H20539 / 399997CNY02",
+   "correction": "3B-6.1.0 用「H+后5位」猜测 H39997 返回空，据此误判无全收益。官方 factsheet「衍生指数」栏披露 H20539（全收益）/ 399997CNY02（净收益），均已实测返回非空序列。",
+   "audit_correction_applied": true
   },
   {
    "index_code": "H30184",
    "index_name": "中证全指半导体产品与设备指数",
    "provider": "中证指数有限公司",
    "price_index_code": "H30184",
-   "total_return_index_code": null,
+   "total_return_index_code": "H20184",
    "net_total_return_index_code": null,
    "price_index_name_returned": "中证全指半导体产品与设备指数",
    "total_index_name_returned": null,
@@ -205,7 +289,22 @@
    "quality_grade": "C",
    "source_grade": "official_third_party_aggregated",
    "usable_for_excess_return": false,
-   "limitation": "**仅价格指数可取得**。H30184 本身就是价格指数代码（H 前缀在此不代表全收益）。未找到全收益变体。**必须保持 unknown**。"
+   "limitation": "**全收益可取（H20184）**，**净收益确实不存在**（factsheet 为 --）。`return_basis` 保持 unknown。",
+   "official_document": {
+    "publisher": "中证指数有限公司",
+    "document": "中证全指半导体产品与设备指数编制方案",
+    "version": "2024年11月 V1.2",
+    "url": "https://oss-ch.csindex.com.cn/static/html/csindex/public/uploads/indices/detail/files/zh_CN/H30184_Index_Methodology_cn.pdf",
+    "downloaded": true,
+    "bytes": 457088,
+    "pages": 2,
+    "sha256_16": "8b7de8a81c93e5f7"
+   },
+   "official_factsheet": null,
+   "official_evidence_level": "L2_document_verified",
+   "official_evidence_note": "factsheet 净收益指数栏为 --，即无净收益辅指数",
+   "correction": "3B-6.1.0 误判「无全收益」。官方 factsheet 披露 H20184（全收益），已实测返回非空；净收益栏为 --，即确实没有。",
+   "audit_correction_applied": true
   },
   {
    "index_code": "000942",
@@ -234,7 +333,22 @@
    "quality_grade": "A",
    "source_grade": "official_third_party_aggregated",
    "usable_for_excess_return": false,
-   "limitation": "价格 + 全收益可取得（H00942）；净收益变体（N00942）返回空。"
+   "limitation": "价格 + 全收益（H00942）可取；**净收益不可得**。`return_basis` 保持 unknown。",
+   "official_document": {
+    "publisher": "中证指数有限公司",
+    "document": "中证内地主题系列指数编制方案",
+    "version": "2022年5月 V1.3",
+    "url": "https://oss-ch.csindex.com.cn/static/html/csindex/public/uploads/indices/detail/files/zh_CN/000942_Index_Methodology_cn.pdf",
+    "downloaded": true,
+    "bytes": 145567,
+    "pages": 3,
+    "sha256_16": "e2893e60254074f9"
+   },
+   "official_factsheet": null,
+   "official_evidence_level": "L2_document_verified",
+   "official_evidence_note": "factsheet 披露 H00942；净收益代码未在 factheet 中给出可验证值",
+   "correction": "净收益代码在 factsheet 中未给出可验证值（CNY020 变体实测返回空）。",
+   "audit_correction_applied": true
   },
   {
    "index_code": "000012",
@@ -242,7 +356,7 @@
    "provider": "上海证券交易所",
    "price_index_code": "000012",
    "total_return_index_code": "N00012",
-   "net_total_return_index_code": "H00012",
+   "net_total_return_index_code": null,
    "price_index_name_returned": "上证国债指数",
    "total_index_name_returned": "上证国债指数(利息及再投资)",
    "net_index_name_returned": "上证国债指数(净价)",
@@ -263,7 +377,52 @@
    "quality_grade": "B",
    "source_grade": "official_third_party_aggregated",
    "usable_for_excess_return": false,
-   "limitation": "**三套序列含义特殊**：000012=上证国债指数（全价），H00012=上证国债指数(净价)，N00012=上证国债指数(利息及再投资)。**H 前缀在此不是全收益**，命名规则与股票指数不同。三套数值差异极大（206 / 104 / 145），不可混用。"
+   "limitation": "**三套序列语义特殊**：000012=全价，H00012=**净价**，N00012=利息及再投资。**H 前缀在此不是全收益、更不是净收益**，命名规则与股票指数不同。三套数值差异极大（206.07 / 104.65 / 145.71）。**未取得官方编制方案**，语义结论来自接口返回名称（L3）。",
+   "index_name_variants": {
+    "000012": {
+     "semantic": "full_price",
+     "interface_name": "上证国债指数",
+     "note": "全价指数（含应计利息，点位不回落）"
+    },
+    "N00012": {
+     "semantic": "interest_and_reinvestment",
+     "interface_name": "上证国债指数(利息及再投资)",
+     "note": "官方口径为「利息及再投资」，**不是**标准的 net_total_return"
+    },
+    "H00012": {
+     "semantic": "clean_price",
+     "interface_name": "上证国债指数(净价)",
+     "note": "**净价指数 ≠ 净收益指数**，不得填入 net_total_return_index_code"
+    }
+   },
+   "price_or_full_price_index_code": "000012",
+   "clean_price_index_code": "H00012",
+   "total_return_code_caveat": "N00012 的接口名称是「利息及再投资」，官方定义未取得编制方案核验；严格意义上它是**债券指数的总收益口径**，但不等同于股票指数的 total_return 定义。保留该代码仅作记录，**不构成口径升级依据**。",
+   "naming_convention_warning": "上证国债指数的代码前缀**不能套用股票指数的 H/N 命名惯例**：H00012 = 净价（股票指数里 H 常代表全收益），N00012 = 利息及再投资。若按惯例映射会把净价指数当成全收益/净收益使用，属严重语义错误。",
+   "net_total_return_note": "净价指数（H00012）不是净收益指数，故 net_total_return_index_code 置 null",
+   "official_document": {
+    "publisher": "上海证券交易所（中证指数有限公司维护）",
+    "document": null,
+    "version": null,
+    "url": null,
+    "downloaded": false,
+    "bytes": null,
+    "pages": null,
+    "sha256_16": null
+   },
+   "official_factsheet": {
+    "url": "https://oss-ch.csindex.com.cn/static/html/csindex/public/uploads/indices/detail/files/zh_CN/000012factsheet.pdf",
+    "bytes": 421962,
+    "sha256_16": "21f24570c840ac91",
+    "pages": 2,
+    "derived_codes": [
+     "H00012",
+     "N00012"
+    ],
+    "has_derived_section": false
+   },
+   "official_evidence_level": "L3_factsheet_only",
+   "official_evidence_note": "**未取得官方编制方案**。已检索 csindex 官网 PDF 直链（{code}_Index_Methodology_cn.pdf / factsheet / methodology_cn）与 sse.com.cn 指数页，均 404 或仅返回导航页。factsheet 无「衍生指数」栏，只列出 H00012/N00012 两个代码，**不解释其经济含义**。语义结论来自接口返回名称，属 L3。"
   },
   {
    "index_code": "000922",
@@ -271,7 +430,7 @@
    "provider": "中证指数有限公司",
    "price_index_code": "000922",
    "total_return_index_code": "H00922",
-   "net_total_return_index_code": null,
+   "net_total_return_index_code": "000922CNY020",
    "price_index_name_returned": "中证红利指数",
    "total_index_name_returned": "中证红利全收益指数",
    "net_index_name_returned": null,
@@ -292,14 +451,29 @@
    "quality_grade": "A",
    "source_grade": "official_third_party_aggregated",
    "usable_for_excess_return": false,
-   "limitation": "价格 + 全收益可取得（H00922）；净收益变体返回空。"
+   "limitation": "价格 + 全收益（H00922）+ 净收益（000922CNY020）均可取；`return_basis` 保持 unknown。",
+   "official_document": {
+    "publisher": "中证指数有限公司",
+    "document": "中证红利指数编制方案",
+    "version": "2022年10月 V1.2",
+    "url": "https://oss-ch.csindex.com.cn/static/html/csindex/public/uploads/indices/detail/files/zh_CN/000922_Index_Methodology_cn.pdf",
+    "downloaded": true,
+    "bytes": 1137267,
+    "pages": 3,
+    "sha256_16": "6b8053f02ca87a0e"
+   },
+   "official_factsheet": null,
+   "official_evidence_level": "L2_document_verified",
+   "official_evidence_note": "方案正文 1,130 字符，未提及辅指数",
+   "correction": "3B-6.1.0 的 N00922 猜测失败。官方 factsheet 披露净收益代码 000922CNY020，已实测。",
+   "audit_correction_applied": true
   },
   {
    "index_code": "930930",
    "index_name": "中证港股通综合指数",
    "provider": "中证指数有限公司",
    "price_index_code": "930930",
-   "total_return_index_code": null,
+   "total_return_index_code": "H20930",
    "net_total_return_index_code": null,
    "price_index_name_returned": "中证港股通综合指数",
    "total_index_name_returned": null,
@@ -321,7 +495,31 @@
    "quality_grade": "C",
    "source_grade": "official_third_party_aggregated",
    "usable_for_excess_return": false,
-   "limitation": "**仅价格指数可取得**。H/N 变体均返回空。港股通指数为人民币计价口径，与汇率处理相关，需单独核实。"
+   "limitation": "**全收益可取（H20930）**，**净收益不存在**。港股通人民币计价与汇率处理规则未查证。`return_basis` 保持 unknown。",
+   "official_document": {
+    "publisher": "中证指数有限公司",
+    "document": null,
+    "version": null,
+    "url": null,
+    "downloaded": false,
+    "bytes": null,
+    "pages": null,
+    "sha256_16": null
+   },
+   "official_factsheet": {
+    "url": "https://oss-ch.csindex.com.cn/static/html/csindex/public/uploads/indices/detail/files/zh_CN/930930factsheet.pdf",
+    "bytes": 446156,
+    "sha256_16": "0bd7e8937145086a",
+    "pages": 2,
+    "derived_codes": [
+     "H20930"
+    ],
+    "has_derived_section": true
+   },
+   "official_evidence_level": "L3_factsheet_only",
+   "official_evidence_note": "**未取得官方编制方案**（csindex PDF 直链全部 404）。factsheet 有「衍生指数」栏，披露全收益 H20930，净收益栏为 --。",
+   "correction": "3B-6.1.0 用 H930930 猜测返回空，误判无全收益。官方 factsheet 披露 H20930，已实测返回非空；净收益栏为 --。",
+   "audit_correction_applied": true
   }
  ],
  "critical_findings": {
@@ -362,5 +560,37 @@
   "ready_for_research_analysis": true,
   "ready_for_backtest": false,
   "ready_for_formal_ranking": false
+ },
+ "audit_corrections": {
+  "round": "3B-6.1.0.1",
+  "correction_1": {
+   "index": "000012",
+   "issue": "H00012 被错误填入 net_total_return_index_code",
+   "fix": "net_total_return_index_code=null；新增 clean_price_index_code=H00012",
+   "net_total_return_index_code": null
+  },
+  "correction_2": {
+   "issue": "3B-6.1.0 按「H+后5位」惯例猜测衍生指数代码全部失败，误判 3 个指数「无全收益」",
+   "actual": {
+    "399997": {
+     "total": "H20539",
+     "net": "399997CNY02"
+    },
+    "H30184": {
+     "total": "H20184",
+     "net": null
+    },
+    "930930": {
+     "total": "H20930",
+     "net": null
+    }
+   },
+   "source": "中证官方 factsheet「衍生指数」栏",
+   "lesson": "不得按代码前缀惯例推断官方衍生指数代码"
+  },
+  "correction_3": {
+   "issue": "其余 9 个指数缺官方编制方案证据",
+   "result": "8/9 已取得编制方案 PDF，10/10 已取得 factsheet；000012 与 930930 无编制方案"
+  }
  }
 }

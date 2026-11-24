@@ -123,5 +123,93 @@
   "ready_for_research_analysis": true,
   "ready_for_backtest": false,
   "ready_for_formal_ranking": false
+ },
+ "evidence_level_correction": {
+  "round": "3B-6.1.0.1",
+  "methodology_docs_obtained": 8,
+  "methodology_docs_missing": [
+   "000012",
+   "930930"
+  ],
+  "factsheets_obtained": 10,
+  "search_log": {
+   "search_engine": "csindex 官网 PDF 直链 + web 搜索 + sse.com.cn",
+   "query_time": "2026-11-24 15:52 ~ 16:05",
+   "patterns_tried": [
+    "{c}_Index_Methodology_cn.pdf",
+    "{c}factsheet.pdf",
+    "{c}_Index_Methodology.pdf",
+    "{c}_methodology_cn.pdf"
+   ],
+   "url_base": "https://oss-ch.csindex.com.cn/static/html/csindex/public/uploads/indices/detail/files/zh_CN/",
+   "keywords": [
+    "中证白酒指数 399997 编制方案 csindex 官方",
+    "上证国债指数 000012 编制方案 上海证券交易所 官方",
+    "site:sse.com.cn 上证国债指数 000012 编制"
+   ],
+   "found_methodology": [
+    "000300",
+    "000905",
+    "000906",
+    "000016",
+    "399997",
+    "H30184",
+    "000942",
+    "000922"
+   ],
+   "found_factsheet": [
+    "000300",
+    "000905",
+    "000906",
+    "000016",
+    "399997",
+    "H30184",
+    "000942",
+    "000012",
+    "000922",
+    "930930"
+   ],
+   "not_found_methodology": [
+    "000012",
+    "930930"
+   ],
+   "not_found_reason": {
+    "000012": "csindex 直链 404；上交所 sse.com.cn 指数页 404；仅有 factsheet",
+    "930930": "csindex 直链 404；仅有 factsheet"
+   }
+  },
+  "levels_after": {
+   "000300": "L2_document_verified",
+   "000905": "L2_document_verified",
+   "000906": "L2_document_verified",
+   "000016": "L2_document_verified",
+   "399997": "L2_document_verified",
+   "H30184": "L2_document_verified",
+   "000942": "L2_document_verified",
+   "000012": "L3_factsheet_only",
+   "000922": "L2_document_verified",
+   "930930": "L3_factsheet_only"
+  },
+  "important_caveat": "L2 只表示「有官方文件」，不等于「口径已核实」；多数方案正文未提全收益/净收益定义，代码映射来自 factsheet。return_basis 仍全部 unknown。",
+  "corrected_conclusions": {
+   "399997": {
+    "before": "no_total_return",
+    "after": "H20539 total / 399997CNY02 net"
+   },
+   "H30184": {
+    "before": "no_total_return",
+    "after": "H20184 total / no net"
+   },
+   "930930": {
+    "before": "no_total_return",
+    "after": "H20930 total / no net"
+   },
+   "000922": {
+    "before": "no_net",
+    "after": "000922CNY020 net"
+   }
+  },
+  "error_cause": "按 H+后5位 惯例猜代码，全部返回空，据此误判不存在",
+  "lesson": "不得按代码前缀惯例推断官方衍生指数代码"
  }
 }

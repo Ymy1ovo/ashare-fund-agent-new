@@ -102,5 +102,12 @@
   "ready_for_research_analysis": true,
   "ready_for_backtest": false,
   "ready_for_formal_ranking": false
+ },
+ "correction_round": {
+  "round": "3B-6.1.0.1",
+  "baseline_head": "6b0dbafd1466c9def6f11b3c89fbe21122294dda",
+  "conclusions_changed": false,
+  "note": "无风险利率审计与本轮指数口径修正相互独立，结论未改",
+  "related_fix": "上证国债三变体语义已澄清，进一步确认该指数不能当无风险利率"
  }
 }

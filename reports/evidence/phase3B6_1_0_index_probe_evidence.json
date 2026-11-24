@@ -1,0 +1,1397 @@
+{
+ "phase": "3B-6.1.0.1",
+ "purpose": "指数探测证据附件（供仓库级测试复核，不依赖本地缓存）",
+ "generated_at": "2026-11-24T16:02:37",
+ "source": "akshare.stock_zh_index_hist_csindex",
+ "probe_window": [
+  "20240102",
+  "20240110"
+ ],
+ "note": "仅保留元数据与 3 条样例收盘值；不包含完整行情序列，不含任何密钥或个人信息",
+ "call_count": 30,
+ "indexes": [
+  {
+   "index_code": "000300",
+   "index_name": "沪深300指数",
+   "provider": "中证指数有限公司",
+   "variants": [
+    {
+     "request_code": "000300",
+     "request_start": "20240102",
+     "request_end": "20240110",
+     "source": "akshare.stock_zh_index_hist_csindex",
+     "called_at": "2026-11-24T16:02:37",
+     "status": "ok",
+     "index_code_returned": "000300",
+     "index_name_returned": "沪深300指数",
+     "rows": 7,
+     "date_min": "2024-01-02",
+     "date_max": "2024-01-10",
+     "duplicate_dates": 0,
+     "null_close": 0,
+     "non_positive_close": 0,
+     "sample": [
+      {
+       "date": "2024-01-02",
+       "close": 3386.35
+      },
+      {
+       "date": "2024-01-03",
+       "close": 3378.3
+      },
+      {
+       "date": "2024-01-04",
+       "close": 3347.05
+      }
+     ],
+     "error": null,
+     "semantic": "price"
+    },
+    {
+     "request_code": "H00300",
+     "request_start": "20240102",
+     "request_end": "20240110",
+     "source": "akshare.stock_zh_index_hist_csindex",
+     "called_at": "2026-11-24T16:02:47",
+     "status": "ok",
+     "index_code_returned": "H00300",
+     "index_name_returned": "沪深300全收益指数",
+     "rows": 7,
+     "date_min": "2024-01-02",
+     "date_max": "2024-01-10",
+     "duplicate_dates": 0,
+     "null_close": 0,
+     "non_positive_close": 0,
+     "sample": [
+      {
+       "date": "2024-01-02",
+       "close": 4709.92
+      },
+      {
+       "date": "2024-01-03",
+       "close": 4698.72
+      },
+      {
+       "date": "2024-01-04",
+       "close": 4655.26
+      }
+     ],
+     "error": null,
+     "semantic": "total"
+    },
+    {
+     "request_code": "N00300",
+     "request_start": "20240102",
+     "request_end": "20240110",
+     "source": "akshare.stock_zh_index_hist_csindex",
+     "called_at": "2026-11-24T16:02:54",
+     "status": "ok",
+     "index_code_returned": "N00300",
+     "index_name_returned": "沪深300净收益指数",
+     "rows": 7,
+     "date_min": "2024-01-02",
+     "date_max": "2024-01-10",
+     "duplicate_dates": 0,
+     "null_close": 0,
+     "non_positive_close": 0,
+     "sample": [
+      {
+       "date": "2024-01-02",
+       "close": 4566.09
+      },
+      {
+       "date": "2024-01-03",
+       "close": 4555.23
+      },
+      {
+       "date": "2024-01-04",
+       "close": 4513.1
+      }
+     ],
+     "error": null,
+     "semantic": "net"
+    }
+   ]
+  },
+  {
+   "index_code": "000905",
+   "index_name": "中证小盘500指数",
+   "provider": "中证指数有限公司",
+   "variants": [
+    {
+     "request_code": "000905",
+     "request_start": "20240102",
+     "request_end": "20240110",
+     "source": "akshare.stock_zh_index_hist_csindex",
+     "called_at": "2026-11-24T16:03:01",
+     "status": "ok",
+     "index_code_returned": "000905",
+     "index_name_returned": "中证小盘500指数",
+     "rows": 7,
+     "date_min": "2024-01-02",
+     "date_max": "2024-01-10",
+     "duplicate_dates": 0,
+     "null_close": 0,
+     "non_positive_close": 0,
+     "sample": [
+      {
+       "date": "2024-01-02",
+       "close": 5409.46
+      },
+      {
+       "date": "2024-01-03",
+       "close": 5401.4
+      },
+      {
+       "date": "2024-01-04",
+       "close": 5355.32
+      }
+     ],
+     "error": null,
+     "semantic": "price"
+    },
+    {
+     "request_code": "H00905",
+     "request_start": "20240102",
+     "request_end": "20240110",
+     "source": "akshare.stock_zh_index_hist_csindex",
+     "called_at": "2026-11-24T16:03:08",
+     "status": "ok",
+     "index_code_returned": "H00905",
+     "index_name_returned": "中证小盘500全收益指数",
+     "rows": 7,
+     "date_min": "2024-01-02",
+     "date_max": "2024-01-10",
+     "duplicate_dates": 0,
+     "null_close": 0,
+     "non_positive_close": 0,
+     "sample": [
+      {
+       "date": "2024-01-02",
+       "close": 6471.93
+      },
+      {
+       "date": "2024-01-03",
+       "close": 6462.28
+      },
+      {
+       "date": "2024-01-04",
+       "close": 6407.16
+      }
+     ],
+     "error": null,
+     "semantic": "total"
+    },
+    {
+     "request_code": "N00905",
+     "request_start": "20240102",
+     "request_end": "20240110",
+     "source": "akshare.stock_zh_index_hist_csindex",
+     "called_at": "2026-11-24T16:03:15",
+     "status": "ok",
+     "index_code_returned": "N00905",
+     "index_name_returned": "中证小盘500净收益指数",
+     "rows": 7,
+     "date_min": "2024-01-02",
+     "date_max": "2024-01-10",
+     "duplicate_dates": 0,
+     "null_close": 0,
+     "non_positive_close": 0,
+     "sample": [
+      {
+       "date": "2024-01-02",
+       "close": 6314.88
+      },
+      {
+       "date": "2024-01-03",
+       "close": 6305.47
+      },
+      {
+       "date": "2024-01-04",
+       "close": 6251.68
+      }
+     ],
+     "error": null,
+     "semantic": "net"
+    }
+   ]
+  },
+  {
+   "index_code": "000906",
+   "index_name": "中证800指数",
+   "provider": "中证指数有限公司",
+   "variants": [
+    {
+     "request_code": "000906",
+     "request_start": "20240102",
+     "request_end": "20240110",
+     "source": "akshare.stock_zh_index_hist_csindex",
+     "called_at": "2026-11-24T16:03:22",
+     "status": "ok",
+     "index_code_returned": "000906",
+     "index_name_returned": "中证800指数",
+     "rows": 7,
+     "date_min": "2024-01-02",
+     "date_max": "2024-01-10",
+     "duplicate_dates": 0,
+     "null_close": 0,
+     "non_positive_close": 0,
+     "sample": [
+      {
+       "date": "2024-01-02",
+       "close": 3727.11
+      },
+      {
+       "date": "2024-01-03",
+       "close": 3719.14
+      },
+      {
+       "date": "2024-01-04",
+       "close": 3685.47
+      }
+     ],
+     "error": null,
+     "semantic": "price"
+    },
+    {
+     "request_code": "H00906",
+     "request_start": "20240102",
+     "request_end": "20240110",
+     "source": "akshare.stock_zh_index_hist_csindex",
+     "called_at": "2026-11-24T16:03:30",
+     "status": "ok",
+     "index_code_returned": "H00906",
+     "index_name_returned": "中证800全收益指数",
+     "rows": 7,
+     "date_min": "2024-01-02",
+     "date_max": "2024-01-10",
+     "duplicate_dates": 0,
+     "null_close": 0,
+     "non_positive_close": 0,
+     "sample": [
+      {
+       "date": "2024-01-02",
+       "close": 5062.96
+      },
+      {
+       "date": "2024-01-03",
+       "close": 5052.13
+      },
+      {
+       "date": "2024-01-04",
+       "close": 5006.39
+      }
+     ],
+     "error": null,
+     "semantic": "total"
+    },
+    {
+     "request_code": "N00906",
+     "request_start": "20240102",
+     "request_end": "20240110",
+     "source": "akshare.stock_zh_index_hist_csindex",
+     "called_at": "2026-11-24T16:03:37",
+     "status": "ok",
+     "index_code_returned": "N00906",
+     "index_name_returned": "中证800净收益指数",
+     "rows": 7,
+     "date_min": "2024-01-02",
+     "date_max": "2024-01-10",
+     "duplicate_dates": 0,
+     "null_close": 0,
+     "non_positive_close": 0,
+     "sample": [
+      {
+       "date": "2024-01-02",
+       "close": 4910.4
+      },
+      {
+       "date": "2024-01-03",
+       "close": 4899.9
+      },
+      {
+       "date": "2024-01-04",
+       "close": 4855.53
+      }
+     ],
+     "error": null,
+     "semantic": "net"
+    }
+   ]
+  },
+  {
+   "index_code": "000016",
+   "index_name": "上证50指数",
+   "provider": "中证指数有限公司",
+   "variants": [
+    {
+     "request_code": "000016",
+     "request_start": "20240102",
+     "request_end": "20240110",
+     "source": "akshare.stock_zh_index_hist_csindex",
+     "called_at": "2026-11-24T16:03:44",
+     "status": "ok",
+     "index_code_returned": "000016",
+     "index_name_returned": "上证50指数",
+     "rows": 7,
+     "date_min": "2024-01-02",
+     "date_max": "2024-01-10",
+     "duplicate_dates": 0,
+     "null_close": 0,
+     "non_positive_close": 0,
+     "sample": [
+      {
+       "date": "2024-01-02",
+       "close": 2292.23
+      },
+      {
+       "date": "2024-01-03",
+       "close": 2294.84
+      },
+      {
+       "date": "2024-01-04",
+       "close": 2279.04
+      }
+     ],
+     "error": null,
+     "semantic": "price"
+    },
+    {
+     "request_code": "H00016",
+     "request_start": "20240102",
+     "request_end": "20240110",
+     "source": "akshare.stock_zh_index_hist_csindex",
+     "called_at": "2026-11-24T16:03:51",
+     "status": "ok",
+     "index_code_returned": "H00016",
+     "index_name_returned": "上证50全收益指数",
+     "rows": 7,
+     "date_min": "2024-01-02",
+     "date_max": "2024-01-10",
+     "duplicate_dates": 0,
+     "null_close": 0,
+     "non_positive_close": 0,
+     "sample": [
+      {
+       "date": "2024-01-02",
+       "close": 3634.97
+      },
+      {
+       "date": "2024-01-03",
+       "close": 3639.11
+      },
+      {
+       "date": "2024-01-04",
+       "close": 3614.05
+      }
+     ],
+     "error": null,
+     "semantic": "total"
+    },
+    {
+     "request_code": "N00016",
+     "request_start": "20240102",
+     "request_end": "20240110",
+     "source": "akshare.stock_zh_index_hist_csindex",
+     "called_at": "2026-11-24T16:03:58",
+     "status": "ok",
+     "index_code_returned": "N00016",
+     "index_name_returned": "上证50净收益指数",
+     "rows": 7,
+     "date_min": "2024-01-02",
+     "date_max": "2024-01-10",
+     "duplicate_dates": 0,
+     "null_close": 0,
+     "non_positive_close": 0,
+     "sample": [
+      {
+       "date": "2024-01-02",
+       "close": 3449.16
+      },
+      {
+       "date": "2024-01-03",
+       "close": 3453.08
+      },
+      {
+       "date": "2024-01-04",
+       "close": 3429.31
+      }
+     ],
+     "error": null,
+     "semantic": "net"
+    }
+   ]
+  },
+  {
+   "index_code": "399997",
+   "index_name": "中证白酒指数",
+   "provider": "中证指数有限公司",
+   "variants": [
+    {
+     "request_code": "399997",
+     "request_start": "20240102",
+     "request_end": "20240110",
+     "source": "akshare.stock_zh_index_hist_csindex",
+     "called_at": "2026-11-24T16:04:05",
+     "status": "ok",
+     "index_code_returned": "399997",
+     "index_name_returned": "中证白酒指数",
+     "rows": 7,
+     "date_min": "2024-01-02",
+     "date_max": "2024-01-10",
+     "duplicate_dates": 0,
+     "null_close": 0,
+     "non_positive_close": 0,
+     "sample": [
+      {
+       "date": "2024-01-02",
+       "close": 12206.51
+      },
+      {
+       "date": "2024-01-03",
+       "close": 12147.94
+      },
+      {
+       "date": "2024-01-04",
+       "close": 11865.42
+      }
+     ],
+     "error": null,
+     "semantic": "price"
+    },
+    {
+     "request_code": "H39997",
+     "request_start": "20240102",
+     "request_end": "20240110",
+     "source": "akshare.stock_zh_index_hist_csindex",
+     "called_at": "2026-11-24T16:04:12",
+     "status": "error",
+     "index_code_returned": null,
+     "index_name_returned": null,
+     "rows": 0,
+     "date_min": null,
+     "date_max": null,
+     "duplicate_dates": 0,
+     "null_close": 0,
+     "non_positive_close": 0,
+     "sample": [],
+     "error": "ValueError: Length mismatch: Expected axis has 0 elements, new values have 16 elements",
+     "semantic": "guess_by_stock_convention"
+    },
+    {
+     "request_code": "H20539",
+     "request_start": "20240102",
+     "request_end": "20240110",
+     "source": "akshare.stock_zh_index_hist_csindex",
+     "called_at": "2026-11-24T16:04:19",
+     "status": "ok",
+     "index_code_returned": "H20539",
+     "index_name_returned": "中证白酒全收益指数",
+     "rows": 7,
+     "date_min": "2024-01-02",
+     "date_max": "2024-01-10",
+     "duplicate_dates": 0,
+     "null_close": 0,
+     "non_positive_close": 0,
+     "sample": [
+      {
+       "date": "2024-01-02",
+       "close": 15644.68
+      },
+      {
+       "date": "2024-01-03",
+       "close": 15569.61
+      },
+      {
+       "date": "2024-01-04",
+       "close": 15207.52
+      }
+     ],
+     "error": null,
+     "semantic": "total_official"
+    },
+    {
+     "request_code": "399997CNY02",
+     "request_start": "20240102",
+     "request_end": "20240110",
+     "source": "akshare.stock_zh_index_hist_csindex",
+     "called_at": "2026-11-24T16:04:26",
+     "status": "ok",
+     "index_code_returned": "399997CNY02",
+     "index_name_returned": "中证白酒净收益指数",
+     "rows": 7,
+     "date_min": "2024-01-02",
+     "date_max": "2024-01-10",
+     "duplicate_dates": 0,
+     "null_close": 0,
+     "non_positive_close": 0,
+     "sample": [
+      {
+       "date": "2024-01-02",
+       "close": 15253.58
+      },
+      {
+       "date": "2024-01-03",
+       "close": 15180.39
+      },
+      {
+       "date": "2024-01-04",
+       "close": 14827.35
+      }
+     ],
+     "error": null,
+     "semantic": "net_official"
+    }
+   ]
+  },
+  {
+   "index_code": "H30184",
+   "index_name": "中证全指半导体产品与设备指数",
+   "provider": "中证指数有限公司",
+   "variants": [
+    {
+     "request_code": "H30184",
+     "request_start": "20240102",
+     "request_end": "20240110",
+     "source": "akshare.stock_zh_index_hist_csindex",
+     "called_at": "2026-11-24T16:04:33",
+     "status": "ok",
+     "index_code_returned": "H30184",
+     "index_name_returned": "中证全指半导体产品与设备指数",
+     "rows": 7,
+     "date_min": "2024-01-02",
+     "date_max": "2024-01-10",
+     "duplicate_dates": 0,
+     "null_close": 0,
+     "non_positive_close": 0,
+     "sample": [
+      {
+       "date": "2024-01-02",
+       "close": 4912.91
+      },
+      {
+       "date": "2024-01-03",
+       "close": 4821.91
+      },
+      {
+       "date": "2024-01-04",
+       "close": 4752.8
+      }
+     ],
+     "error": null,
+     "semantic": "price"
+    },
+    {
+     "request_code": "H20184",
+     "request_start": "20240102",
+     "request_end": "20240110",
+     "source": "akshare.stock_zh_index_hist_csindex",
+     "called_at": "2026-11-24T16:04:40",
+     "status": "ok",
+     "index_code_returned": "H20184",
+     "index_name_returned": "中证全指半导体产品与设备全收益指数",
+     "rows": 7,
+     "date_min": "2024-01-02",
+     "date_max": "2024-01-10",
+     "duplicate_dates": 0,
+     "null_close": 0,
+     "non_positive_close": 0,
+     "sample": [
+      {
+       "date": "2024-01-02",
+       "close": 5305.09
+      },
+      {
+       "date": "2024-01-03",
+       "close": 5206.82
+      },
+      {
+       "date": "2024-01-04",
+       "close": 5132.2
+      }
+     ],
+     "error": null,
+     "semantic": "total_official"
+    }
+   ]
+  },
+  {
+   "index_code": "000942",
+   "index_name": "中证内地消费主题指数",
+   "provider": "中证指数有限公司",
+   "variants": [
+    {
+     "request_code": "000942",
+     "request_start": "20240102",
+     "request_end": "20240110",
+     "source": "akshare.stock_zh_index_hist_csindex",
+     "called_at": "2026-11-24T16:04:47",
+     "status": "ok",
+     "index_code_returned": "000942",
+     "index_name_returned": "中证内地消费主题指数",
+     "rows": 7,
+     "date_min": "2024-01-02",
+     "date_max": "2024-01-10",
+     "duplicate_dates": 0,
+     "null_close": 0,
+     "non_positive_close": 0,
+     "sample": [
+      {
+       "date": "2024-01-02",
+       "close": 9814.16
+      },
+      {
+       "date": "2024-01-03",
+       "close": 9756.15
+      },
+      {
+       "date": "2024-01-04",
+       "close": 9654.64
+      }
+     ],
+     "error": null,
+     "semantic": "price"
+    },
+    {
+     "request_code": "H00942",
+     "request_start": "20240102",
+     "request_end": "20240110",
+     "source": "akshare.stock_zh_index_hist_csindex",
+     "called_at": "2026-11-24T16:04:54",
+     "status": "ok",
+     "index_code_returned": "H00942",
+     "index_name_returned": "中证内地消费主题全收益指数",
+     "rows": 7,
+     "date_min": "2024-01-02",
+     "date_max": "2024-01-10",
+     "duplicate_dates": 0,
+     "null_close": 0,
+     "non_positive_close": 0,
+     "sample": [
+      {
+       "date": "2024-01-02",
+       "close": 13585.15
+      },
+      {
+       "date": "2024-01-03",
+       "close": 13504.86
+      },
+      {
+       "date": "2024-01-04",
+       "close": 13364.33
+      }
+     ],
+     "error": null,
+     "semantic": "total"
+    },
+    {
+     "request_code": "N00942",
+     "request_start": "20240102",
+     "request_end": "20240110",
+     "source": "akshare.stock_zh_index_hist_csindex",
+     "called_at": "2026-11-24T16:05:01",
+     "status": "error",
+     "index_code_returned": null,
+     "index_name_returned": null,
+     "rows": 0,
+     "date_min": null,
+     "date_max": null,
+     "duplicate_dates": 0,
+     "null_close": 0,
+     "non_positive_close": 0,
+     "sample": [],
+     "error": "ValueError: Length mismatch: Expected axis has 0 elements, new values have 16 elements",
+     "semantic": "net_attempt"
+    }
+   ]
+  },
+  {
+   "index_code": "000012",
+   "index_name": "上证国债指数",
+   "provider": "上海证券交易所",
+   "variants": [
+    {
+     "request_code": "000012",
+     "request_start": "20240102",
+     "request_end": "20240110",
+     "source": "akshare.stock_zh_index_hist_csindex",
+     "called_at": "2026-11-24T16:05:09",
+     "status": "ok",
+     "index_code_returned": "000012",
+     "index_name_returned": "上证国债指数",
+     "rows": 7,
+     "date_min": "2024-01-02",
+     "date_max": "2024-01-10",
+     "duplicate_dates": 0,
+     "null_close": 0,
+     "non_positive_close": 0,
+     "sample": [
+      {
+       "date": "2024-01-02",
+       "close": 206.07
+      },
+      {
+       "date": "2024-01-03",
+       "close": 206.02
+      },
+      {
+       "date": "2024-01-04",
+       "close": 206.18
+      }
+     ],
+     "error": null,
+     "semantic": "full_price"
+    },
+    {
+     "request_code": "H00012",
+     "request_start": "20240102",
+     "request_end": "20240110",
+     "source": "akshare.stock_zh_index_hist_csindex",
+     "called_at": "2026-11-24T16:05:16",
+     "status": "ok",
+     "index_code_returned": "H00012",
+     "index_name_returned": "上证国债指数(净价)",
+     "rows": 7,
+     "date_min": "2024-01-02",
+     "date_max": "2024-01-10",
+     "duplicate_dates": 0,
+     "null_close": 0,
+     "non_positive_close": 0,
+     "sample": [
+      {
+       "date": "2024-01-02",
+       "close": 104.65
+      },
+      {
+       "date": "2024-01-03",
+       "close": 104.62
+      },
+      {
+       "date": "2024-01-04",
+       "close": 104.69
+      }
+     ],
+     "error": null,
+     "semantic": "clean_price"
+    },
+    {
+     "request_code": "N00012",
+     "request_start": "20240102",
+     "request_end": "20240110",
+     "source": "akshare.stock_zh_index_hist_csindex",
+     "called_at": "2026-11-24T16:05:23",
+     "status": "ok",
+     "index_code_returned": "N00012",
+     "index_name_returned": "上证国债指数(利息及再投资)",
+     "rows": 7,
+     "date_min": "2024-01-02",
+     "date_max": "2024-01-10",
+     "duplicate_dates": 0,
+     "null_close": 0,
+     "non_positive_close": 0,
+     "sample": [
+      {
+       "date": "2024-01-02",
+       "close": 145.71
+      },
+      {
+       "date": "2024-01-03",
+       "close": 145.72
+      },
+      {
+       "date": "2024-01-04",
+       "close": 145.73
+      }
+     ],
+     "error": null,
+     "semantic": "interest_and_reinvestment"
+    }
+   ]
+  },
+  {
+   "index_code": "000922",
+   "index_name": "中证红利指数",
+   "provider": "中证指数有限公司",
+   "variants": [
+    {
+     "request_code": "000922",
+     "request_start": "20240102",
+     "request_end": "20240110",
+     "source": "akshare.stock_zh_index_hist_csindex",
+     "called_at": "2026-11-24T16:05:30",
+     "status": "ok",
+     "index_code_returned": "000922",
+     "index_name_returned": "中证红利指数",
+     "rows": 7,
+     "date_min": "2024-01-02",
+     "date_max": "2024-01-10",
+     "duplicate_dates": 0,
+     "null_close": 0,
+     "non_positive_close": 0,
+     "sample": [
+      {
+       "date": "2024-01-02",
+       "close": 5020.99
+      },
+      {
+       "date": "2024-01-03",
+       "close": 5074.18
+      },
+      {
+       "date": "2024-01-04",
+       "close": 5096.16
+      }
+     ],
+     "error": null,
+     "semantic": "price"
+    },
+    {
+     "request_code": "H00922",
+     "request_start": "20240102",
+     "request_end": "20240110",
+     "source": "akshare.stock_zh_index_hist_csindex",
+     "called_at": "2026-11-24T16:05:37",
+     "status": "ok",
+     "index_code_returned": "H00922",
+     "index_name_returned": "中证红利全收益指数",
+     "rows": 7,
+     "date_min": "2024-01-02",
+     "date_max": "2024-01-10",
+     "duplicate_dates": 0,
+     "null_close": 0,
+     "non_positive_close": 0,
+     "sample": [
+      {
+       "date": "2024-01-02",
+       "close": 9447.69
+      },
+      {
+       "date": "2024-01-03",
+       "close": 9547.77
+      },
+      {
+       "date": "2024-01-04",
+       "close": 9589.12
+      }
+     ],
+     "error": null,
+     "semantic": "total"
+    },
+    {
+     "request_code": "000922CNY020",
+     "request_start": "20240102",
+     "request_end": "20240110",
+     "source": "akshare.stock_zh_index_hist_csindex",
+     "called_at": "2026-11-24T16:05:44",
+     "status": "ok",
+     "index_code_returned": "000922CNY020",
+     "index_name_returned": "中证红利净收益指数",
+     "rows": 7,
+     "date_min": "2024-01-02",
+     "date_max": "2024-01-10",
+     "duplicate_dates": 0,
+     "null_close": 0,
+     "non_positive_close": 0,
+     "sample": [
+      {
+       "date": "2024-01-02",
+       "close": 8814.98
+      },
+      {
+       "date": "2024-01-03",
+       "close": 8908.36
+      },
+      {
+       "date": "2024-01-04",
+       "close": 8946.94
+      }
+     ],
+     "error": null,
+     "semantic": "net_official"
+    }
+   ]
+  },
+  {
+   "index_code": "930930",
+   "index_name": "中证港股通综合指数",
+   "provider": "中证指数有限公司",
+   "variants": [
+    {
+     "request_code": "930930",
+     "request_start": "20240102",
+     "request_end": "20240110",
+     "source": "akshare.stock_zh_index_hist_csindex",
+     "called_at": "2026-11-24T16:05:51",
+     "status": "ok",
+     "index_code_returned": "930930",
+     "index_name_returned": "中证港股通综合指数",
+     "rows": 7,
+     "date_min": "2024-01-02",
+     "date_max": "2024-01-10",
+     "duplicate_dates": 0,
+     "null_close": 0,
+     "non_positive_close": 0,
+     "sample": [
+      {
+       "date": "2024-01-02",
+       "close": 2399.31
+      },
+      {
+       "date": "2024-01-03",
+       "close": 2383.89
+      },
+      {
+       "date": "2024-01-04",
+       "close": 2379.26
+      }
+     ],
+     "error": null,
+     "semantic": "price"
+    },
+    {
+     "request_code": "H930930",
+     "request_start": "20240102",
+     "request_end": "20240110",
+     "source": "akshare.stock_zh_index_hist_csindex",
+     "called_at": "2026-11-24T16:05:58",
+     "status": "error",
+     "index_code_returned": null,
+     "index_name_returned": null,
+     "rows": 0,
+     "date_min": null,
+     "date_max": null,
+     "duplicate_dates": 0,
+     "null_close": 0,
+     "non_positive_close": 0,
+     "sample": [],
+     "error": "ValueError: Length mismatch: Expected axis has 0 elements, new values have 16 elements",
+     "semantic": "guess_by_stock_convention"
+    },
+    {
+     "request_code": "H20930",
+     "request_start": "20240102",
+     "request_end": "20240110",
+     "source": "akshare.stock_zh_index_hist_csindex",
+     "called_at": "2026-11-24T16:06:05",
+     "status": "ok",
+     "index_code_returned": "H20930",
+     "index_name_returned": "中证港股通综合全收益指数",
+     "rows": 7,
+     "date_min": "2024-01-02",
+     "date_max": "2024-01-10",
+     "duplicate_dates": 0,
+     "null_close": 0,
+     "non_positive_close": 0,
+     "sample": [
+      {
+       "date": "2024-01-02",
+       "close": 3266.65
+      },
+      {
+       "date": "2024-01-03",
+       "close": 3245.65
+      },
+      {
+       "date": "2024-01-04",
+       "close": 3239.45
+      }
+     ],
+     "error": null,
+     "semantic": "total_official"
+    }
+   ]
+  }
+ ],
+ "same_day_comparison": {
+  "date": "2024-01-02",
+  "csi300_price_vs_total": {
+   "price": {
+    "code": "000300",
+    "close": {
+     "date": "2024-01-02",
+     "close": 3386.35
+    }
+   },
+   "total": {
+    "code": "H00300",
+    "close": {
+     "date": "2024-01-02",
+     "close": 4709.92
+    }
+   },
+   "note": "价格与全收益是不同序列，数值必然不同"
+  },
+  "sh_gov_bond_three_variants": {
+   "000012": {
+    "semantic": "full_price",
+    "close": {
+     "date": "2024-01-02",
+     "close": 206.07
+    }
+   },
+   "H00012": {
+    "semantic": "clean_price",
+    "close": {
+     "date": "2024-01-02",
+     "close": 104.65
+    }
+   },
+   "N00012": {
+    "semantic": "interest_and_reinvestment",
+    "close": {
+     "date": "2024-01-02",
+     "close": 145.71
+    }
+   },
+   "note": "H 前缀在上证国债指数代表**净价**，不是全收益；N 前缀才是利息及再投资。不能套用股票指数惯例。"
+  }
+ },
+ "correction_of_prior_audit": {
+  "prior_conclusion_3b6_1_0": "399997/H30184/930930 无全收益序列",
+  "why_wrong": "3B-6.1.0 按「H+后5位」的股票指数命名惯例猜测代码（H39997/H30930），全部返回空，据此误判为「不存在」。",
+  "actual_finding": "中证官方 factsheet 的「衍生指数」栏披露了真实代码：399997→H20539（全收益）/ 399997CNY02（净收益）；H30184→H20184（全收益）；930930→H20930（全收益）；000922→000922CNY020（净收益）。",
+  "lesson": "不得按代码前缀惯例推断官方衍生指数代码，必须以官方文件为准。"
+ },
+ "official_documents": {
+  "000300": {
+   "publisher": "中证指数有限公司",
+   "doc": "沪深300指数编制方案",
+   "version": "2023年9月",
+   "url": "https://oss-ch.csindex.com.cn/static/html/csindex/public/uploads/indices/detail/files/zh_CN/000300_Index_Methodology_cn.pdf",
+   "downloaded": true,
+   "bytes": 1184619,
+   "sha256_16": "de6491e03e5d57ec",
+   "pages": 16,
+   "proves": {
+    "price_defined": true,
+    "total_exists": true,
+    "net_exists": true,
+    "dividend_reinvest_stated": true,
+    "code_mapping_supported": "H00300/N00300 由 factsheet 披露，非方案正文"
+   },
+   "quote": "中证指数有限公司同时计算沪深300全收益指数和净收益指数的日收盘值…计算中考虑了样本税前、税后现金红利的再投资收益",
+   "factsheet": {
+    "filename": "000300factsheet.pdf",
+    "url": "https://oss-ch.csindex.com.cn/static/html/csindex/public/uploads/indices/detail/files/zh_CN/000300factsheet.pdf",
+    "bytes": 451156,
+    "sha256_16": "3eb8fd279126c75e",
+    "pages": 2,
+    "derived_codes": [
+     "H00300",
+     "N00300"
+    ],
+    "has_derived_section": false
+   }
+  },
+  "000905": {
+   "publisher": "中证指数有限公司",
+   "doc": "中证200/500/700/800指数编制方案",
+   "version": "2022年5月 V1.2",
+   "url": "https://oss-ch.csindex.com.cn/static/html/csindex/public/uploads/indices/detail/files/zh_CN/000905_Index_Methodology_cn.pdf",
+   "downloaded": true,
+   "bytes": 185201,
+   "sha256_16": "6109ad8390fdad70",
+   "pages": 3,
+   "proves": {
+    "price_defined": true,
+    "total_exists": "factsheet_only",
+    "net_exists": "factsheet_only",
+    "dividend_reinvest_stated": false,
+    "code_mapping_supported": "H00905/N00905 由 factsheet 披露"
+   },
+   "note": "方案正文未提及全收益/净收益；辅指数信息仅见于 factsheet",
+   "factsheet": {
+    "filename": "000905factsheet.pdf",
+    "url": "https://oss-ch.csindex.com.cn/static/html/csindex/public/uploads/indices/detail/files/zh_CN/000905factsheet.pdf",
+    "bytes": 445394,
+    "sha256_16": "9f4cc04d61f54f7b",
+    "pages": 2,
+    "derived_codes": [
+     "H00905",
+     "N00905"
+    ],
+    "has_derived_section": false
+   }
+  },
+  "000906": {
+   "publisher": "中证指数有限公司",
+   "doc": "中证200/500/700/800指数编制方案",
+   "version": "2022年5月 V1.2",
+   "url": "https://oss-ch.csindex.com.cn/static/html/csindex/public/uploads/indices/detail/files/zh_CN/000906_Index_Methodology_cn.pdf",
+   "downloaded": true,
+   "bytes": 185201,
+   "sha256_16": "6109ad8390fdad70",
+   "pages": 3,
+   "proves": {
+    "price_defined": true,
+    "total_exists": "factsheet_only",
+    "net_exists": "factsheet_only",
+    "dividend_reinvest_stated": false,
+    "code_mapping_supported": "H00906/N00906 由 factsheet 披露"
+   },
+   "note": "与 000905 同一份方案文件（中证规模指数合集）",
+   "factsheet": {
+    "filename": "000906factsheet.pdf",
+    "url": "https://oss-ch.csindex.com.cn/static/html/csindex/public/uploads/indices/detail/files/zh_CN/000906factsheet.pdf",
+    "bytes": 448091,
+    "sha256_16": "8d779deeabab4672",
+    "pages": 2,
+    "derived_codes": [
+     "H00906",
+     "N00906"
+    ],
+    "has_derived_section": false
+   }
+  },
+  "000016": {
+   "publisher": "中证指数有限公司",
+   "doc": "上证50指数编制方案",
+   "version": "2020年12月 V1.1",
+   "url": "https://oss-ch.csindex.com.cn/static/html/csindex/public/uploads/indices/detail/files/zh_CN/000016_Index_Methodology_cn.pdf",
+   "downloaded": true,
+   "bytes": 138004,
+   "sha256_16": "e8f1ce6045b7f913",
+   "pages": 2,
+   "proves": {
+    "price_defined": true,
+    "total_exists": "factsheet_only",
+    "net_exists": "factsheet_only",
+    "dividend_reinvest_stated": false,
+    "code_mapping_supported": "H00016/N00016 由 factsheet 披露"
+   },
+   "note": "方案正文未提及辅指数",
+   "factsheet": {
+    "filename": "000016factsheet.pdf",
+    "url": "https://oss-ch.csindex.com.cn/static/html/csindex/public/uploads/indices/detail/files/zh_CN/000016factsheet.pdf",
+    "bytes": 447776,
+    "sha256_16": "9fb060cab51f74d5",
+    "pages": 2,
+    "derived_codes": [
+     "H00016",
+     "N00016"
+    ],
+    "has_derived_section": false
+   }
+  },
+  "399997": {
+   "publisher": "中证指数有限公司",
+   "doc": "中证白酒指数编制方案",
+   "version": "2023年12月 V1.2",
+   "url": "https://oss-ch.csindex.com.cn/static/html/csindex/public/uploads/indices/detail/files/zh_CN/20231208175434-399997_Index_Methodology_cn.pdf",
+   "downloaded": true,
+   "bytes": 334506,
+   "sha256_16": "62450948684c2930",
+   "pages": 2,
+   "proves": {
+    "price_defined": true,
+    "total_exists": "factsheet_only",
+    "net_exists": "factsheet_only",
+    "dividend_reinvest_stated": false,
+    "code_mapping_supported": "H20539/399997CNY02 由 factsheet 披露"
+   },
+   "note": "方案正文 752 字符，未提及辅指数；factsheet 衍生指数栏披露 H20539 / 399997CNY02",
+   "factsheet": {
+    "filename": "399997factsheet.pdf",
+    "url": "https://oss-ch.csindex.com.cn/static/html/csindex/public/uploads/indices/detail/files/zh_CN/399997factsheet.pdf",
+    "bytes": 431023,
+    "sha256_16": "9dccc78a4b728861",
+    "pages": 2,
+    "derived_codes": [
+     "H20539"
+    ],
+    "has_derived_section": false
+   }
+  },
+  "H30184": {
+   "publisher": "中证指数有限公司",
+   "doc": "中证全指半导体产品与设备指数编制方案",
+   "version": "2024年11月 V1.2",
+   "url": "https://oss-ch.csindex.com.cn/static/html/csindex/public/uploads/indices/detail/files/zh_CN/H30184_Index_Methodology_cn.pdf",
+   "downloaded": true,
+   "bytes": 457088,
+   "sha256_16": "8b7de8a81c93e5f7",
+   "pages": 2,
+   "proves": {
+    "price_defined": true,
+    "total_exists": "factsheet_only",
+    "net_exists": false,
+    "dividend_reinvest_stated": false,
+    "code_mapping_supported": "H20184 由 factsheet 披露；净收益代码 factsheet 为 --"
+   },
+   "note": "factsheet 净收益指数栏为 --，即无净收益辅指数",
+   "factsheet": {
+    "filename": "H30184factsheet.pdf",
+    "url": "https://oss-ch.csindex.com.cn/static/html/csindex/public/uploads/indices/detail/files/zh_CN/H30184factsheet.pdf",
+    "bytes": 431782,
+    "sha256_16": "55a77eabfd15537c",
+    "pages": 2,
+    "derived_codes": [
+     "H20184",
+     "H30184"
+    ],
+    "has_derived_section": false
+   }
+  },
+  "000942": {
+   "publisher": "中证指数有限公司",
+   "doc": "中证内地主题系列指数编制方案",
+   "version": "2022年5月 V1.3",
+   "url": "https://oss-ch.csindex.com.cn/static/html/csindex/public/uploads/indices/detail/files/zh_CN/000942_Index_Methodology_cn.pdf",
+   "downloaded": true,
+   "bytes": 145567,
+   "sha256_16": "e2893e60254074f9",
+   "pages": 3,
+   "proves": {
+    "price_defined": true,
+    "total_exists": "factsheet_only",
+    "net_exists": "factsheet_only",
+    "dividend_reinvest_stated": false,
+    "code_mapping_supported": "H00942 由 factsheet 披露；净收益 CNY020 实测返回空"
+   },
+   "note": "factsheet 披露 H00942；净收益代码未在 factheet 中给出可验证值",
+   "factsheet": {
+    "filename": "000942factsheet.pdf",
+    "url": "https://oss-ch.csindex.com.cn/static/html/csindex/public/uploads/indices/detail/files/zh_CN/000942factsheet.pdf",
+    "bytes": 442911,
+    "sha256_16": "3694be011496b2a3",
+    "pages": 2,
+    "derived_codes": [
+     "H00942"
+    ],
+    "has_derived_section": false
+   }
+  },
+  "000012": {
+   "publisher": "上海证券交易所（中证指数有限公司维护）",
+   "doc": null,
+   "version": null,
+   "url": null,
+   "downloaded": false,
+   "bytes": null,
+   "sha256_16": null,
+   "pages": null,
+   "proves": {
+    "price_defined": "factsheet_only",
+    "total_exists": false,
+    "net_exists": false,
+    "dividend_reinvest_stated": false,
+    "code_mapping_supported": "factsheet 列 H00012/N00012 但未解释语义"
+   },
+   "factsheet": {
+    "url": "https://oss-ch.csindex.com.cn/static/html/csindex/public/uploads/indices/detail/files/zh_CN/000012factsheet.pdf",
+    "bytes": 421962,
+    "sha256_16": "21f24570c840ac91",
+    "pages": 2,
+    "derived_codes": [
+     "H00012",
+     "N00012"
+    ],
+    "has_derived_section": false
+   },
+   "note": "**未取得官方编制方案**。已检索 csindex 官网 PDF 直链（{code}_Index_Methodology_cn.pdf / factsheet / methodology_cn）与 sse.com.cn 指数页，均 404 或仅返回导航页。factsheet 无「衍生指数」栏，只列出 H00012/N00012 两个代码，**不解释其经济含义**。语义结论来自接口返回名称，属 L3。"
+  },
+  "000922": {
+   "publisher": "中证指数有限公司",
+   "doc": "中证红利指数编制方案",
+   "version": "2022年10月 V1.2",
+   "url": "https://oss-ch.csindex.com.cn/static/html/csindex/public/uploads/indices/detail/files/zh_CN/000922_Index_Methodology_cn.pdf",
+   "downloaded": true,
+   "bytes": 1137267,
+   "sha256_16": "6b8053f02ca87a0e",
+   "pages": 3,
+   "proves": {
+    "price_defined": true,
+    "total_exists": "factsheet_only",
+    "net_exists": "factsheet_only",
+    "dividend_reinvest_stated": false,
+    "code_mapping_supported": "H00922 由 factsheet 披露；净收益 000922CNY020"
+   },
+   "note": "方案正文 1,130 字符，未提及辅指数",
+   "factsheet": {
+    "filename": "000922factsheet.pdf",
+    "url": "https://oss-ch.csindex.com.cn/static/html/csindex/public/uploads/indices/detail/files/zh_CN/000922factsheet.pdf",
+    "bytes": 449780,
+    "sha256_16": "b9001c2a26152255",
+    "pages": 2,
+    "derived_codes": [
+     "H00922"
+    ],
+    "has_derived_section": false
+   }
+  },
+  "930930": {
+   "publisher": "中证指数有限公司",
+   "doc": null,
+   "version": null,
+   "url": null,
+   "downloaded": false,
+   "bytes": null,
+   "sha256_16": null,
+   "pages": null,
+   "proves": {
+    "price_defined": "factsheet_only",
+    "total_exists": "factsheet_only",
+    "net_exists": false,
+    "dividend_reinvest_stated": false,
+    "code_mapping_supported": "H20930 由 factsheet 披露"
+   },
+   "factsheet": {
+    "url": "https://oss-ch.csindex.com.cn/static/html/csindex/public/uploads/indices/detail/files/zh_CN/930930factsheet.pdf",
+    "bytes": 446156,
+    "sha256_16": "0bd7e8937145086a",
+    "pages": 2,
+    "derived_codes": [
+     "H20930"
+    ],
+    "has_derived_section": true
+   },
+   "note": "**未取得官方编制方案**（csindex PDF 直链全部 404）。factsheet 有「衍生指数」栏，披露全收益 H20930，净收益栏为 --。"
+  }
+ },
+ "official_search_log": {
+  "search_engine": "csindex 官网 PDF 直链 + web 搜索 + sse.com.cn",
+  "query_time": "2026-11-24 15:52 ~ 16:05",
+  "patterns_tried": [
+   "{c}_Index_Methodology_cn.pdf",
+   "{c}factsheet.pdf",
+   "{c}_Index_Methodology.pdf",
+   "{c}_methodology_cn.pdf"
+  ],
+  "url_base": "https://oss-ch.csindex.com.cn/static/html/csindex/public/uploads/indices/detail/files/zh_CN/",
+  "keywords": [
+   "中证白酒指数 399997 编制方案 csindex 官方",
+   "上证国债指数 000012 编制方案 上海证券交易所 官方",
+   "site:sse.com.cn 上证国债指数 000012 编制"
+  ],
+  "found_methodology": [
+   "000300",
+   "000905",
+   "000906",
+   "000016",
+   "399997",
+   "H30184",
+   "000942",
+   "000922"
+  ],
+  "found_factsheet": [
+   "000300",
+   "000905",
+   "000906",
+   "000016",
+   "399997",
+   "H30184",
+   "000942",
+   "000012",
+   "000922",
+   "930930"
+  ],
+  "not_found_methodology": [
+   "000012",
+   "930930"
+  ],
+  "not_found_reason": {
+   "000012": "csindex 直链 404；上交所 sse.com.cn 指数页 404；仅有 factsheet",
+   "930930": "csindex 直链 404；仅有 factsheet"
+  }
+ }
+}

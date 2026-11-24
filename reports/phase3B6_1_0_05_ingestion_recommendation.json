@@ -158,5 +158,39 @@
   "ready_for_research_analysis": true,
   "ready_for_backtest": false,
   "ready_for_formal_ranking": false
+ },
+ "class_correction": {
+  "round": "3B-6.1.0.1",
+  "prior_error": "3B-6.1.0 误判 399997/H30184/930930 无全收益",
+  "class_A": [
+   "H00300",
+   "N00300"
+  ],
+  "class_B": [
+   "H00905",
+   "N00905",
+   "H00906",
+   "N00906",
+   "H00016",
+   "N00016",
+   "H20539",
+   "399997CNY02",
+   "H20184",
+   "H00942",
+   "H00922",
+   "000922CNY020",
+   "H20930"
+  ],
+  "class_C": [
+   "H30184_net",
+   "930930_net",
+   "中债债券指数",
+   "恒生指数",
+   "历史权重",
+   "税后活期利率序列"
+  ],
+  "indexes_without_total_return": 0,
+  "indexes_with_total_return": 10,
+  "excess_return_still_zero_because": "全收益只是必要条件；10条含现金/5条含债券/1条含固定年收益率折算/15条全缺历史权重"
  }
 }

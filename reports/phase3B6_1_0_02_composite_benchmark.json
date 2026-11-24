@@ -6,8 +6,8 @@
  "db_fingerprint": "115ac91eee7c26424952e6df23ddeeafe2435974fe5e81a8ba6bbcabfe387dd4",
  "total": 15,
  "status_summary": {
-  "partially_reproducible": 13,
-  "not_reproducible": 2
+  "partially_reproducible": 14,
+  "not_reproducible": 1
  },
  "composites": [
   {
@@ -27,11 +27,7 @@
    ],
    "bond_components": [],
    "cash_components": [],
-   "fixed_rate_components": [
-    {
-     "weight": 0.01
-    }
-   ],
+   "fixed_rate_components": [],
    "missing_component_count": 1,
    "all_components_available": false,
    "index_components_have_total_return": true,
@@ -39,9 +35,30 @@
    "current_weight_only": true,
    "status": "partially_reproducible",
    "reasons": [
-    "固定利率成分 1 个无序列",
+    "固定年收益率期间折算规则无证据（合同仅说「按期间折算」）",
     "历史权重生效日期无官方证据（当前权重不等于历史权重）"
-   ]
+   ],
+   "fixed_annual_return_components": [
+    {
+     "component_type": "fixed_annual_return",
+     "annual_rate": 0.01,
+     "weight": null,
+     "period_conversion_required": true,
+     "period_conversion_method": "unknown",
+     "raw_text": "1%（指年收益率，评价时应按期间折算）",
+     "evidence": "合同/平台基准原文明确写「指年收益率，评价时应按期间折算」",
+     "note": "**不是 1% 的资产权重**。若误当权重，95%+1%=96% 合计不成立。正确理解：95% 配沪深300，剩余 5% 按 1% 年化固定收益计。"
+    }
+   ],
+   "weight_sum_of_asset_components": 0.95,
+   "fixed_rate_semantics": "annual_return_not_weight",
+   "period_conversion_evidence": {
+    "required": true,
+    "contract_states": true,
+    "method_specified_in_contract": false,
+    "method_known": false,
+    "note": "合同只说明「应按期间折算」，未给出具体折算公式（单利/复利、天数基准、起止点）"
+   }
   },
   {
    "composite_id": 17,
@@ -73,7 +90,7 @@
    "current_weight_only": true,
    "status": "partially_reproducible",
    "reasons": [
-    "现金成分 1 个无收益序列",
+    "现金成分无收益序列",
     "历史权重生效日期无官方证据（当前权重不等于历史权重）"
    ]
   },
@@ -89,7 +106,7 @@
      "code": "399997",
      "weight": 0.95,
      "data_available": 1,
-     "total_return_available": false
+     "total_return_available": true
     }
    ],
    "bond_components": [],
@@ -102,13 +119,12 @@
    "fixed_rate_components": [],
    "missing_component_count": 1,
    "all_components_available": false,
-   "index_components_have_total_return": false,
+   "index_components_have_total_return": true,
    "historical_weight_evidence": false,
    "current_weight_only": true,
-   "status": "not_reproducible",
+   "status": "partially_reproducible",
    "reasons": [
-    "现金成分 1 个无收益序列",
-    "指数成分无全收益序列：中证白酒",
+    "现金成分无收益序列",
     "历史权重生效日期无官方证据（当前权重不等于历史权重）"
    ]
   },
@@ -124,7 +140,7 @@
      "code": "H30184",
      "weight": 0.95,
      "data_available": 1,
-     "total_return_available": false
+     "total_return_available": true
     }
    ],
    "bond_components": [],
@@ -137,13 +153,12 @@
    "fixed_rate_components": [],
    "missing_component_count": 1,
    "all_components_available": false,
-   "index_components_have_total_return": false,
+   "index_components_have_total_return": true,
    "historical_weight_evidence": false,
    "current_weight_only": true,
-   "status": "not_reproducible",
+   "status": "partially_reproducible",
    "reasons": [
-    "现金成分 1 个无收益序列",
-    "指数成分无全收益序列：中证全指半导体",
+    "现金成分无收益序列",
     "历史权重生效日期无官方证据（当前权重不等于历史权重）"
    ]
   },
@@ -177,7 +192,7 @@
    "current_weight_only": true,
    "status": "partially_reproducible",
    "reasons": [
-    "现金成分 1 个无收益序列",
+    "现金成分无收益序列",
     "历史权重生效日期无官方证据（当前权重不等于历史权重）"
    ]
   },
@@ -211,7 +226,7 @@
    "current_weight_only": true,
    "status": "partially_reproducible",
    "reasons": [
-    "现金成分 1 个无收益序列",
+    "现金成分无收益序列",
     "历史权重生效日期无官方证据（当前权重不等于历史权重）"
    ]
   },
@@ -245,7 +260,7 @@
    "current_weight_only": true,
    "status": "partially_reproducible",
    "reasons": [
-    "现金成分 1 个无收益序列",
+    "现金成分无收益序列",
     "历史权重生效日期无官方证据（当前权重不等于历史权重）"
    ]
   },
@@ -279,7 +294,7 @@
    "current_weight_only": true,
    "status": "partially_reproducible",
    "reasons": [
-    "现金成分 1 个无收益序列",
+    "现金成分无收益序列",
     "历史权重生效日期无官方证据（当前权重不等于历史权重）"
    ]
   },
@@ -313,7 +328,7 @@
    "current_weight_only": true,
    "status": "partially_reproducible",
    "reasons": [
-    "现金成分 1 个无收益序列",
+    "现金成分无收益序列",
     "历史权重生效日期无官方证据（当前权重不等于历史权重）"
    ]
   },
@@ -348,7 +363,7 @@
    "current_weight_only": true,
    "status": "partially_reproducible",
    "reasons": [
-    "债券指数成分 1 个无可用序列",
+    "债券指数成分无可用序列",
     "历史权重生效日期无官方证据（当前权重不等于历史权重）"
    ]
   },
@@ -388,8 +403,8 @@
    "current_weight_only": true,
    "status": "partially_reproducible",
    "reasons": [
-    "现金成分 1 个无收益序列",
-    "债券指数成分 1 个无可用序列",
+    "现金成分无收益序列",
+    "债券指数成分无可用序列",
     "历史权重生效日期无官方证据（当前权重不等于历史权重）"
    ]
   },
@@ -424,7 +439,7 @@
    "current_weight_only": true,
    "status": "partially_reproducible",
    "reasons": [
-    "债券指数成分 1 个无可用序列",
+    "债券指数成分无可用序列",
     "历史权重生效日期无官方证据（当前权重不等于历史权重）"
    ]
   },
@@ -440,7 +455,7 @@
      "code": "930930",
      "weight": 0.75,
      "data_available": 1,
-     "total_return_available": false
+     "total_return_available": true
     },
     {
      "label": "中证500",
@@ -461,13 +476,12 @@
    "fixed_rate_components": [],
    "missing_component_count": 1,
    "all_components_available": false,
-   "index_components_have_total_return": false,
+   "index_components_have_total_return": true,
    "historical_weight_evidence": false,
    "current_weight_only": true,
    "status": "partially_reproducible",
    "reasons": [
-    "债券指数成分 1 个无可用序列",
-    "指数成分无全收益序列：中证港股通综合",
+    "债券指数成分无可用序列",
     "历史权重生效日期无官方证据（当前权重不等于历史权重）"
    ]
   },
@@ -504,13 +518,12 @@
    "fixed_rate_components": [],
    "missing_component_count": 2,
    "all_components_available": false,
-   "index_components_have_total_return": true,
+   "index_components_have_total_return": false,
    "historical_weight_evidence": false,
    "current_weight_only": true,
-   "status": "partially_reproducible",
+   "status": "not_reproducible",
    "reasons": [
-    "债券指数成分 1 个无可用序列",
-    "指数成分无全收益序列：恒生指数",
+    "债券指数成分无可用序列",
     "历史权重生效日期无官方证据（当前权重不等于历史权重）"
    ]
   },
@@ -551,7 +564,7 @@
    "current_weight_only": true,
    "status": "partially_reproducible",
    "reasons": [
-    "现金成分 1 个无收益序列",
+    "现金成分无收益序列",
     "历史权重生效日期无官方证据（当前权重不等于历史权重）"
    ]
   }
@@ -559,7 +572,16 @@
  "gaps_by_layer": {
   "cash_component_missing": 10,
   "bond_index_component_missing": 5,
-  "index_without_total_return": [
+  "fixed_annual_return_conversion_unknown": 1,
+  "index_without_total_return": [],
+  "index_with_total_return": [
+   "000300",
+   "000905",
+   "000906",
+   "000016",
+   "000942",
+   "000922",
+   "000012",
    "399997",
    "H30184",
    "930930"
@@ -613,5 +635,18 @@
   "ready_for_research_analysis": true,
   "ready_for_backtest": false,
   "ready_for_formal_ranking": false
+ },
+ "audit_corrections": {
+  "round": "3B-6.1.0.1",
+  "correction": {
+   "composite_id": 16,
+   "fund": "000051 华夏沪深300ETF联接",
+   "issue": "固定年收益率 1% 被错误记录为 1% 资产权重（导致 95%+1%=96% 语义错误）",
+   "fix": "改为 fixed_annual_return_components，weight=null，annual_rate=0.01",
+   "period_conversion_method": "unknown",
+   "status_changed": "partially_reproducible -> not_reproducible"
+  },
+  "other_composites_with_fixed_rate": 0,
+  "note": "其余 14 条的加项均为「活期存款利率/同业存款利率」，已有独立 cash 成分类型，不属于固定收益率混淆。但它们同样缺收益序列，故仍不可复现。"
  }
 }
