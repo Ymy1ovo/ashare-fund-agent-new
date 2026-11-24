@@ -1,8 +1,8 @@
 {
- "phase": "3B-6.0.2",
+ "phase": "3B-6.0.2.2",
  "report": "composite_benchmark",
- "baseline_head": "4f5d3add205dfc5370d04cda19e3f42dd0e1ece7",
- "generated_at": "2026-11-24T09:00:00",
+ "baseline_head": "ae1dc1979bd32f85341e691405b2310b9d0ea84b",
+ "generated_at": "2026-11-24T09:40:00",
  "evidence_source": "platform",
  "evidence_note": "库内 benchmark 来自第三方接口转述，未核对合同原文",
  "summary": {
@@ -16,407 +16,105 @@
    "benchmark_name": "000051 华夏沪深300ETF联接",
    "is_complete": 0,
    "is_reproducible": 0,
-   "missing_reason": "1 个成分无可用收益序列：fixed_rate(fixed_rate)",
-   "components": [
-    {
-     "component_type": "index",
-     "component_label": "沪深300",
-     "index_code": "000300",
-     "weight": 0.95,
-     "data_available": 1,
-     "unavailable_reason": null
-    },
-    {
-     "component_type": "fixed_rate",
-     "component_label": "fixed_rate",
-     "index_code": null,
-     "weight": 0.01,
-     "data_available": 0,
-     "unavailable_reason": "fixed_rate 成分无可用收益序列（本阶段未接入）"
-    }
-   ]
+   "missing_reason": "1 个成分无可用收益序列：fixed_rate(fixed_rate)"
   },
   {
    "composite_id": 17,
    "benchmark_name": "110020 易方达沪深300ETF联接",
    "is_complete": 0,
    "is_reproducible": 0,
-   "missing_reason": "1 个成分无可用收益序列：cash(cash)",
-   "components": [
-    {
-     "component_type": "index",
-     "component_label": "沪深300",
-     "index_code": "000300",
-     "weight": 0.95,
-     "data_available": 1,
-     "unavailable_reason": null
-    },
-    {
-     "component_type": "cash",
-     "component_label": "cash",
-     "index_code": null,
-     "weight": 0.05,
-     "data_available": 0,
-     "unavailable_reason": "cash 成分无可用收益序列（本阶段未接入）"
-    }
-   ]
+   "missing_reason": "1 个成分无可用收益序列：cash(cash)"
   },
   {
    "composite_id": 18,
    "benchmark_name": "161725 招商中证白酒指数(LOF)",
    "is_complete": 0,
    "is_reproducible": 0,
-   "missing_reason": "1 个成分无可用收益序列：cash(cash)",
-   "components": [
-    {
-     "component_type": "index",
-     "component_label": "中证白酒",
-     "index_code": "399997",
-     "weight": 0.95,
-     "data_available": 1,
-     "unavailable_reason": null
-    },
-    {
-     "component_type": "cash",
-     "component_label": "cash",
-     "index_code": null,
-     "weight": 0.05,
-     "data_available": 0,
-     "unavailable_reason": "cash 成分无可用收益序列（本阶段未接入）"
-    }
-   ]
+   "missing_reason": "1 个成分无可用收益序列：cash(cash)"
   },
   {
    "composite_id": 19,
    "benchmark_name": "007300 国联安中证半导体ETF联接",
    "is_complete": 0,
    "is_reproducible": 0,
-   "missing_reason": "1 个成分无可用收益序列：cash(cash)",
-   "components": [
-    {
-     "component_type": "index",
-     "component_label": "中证全指半导体",
-     "index_code": "H30184",
-     "weight": 0.95,
-     "data_available": 1,
-     "unavailable_reason": null
-    },
-    {
-     "component_type": "cash",
-     "component_label": "cash",
-     "index_code": null,
-     "weight": 0.05,
-     "data_available": 0,
-     "unavailable_reason": "cash 成分无可用收益序列（本阶段未接入）"
-    }
-   ]
+   "missing_reason": "1 个成分无可用收益序列：cash(cash)"
   },
   {
    "composite_id": 20,
    "benchmark_name": "000478 建信中证500指数增强",
    "is_complete": 0,
    "is_reproducible": 0,
-   "missing_reason": "1 个成分无可用收益序列：cash(cash)",
-   "components": [
-    {
-     "component_type": "index",
-     "component_label": "中证500",
-     "index_code": "000905",
-     "weight": 0.95,
-     "data_available": 1,
-     "unavailable_reason": null
-    },
-    {
-     "component_type": "cash",
-     "component_label": "cash",
-     "index_code": null,
-     "weight": 0.05,
-     "data_available": 0,
-     "unavailable_reason": "cash 成分无可用收益序列（本阶段未接入）"
-    }
-   ]
+   "missing_reason": "1 个成分无可用收益序列：cash(cash)"
   },
   {
    "composite_id": 21,
    "benchmark_name": "000961 天弘沪深300ETF联接",
    "is_complete": 0,
    "is_reproducible": 0,
-   "missing_reason": "1 个成分无可用收益序列：cash(cash)",
-   "components": [
-    {
-     "component_type": "index",
-     "component_label": "沪深300",
-     "index_code": "000300",
-     "weight": 0.95,
-     "data_available": 1,
-     "unavailable_reason": null
-    },
-    {
-     "component_type": "cash",
-     "component_label": "cash",
-     "index_code": null,
-     "weight": 0.05,
-     "data_available": 0,
-     "unavailable_reason": "cash 成分无可用收益序列（本阶段未接入）"
-    }
-   ]
+   "missing_reason": "1 个成分无可用收益序列：cash(cash)"
   },
   {
    "composite_id": 22,
    "benchmark_name": "050002 博时裕富沪深300指数",
    "is_complete": 0,
    "is_reproducible": 0,
-   "missing_reason": "1 个成分无可用收益序列：cash(cash)",
-   "components": [
-    {
-     "component_type": "index",
-     "component_label": "沪深300",
-     "index_code": "000300",
-     "weight": 0.95,
-     "data_available": 1,
-     "unavailable_reason": null
-    },
-    {
-     "component_type": "cash",
-     "component_label": "cash",
-     "index_code": null,
-     "weight": 0.05,
-     "data_available": 0,
-     "unavailable_reason": "cash 成分无可用收益序列（本阶段未接入）"
-    }
-   ]
+   "missing_reason": "1 个成分无可用收益序列：cash(cash)"
   },
   {
    "composite_id": 23,
    "benchmark_name": "001052 华夏中证500ETF联接",
    "is_complete": 0,
    "is_reproducible": 0,
-   "missing_reason": "1 个成分无可用收益序列：cash(cash)",
-   "components": [
-    {
-     "component_type": "index",
-     "component_label": "中证500",
-     "index_code": "000905",
-     "weight": 0.95,
-     "data_available": 1,
-     "unavailable_reason": null
-    },
-    {
-     "component_type": "cash",
-     "component_label": "cash",
-     "index_code": null,
-     "weight": 0.05,
-     "data_available": 0,
-     "unavailable_reason": "cash 成分无可用收益序列（本阶段未接入）"
-    }
-   ]
+   "missing_reason": "1 个成分无可用收益序列：cash(cash)"
   },
   {
    "composite_id": 24,
    "benchmark_name": "001548 天弘上证50ETF联接",
    "is_complete": 0,
    "is_reproducible": 0,
-   "missing_reason": "1 个成分无可用收益序列：cash(cash)",
-   "components": [
-    {
-     "component_type": "index",
-     "component_label": "上证50",
-     "index_code": "000016",
-     "weight": 0.95,
-     "data_available": 1,
-     "unavailable_reason": null
-    },
-    {
-     "component_type": "cash",
-     "component_label": "cash",
-     "index_code": null,
-     "weight": 0.05,
-     "data_available": 0,
-     "unavailable_reason": "cash 成分无可用收益序列（本阶段未接入）"
-    }
-   ]
+   "missing_reason": "1 个成分无可用收益序列：cash(cash)"
   },
   {
    "composite_id": 25,
    "benchmark_name": "110022 易方达消费行业股票",
    "is_complete": 0,
    "is_reproducible": 0,
-   "missing_reason": "1 个成分无可用收益序列：中债总(bond_index)",
-   "components": [
-    {
-     "component_type": "index",
-     "component_label": "中证内地消费主题",
-     "index_code": "000942",
-     "weight": 0.85,
-     "data_available": 1,
-     "unavailable_reason": null
-    },
-    {
-     "component_type": "bond_index",
-     "component_label": "中债总",
-     "index_code": null,
-     "weight": 0.15,
-     "data_available": 0,
-     "unavailable_reason": "bond_index 成分无可用收益序列（本阶段未接入）"
-    }
-   ]
+   "missing_reason": "1 个成分无可用收益序列：中债总(bond_index)"
   },
   {
    "composite_id": 26,
    "benchmark_name": "161005 富国天惠成长混合(LOF)",
    "is_complete": 0,
    "is_reproducible": 0,
-   "missing_reason": "2 个成分无可用收益序列：中债综合全价(bond_index), cash(cash)",
-   "components": [
-    {
-     "component_type": "index",
-     "component_label": "沪深300",
-     "index_code": "000300",
-     "weight": 0.7,
-     "data_available": 1,
-     "unavailable_reason": null
-    },
-    {
-     "component_type": "bond_index",
-     "component_label": "中债综合全价",
-     "index_code": null,
-     "weight": 0.25,
-     "data_available": 0,
-     "unavailable_reason": "bond_index 成分无可用收益序列（本阶段未接入）"
-    },
-    {
-     "component_type": "cash",
-     "component_label": "cash",
-     "index_code": null,
-     "weight": 0.05,
-     "data_available": 0,
-     "unavailable_reason": "cash 成分无可用收益序列（本阶段未接入）"
-    }
-   ]
+   "missing_reason": "2 个成分无可用收益序列：中债综合全价(bond_index), cash(cash)"
   },
   {
    "composite_id": 27,
    "benchmark_name": "001938 中欧时代先锋",
    "is_complete": 0,
    "is_reproducible": 0,
-   "missing_reason": "1 个成分无可用收益序列：中证综合债券(bond_index)",
-   "components": [
-    {
-     "component_type": "index",
-     "component_label": "中证500",
-     "index_code": "000905",
-     "weight": 0.9,
-     "data_available": 1,
-     "unavailable_reason": null
-    },
-    {
-     "component_type": "bond_index",
-     "component_label": "中证综合债券",
-     "index_code": null,
-     "weight": 0.1,
-     "data_available": 0,
-     "unavailable_reason": "bond_index 成分无可用收益序列（本阶段未接入）"
-    }
-   ]
+   "missing_reason": "1 个成分无可用收益序列：中证综合债券(bond_index)"
   },
   {
    "composite_id": 28,
    "benchmark_name": "012346 易方达港股通成长混合",
    "is_complete": 0,
    "is_reproducible": 0,
-   "missing_reason": "1 个成分无可用收益序列：中债-总全价(bond_index)",
-   "components": [
-    {
-     "component_type": "index",
-     "component_label": "中证港股通综合",
-     "index_code": "930930",
-     "weight": 0.75,
-     "data_available": 1,
-     "unavailable_reason": null
-    },
-    {
-     "component_type": "index",
-     "component_label": "中证500",
-     "index_code": "000905",
-     "weight": 0.1,
-     "data_available": 1,
-     "unavailable_reason": null
-    },
-    {
-     "component_type": "bond_index",
-     "component_label": "中债-总全价",
-     "index_code": null,
-     "weight": 0.15,
-     "data_available": 0,
-     "unavailable_reason": "bond_index 成分无可用收益序列（本阶段未接入）"
-    }
-   ]
+   "missing_reason": "1 个成分无可用收益序列：中债-总全价(bond_index)"
   },
   {
    "composite_id": 29,
    "benchmark_name": "012344 嘉实领先优势混合",
    "is_complete": 0,
    "is_reproducible": 0,
-   "missing_reason": "1 个指数成分未映射到代码：恒生指数；2 个成分无可用收益序列：恒生指数(index), 中债综合财富(bond_index)",
-   "components": [
-    {
-     "component_type": "index",
-     "component_label": "沪深300",
-     "index_code": "000300",
-     "weight": 0.6,
-     "data_available": 1,
-     "unavailable_reason": null
-    },
-    {
-     "component_type": "index",
-     "component_label": "恒生指数",
-     "index_code": null,
-     "weight": 0.3,
-     "data_available": 0,
-     "unavailable_reason": "该指数尚未映射到可接入的指数代码（本阶段未接入）"
-    },
-    {
-     "component_type": "bond_index",
-     "component_label": "中债综合财富",
-     "index_code": null,
-     "weight": 0.1,
-     "data_available": 0,
-     "unavailable_reason": "bond_index 成分无可用收益序列（本阶段未接入）"
-    }
-   ]
+   "missing_reason": "1 个指数成分未映射到代码：恒生指数；2 个成分无可用收益序列：恒生指数(index), 中债综合财富(bond_index)"
   },
   {
    "composite_id": 30,
    "benchmark_name": "519066 汇添富蓝筹稳健混合",
    "is_complete": 0,
    "is_reproducible": 0,
-   "missing_reason": "1 个成分无可用收益序列：cash(cash)",
-   "components": [
-    {
-     "component_type": "index",
-     "component_label": "中证800",
-     "index_code": "000906",
-     "weight": 0.7,
-     "data_available": 1,
-     "unavailable_reason": null
-    },
-    {
-     "component_type": "index",
-     "component_label": "上证国债",
-     "index_code": "000012",
-     "weight": 0.25,
-     "data_available": 1,
-     "unavailable_reason": null
-    },
-    {
-     "component_type": "cash",
-     "component_label": "cash",
-     "index_code": null,
-     "weight": 0.05,
-     "data_available": 0,
-     "unavailable_reason": "cash 成分无可用收益序列（本阶段未接入）"
-    }
-   ]
+   "missing_reason": "1 个成分无可用收益序列：cash(cash)"
   }
  ],
  "validation_rules": {
@@ -450,7 +148,7 @@
   "ready_for_backtest": false,
   "ready_for_formal_ranking": false
  },
- "correction_round": "3B-6.0.2.1",
+ "correction_round": "3B-6.0.2.2",
  "basis_check_added": {
   "checks_index_return_basis": true,
   "allowed_for_total_return": [
@@ -470,5 +168,126 @@
  "has_rows_equals_usable_total_return": false,
  "composites_regenerated": false,
  "production_composites_modified": false,
- "all_indices_still_unknown": true
+ "all_indices_still_unknown": true,
+ "effective_observation_rule": {
+  "min_valid_observations": 2,
+  "counted_quality_status": [
+   "valid"
+  ],
+  "excluded_quality_status": [
+   "suspect",
+   "rejected"
+  ],
+  "close_must_be_positive_finite": true,
+  "total_row_count_used_for_availability": false,
+  "reevaluated_every_time": true,
+  "stale_data_available_trusted": false,
+  "unchanged_rules": [
+   "权重",
+   "成分数量",
+   "债券/现金/固定加收益成分"
+  ]
+ },
+ "validity_rule_note": "不得仅用总行数判断数据可用性；只计 quality_status='valid' 且 close 为正有限数的行，且至少 2 条",
+ "index_assessment": [
+  {
+   "index_code": "000012",
+   "index_name": "上证国债指数",
+   "return_basis": "unknown",
+   "total_rows": 5558,
+   "valid_rows": 5557,
+   "available": 0,
+   "reason": "收益口径 unknown：只有历史行情点位，没有证据证明是全收益序列，不能用于严格总收益基准"
+  },
+  {
+   "index_code": "000016",
+   "index_name": "上证50指数",
+   "return_basis": "unknown",
+   "total_rows": 5559,
+   "valid_rows": 5558,
+   "available": 0,
+   "reason": "收益口径 unknown：只有历史行情点位，没有证据证明是全收益序列，不能用于严格总收益基准"
+  },
+  {
+   "index_code": "000300",
+   "index_name": "沪深300指数",
+   "return_basis": "unknown",
+   "total_rows": 5558,
+   "valid_rows": 5557,
+   "available": 0,
+   "reason": "收益口径 unknown：只有历史行情点位，没有证据证明是全收益序列，不能用于严格总收益基准"
+  },
+  {
+   "index_code": "000905",
+   "index_name": "中证小盘500指数",
+   "return_basis": "unknown",
+   "total_rows": 5317,
+   "valid_rows": 5316,
+   "available": 0,
+   "reason": "收益口径 unknown：只有历史行情点位，没有证据证明是全收益序列，不能用于严格总收益基准"
+  },
+  {
+   "index_code": "000906",
+   "index_name": "中证800指数",
+   "return_basis": "unknown",
+   "total_rows": 5317,
+   "valid_rows": 5316,
+   "available": 0,
+   "reason": "收益口径 unknown：只有历史行情点位，没有证据证明是全收益序列，不能用于严格总收益基准"
+  },
+  {
+   "index_code": "000922",
+   "index_name": "中证红利指数",
+   "return_basis": "unknown",
+   "total_rows": 5317,
+   "valid_rows": 5316,
+   "available": 0,
+   "reason": "收益口径 unknown：只有历史行情点位，没有证据证明是全收益序列，不能用于严格总收益基准"
+  },
+  {
+   "index_code": "000942",
+   "index_name": "中证内地消费主题指数",
+   "return_basis": "unknown",
+   "total_rows": 5317,
+   "valid_rows": 5316,
+   "available": 0,
+   "reason": "收益口径 unknown：只有历史行情点位，没有证据证明是全收益序列，不能用于严格总收益基准"
+  },
+  {
+   "index_code": "399997",
+   "index_name": "中证白酒指数",
+   "return_basis": "unknown",
+   "total_rows": 4345,
+   "valid_rows": 4344,
+   "available": 0,
+   "reason": "收益口径 unknown：只有历史行情点位，没有证据证明是全收益序列，不能用于严格总收益基准"
+  },
+  {
+   "index_code": "930930",
+   "index_name": "中证港股通综合指数",
+   "return_basis": "unknown",
+   "total_rows": 2999,
+   "valid_rows": 2998,
+   "available": 0,
+   "reason": "收益口径 unknown：只有历史行情点位，没有证据证明是全收益序列，不能用于严格总收益基准"
+  },
+  {
+   "index_code": "H30184",
+   "index_name": "中证全指半导体产品与设备指数",
+   "return_basis": "unknown",
+   "total_rows": 5316,
+   "valid_rows": 5314,
+   "available": 0,
+   "reason": "收益口径 unknown：只有历史行情点位，没有证据证明是全收益序列，不能用于严格总收益基准"
+  }
+ ],
+ "stale_component_flags": {
+  "count_data_available_1": 17,
+  "origin": "3B-6.0.2 建表时按旧逻辑写入",
+  "modified_this_round": false,
+  "affects_result": false,
+  "reason": "evaluate_composite() 每次重新计算，不信任存量标记",
+  "next_action": "3B-6.0.3 等真正写库时重新执行 evaluate_composite() 刷新"
+ },
+ "database_written_this_round": false
 }

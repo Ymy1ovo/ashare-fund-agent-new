@@ -2,7 +2,7 @@
  "phase": "3B-6.0.2",
  "report": "index_data_layer",
  "baseline_head": "4f5d3add205dfc5370d04cda19e3f42dd0e1ece7",
- "generated_at": "2026-11-24T09:00:00",
+ "generated_at": "2026-11-24T09:40:00",
  "source": "akshare.stock_zh_index_hist_csindex",
  "readonly_fund_layer": true,
  "fund_tables_modified": false,
@@ -365,7 +365,7 @@
   "ready_for_backtest": false,
   "ready_for_formal_ranking": false
  },
- "correction_round": "3B-6.0.2.1",
+ "correction_round": "3B-6.0.2.2",
  "raw_quality_order_fix": {
   "before": [
    "_to_rows",
@@ -394,5 +394,24 @@
  },
  "database_untouched_this_round": true,
  "indices_recolledted": false,
- "basis_modified": false
+ "basis_modified": false,
+ "effective_observation_rule": {
+  "min_valid_observations": 2,
+  "counted_quality_status": [
+   "valid"
+  ],
+  "excluded_quality_status": [
+   "suspect",
+   "rejected"
+  ],
+  "close_must_be_positive_finite": true,
+  "total_row_count_used_for_availability": false,
+  "reevaluated_every_time": true,
+  "stale_data_available_trusted": false,
+  "unchanged_rules": [
+   "权重",
+   "成分数量",
+   "债券/现金/固定加收益成分"
+  ]
+ }
 }

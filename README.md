@@ -2457,7 +2457,8 @@ if (basis != ACCOUNTING_FORMAL
 | 3B-6.0.1 | 基准与指数数据源审计 | 1662 | `phase3B6_0_1_benchmark_coverage.md` |
 | 3B-6.0.1.1 | 指数验证范围与覆盖结论修正 | 1690 | `phase3B6_0_1_test_report.md` |
 | 3B-6.0.2 | 指数与基准数据层建设 | 1736 | `phase3B6_0_2_index_data_layer.md` |
-| 3B-6.0.2.1 | 原始质检顺序与基准口径修正 | **1758** | `phase3B6_0_2_test_report.md` |
+| 3B-6.0.2.1 | 原始质检顺序与基准口径修正 | 1758 | `phase3B6_0_2_test_report.md` |
+| 3B-6.0.2.2 | 复合基准有效行情判定 | **1782** | `phase3B6_0_2_test_report.md` |
 
 当前正式会计版本：`ca-v2-receivable`；正式会计基础：`formal_receivable`；正式估值标记：`formal_valuation=True`。
 
@@ -6036,4 +6037,52 @@ OHLC 缺失只算警告的理由：指数基准只用于**收盘收益**，收�
 **一处既有测试收紧**：`test_duplicate_dates_in_payload_deduped`
 改为 `..._rejected_at_ingest`，从「去重后入库 5 行」改为「拒绝入库 0 行」。
 旧断言本身就是被修掉的绕过行为，**这是收紧不是放宽**。
+
+### 70.11 修正轮 3B-6.0.2.2
+
+上轮修好了收益口径，但行情可用性判定仍有漏洞：
+
+```sql
+SELECT COUNT(*) FROM index_daily WHERE index_code=?   -- 旧写法
+```
+
+只数**总行数**，不看 `quality_status`。只有 suspect 行或只有 1 条有效观测的指数，
+会被错误标记为 `data_available=1`。
+
+**修正后的有效行情判定**（四条同时满足）：
+
+| # | 条件 |
+| ---: | --- |
+| 1 | 指数代码存在 |
+| 2 | 收益口径为 `total_return` / `net_total_return` |
+| 3 | `index_daily` 至少 **2 条** `quality_status='valid'` |
+| 4 | 这些行 `close` 为正的有限数 |
+
+| 状态 | 计入有效观测 |
+| --- | --- |
+| `valid` | ✅ |
+| `suspect` | ❌ |
+| `rejected` | ❌ |
+
+**不得仅用总行数判断数据可用性。**
+
+为什么是 2 条：一期收益至少需要两个时间点。
+
+**`evaluate_composite()` 不再信任历史标记**：每次都重新统计有效行和读取口径，
+历史组件曾标可用也无效，并把最新判定写回组件。
+
+**变异验证**：
+
+| 变异 | 失败测试数 |
+| --- | ---: |
+| 忽略 `quality_status` | **5** |
+| `MIN_VALID_OBSERVATIONS = 1` | **4** |
+| 信任历史 `data_available` | **4** |
+
+**现状态未变**：10 个指数有效观测都远超 2 条但口径全 `unknown`，
+15 条复合基准仍全不可复现，50,603 行指数行情零改动，正式库零写入。
+
+**如实记录**：正式库 `benchmark_composite_component` 有 17 条 `data_available=1`，
+是 3B-6.0.2 建表时按旧逻辑写入的历史遗留值。本轮不写库故不刷新，
+但 `evaluate_composite()` 每次重算，不会让它泄漏成可复现。
 

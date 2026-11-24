@@ -128,3 +128,21 @@ _to_rows（保持原始顺序、保留重复行）
 | `ready_for_research_analysis` | **True** |
 | `ready_for_backtest` | **False** |
 | `ready_for_formal_ranking` | **False** |
+
+---
+
+## 7. 3B-6.0.2.2 补充：有效行情判定
+
+复合基准判定指数成分时，改为只统计 **`quality_status='valid'` 且收盘价为正** 的行，
+且至少需要 **2 条**（一期收益需要两个点）。
+
+| 状态 | 是否计入 | 原因 |
+| --- | --- | --- |
+| `valid` | ✅ | 正常行情 |
+| `suspect` | ❌ | 基线占位行等可疑数据 |
+| `rejected` | ❌ | 已被拒绝 |
+
+**不得仅用总行数判断数据可用性。**
+
+10 个指数的有效观测都远超 2 条，全部卡在收益口径 `unknown`，判定仍为不可用。
+详见 `reports/phase3B6_0_2_composite_benchmark.md`。

@@ -1,93 +1,136 @@
 {
- "phase": "3B-6.0.2.1",
+ "phase": "3B-6.0.2.2",
  "report": "tests",
- "baseline_head": "6c9405411737f42776962e0a87ce5f97112462ca",
- "generated_at": "2026-11-24T09:00:00",
- "correction_round": "3B-6.0.2.1",
+ "baseline_head": "ae1dc1979bd32f85341e691405b2310b9d0ea84b",
+ "generated_at": "2026-11-24T09:40:00",
+ "correction_round": "3B-6.0.2.2",
  "executed": true,
  "new_suite": {
-  "file": "tests/test_3b6_0_2_1_raw_quality_and_basis.py",
-  "passed": 22,
+  "file": "tests/test_3b6_0_2_2_effective_observations.py",
+  "passed": 24,
   "failed": 0,
-  "seconds": 6.33
+  "seconds": 7.09
  },
- "new_suite_breakdown": {
-  "raw_quality_order": 9,
-  "composite_basis": 8,
-  "production_state": 4,
-  "gate": 1
+ "new_suite_coverage": {
+  "A_all_suspect": true,
+  "B_all_rejected": true,
+  "C_single_valid": true,
+  "D_two_valid_total_return": true,
+  "E_two_valid_unknown": true,
+  "F_reevaluate_after_degradation": true,
+  "G_production_composites_none_reproducible": true,
+  "H_production_indices_unknown_and_rows_unchanged": true
  },
  "regression": {
-  "3b6_0_2_existing": {
-   "file": "tests/test_3b6_0_2_index_layer.py",
-   "passed": 46,
-   "seconds": 16.73
+  "3b6_0_2_1": {
+   "passed": 22
   },
-  "combined_6_0_2_1_plus_6_0_2": {
-   "passed": 68,
-   "seconds": 38.96
+  "3b6_0_2_index_layer": {
+   "passed": 46
+  },
+  "combined_three_suites": {
+   "passed": 92,
+   "seconds": 35.19
   },
   "3b6_0_1_series": {
    "passed": 61,
-   "seconds": 20.31
+   "seconds": 21.19
   },
   "3b5_5_series": {
    "passed": 112,
-   "seconds": 139.72
+   "seconds": 137.62
   }
  },
  "full": {
   "command": "pytest -q",
-  "passed": 1758,
+  "passed": 1782,
   "failed": 0,
   "errors": 0,
-  "seconds": 714.2
+  "seconds": 673.98
  },
  "evolution": {
-  "3B-6.0.2": 1736,
-  "3B-6.0.2.1": 1758
+  "3B-6.0.2.1": 1758,
+  "3B-6.0.2.2": 1782
  },
  "assertions_removed": 0,
- "existing_test_tightened": {
-  "old_name": "test_duplicate_dates_in_payload_deduped",
-  "new_name": "test_duplicate_dates_in_payload_rejected_at_ingest",
-  "old_assertion": "ok is True, rows == 5 (去重后入库)",
-  "new_assertion": "ok is False, rows == 0 (拒绝入库)",
-  "nature": "收紧，非放宽",
-  "reason": "旧断言本身就是被修掉的绕过行为"
- },
- "mutation_testing": {
-  "raw_order_mutation": {
-   "action": "改回旧顺序（先去重排序再质检）",
-   "failed_tests": 7,
+ "assertions_weakened": 0,
+ "mutation_testing": [
+  {
+   "mutation": "忽略 quality_status（退回总行数判定）",
+   "failed_tests": 5,
+   "failed_names": [
+    "test_A_all_suspect_not_available",
+    "test_B_all_rejected_not_available",
+    "test_B2_mixed_quality_only_valid_counted",
+    "test_F_reevaluate_detects_degradation",
+    "test_F4_stale_flag_does_not_stick"
+   ],
    "restored": true
   },
-  "basis_add_component_mutation": {
-   "failed_tests": 2,
+  {
+   "mutation": "MIN_VALID_OBSERVATIONS = 1",
+   "failed_tests": 4,
+   "failed_names": [
+    "test_C_single_valid_not_available",
+    "test_C2_min_observations_is_two",
+    "test_C4_non_positive_close_not_counted",
+    "test_F2_reevaluate_detects_rows_deleted"
+   ],
    "restored": true
   },
-  "basis_evaluate_mutation": {
-   "failed_tests": 2,
+  {
+   "mutation": "evaluate_composite 信任历史 data_available",
+   "failed_tests": 4,
+   "failed_names": [
+    "test_F_reevaluate_detects_degradation",
+    "test_F2_reevaluate_detects_rows_deleted",
+    "test_F3_reevaluate_detects_basis_downgrade",
+    "test_F4_stale_flag_does_not_stick"
+   ],
    "restored": true
   }
- },
+ ],
  "source_actual_calls": {
-  "interface": "akshare.stock_zh_index_hist_csindex",
   "invocations": 0,
-  "reason": "任务书禁止重新采集"
+  "reason": "任务书禁止重新调用中证接口"
  },
  "static_checks_excluded": [
   "compileall 语法检查",
   "JSON 合法性校验"
  ],
  "database_conservation": {
-  "fund_master": 60,
-  "fund_share_classes": 89,
-  "fund_nav_daily": 80083,
-  "fund_lifecycle_events": 49,
-  "index_daily": 50603,
-  "index_basis_all_unknown": true,
-  "composites_reproducible": 0,
+  "fund_master": {
+   "before": 60,
+   "after": 60
+  },
+  "fund_share_classes": {
+   "before": 89,
+   "after": 89
+  },
+  "fund_nav_daily": {
+   "before": 80083,
+   "after": 80083
+  },
+  "fund_lifecycle_events": {
+   "before": 49,
+   "after": 49
+  },
+  "terminated": {
+   "before": 41,
+   "after": 41
+  },
+  "index_daily": {
+   "before": 50603,
+   "after": 50603
+  },
+  "index_basis_unknown": {
+   "before": 10,
+   "after": 10
+  },
+  "composites_reproducible": {
+   "before": 0,
+   "after": 0
+  },
   "content_fingerprint": "11c56eba1489976fa35be92586a99bc21a27e20c06e95cacab5c8ca553c05116",
   "etf_fingerprint": "d54727c0a76a1b09531accd04b3d66ff4ea2374592b1d4a8cb8381602cbbac49",
   "integrity_check": "ok",
@@ -96,16 +139,17 @@
  },
  "code_changes": {
   "modified": [
-   "app/fund/index_ingest.py",
-   "app/fund/composite_benchmark.py",
-   "tests/test_3b6_0_2_index_layer.py"
+   "app/fund/composite_benchmark.py"
   ],
   "new": [
-   "tests/test_3b6_0_2_1_raw_quality_and_basis.py"
+   "tests/test_3b6_0_2_2_effective_observations.py"
   ],
   "unchanged": [
    "app/fund/index_layer.py",
+   "app/fund/index_ingest.py",
    "app/fund/index_returns.py",
+   "tests/test_3b6_0_2_1_raw_quality_and_basis.py",
+   "tests/test_3b6_0_2_index_layer.py",
    "app/fund/research/engine.py",
    "app/fund/research/indicators.py",
    "app/fund/research/quality.py"

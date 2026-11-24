@@ -12,7 +12,7 @@ import sqlite3
 from datetime import datetime
 
 from app.fund.index_returns import (
-    ReturnBasisError, assert_basis_usable_for_total_return,
+    TOTAL_RETURN_BASES, assert_basis_usable_for_total_return,
 )
 
 COMPONENT_INDEX = "index"
@@ -25,6 +25,93 @@ COMPONENT_TYPES = (COMPONENT_INDEX, COMPONENT_BOND,
 
 def _now() -> str:
     return datetime.now().isoformat(timespec="seconds")
+
+
+# 计算收益序列所需的最小有效观测数：至少需要 2 个点才能算出一期收益
+MIN_VALID_OBSERVATIONS = 2
+
+
+def count_effective_observations(conn: sqlite3.Connection,
+                                 index_code: str) -> int:
+    """统计某指数的**有效**行情条数。
+
+    只计 ``quality_status='valid'`` 且 ``close`` 非空且为有限正数的行。
+
+    **不得用总行数判断数据可用性**——``suspect``（如基线占位行）
+    与 ``rejected`` 行都不能参与收益计算。
+    """
+    rows = conn.execute(
+        "SELECT close FROM index_daily "
+        "WHERE index_code=? AND quality_status='valid'", (index_code,))
+    n = 0
+    for r in rows:
+        try:
+            c = float(r[0])
+        except (TypeError, ValueError):
+            continue
+        if c != c or c <= 0:        # NaN / 非正数
+            continue
+        n += 1
+    return n
+
+
+def assess_index_component(conn: sqlite3.Connection,
+                           index_code: str | None) -> dict:
+    """判定指数成分能否用于严格总收益基准复现。
+
+    必须**同时**满足：
+    1. 指数代码存在；
+    2. ``index_master`` 收益口径为 ``total_return`` / ``net_total_return``；
+    3. ``index_daily`` 至少有 2 条 ``quality_status='valid'`` 且收盘价有效。
+
+    返回 ``{available, reason, return_basis, valid_rows, total_rows}``。
+    """
+    out = {"available": 0, "reason": None, "return_basis": None,
+           "valid_rows": 0, "total_rows": 0}
+    if not index_code:
+        out["reason"] = "该指数尚未映射到可接入的指数代码（本阶段未接入）"
+        return out
+
+    master = conn.execute(
+        "SELECT return_basis FROM index_master WHERE index_code=?",
+        (index_code,)).fetchone()
+    out["return_basis"] = master["return_basis"] if master else None
+
+    out["total_rows"] = conn.execute(
+        "SELECT COUNT(*) FROM index_daily WHERE index_code=?",
+        (index_code,)).fetchone()[0]
+    out["valid_rows"] = count_effective_observations(conn, index_code)
+
+    if out["total_rows"] == 0:
+        out["reason"] = "该指数尚未接入历史数据"
+        return out
+    if out["valid_rows"] == 0:
+        out["reason"] = (f"没有有效行情：{out['total_rows']} 条记录中"
+                         "quality_status 均非 valid（suspect/rejected 不可用）")
+        return out
+    if out["valid_rows"] < MIN_VALID_OBSERVATIONS:
+        out["reason"] = (f"有效行情不足：仅 {out['valid_rows']} 条有效观测，"
+                         f"至少需要 {MIN_VALID_OBSERVATIONS} 条才能计算收益序列")
+        return out
+
+    basis = out["return_basis"]
+    if basis is None:
+        out["reason"] = "指数未登记收益口径，无法用于总收益比较"
+        return out
+    if basis == "unknown":
+        out["reason"] = ("收益口径 unknown：只有历史行情点位，"
+                         "没有证据证明是全收益序列，不能用于严格总收益基准")
+        return out
+    if basis == "price_return":
+        out["reason"] = ("收益口径 price_return：价格指数不含分红再投资，"
+                         "不能冒充全收益基准")
+        return out
+    if basis not in TOTAL_RETURN_BASES:
+        out["reason"] = f"未识别的收益口径: {basis}"
+        return out
+
+    out["available"] = 1
+    return out
 
 
 def create_composite(conn: sqlite3.Connection, *, benchmark_name: str,
@@ -57,33 +144,11 @@ def add_component(conn: sqlite3.Connection, composite_id: int, *,
 
     available = 0
     reason = None
-    return_basis = None
     if component_type == COMPONENT_INDEX:
-        if not index_code:
-            reason = "该指数尚未映射到可接入的指数代码（本阶段未接入）"
-        else:
-            has_data = conn.execute(
-                "SELECT COUNT(*) FROM index_daily WHERE index_code=?",
-                (index_code,)).fetchone()[0]
-            master = conn.execute(
-                "SELECT return_basis FROM index_master WHERE index_code=?",
-                (index_code,)).fetchone()
-            return_basis = master["return_basis"] if master else None
-            if not has_data:
-                reason = "该指数尚未接入历史数据"
-            elif return_basis is None:
-                reason = "指数未登记收益口径，无法用于总收益比较"
-            elif return_basis == "unknown":
-                reason = ("收益口径 unknown：只有历史行情点位，"
-                          "没有证据证明是全收益序列，不能用于严格总收益基准")
-            elif return_basis == "price_return":
-                reason = ("收益口径 price_return：价格指数不含分红再投资，"
-                          "不能冒充全收益基准")
-            elif return_basis not in ("total_return", "net_total_return"):
-                reason = f"未识别的收益口径: {return_basis}"
-            else:
-                # 口径合格，才算「有可用于总收益比较的历史序列」
-                available = 1
+        # 有效行情 + 收益口径双重判定，不能用总行数代替
+        verdict = assess_index_component(conn, index_code)
+        available = verdict["available"]
+        reason = verdict["reason"]
     else:
         reason = f"{component_type} 成分无可用收益序列（本阶段未接入）"
 
@@ -127,24 +192,31 @@ def evaluate_composite(conn: sqlite3.Connection, composite_id: int) -> dict:
             f"{len(no_code)} 个指数成分未映射到代码："
             + ", ".join(str(c["component_label"]) for c in no_code[:3]))
 
-    # 收益口径校验：有历史行情 ≠ 有可用于总收益比较的序列
+    # ---- 指数成分：**重新**按当前库状态判定，不信任历史 data_available ----
+    # 历史组件可能曾标记可用，但之后有效行情被移除或质量状态被改写，
+    # 因此每次评估都必须重新统计有效观测与收益口径。
     basis_fail = []
+    effective_fail = []
     for c in comps:
-        if c["component_type"] != COMPONENT_INDEX or not c["index_code"]:
+        if c["component_type"] != COMPONENT_INDEX:
             continue
-        row = conn.execute(
-            "SELECT return_basis FROM index_master WHERE index_code=?",
-            (c["index_code"],)).fetchone()
-        basis = row["return_basis"] if row else None
-        try:
-            assert_basis_usable_for_total_return(basis)
-        except ReturnBasisError as exc:
-            basis_fail.append(
-                f"{c['component_label']}({c['index_code']}): {exc}")
-    if basis_fail:
+        verdict = assess_index_component(conn, c["index_code"])
+        # 把最新判定写回组件，保持组件状态与当前库一致
+        conn.execute(
+            "UPDATE benchmark_composite_component "
+            "SET data_available=?, unavailable_reason=? WHERE component_id=?",
+            (verdict["available"], verdict["reason"], c["component_id"]))
+        c["data_available"] = verdict["available"]
+
+        if not verdict["available"]:
+            effective_fail.append(
+                f"{c['component_label']}({c['index_code'] or '未映射'}): "
+                f"{verdict['reason']}")
+
+    if effective_fail:
         missing.append(
-            f"{len(basis_fail)} 个指数成分收益口径不合格："
-            + "；".join(basis_fail[:3]))
+            f"{len(effective_fail)} 个指数成分无可用收益序列："
+            + "；".join(effective_fail[:3]))
 
     no_data = [c for c in comps if not c["data_available"]]
     if no_data:
