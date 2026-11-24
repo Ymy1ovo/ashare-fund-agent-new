@@ -219,5 +219,36 @@
   "full_history_probe_in_evidence": true,
   "semantic_attribution_source": "interface_returned_name (L3), NOT factsheet",
   "key_distinction": "factsheet 提供代码列表，但不保证列顺序可读、多数不解释经济含义"
+ },
+ "coverage_quality_evidence_103": {
+  "round": "3B-6.1.0.3",
+  "new_section": "coverage_quality_probe",
+  "codes_probed": 27,
+  "standard_declared": true,
+  "no_auto_propagation": true,
+  "placeholder_handling": {
+   "detection": "首行与次行间隔 >= 300 天",
+   "examples": [
+    "000905",
+    "000906",
+    "000942",
+    "000922",
+    "399997",
+    "H30184",
+    "930930",
+    "N00012"
+   ],
+   "no_placeholder": [
+    "000300",
+    "000016",
+    "H00016"
+   ]
+  },
+  "gap_truth": {
+   "365_369_days": "基线占位行，非数据缺失",
+   "11_13_days": "法定长假，非数据缺失",
+   "1826_3970_days": "指数真实发布起点晚"
+  },
+  "non_positive_preserved": true
  }
 }

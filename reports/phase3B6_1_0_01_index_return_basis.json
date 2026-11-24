@@ -19,49 +19,57 @@
   "quote": "中证指数有限公司同时计算沪深300全收益指数和净收益指数的日收盘值。沪深300全收益指数、净收益指数是沪深300指数的辅指数，沪深300全收益指数、净收益指数的计算中考虑了样本税前、税后现金红利的再投资收益"
  },
  "summary": {
-  "definition_note": "三层口径：①code_identified=有官方衍生指数代码记录；②short_probe_ok=短窗口实测有数据；③full_history_verified=完整历史已验证。本摘要只按第③层（完整历史）分类，不把①②当③。",
+  "definition_note": "五态独立判定：history_retrieved（接口取到）/ history_range_verified（区间已核实）/ history_coverage_adequate（覆盖率达标）/ history_quality_adequate（质量达标）/ backtest_usable（可回测）。**不得因前一项为 true 就自动把后一项设为 true。**",
   "total_indexes": 10,
-  "by_layer": {
-   "code_identified": 10,
-   "short_probe_ok": 10,
-   "full_history_verified_total_return": 10,
-   "note": "short_probe_ok 按 total_return_index_code 在探测窗口内是否有非空返回计算；000012 的 total 变体语义为 interest_and_reinvestment，也计入。"
-  },
-  "by_coverage_category": {
-   "A_full_three_series_history": 6,
-   "B_price_and_total_history": 3,
-   "special_bond_index": 1
-  },
-  "detail": {
-   "A_full_three_series_history": [
+  "by_economic_semantics": {
+   "equity_indexes": [
     "000300",
     "000905",
     "000906",
     "000016",
     "399997",
-    "000922"
-   ],
-   "B_price_and_total_history": [
     "H30184",
     "000942",
+    "000922",
     "930930"
    ],
-   "special_bond_index": [
+   "special_bond_indexes": [
     "000012"
-   ]
+   ],
+   "note": "000012 的上证国债指数属于债券指数，其 N00012「利息及再投资」不得计入普通股票指数全收益统计"
   },
-  "category_labels": {
-   "A_full_three_series_history": "价格/全收益/净收益 完整历史均可用",
-   "B_price_and_total_history": "价格 + 全收益完整历史可用（净收益不可得）",
-   "C_price_history_only": "仅价格完整历史可用（全收益/净收益历史未验证）",
-   "special_bond_index": "特殊债券指数（语义不同于股票指数）",
-   "D_incomplete": "历史不完整"
+  "equity_indexes_stats": {
+   "count": 9,
+   "total_return_history_retrieved": 9,
+   "total_return_history_range_verified": 9,
+   "total_return_history_coverage_adequate": 7,
+   "total_return_history_quality_adequate": 8,
+   "total_return_backtest_usable": 0
   },
+  "special_bond_stats": {
+   "count": 1,
+   "series_code": "N00012",
+   "history_retrieved": 1,
+   "history_range_verified": 1,
+   "history_coverage_adequate": 0,
+   "history_quality_adequate": 1,
+   "backtest_usable": 0,
+   "note": "特殊债券序列，不套用股票指数收益口径，不计入普通股票指数全收益覆盖率"
+  },
+  "all_indexes_backtest_usable": 0,
   "return_basis_upgraded": 0,
   "consistency_check": {
-   "sum_of_categories": 10,
+   "equity_plus_bond": 10,
    "total_indexes": 10,
    "consistent": true
+  },
+  "rate_breakdown": {
+   "data_retrieval_rate": "9/9",
+   "range_verified_rate": "9/9",
+   "coverage_adequate_rate": "7/9",
+   "quality_adequate_rate": "8/9",
+   "backtest_usable_rate": "0/9",
+   "note": "五项比率**逐级递减**：取到 9/9 不等于覆盖 9/9，覆盖达标不等于质量达标，质量达标也不等于可回测"
   }
  },
  "indexes": [
@@ -88,11 +96,9 @@
    "history_start": "2004-01-01",
    "history_end": "2026-11-23",
    "row_count": 5559,
-   "total_history_available": true,
    "total_history_start": "2004-01-01",
    "total_history_end": "2026-11-23",
    "total_row_count": 5318,
-   "net_history_available": true,
    "net_row_count": 5318,
    "max_gap_days": 13,
    "non_positive_close": 0,
@@ -139,15 +145,264 @@
    "net_history_end": "2026-11-23",
    "net_max_gap_days": 365,
    "net_non_positive_close": 0,
-   "layers": {
-    "code_identified": true,
-    "short_probe_ok": true,
-    "full_history_verified": true,
-    "note": "三层必须分别看：代码已识别 ≠ 短窗口可取 ≠ 完整历史可用"
-   },
    "coverage_category": "A_full_three_series_history",
    "short_probe_row_count": 7,
-   "short_probe_window": "20240102~20240110"
+   "short_probe_window": "20240102~20240110",
+   "price_quality": {
+    "status": "ok",
+    "index_name_returned": "沪深300指数",
+    "request_range": [
+     "20040101",
+     "20261231"
+    ],
+    "rows": 5559,
+    "date_min": "2004-01-01",
+    "date_max": "2026-11-23",
+    "has_baseline_placeholder": false,
+    "placeholder_detail": null,
+    "real_start_date": "2004-01-01",
+    "real_rows_excluding_placeholder": 5559,
+    "max_gap_days": 13,
+    "max_interior_gap_days": 13,
+    "interior_gap_count": 7,
+    "all_gaps_gt_10d": [
+     {
+      "after": "2004-01-16",
+      "before": "2004-01-29",
+      "days": 13,
+      "position": "interior"
+     },
+     {
+      "after": "2005-02-04",
+      "before": "2005-02-16",
+      "days": 12,
+      "position": "interior"
+     },
+     {
+      "after": "2006-01-25",
+      "before": "2006-02-06",
+      "days": 12,
+      "position": "interior"
+     },
+     {
+      "after": "2020-01-23",
+      "before": "2020-02-03",
+      "days": 11,
+      "position": "interior"
+     },
+     {
+      "after": "2023-09-28",
+      "before": "2023-10-09",
+      "days": 11,
+      "position": "interior"
+     },
+     {
+      "after": "2024-02-08",
+      "before": "2024-02-19",
+      "days": 11,
+      "position": "interior"
+     },
+     {
+      "after": "2026-02-13",
+      "before": "2026-02-24",
+      "days": 11,
+      "position": "interior"
+     }
+    ],
+    "duplicate_dates": 0,
+    "null_close": 0,
+    "non_positive_close": 0,
+    "non_positive_dates": [],
+    "history_retrieved": true,
+    "history_range_verified": true,
+    "history_coverage_adequate": true,
+    "history_quality_adequate": true,
+    "backtest_usable": false,
+    "coverage_ratio": 1.0,
+    "quality_fails": [],
+    "backtest_blockers": [
+     "收益口径 return_basis=unknown，未获官方确认"
+    ]
+   },
+   "total_return_quality": {
+    "status": "ok",
+    "index_name_returned": "沪深300全收益指数",
+    "request_range": [
+     "20040101",
+     "20261231"
+    ],
+    "rows": 5318,
+    "date_min": "2004-01-01",
+    "date_max": "2026-11-23",
+    "has_baseline_placeholder": true,
+    "placeholder_detail": {
+     "after": "2004-01-01",
+     "before": "2004-12-31",
+     "days": 365,
+     "position": "leading"
+    },
+    "real_start_date": "2004-12-31",
+    "real_rows_excluding_placeholder": 5317,
+    "max_gap_days": 365,
+    "max_interior_gap_days": 12,
+    "interior_gap_count": 6,
+    "all_gaps_gt_10d": [
+     {
+      "after": "2004-01-01",
+      "before": "2004-12-31",
+      "days": 365,
+      "position": "leading"
+     },
+     {
+      "after": "2005-02-04",
+      "before": "2005-02-16",
+      "days": 12,
+      "position": "interior"
+     },
+     {
+      "after": "2006-01-25",
+      "before": "2006-02-06",
+      "days": 12,
+      "position": "interior"
+     },
+     {
+      "after": "2020-01-23",
+      "before": "2020-02-03",
+      "days": 11,
+      "position": "interior"
+     },
+     {
+      "after": "2023-09-28",
+      "before": "2023-10-09",
+      "days": 11,
+      "position": "interior"
+     },
+     {
+      "after": "2024-02-08",
+      "before": "2024-02-19",
+      "days": 11,
+      "position": "interior"
+     },
+     {
+      "after": "2026-02-13",
+      "before": "2026-02-24",
+      "days": 11,
+      "position": "interior"
+     }
+    ],
+    "duplicate_dates": 0,
+    "null_close": 0,
+    "non_positive_close": 0,
+    "non_positive_dates": [],
+    "history_retrieved": true,
+    "history_range_verified": true,
+    "history_coverage_adequate": true,
+    "history_quality_adequate": true,
+    "backtest_usable": false,
+    "coverage_ratio": 0.95635,
+    "quality_fails": [],
+    "backtest_blockers": [
+     "收益口径 return_basis=unknown，未获官方确认"
+    ]
+   },
+   "net_return_quality": {
+    "status": "ok",
+    "index_name_returned": "沪深300净收益指数",
+    "request_range": [
+     "20040101",
+     "20261231"
+    ],
+    "rows": 5318,
+    "date_min": "2004-01-01",
+    "date_max": "2026-11-23",
+    "has_baseline_placeholder": true,
+    "placeholder_detail": {
+     "after": "2004-01-01",
+     "before": "2004-12-31",
+     "days": 365,
+     "position": "leading"
+    },
+    "real_start_date": "2004-12-31",
+    "real_rows_excluding_placeholder": 5317,
+    "max_gap_days": 365,
+    "max_interior_gap_days": 12,
+    "interior_gap_count": 6,
+    "all_gaps_gt_10d": [
+     {
+      "after": "2004-01-01",
+      "before": "2004-12-31",
+      "days": 365,
+      "position": "leading"
+     },
+     {
+      "after": "2005-02-04",
+      "before": "2005-02-16",
+      "days": 12,
+      "position": "interior"
+     },
+     {
+      "after": "2006-01-25",
+      "before": "2006-02-06",
+      "days": 12,
+      "position": "interior"
+     },
+     {
+      "after": "2020-01-23",
+      "before": "2020-02-03",
+      "days": 11,
+      "position": "interior"
+     },
+     {
+      "after": "2023-09-28",
+      "before": "2023-10-09",
+      "days": 11,
+      "position": "interior"
+     },
+     {
+      "after": "2024-02-08",
+      "before": "2024-02-19",
+      "days": 11,
+      "position": "interior"
+     },
+     {
+      "after": "2026-02-13",
+      "before": "2026-02-24",
+      "days": 11,
+      "position": "interior"
+     }
+    ],
+    "duplicate_dates": 0,
+    "null_close": 0,
+    "non_positive_close": 0,
+    "non_positive_dates": [],
+    "history_retrieved": true,
+    "history_range_verified": true,
+    "history_coverage_adequate": true,
+    "history_quality_adequate": true,
+    "backtest_usable": false,
+    "coverage_ratio": 0.95635,
+    "quality_fails": [],
+    "backtest_blockers": [
+     "收益口径 return_basis=unknown，未获官方确认"
+    ]
+   },
+   "history_states": {
+    "history_retrieved": true,
+    "history_range_verified": true,
+    "history_coverage_adequate": true,
+    "history_quality_adequate": true,
+    "backtest_usable": false,
+    "primary_series_code": "H00300",
+    "note": "五项独立判定。backtest_usable 恒为 false，因为 return_basis 全为 unknown",
+    "coverage_ratio": 0.95635,
+    "real_start_date": "2004-12-31",
+    "has_baseline_placeholder": true,
+    "max_interior_gap_days": 12,
+    "quality_fails": [],
+    "backtest_blockers": [
+     "收益口径 return_basis=unknown，未获官方确认"
+    ]
+   }
   },
   {
    "index_code": "000905",
@@ -165,11 +420,9 @@
    "history_start": "2004-01-01",
    "history_end": "2026-11-23",
    "row_count": 5318,
-   "total_history_available": true,
    "total_history_start": "2004-01-01",
    "total_history_end": "2026-11-23",
    "total_row_count": 5318,
-   "net_history_available": true,
    "net_row_count": 5318,
    "max_gap_days": 365,
    "non_positive_close": 0,
@@ -216,15 +469,274 @@
    "net_history_end": "2026-11-23",
    "net_max_gap_days": 365,
    "net_non_positive_close": 1,
-   "layers": {
-    "code_identified": true,
-    "short_probe_ok": true,
-    "full_history_verified": true,
-    "note": "三层必须分别看：代码已识别 ≠ 短窗口可取 ≠ 完整历史可用"
-   },
    "coverage_category": "A_full_three_series_history",
    "short_probe_row_count": 7,
-   "short_probe_window": "20240102~20240110"
+   "short_probe_window": "20240102~20240110",
+   "price_quality": {
+    "status": "ok",
+    "index_name_returned": "中证小盘500指数",
+    "request_range": [
+     "20040101",
+     "20261231"
+    ],
+    "rows": 5318,
+    "date_min": "2004-01-01",
+    "date_max": "2026-11-23",
+    "has_baseline_placeholder": true,
+    "placeholder_detail": {
+     "after": "2004-01-01",
+     "before": "2004-12-31",
+     "days": 365,
+     "position": "leading"
+    },
+    "real_start_date": "2004-12-31",
+    "real_rows_excluding_placeholder": 5317,
+    "max_gap_days": 365,
+    "max_interior_gap_days": 12,
+    "interior_gap_count": 6,
+    "all_gaps_gt_10d": [
+     {
+      "after": "2004-01-01",
+      "before": "2004-12-31",
+      "days": 365,
+      "position": "leading"
+     },
+     {
+      "after": "2005-02-04",
+      "before": "2005-02-16",
+      "days": 12,
+      "position": "interior"
+     },
+     {
+      "after": "2006-01-25",
+      "before": "2006-02-06",
+      "days": 12,
+      "position": "interior"
+     },
+     {
+      "after": "2020-01-23",
+      "before": "2020-02-03",
+      "days": 11,
+      "position": "interior"
+     },
+     {
+      "after": "2023-09-28",
+      "before": "2023-10-09",
+      "days": 11,
+      "position": "interior"
+     },
+     {
+      "after": "2024-02-08",
+      "before": "2024-02-19",
+      "days": 11,
+      "position": "interior"
+     },
+     {
+      "after": "2026-02-13",
+      "before": "2026-02-24",
+      "days": 11,
+      "position": "interior"
+     }
+    ],
+    "duplicate_dates": 0,
+    "null_close": 0,
+    "non_positive_close": 0,
+    "non_positive_dates": [],
+    "history_retrieved": true,
+    "history_range_verified": true,
+    "history_coverage_adequate": true,
+    "history_quality_adequate": true,
+    "backtest_usable": false,
+    "coverage_ratio": 0.95635,
+    "quality_fails": [],
+    "backtest_blockers": [
+     "收益口径 return_basis=unknown，未获官方确认"
+    ]
+   },
+   "total_return_quality": {
+    "status": "ok",
+    "index_name_returned": "中证小盘500全收益指数",
+    "request_range": [
+     "20040101",
+     "20261231"
+    ],
+    "rows": 5318,
+    "date_min": "2004-01-01",
+    "date_max": "2026-11-23",
+    "has_baseline_placeholder": true,
+    "placeholder_detail": {
+     "after": "2004-01-01",
+     "before": "2004-12-31",
+     "days": 365,
+     "position": "leading"
+    },
+    "real_start_date": "2004-12-31",
+    "real_rows_excluding_placeholder": 5317,
+    "max_gap_days": 365,
+    "max_interior_gap_days": 12,
+    "interior_gap_count": 6,
+    "all_gaps_gt_10d": [
+     {
+      "after": "2004-01-01",
+      "before": "2004-12-31",
+      "days": 365,
+      "position": "leading"
+     },
+     {
+      "after": "2005-02-04",
+      "before": "2005-02-16",
+      "days": 12,
+      "position": "interior"
+     },
+     {
+      "after": "2006-01-25",
+      "before": "2006-02-06",
+      "days": 12,
+      "position": "interior"
+     },
+     {
+      "after": "2020-01-23",
+      "before": "2020-02-03",
+      "days": 11,
+      "position": "interior"
+     },
+     {
+      "after": "2023-09-28",
+      "before": "2023-10-09",
+      "days": 11,
+      "position": "interior"
+     },
+     {
+      "after": "2024-02-08",
+      "before": "2024-02-19",
+      "days": 11,
+      "position": "interior"
+     },
+     {
+      "after": "2026-02-13",
+      "before": "2026-02-24",
+      "days": 11,
+      "position": "interior"
+     }
+    ],
+    "duplicate_dates": 0,
+    "null_close": 0,
+    "non_positive_close": 0,
+    "non_positive_dates": [],
+    "history_retrieved": true,
+    "history_range_verified": true,
+    "history_coverage_adequate": true,
+    "history_quality_adequate": true,
+    "backtest_usable": false,
+    "coverage_ratio": 0.95635,
+    "quality_fails": [],
+    "backtest_blockers": [
+     "收益口径 return_basis=unknown，未获官方确认"
+    ]
+   },
+   "net_return_quality": {
+    "status": "ok",
+    "index_name_returned": "中证小盘500净收益指数",
+    "request_range": [
+     "20040101",
+     "20261231"
+    ],
+    "rows": 5318,
+    "date_min": "2004-01-01",
+    "date_max": "2026-11-23",
+    "has_baseline_placeholder": true,
+    "placeholder_detail": {
+     "after": "2004-01-01",
+     "before": "2004-12-31",
+     "days": 365,
+     "position": "leading"
+    },
+    "real_start_date": "2004-12-31",
+    "real_rows_excluding_placeholder": 5317,
+    "max_gap_days": 365,
+    "max_interior_gap_days": 12,
+    "interior_gap_count": 6,
+    "all_gaps_gt_10d": [
+     {
+      "after": "2004-01-01",
+      "before": "2004-12-31",
+      "days": 365,
+      "position": "leading"
+     },
+     {
+      "after": "2005-02-04",
+      "before": "2005-02-16",
+      "days": 12,
+      "position": "interior"
+     },
+     {
+      "after": "2006-01-25",
+      "before": "2006-02-06",
+      "days": 12,
+      "position": "interior"
+     },
+     {
+      "after": "2020-01-23",
+      "before": "2020-02-03",
+      "days": 11,
+      "position": "interior"
+     },
+     {
+      "after": "2023-09-28",
+      "before": "2023-10-09",
+      "days": 11,
+      "position": "interior"
+     },
+     {
+      "after": "2024-02-08",
+      "before": "2024-02-19",
+      "days": 11,
+      "position": "interior"
+     },
+     {
+      "after": "2026-02-13",
+      "before": "2026-02-24",
+      "days": 11,
+      "position": "interior"
+     }
+    ],
+    "duplicate_dates": 0,
+    "null_close": 0,
+    "non_positive_close": 1,
+    "non_positive_dates": [
+     "2013-01-25"
+    ],
+    "history_retrieved": true,
+    "history_range_verified": true,
+    "history_coverage_adequate": true,
+    "history_quality_adequate": false,
+    "backtest_usable": false,
+    "coverage_ratio": 0.95635,
+    "quality_fails": [
+     "非正值 1"
+    ],
+    "backtest_blockers": [
+     "非正值 1",
+     "收益口径 return_basis=unknown，未获官方确认"
+    ]
+   },
+   "history_states": {
+    "history_retrieved": true,
+    "history_range_verified": true,
+    "history_coverage_adequate": true,
+    "history_quality_adequate": true,
+    "backtest_usable": false,
+    "primary_series_code": "H00905",
+    "note": "五项独立判定。backtest_usable 恒为 false，因为 return_basis 全为 unknown",
+    "coverage_ratio": 0.95635,
+    "real_start_date": "2004-12-31",
+    "has_baseline_placeholder": true,
+    "max_interior_gap_days": 12,
+    "quality_fails": [],
+    "backtest_blockers": [
+     "收益口径 return_basis=unknown，未获官方确认"
+    ]
+   }
   },
   {
    "index_code": "000906",
@@ -242,11 +754,9 @@
    "history_start": "2004-01-01",
    "history_end": "2026-11-23",
    "row_count": 5318,
-   "total_history_available": true,
    "total_history_start": "2004-01-01",
    "total_history_end": "2026-11-23",
    "total_row_count": 5318,
-   "net_history_available": true,
    "net_row_count": 5318,
    "max_gap_days": 365,
    "non_positive_close": 0,
@@ -293,15 +803,274 @@
    "net_history_end": "2026-11-23",
    "net_max_gap_days": 365,
    "net_non_positive_close": 1,
-   "layers": {
-    "code_identified": true,
-    "short_probe_ok": true,
-    "full_history_verified": true,
-    "note": "三层必须分别看：代码已识别 ≠ 短窗口可取 ≠ 完整历史可用"
-   },
    "coverage_category": "A_full_three_series_history",
    "short_probe_row_count": 7,
-   "short_probe_window": "20240102~20240110"
+   "short_probe_window": "20240102~20240110",
+   "price_quality": {
+    "status": "ok",
+    "index_name_returned": "中证800指数",
+    "request_range": [
+     "20040101",
+     "20261231"
+    ],
+    "rows": 5318,
+    "date_min": "2004-01-01",
+    "date_max": "2026-11-23",
+    "has_baseline_placeholder": true,
+    "placeholder_detail": {
+     "after": "2004-01-01",
+     "before": "2004-12-31",
+     "days": 365,
+     "position": "leading"
+    },
+    "real_start_date": "2004-12-31",
+    "real_rows_excluding_placeholder": 5317,
+    "max_gap_days": 365,
+    "max_interior_gap_days": 12,
+    "interior_gap_count": 6,
+    "all_gaps_gt_10d": [
+     {
+      "after": "2004-01-01",
+      "before": "2004-12-31",
+      "days": 365,
+      "position": "leading"
+     },
+     {
+      "after": "2005-02-04",
+      "before": "2005-02-16",
+      "days": 12,
+      "position": "interior"
+     },
+     {
+      "after": "2006-01-25",
+      "before": "2006-02-06",
+      "days": 12,
+      "position": "interior"
+     },
+     {
+      "after": "2020-01-23",
+      "before": "2020-02-03",
+      "days": 11,
+      "position": "interior"
+     },
+     {
+      "after": "2023-09-28",
+      "before": "2023-10-09",
+      "days": 11,
+      "position": "interior"
+     },
+     {
+      "after": "2024-02-08",
+      "before": "2024-02-19",
+      "days": 11,
+      "position": "interior"
+     },
+     {
+      "after": "2026-02-13",
+      "before": "2026-02-24",
+      "days": 11,
+      "position": "interior"
+     }
+    ],
+    "duplicate_dates": 0,
+    "null_close": 0,
+    "non_positive_close": 0,
+    "non_positive_dates": [],
+    "history_retrieved": true,
+    "history_range_verified": true,
+    "history_coverage_adequate": true,
+    "history_quality_adequate": true,
+    "backtest_usable": false,
+    "coverage_ratio": 0.95635,
+    "quality_fails": [],
+    "backtest_blockers": [
+     "收益口径 return_basis=unknown，未获官方确认"
+    ]
+   },
+   "total_return_quality": {
+    "status": "ok",
+    "index_name_returned": "中证800全收益指数",
+    "request_range": [
+     "20040101",
+     "20261231"
+    ],
+    "rows": 5318,
+    "date_min": "2004-01-01",
+    "date_max": "2026-11-23",
+    "has_baseline_placeholder": true,
+    "placeholder_detail": {
+     "after": "2004-01-01",
+     "before": "2004-12-31",
+     "days": 365,
+     "position": "leading"
+    },
+    "real_start_date": "2004-12-31",
+    "real_rows_excluding_placeholder": 5317,
+    "max_gap_days": 365,
+    "max_interior_gap_days": 12,
+    "interior_gap_count": 6,
+    "all_gaps_gt_10d": [
+     {
+      "after": "2004-01-01",
+      "before": "2004-12-31",
+      "days": 365,
+      "position": "leading"
+     },
+     {
+      "after": "2005-02-04",
+      "before": "2005-02-16",
+      "days": 12,
+      "position": "interior"
+     },
+     {
+      "after": "2006-01-25",
+      "before": "2006-02-06",
+      "days": 12,
+      "position": "interior"
+     },
+     {
+      "after": "2020-01-23",
+      "before": "2020-02-03",
+      "days": 11,
+      "position": "interior"
+     },
+     {
+      "after": "2023-09-28",
+      "before": "2023-10-09",
+      "days": 11,
+      "position": "interior"
+     },
+     {
+      "after": "2024-02-08",
+      "before": "2024-02-19",
+      "days": 11,
+      "position": "interior"
+     },
+     {
+      "after": "2026-02-13",
+      "before": "2026-02-24",
+      "days": 11,
+      "position": "interior"
+     }
+    ],
+    "duplicate_dates": 0,
+    "null_close": 0,
+    "non_positive_close": 0,
+    "non_positive_dates": [],
+    "history_retrieved": true,
+    "history_range_verified": true,
+    "history_coverage_adequate": true,
+    "history_quality_adequate": true,
+    "backtest_usable": false,
+    "coverage_ratio": 0.95635,
+    "quality_fails": [],
+    "backtest_blockers": [
+     "收益口径 return_basis=unknown，未获官方确认"
+    ]
+   },
+   "net_return_quality": {
+    "status": "ok",
+    "index_name_returned": "中证800净收益指数",
+    "request_range": [
+     "20040101",
+     "20261231"
+    ],
+    "rows": 5318,
+    "date_min": "2004-01-01",
+    "date_max": "2026-11-23",
+    "has_baseline_placeholder": true,
+    "placeholder_detail": {
+     "after": "2004-01-01",
+     "before": "2004-12-31",
+     "days": 365,
+     "position": "leading"
+    },
+    "real_start_date": "2004-12-31",
+    "real_rows_excluding_placeholder": 5317,
+    "max_gap_days": 365,
+    "max_interior_gap_days": 12,
+    "interior_gap_count": 6,
+    "all_gaps_gt_10d": [
+     {
+      "after": "2004-01-01",
+      "before": "2004-12-31",
+      "days": 365,
+      "position": "leading"
+     },
+     {
+      "after": "2005-02-04",
+      "before": "2005-02-16",
+      "days": 12,
+      "position": "interior"
+     },
+     {
+      "after": "2006-01-25",
+      "before": "2006-02-06",
+      "days": 12,
+      "position": "interior"
+     },
+     {
+      "after": "2020-01-23",
+      "before": "2020-02-03",
+      "days": 11,
+      "position": "interior"
+     },
+     {
+      "after": "2023-09-28",
+      "before": "2023-10-09",
+      "days": 11,
+      "position": "interior"
+     },
+     {
+      "after": "2024-02-08",
+      "before": "2024-02-19",
+      "days": 11,
+      "position": "interior"
+     },
+     {
+      "after": "2026-02-13",
+      "before": "2026-02-24",
+      "days": 11,
+      "position": "interior"
+     }
+    ],
+    "duplicate_dates": 0,
+    "null_close": 0,
+    "non_positive_close": 1,
+    "non_positive_dates": [
+     "2013-01-25"
+    ],
+    "history_retrieved": true,
+    "history_range_verified": true,
+    "history_coverage_adequate": true,
+    "history_quality_adequate": false,
+    "backtest_usable": false,
+    "coverage_ratio": 0.95635,
+    "quality_fails": [
+     "非正值 1"
+    ],
+    "backtest_blockers": [
+     "非正值 1",
+     "收益口径 return_basis=unknown，未获官方确认"
+    ]
+   },
+   "history_states": {
+    "history_retrieved": true,
+    "history_range_verified": true,
+    "history_coverage_adequate": true,
+    "history_quality_adequate": true,
+    "backtest_usable": false,
+    "primary_series_code": "H00906",
+    "note": "五项独立判定。backtest_usable 恒为 false，因为 return_basis 全为 unknown",
+    "coverage_ratio": 0.95635,
+    "real_start_date": "2004-12-31",
+    "has_baseline_placeholder": true,
+    "max_interior_gap_days": 12,
+    "quality_fails": [],
+    "backtest_blockers": [
+     "收益口径 return_basis=unknown，未获官方确认"
+    ]
+   }
   },
   {
    "index_code": "000016",
@@ -319,11 +1088,9 @@
    "history_start": "2004-01-01",
    "history_end": "2026-11-23",
    "row_count": 5560,
-   "total_history_available": true,
    "total_history_start": "2004-01-01",
    "total_history_end": "2026-11-23",
    "total_row_count": 5560,
-   "net_history_available": true,
    "net_row_count": 5560,
    "max_gap_days": 13,
    "non_positive_close": 0,
@@ -370,15 +1137,259 @@
    "net_history_end": "2026-11-23",
    "net_max_gap_days": 13,
    "net_non_positive_close": 1,
-   "layers": {
-    "code_identified": true,
-    "short_probe_ok": true,
-    "full_history_verified": true,
-    "note": "三层必须分别看：代码已识别 ≠ 短窗口可取 ≠ 完整历史可用"
-   },
    "coverage_category": "A_full_three_series_history",
    "short_probe_row_count": 7,
-   "short_probe_window": "20240102~20240110"
+   "short_probe_window": "20240102~20240110",
+   "price_quality": {
+    "status": "ok",
+    "index_name_returned": "上证50指数",
+    "request_range": [
+     "20040101",
+     "20261231"
+    ],
+    "rows": 5560,
+    "date_min": "2004-01-01",
+    "date_max": "2026-11-23",
+    "has_baseline_placeholder": false,
+    "placeholder_detail": null,
+    "real_start_date": "2004-01-01",
+    "real_rows_excluding_placeholder": 5560,
+    "max_gap_days": 13,
+    "max_interior_gap_days": 13,
+    "interior_gap_count": 7,
+    "all_gaps_gt_10d": [
+     {
+      "after": "2004-01-16",
+      "before": "2004-01-29",
+      "days": 13,
+      "position": "interior"
+     },
+     {
+      "after": "2005-02-04",
+      "before": "2005-02-16",
+      "days": 12,
+      "position": "interior"
+     },
+     {
+      "after": "2006-01-25",
+      "before": "2006-02-06",
+      "days": 12,
+      "position": "interior"
+     },
+     {
+      "after": "2020-01-23",
+      "before": "2020-02-03",
+      "days": 11,
+      "position": "interior"
+     },
+     {
+      "after": "2023-09-28",
+      "before": "2023-10-09",
+      "days": 11,
+      "position": "interior"
+     },
+     {
+      "after": "2024-02-08",
+      "before": "2024-02-19",
+      "days": 11,
+      "position": "interior"
+     },
+     {
+      "after": "2026-02-13",
+      "before": "2026-02-24",
+      "days": 11,
+      "position": "interior"
+     }
+    ],
+    "duplicate_dates": 0,
+    "null_close": 0,
+    "non_positive_close": 0,
+    "non_positive_dates": [],
+    "history_retrieved": true,
+    "history_range_verified": true,
+    "history_coverage_adequate": true,
+    "history_quality_adequate": true,
+    "backtest_usable": false,
+    "coverage_ratio": 1.0,
+    "quality_fails": [],
+    "backtest_blockers": [
+     "收益口径 return_basis=unknown，未获官方确认"
+    ]
+   },
+   "total_return_quality": {
+    "status": "ok",
+    "index_name_returned": "上证50全收益指数",
+    "request_range": [
+     "20040101",
+     "20261231"
+    ],
+    "rows": 5560,
+    "date_min": "2004-01-01",
+    "date_max": "2026-11-23",
+    "has_baseline_placeholder": false,
+    "placeholder_detail": null,
+    "real_start_date": "2004-01-01",
+    "real_rows_excluding_placeholder": 5560,
+    "max_gap_days": 13,
+    "max_interior_gap_days": 13,
+    "interior_gap_count": 7,
+    "all_gaps_gt_10d": [
+     {
+      "after": "2004-01-16",
+      "before": "2004-01-29",
+      "days": 13,
+      "position": "interior"
+     },
+     {
+      "after": "2005-02-04",
+      "before": "2005-02-16",
+      "days": 12,
+      "position": "interior"
+     },
+     {
+      "after": "2006-01-25",
+      "before": "2006-02-06",
+      "days": 12,
+      "position": "interior"
+     },
+     {
+      "after": "2020-01-23",
+      "before": "2020-02-03",
+      "days": 11,
+      "position": "interior"
+     },
+     {
+      "after": "2023-09-28",
+      "before": "2023-10-09",
+      "days": 11,
+      "position": "interior"
+     },
+     {
+      "after": "2024-02-08",
+      "before": "2024-02-19",
+      "days": 11,
+      "position": "interior"
+     },
+     {
+      "after": "2026-02-13",
+      "before": "2026-02-24",
+      "days": 11,
+      "position": "interior"
+     }
+    ],
+    "duplicate_dates": 0,
+    "null_close": 0,
+    "non_positive_close": 0,
+    "non_positive_dates": [],
+    "history_retrieved": true,
+    "history_range_verified": true,
+    "history_coverage_adequate": true,
+    "history_quality_adequate": true,
+    "backtest_usable": false,
+    "coverage_ratio": 1.0,
+    "quality_fails": [],
+    "backtest_blockers": [
+     "收益口径 return_basis=unknown，未获官方确认"
+    ]
+   },
+   "net_return_quality": {
+    "status": "ok",
+    "index_name_returned": "上证50净收益指数",
+    "request_range": [
+     "20040101",
+     "20261231"
+    ],
+    "rows": 5560,
+    "date_min": "2004-01-01",
+    "date_max": "2026-11-23",
+    "has_baseline_placeholder": false,
+    "placeholder_detail": null,
+    "real_start_date": "2004-01-01",
+    "real_rows_excluding_placeholder": 5560,
+    "max_gap_days": 13,
+    "max_interior_gap_days": 13,
+    "interior_gap_count": 7,
+    "all_gaps_gt_10d": [
+     {
+      "after": "2004-01-16",
+      "before": "2004-01-29",
+      "days": 13,
+      "position": "interior"
+     },
+     {
+      "after": "2005-02-04",
+      "before": "2005-02-16",
+      "days": 12,
+      "position": "interior"
+     },
+     {
+      "after": "2006-01-25",
+      "before": "2006-02-06",
+      "days": 12,
+      "position": "interior"
+     },
+     {
+      "after": "2020-01-23",
+      "before": "2020-02-03",
+      "days": 11,
+      "position": "interior"
+     },
+     {
+      "after": "2023-09-28",
+      "before": "2023-10-09",
+      "days": 11,
+      "position": "interior"
+     },
+     {
+      "after": "2024-02-08",
+      "before": "2024-02-19",
+      "days": 11,
+      "position": "interior"
+     },
+     {
+      "after": "2026-02-13",
+      "before": "2026-02-24",
+      "days": 11,
+      "position": "interior"
+     }
+    ],
+    "duplicate_dates": 0,
+    "null_close": 0,
+    "non_positive_close": 1,
+    "non_positive_dates": [
+     "2013-01-25"
+    ],
+    "history_retrieved": true,
+    "history_range_verified": true,
+    "history_coverage_adequate": true,
+    "history_quality_adequate": false,
+    "backtest_usable": false,
+    "coverage_ratio": 1.0,
+    "quality_fails": [
+     "非正值 1"
+    ],
+    "backtest_blockers": [
+     "非正值 1",
+     "收益口径 return_basis=unknown，未获官方确认"
+    ]
+   },
+   "history_states": {
+    "history_retrieved": true,
+    "history_range_verified": true,
+    "history_coverage_adequate": true,
+    "history_quality_adequate": true,
+    "backtest_usable": false,
+    "primary_series_code": "H00016",
+    "note": "五项独立判定。backtest_usable 恒为 false，因为 return_basis 全为 unknown",
+    "coverage_ratio": 1.0,
+    "real_start_date": "2004-01-01",
+    "has_baseline_placeholder": false,
+    "max_interior_gap_days": 13,
+    "quality_fails": [],
+    "backtest_blockers": [
+     "收益口径 return_basis=unknown，未获官方确认"
+    ]
+   }
   },
   {
    "index_code": "399997",
@@ -396,11 +1407,9 @@
    "history_start": "2004-01-01",
    "history_end": "2026-11-23",
    "row_count": 4346,
-   "total_history_available": true,
    "total_history_start": "2004-01-01",
    "total_history_end": "2026-11-23",
    "total_row_count": 4347,
-   "net_history_available": true,
    "net_row_count": 4346,
    "max_gap_days": 1831,
    "non_positive_close": 0,
@@ -448,15 +1457,237 @@
    "net_history_end": "2026-11-23",
    "net_max_gap_days": 1826,
    "net_non_positive_close": 0,
-   "layers": {
-    "code_identified": true,
-    "short_probe_ok": true,
-    "full_history_verified": true,
-    "note": "三层必须分别看：代码已识别 ≠ 短窗口可取 ≠ 完整历史可用"
-   },
    "coverage_category": "A_full_three_series_history",
    "short_probe_row_count": 7,
-   "short_probe_window": "20240102~20240110"
+   "short_probe_window": "20240102~20240110",
+   "price_quality": {
+    "status": "ok",
+    "index_name_returned": "中证白酒指数",
+    "request_range": [
+     "20040101",
+     "20261231"
+    ],
+    "rows": 4346,
+    "date_min": "2004-01-01",
+    "date_max": "2026-11-23",
+    "has_baseline_placeholder": true,
+    "placeholder_detail": {
+     "after": "2004-01-01",
+     "before": "2009-01-05",
+     "days": 1831,
+     "position": "leading"
+    },
+    "real_start_date": "2009-01-05",
+    "real_rows_excluding_placeholder": 4345,
+    "max_gap_days": 1831,
+    "max_interior_gap_days": 11,
+    "interior_gap_count": 4,
+    "all_gaps_gt_10d": [
+     {
+      "after": "2004-01-01",
+      "before": "2009-01-05",
+      "days": 1831,
+      "position": "leading"
+     },
+     {
+      "after": "2020-01-23",
+      "before": "2020-02-03",
+      "days": 11,
+      "position": "interior"
+     },
+     {
+      "after": "2023-09-28",
+      "before": "2023-10-09",
+      "days": 11,
+      "position": "interior"
+     },
+     {
+      "after": "2024-02-08",
+      "before": "2024-02-19",
+      "days": 11,
+      "position": "interior"
+     },
+     {
+      "after": "2026-02-13",
+      "before": "2026-02-24",
+      "days": 11,
+      "position": "interior"
+     }
+    ],
+    "duplicate_dates": 0,
+    "null_close": 0,
+    "non_positive_close": 0,
+    "non_positive_dates": [],
+    "history_retrieved": true,
+    "history_range_verified": true,
+    "history_coverage_adequate": false,
+    "history_quality_adequate": true,
+    "backtest_usable": false,
+    "coverage_ratio": 0.781033,
+    "quality_fails": [],
+    "backtest_blockers": [
+     "历史起点晚（2009-01-05），覆盖率 78.1%",
+     "收益口径 return_basis=unknown，未获官方确认"
+    ]
+   },
+   "total_return_quality": {
+    "status": "ok",
+    "index_name_returned": "中证白酒全收益指数",
+    "request_range": [
+     "20040101",
+     "20261231"
+    ],
+    "rows": 4347,
+    "date_min": "2004-01-01",
+    "date_max": "2026-11-23",
+    "has_baseline_placeholder": true,
+    "placeholder_detail": {
+     "after": "2004-01-01",
+     "before": "2008-12-31",
+     "days": 1826,
+     "position": "leading"
+    },
+    "real_start_date": "2008-12-31",
+    "real_rows_excluding_placeholder": 4346,
+    "max_gap_days": 1826,
+    "max_interior_gap_days": 11,
+    "interior_gap_count": 4,
+    "all_gaps_gt_10d": [
+     {
+      "after": "2004-01-01",
+      "before": "2008-12-31",
+      "days": 1826,
+      "position": "leading"
+     },
+     {
+      "after": "2020-01-23",
+      "before": "2020-02-03",
+      "days": 11,
+      "position": "interior"
+     },
+     {
+      "after": "2023-09-28",
+      "before": "2023-10-09",
+      "days": 11,
+      "position": "interior"
+     },
+     {
+      "after": "2024-02-08",
+      "before": "2024-02-19",
+      "days": 11,
+      "position": "interior"
+     },
+     {
+      "after": "2026-02-13",
+      "before": "2026-02-24",
+      "days": 11,
+      "position": "interior"
+     }
+    ],
+    "duplicate_dates": 0,
+    "null_close": 0,
+    "non_positive_close": 0,
+    "non_positive_dates": [],
+    "history_retrieved": true,
+    "history_range_verified": true,
+    "history_coverage_adequate": false,
+    "history_quality_adequate": true,
+    "backtest_usable": false,
+    "coverage_ratio": 0.781631,
+    "quality_fails": [],
+    "backtest_blockers": [
+     "历史起点晚（2008-12-31），覆盖率 78.2%",
+     "收益口径 return_basis=unknown，未获官方确认"
+    ]
+   },
+   "net_return_quality": {
+    "status": "ok",
+    "index_name_returned": "中证白酒净收益指数",
+    "request_range": [
+     "20040101",
+     "20261231"
+    ],
+    "rows": 4346,
+    "date_min": "2004-01-01",
+    "date_max": "2026-11-23",
+    "has_baseline_placeholder": true,
+    "placeholder_detail": {
+     "after": "2004-01-01",
+     "before": "2008-12-31",
+     "days": 1826,
+     "position": "leading"
+    },
+    "real_start_date": "2008-12-31",
+    "real_rows_excluding_placeholder": 4345,
+    "max_gap_days": 1826,
+    "max_interior_gap_days": 11,
+    "interior_gap_count": 4,
+    "all_gaps_gt_10d": [
+     {
+      "after": "2004-01-01",
+      "before": "2008-12-31",
+      "days": 1826,
+      "position": "leading"
+     },
+     {
+      "after": "2020-01-23",
+      "before": "2020-02-03",
+      "days": 11,
+      "position": "interior"
+     },
+     {
+      "after": "2023-09-28",
+      "before": "2023-10-09",
+      "days": 11,
+      "position": "interior"
+     },
+     {
+      "after": "2024-02-08",
+      "before": "2024-02-19",
+      "days": 11,
+      "position": "interior"
+     },
+     {
+      "after": "2026-02-13",
+      "before": "2026-02-24",
+      "days": 11,
+      "position": "interior"
+     }
+    ],
+    "duplicate_dates": 0,
+    "null_close": 0,
+    "non_positive_close": 0,
+    "non_positive_dates": [],
+    "history_retrieved": true,
+    "history_range_verified": true,
+    "history_coverage_adequate": false,
+    "history_quality_adequate": true,
+    "backtest_usable": false,
+    "coverage_ratio": 0.781631,
+    "quality_fails": [],
+    "backtest_blockers": [
+     "历史起点晚（2008-12-31），覆盖率 78.2%",
+     "收益口径 return_basis=unknown，未获官方确认"
+    ]
+   },
+   "history_states": {
+    "history_retrieved": true,
+    "history_range_verified": true,
+    "history_coverage_adequate": false,
+    "history_quality_adequate": true,
+    "backtest_usable": false,
+    "primary_series_code": "H20539",
+    "note": "五项独立判定。backtest_usable 恒为 false，因为 return_basis 全为 unknown",
+    "coverage_ratio": 0.781631,
+    "real_start_date": "2008-12-31",
+    "has_baseline_placeholder": true,
+    "max_interior_gap_days": 11,
+    "quality_fails": [],
+    "backtest_blockers": [
+     "历史起点晚（2008-12-31），覆盖率 78.2%",
+     "收益口径 return_basis=unknown，未获官方确认"
+    ]
+   }
   },
   {
    "index_code": "H30184",
@@ -474,11 +1705,9 @@
    "history_start": "2004-01-01",
    "history_end": "2026-11-23",
    "row_count": 5317,
-   "total_history_available": true,
    "total_history_start": "2004-01-01",
    "total_history_end": "2026-11-23",
    "total_row_count": 5317,
-   "net_history_available": false,
    "net_row_count": null,
    "max_gap_days": 369,
    "non_positive_close": 1,
@@ -526,15 +1755,202 @@
    "net_history_end": null,
    "net_max_gap_days": null,
    "net_non_positive_close": null,
-   "layers": {
-    "code_identified": true,
-    "short_probe_ok": true,
-    "full_history_verified": true,
-    "note": "三层必须分别看：代码已识别 ≠ 短窗口可取 ≠ 完整历史可用"
-   },
    "coverage_category": "B_price_and_total_history",
    "short_probe_row_count": 7,
-   "short_probe_window": "20240102~20240110"
+   "short_probe_window": "20240102~20240110",
+   "price_quality": {
+    "status": "ok",
+    "index_name_returned": "中证全指半导体产品与设备指数",
+    "request_range": [
+     "20040101",
+     "20261231"
+    ],
+    "rows": 5317,
+    "date_min": "2004-01-01",
+    "date_max": "2026-11-23",
+    "has_baseline_placeholder": true,
+    "placeholder_detail": {
+     "after": "2004-01-01",
+     "before": "2005-01-04",
+     "days": 369,
+     "position": "leading"
+    },
+    "real_start_date": "2005-01-04",
+    "real_rows_excluding_placeholder": 5316,
+    "max_gap_days": 369,
+    "max_interior_gap_days": 12,
+    "interior_gap_count": 6,
+    "all_gaps_gt_10d": [
+     {
+      "after": "2004-01-01",
+      "before": "2005-01-04",
+      "days": 369,
+      "position": "leading"
+     },
+     {
+      "after": "2005-02-04",
+      "before": "2005-02-16",
+      "days": 12,
+      "position": "interior"
+     },
+     {
+      "after": "2006-01-25",
+      "before": "2006-02-06",
+      "days": 12,
+      "position": "interior"
+     },
+     {
+      "after": "2020-01-23",
+      "before": "2020-02-03",
+      "days": 11,
+      "position": "interior"
+     },
+     {
+      "after": "2023-09-28",
+      "before": "2023-10-09",
+      "days": 11,
+      "position": "interior"
+     },
+     {
+      "after": "2024-02-08",
+      "before": "2024-02-19",
+      "days": 11,
+      "position": "interior"
+     },
+     {
+      "after": "2026-02-13",
+      "before": "2026-02-24",
+      "days": 11,
+      "position": "interior"
+     }
+    ],
+    "duplicate_dates": 0,
+    "null_close": 0,
+    "non_positive_close": 1,
+    "non_positive_dates": [
+     "2013-06-28"
+    ],
+    "history_retrieved": true,
+    "history_range_verified": true,
+    "history_coverage_adequate": true,
+    "history_quality_adequate": false,
+    "backtest_usable": false,
+    "coverage_ratio": 0.955872,
+    "quality_fails": [
+     "非正值 1"
+    ],
+    "backtest_blockers": [
+     "非正值 1",
+     "收益口径 return_basis=unknown，未获官方确认"
+    ]
+   },
+   "total_return_quality": {
+    "status": "ok",
+    "index_name_returned": "中证全指半导体产品与设备全收益指数",
+    "request_range": [
+     "20040101",
+     "20261231"
+    ],
+    "rows": 5317,
+    "date_min": "2004-01-01",
+    "date_max": "2026-11-23",
+    "has_baseline_placeholder": true,
+    "placeholder_detail": {
+     "after": "2004-01-01",
+     "before": "2005-01-04",
+     "days": 369,
+     "position": "leading"
+    },
+    "real_start_date": "2005-01-04",
+    "real_rows_excluding_placeholder": 5316,
+    "max_gap_days": 369,
+    "max_interior_gap_days": 12,
+    "interior_gap_count": 6,
+    "all_gaps_gt_10d": [
+     {
+      "after": "2004-01-01",
+      "before": "2005-01-04",
+      "days": 369,
+      "position": "leading"
+     },
+     {
+      "after": "2005-02-04",
+      "before": "2005-02-16",
+      "days": 12,
+      "position": "interior"
+     },
+     {
+      "after": "2006-01-25",
+      "before": "2006-02-06",
+      "days": 12,
+      "position": "interior"
+     },
+     {
+      "after": "2020-01-23",
+      "before": "2020-02-03",
+      "days": 11,
+      "position": "interior"
+     },
+     {
+      "after": "2023-09-28",
+      "before": "2023-10-09",
+      "days": 11,
+      "position": "interior"
+     },
+     {
+      "after": "2024-02-08",
+      "before": "2024-02-19",
+      "days": 11,
+      "position": "interior"
+     },
+     {
+      "after": "2026-02-13",
+      "before": "2026-02-24",
+      "days": 11,
+      "position": "interior"
+     }
+    ],
+    "duplicate_dates": 0,
+    "null_close": 0,
+    "non_positive_close": 1,
+    "non_positive_dates": [
+     "2013-06-28"
+    ],
+    "history_retrieved": true,
+    "history_range_verified": true,
+    "history_coverage_adequate": true,
+    "history_quality_adequate": false,
+    "backtest_usable": false,
+    "coverage_ratio": 0.955872,
+    "quality_fails": [
+     "非正值 1"
+    ],
+    "backtest_blockers": [
+     "非正值 1",
+     "收益口径 return_basis=unknown，未获官方确认"
+    ]
+   },
+   "net_return_quality": null,
+   "history_states": {
+    "history_retrieved": true,
+    "history_range_verified": true,
+    "history_coverage_adequate": true,
+    "history_quality_adequate": false,
+    "backtest_usable": false,
+    "primary_series_code": "H20184",
+    "note": "五项独立判定。backtest_usable 恒为 false，因为 return_basis 全为 unknown",
+    "coverage_ratio": 0.955872,
+    "real_start_date": "2005-01-04",
+    "has_baseline_placeholder": true,
+    "max_interior_gap_days": 12,
+    "quality_fails": [
+     "非正值 1"
+    ],
+    "backtest_blockers": [
+     "非正值 1",
+     "收益口径 return_basis=unknown，未获官方确认"
+    ]
+   }
   },
   {
    "index_code": "000942",
@@ -552,11 +1968,9 @@
    "history_start": "2004-01-01",
    "history_end": "2026-11-23",
    "row_count": 5318,
-   "total_history_available": true,
    "total_history_start": "2004-01-01",
    "total_history_end": "2026-11-23",
    "total_row_count": 5318,
-   "net_history_available": false,
    "net_row_count": null,
    "max_gap_days": 365,
    "non_positive_close": 0,
@@ -603,15 +2017,189 @@
    "net_history_end": null,
    "net_max_gap_days": null,
    "net_non_positive_close": null,
-   "layers": {
-    "code_identified": true,
-    "short_probe_ok": true,
-    "full_history_verified": true,
-    "note": "三层必须分别看：代码已识别 ≠ 短窗口可取 ≠ 完整历史可用"
-   },
    "coverage_category": "B_price_and_total_history",
    "short_probe_row_count": 7,
-   "short_probe_window": "20240102~20240110"
+   "short_probe_window": "20240102~20240110",
+   "price_quality": {
+    "status": "ok",
+    "index_name_returned": "中证内地消费主题指数",
+    "request_range": [
+     "20040101",
+     "20261231"
+    ],
+    "rows": 5318,
+    "date_min": "2004-01-01",
+    "date_max": "2026-11-23",
+    "has_baseline_placeholder": true,
+    "placeholder_detail": {
+     "after": "2004-01-01",
+     "before": "2004-12-31",
+     "days": 365,
+     "position": "leading"
+    },
+    "real_start_date": "2004-12-31",
+    "real_rows_excluding_placeholder": 5317,
+    "max_gap_days": 365,
+    "max_interior_gap_days": 12,
+    "interior_gap_count": 6,
+    "all_gaps_gt_10d": [
+     {
+      "after": "2004-01-01",
+      "before": "2004-12-31",
+      "days": 365,
+      "position": "leading"
+     },
+     {
+      "after": "2005-02-04",
+      "before": "2005-02-16",
+      "days": 12,
+      "position": "interior"
+     },
+     {
+      "after": "2006-01-25",
+      "before": "2006-02-06",
+      "days": 12,
+      "position": "interior"
+     },
+     {
+      "after": "2020-01-23",
+      "before": "2020-02-03",
+      "days": 11,
+      "position": "interior"
+     },
+     {
+      "after": "2023-09-28",
+      "before": "2023-10-09",
+      "days": 11,
+      "position": "interior"
+     },
+     {
+      "after": "2024-02-08",
+      "before": "2024-02-19",
+      "days": 11,
+      "position": "interior"
+     },
+     {
+      "after": "2026-02-13",
+      "before": "2026-02-24",
+      "days": 11,
+      "position": "interior"
+     }
+    ],
+    "duplicate_dates": 0,
+    "null_close": 0,
+    "non_positive_close": 0,
+    "non_positive_dates": [],
+    "history_retrieved": true,
+    "history_range_verified": true,
+    "history_coverage_adequate": true,
+    "history_quality_adequate": true,
+    "backtest_usable": false,
+    "coverage_ratio": 0.95635,
+    "quality_fails": [],
+    "backtest_blockers": [
+     "收益口径 return_basis=unknown，未获官方确认"
+    ]
+   },
+   "total_return_quality": {
+    "status": "ok",
+    "index_name_returned": "中证内地消费主题全收益指数",
+    "request_range": [
+     "20040101",
+     "20261231"
+    ],
+    "rows": 5318,
+    "date_min": "2004-01-01",
+    "date_max": "2026-11-23",
+    "has_baseline_placeholder": true,
+    "placeholder_detail": {
+     "after": "2004-01-01",
+     "before": "2004-12-31",
+     "days": 365,
+     "position": "leading"
+    },
+    "real_start_date": "2004-12-31",
+    "real_rows_excluding_placeholder": 5317,
+    "max_gap_days": 365,
+    "max_interior_gap_days": 12,
+    "interior_gap_count": 6,
+    "all_gaps_gt_10d": [
+     {
+      "after": "2004-01-01",
+      "before": "2004-12-31",
+      "days": 365,
+      "position": "leading"
+     },
+     {
+      "after": "2005-02-04",
+      "before": "2005-02-16",
+      "days": 12,
+      "position": "interior"
+     },
+     {
+      "after": "2006-01-25",
+      "before": "2006-02-06",
+      "days": 12,
+      "position": "interior"
+     },
+     {
+      "after": "2020-01-23",
+      "before": "2020-02-03",
+      "days": 11,
+      "position": "interior"
+     },
+     {
+      "after": "2023-09-28",
+      "before": "2023-10-09",
+      "days": 11,
+      "position": "interior"
+     },
+     {
+      "after": "2024-02-08",
+      "before": "2024-02-19",
+      "days": 11,
+      "position": "interior"
+     },
+     {
+      "after": "2026-02-13",
+      "before": "2026-02-24",
+      "days": 11,
+      "position": "interior"
+     }
+    ],
+    "duplicate_dates": 0,
+    "null_close": 0,
+    "non_positive_close": 0,
+    "non_positive_dates": [],
+    "history_retrieved": true,
+    "history_range_verified": true,
+    "history_coverage_adequate": true,
+    "history_quality_adequate": true,
+    "backtest_usable": false,
+    "coverage_ratio": 0.95635,
+    "quality_fails": [],
+    "backtest_blockers": [
+     "收益口径 return_basis=unknown，未获官方确认"
+    ]
+   },
+   "net_return_quality": null,
+   "history_states": {
+    "history_retrieved": true,
+    "history_range_verified": true,
+    "history_coverage_adequate": true,
+    "history_quality_adequate": true,
+    "backtest_usable": false,
+    "primary_series_code": "H00942",
+    "note": "五项独立判定。backtest_usable 恒为 false，因为 return_basis 全为 unknown",
+    "coverage_ratio": 0.95635,
+    "real_start_date": "2004-12-31",
+    "has_baseline_placeholder": true,
+    "max_interior_gap_days": 12,
+    "quality_fails": [],
+    "backtest_blockers": [
+     "收益口径 return_basis=unknown，未获官方确认"
+    ]
+   }
   },
   {
    "index_code": "000012",
@@ -629,11 +2217,9 @@
    "history_start": "2004-01-01",
    "history_end": "2026-11-23",
    "row_count": 5559,
-   "total_history_available": true,
    "total_history_start": "2004-01-01",
    "total_history_end": "2026-11-23",
    "total_row_count": 3373,
-   "net_history_available": false,
    "net_row_count": null,
    "max_gap_days": 13,
    "non_positive_close": 0,
@@ -702,12 +2288,6 @@
    "net_history_end": null,
    "net_max_gap_days": null,
    "net_non_positive_close": null,
-   "layers": {
-    "code_identified": true,
-    "short_probe_ok": true,
-    "full_history_verified": true,
-    "note": "三层必须分别看：代码已识别 ≠ 短窗口可取 ≠ 完整历史可用"
-   },
    "coverage_category": "special_bond_index",
    "clean_price_history_available": true,
    "clean_price_history_start": "2004-01-01",
@@ -715,7 +2295,172 @@
    "clean_price_row_count": 3373,
    "clean_price_max_gap_days": 3287,
    "short_probe_row_count": 7,
-   "short_probe_window": "20240102~20240110"
+   "short_probe_window": "20240102~20240110",
+   "price_quality": {
+    "status": "ok",
+    "index_name_returned": "上证国债指数",
+    "request_range": [
+     "20040101",
+     "20261231"
+    ],
+    "rows": 5559,
+    "date_min": "2004-01-01",
+    "date_max": "2026-11-23",
+    "has_baseline_placeholder": false,
+    "placeholder_detail": null,
+    "real_start_date": "2004-01-01",
+    "real_rows_excluding_placeholder": 5559,
+    "max_gap_days": 13,
+    "max_interior_gap_days": 13,
+    "interior_gap_count": 7,
+    "all_gaps_gt_10d": [
+     {
+      "after": "2004-01-16",
+      "before": "2004-01-29",
+      "days": 13,
+      "position": "interior"
+     },
+     {
+      "after": "2005-02-04",
+      "before": "2005-02-16",
+      "days": 12,
+      "position": "interior"
+     },
+     {
+      "after": "2006-01-25",
+      "before": "2006-02-06",
+      "days": 12,
+      "position": "interior"
+     },
+     {
+      "after": "2020-01-23",
+      "before": "2020-02-03",
+      "days": 11,
+      "position": "interior"
+     },
+     {
+      "after": "2023-09-28",
+      "before": "2023-10-09",
+      "days": 11,
+      "position": "interior"
+     },
+     {
+      "after": "2024-02-08",
+      "before": "2024-02-19",
+      "days": 11,
+      "position": "interior"
+     },
+     {
+      "after": "2026-02-13",
+      "before": "2026-02-24",
+      "days": 11,
+      "position": "interior"
+     }
+    ],
+    "duplicate_dates": 0,
+    "null_close": 0,
+    "non_positive_close": 0,
+    "non_positive_dates": [],
+    "history_retrieved": true,
+    "history_range_verified": true,
+    "history_coverage_adequate": true,
+    "history_quality_adequate": true,
+    "backtest_usable": false,
+    "coverage_ratio": 1.0,
+    "quality_fails": [],
+    "backtest_blockers": [
+     "收益口径 return_basis=unknown，未获官方确认"
+    ]
+   },
+   "total_return_quality": {
+    "status": "ok",
+    "index_name_returned": "上证国债指数(利息及再投资)",
+    "request_range": [
+     "20040101",
+     "20261231"
+    ],
+    "rows": 3373,
+    "date_min": "2004-01-01",
+    "date_max": "2026-11-23",
+    "has_baseline_placeholder": true,
+    "placeholder_detail": {
+     "after": "2004-01-01",
+     "before": "2012-12-31",
+     "days": 3287,
+     "position": "leading"
+    },
+    "real_start_date": "2012-12-31",
+    "real_rows_excluding_placeholder": 3372,
+    "max_gap_days": 3287,
+    "max_interior_gap_days": 11,
+    "interior_gap_count": 4,
+    "all_gaps_gt_10d": [
+     {
+      "after": "2004-01-01",
+      "before": "2012-12-31",
+      "days": 3287,
+      "position": "leading"
+     },
+     {
+      "after": "2020-01-23",
+      "before": "2020-02-03",
+      "days": 11,
+      "position": "interior"
+     },
+     {
+      "after": "2023-09-28",
+      "before": "2023-10-09",
+      "days": 11,
+      "position": "interior"
+     },
+     {
+      "after": "2024-02-08",
+      "before": "2024-02-19",
+      "days": 11,
+      "position": "interior"
+     },
+     {
+      "after": "2026-02-13",
+      "before": "2026-02-24",
+      "days": 11,
+      "position": "interior"
+     }
+    ],
+    "duplicate_dates": 0,
+    "null_close": 0,
+    "non_positive_close": 0,
+    "non_positive_dates": [],
+    "history_retrieved": true,
+    "history_range_verified": true,
+    "history_coverage_adequate": false,
+    "history_quality_adequate": true,
+    "backtest_usable": false,
+    "coverage_ratio": 0.606912,
+    "quality_fails": [],
+    "backtest_blockers": [
+     "历史起点晚（2012-12-31），覆盖率 60.7%",
+     "收益口径 return_basis=unknown，未获官方确认"
+    ]
+   },
+   "net_return_quality": null,
+   "history_states": {
+    "history_retrieved": true,
+    "history_range_verified": true,
+    "history_coverage_adequate": false,
+    "history_quality_adequate": true,
+    "backtest_usable": false,
+    "primary_series_code": "N00012",
+    "note": "五项独立判定。backtest_usable 恒为 false，因为 return_basis 全为 unknown",
+    "coverage_ratio": 0.606912,
+    "real_start_date": "2012-12-31",
+    "has_baseline_placeholder": true,
+    "max_interior_gap_days": 11,
+    "quality_fails": [],
+    "backtest_blockers": [
+     "历史起点晚（2012-12-31），覆盖率 60.7%",
+     "收益口径 return_basis=unknown，未获官方确认"
+    ]
+   }
   },
   {
    "index_code": "000922",
@@ -733,11 +2478,9 @@
    "history_start": "2004-01-01",
    "history_end": "2026-11-23",
    "row_count": 5318,
-   "total_history_available": true,
    "total_history_start": "2004-01-01",
    "total_history_end": "2026-11-23",
    "total_row_count": 5318,
-   "net_history_available": true,
    "net_row_count": 5317,
    "max_gap_days": 365,
    "non_positive_close": 0,
@@ -785,15 +2528,269 @@
    "net_history_end": "2026-11-23",
    "net_max_gap_days": 365,
    "net_non_positive_close": 0,
-   "layers": {
-    "code_identified": true,
-    "short_probe_ok": true,
-    "full_history_verified": true,
-    "note": "三层必须分别看：代码已识别 ≠ 短窗口可取 ≠ 完整历史可用"
-   },
    "coverage_category": "A_full_three_series_history",
    "short_probe_row_count": 7,
-   "short_probe_window": "20240102~20240110"
+   "short_probe_window": "20240102~20240110",
+   "price_quality": {
+    "status": "ok",
+    "index_name_returned": "中证红利指数",
+    "request_range": [
+     "20040101",
+     "20261231"
+    ],
+    "rows": 5318,
+    "date_min": "2004-01-01",
+    "date_max": "2026-11-23",
+    "has_baseline_placeholder": true,
+    "placeholder_detail": {
+     "after": "2004-01-01",
+     "before": "2004-12-31",
+     "days": 365,
+     "position": "leading"
+    },
+    "real_start_date": "2004-12-31",
+    "real_rows_excluding_placeholder": 5317,
+    "max_gap_days": 365,
+    "max_interior_gap_days": 12,
+    "interior_gap_count": 6,
+    "all_gaps_gt_10d": [
+     {
+      "after": "2004-01-01",
+      "before": "2004-12-31",
+      "days": 365,
+      "position": "leading"
+     },
+     {
+      "after": "2005-02-04",
+      "before": "2005-02-16",
+      "days": 12,
+      "position": "interior"
+     },
+     {
+      "after": "2006-01-25",
+      "before": "2006-02-06",
+      "days": 12,
+      "position": "interior"
+     },
+     {
+      "after": "2020-01-23",
+      "before": "2020-02-03",
+      "days": 11,
+      "position": "interior"
+     },
+     {
+      "after": "2023-09-28",
+      "before": "2023-10-09",
+      "days": 11,
+      "position": "interior"
+     },
+     {
+      "after": "2024-02-08",
+      "before": "2024-02-19",
+      "days": 11,
+      "position": "interior"
+     },
+     {
+      "after": "2026-02-13",
+      "before": "2026-02-24",
+      "days": 11,
+      "position": "interior"
+     }
+    ],
+    "duplicate_dates": 0,
+    "null_close": 0,
+    "non_positive_close": 0,
+    "non_positive_dates": [],
+    "history_retrieved": true,
+    "history_range_verified": true,
+    "history_coverage_adequate": true,
+    "history_quality_adequate": true,
+    "backtest_usable": false,
+    "coverage_ratio": 0.95635,
+    "quality_fails": [],
+    "backtest_blockers": [
+     "收益口径 return_basis=unknown，未获官方确认"
+    ]
+   },
+   "total_return_quality": {
+    "status": "ok",
+    "index_name_returned": "中证红利全收益指数",
+    "request_range": [
+     "20040101",
+     "20261231"
+    ],
+    "rows": 5318,
+    "date_min": "2004-01-01",
+    "date_max": "2026-11-23",
+    "has_baseline_placeholder": true,
+    "placeholder_detail": {
+     "after": "2004-01-01",
+     "before": "2004-12-31",
+     "days": 365,
+     "position": "leading"
+    },
+    "real_start_date": "2004-12-31",
+    "real_rows_excluding_placeholder": 5317,
+    "max_gap_days": 365,
+    "max_interior_gap_days": 12,
+    "interior_gap_count": 6,
+    "all_gaps_gt_10d": [
+     {
+      "after": "2004-01-01",
+      "before": "2004-12-31",
+      "days": 365,
+      "position": "leading"
+     },
+     {
+      "after": "2005-02-04",
+      "before": "2005-02-16",
+      "days": 12,
+      "position": "interior"
+     },
+     {
+      "after": "2006-01-25",
+      "before": "2006-02-06",
+      "days": 12,
+      "position": "interior"
+     },
+     {
+      "after": "2020-01-23",
+      "before": "2020-02-03",
+      "days": 11,
+      "position": "interior"
+     },
+     {
+      "after": "2023-09-28",
+      "before": "2023-10-09",
+      "days": 11,
+      "position": "interior"
+     },
+     {
+      "after": "2024-02-08",
+      "before": "2024-02-19",
+      "days": 11,
+      "position": "interior"
+     },
+     {
+      "after": "2026-02-13",
+      "before": "2026-02-24",
+      "days": 11,
+      "position": "interior"
+     }
+    ],
+    "duplicate_dates": 0,
+    "null_close": 0,
+    "non_positive_close": 0,
+    "non_positive_dates": [],
+    "history_retrieved": true,
+    "history_range_verified": true,
+    "history_coverage_adequate": true,
+    "history_quality_adequate": true,
+    "backtest_usable": false,
+    "coverage_ratio": 0.95635,
+    "quality_fails": [],
+    "backtest_blockers": [
+     "收益口径 return_basis=unknown，未获官方确认"
+    ]
+   },
+   "net_return_quality": {
+    "status": "ok",
+    "index_name_returned": "中证红利净收益指数",
+    "request_range": [
+     "20040101",
+     "20261231"
+    ],
+    "rows": 5317,
+    "date_min": "2004-01-01",
+    "date_max": "2026-11-23",
+    "has_baseline_placeholder": true,
+    "placeholder_detail": {
+     "after": "2004-01-01",
+     "before": "2004-12-31",
+     "days": 365,
+     "position": "leading"
+    },
+    "real_start_date": "2004-12-31",
+    "real_rows_excluding_placeholder": 5316,
+    "max_gap_days": 365,
+    "max_interior_gap_days": 12,
+    "interior_gap_count": 6,
+    "all_gaps_gt_10d": [
+     {
+      "after": "2004-01-01",
+      "before": "2004-12-31",
+      "days": 365,
+      "position": "leading"
+     },
+     {
+      "after": "2005-02-04",
+      "before": "2005-02-16",
+      "days": 12,
+      "position": "interior"
+     },
+     {
+      "after": "2006-01-25",
+      "before": "2006-02-06",
+      "days": 12,
+      "position": "interior"
+     },
+     {
+      "after": "2020-01-23",
+      "before": "2020-02-03",
+      "days": 11,
+      "position": "interior"
+     },
+     {
+      "after": "2023-09-28",
+      "before": "2023-10-09",
+      "days": 11,
+      "position": "interior"
+     },
+     {
+      "after": "2024-02-08",
+      "before": "2024-02-19",
+      "days": 11,
+      "position": "interior"
+     },
+     {
+      "after": "2026-02-13",
+      "before": "2026-02-24",
+      "days": 11,
+      "position": "interior"
+     }
+    ],
+    "duplicate_dates": 0,
+    "null_close": 0,
+    "non_positive_close": 0,
+    "non_positive_dates": [],
+    "history_retrieved": true,
+    "history_range_verified": true,
+    "history_coverage_adequate": true,
+    "history_quality_adequate": true,
+    "backtest_usable": false,
+    "coverage_ratio": 0.95635,
+    "quality_fails": [],
+    "backtest_blockers": [
+     "收益口径 return_basis=unknown，未获官方确认"
+    ]
+   },
+   "history_states": {
+    "history_retrieved": true,
+    "history_range_verified": true,
+    "history_coverage_adequate": true,
+    "history_quality_adequate": true,
+    "backtest_usable": false,
+    "primary_series_code": "H00922",
+    "note": "五项独立判定。backtest_usable 恒为 false，因为 return_basis 全为 unknown",
+    "coverage_ratio": 0.95635,
+    "real_start_date": "2004-12-31",
+    "has_baseline_placeholder": true,
+    "max_interior_gap_days": 12,
+    "quality_fails": [],
+    "backtest_blockers": [
+     "收益口径 return_basis=unknown，未获官方确认"
+    ]
+   }
   },
   {
    "index_code": "930930",
@@ -811,11 +2808,9 @@
    "history_start": "2004-01-01",
    "history_end": "2026-11-23",
    "row_count": 3000,
-   "total_history_available": true,
    "total_history_start": "2004-01-01",
    "total_history_end": "2026-11-23",
    "total_row_count": 3000,
-   "net_history_available": false,
    "net_row_count": null,
    "max_gap_days": 3970,
    "non_positive_close": 0,
@@ -862,15 +2857,120 @@
    "net_history_end": null,
    "net_max_gap_days": null,
    "net_non_positive_close": null,
-   "layers": {
-    "code_identified": true,
-    "short_probe_ok": true,
-    "full_history_verified": true,
-    "note": "三层必须分别看：代码已识别 ≠ 短窗口可取 ≠ 完整历史可用"
-   },
    "coverage_category": "B_price_and_total_history",
    "short_probe_row_count": 7,
-   "short_probe_window": "20240102~20240110"
+   "short_probe_window": "20240102~20240110",
+   "price_quality": {
+    "status": "ok",
+    "index_name_returned": "中证港股通综合指数",
+    "request_range": [
+     "20040101",
+     "20261231"
+    ],
+    "rows": 3000,
+    "date_min": "2004-01-01",
+    "date_max": "2026-11-23",
+    "has_baseline_placeholder": true,
+    "placeholder_detail": {
+     "after": "2004-01-01",
+     "before": "2014-11-14",
+     "days": 3970,
+     "position": "leading"
+    },
+    "real_start_date": "2014-11-14",
+    "real_rows_excluding_placeholder": 2999,
+    "max_gap_days": 3970,
+    "max_interior_gap_days": 0,
+    "interior_gap_count": 0,
+    "all_gaps_gt_10d": [
+     {
+      "after": "2004-01-01",
+      "before": "2014-11-14",
+      "days": 3970,
+      "position": "leading"
+     }
+    ],
+    "duplicate_dates": 0,
+    "null_close": 0,
+    "non_positive_close": 0,
+    "non_positive_dates": [],
+    "history_retrieved": true,
+    "history_range_verified": true,
+    "history_coverage_adequate": false,
+    "history_quality_adequate": true,
+    "backtest_usable": false,
+    "coverage_ratio": 0.525233,
+    "quality_fails": [],
+    "backtest_blockers": [
+     "历史起点晚（2014-11-14），覆盖率 52.5%",
+     "收益口径 return_basis=unknown，未获官方确认"
+    ]
+   },
+   "total_return_quality": {
+    "status": "ok",
+    "index_name_returned": "中证港股通综合全收益指数",
+    "request_range": [
+     "20040101",
+     "20261231"
+    ],
+    "rows": 3000,
+    "date_min": "2004-01-01",
+    "date_max": "2026-11-23",
+    "has_baseline_placeholder": true,
+    "placeholder_detail": {
+     "after": "2004-01-01",
+     "before": "2014-11-14",
+     "days": 3970,
+     "position": "leading"
+    },
+    "real_start_date": "2014-11-14",
+    "real_rows_excluding_placeholder": 2999,
+    "max_gap_days": 3970,
+    "max_interior_gap_days": 0,
+    "interior_gap_count": 0,
+    "all_gaps_gt_10d": [
+     {
+      "after": "2004-01-01",
+      "before": "2014-11-14",
+      "days": 3970,
+      "position": "leading"
+     }
+    ],
+    "duplicate_dates": 0,
+    "null_close": 0,
+    "non_positive_close": 0,
+    "non_positive_dates": [],
+    "history_retrieved": true,
+    "history_range_verified": true,
+    "history_coverage_adequate": false,
+    "history_quality_adequate": true,
+    "backtest_usable": false,
+    "coverage_ratio": 0.525233,
+    "quality_fails": [],
+    "backtest_blockers": [
+     "历史起点晚（2014-11-14），覆盖率 52.5%",
+     "收益口径 return_basis=unknown，未获官方确认"
+    ]
+   },
+   "net_return_quality": null,
+   "history_states": {
+    "history_retrieved": true,
+    "history_range_verified": true,
+    "history_coverage_adequate": false,
+    "history_quality_adequate": true,
+    "backtest_usable": false,
+    "primary_series_code": "H20930",
+    "note": "五项独立判定。backtest_usable 恒为 false，因为 return_basis 全为 unknown",
+    "coverage_ratio": 0.525233,
+    "real_start_date": "2014-11-14",
+    "has_baseline_placeholder": true,
+    "max_interior_gap_days": 0,
+    "quality_fails": [],
+    "backtest_blockers": [
+     "历史起点晚（2014-11-14），覆盖率 52.5%",
+     "收益口径 return_basis=unknown，未获官方确认"
+    ]
+   }
   }
  ],
  "critical_findings": {
@@ -960,5 +3060,24 @@
    "fix": "从证据附件复制真实元数据（URL/字节/页数/sha256/衍生代码）",
    "count": 10
   }
+ },
+ "correction_103": {
+  "round": "3B-6.1.0.3",
+  "issue": "full_history_verified 语义过宽，把「接口取到数据」当成了「覆盖与质量达标」",
+  "fix": "拆分为五态独立判定，且按经济语义分开统计",
+  "removed_fields": [
+   "layers",
+   "full_history_verified",
+   "total_history_available",
+   "net_history_available",
+   "full_history_verified_total_return"
+  ],
+  "added_fields": [
+   "history_states（五态）",
+   "price_quality",
+   "total_return_quality",
+   "net_return_quality"
+  ],
+  "backtest_usable_reason_always_false": "return_basis 全部 unknown"
  }
 }

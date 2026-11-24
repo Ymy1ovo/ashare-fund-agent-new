@@ -1,25 +1,29 @@
 {
- "phase": "3B-6.1.0.2",
+ "phase": "3B-6.1.0.3",
  "step": "06_tests",
- "baseline_head": "f570012330e650f219acebe1f37cfe934c141475",
- "generated_at": "2026-11-24 17:08",
+ "baseline_head": "472f4a531da250cfe301c22c4668f52ac760a470",
+ "generated_at": "2026-11-24 17:39",
  "new_tests": [
+  {
+   "file": "tests/test_3b6_1_0_3_coverage.py",
+   "count": 22,
+   "passed": 22,
+   "skipped": 0,
+   "seconds": 0.52
+  }
+ ],
+ "modified_tests": [
   {
    "file": "tests/test_3b6_1_0_2_consistency.py",
    "count": 27,
-   "passed": 27,
-   "skipped": 0,
-   "seconds": 0.76
+   "change": "三层->五态，仍27项，零删除零弱化"
   },
   {
    "file": "tests/test_3b6_1_0_2_hist_evidence.py",
    "count": 7,
-   "passed": 7,
-   "skipped": 0,
-   "seconds": 0.46
+   "change": "改读 coverage_quality_probe，仍7项"
   }
  ],
- "total_new": 34,
  "covered_items": [
   1,
   2,
@@ -34,24 +38,23 @@
   11,
   12
  ],
- "covered_items_note": "12 项任务4要求全部覆盖，测试详情见报告 0.1 节",
- "no_hardcoded_stats": true,
+ "no_hardcoded_expectations": true,
  "full_pytest": {
-  "passed": 1979,
+  "passed": 2001,
   "failed": 0,
   "errors": 0,
   "skipped": 0,
-  "seconds": 827.01,
+  "seconds": 778.48,
   "executed": true
  },
  "evolution": {
-  "3B-6.1.0.1": 1945,
   "3B-6.1.0.2": 1979,
-  "delta": 34
+  "3B-6.1.0.3": 2001,
+  "delta": 22
  },
  "regression": {
-  "3b6_1_0_and_1_0_1": {
-   "passed": 43
+  "3b6_1_0_suite": {
+   "passed": 99
   },
   "3b6_0_4_1_suite": {
    "passed": 88
@@ -63,27 +66,29 @@
   "pdf text extraction"
  ],
  "data_source_calls": {
-  "full_history_probe": 17,
-  "short_probe": 0,
-  "pdf_download": 0,
-  "total": 17
+  "coverage_quality_probe": 27,
+  "total": 27
  },
  "not_executed": [
   {
-   "item": "重新下载核验官方PDF",
-   "reason": "复用3B-6.1.0.1已下载文件"
+   "item": "重新下载官方PDF",
+   "reason": "复用上轮文件，sha256已记录"
   },
   {
    "item": "独立第二数据源交叉验证",
-   "reason": "上轮已确认东财限流"
+   "reason": "东财限流未解决"
   },
   {
    "item": "中债债券指数接口探测",
-   "reason": "本轮范围限定为一致性修正"
+   "reason": "超出本轮范围"
   },
   {
    "item": "历史权重官方文件检索",
    "reason": "同上"
+  },
+  {
+   "item": "000051合同原文核验",
+   "reason": "沿用平台基准文本"
   }
  ],
  "database_readonly": {
@@ -99,20 +104,6 @@
    "benchmark_composite_component": 34,
    "fund_master": 120
   }
- },
- "code_changes": {
-  "new_tests": [
-   "tests/test_3b6_1_0_2_consistency.py",
-   "tests/test_3b6_1_0_2_hist_evidence.py"
-  ],
-  "modified_evidence": [
-   "reports/evidence/phase3B6_1_0_index_probe_evidence.json"
-  ],
-  "modified_reports": true,
-  "business_code_modified": false,
-  "schema_changed": false,
-  "tests_deleted": 0,
-  "tests_weakened": 0
  },
  "gate": {
   "ready_for_research_analysis": true,

@@ -67,22 +67,34 @@ def ev() -> dict:
 
 # ================================================================ 1. summary 一致性
 def test_summary_counts_equal_detail_lengths(r01):
-    """JSON summary 的每个分类数量必须等于 detail 数组长度。"""
-    summary = r01["summary"]
-    detail = summary["detail"]
-    by_cat = summary["by_coverage_category"]
-    assert set(by_cat.keys()) == set(detail.keys()), "分类键集不一致"
-    for key, count in by_cat.items():
-        assert count == len(detail[key]), \
-            f"{key}: summary={count} 但 detail 有 {len(detail[key])} 个"
+    """JSON summary 的每个统计数必须等于从 indexes 逐项复算的结果。
+
+    3B-6.1.0.3 起统计改为「按经济语义 + 五态」，不再是单一分类数组。
+    """
+    s = r01["summary"]
+    eq = s["equity_indexes_stats"]
+    equity = s["by_economic_semantics"]["equity_indexes"]
+    assert eq["count"] == len(equity)
+    for field, key in (
+        ("history_retrieved", "total_return_history_retrieved"),
+        ("history_range_verified", "total_return_history_range_verified"),
+        ("history_coverage_adequate", "total_return_history_coverage_adequate"),
+        ("history_quality_adequate", "total_return_history_quality_adequate"),
+        ("backtest_usable", "total_return_backtest_usable"),
+    ):
+        recalc = sum(1 for x in r01["indexes"]
+                     if x["index_code"] in equity
+                     and x["history_states"].get(field) is True)
+        assert eq[key] == recalc, f"{key}: summary={eq[key]} 复算={recalc}"
 
 
 def test_summary_categories_are_exhaustive_and_exclusive(r01):
-    """分类必须互斥且覆盖全部 10 个指数。"""
-    detail = r01["summary"]["detail"]
-    all_codes = [c for v in detail.values() for c in v]
-    assert len(all_codes) == len(set(all_codes)), "存在重复归类"
-    assert set(all_codes) == INDEX_CODES, "分类未覆盖全部指数"
+    """按经济语义的分组必须互斥且覆盖全部 10 个指数。"""
+    sem = r01["summary"]["by_economic_semantics"]
+    equity = set(sem["equity_indexes"])
+    bond = set(sem["special_bond_indexes"])
+    assert not (equity & bond), "股票与债券分组重叠"
+    assert equity | bond == INDEX_CODES, "分组未覆盖全部指数"
 
 
 def test_summary_total_matches_indexes(r01):
@@ -90,88 +102,74 @@ def test_summary_total_matches_indexes(r01):
     assert r01["summary"]["consistency_check"]["consistent"] is True
 
 
-def test_three_layers_are_not_conflated(r01):
-    """三层数量必须分别计算，且每层都由自己的证据决定，不得互相冒充。"""
-    L = r01["summary"]["by_layer"]
-    # 逻辑必然：完整历史可用 ⇒ 代码必然已识别（但反向不成立）
-    assert L["full_history_verified_total_return"] <= L["code_identified"]
-    # 汇总数必须等于逐指数计数，不得手工填写
-    assert L["code_identified"] == sum(
-        1 for x in r01["indexes"] if x["layers"]["code_identified"])
-    assert L["short_probe_ok"] == sum(
-        1 for x in r01["indexes"] if x["layers"]["short_probe_ok"])
-    assert L["full_history_verified_total_return"] == sum(
-        1 for x in r01["indexes"] if x["layers"]["full_history_verified"])
-    # 每个指数的 layers 字段必须自洽
+def test_five_states_are_independent(r01):
+    """五态必须各自独立判定，且汇总数可逐项复算。"""
+    s = r01["summary"]
+    eq = s["equity_indexes_stats"]
+    equity = s["by_economic_semantics"]["equity_indexes"]
+    for key, field in (
+        ("total_return_history_retrieved", "history_retrieved"),
+        ("total_return_history_coverage_adequate", "history_coverage_adequate"),
+        ("total_return_history_quality_adequate", "history_quality_adequate"),
+        ("total_return_backtest_usable", "backtest_usable"),
+    ):
+        recalc = sum(1 for x in r01["indexes"]
+                     if x["index_code"] in equity
+                     and x["history_states"].get(field) is True)
+        assert eq[key] == recalc
+    # 逻辑必然：可回测 ⇒ 质量达标 ⇒ 覆盖达标 ⇒ 已取到
     for x in r01["indexes"]:
-        lyr = x["layers"]
-        if lyr["full_history_verified"]:
-            assert lyr["code_identified"], \
-                f"{x['index_code']}: 完整历史可用却标代码未识别"
-            assert lyr["short_probe_ok"], \
-                f"{x['index_code']}: 完整历史可用却标短窗口不可用"
+        st = x["history_states"]
+        if st["backtest_usable"]:
+            assert st["history_quality_adequate"]
+            assert st["history_coverage_adequate"]
+            assert st["history_retrieved"]
 
 
-def test_layers_derived_from_real_evidence(r01, ev):
-    """每一层都必须能由证据附件的数据独立复算出来。"""
-    probe = {}
-    for e in ev["indexes"]:
-        for v in e["variants"]:
-            probe[v["request_code"]] = v
+def test_states_derived_from_real_evidence(r01, ev):
+    """每一态都必须能由证据附件的数据独立复算出来。"""
+    qb = ev["coverage_quality_probe"]["by_code"]
     for x in r01["indexes"]:
-        tc = x["total_return_index_code"]
-        has_code = tc is not None
-        assert x["layers"]["code_identified"] is has_code
-        short_ok = bool(tc and probe.get(tc, {}).get("status") == "ok")
-        assert x["layers"]["short_probe_ok"] is short_ok, \
-            f"{x['index_code']}: 短窗口状态与证据不符"
-        # 完整历史可用 ⇒ 必须有真实行数与起止日期
-        if x["layers"]["full_history_verified"]:
-            assert x["total_row_count"] and x["total_row_count"] > 0
-            assert x["total_history_start"] and x["total_history_end"]
+        code = x.get("total_return_index_code")
+        if not code or code not in qb:
+            continue
+        evq = qb[code]
+        st = x["history_states"]
+        assert st["history_retrieved"] == evq["history_retrieved"], \
+            f"{x['index_code']}: 取到状态与证据不符"
+        assert st["history_coverage_adequate"] == evq["history_coverage_adequate"]
+        assert st["history_quality_adequate"] == evq["history_quality_adequate"]
 
 
 # ================================================================ 2. MD 与 JSON 一致
 def test_markdown_category_counts_match_json(r01):
-    """Markdown 里每个分类的指数数必须与 JSON 一致。"""
+    """Markdown 里的五态比率必须与 JSON 统计一致。"""
     md = _md(MD01)
-    detail = r01["summary"]["detail"]
-    labels = r01["summary"]["category_labels"]
-    for key, codes in detail.items():
-        label = labels[key]
-        # MD 里该分类行必须包含 N
-        pattern = re.compile(rf"{re.escape(label)}[^|]*\|\s*\*\*(\d+)\*\*")
-        m = pattern.search(md)
-        if m:
-            assert int(m.group(1)) == len(codes), \
-                f"{key}: MD 写 {m.group(1)}，JSON 是 {len(codes)}"
+    eq = r01["summary"]["equity_indexes_stats"]
+    n = eq["count"]
+    for key in ("total_return_history_retrieved",
+                "total_return_history_range_verified",
+                "total_return_history_coverage_adequate",
+                "total_return_history_quality_adequate",
+                "total_return_backtest_usable"):
+        assert f"**{eq[key]}/{n}**" in md, f"MD 缺 {key}={eq[key]}/{n}"
 
 
-def test_markdown_three_layers_match_json(r01):
+def test_markdown_five_states_match_json(r01):
     md = _md(MD01)
-    L = r01["summary"]["by_layer"]
-    for key, val in (("code_identified", L["code_identified"]),
-                     ("short_probe_ok", L["short_probe_ok"]),
-                     ("full_history_verified_total_return",
-                      L["full_history_verified_total_return"])):
-        assert f"**{val} / 10**" in md, f"MD 缺 {key}={val}/10"
+    for x in r01["indexes"]:
+        assert f"| `{x['index_code']}` |" in md, f"MD 缺 {x['index_code']}"
 
 
 def test_markdown_does_not_claim_unverified_full_history(r01):
-    """MD 不得把无完整历史的指数标成完整历史可用。"""
+    """未达覆盖标准的指数，在 MD 与 JSON 中都不得标为覆盖达标。"""
     md = _md(MD01)
     for x in r01["indexes"]:
-        if x["layers"]["full_history_verified"]:
+        st = x["history_states"]
+        if st["history_coverage_adequate"]:
             continue
-        # 该指数在该表格行里，③ 列必须是 ❌
-        line = next((ln for ln in md.splitlines()
-                     if ln.startswith(f"| `{x['index_code']}` |")), None)
-        if line and "短窗口" in md.split("\n")[0:5]:
-            pass  # 表格格式检查在下面单独做
-    # 更直接：没有 full_history 的指数必须 total_history_available=False
-    for x in r01["indexes"]:
-        if not x["layers"]["full_history_verified"]:
-            assert x["total_history_available"] is False
+        assert st["coverage_ratio"] < 0.95, \
+            f"{x['index_code']}: 覆盖率 {st['coverage_ratio']} 却标未达标"
 
 
 # ================================================================ 3. factsheet 一致性
@@ -214,66 +212,59 @@ def test_markdown_factsheet_table_matches_json(r01):
 
 # ================================================================ 4-7. 三层不得混淆
 def test_code_identified_does_not_imply_full_history(r01):
-    """代码存在 ≠ 完整历史可用。"""
+    """代码存在 ≠ 历史覆盖达标。"""
     for x in r01["indexes"]:
         has_code = bool(x["total_return_index_code"])
-        has_hist = x["total_history_available"]
-        if has_code and not has_hist:
-            # 允许：代码已识别但历史未取到
-            assert x["layers"]["code_identified"] is True
-            assert x["layers"]["full_history_verified"] is False
-            continue
-        if not has_hist:
-            assert x["total_row_count"] is None
+        st = x["history_states"]
+        assert st["history_retrieved"] == has_code or st["history_retrieved"] is False
+        if has_code and not st["history_coverage_adequate"]:
+            assert st["coverage_ratio"] < 0.95
 
 
 def test_short_probe_does_not_imply_full_history(r01, ev):
-    """短窗口成功 ≠ 完整历史覆盖。"""
+    """短窗口成功 ≠ 覆盖达标。"""
+    probe = {}
+    for e in ev["indexes"]:
+        for v in e["variants"]:
+            probe[v["request_code"]] = v
     for x in r01["indexes"]:
-        lyr = x["layers"]
-        if lyr["short_probe_ok"] and not lyr["full_history_verified"]:
-            # 这是合法状态，但 total_history_available 必须为 False
-            assert x["total_history_available"] is False, \
-                f"{x['index_code']}: 短窗口成功但完整历史未验证，不得标记可用"
+        tc = x.get("total_return_index_code")
+        if not tc: continue
+        short_ok = probe.get(tc, {}).get("status") == "ok"
+        if short_ok and not x["history_states"]["history_coverage_adequate"]:
+            assert x["history_states"]["coverage_ratio"] < 0.95, \
+                f"{x['index_code']}: 短窗口成功但覆盖未达标，比率却 >= 0.95"
 
 
 def test_unavailable_history_not_marked_available(r01):
-    """完整历史不可用时字段必须为空，不能填占位值。"""
+    """覆盖未达标时必须给出可追溯的阻断原因。"""
     for x in r01["indexes"]:
-        if x["total_history_available"]:
-            assert x["total_row_count"] and x["total_row_count"] > 0
-            assert x["total_history_start"] and x["total_history_end"]
-        else:
-            assert x["total_row_count"] is None
-            assert x["total_history_start"] is None
-            assert x["total_history_end"] is None
+        st = x["history_states"]
+        if not st["history_coverage_adequate"]:
+            blockers = st.get("backtest_blockers") or []
+            assert any("历史起点晚" in b or "覆盖" in b for b in blockers), \
+                f"{x['index_code']} 覆盖未达标却无阻断说明"
 
 
-def test_specific_indexes_history_status_accurate(r01):
-    """逐指数核对完整历史状态与真实探测一致。"""
-    expect_total_hist = {
-        "000300": True, "000905": True, "000906": True, "000016": True,
-        "399997": True,   # H20539 已实测 4,347 行
-        "H30184": True,   # H20184 已实测 5,317 行
-        "000942": True,   # H00942 已实测 5,318 行
-        "000922": True,   # H00922 已实测 5,318 行
-        "930930": True,   # H20930 已实测 3,000 行
-    }
+def test_specific_indexes_history_status_accurate(r01, ev):
+    """逐指数核对覆盖状态与证据一致。"""
+    qb = ev["coverage_quality_probe"]["by_code"]
     for x in r01["indexes"]:
-        want = expect_total_hist.get(x["index_code"])
-        if want is None: continue
-        assert x["total_history_available"] is want, \
-            f"{x['index_code']}: 期望 {want}，实际 {x['total_history_available']}"
+        tc = x.get("total_return_index_code")
+        if not tc or tc not in qb: continue
+        assert (x["history_states"]["history_coverage_adequate"]
+                == qb[tc]["history_coverage_adequate"])
 
 
-def test_000922_net_history_reflects_reality(r01):
-    """000922 净收益代码存在，历史必须来自实测。"""
+def test_000922_net_history_reflects_reality(r01, ev):
+    """000922 净收益序列存在，其覆盖状态必须来自实测。"""
     x = next(v for v in r01["indexes"] if v["index_code"] == "000922")
     assert x["net_total_return_index_code"] == "000922CNY020"
-    if x["net_history_available"]:
-        assert x["net_row_count"] and x["net_row_count"] > 0
-    else:
-        assert x["net_row_count"] is None
+    qb = ev["coverage_quality_probe"]["by_code"]
+    if "000922CNY020" in qb:
+        nq = x.get("net_return_quality")
+        assert nq is not None
+        assert nq["history_retrieved"] == qb["000922CNY020"]["history_retrieved"]
 
 
 # ================================================================ 8-9. 000051
@@ -391,8 +382,13 @@ def test_reports_have_no_deprecated_category_names(r01, r02):
 
 
 def test_summary_numbers_not_handwritten(r01):
-    """summary 数字必须可由 detail 复算，不可是手写常量。"""
-    summary = r01["summary"]
-    recalc = {k: len(v) for k, v in summary["detail"].items()}
-    assert summary["by_coverage_category"] == recalc
-    assert sum(recalc.values()) == summary["total_indexes"]
+    """summary 数字必须可由 indexes 复算，不可是手写常量。"""
+    s = r01["summary"]
+    sem = s["by_economic_semantics"]
+    assert len(sem["equity_indexes"]) + len(sem["special_bond_indexes"]) \
+        == s["total_indexes"]
+    eq = s["equity_indexes_stats"]
+    recalc = sum(1 for x in r01["indexes"]
+                 if x["index_code"] in sem["equity_indexes"]
+                 and x["history_states"]["backtest_usable"])
+    assert eq["total_return_backtest_usable"] == recalc == 0

@@ -146,5 +146,42 @@
    "open_backtest",
    "open_ranking"
   ]
+ },
+ "correction_round_103": {
+  "round": "3B-6.1.0.3",
+  "baseline_head": "472f4a531da250cfe301c22c4668f52ac760a470",
+  "generated_at": "2026-11-24 17:25",
+  "db_fingerprint": "115ac91eee7c26424952e6df23ddeeafe2435974fe5e81a8ba6bbcabfe387dd4",
+  "db_modified": false,
+  "issue": "full_history_verified 语义过宽：把「接口取到数据」当成「覆盖与质量达标」",
+  "fix": "拆分为五态独立判定 + 按经济语义分组统计",
+  "five_states": [
+   "history_retrieved",
+   "history_range_verified",
+   "history_coverage_adequate",
+   "history_quality_adequate",
+   "backtest_usable"
+  ],
+  "removed_fields": [
+   "layers",
+   "full_history_verified",
+   "total_history_available",
+   "net_history_available"
+  ],
+  "rates": {
+   "data_retrieval_rate": "9/9",
+   "range_verified_rate": "9/9",
+   "coverage_adequate_rate": "7/9",
+   "quality_adequate_rate": "8/9",
+   "backtest_usable_rate": "0/9",
+   "note": "五项比率**逐级递减**：取到 9/9 不等于覆盖 9/9，覆盖达标不等于质量达标，质量达标也不等于可回测"
+  },
+  "still_not_done": [
+   "upgrade_return_basis",
+   "write_db",
+   "open_backtest",
+   "open_ranking",
+   "relax_backtest_threshold"
+  ]
  }
 }

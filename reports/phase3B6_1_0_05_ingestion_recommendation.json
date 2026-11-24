@@ -205,5 +205,24 @@
   "class_B": 8,
   "class_C": 4,
   "class_B_reason": "有代码有历史，但方案正文未确认收益口径"
+ },
+ "coverage_based_reassessment_103": {
+  "round": "3B-6.1.0.3",
+  "five_gates": {
+   "retrieved": "9/9",
+   "range_verified": "9/9",
+   "coverage_adequate": "7/9",
+   "quality_adequate": "8/9",
+   "backtest_usable": "0/9"
+  },
+  "fail_coverage": {
+   "399997": "真实起点 2008-12-31，覆盖率 78.2%",
+   "930930": "真实起点 2014-11-14，覆盖率 52.5%"
+  },
+  "fail_quality": {
+   "H30184": "1 个非正收盘（2013-06-28 close=0.0）"
+  },
+  "cannot_fix_by_source_change": "399997/930930 是指数发布晚，非数据缺失",
+  "still_not_ingesting": true
  }
 }
