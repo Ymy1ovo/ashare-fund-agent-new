@@ -97,5 +97,54 @@
    "modify_schema",
    "modify_excess_rule"
   ]
+ },
+ "correction_round_102": {
+  "round": "3B-6.1.0.2",
+  "baseline_head": "f570012330e650f219acebe1f37cfe934c141475",
+  "generated_at": "2026-11-24 16:53",
+  "db_fingerprint": "115ac91eee7c26424952e6df23ddeeafe2435974fe5e81a8ba6bbcabfe387dd4",
+  "db_modified": false,
+  "fixed": [
+   {
+    "id": 1,
+    "issue": "summary 数量(5/2)与 detail 数组长度(6/3)不一致",
+    "type": "statistics_inconsistency",
+    "fix": "改为按完整历史覆盖的互斥分类，数量由 detail 自动计算"
+   },
+   {
+    "id": 2,
+    "issue": "official_factsheet 全为 null，但证据记录 10/10 已下载",
+    "type": "evidence_inconsistency",
+    "fix": "从证据附件回填真实元数据（URL/字节/页数/sha256/披露代码）"
+   },
+   {
+    "id": 3,
+    "issue": "短窗口成功被当完整历史可用",
+    "type": "definition_conflation",
+    "fix": "定义三层口径（code_identified/short_probe_ok/full_history_verified）"
+   },
+   {
+    "id": 4,
+    "issue": "000051 描述推断剩余 5% 的资产配置",
+    "type": "over_interpretation",
+    "fix": "改为「原始文本未明确说明其余5%的资产配置方式，因此不推断其配置含义」"
+   }
+  ],
+  "new_tests": {
+   "file": "tests/test_3b6_1_0_2_consistency.py",
+   "count": 27
+  },
+  "new_tests_2": {
+   "file": "tests/test_3b6_1_0_2_hist_evidence.py",
+   "count": 7
+  },
+  "hist_probe_added_to_evidence": true,
+  "still_not_done": [
+   "upgrade_return_basis",
+   "write_db",
+   "modify_schema",
+   "open_backtest",
+   "open_ranking"
+  ]
  }
 }

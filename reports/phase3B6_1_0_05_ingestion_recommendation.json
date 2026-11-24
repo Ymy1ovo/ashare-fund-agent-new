@@ -192,5 +192,18 @@
   "indexes_without_total_return": 0,
   "indexes_with_total_return": 10,
   "excess_return_still_zero_because": "全收益只是必要条件；10条含现金/5条含债券/1条含固定年收益率折算/15条全缺历史权重"
+ },
+ "layer_based_grading_102": {
+  "round": "3B-6.1.0.2",
+  "three_layers": {
+   "code_identified": 10,
+   "short_probe_ok": 10,
+   "full_history_verified": 10
+  },
+  "why_all_ten": "本轮专门补做 2004~2026 全量探测；此前 ③ 并非全部可用",
+  "class_A": 2,
+  "class_B": 8,
+  "class_C": 4,
+  "class_B_reason": "有代码有历史，但方案正文未确认收益口径"
  }
 }

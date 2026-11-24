@@ -1393,5 +1393,331 @@
    "000012": "csindex 直链 404；上交所 sse.com.cn 指数页 404；仅有 factsheet",
    "930930": "csindex 直链 404；仅有 factsheet"
   }
+ },
+ "full_history_probe": {
+  "purpose": "第三层证据：完整历史覆盖探测（2004-01-01~2026-12-31）",
+  "source": "akshare.stock_zh_index_hist_csindex",
+  "request_range": [
+   "20040101",
+   "20261231"
+  ],
+  "probed_at": "2026-11-24T16:45~17:00",
+  "updated_at": "2026-11-24T17:05",
+  "codes_probed": 30,
+  "note": "仅记录覆盖元数据（行数/起止/缺口/异常值），不保存完整行情序列",
+  "by_code": {
+   "000300": {
+    "status": "ok",
+    "index_name_returned": "沪深300指数",
+    "rows": 5559,
+    "date_min": "2004-01-01",
+    "date_max": "2026-11-23",
+    "duplicate_dates": 0,
+    "max_gap_days": 13,
+    "non_positive_close": 0,
+    "null_close": 0
+   },
+   "000905": {
+    "status": "ok",
+    "index_name_returned": "中证小盘500指数",
+    "rows": 5318,
+    "date_min": "2004-01-01",
+    "date_max": "2026-11-23",
+    "duplicate_dates": 0,
+    "max_gap_days": 365,
+    "non_positive_close": 0,
+    "null_close": 0
+   },
+   "000906": {
+    "status": "ok",
+    "index_name_returned": "中证800指数",
+    "rows": 5318,
+    "date_min": "2004-01-01",
+    "date_max": "2026-11-23",
+    "duplicate_dates": 0,
+    "max_gap_days": 365,
+    "non_positive_close": 0,
+    "null_close": 0
+   },
+   "000016": {
+    "status": "ok",
+    "index_name_returned": "上证50指数",
+    "rows": 5560,
+    "date_min": "2004-01-01",
+    "date_max": "2026-11-23",
+    "duplicate_dates": 0,
+    "max_gap_days": 13,
+    "non_positive_close": 0,
+    "null_close": 0
+   },
+   "399997": {
+    "status": "ok",
+    "index_name_returned": "中证白酒指数",
+    "rows": 4346,
+    "date_min": "2004-01-01",
+    "date_max": "2026-11-23",
+    "duplicate_dates": 0,
+    "max_gap_days": 1831,
+    "non_positive_close": 0,
+    "null_close": 0
+   },
+   "H30184": {
+    "status": "ok",
+    "index_name_returned": "中证全指半导体产品与设备指数",
+    "rows": 5317,
+    "date_min": "2004-01-01",
+    "date_max": "2026-11-23",
+    "duplicate_dates": 0,
+    "max_gap_days": 369,
+    "non_positive_close": 1,
+    "null_close": 0
+   },
+   "000942": {
+    "status": "ok",
+    "index_name_returned": "中证内地消费主题指数",
+    "rows": 5318,
+    "date_min": "2004-01-01",
+    "date_max": "2026-11-23",
+    "duplicate_dates": 0,
+    "max_gap_days": 365,
+    "non_positive_close": 0,
+    "null_close": 0
+   },
+   "000012": {
+    "status": "ok",
+    "index_name_returned": "上证国债指数",
+    "rows": 5559,
+    "date_min": "2004-01-01",
+    "date_max": "2026-11-23",
+    "duplicate_dates": 0,
+    "max_gap_days": 13,
+    "non_positive_close": 0,
+    "null_close": 0
+   },
+   "000922": {
+    "status": "ok",
+    "index_name_returned": "中证红利指数",
+    "rows": 5318,
+    "date_min": "2004-01-01",
+    "date_max": "2026-11-23",
+    "duplicate_dates": 0,
+    "max_gap_days": 365,
+    "non_positive_close": 0,
+    "null_close": 0
+   },
+   "930930": {
+    "status": "ok",
+    "index_name_returned": "中证港股通综合指数",
+    "rows": 3000,
+    "date_min": "2004-01-01",
+    "date_max": "2026-11-23",
+    "duplicate_dates": 0,
+    "max_gap_days": 3970,
+    "non_positive_close": 0,
+    "null_close": 0
+   },
+   "N00942": {
+    "status": "error",
+    "error": "ValueError",
+    "note": "该变体不存在或无数据"
+   },
+   "N20184": {
+    "status": "error",
+    "error": "ValueError",
+    "note": "该变体不存在或无数据"
+   },
+   "N20930": {
+    "status": "error",
+    "error": "ValueError",
+    "note": "该变体不存在或无数据"
+   },
+   "H00942": {
+    "status": "ok",
+    "index_name_returned": "中证内地消费主题全收益指数",
+    "rows": 5318,
+    "date_min": "2004-01-01",
+    "date_max": "2026-11-23",
+    "duplicate_dates": 0,
+    "max_gap_days": 365,
+    "non_positive_close": 0,
+    "null_close": 0
+   },
+   "H00300": {
+    "status": "ok",
+    "index_name_returned": "沪深300全收益指数",
+    "rows": 5318,
+    "date_min": "2004-01-01",
+    "date_max": "2026-11-23",
+    "duplicate_dates": 0,
+    "max_gap_days": 365,
+    "non_positive_close": 0,
+    "null_close": 0
+   },
+   "N00300": {
+    "status": "ok",
+    "index_name_returned": "沪深300净收益指数",
+    "rows": 5318,
+    "date_min": "2004-01-01",
+    "date_max": "2026-11-23",
+    "duplicate_dates": 0,
+    "max_gap_days": 365,
+    "non_positive_close": 0,
+    "null_close": 0
+   },
+   "H00905": {
+    "status": "ok",
+    "index_name_returned": "中证小盘500全收益指数",
+    "rows": 5318,
+    "date_min": "2004-01-01",
+    "date_max": "2026-11-23",
+    "duplicate_dates": 0,
+    "max_gap_days": 365,
+    "non_positive_close": 0,
+    "null_close": 0
+   },
+   "N00905": {
+    "status": "ok",
+    "index_name_returned": "中证小盘500净收益指数",
+    "rows": 5318,
+    "date_min": "2004-01-01",
+    "date_max": "2026-11-23",
+    "duplicate_dates": 0,
+    "max_gap_days": 365,
+    "non_positive_close": 1,
+    "null_close": 0
+   },
+   "H00906": {
+    "status": "ok",
+    "index_name_returned": "中证800全收益指数",
+    "rows": 5318,
+    "date_min": "2004-01-01",
+    "date_max": "2026-11-23",
+    "duplicate_dates": 0,
+    "max_gap_days": 365,
+    "non_positive_close": 0,
+    "null_close": 0
+   },
+   "N00906": {
+    "status": "ok",
+    "index_name_returned": "中证800净收益指数",
+    "rows": 5318,
+    "date_min": "2004-01-01",
+    "date_max": "2026-11-23",
+    "duplicate_dates": 0,
+    "max_gap_days": 365,
+    "non_positive_close": 1,
+    "null_close": 0
+   },
+   "H00016": {
+    "status": "ok",
+    "index_name_returned": "上证50全收益指数",
+    "rows": 5560,
+    "date_min": "2004-01-01",
+    "date_max": "2026-11-23",
+    "duplicate_dates": 0,
+    "max_gap_days": 13,
+    "non_positive_close": 0,
+    "null_close": 0
+   },
+   "N00016": {
+    "status": "ok",
+    "index_name_returned": "上证50净收益指数",
+    "rows": 5560,
+    "date_min": "2004-01-01",
+    "date_max": "2026-11-23",
+    "duplicate_dates": 0,
+    "max_gap_days": 13,
+    "non_positive_close": 1,
+    "null_close": 0
+   },
+   "H00922": {
+    "status": "ok",
+    "index_name_returned": "中证红利全收益指数",
+    "rows": 5318,
+    "date_min": "2004-01-01",
+    "date_max": "2026-11-23",
+    "duplicate_dates": 0,
+    "max_gap_days": 365,
+    "non_positive_close": 0,
+    "null_close": 0
+   },
+   "H20539": {
+    "status": "ok",
+    "index_name_returned": "中证白酒全收益指数",
+    "rows": 4347,
+    "date_min": "2004-01-01",
+    "date_max": "2026-11-23",
+    "duplicate_dates": 0,
+    "max_gap_days": 1826,
+    "non_positive_close": 0,
+    "null_close": 0
+   },
+   "399997CNY02": {
+    "status": "ok",
+    "index_name_returned": "中证白酒净收益指数",
+    "rows": 4346,
+    "date_min": "2004-01-01",
+    "date_max": "2026-11-23",
+    "duplicate_dates": 0,
+    "max_gap_days": 1826,
+    "non_positive_close": 0,
+    "null_close": 0
+   },
+   "H20184": {
+    "status": "ok",
+    "index_name_returned": "中证全指半导体产品与设备全收益指数",
+    "rows": 5317,
+    "date_min": "2004-01-01",
+    "date_max": "2026-11-23",
+    "duplicate_dates": 0,
+    "max_gap_days": 369,
+    "non_positive_close": 1,
+    "null_close": 0
+   },
+   "H20930": {
+    "status": "ok",
+    "index_name_returned": "中证港股通综合全收益指数",
+    "rows": 3000,
+    "date_min": "2004-01-01",
+    "date_max": "2026-11-23",
+    "duplicate_dates": 0,
+    "max_gap_days": 3970,
+    "non_positive_close": 0,
+    "null_close": 0
+   },
+   "000922CNY020": {
+    "status": "ok",
+    "index_name_returned": "中证红利净收益指数",
+    "rows": 5317,
+    "date_min": "2004-01-01",
+    "date_max": "2026-11-23",
+    "duplicate_dates": 0,
+    "max_gap_days": 365,
+    "non_positive_close": 0,
+    "null_close": 0
+   },
+   "H00012": {
+    "status": "ok",
+    "index_name_returned": "上证国债指数(净价)",
+    "rows": 3373,
+    "date_min": "2004-01-01",
+    "date_max": "2026-11-23",
+    "duplicate_dates": 0,
+    "max_gap_days": 3287,
+    "non_positive_close": 0,
+    "null_close": 0
+   },
+   "N00012": {
+    "status": "ok",
+    "index_name_returned": "上证国债指数(利息及再投资)",
+    "rows": 3373,
+    "date_min": "2004-01-01",
+    "date_max": "2026-11-23",
+    "duplicate_dates": 0,
+    "max_gap_days": 3287,
+    "non_positive_close": 0,
+    "null_close": 0
+   }
+  }
  }
 }

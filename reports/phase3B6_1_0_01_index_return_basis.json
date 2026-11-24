@@ -19,12 +19,21 @@
   "quote": "中证指数有限公司同时计算沪深300全收益指数和净收益指数的日收盘值。沪深300全收益指数、净收益指数是沪深300指数的辅指数，沪深300全收益指数、净收益指数的计算中考虑了样本税前、税后现金红利的再投资收益"
  },
  "summary": {
-  "all_three_series": 5,
-  "price_and_total_only": 2,
-  "special_bond": 1,
-  "return_basis_upgraded": 0,
+  "definition_note": "三层口径：①code_identified=有官方衍生指数代码记录；②short_probe_ok=短窗口实测有数据；③full_history_verified=完整历史已验证。本摘要只按第③层（完整历史）分类，不把①②当③。",
+  "total_indexes": 10,
+  "by_layer": {
+   "code_identified": 10,
+   "short_probe_ok": 10,
+   "full_history_verified_total_return": 10,
+   "note": "short_probe_ok 按 total_return_index_code 在探测窗口内是否有非空返回计算；000012 的 total 变体语义为 interest_and_reinvestment，也计入。"
+  },
+  "by_coverage_category": {
+   "A_full_three_series_history": 6,
+   "B_price_and_total_history": 3,
+   "special_bond_index": 1
+  },
   "detail": {
-   "all_three": [
+   "A_full_three_series_history": [
     "000300",
     "000905",
     "000906",
@@ -32,14 +41,27 @@
     "399997",
     "000922"
    ],
-   "price_total_only": [
-    "000942",
+   "B_price_and_total_history": [
     "H30184",
+    "000942",
     "930930"
    ],
-   "special": [
+   "special_bond_index": [
     "000012"
    ]
+  },
+  "category_labels": {
+   "A_full_three_series_history": "价格/全收益/净收益 完整历史均可用",
+   "B_price_and_total_history": "价格 + 全收益完整历史可用（净收益不可得）",
+   "C_price_history_only": "仅价格完整历史可用（全收益/净收益历史未验证）",
+   "special_bond_index": "特殊债券指数（语义不同于股票指数）",
+   "D_incomplete": "历史不完整"
+  },
+  "return_basis_upgraded": 0,
+  "consistency_check": {
+   "sum_of_categories": 10,
+   "total_indexes": 10,
+   "consistent": true
   }
  },
  "indexes": [
@@ -88,9 +110,44 @@
     "pages": 16,
     "sha256_16": "de6491e03e5d57ec"
    },
-   "official_factsheet": null,
+   "official_factsheet": {
+    "url": "https://oss-ch.csindex.com.cn/static/html/csindex/public/uploads/indices/detail/files/zh_CN/000300factsheet.pdf",
+    "downloaded": true,
+    "bytes": 451156,
+    "pages": 2,
+    "sha256_16": "3eb8fd279126c75e",
+    "derived_codes": [
+     "H00300",
+     "N00300"
+    ],
+    "has_derived_section": false,
+    "note": null,
+    "disclosed_codes": [
+     "H00300",
+     "N00300"
+    ],
+    "semantic_attribution": "全收益/净收益语义由接口返回名称决定，factsheet 仅提供代码列表",
+    "note_on_download": "已实际下载并解析（PDF），元数据见 reports/evidence/phase3B6_1_0_index_probe_evidence.json"
+   },
    "official_evidence_level": "L2_document_verified",
-   "official_evidence_note": null
+   "official_evidence_note": null,
+   "duplicate_dates": 0,
+   "null_close": 0,
+   "total_max_gap_days": 365,
+   "total_non_positive_close": 0,
+   "net_history_start": "2004-01-01",
+   "net_history_end": "2026-11-23",
+   "net_max_gap_days": 365,
+   "net_non_positive_close": 0,
+   "layers": {
+    "code_identified": true,
+    "short_probe_ok": true,
+    "full_history_verified": true,
+    "note": "三层必须分别看：代码已识别 ≠ 短窗口可取 ≠ 完整历史可用"
+   },
+   "coverage_category": "A_full_three_series_history",
+   "short_probe_row_count": 7,
+   "short_probe_window": "20240102~20240110"
   },
   {
    "index_code": "000905",
@@ -130,9 +187,44 @@
     "pages": 3,
     "sha256_16": "6109ad8390fdad70"
    },
-   "official_factsheet": null,
+   "official_factsheet": {
+    "url": "https://oss-ch.csindex.com.cn/static/html/csindex/public/uploads/indices/detail/files/zh_CN/000905factsheet.pdf",
+    "downloaded": true,
+    "bytes": 445394,
+    "pages": 2,
+    "sha256_16": "9f4cc04d61f54f7b",
+    "derived_codes": [
+     "H00905",
+     "N00905"
+    ],
+    "has_derived_section": false,
+    "note": "方案正文未提及全收益/净收益；辅指数信息仅见于 factsheet",
+    "disclosed_codes": [
+     "H00905",
+     "N00905"
+    ],
+    "semantic_attribution": "全收益/净收益语义由接口返回名称决定，factsheet 仅提供代码列表",
+    "note_on_download": "已实际下载并解析（PDF），元数据见 reports/evidence/phase3B6_1_0_index_probe_evidence.json"
+   },
    "official_evidence_level": "L2_document_verified",
-   "official_evidence_note": "方案正文未提及全收益/净收益；辅指数信息仅见于 factsheet"
+   "official_evidence_note": "方案正文未提及全收益/净收益；辅指数信息仅见于 factsheet",
+   "duplicate_dates": 0,
+   "null_close": 0,
+   "total_max_gap_days": 365,
+   "total_non_positive_close": 0,
+   "net_history_start": "2004-01-01",
+   "net_history_end": "2026-11-23",
+   "net_max_gap_days": 365,
+   "net_non_positive_close": 1,
+   "layers": {
+    "code_identified": true,
+    "short_probe_ok": true,
+    "full_history_verified": true,
+    "note": "三层必须分别看：代码已识别 ≠ 短窗口可取 ≠ 完整历史可用"
+   },
+   "coverage_category": "A_full_three_series_history",
+   "short_probe_row_count": 7,
+   "short_probe_window": "20240102~20240110"
   },
   {
    "index_code": "000906",
@@ -172,9 +264,44 @@
     "pages": 3,
     "sha256_16": "6109ad8390fdad70"
    },
-   "official_factsheet": null,
+   "official_factsheet": {
+    "url": "https://oss-ch.csindex.com.cn/static/html/csindex/public/uploads/indices/detail/files/zh_CN/000906factsheet.pdf",
+    "downloaded": true,
+    "bytes": 448091,
+    "pages": 2,
+    "sha256_16": "8d779deeabab4672",
+    "derived_codes": [
+     "H00906",
+     "N00906"
+    ],
+    "has_derived_section": false,
+    "note": "与 000905 同一份方案文件（中证规模指数合集）",
+    "disclosed_codes": [
+     "H00906",
+     "N00906"
+    ],
+    "semantic_attribution": "全收益/净收益语义由接口返回名称决定，factsheet 仅提供代码列表",
+    "note_on_download": "已实际下载并解析（PDF），元数据见 reports/evidence/phase3B6_1_0_index_probe_evidence.json"
+   },
    "official_evidence_level": "L2_document_verified",
-   "official_evidence_note": "与 000905 同一份方案文件（中证规模指数合集）"
+   "official_evidence_note": "与 000905 同一份方案文件（中证规模指数合集）",
+   "duplicate_dates": 0,
+   "null_close": 0,
+   "total_max_gap_days": 365,
+   "total_non_positive_close": 0,
+   "net_history_start": "2004-01-01",
+   "net_history_end": "2026-11-23",
+   "net_max_gap_days": 365,
+   "net_non_positive_close": 1,
+   "layers": {
+    "code_identified": true,
+    "short_probe_ok": true,
+    "full_history_verified": true,
+    "note": "三层必须分别看：代码已识别 ≠ 短窗口可取 ≠ 完整历史可用"
+   },
+   "coverage_category": "A_full_three_series_history",
+   "short_probe_row_count": 7,
+   "short_probe_window": "20240102~20240110"
   },
   {
    "index_code": "000016",
@@ -214,9 +341,44 @@
     "pages": 2,
     "sha256_16": "e8f1ce6045b7f913"
    },
-   "official_factsheet": null,
+   "official_factsheet": {
+    "url": "https://oss-ch.csindex.com.cn/static/html/csindex/public/uploads/indices/detail/files/zh_CN/000016factsheet.pdf",
+    "downloaded": true,
+    "bytes": 447776,
+    "pages": 2,
+    "sha256_16": "9fb060cab51f74d5",
+    "derived_codes": [
+     "H00016",
+     "N00016"
+    ],
+    "has_derived_section": false,
+    "note": "方案正文未提及辅指数",
+    "disclosed_codes": [
+     "H00016",
+     "N00016"
+    ],
+    "semantic_attribution": "全收益/净收益语义由接口返回名称决定，factsheet 仅提供代码列表",
+    "note_on_download": "已实际下载并解析（PDF），元数据见 reports/evidence/phase3B6_1_0_index_probe_evidence.json"
+   },
    "official_evidence_level": "L2_document_verified",
-   "official_evidence_note": "方案正文未提及辅指数"
+   "official_evidence_note": "方案正文未提及辅指数",
+   "duplicate_dates": 0,
+   "null_close": 0,
+   "total_max_gap_days": 13,
+   "total_non_positive_close": 0,
+   "net_history_start": "2004-01-01",
+   "net_history_end": "2026-11-23",
+   "net_max_gap_days": 13,
+   "net_non_positive_close": 1,
+   "layers": {
+    "code_identified": true,
+    "short_probe_ok": true,
+    "full_history_verified": true,
+    "note": "三层必须分别看：代码已识别 ≠ 短窗口可取 ≠ 完整历史可用"
+   },
+   "coverage_category": "A_full_three_series_history",
+   "short_probe_row_count": 7,
+   "short_probe_window": "20240102~20240110"
   },
   {
    "index_code": "399997",
@@ -234,12 +396,12 @@
    "history_start": "2004-01-01",
    "history_end": "2026-11-23",
    "row_count": 4346,
-   "total_history_available": false,
-   "total_history_start": null,
-   "total_history_end": null,
-   "total_row_count": null,
-   "net_history_available": false,
-   "net_row_count": null,
+   "total_history_available": true,
+   "total_history_start": "2004-01-01",
+   "total_history_end": "2026-11-23",
+   "total_row_count": 4347,
+   "net_history_available": true,
+   "net_row_count": 4346,
    "max_gap_days": 1831,
    "non_positive_close": 0,
    "quality_grade": "C",
@@ -256,11 +418,45 @@
     "pages": 2,
     "sha256_16": "62450948684c2930"
    },
-   "official_factsheet": null,
+   "official_factsheet": {
+    "url": "https://oss-ch.csindex.com.cn/static/html/csindex/public/uploads/indices/detail/files/zh_CN/399997factsheet.pdf",
+    "downloaded": true,
+    "bytes": 431023,
+    "pages": 2,
+    "sha256_16": "9dccc78a4b728861",
+    "derived_codes": [
+     "H20539"
+    ],
+    "has_derived_section": false,
+    "note": "方案正文 752 字符，未提及辅指数；factsheet 衍生指数栏披露 H20539 / 399997CNY02",
+    "disclosed_codes": [
+     "H20539",
+     "399997CNY02"
+    ],
+    "semantic_attribution": "factsheet「衍生指数」栏同时列出 H20539 与 399997CNY02。**PDF 文本提取会打乱列顺序**，因此哪个是全收益、哪个是净收益，**以接口返回的指数中文全称为准**（H20539=中证白酒全收益指数，399997CNY02=中证白酒净收益指数），不依据 factsheet 的列位置。",
+    "note_on_download": "已实际下载并解析（PDF），元数据见 reports/evidence/phase3B6_1_0_index_probe_evidence.json"
+   },
    "official_evidence_level": "L2_document_verified",
    "official_evidence_note": "方案正文 752 字符，未提及辅指数；factsheet 衍生指数栏披露 H20539 / 399997CNY02",
    "correction": "3B-6.1.0 用「H+后5位」猜测 H39997 返回空，据此误判无全收益。官方 factsheet「衍生指数」栏披露 H20539（全收益）/ 399997CNY02（净收益），均已实测返回非空序列。",
-   "audit_correction_applied": true
+   "audit_correction_applied": true,
+   "duplicate_dates": 0,
+   "null_close": 0,
+   "total_max_gap_days": 1826,
+   "total_non_positive_close": 0,
+   "net_history_start": "2004-01-01",
+   "net_history_end": "2026-11-23",
+   "net_max_gap_days": 1826,
+   "net_non_positive_close": 0,
+   "layers": {
+    "code_identified": true,
+    "short_probe_ok": true,
+    "full_history_verified": true,
+    "note": "三层必须分别看：代码已识别 ≠ 短窗口可取 ≠ 完整历史可用"
+   },
+   "coverage_category": "A_full_three_series_history",
+   "short_probe_row_count": 7,
+   "short_probe_window": "20240102~20240110"
   },
   {
    "index_code": "H30184",
@@ -278,10 +474,10 @@
    "history_start": "2004-01-01",
    "history_end": "2026-11-23",
    "row_count": 5317,
-   "total_history_available": false,
-   "total_history_start": null,
-   "total_history_end": null,
-   "total_row_count": null,
+   "total_history_available": true,
+   "total_history_start": "2004-01-01",
+   "total_history_end": "2026-11-23",
+   "total_row_count": 5317,
    "net_history_available": false,
    "net_row_count": null,
    "max_gap_days": 369,
@@ -300,11 +496,45 @@
     "pages": 2,
     "sha256_16": "8b7de8a81c93e5f7"
    },
-   "official_factsheet": null,
+   "official_factsheet": {
+    "url": "https://oss-ch.csindex.com.cn/static/html/csindex/public/uploads/indices/detail/files/zh_CN/H30184factsheet.pdf",
+    "downloaded": true,
+    "bytes": 431782,
+    "pages": 2,
+    "sha256_16": "55a77eabfd15537c",
+    "derived_codes": [
+     "H20184",
+     "H30184"
+    ],
+    "has_derived_section": false,
+    "note": "factsheet 净收益指数栏为 --，即无净收益辅指数",
+    "disclosed_codes": [
+     "H20184"
+    ],
+    "semantic_attribution": "factsheet 衍生指数栏披露 H20184（全收益），净收益栏为 `--`。",
+    "note_on_download": "已实际下载并解析（PDF），元数据见 reports/evidence/phase3B6_1_0_index_probe_evidence.json"
+   },
    "official_evidence_level": "L2_document_verified",
    "official_evidence_note": "factsheet 净收益指数栏为 --，即无净收益辅指数",
    "correction": "3B-6.1.0 误判「无全收益」。官方 factsheet 披露 H20184（全收益），已实测返回非空；净收益栏为 --，即确实没有。",
-   "audit_correction_applied": true
+   "audit_correction_applied": true,
+   "duplicate_dates": 0,
+   "null_close": 0,
+   "total_max_gap_days": 369,
+   "total_non_positive_close": 1,
+   "net_history_start": null,
+   "net_history_end": null,
+   "net_max_gap_days": null,
+   "net_non_positive_close": null,
+   "layers": {
+    "code_identified": true,
+    "short_probe_ok": true,
+    "full_history_verified": true,
+    "note": "三层必须分别看：代码已识别 ≠ 短窗口可取 ≠ 完整历史可用"
+   },
+   "coverage_category": "B_price_and_total_history",
+   "short_probe_row_count": 7,
+   "short_probe_window": "20240102~20240110"
   },
   {
    "index_code": "000942",
@@ -344,11 +574,44 @@
     "pages": 3,
     "sha256_16": "e2893e60254074f9"
    },
-   "official_factsheet": null,
+   "official_factsheet": {
+    "url": "https://oss-ch.csindex.com.cn/static/html/csindex/public/uploads/indices/detail/files/zh_CN/000942factsheet.pdf",
+    "downloaded": true,
+    "bytes": 442911,
+    "pages": 2,
+    "sha256_16": "3694be011496b2a3",
+    "derived_codes": [
+     "H00942"
+    ],
+    "has_derived_section": false,
+    "note": "factsheet 披露 H00942；净收益代码未在 factheet 中给出可验证值",
+    "disclosed_codes": [
+     "H00942"
+    ],
+    "semantic_attribution": "factsheet 仅披露 H00942（全收益）；净收益代码未在文件中给出，尝试的 N00942 / 000942CNY020 变体均返回空。",
+    "note_on_download": "已实际下载并解析（PDF），元数据见 reports/evidence/phase3B6_1_0_index_probe_evidence.json"
+   },
    "official_evidence_level": "L2_document_verified",
    "official_evidence_note": "factsheet 披露 H00942；净收益代码未在 factheet 中给出可验证值",
    "correction": "净收益代码在 factsheet 中未给出可验证值（CNY020 变体实测返回空）。",
-   "audit_correction_applied": true
+   "audit_correction_applied": true,
+   "duplicate_dates": 0,
+   "null_close": 0,
+   "total_max_gap_days": 365,
+   "total_non_positive_close": 0,
+   "net_history_start": null,
+   "net_history_end": null,
+   "net_max_gap_days": null,
+   "net_non_positive_close": null,
+   "layers": {
+    "code_identified": true,
+    "short_probe_ok": true,
+    "full_history_verified": true,
+    "note": "三层必须分别看：代码已识别 ≠ 短窗口可取 ≠ 完整历史可用"
+   },
+   "coverage_category": "B_price_and_total_history",
+   "short_probe_row_count": 7,
+   "short_probe_window": "20240102~20240110"
   },
   {
    "index_code": "000012",
@@ -370,8 +633,8 @@
    "total_history_start": "2004-01-01",
    "total_history_end": "2026-11-23",
    "total_row_count": 3373,
-   "net_history_available": true,
-   "net_row_count": 3373,
+   "net_history_available": false,
+   "net_row_count": null,
    "max_gap_days": 13,
    "non_positive_close": 0,
    "quality_grade": "B",
@@ -412,17 +675,47 @@
    },
    "official_factsheet": {
     "url": "https://oss-ch.csindex.com.cn/static/html/csindex/public/uploads/indices/detail/files/zh_CN/000012factsheet.pdf",
+    "downloaded": true,
     "bytes": 421962,
-    "sha256_16": "21f24570c840ac91",
     "pages": 2,
+    "sha256_16": "21f24570c840ac91",
     "derived_codes": [
      "H00012",
      "N00012"
     ],
-    "has_derived_section": false
+    "has_derived_section": false,
+    "note": "**未取得官方编制方案**。已检索 csindex 官网 PDF 直链（{code}_Index_Methodology_cn.pdf / factsheet / methodology_cn）与 sse.com.cn 指数页，均 404 或仅返回导航页。factsheet 无「衍生指数」栏，只列出 H00012/N00012 两个代码，**不解释其经济含义**。语义结论来自接口返回名称，属 L3。",
+    "disclosed_codes": [
+     "H00012",
+     "N00012"
+    ],
+    "semantic_attribution": "factsheet 只列出 H00012 / N00012 两个代码，**未解释其经济含义**；「H00012=净价、N00012=利息及再投资」这一结论来自接口返回名称（L3），不是官方文件证明。",
+    "note_on_download": "已实际下载并解析（PDF），元数据见 reports/evidence/phase3B6_1_0_index_probe_evidence.json"
    },
    "official_evidence_level": "L3_factsheet_only",
-   "official_evidence_note": "**未取得官方编制方案**。已检索 csindex 官网 PDF 直链（{code}_Index_Methodology_cn.pdf / factsheet / methodology_cn）与 sse.com.cn 指数页，均 404 或仅返回导航页。factsheet 无「衍生指数」栏，只列出 H00012/N00012 两个代码，**不解释其经济含义**。语义结论来自接口返回名称，属 L3。"
+   "official_evidence_note": "**未取得官方编制方案**。已检索 csindex 官网 PDF 直链（{code}_Index_Methodology_cn.pdf / factsheet / methodology_cn）与 sse.com.cn 指数页，均 404 或仅返回导航页。factsheet 无「衍生指数」栏，只列出 H00012/N00012 两个代码，**不解释其经济含义**。语义结论来自接口返回名称，属 L3。",
+   "duplicate_dates": 0,
+   "null_close": 0,
+   "total_max_gap_days": 3287,
+   "total_non_positive_close": 0,
+   "net_history_start": null,
+   "net_history_end": null,
+   "net_max_gap_days": null,
+   "net_non_positive_close": null,
+   "layers": {
+    "code_identified": true,
+    "short_probe_ok": true,
+    "full_history_verified": true,
+    "note": "三层必须分别看：代码已识别 ≠ 短窗口可取 ≠ 完整历史可用"
+   },
+   "coverage_category": "special_bond_index",
+   "clean_price_history_available": true,
+   "clean_price_history_start": "2004-01-01",
+   "clean_price_history_end": "2026-11-23",
+   "clean_price_row_count": 3373,
+   "clean_price_max_gap_days": 3287,
+   "short_probe_row_count": 7,
+   "short_probe_window": "20240102~20240110"
   },
   {
    "index_code": "000922",
@@ -444,8 +737,8 @@
    "total_history_start": "2004-01-01",
    "total_history_end": "2026-11-23",
    "total_row_count": 5318,
-   "net_history_available": false,
-   "net_row_count": null,
+   "net_history_available": true,
+   "net_row_count": 5317,
    "max_gap_days": 365,
    "non_positive_close": 0,
    "quality_grade": "A",
@@ -462,11 +755,45 @@
     "pages": 3,
     "sha256_16": "6b8053f02ca87a0e"
    },
-   "official_factsheet": null,
+   "official_factsheet": {
+    "url": "https://oss-ch.csindex.com.cn/static/html/csindex/public/uploads/indices/detail/files/zh_CN/000922factsheet.pdf",
+    "downloaded": true,
+    "bytes": 449780,
+    "pages": 2,
+    "sha256_16": "b9001c2a26152255",
+    "derived_codes": [
+     "H00922"
+    ],
+    "has_derived_section": false,
+    "note": "方案正文 1,130 字符，未提及辅指数",
+    "disclosed_codes": [
+     "H00922",
+     "000922CNY020"
+    ],
+    "semantic_attribution": "factsheet 同时列出 H00922 与 000922CNY020；语义归属同样以接口返回名称为准。",
+    "note_on_download": "已实际下载并解析（PDF），元数据见 reports/evidence/phase3B6_1_0_index_probe_evidence.json"
+   },
    "official_evidence_level": "L2_document_verified",
    "official_evidence_note": "方案正文 1,130 字符，未提及辅指数",
    "correction": "3B-6.1.0 的 N00922 猜测失败。官方 factsheet 披露净收益代码 000922CNY020，已实测。",
-   "audit_correction_applied": true
+   "audit_correction_applied": true,
+   "duplicate_dates": 0,
+   "null_close": 0,
+   "total_max_gap_days": 365,
+   "total_non_positive_close": 0,
+   "net_history_start": "2004-01-01",
+   "net_history_end": "2026-11-23",
+   "net_max_gap_days": 365,
+   "net_non_positive_close": 0,
+   "layers": {
+    "code_identified": true,
+    "short_probe_ok": true,
+    "full_history_verified": true,
+    "note": "三层必须分别看：代码已识别 ≠ 短窗口可取 ≠ 完整历史可用"
+   },
+   "coverage_category": "A_full_three_series_history",
+   "short_probe_row_count": 7,
+   "short_probe_window": "20240102~20240110"
   },
   {
    "index_code": "930930",
@@ -484,10 +811,10 @@
    "history_start": "2004-01-01",
    "history_end": "2026-11-23",
    "row_count": 3000,
-   "total_history_available": false,
-   "total_history_start": null,
-   "total_history_end": null,
-   "total_row_count": null,
+   "total_history_available": true,
+   "total_history_start": "2004-01-01",
+   "total_history_end": "2026-11-23",
+   "total_row_count": 3000,
    "net_history_available": false,
    "net_row_count": null,
    "max_gap_days": 3970,
@@ -508,18 +835,42 @@
    },
    "official_factsheet": {
     "url": "https://oss-ch.csindex.com.cn/static/html/csindex/public/uploads/indices/detail/files/zh_CN/930930factsheet.pdf",
+    "downloaded": true,
     "bytes": 446156,
-    "sha256_16": "0bd7e8937145086a",
     "pages": 2,
+    "sha256_16": "0bd7e8937145086a",
     "derived_codes": [
      "H20930"
     ],
-    "has_derived_section": true
+    "has_derived_section": true,
+    "note": "**未取得官方编制方案**（csindex PDF 直链全部 404）。factsheet 有「衍生指数」栏，披露全收益 H20930，净收益栏为 --。",
+    "disclosed_codes": [
+     "H20930"
+    ],
+    "semantic_attribution": "factsheet 衍生指数栏披露 H20930（全收益），净收益栏为 `--`，即无净收益辅指数。",
+    "note_on_download": "已实际下载并解析（PDF），元数据见 reports/evidence/phase3B6_1_0_index_probe_evidence.json"
    },
    "official_evidence_level": "L3_factsheet_only",
    "official_evidence_note": "**未取得官方编制方案**（csindex PDF 直链全部 404）。factsheet 有「衍生指数」栏，披露全收益 H20930，净收益栏为 --。",
    "correction": "3B-6.1.0 用 H930930 猜测返回空，误判无全收益。官方 factsheet 披露 H20930，已实测返回非空；净收益栏为 --。",
-   "audit_correction_applied": true
+   "audit_correction_applied": true,
+   "duplicate_dates": 0,
+   "null_close": 0,
+   "total_max_gap_days": 3970,
+   "total_non_positive_close": 0,
+   "net_history_start": null,
+   "net_history_end": null,
+   "net_max_gap_days": null,
+   "net_non_positive_close": null,
+   "layers": {
+    "code_identified": true,
+    "short_probe_ok": true,
+    "full_history_verified": true,
+    "note": "三层必须分别看：代码已识别 ≠ 短窗口可取 ≠ 完整历史可用"
+   },
+   "coverage_category": "B_price_and_total_history",
+   "short_probe_row_count": 7,
+   "short_probe_window": "20240102~20240110"
   }
  ],
  "critical_findings": {
@@ -591,6 +942,23 @@
   "correction_3": {
    "issue": "其余 9 个指数缺官方编制方案证据",
    "result": "8/9 已取得编制方案 PDF，10/10 已取得 factsheet；000012 与 930930 无编制方案"
+  }
+ },
+ "audit_corrections_v102": {
+  "round": "3B-6.1.0.2",
+  "correction_1": {
+   "issue": "summary 数量与 detail 数组长度不一致（5/2 vs 6/3）",
+   "fix": "改为按完整历史覆盖的互斥分类，数量自动由 detail 计算",
+   "new_categories": {
+    "A_full_three_series_history": 6,
+    "B_price_and_total_history": 3,
+    "special_bond_index": 1
+   }
+  },
+  "correction_2": {
+   "issue": "official_factsheet 字段全部为 null，但证据附件记录 10/10 已下载",
+   "fix": "从证据附件复制真实元数据（URL/字节/页数/sha256/衍生代码）",
+   "count": 10
   }
  }
 }

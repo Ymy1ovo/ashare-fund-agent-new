@@ -6,8 +6,8 @@
  "db_fingerprint": "115ac91eee7c26424952e6df23ddeeafe2435974fe5e81a8ba6bbcabfe387dd4",
  "total": 15,
  "status_summary": {
-  "partially_reproducible": 14,
-  "not_reproducible": 1
+  "not_reproducible": 2,
+  "partially_reproducible": 13
  },
  "composites": [
   {
@@ -33,10 +33,11 @@
    "index_components_have_total_return": true,
    "historical_weight_evidence": false,
    "current_weight_only": true,
-   "status": "partially_reproducible",
+   "status": "not_reproducible",
    "reasons": [
-    "固定年收益率期间折算规则无证据（合同仅说「按期间折算」）",
-    "历史权重生效日期无官方证据（当前权重不等于历史权重）"
+    "固定年收益率 1% 的期间折算规则无证据（合同仅说「按期间折算」，未给公式与天数基准）",
+    "其余 5% 的资产配置方式原文未说明，无法确定基准的完整构成",
+    "95% 系数的历史生效日期无官方证据（当前权重不等于历史权重）"
    ],
    "fixed_annual_return_components": [
     {
@@ -47,7 +48,8 @@
      "period_conversion_method": "unknown",
      "raw_text": "1%（指年收益率，评价时应按期间折算）",
      "evidence": "合同/平台基准原文明确写「指年收益率，评价时应按期间折算」",
-     "note": "**不是 1% 的资产权重**。若误当权重，95%+1%=96% 合计不成立。正确理解：95% 配沪深300，剩余 5% 按 1% 年化固定收益计。"
+     "note": "基准公式包含沪深300指数收益率×95%，另加按期间折算的1%年化固定收益率。该1%不是资产权重。原始文本未明确说明其余5%的资产配置方式，因此不推断其配置含义。",
+     "weight_is_null_reason": "1% 是年化固定收益率加项，不是资产权重；原文未说明其余 5% 的配置方式，不得据此推断权重分配"
     }
    ],
    "weight_sum_of_asset_components": 0.95,
@@ -57,8 +59,31 @@
     "contract_states": true,
     "method_specified_in_contract": false,
     "method_known": false,
-    "note": "合同只说明「应按期间折算」，未给出具体折算公式（单利/复利、天数基准、起止点）"
-   }
+    "unknown_dimensions": [
+     "单利或复利",
+     "天数基准",
+     "折算起止点"
+    ],
+    "note": "合同仅说明「评价时应按期间折算」，未给出具体折算规则"
+   },
+   "benchmark_interpretation": {
+    "verbatim": "沪深300指数收益率×95%＋1%（指年收益率，评价时应按期间折算）",
+    "stateable_facts": [
+     "沪深300指数收益率的系数为 95%",
+     "另加 1% 的**年化固定收益率**加项",
+     "该 1% 明确标注为「年收益率」，不是资产权重",
+     "原文要求「评价时应按期间折算」"
+    ],
+    "not_stateable": [
+     "**其余 5% 的资产配置方式**：原文未说明是现金、债券还是任何资产",
+     "折算公式（单利/复利）",
+     "天数基准（365/360/实际天数）",
+     "折算起止点"
+    ],
+    "accurate_description": "基准公式包含沪深300指数收益率×95%，另加按期间折算的1%年化固定收益率。该1%不是资产权重。原始文本未明确说明其余5%的资产配置方式，因此不推断其配置含义。",
+    "prohibited_interpretation": "不得表述为「95% 配沪深300，剩余 5% 按 1% 年化固定收益计」——这是对原文的推断性解释，超出了原文能直接证明的范围。"
+   },
+   "weight_sum_note": "0.95 是**原文明确写出的**指数收益率系数；剩余 0.05 对应的资产配置方式原文未说明，**不将其分配为任何成分权重**"
   },
   {
    "composite_id": 17,
@@ -648,5 +673,9 @@
   },
   "other_composites_with_fixed_rate": 0,
   "note": "其余 14 条的加项均为「活期存款利率/同业存款利率」，已有独立 cash 成分类型，不属于固定收益率混淆。但它们同样缺收益序列，故仍不可复现。"
+ },
+ "note_000051": {
+  "accurate_description": "基准公式包含沪深300指数收益率×95%，另加按期间折算的1%年化固定收益率。该1%不是资产权重。原始文本未明确说明其余5%的资产配置方式，因此不推断其配置含义。",
+  "remaining_5pct_inferred": false
  }
 }

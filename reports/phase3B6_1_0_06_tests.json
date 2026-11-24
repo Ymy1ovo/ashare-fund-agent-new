@@ -1,47 +1,57 @@
 {
- "phase": "3B-6.1.0.1",
+ "phase": "3B-6.1.0.2",
  "step": "06_tests",
- "baseline_head": "6b0dbafd1466c9def6f11b3c89fbe21122294dda",
- "generated_at": "2026-11-24 16:23",
- "reproducibility_fix": {
-  "issue": "3 项测试依赖本地 .tmp610 缓存，干净检出时跳过",
-  "fix": "改为读 reports/evidence/phase3B6_1_0_index_probe_evidence.json",
-  "before": {
-   "passed": 14,
-   "skipped": 3
+ "baseline_head": "f570012330e650f219acebe1f37cfe934c141475",
+ "generated_at": "2026-11-24 17:08",
+ "new_tests": [
+  {
+   "file": "tests/test_3b6_1_0_2_consistency.py",
+   "count": 27,
+   "passed": 27,
+   "skipped": 0,
+   "seconds": 0.76
   },
-  "after": {
-   "passed": 17,
-   "skipped": 0
-  },
-  "cache_removed_verified": true,
-  "skip_removed": true,
-  "assertions_weakened": false
- },
- "new_tests": {
-  "file": "tests/test_3b6_1_0_1_audit_fix.py",
-  "count": 26,
-  "passed": 26,
-  "skipped": 0,
-  "seconds": 0.76
- },
+  {
+   "file": "tests/test_3b6_1_0_2_hist_evidence.py",
+   "count": 7,
+   "passed": 7,
+   "skipped": 0,
+   "seconds": 0.46
+  }
+ ],
+ "total_new": 34,
+ "covered_items": [
+  1,
+  2,
+  3,
+  4,
+  5,
+  6,
+  7,
+  8,
+  9,
+  10,
+  11,
+  12
+ ],
+ "covered_items_note": "12 项任务4要求全部覆盖，测试详情见报告 0.1 节",
+ "no_hardcoded_stats": true,
  "full_pytest": {
-  "passed": 1945,
+  "passed": 1979,
   "failed": 0,
   "errors": 0,
   "skipped": 0,
-  "seconds": 752.8,
+  "seconds": 827.01,
   "executed": true
  },
  "evolution": {
-  "3B-6.1.0": 1919,
   "3B-6.1.0.1": 1945,
-  "delta": 26
+  "3B-6.1.0.2": 1979,
+  "delta": 34
  },
  "regression": {
-  "3b6_1_0_audit": {
-   "passed": 17,
-   "seconds": 0.46
+  "3b6_1_0_and_1_0_1": {
+   "passed": 43
   },
   "3b6_0_4_1_suite": {
    "passed": 88
@@ -53,10 +63,29 @@
   "pdf text extraction"
  ],
  "data_source_calls": {
-  "index_hist": 34,
-  "pdf_http": 18,
-  "total": 52
+  "full_history_probe": 17,
+  "short_probe": 0,
+  "pdf_download": 0,
+  "total": 17
  },
+ "not_executed": [
+  {
+   "item": "重新下载核验官方PDF",
+   "reason": "复用3B-6.1.0.1已下载文件"
+  },
+  {
+   "item": "独立第二数据源交叉验证",
+   "reason": "上轮已确认东财限流"
+  },
+  {
+   "item": "中债债券指数接口探测",
+   "reason": "本轮范围限定为一致性修正"
+  },
+  {
+   "item": "历史权重官方文件检索",
+   "reason": "同上"
+  }
+ ],
  "database_readonly": {
   "fingerprint_before": "115ac91eee7c26424952e6df23ddeeafe2435974fe5e81a8ba6bbcabfe387dd4",
   "fingerprint_after": "115ac91eee7c26424952e6df23ddeeafe2435974fe5e81a8ba6bbcabfe387dd4",
@@ -72,24 +101,18 @@
   }
  },
  "code_changes": {
-  "new_scripts": [
-   "scripts/build_3b6_1_0_1_evidence.py"
-  ],
-  "new_evidence": [
-   "reports/evidence/phase3B6_1_0_index_probe_evidence.json"
-  ],
   "new_tests": [
-   "tests/test_3b6_1_0_1_audit_fix.py"
+   "tests/test_3b6_1_0_2_consistency.py",
+   "tests/test_3b6_1_0_2_hist_evidence.py"
   ],
-  "modified_tests": [
-   "tests/test_3b6_1_0_audit.py"
+  "modified_evidence": [
+   "reports/evidence/phase3B6_1_0_index_probe_evidence.json"
   ],
   "modified_reports": true,
   "business_code_modified": false,
   "schema_changed": false,
   "tests_deleted": 0,
-  "tests_skipped": 0,
-  "assertions_weakened": 0
+  "tests_weakened": 0
  },
  "gate": {
   "ready_for_research_analysis": true,

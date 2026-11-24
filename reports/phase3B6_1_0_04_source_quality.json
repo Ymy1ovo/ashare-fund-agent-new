@@ -211,5 +211,13 @@
   },
   "error_cause": "按 H+后5位 惯例猜代码，全部返回空，据此误判不存在",
   "lesson": "不得按代码前缀惯例推断官方衍生指数代码"
+ },
+ "consistency_fix_102": {
+  "round": "3B-6.1.0.2",
+  "factsheet_fields_filled": 10,
+  "methodology_docs": 8,
+  "full_history_probe_in_evidence": true,
+  "semantic_attribution_source": "interface_returned_name (L3), NOT factsheet",
+  "key_distinction": "factsheet 提供代码列表，但不保证列顺序可读、多数不解释经济含义"
  }
 }

@@ -1,158 +1,86 @@
-# 阶段3B-6.1.0.1 测试报告
+# 阶段3B-6.1.0.2 测试报告
 
-- 本轮基线 HEAD：`6b0dbafd1466c9def6f11b3c89fbe21122294dda`
-- 执行时间：2026-11-24 16:23
+- 本轮基线 HEAD：`f570012330e650f219acebe1f37cfe934c141475`
+- 执行时间：2026-11-24 17:08
 
-> **严格区分**：真实执行 pytest / 静态检查 / 数据源调用。
-
----
-
-## 0. 本轮修正的核心：测试可复现性
-
-3B-6.1.0 有 **3 项测试依赖 `.tmp610/raw/`（本地临时缓存）**，
-在干净检出时会跳过，**其他环境无法复核**。
-
-### 0.1 修正前
-
-```bash
-$ pytest tests/test_3b6_1_0_audit.py -q
-14 passed, 3 skipped
-```
-
-| 测试 | 跳过原因 |
-| --- | --- |
-| `test_all_10_indexes_probed` | 依赖 `.tmp610/raw/index_basis.json` |
-| `test_total_return_variants_actually_returned_by_source` | 同上 |
-| `test_price_and_total_are_different_series` | 同上 |
-
-### 0.2 修正后
-
-```bash
-$ pytest tests/test_3b6_1_0_audit.py tests/test_3b6_1_0_1_audit_fix.py -q
-43 passed in 0.58s
-```
-
-**0 skipped。** 3 项测试改为读取仓库内正式证据附件：
-
-```
-reports/evidence/phase3B6_1_0_index_probe_evidence.json
-```
-
-### 0.3 证据附件内容
-
-| 项 | 内容 |
-| --- | --- |
-| 10 个指数 × 各自变体 | 每次调用的请求代码 / 区间 / 来源 / 状态 |
-| 返回值 | 指数代码、指数中文全称、行数、首末日期 |
-| 质量 | 重复日期数、空收盘数、非正收盘数 |
-| 样例 | 前 3 条日期的收盘值（不含完整序列） |
-| 同日对比 | 沪深300 价格 vs 全收益；上证国债三变体 |
-| 官方文档 | 8 份编制方案 + 10 份 factsheet 的 URL/字节/sha256/页数 |
-| 修正记录 | 3B-6.1.0 误判的成因与更正 |
-
-**不含完整行情序列、不含密钥、不含个人信息。**
-
-### 0.4 缓存移除验证
-
-把 `.tmp610` 目录临时改名后复测：
-
-```bash
-$ mv .tmp610 .tmp610_bak
-$ pytest tests/test_3b6_1_0_audit.py tests/test_3b6_1_0_1_audit_fix.py -q
-43 passed in 0.58s
-```
-
-**确认不再依赖本地缓存。**
+> **严格区分**：真实执行 pytest / 静态检查 / 数据源调用 / **未实际执行**的检查。
 
 ---
 
-## 1. 新增专项测试（26 项）
+## 0. 本轮新增的两组一致性测试（34 项）
+
+### 0.1 `tests/test_3b6_1_0_2_consistency.py`（27 项）
 
 ```bash
-$ pytest tests/test_3b6_1_0_1_audit_fix.py -q
-26 passed in 0.76s
+$ pytest tests/test_3b6_1_0_2_consistency.py -q
+27 passed in 0.76s
 ```
 
-### 1.1 问题1：000012 语义分离（6 项）
+| 覆盖要求 | 对应测试 |
+| --- | --- |
+| 1. summary 数量与明细数组一致 | `test_summary_counts_equal_detail_lengths`、`test_summary_total_matches_indexes`、`test_summary_numbers_not_handwritten` |
+| | `test_summary_categories_are_exhaustive_and_exclusive` |
+| 2. Markdown 统计与 JSON 一致 | `test_markdown_category_counts_match_json`、`test_markdown_three_layers_match_json` |
+| 3. factsheet 字段与证据一致 | `test_factsheet_fields_match_evidence`、`test_markdown_factsheet_table_matches_json` |
+| 4. 下载状态有真实元数据 | `test_factsheet_download_backed_by_real_metadata` |
+| 5. 代码存在 ≠ 完整历史 | `test_code_identified_does_not_imply_full_history` |
+| 6. 短窗口 ≠ 完整历史 | `test_short_probe_does_not_imply_full_history` |
+| 7. 不可用不得标可用 | `test_unavailable_history_not_marked_available`、`test_specific_indexes_history_status_accurate` |
+| 8. 000051 无无证据表述 | `test_000051_no_unsupported_interpretation`、`test_000051_requires_accurate_description` |
+| | `test_000051_declares_not_stateable`、`test_markdown_000051_uses_accurate_wording` |
+| 9. 固定收益率不入权重和 | `test_000051_fixed_rate_not_in_weight_sum` |
+| 10. return_basis 全 unknown | `test_all_return_basis_still_unknown` |
+| 11-12. 门禁不变 | `test_gates_unchanged` |
+| 附加：三层独立复算 | `test_three_layers_are_not_conflated`、`test_layers_derived_from_real_evidence` |
+| 附加：只读 | `test_no_database_write`、`test_reports_have_no_deprecated_category_names` |
+
+**测试未硬编码统计数字**，全部分类数量由 `detail` 数组长度复算。
+
+### 0.2 `tests/test_3b6_1_0_2_hist_evidence.py`（7 项）
+
+```bash
+$ pytest tests/test_3b6_1_0_2_hist_evidence.py -q
+7 passed in 0.46s
+```
 
 | 测试 | 断言 |
 | --- | --- |
-| `test_000012_clean_price_is_not_net_total_return` | `H00012` 不得填入 `net_total_return_index_code` |
-| `test_000012_net_return_semantically_separated` | 净价与净收益是两个不同 semantic |
-| `test_000012_interest_and_reinvestment_code` | `N00012` 才是利息及再投资 |
-| `test_000012_has_naming_convention_warning` | 必须有前缀惯例警告 |
-| `test_000012_return_basis_still_unknown` | 修正不改 `return_basis` |
-| `test_000012_field_mapping_matches_evidence` | 报告字段与证据附件一致 |
+| `test_hist_evidence_exists` | 证据附件含 `full_history_probe` 段 |
+| `test_total_history_matches_evidence` | 全收益历史状态/行数/起止与证据逐项一致 |
+| `test_net_history_matches_evidence` | 净收益历史状态与证据一致 |
+| `test_price_history_matches_evidence` | 价格行数与缺口与证据一致 |
+| `test_no_placeholder_rows_in_evidence` | 证据里无占位行、无重复日期 |
+| `test_evidenced_differences_documented` | 已知非正值异常留痕 |
+| `test_gate_still_closed` | 门禁三值 |
 
-### 1.2 问题2：000051 固定收益率（7 项）
-
-| 测试 | 断言 |
-| --- | --- |
-| `test_000051_fixed_rate_is_not_weight` | `weight=null`，`annual_rate=0.01` |
-| `test_000051_no_stale_weight_component` | 旧 `fixed_rate_components` 已清空 |
-| `test_000051_asset_weight_sum_is_0_95` | 资产权重合计 = **0.95**，不是 0.96 |
-| `test_000051_period_conversion_method_unknown` | 折算方法未知时不得 reproducible |
-| `test_fixed_rate_semantics_declared` | `annual_return_not_weight` |
-| `test_other_composites_have_no_fixed_rate_confusion` | 其余 14 条无同类混淆 |
-
-### 1.3 问题3：官方证据（6 项）
-
-| 测试 | 断言 |
-| --- | --- |
-| `test_all_10_indexes_have_official_evidence` | 10/10 有证据记录 |
-| `test_methodology_docs_actually_downloaded` | **8 份**方案真实下载（bytes>0, pages>=2, sha16 长度 16） |
-| `test_missing_methodology_reported_honestly` | 缺的 2 份如实记录原因 |
-| `test_search_log_is_traceable` | 搜索时间/URL/模式/关键词齐全 |
-| `test_all_10_have_factsheet` | 10/10 factsheet |
-| `test_no_basis_upgraded` | **无 return_basis 升级** |
-
-### 1.4 问题4 + 门禁（7 项）
-
-| 测试 | 断言 |
-| --- | --- |
-| `test_evidence_file_in_repo` | 证据附件在 `reports/evidence/` |
-| `test_evidence_covers_all_10_indexes` | 覆盖 10 个 |
-| `test_evidence_has_full_call_metadata` | 每个变体有完整元数据 |
-| `test_evidence_price_and_total_are_different` | 价格≠全收益 |
-| `test_no_local_cache_dependency` | 不依赖 `.tmp` |
-| `test_gate_unchanged` | 门禁三值 |
-| `test_no_index_written_to_db` / `test_no_composite_modified` | 只读 |
+**这组测试让第三层（完整历史）也能在干净仓库复核，不依赖本地缓存。**
 
 ---
 
-## 2. 全量 pytest（真实执行）
+## 1. 全量 pytest（真实执行）
 
 ```bash
 $ pytest -q
-1945 passed, 1 warning in 752.80s (0:12:32)
+1979 passed, 1 warning in 827.01s (0:13:47)
 ```
 
 | 项 | 数值 |
 | --- | ---: |
-| 通过 | **1945** |
+| 通过 | **1979** |
 | 失败 | 0 |
 | 错误 | 0 |
 | 跳过 | **0** |
-| 耗时 | 752.80 秒 |
+| 耗时 | 827.01 秒 |
 
-**演进**：1919（3B-6.1.0）→ **1945**（+26 本轮新增，且原 3 项 skip 已消除）
-
-### 2.1 测试数变化解析
-
-| 变化 | 数量 |
-| --- | ---: |
-| 3B-6.1.0 | 1919（含 3 skip） |
-| 本轮新增 `test_3b6_1_0_1_audit_fix.py` | **+26** |
-| 原 3 项 skip 转为真实执行 | 0（本来也算在 1919 里） |
-| **本轮** | **1945（0 skip）** |
+**演进**：1945（3B-6.1.0.1）→ **1979**（+34 本轮新增）
 
 ---
 
-## 3. 相关回归（真实执行）
+## 2. 相关回归（真实执行）
 
 ```bash
-$ pytest tests/test_3b6_1_0_audit.py -q
-17 passed in 0.46s
+$ pytest tests/test_3b6_1_0_audit.py tests/test_3b6_1_0_1_audit_fix.py -q
+43 passed
 ```
 
 ```bash
@@ -163,26 +91,37 @@ $ pytest tests/test_3b6_0_4_1_lof_and_grade.py tests/test_3b6_0_4_peer_compariso
 
 ---
 
-## 4. 静态检查（**不计入** 1945）
+## 3. 静态检查（**不计入** 1979）
 
-| 项 | 性质 |
-| --- | --- |
-| `python -m compileall` 脚本语法 | 静态 |
-| JSON 合法性校验（7 个 JSON + 1 个证据附件） | 静态 |
-| PDF 文本提取 | 静态解析 |
+| 项 | 性质 | 是否执行 |
+| --- | --- | --- |
+| `python -m compileall` 脚本语法 | 静态 | ✅ 执行 |
+| JSON 合法性校验（7 份报告 + 1 份证据） | 静态 | ✅ 执行 |
+| PDF 文本提取（18 份官方文件） | 静态解析 | ✅ 执行 |
 
-**不是测试。**
+**这些不是测试，不计入 1979。**
 
 ---
 
-## 5. 数据源调用（真实执行，非测试）
+## 4. 数据源实际调用（真实执行，非测试）
 
-| 接口 | 次数 | 用途 |
+| 接口 / 动作 | 次数 | 用途 |
 | --- | ---: | --- |
-| `stock_zh_index_hist_csindex` | **30** | 证据附件重建 |
-| `stock_zh_index_hist_csindex` | 4 | 验证 factsheet 披露的新代码 |
-| 官方 PDF HTTP 下载 | **18** | 8 份方案 + 10 份 factsheet |
-| **合计** | **52** | |
+| `stock_zh_index_hist_csindex`（完整历史） | **17** | 补探测全收益/净收益/价格完整历史 |
+| `stock_zh_index_hist_csindex`（短窗口） | 0 | 本轮未重跑（复用 3B-6.1.0.1 证据） |
+| 官方 PDF HTTP 下载 | 0 | 本轮未下载（复用 3B-6.1.0.1 已下载文件） |
+| **合计** | **17** | |
+
+---
+
+## 5. 未实际执行的检查（如实声明）
+
+| 检查项 | 状态 | 原因 |
+| --- | --- | --- |
+| 重新下载并核验官方 PDF | **未执行** | 复用 3B-6.1.0.1 已下载文件（sha256 已记录，可校验） |
+| 用独立第二数据源交叉验证指数点位 | **未执行** | 上轮已确认东财限流，本轮无新增来源 |
+| 中债债券指数接口探测 | **未执行** | 本轮范围限定为一致性问题修正 |
+| 历史权重官方文件检索 | **未执行** | 同上 |
 
 ---
 
@@ -206,20 +145,17 @@ $ pytest tests/test_3b6_0_4_1_lof_and_grade.py tests/test_3b6_0_4_peer_compariso
 
 ---
 
-## 7. 代码与文件改动清单
+## 7. 文件改动清单
 
-| 文件 | 类型 | 说明 |
-| --- | --- | --- |
-| `scripts/build_3b6_1_0_1_evidence.py` | **新增** | 证据附件生成脚本 |
-| `reports/evidence/phase3B6_1_0_index_probe_evidence.json` | **新增** | 仓库级证据附件 |
-| `tests/test_3b6_1_0_1_audit_fix.py` | **新增** | 26 项专项测试 |
-| `tests/test_3b6_1_0_audit.py` | **修改** | 3 项缓存依赖 → 仓库证据 |
-| `reports/phase3B6_1_0_*.md/json` | **修改** | 6 对报告语义修正 |
-| `app/**` 业务代码 | **未改** | — |
-| Schema / 迁移 | **未改** | — |
-
-**既有测试：0 删除、0 跳过、0 弱化。**
-唯一修改是把 3 项 skip 改成真实执行——**加强而非削弱**。
+| 文件 | 类型 |
+| --- | --- |
+| `tests/test_3b6_1_0_2_consistency.py` | **新增**（27 项） |
+| `tests/test_3b6_1_0_2_hist_evidence.py` | **新增**（7 项） |
+| `reports/evidence/phase3B6_1_0_index_probe_evidence.json` | **修改**（新增 `full_history_probe`） |
+| `reports/phase3B6_1_0_00/01/02/04/05/06` | **修改**（一致性修正） |
+| `app/**` 业务代码 | **未改** |
+| Schema / 迁移 | **未改** |
+| 既有测试 | **零删除、零弱化** |
 
 ---
 
