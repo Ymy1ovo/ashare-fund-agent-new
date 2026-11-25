@@ -1,0 +1,1049 @@
+{
+ "phase": "3B-6.1.2",
+ "generated_at": "2026-11-25T10:19:37",
+ "baseline_head": "16307eb5ef4f19ca62417a546b6d2ec0a13d492a",
+ "audit_target": "正式库 benchmark_composite 全部 15 条记录",
+ "states_definition": {
+  "component_identified": "成分已识别（有名称与代码或明确资产类别）",
+  "weight_verified": "权重有可靠文本证据（当前合同）",
+  "weight_history_verified": "历史权重及生效时间已核实",
+  "return_basis_verified": "各成分收益率口径已核实",
+  "history_data_available": "历史行情数据可取得",
+  "point_in_time_verified": "历史时点可用性有证据支持",
+  "formula_reproducible": "公式可以完整计算",
+  "historically_reproducible": "历史期间能按当时有效合同完整复现"
+ },
+ "states_are_independent": true,
+ "no_auto_inheritance_note": "**八态独立判定**：成分已识别不得自动推导为历史可复现；历史行情可获取不得自动推导为历史时点可用。",
+ "evidence_grade_definition": {
+  "L1": "基金管理人、指数发布机构、法定披露文件原始证据",
+  "L2": "权威机构可追溯的官方转载或正式数据库",
+  "L3": "第三方聚合数据",
+  "L4": "无法核验的二手描述或推断"
+ },
+ "summary": {
+  "total_benchmarks": 15,
+  "total_components": 34,
+  "component_identified": 14,
+  "weight_verified": 15,
+  "weight_history_verified": 0,
+  "return_basis_verified": 0,
+  "history_data_available": 1,
+  "point_in_time_verified": 0,
+  "formula_reproducible": 0,
+  "historically_reproducible": 0,
+  "fully_not_reproducible": 15,
+  "all_weights_have_evidence": 15,
+  "text_identical_count": 5,
+  "text_equivalent_count": 10,
+  "text_semantic_diff_count": 4,
+  "text_semantic_diff_ids": [
+   18,
+   20,
+   22,
+   23
+  ],
+  "components_without_code": 1,
+  "fixed_rate_components": 1,
+  "cash_components": 10,
+  "bond_index_components": 5,
+  "_self_check": {
+   "sum_equals_total": true,
+   "detail_length": 15,
+   "summary_total": 15,
+   "consistent": true
+  }
+ },
+ "benchmarks": [
+  {
+   "composite_id": 16,
+   "fund_code": "000051",
+   "benchmark_name": "000051 华夏沪深300ETF联接",
+   "fund_info": {
+    "fund_code": "000051",
+    "fund_name": "华夏沪深300ETF联接",
+    "fund_full_name": "华夏沪深300交易型开放式指数证券投资基金联接基金",
+    "fund_company": "华夏基金管理有限公司",
+    "fund_type_l1": "指数型-股票",
+    "established_date": "2009-07-10",
+    "fund_master_benchmark": "沪深300指数收益率×95%＋1%（指年收益率，评价时应按期间折算）"
+   },
+   "benchmark_raw_text": "沪深300指数收益率×95%＋1%（指年收益率，评价时应按期间折算）",
+   "fund_master_benchmark_text": "沪深300指数收益率×95%＋1%（指年收益率，评价时应按期间折算）",
+   "text_consistency": {
+    "identical": true,
+    "equivalent_after_normalization": true,
+    "same_terms_different_order": true,
+    "classification": "identical",
+    "note": "两处文本完全一致"
+   },
+   "evidence_source": "platform",
+   "evidence_grade": "L3",
+   "evidence_grade_reason": "来源为 `platform`（第三方平台披露文本），**未取得基金合同/招募说明书原始文件**，不能作为 L1 法定披露证据",
+   "component_count": 2,
+   "components_by_type": {
+    "index": 1,
+    "fixed_rate": 1
+   },
+   "asset_weight_sum": 0.95,
+   "fixed_rate_components": 1,
+   "unexplained_residual": 0.05,
+   "states": {
+    "component_identified": true,
+    "weight_verified": true,
+    "weight_history_verified": false,
+    "return_basis_verified": false,
+    "history_data_available": false,
+    "point_in_time_verified": false,
+    "formula_reproducible": false,
+    "historically_reproducible": false
+   },
+   "db_claimed": {
+    "is_complete": false,
+    "is_reproducible": false,
+    "missing_reason": "1 个成分无可用收益序列：fixed_rate(fixed_rate)"
+   },
+   "blockers": [
+    "**历史权重与生效日期全部缺失**（15/15 条基准的 weight_effective_from 均为 NULL）",
+    "**收益口径未确认**（全部 return_basis=unknown 或未核实）",
+    "历史数据缺失：fixed_rate",
+    "**时点可用性无证据**"
+   ],
+   "earliest_reproducible_date": null,
+   "latest_reproducible_date": null,
+   "non_reproducible_interval": "全部历史（无法确定任何可用区间）",
+   "required_evidence": [
+    "基金合同/招募说明书原始文件（L1）",
+    "历次基准变更公告及生效日期（L1）",
+    "各债券指数的官方代码对照与编制方案（L1/L2）",
+    "活期/同业存款利率的历史序列及税后换算口径",
+    "固定年化收益率的期间折算规则",
+    "各成分数据的发布时刻与修订记录"
+   ]
+  },
+  {
+   "composite_id": 17,
+   "fund_code": "110020",
+   "benchmark_name": "110020 易方达沪深300ETF联接",
+   "fund_info": {
+    "fund_code": "110020",
+    "fund_name": "易方达沪深300ETF联接",
+    "fund_full_name": "易方达沪深300交易型开放式指数发起式证券投资基金联接基金",
+    "fund_company": "易方达基金管理有限公司",
+    "fund_type_l1": "指数型-股票",
+    "established_date": "2009-08-26",
+    "fund_master_benchmark": "沪深300指数收益率X95%+活期存款利率(税后)X5%"
+   },
+   "benchmark_raw_text": "沪深300指数收益率×95%+活期存款利率(税后)×5%",
+   "fund_master_benchmark_text": "沪深300指数收益率X95%+活期存款利率(税后)X5%",
+   "text_consistency": {
+    "identical": false,
+    "equivalent_after_normalization": true,
+    "same_terms_different_order": true,
+    "classification": "char_diff_only",
+    "note": "仅全角/半角、× 与 * 的符号差异，语义相同"
+   },
+   "evidence_source": "platform",
+   "evidence_grade": "L3",
+   "evidence_grade_reason": "来源为 `platform`（第三方平台披露文本），**未取得基金合同/招募说明书原始文件**，不能作为 L1 法定披露证据",
+   "component_count": 2,
+   "components_by_type": {
+    "index": 1,
+    "cash": 1
+   },
+   "asset_weight_sum": 1.0,
+   "fixed_rate_components": 0,
+   "unexplained_residual": 0.0,
+   "states": {
+    "component_identified": true,
+    "weight_verified": true,
+    "weight_history_verified": false,
+    "return_basis_verified": false,
+    "history_data_available": false,
+    "point_in_time_verified": false,
+    "formula_reproducible": false,
+    "historically_reproducible": false
+   },
+   "db_claimed": {
+    "is_complete": false,
+    "is_reproducible": false,
+    "missing_reason": "1 个成分无可用收益序列：cash(cash)"
+   },
+   "blockers": [
+    "**历史权重与生效日期全部缺失**（15/15 条基准的 weight_effective_from 均为 NULL）",
+    "**收益口径未确认**（全部 return_basis=unknown 或未核实）",
+    "历史数据缺失：cash",
+    "**时点可用性无证据**"
+   ],
+   "earliest_reproducible_date": null,
+   "latest_reproducible_date": null,
+   "non_reproducible_interval": "全部历史（无法确定任何可用区间）",
+   "required_evidence": [
+    "基金合同/招募说明书原始文件（L1）",
+    "历次基准变更公告及生效日期（L1）",
+    "各债券指数的官方代码对照与编制方案（L1/L2）",
+    "活期/同业存款利率的历史序列及税后换算口径",
+    "固定年化收益率的期间折算规则",
+    "各成分数据的发布时刻与修订记录"
+   ]
+  },
+  {
+   "composite_id": 18,
+   "fund_code": "161725",
+   "benchmark_name": "161725 招商中证白酒指数(LOF)",
+   "fund_info": {
+    "fund_code": "161725",
+    "fund_name": "招商中证白酒指数(LOF)",
+    "fund_full_name": "招商中证白酒指数证券投资基金",
+    "fund_company": "招商基金管理有限公司",
+    "fund_type_l1": "指数型-股票",
+    "established_date": "2015-05-27",
+    "fund_master_benchmark": "中证白酒指数收益率×95%＋金融机构人民币活期存款基准利率（税后）×5%"
+   },
+   "benchmark_raw_text": "中证白酒指数收益率×95%+活期存款利率(税后)×5%",
+   "fund_master_benchmark_text": "中证白酒指数收益率×95%＋金融机构人民币活期存款基准利率（税后）×5%",
+   "text_consistency": {
+    "identical": false,
+    "equivalent_after_normalization": false,
+    "same_terms_different_order": false,
+    "classification": "semantic_diff",
+    "note": "**语义实质不同**，必须确认以合同为准"
+   },
+   "evidence_source": "platform",
+   "evidence_grade": "L3",
+   "evidence_grade_reason": "来源为 `platform`（第三方平台披露文本），**未取得基金合同/招募说明书原始文件**，不能作为 L1 法定披露证据",
+   "component_count": 2,
+   "components_by_type": {
+    "index": 1,
+    "cash": 1
+   },
+   "asset_weight_sum": 1.0,
+   "fixed_rate_components": 0,
+   "unexplained_residual": 0.0,
+   "states": {
+    "component_identified": true,
+    "weight_verified": true,
+    "weight_history_verified": false,
+    "return_basis_verified": false,
+    "history_data_available": false,
+    "point_in_time_verified": false,
+    "formula_reproducible": false,
+    "historically_reproducible": false
+   },
+   "db_claimed": {
+    "is_complete": false,
+    "is_reproducible": false,
+    "missing_reason": "1 个成分无可用收益序列：cash(cash)"
+   },
+   "blockers": [
+    "**历史权重与生效日期全部缺失**（15/15 条基准的 weight_effective_from 均为 NULL）",
+    "**收益口径未确认**（全部 return_basis=unknown 或未核实）",
+    "历史数据缺失：cash",
+    "**时点可用性无证据**"
+   ],
+   "earliest_reproducible_date": null,
+   "latest_reproducible_date": null,
+   "non_reproducible_interval": "全部历史（无法确定任何可用区间）",
+   "required_evidence": [
+    "基金合同/招募说明书原始文件（L1）",
+    "历次基准变更公告及生效日期（L1）",
+    "各债券指数的官方代码对照与编制方案（L1/L2）",
+    "活期/同业存款利率的历史序列及税后换算口径",
+    "固定年化收益率的期间折算规则",
+    "各成分数据的发布时刻与修订记录"
+   ]
+  },
+  {
+   "composite_id": 19,
+   "fund_code": "007300",
+   "benchmark_name": "007300 国联安中证半导体ETF联接",
+   "fund_info": {
+    "fund_code": "007300",
+    "fund_name": "国联安中证半导体ETF联接",
+    "fund_full_name": "国联安中证全指半导体产品与设备交易型开放式指数证券投资基金联接基金",
+    "fund_company": "国联安基金管理有限公司",
+    "fund_type_l1": "指数型-股票",
+    "established_date": "2019-06-26",
+    "fund_master_benchmark": "中证全指半导体产品与设备指数收益率×95%＋银行活期存款利率（税后）×5%"
+   },
+   "benchmark_raw_text": "中证全指半导体产品与设备指数收益率×95%+银行活期存款利率(税后)×5%",
+   "fund_master_benchmark_text": "中证全指半导体产品与设备指数收益率×95%＋银行活期存款利率（税后）×5%",
+   "text_consistency": {
+    "identical": false,
+    "equivalent_after_normalization": true,
+    "same_terms_different_order": true,
+    "classification": "char_diff_only",
+    "note": "仅全角/半角、× 与 * 的符号差异，语义相同"
+   },
+   "evidence_source": "platform",
+   "evidence_grade": "L3",
+   "evidence_grade_reason": "来源为 `platform`（第三方平台披露文本），**未取得基金合同/招募说明书原始文件**，不能作为 L1 法定披露证据",
+   "component_count": 2,
+   "components_by_type": {
+    "index": 1,
+    "cash": 1
+   },
+   "asset_weight_sum": 1.0,
+   "fixed_rate_components": 0,
+   "unexplained_residual": 0.0,
+   "states": {
+    "component_identified": true,
+    "weight_verified": true,
+    "weight_history_verified": false,
+    "return_basis_verified": false,
+    "history_data_available": false,
+    "point_in_time_verified": false,
+    "formula_reproducible": false,
+    "historically_reproducible": false
+   },
+   "db_claimed": {
+    "is_complete": false,
+    "is_reproducible": false,
+    "missing_reason": "1 个成分无可用收益序列：cash(cash)"
+   },
+   "blockers": [
+    "**历史权重与生效日期全部缺失**（15/15 条基准的 weight_effective_from 均为 NULL）",
+    "**收益口径未确认**（全部 return_basis=unknown 或未核实）",
+    "历史数据缺失：cash",
+    "**时点可用性无证据**"
+   ],
+   "earliest_reproducible_date": null,
+   "latest_reproducible_date": null,
+   "non_reproducible_interval": "全部历史（无法确定任何可用区间）",
+   "required_evidence": [
+    "基金合同/招募说明书原始文件（L1）",
+    "历次基准变更公告及生效日期（L1）",
+    "各债券指数的官方代码对照与编制方案（L1/L2）",
+    "活期/同业存款利率的历史序列及税后换算口径",
+    "固定年化收益率的期间折算规则",
+    "各成分数据的发布时刻与修订记录"
+   ]
+  },
+  {
+   "composite_id": 20,
+   "fund_code": "000478",
+   "benchmark_name": "000478 建信中证500指数增强",
+   "fund_info": {
+    "fund_code": "000478",
+    "fund_name": "建信中证500指数增强",
+    "fund_full_name": "建信中证500指数增强型证券投资基金",
+    "fund_company": "建信基金管理有限责任公司",
+    "fund_type_l1": "指数型-股票",
+    "established_date": "2014-01-27",
+    "fund_master_benchmark": "95%×中证500指数收益率+5%×商业银行活期存款利率（税前）"
+   },
+   "benchmark_raw_text": "中证500指数收益率×95%+银行活期存款利率(税后)×5%",
+   "fund_master_benchmark_text": "95%×中证500指数收益率+5%×商业银行活期存款利率（税前）",
+   "text_consistency": {
+    "identical": false,
+    "equivalent_after_normalization": false,
+    "same_terms_different_order": false,
+    "classification": "semantic_diff",
+    "note": "**语义实质不同**，必须确认以合同为准"
+   },
+   "evidence_source": "platform",
+   "evidence_grade": "L3",
+   "evidence_grade_reason": "来源为 `platform`（第三方平台披露文本），**未取得基金合同/招募说明书原始文件**，不能作为 L1 法定披露证据",
+   "component_count": 2,
+   "components_by_type": {
+    "index": 1,
+    "cash": 1
+   },
+   "asset_weight_sum": 1.0,
+   "fixed_rate_components": 0,
+   "unexplained_residual": 0.0,
+   "states": {
+    "component_identified": true,
+    "weight_verified": true,
+    "weight_history_verified": false,
+    "return_basis_verified": false,
+    "history_data_available": false,
+    "point_in_time_verified": false,
+    "formula_reproducible": false,
+    "historically_reproducible": false
+   },
+   "db_claimed": {
+    "is_complete": false,
+    "is_reproducible": false,
+    "missing_reason": "1 个成分无可用收益序列：cash(cash)"
+   },
+   "blockers": [
+    "**历史权重与生效日期全部缺失**（15/15 条基准的 weight_effective_from 均为 NULL）",
+    "**收益口径未确认**（全部 return_basis=unknown 或未核实）",
+    "历史数据缺失：cash",
+    "**时点可用性无证据**"
+   ],
+   "earliest_reproducible_date": null,
+   "latest_reproducible_date": null,
+   "non_reproducible_interval": "全部历史（无法确定任何可用区间）",
+   "required_evidence": [
+    "基金合同/招募说明书原始文件（L1）",
+    "历次基准变更公告及生效日期（L1）",
+    "各债券指数的官方代码对照与编制方案（L1/L2）",
+    "活期/同业存款利率的历史序列及税后换算口径",
+    "固定年化收益率的期间折算规则",
+    "各成分数据的发布时刻与修订记录"
+   ]
+  },
+  {
+   "composite_id": 21,
+   "fund_code": "000961",
+   "benchmark_name": "000961 天弘沪深300ETF联接",
+   "fund_info": {
+    "fund_code": "000961",
+    "fund_name": "天弘沪深300ETF联接",
+    "fund_full_name": "天弘沪深300交易型开放式指数证券投资基金联接基金",
+    "fund_company": "天弘基金管理有限公司",
+    "fund_type_l1": "股票型-标准指数",
+    "established_date": "2015-01-20",
+    "fund_master_benchmark": "沪深300指数收益率×95%＋银行活期存款利率（税后）×5%"
+   },
+   "benchmark_raw_text": "沪深300指数收益率×95%+银行活期存款利率(税后)×5%",
+   "fund_master_benchmark_text": "沪深300指数收益率×95%＋银行活期存款利率（税后）×5%",
+   "text_consistency": {
+    "identical": false,
+    "equivalent_after_normalization": true,
+    "same_terms_different_order": true,
+    "classification": "char_diff_only",
+    "note": "仅全角/半角、× 与 * 的符号差异，语义相同"
+   },
+   "evidence_source": "platform",
+   "evidence_grade": "L3",
+   "evidence_grade_reason": "来源为 `platform`（第三方平台披露文本），**未取得基金合同/招募说明书原始文件**，不能作为 L1 法定披露证据",
+   "component_count": 2,
+   "components_by_type": {
+    "index": 1,
+    "cash": 1
+   },
+   "asset_weight_sum": 1.0,
+   "fixed_rate_components": 0,
+   "unexplained_residual": 0.0,
+   "states": {
+    "component_identified": true,
+    "weight_verified": true,
+    "weight_history_verified": false,
+    "return_basis_verified": false,
+    "history_data_available": false,
+    "point_in_time_verified": false,
+    "formula_reproducible": false,
+    "historically_reproducible": false
+   },
+   "db_claimed": {
+    "is_complete": false,
+    "is_reproducible": false,
+    "missing_reason": "1 个成分无可用收益序列：cash(cash)"
+   },
+   "blockers": [
+    "**历史权重与生效日期全部缺失**（15/15 条基准的 weight_effective_from 均为 NULL）",
+    "**收益口径未确认**（全部 return_basis=unknown 或未核实）",
+    "历史数据缺失：cash",
+    "**时点可用性无证据**"
+   ],
+   "earliest_reproducible_date": null,
+   "latest_reproducible_date": null,
+   "non_reproducible_interval": "全部历史（无法确定任何可用区间）",
+   "required_evidence": [
+    "基金合同/招募说明书原始文件（L1）",
+    "历次基准变更公告及生效日期（L1）",
+    "各债券指数的官方代码对照与编制方案（L1/L2）",
+    "活期/同业存款利率的历史序列及税后换算口径",
+    "固定年化收益率的期间折算规则",
+    "各成分数据的发布时刻与修订记录"
+   ]
+  },
+  {
+   "composite_id": 22,
+   "fund_code": "050002",
+   "benchmark_name": "050002 博时裕富沪深300指数",
+   "fund_info": {
+    "fund_code": "050002",
+    "fund_name": "博时裕富沪深300指数",
+    "fund_full_name": "博时裕富沪深300指数证券投资基金",
+    "fund_company": "博时基金管理有限公司",
+    "fund_type_l1": "股票型-标准指数",
+    "established_date": "2003-08-26",
+    "fund_master_benchmark": "95%*沪深300指数+5%*银行同业存款利率"
+   },
+   "benchmark_raw_text": "沪深300指数收益率×95%+银行活期存款利率(税后)×5%",
+   "fund_master_benchmark_text": "95%*沪深300指数+5%*银行同业存款利率",
+   "text_consistency": {
+    "identical": false,
+    "equivalent_after_normalization": false,
+    "same_terms_different_order": false,
+    "classification": "semantic_diff",
+    "note": "**语义实质不同**，必须确认以合同为准"
+   },
+   "evidence_source": "platform",
+   "evidence_grade": "L3",
+   "evidence_grade_reason": "来源为 `platform`（第三方平台披露文本），**未取得基金合同/招募说明书原始文件**，不能作为 L1 法定披露证据",
+   "component_count": 2,
+   "components_by_type": {
+    "index": 1,
+    "cash": 1
+   },
+   "asset_weight_sum": 1.0,
+   "fixed_rate_components": 0,
+   "unexplained_residual": 0.0,
+   "states": {
+    "component_identified": true,
+    "weight_verified": true,
+    "weight_history_verified": false,
+    "return_basis_verified": false,
+    "history_data_available": false,
+    "point_in_time_verified": false,
+    "formula_reproducible": false,
+    "historically_reproducible": false
+   },
+   "db_claimed": {
+    "is_complete": false,
+    "is_reproducible": false,
+    "missing_reason": "1 个成分无可用收益序列：cash(cash)"
+   },
+   "blockers": [
+    "**历史权重与生效日期全部缺失**（15/15 条基准的 weight_effective_from 均为 NULL）",
+    "**收益口径未确认**（全部 return_basis=unknown 或未核实）",
+    "历史数据缺失：cash",
+    "**时点可用性无证据**"
+   ],
+   "earliest_reproducible_date": null,
+   "latest_reproducible_date": null,
+   "non_reproducible_interval": "全部历史（无法确定任何可用区间）",
+   "required_evidence": [
+    "基金合同/招募说明书原始文件（L1）",
+    "历次基准变更公告及生效日期（L1）",
+    "各债券指数的官方代码对照与编制方案（L1/L2）",
+    "活期/同业存款利率的历史序列及税后换算口径",
+    "固定年化收益率的期间折算规则",
+    "各成分数据的发布时刻与修订记录"
+   ]
+  },
+  {
+   "composite_id": 23,
+   "fund_code": "001052",
+   "benchmark_name": "001052 华夏中证500ETF联接",
+   "fund_info": {
+    "fund_code": "001052",
+    "fund_name": "华夏中证500ETF联接",
+    "fund_full_name": "华夏中证500交易型开放式指数证券投资基金联接基金",
+    "fund_company": "华夏基金管理有限公司",
+    "fund_type_l1": "股票型-标准指数",
+    "established_date": "2015-05-05",
+    "fund_master_benchmark": "中证500指数收益率×95%＋人民币活期存款税后利率×5%"
+   },
+   "benchmark_raw_text": "中证500指数收益率×95%+银行活期存款利率(税后)×5%",
+   "fund_master_benchmark_text": "中证500指数收益率×95%＋人民币活期存款税后利率×5%",
+   "text_consistency": {
+    "identical": false,
+    "equivalent_after_normalization": false,
+    "same_terms_different_order": false,
+    "classification": "semantic_diff",
+    "note": "**语义实质不同**，必须确认以合同为准"
+   },
+   "evidence_source": "platform",
+   "evidence_grade": "L3",
+   "evidence_grade_reason": "来源为 `platform`（第三方平台披露文本），**未取得基金合同/招募说明书原始文件**，不能作为 L1 法定披露证据",
+   "component_count": 2,
+   "components_by_type": {
+    "index": 1,
+    "cash": 1
+   },
+   "asset_weight_sum": 1.0,
+   "fixed_rate_components": 0,
+   "unexplained_residual": 0.0,
+   "states": {
+    "component_identified": true,
+    "weight_verified": true,
+    "weight_history_verified": false,
+    "return_basis_verified": false,
+    "history_data_available": false,
+    "point_in_time_verified": false,
+    "formula_reproducible": false,
+    "historically_reproducible": false
+   },
+   "db_claimed": {
+    "is_complete": false,
+    "is_reproducible": false,
+    "missing_reason": "1 个成分无可用收益序列：cash(cash)"
+   },
+   "blockers": [
+    "**历史权重与生效日期全部缺失**（15/15 条基准的 weight_effective_from 均为 NULL）",
+    "**收益口径未确认**（全部 return_basis=unknown 或未核实）",
+    "历史数据缺失：cash",
+    "**时点可用性无证据**"
+   ],
+   "earliest_reproducible_date": null,
+   "latest_reproducible_date": null,
+   "non_reproducible_interval": "全部历史（无法确定任何可用区间）",
+   "required_evidence": [
+    "基金合同/招募说明书原始文件（L1）",
+    "历次基准变更公告及生效日期（L1）",
+    "各债券指数的官方代码对照与编制方案（L1/L2）",
+    "活期/同业存款利率的历史序列及税后换算口径",
+    "固定年化收益率的期间折算规则",
+    "各成分数据的发布时刻与修订记录"
+   ]
+  },
+  {
+   "composite_id": 24,
+   "fund_code": "001548",
+   "benchmark_name": "001548 天弘上证50ETF联接",
+   "fund_info": {
+    "fund_code": "001548",
+    "fund_name": "天弘上证50ETF联接",
+    "fund_full_name": "天弘上证50交易型开放式指数证券投资基金联接基金",
+    "fund_company": "天弘基金管理有限公司",
+    "fund_type_l1": "股票型-标准指数",
+    "established_date": "2015-07-16",
+    "fund_master_benchmark": "上证50指数收益率×95%＋银行活期存款利率（税后）×5%"
+   },
+   "benchmark_raw_text": "上证50指数收益率×95%+银行活期存款利率(税后)×5%",
+   "fund_master_benchmark_text": "上证50指数收益率×95%＋银行活期存款利率（税后）×5%",
+   "text_consistency": {
+    "identical": false,
+    "equivalent_after_normalization": true,
+    "same_terms_different_order": true,
+    "classification": "char_diff_only",
+    "note": "仅全角/半角、× 与 * 的符号差异，语义相同"
+   },
+   "evidence_source": "platform",
+   "evidence_grade": "L3",
+   "evidence_grade_reason": "来源为 `platform`（第三方平台披露文本），**未取得基金合同/招募说明书原始文件**，不能作为 L1 法定披露证据",
+   "component_count": 2,
+   "components_by_type": {
+    "index": 1,
+    "cash": 1
+   },
+   "asset_weight_sum": 1.0,
+   "fixed_rate_components": 0,
+   "unexplained_residual": 0.0,
+   "states": {
+    "component_identified": true,
+    "weight_verified": true,
+    "weight_history_verified": false,
+    "return_basis_verified": false,
+    "history_data_available": false,
+    "point_in_time_verified": false,
+    "formula_reproducible": false,
+    "historically_reproducible": false
+   },
+   "db_claimed": {
+    "is_complete": false,
+    "is_reproducible": false,
+    "missing_reason": "1 个成分无可用收益序列：cash(cash)"
+   },
+   "blockers": [
+    "**历史权重与生效日期全部缺失**（15/15 条基准的 weight_effective_from 均为 NULL）",
+    "**收益口径未确认**（全部 return_basis=unknown 或未核实）",
+    "历史数据缺失：cash",
+    "**时点可用性无证据**"
+   ],
+   "earliest_reproducible_date": null,
+   "latest_reproducible_date": null,
+   "non_reproducible_interval": "全部历史（无法确定任何可用区间）",
+   "required_evidence": [
+    "基金合同/招募说明书原始文件（L1）",
+    "历次基准变更公告及生效日期（L1）",
+    "各债券指数的官方代码对照与编制方案（L1/L2）",
+    "活期/同业存款利率的历史序列及税后换算口径",
+    "固定年化收益率的期间折算规则",
+    "各成分数据的发布时刻与修订记录"
+   ]
+  },
+  {
+   "composite_id": 25,
+   "fund_code": "110022",
+   "benchmark_name": "110022 易方达消费行业股票",
+   "fund_info": {
+    "fund_code": "110022",
+    "fund_name": "易方达消费行业股票",
+    "fund_full_name": "易方达消费行业股票型证券投资基金",
+    "fund_company": "易方达基金管理有限公司",
+    "fund_type_l1": "股票型",
+    "established_date": "2010-08-20",
+    "fund_master_benchmark": "中证内地消费主题指数收益率×85%+中债总指数收益率×15%"
+   },
+   "benchmark_raw_text": "中证内地消费主题指数收益率×85%+中债总指数收益率×15%",
+   "fund_master_benchmark_text": "中证内地消费主题指数收益率×85%+中债总指数收益率×15%",
+   "text_consistency": {
+    "identical": true,
+    "equivalent_after_normalization": true,
+    "same_terms_different_order": true,
+    "classification": "identical",
+    "note": "两处文本完全一致"
+   },
+   "evidence_source": "platform",
+   "evidence_grade": "L3",
+   "evidence_grade_reason": "来源为 `platform`（第三方平台披露文本），**未取得基金合同/招募说明书原始文件**，不能作为 L1 法定披露证据",
+   "component_count": 2,
+   "components_by_type": {
+    "index": 1,
+    "bond_index": 1
+   },
+   "asset_weight_sum": 1.0,
+   "fixed_rate_components": 0,
+   "unexplained_residual": 0.0,
+   "states": {
+    "component_identified": true,
+    "weight_verified": true,
+    "weight_history_verified": false,
+    "return_basis_verified": false,
+    "history_data_available": true,
+    "point_in_time_verified": false,
+    "formula_reproducible": false,
+    "historically_reproducible": false
+   },
+   "db_claimed": {
+    "is_complete": false,
+    "is_reproducible": false,
+    "missing_reason": "1 个成分无可用收益序列：中债总(bond_index)"
+   },
+   "blockers": [
+    "**历史权重与生效日期全部缺失**（15/15 条基准的 weight_effective_from 均为 NULL）",
+    "**收益口径未确认**（全部 return_basis=unknown 或未核实）",
+    "**时点可用性无证据**"
+   ],
+   "earliest_reproducible_date": null,
+   "latest_reproducible_date": null,
+   "non_reproducible_interval": "全部历史（无法确定任何可用区间）",
+   "required_evidence": [
+    "基金合同/招募说明书原始文件（L1）",
+    "历次基准变更公告及生效日期（L1）",
+    "各债券指数的官方代码对照与编制方案（L1/L2）",
+    "活期/同业存款利率的历史序列及税后换算口径",
+    "固定年化收益率的期间折算规则",
+    "各成分数据的发布时刻与修订记录"
+   ]
+  },
+  {
+   "composite_id": 26,
+   "fund_code": "161005",
+   "benchmark_name": "161005 富国天惠成长混合(LOF)",
+   "fund_info": {
+    "fund_code": "161005",
+    "fund_name": "富国天惠成长混合(LOF)",
+    "fund_full_name": "富国天惠精选成长混合型证券投资基金(LOF)",
+    "fund_company": "富国基金管理有限公司",
+    "fund_type_l1": "混合型-偏股",
+    "established_date": "2005-11-16",
+    "fund_master_benchmark": "沪深300指数收益率×70%+中债综合全价指数收益率×25%+同业存款利率×5%"
+   },
+   "benchmark_raw_text": "沪深300指数收益率×70%+中债综合全价指数收益率×25%+同业存款利率×5%",
+   "fund_master_benchmark_text": "沪深300指数收益率×70%+中债综合全价指数收益率×25%+同业存款利率×5%",
+   "text_consistency": {
+    "identical": true,
+    "equivalent_after_normalization": true,
+    "same_terms_different_order": true,
+    "classification": "identical",
+    "note": "两处文本完全一致"
+   },
+   "evidence_source": "platform",
+   "evidence_grade": "L3",
+   "evidence_grade_reason": "来源为 `platform`（第三方平台披露文本），**未取得基金合同/招募说明书原始文件**，不能作为 L1 法定披露证据",
+   "component_count": 3,
+   "components_by_type": {
+    "index": 1,
+    "bond_index": 1,
+    "cash": 1
+   },
+   "asset_weight_sum": 1.0,
+   "fixed_rate_components": 0,
+   "unexplained_residual": 0.0,
+   "states": {
+    "component_identified": true,
+    "weight_verified": true,
+    "weight_history_verified": false,
+    "return_basis_verified": false,
+    "history_data_available": false,
+    "point_in_time_verified": false,
+    "formula_reproducible": false,
+    "historically_reproducible": false
+   },
+   "db_claimed": {
+    "is_complete": false,
+    "is_reproducible": false,
+    "missing_reason": "2 个成分无可用收益序列：中债综合全价(bond_index), cash(cash)"
+   },
+   "blockers": [
+    "**历史权重与生效日期全部缺失**（15/15 条基准的 weight_effective_from 均为 NULL）",
+    "**收益口径未确认**（全部 return_basis=unknown 或未核实）",
+    "历史数据缺失：cash",
+    "**时点可用性无证据**"
+   ],
+   "earliest_reproducible_date": null,
+   "latest_reproducible_date": null,
+   "non_reproducible_interval": "全部历史（无法确定任何可用区间）",
+   "required_evidence": [
+    "基金合同/招募说明书原始文件（L1）",
+    "历次基准变更公告及生效日期（L1）",
+    "各债券指数的官方代码对照与编制方案（L1/L2）",
+    "活期/同业存款利率的历史序列及税后换算口径",
+    "固定年化收益率的期间折算规则",
+    "各成分数据的发布时刻与修订记录"
+   ]
+  },
+  {
+   "composite_id": 27,
+   "fund_code": "001938",
+   "benchmark_name": "001938 中欧时代先锋",
+   "fund_info": {
+    "fund_code": "001938",
+    "fund_name": "中欧时代先锋",
+    "fund_full_name": "中欧时代先锋股票型发起式证券投资基金",
+    "fund_company": "中欧基金管理公司",
+    "fund_type_l1": "股票型-普通",
+    "established_date": "2015-11-03",
+    "fund_master_benchmark": "90%×中证500指数收益率+10%×中证综合债券指数收益率"
+   },
+   "benchmark_raw_text": "中证500指数收益率×90%+中证综合债券指数收益率×10%",
+   "fund_master_benchmark_text": "90%×中证500指数收益率+10%×中证综合债券指数收益率",
+   "text_consistency": {
+    "identical": false,
+    "equivalent_after_normalization": false,
+    "same_terms_different_order": true,
+    "classification": "order_diff_only",
+    "note": "仅各项书写顺序不同，语义相同"
+   },
+   "evidence_source": "platform",
+   "evidence_grade": "L3",
+   "evidence_grade_reason": "来源为 `platform`（第三方平台披露文本），**未取得基金合同/招募说明书原始文件**，不能作为 L1 法定披露证据",
+   "component_count": 2,
+   "components_by_type": {
+    "index": 1,
+    "bond_index": 1
+   },
+   "asset_weight_sum": 1.0,
+   "fixed_rate_components": 0,
+   "unexplained_residual": 0.0,
+   "states": {
+    "component_identified": true,
+    "weight_verified": true,
+    "weight_history_verified": false,
+    "return_basis_verified": false,
+    "history_data_available": false,
+    "point_in_time_verified": false,
+    "formula_reproducible": false,
+    "historically_reproducible": false
+   },
+   "db_claimed": {
+    "is_complete": false,
+    "is_reproducible": false,
+    "missing_reason": "1 个成分无可用收益序列：中证综合债券(bond_index)"
+   },
+   "blockers": [
+    "**历史权重与生效日期全部缺失**（15/15 条基准的 weight_effective_from 均为 NULL）",
+    "**收益口径未确认**（全部 return_basis=unknown 或未核实）",
+    "历史数据缺失：中证综合债券",
+    "**时点可用性无证据**"
+   ],
+   "earliest_reproducible_date": null,
+   "latest_reproducible_date": null,
+   "non_reproducible_interval": "全部历史（无法确定任何可用区间）",
+   "required_evidence": [
+    "基金合同/招募说明书原始文件（L1）",
+    "历次基准变更公告及生效日期（L1）",
+    "各债券指数的官方代码对照与编制方案（L1/L2）",
+    "活期/同业存款利率的历史序列及税后换算口径",
+    "固定年化收益率的期间折算规则",
+    "各成分数据的发布时刻与修订记录"
+   ]
+  },
+  {
+   "composite_id": 28,
+   "fund_code": "012346",
+   "benchmark_name": "012346 易方达港股通成长混合",
+   "fund_info": {
+    "fund_code": "012346",
+    "fund_name": "易方达港股通成长混合",
+    "fund_full_name": "易方达港股通成长混合型证券投资基金",
+    "fund_company": "易方达基金管理有限公司",
+    "fund_type_l1": "混合型-偏股",
+    "established_date": "2021-08-31",
+    "fund_master_benchmark": "中证港股通综合指数(人民币)收益率×75%+中证500指数收益率×10%+中债-总全价(总值)指数收益率×15%"
+   },
+   "benchmark_raw_text": "中证港股通综合指数(人民币)收益率×75%+中证500指数收益率×10%+中债-总全价(总值)指数收益率×15%",
+   "fund_master_benchmark_text": "中证港股通综合指数(人民币)收益率×75%+中证500指数收益率×10%+中债-总全价(总值)指数收益率×15%",
+   "text_consistency": {
+    "identical": true,
+    "equivalent_after_normalization": true,
+    "same_terms_different_order": true,
+    "classification": "identical",
+    "note": "两处文本完全一致"
+   },
+   "evidence_source": "platform",
+   "evidence_grade": "L3",
+   "evidence_grade_reason": "来源为 `platform`（第三方平台披露文本），**未取得基金合同/招募说明书原始文件**，不能作为 L1 法定披露证据",
+   "component_count": 3,
+   "components_by_type": {
+    "index": 2,
+    "bond_index": 1
+   },
+   "asset_weight_sum": 1.0,
+   "fixed_rate_components": 0,
+   "unexplained_residual": 0.0,
+   "states": {
+    "component_identified": true,
+    "weight_verified": true,
+    "weight_history_verified": false,
+    "return_basis_verified": false,
+    "history_data_available": false,
+    "point_in_time_verified": false,
+    "formula_reproducible": false,
+    "historically_reproducible": false
+   },
+   "db_claimed": {
+    "is_complete": false,
+    "is_reproducible": false,
+    "missing_reason": "1 个成分无可用收益序列：中债-总全价(bond_index)"
+   },
+   "blockers": [
+    "**历史权重与生效日期全部缺失**（15/15 条基准的 weight_effective_from 均为 NULL）",
+    "**收益口径未确认**（全部 return_basis=unknown 或未核实）",
+    "历史数据缺失：中债-总全价",
+    "**时点可用性无证据**"
+   ],
+   "earliest_reproducible_date": null,
+   "latest_reproducible_date": null,
+   "non_reproducible_interval": "全部历史（无法确定任何可用区间）",
+   "required_evidence": [
+    "基金合同/招募说明书原始文件（L1）",
+    "历次基准变更公告及生效日期（L1）",
+    "各债券指数的官方代码对照与编制方案（L1/L2）",
+    "活期/同业存款利率的历史序列及税后换算口径",
+    "固定年化收益率的期间折算规则",
+    "各成分数据的发布时刻与修订记录"
+   ]
+  },
+  {
+   "composite_id": 29,
+   "fund_code": "012344",
+   "benchmark_name": "012344 嘉实领先优势混合",
+   "fund_info": {
+    "fund_code": "012344",
+    "fund_name": "嘉实领先优势混合",
+    "fund_full_name": "嘉实领先优势混合型证券投资基金",
+    "fund_company": "嘉实基金管理有限公司",
+    "fund_type_l1": "混合型-偏股",
+    "established_date": "2021-06-09",
+    "fund_master_benchmark": "沪深300指数收益率×60%+恒生指数收益率（人民币计价）×30%+中债综合财富指数收益率×10%"
+   },
+   "benchmark_raw_text": "沪深300指数收益率×60%+恒生指数收益率（人民币计价）×30%+中债综合财富指数收益率×10%",
+   "fund_master_benchmark_text": "沪深300指数收益率×60%+恒生指数收益率（人民币计价）×30%+中债综合财富指数收益率×10%",
+   "text_consistency": {
+    "identical": true,
+    "equivalent_after_normalization": true,
+    "same_terms_different_order": true,
+    "classification": "identical",
+    "note": "两处文本完全一致"
+   },
+   "evidence_source": "platform",
+   "evidence_grade": "L3",
+   "evidence_grade_reason": "来源为 `platform`（第三方平台披露文本），**未取得基金合同/招募说明书原始文件**，不能作为 L1 法定披露证据",
+   "component_count": 3,
+   "components_by_type": {
+    "index": 2,
+    "bond_index": 1
+   },
+   "asset_weight_sum": 1.0,
+   "fixed_rate_components": 0,
+   "unexplained_residual": 0.0,
+   "states": {
+    "component_identified": false,
+    "weight_verified": true,
+    "weight_history_verified": false,
+    "return_basis_verified": false,
+    "history_data_available": false,
+    "point_in_time_verified": false,
+    "formula_reproducible": false,
+    "historically_reproducible": false
+   },
+   "db_claimed": {
+    "is_complete": false,
+    "is_reproducible": false,
+    "missing_reason": "1 个指数成分未映射到代码：恒生指数；2 个成分无可用收益序列：恒生指数(index), 中债综合财富(bond_index)"
+   },
+   "blockers": [
+    "存在未映射到代码的成分（恒生指数）",
+    "**历史权重与生效日期全部缺失**（15/15 条基准的 weight_effective_from 均为 NULL）",
+    "**收益口径未确认**（全部 return_basis=unknown 或未核实）",
+    "**时点可用性无证据**"
+   ],
+   "earliest_reproducible_date": null,
+   "latest_reproducible_date": null,
+   "non_reproducible_interval": "全部历史（无法确定任何可用区间）",
+   "required_evidence": [
+    "基金合同/招募说明书原始文件（L1）",
+    "历次基准变更公告及生效日期（L1）",
+    "各债券指数的官方代码对照与编制方案（L1/L2）",
+    "活期/同业存款利率的历史序列及税后换算口径",
+    "固定年化收益率的期间折算规则",
+    "各成分数据的发布时刻与修订记录"
+   ]
+  },
+  {
+   "composite_id": 30,
+   "fund_code": "519066",
+   "benchmark_name": "519066 汇添富蓝筹稳健混合",
+   "fund_info": {
+    "fund_code": "519066",
+    "fund_name": "汇添富蓝筹稳健混合",
+    "fund_full_name": "汇添富蓝筹稳健灵活配置混合型证券投资基金",
+    "fund_company": "汇添富基金公司",
+    "fund_type_l1": "混合型-灵活配置",
+    "established_date": "2008-07-08",
+    "fund_master_benchmark": "中证800指数收益率*70%+上证国债指数收益率*25%+活期存款基准利率*5%"
+   },
+   "benchmark_raw_text": "中证800指数收益率×70%+上证国债指数收益率×25%+活期存款基准利率×5%",
+   "fund_master_benchmark_text": "中证800指数收益率*70%+上证国债指数收益率*25%+活期存款基准利率*5%",
+   "text_consistency": {
+    "identical": false,
+    "equivalent_after_normalization": true,
+    "same_terms_different_order": true,
+    "classification": "char_diff_only",
+    "note": "仅全角/半角、× 与 * 的符号差异，语义相同"
+   },
+   "evidence_source": "platform",
+   "evidence_grade": "L3",
+   "evidence_grade_reason": "来源为 `platform`（第三方平台披露文本），**未取得基金合同/招募说明书原始文件**，不能作为 L1 法定披露证据",
+   "component_count": 3,
+   "components_by_type": {
+    "index": 2,
+    "cash": 1
+   },
+   "asset_weight_sum": 1.0,
+   "fixed_rate_components": 0,
+   "unexplained_residual": 0.0,
+   "states": {
+    "component_identified": true,
+    "weight_verified": true,
+    "weight_history_verified": false,
+    "return_basis_verified": false,
+    "history_data_available": false,
+    "point_in_time_verified": false,
+    "formula_reproducible": false,
+    "historically_reproducible": false
+   },
+   "db_claimed": {
+    "is_complete": false,
+    "is_reproducible": false,
+    "missing_reason": "1 个成分无可用收益序列：cash(cash)"
+   },
+   "blockers": [
+    "**历史权重与生效日期全部缺失**（15/15 条基准的 weight_effective_from 均为 NULL）",
+    "**收益口径未确认**（全部 return_basis=unknown 或未核实）",
+    "历史数据缺失：cash",
+    "**时点可用性无证据**"
+   ],
+   "earliest_reproducible_date": null,
+   "latest_reproducible_date": null,
+   "non_reproducible_interval": "全部历史（无法确定任何可用区间）",
+   "required_evidence": [
+    "基金合同/招募说明书原始文件（L1）",
+    "历次基准变更公告及生效日期（L1）",
+    "各债券指数的官方代码对照与编制方案（L1/L2）",
+    "活期/同业存款利率的历史序列及税后换算口径",
+    "固定年化收益率的期间折算规则",
+    "各成分数据的发布时刻与修订记录"
+   ]
+  }
+ ]
+}

@@ -1,0 +1,347 @@
+{
+ "phase": "3B-6.1.2",
+ "task": "point_in_time_audit",
+ "generated_at": "2026-11-25T10:17:09",
+ "baseline_head": "16307eb5ef4f19ca62417a546b6d2ec0a13d492a",
+ "three_dates_definition": {
+  "observation_date": "收益率/点位对应的观察日期",
+  "publication_date": "数据实际公开日期",
+  "available_date": "研究系统允许使用的最早日期",
+  "warning": "**无可靠证据时不得把三者默认视为相同**"
+ },
+ "evidence_by_component_type": {
+  "index": {
+   "observation_date": "有（接口日期字段）",
+   "publication_date": "**无官方时刻证据**",
+   "available_date": "**无法证明**",
+   "source": "3B-6.1.1 已审计（中债国债收益率）与指数点位接口"
+  },
+  "bond_index": {
+   "observation_date": "有（接口 date 字段）",
+   "publication_date": "**无中债登官方发布时刻证据**",
+   "available_date": "**无法证明**",
+   "source": "本轮 3B-6.1.2 债券指数审计"
+  },
+  "cash": {
+   "observation_date": "**无历史序列**",
+   "publication_date": "不适用",
+   "available_date": "**无法证明**",
+   "source": "活期/同业存款利率历史序列未取得"
+  },
+  "fixed_rate": {
+   "observation_date": "合同约定值，无观察日概念",
+   "publication_date": "不适用（合同约定值，无市场发布概念）；合同签署日未取得",
+   "available_date": "**期间折算规则未知**",
+   "source": "合同仅写「按期间折算」，未给公式"
+  }
+ },
+ "forward_look_bias_warning": "**在取得各成分发布时刻与修订记录证据前，任何「观察日即可用日」的假设都属前视偏差风险，不得为了扩大历史样本而默认成立**",
+ "benchmarks": [
+  {
+   "composite_id": 16,
+   "benchmark_name": "000051 华夏沪深300ETF联接",
+   "component_count": 2,
+   "component_types": {
+    "index": 1,
+    "fixed_rate": 1
+   },
+   "point_in_time_verified": false,
+   "observation_date_evidence": "无（所有成分均无发布日期/时刻证据）",
+   "publication_date_evidence": "无",
+   "available_date_evidence": "无",
+   "recommended_conservative_lag": "T+1（**建议值，未验证**）",
+   "reason": "**时点可用性无证据**",
+   "earliest_reproducible_date": null,
+   "latest_reproducible_date": null
+  },
+  {
+   "composite_id": 17,
+   "benchmark_name": "110020 易方达沪深300ETF联接",
+   "component_count": 2,
+   "component_types": {
+    "index": 1,
+    "cash": 1
+   },
+   "point_in_time_verified": false,
+   "observation_date_evidence": "无（所有成分均无发布日期/时刻证据）",
+   "publication_date_evidence": "无",
+   "available_date_evidence": "无",
+   "recommended_conservative_lag": "T+1（**建议值，未验证**）",
+   "reason": "**时点可用性无证据**",
+   "earliest_reproducible_date": null,
+   "latest_reproducible_date": null
+  },
+  {
+   "composite_id": 18,
+   "benchmark_name": "161725 招商中证白酒指数(LOF)",
+   "component_count": 2,
+   "component_types": {
+    "index": 1,
+    "cash": 1
+   },
+   "point_in_time_verified": false,
+   "observation_date_evidence": "无（所有成分均无发布日期/时刻证据）",
+   "publication_date_evidence": "无",
+   "available_date_evidence": "无",
+   "recommended_conservative_lag": "T+1（**建议值，未验证**）",
+   "reason": "**时点可用性无证据**",
+   "earliest_reproducible_date": null,
+   "latest_reproducible_date": null
+  },
+  {
+   "composite_id": 19,
+   "benchmark_name": "007300 国联安中证半导体ETF联接",
+   "component_count": 2,
+   "component_types": {
+    "index": 1,
+    "cash": 1
+   },
+   "point_in_time_verified": false,
+   "observation_date_evidence": "无（所有成分均无发布日期/时刻证据）",
+   "publication_date_evidence": "无",
+   "available_date_evidence": "无",
+   "recommended_conservative_lag": "T+1（**建议值，未验证**）",
+   "reason": "**时点可用性无证据**",
+   "earliest_reproducible_date": null,
+   "latest_reproducible_date": null
+  },
+  {
+   "composite_id": 20,
+   "benchmark_name": "000478 建信中证500指数增强",
+   "component_count": 2,
+   "component_types": {
+    "index": 1,
+    "cash": 1
+   },
+   "point_in_time_verified": false,
+   "observation_date_evidence": "无（所有成分均无发布日期/时刻证据）",
+   "publication_date_evidence": "无",
+   "available_date_evidence": "无",
+   "recommended_conservative_lag": "T+1（**建议值，未验证**）",
+   "reason": "**时点可用性无证据**",
+   "earliest_reproducible_date": null,
+   "latest_reproducible_date": null
+  },
+  {
+   "composite_id": 21,
+   "benchmark_name": "000961 天弘沪深300ETF联接",
+   "component_count": 2,
+   "component_types": {
+    "index": 1,
+    "cash": 1
+   },
+   "point_in_time_verified": false,
+   "observation_date_evidence": "无（所有成分均无发布日期/时刻证据）",
+   "publication_date_evidence": "无",
+   "available_date_evidence": "无",
+   "recommended_conservative_lag": "T+1（**建议值，未验证**）",
+   "reason": "**时点可用性无证据**",
+   "earliest_reproducible_date": null,
+   "latest_reproducible_date": null
+  },
+  {
+   "composite_id": 22,
+   "benchmark_name": "050002 博时裕富沪深300指数",
+   "component_count": 2,
+   "component_types": {
+    "index": 1,
+    "cash": 1
+   },
+   "point_in_time_verified": false,
+   "observation_date_evidence": "无（所有成分均无发布日期/时刻证据）",
+   "publication_date_evidence": "无",
+   "available_date_evidence": "无",
+   "recommended_conservative_lag": "T+1（**建议值，未验证**）",
+   "reason": "**时点可用性无证据**",
+   "earliest_reproducible_date": null,
+   "latest_reproducible_date": null
+  },
+  {
+   "composite_id": 23,
+   "benchmark_name": "001052 华夏中证500ETF联接",
+   "component_count": 2,
+   "component_types": {
+    "index": 1,
+    "cash": 1
+   },
+   "point_in_time_verified": false,
+   "observation_date_evidence": "无（所有成分均无发布日期/时刻证据）",
+   "publication_date_evidence": "无",
+   "available_date_evidence": "无",
+   "recommended_conservative_lag": "T+1（**建议值，未验证**）",
+   "reason": "**时点可用性无证据**",
+   "earliest_reproducible_date": null,
+   "latest_reproducible_date": null
+  },
+  {
+   "composite_id": 24,
+   "benchmark_name": "001548 天弘上证50ETF联接",
+   "component_count": 2,
+   "component_types": {
+    "index": 1,
+    "cash": 1
+   },
+   "point_in_time_verified": false,
+   "observation_date_evidence": "无（所有成分均无发布日期/时刻证据）",
+   "publication_date_evidence": "无",
+   "available_date_evidence": "无",
+   "recommended_conservative_lag": "T+1（**建议值，未验证**）",
+   "reason": "**时点可用性无证据**",
+   "earliest_reproducible_date": null,
+   "latest_reproducible_date": null
+  },
+  {
+   "composite_id": 25,
+   "benchmark_name": "110022 易方达消费行业股票",
+   "component_count": 2,
+   "component_types": {
+    "index": 1,
+    "bond_index": 1
+   },
+   "point_in_time_verified": false,
+   "observation_date_evidence": "无（所有成分均无发布日期/时刻证据）",
+   "publication_date_evidence": "无",
+   "available_date_evidence": "无",
+   "recommended_conservative_lag": "T+1（**建议值，未验证**）",
+   "reason": "**时点可用性无证据**",
+   "earliest_reproducible_date": null,
+   "latest_reproducible_date": null
+  },
+  {
+   "composite_id": 26,
+   "benchmark_name": "161005 富国天惠成长混合(LOF)",
+   "component_count": 3,
+   "component_types": {
+    "index": 1,
+    "bond_index": 1,
+    "cash": 1
+   },
+   "point_in_time_verified": false,
+   "observation_date_evidence": "无（所有成分均无发布日期/时刻证据）",
+   "publication_date_evidence": "无",
+   "available_date_evidence": "无",
+   "recommended_conservative_lag": "T+1（**建议值，未验证**）",
+   "reason": "**时点可用性无证据**",
+   "earliest_reproducible_date": null,
+   "latest_reproducible_date": null
+  },
+  {
+   "composite_id": 27,
+   "benchmark_name": "001938 中欧时代先锋",
+   "component_count": 2,
+   "component_types": {
+    "index": 1,
+    "bond_index": 1
+   },
+   "point_in_time_verified": false,
+   "observation_date_evidence": "无（所有成分均无发布日期/时刻证据）",
+   "publication_date_evidence": "无",
+   "available_date_evidence": "无",
+   "recommended_conservative_lag": "T+1（**建议值，未验证**）",
+   "reason": "**时点可用性无证据**",
+   "earliest_reproducible_date": null,
+   "latest_reproducible_date": null
+  },
+  {
+   "composite_id": 28,
+   "benchmark_name": "012346 易方达港股通成长混合",
+   "component_count": 3,
+   "component_types": {
+    "index": 2,
+    "bond_index": 1
+   },
+   "point_in_time_verified": false,
+   "observation_date_evidence": "无（所有成分均无发布日期/时刻证据）",
+   "publication_date_evidence": "无",
+   "available_date_evidence": "无",
+   "recommended_conservative_lag": "T+1（**建议值，未验证**）",
+   "reason": "**时点可用性无证据**",
+   "earliest_reproducible_date": null,
+   "latest_reproducible_date": null
+  },
+  {
+   "composite_id": 29,
+   "benchmark_name": "012344 嘉实领先优势混合",
+   "component_count": 3,
+   "component_types": {
+    "index": 2,
+    "bond_index": 1
+   },
+   "point_in_time_verified": false,
+   "observation_date_evidence": "无（所有成分均无发布日期/时刻证据）",
+   "publication_date_evidence": "无",
+   "available_date_evidence": "无",
+   "recommended_conservative_lag": "T+1（**建议值，未验证**）",
+   "reason": "**时点可用性无证据**",
+   "earliest_reproducible_date": null,
+   "latest_reproducible_date": null
+  },
+  {
+   "composite_id": 30,
+   "benchmark_name": "519066 汇添富蓝筹稳健混合",
+   "component_count": 3,
+   "component_types": {
+    "index": 2,
+    "cash": 1
+   },
+   "point_in_time_verified": false,
+   "observation_date_evidence": "无（所有成分均无发布日期/时刻证据）",
+   "publication_date_evidence": "无",
+   "available_date_evidence": "无",
+   "recommended_conservative_lag": "T+1（**建议值，未验证**）",
+   "reason": "**时点可用性无证据**",
+   "earliest_reproducible_date": null,
+   "latest_reproducible_date": null
+  }
+ ],
+ "summary": {
+  "total_benchmarks": 15,
+  "point_in_time_verified": 0,
+  "all_unverified": true,
+  "component_types_needing_evidence": [
+   "index",
+   "bond_index",
+   "cash",
+   "fixed_rate"
+  ],
+  "component_types_with_evidence": [],
+  "note": "**15/15 条基准的时点可用性全部未验证**：4 类成分均无发布时刻证据"
+ },
+ "bond_index_pit_detail": [
+  {
+   "contract_label": "中债总",
+   "mapping_confidence": "LOW",
+   "methodology_doc_obtained": false,
+   "revision_risk": "未排除",
+   "publication_time_evidence": false
+  },
+  {
+   "contract_label": "中债综合全价",
+   "mapping_confidence": "MEDIUM",
+   "methodology_doc_obtained": false,
+   "revision_risk": "未排除",
+   "publication_time_evidence": false
+  },
+  {
+   "contract_label": "中证综合债券",
+   "mapping_confidence": "NONE",
+   "methodology_doc_obtained": false,
+   "revision_risk": "未排除",
+   "publication_time_evidence": false
+  },
+  {
+   "contract_label": "中债-总全价(总值)",
+   "mapping_confidence": "LOW",
+   "methodology_doc_obtained": false,
+   "revision_risk": "未排除",
+   "publication_time_evidence": false
+  },
+  {
+   "contract_label": "中债综合财富",
+   "mapping_confidence": "MEDIUM",
+   "methodology_doc_obtained": false,
+   "revision_risk": "未排除",
+   "publication_time_evidence": false
+  }
+ ]
+}

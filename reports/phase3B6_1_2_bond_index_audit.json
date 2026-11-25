@@ -1,0 +1,399 @@
+{
+ "phase": "3B-6.1.2",
+ "task": "bond_index_component_audit",
+ "generated_at": "2026-11-25T10:16:14",
+ "source": "akshare.bond_index_general_cbond",
+ "upstream": "https://yield.chinabond.com.cn/cbweb-mn/indices/singleIndexQueryResult",
+ "publisher": "中债金融估值中心（中债登）",
+ "evidence_grade": "L3",
+ "evidence_grade_reason": "经 AKShare 聚合访问中债登数据；**未下载中债登官方编制方案或指数公告**，不能描述为「官方原始数据已独立核验」",
+ "indicator_semantics": {
+  "财富": "含利息及再投资的财富指数（≈总收益口径）",
+  "全价": "全价指数（含应计利息，不含再投资）",
+  "净价": "净价指数（不含应计利息）",
+  "warning": "**全价指数不等于全收益指数**；**财富指数含利息再投资，接近总收益但不等于「全收益」标准定义**"
+ },
+ "gap_threshold_days": 15,
+ "targets": [
+  {
+   "contract_label": "中债总",
+   "used_by_composite": [
+    110022
+   ],
+   "candidate_index_name": "综合指数",
+   "candidate_index": "综合指数",
+   "mapping_confidence": "LOW",
+   "mapping_note": "合同写「中债总指数」，无法确认对应「综合指数」还是「总指数」族系",
+   "probes": [
+    {
+     "source": "akshare.bond_index_general_cbond",
+     "upstream": "https://yield.chinabond.com.cn/cbweb-mn/indices/singleIndexQueryResult",
+     "params": {
+      "index_category": "综合指数",
+      "indicator": "财富",
+      "period": "总值"
+     },
+     "called_at": "2026-11-25T10:16:14",
+     "status": "ok",
+     "rows": 6225,
+     "error": null,
+     "date_min": "2002-01-04",
+     "date_max": "2026-11-24",
+     "duplicate_dates": 0,
+     "non_positive_values": 0,
+     "value_min": 99.8273,
+     "value_max": 265.0608,
+     "value_first": 99.9731,
+     "value_last": 264.6565,
+     "max_gap_days": 11,
+     "gap_count_over_threshold": 0,
+     "missing_intervals": [],
+     "coverage_ratio": 0.684743,
+     "raw_file": {
+      "file": "cbond_综合指数_财富.csv",
+      "bytes": 130054,
+      "sha256_16": "7844f92dfd42779c"
+     },
+     "sample": [
+      {
+       "date": "2002-01-04",
+       "value": 99.9731
+      },
+      {
+       "date": "2002-01-07",
+       "value": 100.0149
+      },
+      {
+       "date": "2002-01-08",
+       "value": 99.8273
+      }
+     ]
+    },
+    {
+     "source": "akshare.bond_index_general_cbond",
+     "upstream": "https://yield.chinabond.com.cn/cbweb-mn/indices/singleIndexQueryResult",
+     "params": {
+      "index_category": "综合指数",
+      "indicator": "全价",
+      "period": "总值"
+     },
+     "called_at": "2026-11-25T10:16:22",
+     "status": "ok",
+     "rows": 6225,
+     "error": null,
+     "date_min": "2002-01-04",
+     "date_max": "2026-11-24",
+     "duplicate_dates": 0,
+     "non_positive_values": 0,
+     "value_min": 97.1329,
+     "value_max": 132.8564,
+     "value_first": 99.9731,
+     "value_last": 132.362,
+     "max_gap_days": 11,
+     "gap_count_over_threshold": 0,
+     "missing_intervals": [],
+     "coverage_ratio": 0.684743,
+     "raw_file": {
+      "file": "cbond_综合指数_全价.csv",
+      "bytes": 129730,
+      "sha256_16": "e72aeae628916dc0"
+     },
+     "sample": [
+      {
+       "date": "2002-01-04",
+       "value": 99.9731
+      },
+      {
+       "date": "2002-01-07",
+       "value": 100.0149
+      },
+      {
+       "date": "2002-01-08",
+       "value": 99.8273
+      }
+     ]
+    },
+    {
+     "source": "akshare.bond_index_general_cbond",
+     "upstream": "https://yield.chinabond.com.cn/cbweb-mn/indices/singleIndexQueryResult",
+     "params": {
+      "index_category": "综合指数",
+      "indicator": "净价",
+      "period": "总值"
+     },
+     "called_at": "2026-11-25T10:16:28",
+     "status": "ok",
+     "rows": 6225,
+     "error": null,
+     "date_min": "2002-01-04",
+     "date_max": "2026-11-24",
+     "duplicate_dates": 0,
+     "non_positive_values": 0,
+     "value_min": 95.1678,
+     "value_max": 109.9879,
+     "value_first": 99.935,
+     "value_last": 108.8953,
+     "max_gap_days": 11,
+     "gap_count_over_threshold": 0,
+     "missing_intervals": [],
+     "coverage_ratio": 0.684743,
+     "raw_file": {
+      "file": "cbond_综合指数_净价.csv",
+      "bytes": 128530,
+      "sha256_16": "d34e74428ae7ba89"
+     },
+     "sample": [
+      {
+       "date": "2002-01-04",
+       "value": 99.935
+      },
+      {
+       "date": "2002-01-07",
+       "value": 99.9491
+      },
+      {
+       "date": "2002-01-08",
+       "value": 99.7497
+      }
+     ]
+    }
+   ],
+   "official_code": null,
+   "official_publisher": "中债金融估值中心（中债登）",
+   "index_publication_date": null,
+   "methodology_doc_obtained": false,
+   "code_changed_or_terminated": "unknown",
+   "revision_risk": "未排除",
+   "series_semantics_confirmed": false,
+   "blocking_reason": "**合同未明说收益口径**（仅「中债总指数」），无法确定应使用财富/全价/净价中的哪一条",
+   "contract_states_basis": null
+  },
+  {
+   "contract_label": "中债综合全价",
+   "used_by_composite": [
+    161005
+   ],
+   "candidate_index_name": "综合指数",
+   "candidate_index": "综合指数",
+   "mapping_confidence": "MEDIUM",
+   "mapping_note": "「综合全价」字面吻合「综合指数[全价]」，未取得官方代码对照",
+   "probes": [
+    {
+     "source": "akshare.bond_index_general_cbond",
+     "upstream": "https://yield.chinabond.com.cn/cbweb-mn/indices/singleIndexQueryResult",
+     "params": {
+      "index_category": "综合指数",
+      "indicator": "全价",
+      "period": "总值"
+     },
+     "called_at": "2026-11-25T10:16:33",
+     "status": "ok",
+     "rows": 6225,
+     "error": null,
+     "date_min": "2002-01-04",
+     "date_max": "2026-11-24",
+     "duplicate_dates": 0,
+     "non_positive_values": 0,
+     "value_min": 97.1329,
+     "value_max": 132.8564,
+     "value_first": 99.9731,
+     "value_last": 132.362,
+     "max_gap_days": 11,
+     "gap_count_over_threshold": 0,
+     "missing_intervals": [],
+     "coverage_ratio": 0.684743,
+     "raw_file": {
+      "file": "cbond_综合指数_全价.csv",
+      "bytes": 129730,
+      "sha256_16": "e72aeae628916dc0"
+     },
+     "sample": [
+      {
+       "date": "2002-01-04",
+       "value": 99.9731
+      },
+      {
+       "date": "2002-01-07",
+       "value": 100.0149
+      },
+      {
+       "date": "2002-01-08",
+       "value": 99.8273
+      }
+     ]
+    }
+   ],
+   "official_code": null,
+   "official_publisher": "中债金融估值中心（中债登）",
+   "index_publication_date": null,
+   "methodology_doc_obtained": false,
+   "code_changed_or_terminated": "unknown",
+   "revision_risk": "未排除",
+   "series_semantics_confirmed": true,
+   "blocking_reason": "合同明说「全价」，全价序列可得；但**全价 ≠ 全收益**，若基准本意是全收益则口径不符",
+   "contract_states_basis": "全价"
+  },
+  {
+   "contract_label": "中证综合债券",
+   "used_by_composite": [
+    1938
+   ],
+   "candidate_index_name": null,
+   "candidate_index": null,
+   "mapping_confidence": "NONE",
+   "mapping_note": "**中证系列债券指数无可用接口**，完全阻断",
+   "probes": [],
+   "official_code": null,
+   "official_publisher": null,
+   "index_publication_date": null,
+   "methodology_doc_obtained": false,
+   "code_changed_or_terminated": "unknown",
+   "revision_risk": "未排除",
+   "series_semantics_confirmed": false,
+   "blocking_reason": "**该债券指数无可用数据接口**。不得用国债收益率曲线代替债券指数收益率。"
+  },
+  {
+   "contract_label": "中债-总全价(总值)",
+   "used_by_composite": [
+    12346
+   ],
+   "candidate_index_name": "综合指数",
+   "candidate_index": "综合指数",
+   "mapping_confidence": "LOW",
+   "mapping_note": "「总全价(总值)」的代码未确认；全价序列可得但不等于总收益",
+   "probes": [
+    {
+     "source": "akshare.bond_index_general_cbond",
+     "upstream": "https://yield.chinabond.com.cn/cbweb-mn/indices/singleIndexQueryResult",
+     "params": {
+      "index_category": "综合指数",
+      "indicator": "全价",
+      "period": "总值"
+     },
+     "called_at": "2026-11-25T10:16:38",
+     "status": "ok",
+     "rows": 6225,
+     "error": null,
+     "date_min": "2002-01-04",
+     "date_max": "2026-11-24",
+     "duplicate_dates": 0,
+     "non_positive_values": 0,
+     "value_min": 97.1329,
+     "value_max": 132.8564,
+     "value_first": 99.9731,
+     "value_last": 132.362,
+     "max_gap_days": 11,
+     "gap_count_over_threshold": 0,
+     "missing_intervals": [],
+     "coverage_ratio": 0.684743,
+     "raw_file": {
+      "file": "cbond_综合指数_全价.csv",
+      "bytes": 129730,
+      "sha256_16": "e72aeae628916dc0"
+     },
+     "sample": [
+      {
+       "date": "2002-01-04",
+       "value": 99.9731
+      },
+      {
+       "date": "2002-01-07",
+       "value": 100.0149
+      },
+      {
+       "date": "2002-01-08",
+       "value": 99.8273
+      }
+     ]
+    }
+   ],
+   "official_code": null,
+   "official_publisher": "中债金融估值中心（中债登）",
+   "index_publication_date": null,
+   "methodology_doc_obtained": false,
+   "code_changed_or_terminated": "unknown",
+   "revision_risk": "未排除",
+   "series_semantics_confirmed": true,
+   "blocking_reason": "合同明说「全价」，全价序列可得；但**全价 ≠ 全收益**，若基准本意是全收益则口径不符",
+   "contract_states_basis": "全价"
+  },
+  {
+   "contract_label": "中债综合财富",
+   "used_by_composite": [
+    12344
+   ],
+   "candidate_index_name": "综合指数",
+   "candidate_index": "综合指数",
+   "mapping_confidence": "MEDIUM",
+   "mapping_note": "「综合财富」字面吻合「综合指数[财富]」；财富指数含利息再投资",
+   "probes": [
+    {
+     "source": "akshare.bond_index_general_cbond",
+     "upstream": "https://yield.chinabond.com.cn/cbweb-mn/indices/singleIndexQueryResult",
+     "params": {
+      "index_category": "综合指数",
+      "indicator": "财富",
+      "period": "总值"
+     },
+     "called_at": "2026-11-25T10:16:43",
+     "status": "ok",
+     "rows": 6225,
+     "error": null,
+     "date_min": "2002-01-04",
+     "date_max": "2026-11-24",
+     "duplicate_dates": 0,
+     "non_positive_values": 0,
+     "value_min": 99.8273,
+     "value_max": 265.0608,
+     "value_first": 99.9731,
+     "value_last": 264.6565,
+     "max_gap_days": 11,
+     "gap_count_over_threshold": 0,
+     "missing_intervals": [],
+     "coverage_ratio": 0.684743,
+     "raw_file": {
+      "file": "cbond_综合指数_财富.csv",
+      "bytes": 130054,
+      "sha256_16": "7844f92dfd42779c"
+     },
+     "sample": [
+      {
+       "date": "2002-01-04",
+       "value": 99.9731
+      },
+      {
+       "date": "2002-01-07",
+       "value": 100.0149
+      },
+      {
+       "date": "2002-01-08",
+       "value": 99.8273
+      }
+     ]
+    }
+   ],
+   "official_code": null,
+   "official_publisher": "中债金融估值中心（中债登）",
+   "index_publication_date": null,
+   "methodology_doc_obtained": false,
+   "code_changed_or_terminated": "unknown",
+   "revision_risk": "未排除",
+   "series_semantics_confirmed": true,
+   "blocking_reason": "合同明说「财富」，财富序列可得且含利息再投资；但**代码映射未获官方确认**",
+   "contract_states_basis": "财富"
+  }
+ ],
+ "summary": {
+  "total_bond_components": 5,
+  "interface_available": 4,
+  "interface_blocked": 1,
+  "probes_ok": 6,
+  "contract_states_basis": 3,
+  "all_three_series": 1,
+  "official_code_confirmed": 0,
+  "methodology_doc_obtained": 0,
+  "series_semantics_confirmed": 3,
+  "fully_qualified": 0,
+  "note": "**0 条债券指数成分达到「完全合格」**：代码映射未获官方确认、无编制方案、修订风险未排除"
+ }
+}
