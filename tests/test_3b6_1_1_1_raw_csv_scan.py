@@ -90,7 +90,7 @@ def test_dict_parsing_hides_duplicates(tmp_path):
     st = mod.scan_file(p)
     assert st["raw_rows"] == 2
     assert st["date_parsed_rows"] == 2
-    recs = [r for r in st["records"] if r[4] == "ok"]
+    recs = [r for r in st["records"] if r[4] == "valid"]
     assert len(recs) == 16
     c = Counter((d, t) for d, t, v, ln, k in recs)
     assert sum(n - 1 for n in c.values()) == 8, "逐行扫描应发现 8 条重复"
@@ -131,7 +131,7 @@ def test_duplicate_same_value_detected(tmp_path):
         _row("2024-01-02", ["1.5"] + [""] * 7),
     ])
     st = mod.scan_file(p)
-    recs = [r for r in st["records"] if r[4] == "ok"]
+    recs = [r for r in st["records"] if r[4] == "valid"]
     c = Counter((d, t) for d, t, v, ln, k in recs)
     dups = {k: n for k, n in c.items() if n > 1}
     assert dups, "相同数值的重复未被发现"
@@ -149,7 +149,7 @@ def test_duplicate_different_value_detected_as_conflict(tmp_path):
         _row("2024-01-02", ["1.7"] + [""] * 7),
     ])
     st = mod.scan_file(p)
-    recs = [r for r in st["records"] if r[4] == "ok"]
+    recs = [r for r in st["records"] if r[4] == "valid"]
     vals = [v for d, t, v, ln, k in recs if (d, t) == ("2024-01-02", "3月")]
     assert len(vals) == 2
     assert len(set(vals)) == 2, "不同数值应被识别为冲突"
@@ -226,7 +226,7 @@ def test_normal_records_not_flagged(tmp_path):
     assert st["nan_cells"] == 0
     assert st["inf_cells"] == 0
     assert st["out_of_range_cells"] == 0
-    ok = [r for r in st["records"] if r[4] == "ok"]
+    ok = [r for r in st["records"] if r[4] == "valid"]
     assert len(ok) == len(TENORS)
 
 
@@ -324,3 +324,173 @@ def test_no_vacuous_assertion():
         if st.startswith("#") or st.startswith('"') or st.startswith("'"):
             continue
         assert bad not in ln, f"恒真断言：{st}"
+
+
+# ============================================================ 3B-6.1.1.1.1 新增
+# 七类互斥识别 + 缺失期限字段显式报错
+
+def test_classify_cell_seven_categories(scanner):
+    """七类必须互斥，不能把 NaN/Inf 混入其它类。"""
+    cases = [
+        ("", "empty"),
+        (None, "empty"),
+        ("null", "empty"),
+        ("NULL", "empty"),
+        ("nan", "nan"),
+        ("NaN", "nan"),
+        ("-nan", "nan"),
+        ("inf", "inf"),
+        ("Inf", "inf"),
+        ("-inf", "inf"),
+        ("Infinity", "inf"),
+        ("-Infinity", "inf"),
+        ("abc", "non_numeric"),
+        ("1.5", "valid"),
+        ("999", "out_of_range"),
+        ("-1", "out_of_range"),
+        ("1e999", "inf"),      # 解析后是 inf
+    ]
+    for raw, expected in cases:
+        kind, _ = scanner.classify_cell(raw)
+        assert kind == expected, f"{raw!r}: 期望 {expected}，实际 {kind}"
+
+
+def test_nan_counted_only_as_nan(tmp_path, scanner):
+    """NaN 只计 nan，不得同时计 empty。"""
+    p = _write_csv(tmp_path, [_row("2024-01-02", ["nan"] + [""] * 7)])
+    st = scanner.scan_file(p)
+    assert st["nan_cells"] == 1
+    assert st["empty_value_cells"] == 7, "其余 7 个空列才是 empty"
+    # 证明 NaN 与空值没有重复计数
+    assert st["nan_cells"] + st["empty_value_cells"] == 8
+
+
+def test_inf_counted_only_as_inf(tmp_path, scanner):
+    """Inf 只计 inf，不得计 non_numeric。"""
+    p = _write_csv(tmp_path, [_row("2024-01-02", ["inf"] + [""] * 7)])
+    st = scanner.scan_file(p)
+    assert st["inf_cells"] == 1
+    assert st["non_numeric_cells"] == 0
+
+
+def test_neg_inf_counted_as_inf(tmp_path, scanner):
+    p = _write_csv(tmp_path, [_row("2024-01-02", ["-inf"] + [""] * 7)])
+    st = scanner.scan_file(p)
+    assert st["inf_cells"] == 1
+    assert st["non_numeric_cells"] == 0
+
+
+def test_abc_counted_as_non_numeric(tmp_path, scanner):
+    p = _write_csv(tmp_path, [_row("2024-01-02", ["abc"] + [""] * 7)])
+    st = scanner.scan_file(p)
+    assert st["non_numeric_cells"] == 1
+    assert st["nan_cells"] == 0
+    assert st["inf_cells"] == 0
+
+
+def test_mixed_nan_inf_abc_not_confused(tmp_path, scanner):
+    """同一行同时出现 NaN / Inf / abc，三类必须互不混淆。"""
+    p = _write_csv(tmp_path, [
+        _row("2024-01-02", ["nan", "inf", "abc", "1.5", "", "2.0",
+                             "2.5", "3.0"]),
+    ])
+    st = scanner.scan_file(p)
+    assert st["nan_cells"] == 1
+    assert st["inf_cells"] == 1
+    assert st["non_numeric_cells"] == 1
+    assert st["empty_value_cells"] == 1
+    assert st["valid_cells"] == 4
+    assert st["out_of_range_cells"] == 0
+
+    kinds = {s["kind"] for s in st["bad_samples"]}
+    assert {"nan", "inf", "non_numeric", "empty"} <= kinds
+
+
+def test_bad_samples_keep_line_tenor_raw(tmp_path, scanner):
+    """异常样本必须保留行号、期限、原始值。"""
+    p = _write_csv(tmp_path, [
+        _row("2024-01-02", ["1.5", "nan", "inf", "abc", "", "2.0",
+                             "2.5", "3.0"]),
+    ])
+    st = scanner.scan_file(p)
+    for s in st["bad_samples"]:
+        if s["kind"] in ("nan", "inf", "non_numeric", "empty"):
+            assert "line" in s
+            assert "tenor" in s
+            assert "raw" in s
+    nan_sample = next(s for s in st["bad_samples"] if s["kind"] == "nan")
+    assert nan_sample["tenor"] == "6月"
+    assert nan_sample["raw"] == "nan"
+    assert nan_sample["line"] == 2
+
+
+# ============================================================ 缺失期限字段
+def test_missing_tenor_column_detected(tmp_path, scanner):
+    """缺少一个期限列必须显式报告。"""
+    p = tmp_path / "missing.csv"
+    header = ["曲线名称", "日期"] + [t for t in TENORS if t != "5年"]
+    with open(p, "w", encoding="utf-8-sig", newline="") as fh:
+        w = csv.writer(fh)
+        w.writerow(header)
+        vals = ["1.5"] * len(TENORS)
+        w.writerow([CURVE, "2024-01-02"] + vals[:3] + vals[4:])
+    st = scanner.scan_file(p)
+    assert st["structure_ok"] is False
+    assert "5年" in st["missing_columns"]
+    assert st["tenor_presence"]["5年"] is False
+    assert any(s["kind"] == "missing_columns" for s in st["bad_samples"])
+
+
+def test_missing_multiple_columns_detected(tmp_path, scanner):
+    p = tmp_path / "missing2.csv"
+    header = ["曲线名称", "日期"] + [t for t in TENORS if t not in ("3月", "30年")]
+    with open(p, "w", encoding="utf-8-sig", newline="") as fh:
+        w = csv.writer(fh)
+        w.writerow(header)
+        w.writerow([CURVE, "2024-01-02"] + ["1.5"] * 6)
+    st = scanner.scan_file(p)
+    assert st["structure_ok"] is False
+    assert set(st["missing_columns"]) == {"3月", "30年"}
+
+
+def test_missing_date_column_detected(tmp_path, scanner):
+    p = tmp_path / "nodate.csv"
+    header = ["曲线名称"] + TENORS
+    with open(p, "w", encoding="utf-8-sig", newline="") as fh:
+        w = csv.writer(fh)
+        w.writerow(header)
+        w.writerow([CURVE] + ["1.5"] * 8)
+    st = scanner.scan_file(p)
+    assert st["structure_ok"] is False
+    assert "日期" in st["missing_columns"]
+
+
+def test_complete_8_tenor_csv_passes(tmp_path, scanner):
+    """完整 8 期限的正常 CSV 必须判定结构正常且零缺陷。"""
+    p = _write_csv(tmp_path, [
+        _row("2024-01-02", ["1.5", "1.6", "1.7", "2.0", "2.2", "2.4",
+                             "2.5", "2.8"]),
+    ])
+    st = scanner.scan_file(p)
+    assert st["structure_ok"] is True
+    assert st["missing_columns"] == []
+    assert all(st["tenor_presence"].values())
+    assert st["valid_cells"] == 8
+    assert st["nan_cells"] == 0
+    assert st["inf_cells"] == 0
+    assert st["non_numeric_cells"] == 0
+    assert st["empty_value_cells"] == 0
+    assert st["out_of_range_cells"] == 0
+
+
+def test_scan_all_reports_structure_status(scan_result):
+    """真实 42 份 CSV 必须全部结构正常。"""
+    assert scan_result["structure_all_ok"] is True
+    assert scan_result["files_with_missing_columns"] == []
+    assert scan_result["missing_columns_union"] == []
+    assert scan_result["required_columns"] == \
+        ["曲线名称", "日期"] + TENORS
+
+
+def test_scanner_version_marked(scan_result):
+    assert scan_result["scanner_version"] == "3B-6.1.1.1.1"

@@ -1,5 +1,90 @@
 # 变更日志
 
+## 2026-11-25 — 阶段3B-6.1.1.1.1 CSV 扫描器数值异常与期限字段边界修正
+
+**只修复扫描器两个边界问题。不重新下载数据、不改 42 份原始 CSV、不改审计结论。**
+
+**问题一：NaN / Inf / 非数值混为一类**
+
+原 `_is_number()` 用 `float()` 转换后只判断是否为有限数，
+**NaN 和 Inf 都被归为「非数值」**，导致 `inf_cells` 字段存在但永远为 0。
+
+修正：新增 `classify_cell()`，七类**互斥**分类，优先级固定：
+
+| 序 | 类别 | 判定 | 计入字段 |
+| ---: | --- | --- | --- |
+| 1 | `empty` | 空串 / `None` / `null` | `empty_value_cells` |
+| 2 | `nan` | `nan` / `NaN` / `-nan` | `nan_cells` |
+| 3 | `inf` | `inf` / `-inf` / `Infinity` / `1e999` | `inf_cells` |
+| 4 | `non_numeric` | `abc` 等 | `non_numeric_cells` |
+| 5 | `out_of_range` | 有限但 < 0 或 > 15 | `out_of_range_cells` |
+| 6 | `valid` | 有限且在 [0, 15] | `valid_cells` |
+
+**关键：NaN 只计 nan（不再计入 empty），Inf 只计 inf（不再计入 non_numeric）。**
+
+**问题二：缺失期限字段被静默忽略**
+
+原代码 `idx_tenors = [t for t in TENORS if t in header]` ——
+CSV 少一列时**静默跳过**，仍会输出看似完整的 8 期限统计。
+
+修正：读取 header 后立即检查 `曲线名称`、`日期` + 8 个期限是否齐全。
+
+| 字段 | 用途 |
+| --- | --- |
+| `missing_columns` | 记录缺失的具体字段名 |
+| `tenor_presence` | 逐期限记录是否存在 |
+| `structure_ok` | **结构异常标记** |
+| `structure_all_ok` | 全部文件汇总 |
+
+**缺列时不得把其余字段统计伪装成完整的 8 期限结果。**
+
+**真实数据复核（修正后重跑 42 份 CSV）**
+
+| 项 | 修正后 |
+| --- | ---: |
+| 扫描文件数 | **42** |
+| **结构全部正常** | **True** |
+| 缺失字段并集 | **[]** |
+| 原始数据行数 | **5,185** |
+| 空值单元格 | **0** |
+| **NaN 单元格** | **0**（修正后可独立统计） |
+| **Inf 单元格** | **0**（修正后可独立统计） |
+| 非数值单元格 | **0** |
+| 超范围单元格 | **0** |
+| 有效记录 | **41,480** |
+| 唯一 `(日期,期限)` | **41,480** |
+| 重复对数 | **0** |
+| 数值冲突 | **0** |
+| 各期限记录数 | **均 5,185** |
+
+**与 source_audit（41,480 / 5,185 日期）、coverage_quality（8×5,185）完全一致。**
+**真实数据无新增异常，既有审计结论不变。**
+
+**新增测试 13 项**
+
+| 类别 | 数量 | 代表测试 |
+| --- | ---: | --- |
+| 七类互斥识别 | 7 | `test_classify_cell_seven_categories`（17 个输入）、`test_mixed_nan_inf_abc_not_confused` |
+| 缺失字段检测 | 4 | `test_missing_tenor_column_detected`、`test_missing_multiple_columns_detected` |
+| 真实数据与版本 | 2 | `test_scan_all_reports_structure_status`、`test_scanner_version_marked` |
+
+**全部调用真实扫描器逻辑**（`scan_file()` / `classify_cell()`），不是检查源码字符串。
+
+**顺带**：旧测试中的 `kind == "ok"` 统一改为 `"valid"`（与七类命名对齐）。
+
+**测试**：新增 13 项；全量 **2119 passed / 0 failed / 0 skipped**（2106 → 2119）。
+
+**只读保证**：内容指纹 `115ac91e…387dd4` 未变；
+`index_daily` 50,603 / `fund_nav_daily` 245,656 未变；integrity ok；外键违规 0；
+**42 份原始 CSV 未改动**。
+
+**门禁不变**：`ready_for_research_analysis=true`，
+`ready_for_backtest=false`，`ready_for_formal_ranking=false`。
+
+**本任务只是数据审计测试可靠性修正，不代表中债收益率已具备回测时点可用性，
+也不代表 3B-6.1.1 可以提前开放回测。**
+
+
 ## 2026-11-25 — 阶段3B-6.1.1.1 原始 CSV 重复记录与异常行独立校验修正
 
 **只增强测试的独立校验能力。不重新下载数据、不改审计结论、不动数据库。**

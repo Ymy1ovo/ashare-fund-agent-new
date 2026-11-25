@@ -7215,3 +7215,71 @@ series[(date, tenor)] = value
 | `ready_for_backtest` | **False** |
 | `ready_for_formal_ranking` | **False** |
 
+### 79.9 3B-6.1.1.1.1 修正：七类互斥与缺失字段报错
+
+**修正前的两个边界问题**：
+
+| # | 问题 | 后果 |
+| ---: | --- | --- |
+| 1 | `_is_number()` 把 NaN、Inf 一并判为「非数值」 | **`inf_cells` 永远统计不到**，NaN 与 Inf 混作一类 |
+| 2 | 用 `if t in header` 过滤期限列 | CSV 缺列时**静默跳过**，仍输出看似完整的 8 期限统计 |
+
+**修正后：七类互斥分类**
+
+| 序 | 类别 | 判定 | 计入字段 |
+| ---: | --- | --- | --- |
+| 1 | `empty` | 空串 / `None` / `null` | `empty_value_cells` |
+| 2 | `nan` | `nan` / `NaN` / `-nan` | `nan_cells` |
+| 3 | `inf` | `inf` / `-inf` / `Infinity` / `1e999` | `inf_cells` |
+| 4 | `non_numeric` | `abc` 等无法转 float | `non_numeric_cells` |
+| 5 | `out_of_range` | 有限但 < 0 或 > 15 | `out_of_range_cells` |
+| 6 | `valid` | 有限且在 [0, 15] | `valid_cells` |
+
+**关键约束验证**：
+
+| 约束 | 验证测试 |
+| --- | --- |
+| NaN **只**计 nan，不计 empty | `test_nan_counted_only_as_nan`（nan + empty 合计 = 8） |
+| Inf **只**计 inf，不计 non_numeric | `test_inf_counted_only_as_inf` |
+| `-inf` 同样计 inf | `test_neg_inf_counted_as_inf` |
+| `abc` 计 non_numeric | `test_abc_counted_as_non_numeric` |
+| 三者同现互不混淆 | `test_mixed_nan_inf_abc_not_confused` |
+| 异常样本保留行号/期限/原值 | `test_bad_samples_keep_line_tenor_raw` |
+
+**缺失期限字段显式报错**
+
+| 项 | 实现 |
+| --- | --- |
+| 必需列 | `曲线名称`、`日期` + **8 个期限** |
+| 检查时机 | 读取 header 后立即检查 |
+| 记录内容 | `missing_columns`、`tenor_presence`（逐期限是否存在） |
+| 结构标记 | **`structure_ok=False`** |
+| 汇总 | `structure_all_ok`、`files_with_missing_columns` |
+
+**缺列时不得把其余字段统计伪装成完整的 8 期限结果。**
+
+**真实数据复核（修正后重跑 42 份）**
+
+| 项 | 修正后 |
+| --- | ---: |
+| 扫描文件数 | **42** |
+| **结构全部正常** | **True** |
+| 缺失字段并集 | **[]** |
+| 原始数据行数 | **5,185** |
+| 空值 / **NaN** / **Inf** / 非数值 / 超范围 | **0 / 0 / 0 / 0 / 0** |
+| 有效记录 | **41,480** |
+| 唯一 `(日期,期限)` | **41,480** |
+| 重复对数 / 数值冲突 | **0 / 0** |
+| 各期限记录数 | **均 5,185** |
+
+**真实数据无新增异常，既有审计结论不变。**
+
+**新增测试 13 项**，全部调用真实扫描器逻辑（`scan_file()` / `classify_cell()`），
+不是检查源码字符串。
+
+| 类目 | 数量 |
+| --- | ---: |
+| 七类互斥识别 | 7 |
+| 缺失字段检测 | 4 |
+| 真实数据与版本标记 | 2 |
+
