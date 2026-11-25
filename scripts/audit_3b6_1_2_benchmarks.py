@@ -27,6 +27,7 @@ EV = REPORTS / "evidence" / "phase3B6_1_2"
 # 七态定义（任务第五部分）
 STATES = [
     "component_identified",
+    "weight_text_evidence_present",
     "weight_verified",
     "weight_history_verified",
     "return_basis_verified",
@@ -209,6 +210,14 @@ def build_component_audit(comp: dict, part: dict, fund: dict) -> dict:
         "weight": part["weight"],
         "weight_unit": "无（固定年化收益率）" if ctype == "fixed_rate" else "比例",
         "weight_evidence_in_db": part["weight_evidence"],
+        "weight_evidence_source": "platform（第三方平台文本）",
+        "weight_evidence_grade": "L3",
+        # 是否有可追溯的权重文本（无论等级）
+        "weight_text_evidence_present": bool(part["weight_evidence"]),
+        # 是否为 L1 官方合同权重证据
+        "weight_official_contract_evidence": False,
+        "weight_official_evidence_reason": (
+            "**未取得基金合同/招募说明书原文**，当前权重文本来自第三方平台（L3）"),
         "weight_has_text_evidence": bool(part["weight_evidence"]),
         "weight_effective_from": part["weight_effective_from"],
         "weight_effective_to": part["weight_effective_to"],
@@ -345,7 +354,16 @@ def build_benchmark_audit(comp: dict, parts: list[dict], fund: dict) -> dict:
     comp_identified = all(
         (p["index_code"] is not None) or (p["component_type"] != "index")
         for p in parts)
-    all_weight_evidence = all(p["weight_evidence"] for p in parts)
+
+    # 权重证据分级：
+    #   weight_text_present  = 有可追溯的权重文本（L3 亦可）
+    #   weight_verified      = 达到预设可靠证据标准（**必须有 L1 官方合同证据**）
+    weight_text_present = all(p["weight_evidence"] for p in parts)
+    weight_official = all(
+        bool(p.get("weight_official_contract_evidence")) for p in parts)
+    # 本项目尚未取得任何 L1 合同文件 → 一律不满足官方证据标准
+    all_weight_evidence = weight_text_present and weight_official
+
     weight_history = all(p["weight_effective_from"] for p in parts)
     basis_verified = all(
         (INDEX_BASIS.get(p["index_code"], {}).get("basis_verified", False)
@@ -360,13 +378,58 @@ def build_benchmark_audit(comp: dict, parts: list[dict], fund: dict) -> dict:
             and BOND_INDEX_EVIDENCE.get(p["component_label"], {}).get("rows", 0) > 0)
         for p in parts)
     pit_verified = False
-    formula_ok = hist_available and basis_verified
-    hist_reproducible = (comp_identified and all_weight_evidence
-                          and weight_history and basis_verified
-                          and hist_available and pit_verified)
+
+    # 每条成分数据是否真实可得（逐成分判断，不用整体推导）
+    per_component_data_ok = all(
+        (p["component_type"] == "index" and p["index_code"] is not None
+         and p["index_code"] in INDEX_BASIS)
+        or (p["component_type"] == "bond_index"
+            and BOND_INDEX_EVIDENCE.get(p["component_label"], {}).get("rows", 0) > 0)
+        or (p["component_type"] == "cash" and False)      # 现金无历史序列
+        or (p["component_type"] == "fixed_rate" and False)  # 折算规则未知
+        for p in parts)
+    # 公式计算规则是否全部明确（固定收益率折算、现金计息等）
+    _formula_rules_explicit = all(
+        (p["component_type"] == "index")
+        or (p["component_type"] == "bond_index"
+            and BOND_INDEX_EVIDENCE.get(p["component_label"], {})
+                .get("mapping_confidence") in ("HIGH", "MEDIUM"))
+        or (p["component_type"] == "cash"
+            and p.get("cash_period_conversion_known"))
+        or (p["component_type"] == "fixed_rate"
+            and p.get("fixed_rate_conversion_known"))
+        for p in parts)
+    fixed_rate_ok = all(
+        (p["component_type"] != "fixed_rate")
+        or (p.get("fixed_rate_conversion_known") is True)
+        for p in parts)
+    no_missing_component = all(
+        p["component_type"] not in ("cash", "fixed_rate")
+        or False for p in parts)
+
+    formula_conditions = {
+        "all_components_identified": comp_identified,
+        "all_weights_official": all_weight_evidence,
+        "all_component_data_available": per_component_data_ok,
+        "return_basis_verified": basis_verified,
+        "formula_rules_explicit": _formula_rules_explicit,
+        "fixed_rate_conversion_known": fixed_rate_ok,
+        "no_missing_cash_bond_index_component": no_missing_component,
+    }
+    formula_ok = all(formula_conditions.values())
+
+    hist_conditions = dict(formula_conditions)
+    hist_conditions.update({
+        "weight_history_verified": weight_history,
+        "benchmark_change_traceable": False,
+        "point_in_time_verified": pit_verified,
+        "historical_component_data_available": hist_available,
+    })
+    hist_reproducible = all(hist_conditions.values())
 
     states = {
         "component_identified": comp_identified,
+        "weight_text_evidence_present": weight_text_present,
         "weight_verified": all_weight_evidence,
         "weight_history_verified": weight_history,
         "return_basis_verified": basis_verified,
@@ -423,6 +486,8 @@ def build_benchmark_audit(comp: dict, parts: list[dict], fund: dict) -> dict:
         "fixed_rate_components": len(fixed_weights),
         "unexplained_residual": round(1.0 - asset_weight, 6) if asset_weight < 1 else 0.0,
         "states": states,
+        "formula_conditions": formula_conditions,
+        "historically_reproducible_conditions": hist_conditions,
         "db_claimed": {
             "is_complete": comp["is_complete"],
             "is_reproducible": comp["is_reproducible"],
@@ -493,6 +558,13 @@ def main() -> int:
         "text_semantic_diff_ids": [
             b["composite_id"] for b in bench_audit
             if b["text_consistency"]["classification"] == "semantic_diff"],
+        "weight_text_evidence_present": sum(
+            1 for b in bench_audit if b["states"]["weight_text_evidence_present"]),
+        "weight_official_evidence": sum(
+            1 for b in bench_audit if b["states"]["weight_verified"]),
+        "components_by_category": {
+            k: sum(1 for c in comp_audit if c["component_category"] == k)
+            for k in ("index", "bond_index", "cash", "fixed_rate")},
         "components_without_code": sum(
             1 for c in comp_audit
             if c["component_category"] == "index" and c["index_code"] is None),
@@ -557,7 +629,8 @@ def main() -> int:
         json.dumps(ch, ensure_ascii=False, indent=1), encoding="utf-8")
 
     print(f"基准 {len(bench_audit)} 条，成分 {len(comp_audit)} 个")
-    for k in ("component_identified", "weight_verified", "weight_history_verified",
+    for k in ("component_identified", "weight_text_evidence_present",
+              "weight_verified", "weight_history_verified",
               "return_basis_verified", "history_data_available",
               "point_in_time_verified", "formula_reproducible",
               "historically_reproducible"):

@@ -127,8 +127,8 @@ def test_no_auto_inheritance(audit):
     assert any(b["states"]["component_identified"]
                and not b["states"]["historically_reproducible"]
                for b in audit["benchmarks"])
-    # 权重有证据但历史权重不可验证
-    assert any(b["states"]["weight_verified"]
+    # 有权重文本（L3）但历史权重不可验证
+    assert any(b["states"]["weight_text_evidence_present"]
                and not b["states"]["weight_history_verified"]
                for b in audit["benchmarks"])
 
@@ -169,12 +169,15 @@ def test_fixed_rate_not_in_asset_weight(audit, comp):
     assert fr[0]["return_basis"]["period_conversion_method"] == "unknown"
 
 
-def test_all_weight_evidence_recorded(audit, comp):
+def test_all_weight_text_recorded(audit, comp):
+    """权重文本必须 34/34 全部存在（但等级为 L3，不等于官方验证）。"""
     s = audit["summary"]
-    assert s["weight_verified"] == 15
+    assert s["weight_text_evidence_present"] == 15
+    assert s["weight_verified"] == 0
     for c in comp["components"]:
-        assert c["weight_evidence_in_db"], \
-            f"成分 {c['component_id']} 缺权重证据"
+        assert c["weight_text_evidence_present"], \
+            f"成分 {c['component_id']} 缺权重文本"
+        assert c["weight_evidence_in_db"]
 
 
 def test_weight_history_all_missing(audit):
@@ -426,3 +429,244 @@ def test_identical_benchmarks_also_recorded(audit):
     assert len(identical) == audit["summary"]["text_identical_count"]
     for b in identical:
         assert b["benchmark_raw_text"] == b["fund_master_benchmark_text"]
+
+
+# ============================================================ 3B-6.1.2.1 新增
+STATES_V2 = [
+    "component_identified", "weight_text_evidence_present", "weight_verified",
+    "weight_history_verified", "return_basis_verified",
+    "history_data_available", "point_in_time_verified",
+    "formula_reproducible", "historically_reproducible",
+]
+
+
+def test_component_category_counts_exact(audit, comp):
+    """34 条成分分类必须严格为 index 18 / bond_index 5 / cash 10 / fixed_rate 1。"""
+    from collections import Counter
+    cnt = Counter(c["component_category"] for c in comp["components"])
+    assert cnt["index"] == 18
+    assert cnt["bond_index"] == 5
+    assert cnt["cash"] == 10
+    assert cnt["fixed_rate"] == 1
+    assert sum(cnt.values()) == 34
+    assert audit["summary"]["components_by_category"] == {
+        "index": 18, "bond_index": 5, "cash": 10, "fixed_rate": 1}
+
+
+def test_cash_and_fixed_rate_not_merged(audit, comp):
+    """fixed_rate 不得计入 cash。"""
+    cash = [c for c in comp["components"] if c["component_category"] == "cash"]
+    fixed = [c for c in comp["components"]
+             if c["component_category"] == "fixed_rate"]
+    assert len(cash) == 10
+    assert len(fixed) == 1
+    assert not set(c["component_id"] for c in cash) & \
+        set(c["component_id"] for c in fixed)
+    # 000051 的 fixed_rate 必须是独立类别
+    fr = fixed[0]
+    assert fr["composite_id"] == 16
+    assert fr["component_name"] == "fixed_rate"
+
+
+def test_l3_weight_not_upgraded_to_official(audit, comp):
+    """L3 权重文本不得自动升级为官方权重验证。"""
+    assert audit["summary"]["weight_text_evidence_present"] == 15
+    assert audit["summary"]["weight_verified"] == 0
+    for c in comp["components"]:
+        assert c["weight_evidence_grade"] == "L3"
+        assert c["weight_official_contract_evidence"] is False
+        assert c["weight_text_evidence_present"] is True
+
+
+def test_weight_three_states_distinguished(audit):
+    """三种权重状态必须分别记录。"""
+    s = audit["summary"]
+    assert s["weight_text_evidence_present"] == 15   # 有第三方文本
+    assert s["weight_verified"] == 0                 # 无官方合同证据
+    assert s["weight_history_verified"] == 0         # 无历史权重
+
+
+def test_summary_detail_all_consistent(audit):
+    """所有 summary 计数必须可由明细复算。"""
+    s = audit["summary"]
+    bm = audit["benchmarks"]
+    for k in STATES_V2:
+        recalc = sum(1 for b in bm if b["states"][k])
+        assert s[k] == recalc, f"{k}: summary={s[k]} 复算={recalc}"
+    assert s["total_benchmarks"] == len(bm) == 15
+    assert s["total_components"] == sum(b["component_count"] for b in bm) == 34
+
+
+def test_semantic_conflict_ids_exact(audit):
+    """语义冲突必须正好是 ID 18/20/22/23。"""
+    assert audit["summary"]["text_semantic_diff_count"] == 4
+    assert sorted(audit["summary"]["text_semantic_diff_ids"]) == [18, 20, 22, 23]
+    actual = sorted(b["composite_id"] for b in audit["benchmarks"]
+                    if b["text_consistency"]["classification"] == "semantic_diff")
+    assert actual == [18, 20, 22, 23]
+
+
+def test_formula_requires_all_conditions(audit):
+    """公式可复现必须同时满足全部必要条件。"""
+    for b in audit["benchmarks"]:
+        fc = b["formula_conditions"]
+        assert set(fc) == {
+            "all_components_identified", "all_weights_official",
+            "all_component_data_available", "return_basis_verified",
+            "formula_rules_explicit", "fixed_rate_conversion_known",
+            "no_missing_cash_bond_index_component"}
+        assert b["states"]["formula_reproducible"] == all(fc.values())
+
+
+def test_formula_not_hardcoded_false(audit):
+    """不可复现必须由具体失败条件得出，不是硬编码。"""
+    for b in audit["benchmarks"]:
+        fc = b["formula_conditions"]
+        failed = [k for k, v in fc.items() if not v]
+        assert failed, f"{b['composite_id']} 无失败条件却被判不可复现"
+        assert b["states"]["formula_reproducible"] is False
+
+
+def test_historical_reproducible_requires_more(audit):
+    """历史可复现的附加条件必须存在且真实判定。"""
+    for b in audit["benchmarks"]:
+        hc = b["historically_reproducible_conditions"]
+        for k in ("weight_history_verified", "benchmark_change_traceable",
+                  "point_in_time_verified", "historical_component_data_available"):
+            assert k in hc
+        assert b["states"]["historically_reproducible"] == all(hc.values())
+
+
+def test_weight_history_missing_blocks_historical(audit):
+    """历史权重缺失时不得判历史可复现。"""
+    for b in audit["benchmarks"]:
+        if not b["historically_reproducible_conditions"]["weight_history_verified"]:
+            assert b["states"]["historically_reproducible"] is False
+
+
+# ============================================================ 债券成分关联
+def test_bond_used_by_composite_ids_real(bond):
+    """composite_id 必须真实存在于正式库。"""
+    from app.database.db import get_connection
+    with get_connection() as c:
+        valid = {r[0] for r in c.execute(
+            "SELECT composite_id FROM benchmark_composite").fetchall()}
+    for t in bond["targets"]:
+        assert t["used_by_composite_ids"], f"{t['contract_label']} 无 composite_id"
+        for cid in t["used_by_composite_ids"]:
+            assert cid in valid, f"{cid} 不是真实 composite_id"
+            assert cid >= 16, f"{cid} 看起来像基金代码"
+
+
+def test_bond_fund_codes_keep_leading_zero(bond):
+    """001938 不得丢前导零。"""
+    t = next(x for x in bond["targets"] if x["contract_label"] == "中证综合债券")
+    assert t["used_by_fund_codes"] == ["001938"]
+    assert all(len(c) == 6 for x in bond["targets"]
+               for c in x["used_by_fund_codes"])
+
+
+def test_bond_fund_code_matches_composite(bond):
+    """fund_code 与 composite_id 必须一一对应。"""
+    from app.database.db import get_connection
+    with get_connection() as c:
+        rows = c.execute(
+            "SELECT composite_id, benchmark_name FROM benchmark_composite"
+        ).fetchall()
+    mapping = {r[0]: r[1].split(" ")[0] for r in rows}
+    for t in bond["targets"]:
+        for cid, code in zip(t["used_by_composite_ids"], t["used_by_fund_codes"]):
+            assert mapping[cid] == code, f"{cid}: {mapping[cid]} != {code}"
+
+
+def test_bond_no_fund_code_as_composite_id(bond):
+    """不得把基金代码误当 composite_id。"""
+    for t in bond["targets"]:
+        for cid in t["used_by_composite_ids"]:
+            assert isinstance(cid, int)
+            assert cid not in (110022, 161005, 1938, 12346, 12344)
+
+
+# ============================================================ 报告与 JSON 一致性
+DOCS = [
+    REPORTS / "phase3B6_1_2_design.md",
+    REPORTS / "phase3B6_1_2_recommendation.md",
+]
+
+
+def _read_docs() -> str:
+    return "\n".join(p.read_text(encoding="utf-8") for p in DOCS)
+
+
+def test_docs_no_stale_weight_verified_15(audit):
+    """报告不得残留「weight_verified = 15/15」的旧统计。"""
+    txt = _read_docs()
+    assert "weight_verified` | **15/15**" not in txt
+    assert audit["summary"]["weight_verified"] == 0
+
+
+def test_docs_semantic_conflict_ids(audit):
+    """报告中的语义冲突 ID 必须与明细一致。"""
+    txt = _read_docs()
+    ids = audit["summary"]["text_semantic_diff_ids"]
+    assert str(sorted(ids)) in txt or "18, 20, 22, 23" in txt
+
+
+def test_docs_no_stale_six_conflicts():
+    """不得残留「6 条语义冲突」的旧统计。"""
+    txt = _read_docs()
+    assert "语义实质不同** | **6/15" not in txt
+    assert "实质不同的 6 条" not in txt
+
+
+def test_docs_component_category_numbers(audit):
+    """报告必须写明 index 18 / bond_index 5 / cash 10 / fixed_rate 1。"""
+    txt = _read_docs()
+    import re as _re
+    for cat, n in (("index", 18), ("bond_index", 5), ("cash", 10),
+                    ("fixed_rate", 1)):
+        pat = r"`" + cat + r"`\s*\|\s*\**" + str(n) + r"\**"
+        assert _re.search(pat, txt), f"缺 {cat}={n}"
+
+
+def test_docs_fixed_rate_not_in_cash():
+    """报告必须明确 fixed_rate 不计入 cash。"""
+    txt = _read_docs()
+    assert "固定年化收益率" in txt
+    assert "不计入 `cash`" in txt or "不得计入 `cash`" in txt
+
+
+# ============================================================ 证据检索记录
+def test_evidence_search_log_exists():
+    p = REPORTS / "evidence" / "phase3B6_1_2" / "evidence_search_log.json"
+    assert p.exists(), "缺原始证据检索记录"
+
+
+def test_evidence_log_no_fake_download():
+    p = REPORTS / "evidence" / "phase3B6_1_2" / "evidence_search_log.json"
+    d = json.loads(p.read_text(encoding="utf-8"))
+    assert d["summary"]["documents_obtained"] == 0
+    assert d["summary"]["funds_with_l1_evidence"] == 0
+    for f in d["funds_document_status"]:
+        assert f["document_obtained"] is False
+        assert f["sha256"] is None, "未下载文件不得填写 SHA256"
+        assert f["current_evidence_grade"] == "L3"
+
+
+def test_evidence_log_channels_really_probed():
+    p = REPORTS / "evidence" / "phase3B6_1_2" / "evidence_search_log.json"
+    d = json.loads(p.read_text(encoding="utf-8"))
+    assert len(d["channels_probed"]) == 5
+    for ch in d["channels_probed"]:
+        assert ch["url"].startswith("http")
+        assert ch["probed_at"]
+        assert ch["reachable"] is True
+        assert ch["http_status"] == 200
+
+
+def test_evidence_log_covers_all_15_funds():
+    p = REPORTS / "evidence" / "phase3B6_1_2" / "evidence_search_log.json"
+    d = json.loads(p.read_text(encoding="utf-8"))
+    assert len(d["funds_document_status"]) == 15
+    codes = {f["fund_code"] for f in d["funds_document_status"]}
+    assert len(codes) == 15

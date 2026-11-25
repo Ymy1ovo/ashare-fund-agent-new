@@ -32,31 +32,36 @@ CHINABOND_UPSTREAM = ("https://yield.chinabond.com.cn/cbweb-mn/indices/"
 # 5 个债券指数成分 → 候选中债指数名（来自 INDEX_MAPPING）
 TARGETS = [
     {"contract_label": "中债总",
-     "used_by": [110022],
+     "used_by_composite_ids": [25],
+     "used_by_fund_codes": ["110022"],
      "candidate_index": "综合指数",
      "indicators": ["财富", "全价", "净价"],
      "mapping_confidence": "LOW",
      "note": "合同写「中债总指数」，无法确认对应「综合指数」还是「总指数」族系"},
     {"contract_label": "中债综合全价",
-     "used_by": [161005],
+     "used_by_composite_ids": [26],
+     "used_by_fund_codes": ["161005"],
      "candidate_index": "综合指数",
      "indicators": ["全价"],
      "mapping_confidence": "MEDIUM",
      "note": "「综合全价」字面吻合「综合指数[全价]」，未取得官方代码对照"},
     {"contract_label": "中证综合债券",
-     "used_by": [1938],
+     "used_by_composite_ids": [27],
+     "used_by_fund_codes": ["001938"],
      "candidate_index": None,
      "indicators": [],
      "mapping_confidence": "NONE",
      "note": "**中证系列债券指数无可用接口**，完全阻断"},
     {"contract_label": "中债-总全价(总值)",
-     "used_by": [12346],
+     "used_by_composite_ids": [28],
+     "used_by_fund_codes": ["012346"],
      "candidate_index": "综合指数",
      "indicators": ["全价"],
      "mapping_confidence": "LOW",
      "note": "「总全价(总值)」的代码未确认；全价序列可得但不等于总收益"},
     {"contract_label": "中债综合财富",
-     "used_by": [12344],
+     "used_by_composite_ids": [29],
+     "used_by_fund_codes": ["012344"],
      "candidate_index": "综合指数",
      "indicators": ["财富"],
      "mapping_confidence": "MEDIUM",
@@ -82,7 +87,9 @@ def probe(candidate_index: str, indicator: str) -> dict:
             index_category=candidate_index, indicator=indicator, period="总值")
     except Exception as exc:
         rec["status"] = "error"
-        rec["error"] = f"{type(exc).__name__}: {str(ex)[:150]}"
+        rec["error_type"] = type(exc).__name__
+        rec["error_message"] = str(exc)[:150]
+        rec["error"] = f"{type(exc).__name__}: {str(exc)[:150]}"
         return rec
 
     if df is None or len(df) == 0:
@@ -122,9 +129,26 @@ def probe(candidate_index: str, indicator: str) -> dict:
     fn = RAW / f"cbond_{candidate_index}_{indicator}.csv"
     df.to_csv(fn, index=False, encoding="utf-8-sig")
     data = fn.read_bytes()
+    from scripts.scan_bond_index_csv import scan_csv
+    quality = scan_csv(fn)
     rec["raw_file"] = {
-        "file": fn.name, "bytes": len(data),
+        "file": fn.name,
+        "bytes": len(data),
+        "sha256": hashlib.sha256(data).hexdigest(),     # 完整 64 位
         "sha256_16": hashlib.sha256(data).hexdigest()[:16],
+        "raw_rows": quality["raw_rows"],
+        "valid_rows": quality["valid_rows"],
+        "empty_cells": quality["empty_cells"],
+        "nan_cells": quality["nan_cells"],
+        "inf_cells": quality["inf_cells"],
+        "non_numeric_cells": quality["non_numeric_cells"],
+        "out_of_range_cells": quality["out_of_range_cells"],
+        "duplicate_dates": quality["duplicate_dates"],
+        "conflict_dates": quality["conflict_dates"],
+        "out_of_order_rows": quality["out_of_order_rows"],
+        "structure_ok": quality["structure_ok"],
+        "quality_detail": {k: v for k, v in quality.items()
+                            if k not in ("records", "bad_samples")},
     }
     rec["sample"] = [{"date": dates[i], "value": values[i]} for i in range(3)]
     return rec
@@ -159,7 +183,8 @@ def main() -> int:
     for t in TARGETS:
         entry = {
             "contract_label": t["contract_label"],
-            "used_by_composite": t["used_by"],
+            "used_by_composite_ids": t["used_by_composite_ids"],
+            "used_by_fund_codes": t["used_by_fund_codes"],
             "candidate_index_name": t["candidate_index"],
             "candidate_index": t["candidate_index"],
             "mapping_confidence": t["mapping_confidence"],
@@ -228,6 +253,33 @@ def main() -> int:
                                  and all(p["status"] == "ok" for p in t["probes"])),
         "official_code_confirmed": sum(1 for t in out["targets"]
                                         if t["official_code"]),
+        "raw_csv_quality": {
+            "files": sum(len([p for p in t["probes"] if p["status"] == "ok"])
+                          for t in out["targets"]),
+            "total_raw_rows": sum(p["raw_file"]["raw_rows"]
+                                   for t in out["targets"] for p in t["probes"]
+                                   if p["status"] == "ok"),
+            "total_valid_rows": sum(p["raw_file"]["valid_rows"]
+                                     for t in out["targets"] for p in t["probes"]
+                                     if p["status"] == "ok"),
+            "total_duplicate_dates": sum(p["raw_file"]["duplicate_dates"]
+                                          for t in out["targets"] for p in t["probes"]
+                                          if p["status"] == "ok"),
+            "total_conflicts": sum(p["raw_file"]["conflict_dates"]
+                                    for t in out["targets"] for p in t["probes"]
+                                    if p["status"] == "ok"),
+            "all_structure_ok": all(p["raw_file"]["structure_ok"]
+                                     for t in out["targets"] for p in t["probes"]
+                                     if p["status"] == "ok"),
+            "all_zero_defects": all(
+                p["raw_file"][k] == 0
+                for t in out["targets"] for p in t["probes"]
+                if p["status"] == "ok"
+                for k in ("empty_cells", "nan_cells", "inf_cells",
+                           "non_numeric_cells", "out_of_range_cells",
+                           "duplicate_dates", "conflict_dates",
+                           "out_of_order_rows")),
+        },
         "methodology_doc_obtained": sum(1 for t in out["targets"]
                                          if t["methodology_doc_obtained"]),
         "series_semantics_confirmed": sum(1 for t in out["targets"]

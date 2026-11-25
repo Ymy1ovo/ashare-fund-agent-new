@@ -1,7 +1,7 @@
 {
  "phase": "3B-6.1.2",
  "task": "bond_index_component_audit",
- "generated_at": "2026-11-25T10:16:14",
+ "generated_at": "2026-11-25T10:43:52",
  "source": "akshare.bond_index_general_cbond",
  "upstream": "https://yield.chinabond.com.cn/cbweb-mn/indices/singleIndexQueryResult",
  "publisher": "中债金融估值中心（中债登）",
@@ -17,8 +17,11 @@
  "targets": [
   {
    "contract_label": "中债总",
-   "used_by_composite": [
-    110022
+   "used_by_composite_ids": [
+    25
+   ],
+   "used_by_fund_codes": [
+    "110022"
    ],
    "candidate_index_name": "综合指数",
    "candidate_index": "综合指数",
@@ -33,7 +36,7 @@
       "indicator": "财富",
       "period": "总值"
      },
-     "called_at": "2026-11-25T10:16:14",
+     "called_at": "2026-11-25T10:43:52",
      "status": "ok",
      "rows": 6225,
      "error": null,
@@ -52,7 +55,49 @@
      "raw_file": {
       "file": "cbond_综合指数_财富.csv",
       "bytes": 130054,
-      "sha256_16": "7844f92dfd42779c"
+      "sha256": "7844f92dfd42779ccf6e7a9b07cca1b84943f53abbe83bcc6133d8e562e0455c",
+      "sha256_16": "7844f92dfd42779c",
+      "raw_rows": 6225,
+      "valid_rows": 6225,
+      "empty_cells": 0,
+      "nan_cells": 0,
+      "inf_cells": 0,
+      "non_numeric_cells": 0,
+      "out_of_range_cells": 0,
+      "duplicate_dates": 0,
+      "conflict_dates": 0,
+      "out_of_order_rows": 0,
+      "structure_ok": true,
+      "quality_detail": {
+       "file": "cbond_综合指数_财富.csv",
+       "bytes": 130054,
+       "sha256": "7844f92dfd42779ccf6e7a9b07cca1b84943f53abbe83bcc6133d8e562e0455c",
+       "structure_ok": true,
+       "missing_columns": [],
+       "header": [
+        "date",
+        "value"
+       ],
+       "raw_rows": 6225,
+       "valid_rows": 6225,
+       "empty_cells": 0,
+       "nan_cells": 0,
+       "inf_cells": 0,
+       "non_numeric_cells": 0,
+       "out_of_range_cells": 0,
+       "empty_date_rows": 0,
+       "bad_date_format_rows": 0,
+       "invalid_date_rows": 0,
+       "duplicate_dates": 0,
+       "out_of_order_rows": 0,
+       "conflict_dates": 0,
+       "conflict_detail": [],
+       "date_min": "2002-01-04",
+       "date_max": "2026-11-24",
+       "max_gap_days": 11,
+       "gap_count_over_threshold": 0,
+       "missing_intervals": []
+      }
      },
      "sample": [
       {
@@ -77,7 +122,7 @@
       "indicator": "全价",
       "period": "总值"
      },
-     "called_at": "2026-11-25T10:16:22",
+     "called_at": "2026-11-25T10:44:01",
      "status": "ok",
      "rows": 6225,
      "error": null,
@@ -96,7 +141,49 @@
      "raw_file": {
       "file": "cbond_综合指数_全价.csv",
       "bytes": 129730,
-      "sha256_16": "e72aeae628916dc0"
+      "sha256": "e72aeae628916dc0d86e3e2448c32fc3ac53ef541177342d72dbe377403c8107",
+      "sha256_16": "e72aeae628916dc0",
+      "raw_rows": 6225,
+      "valid_rows": 6225,
+      "empty_cells": 0,
+      "nan_cells": 0,
+      "inf_cells": 0,
+      "non_numeric_cells": 0,
+      "out_of_range_cells": 0,
+      "duplicate_dates": 0,
+      "conflict_dates": 0,
+      "out_of_order_rows": 0,
+      "structure_ok": true,
+      "quality_detail": {
+       "file": "cbond_综合指数_全价.csv",
+       "bytes": 129730,
+       "sha256": "e72aeae628916dc0d86e3e2448c32fc3ac53ef541177342d72dbe377403c8107",
+       "structure_ok": true,
+       "missing_columns": [],
+       "header": [
+        "date",
+        "value"
+       ],
+       "raw_rows": 6225,
+       "valid_rows": 6225,
+       "empty_cells": 0,
+       "nan_cells": 0,
+       "inf_cells": 0,
+       "non_numeric_cells": 0,
+       "out_of_range_cells": 0,
+       "empty_date_rows": 0,
+       "bad_date_format_rows": 0,
+       "invalid_date_rows": 0,
+       "duplicate_dates": 0,
+       "out_of_order_rows": 0,
+       "conflict_dates": 0,
+       "conflict_detail": [],
+       "date_min": "2002-01-04",
+       "date_max": "2026-11-24",
+       "max_gap_days": 11,
+       "gap_count_over_threshold": 0,
+       "missing_intervals": []
+      }
      },
      "sample": [
       {
@@ -121,7 +208,7 @@
       "indicator": "净价",
       "period": "总值"
      },
-     "called_at": "2026-11-25T10:16:28",
+     "called_at": "2026-11-25T10:44:06",
      "status": "ok",
      "rows": 6225,
      "error": null,
@@ -140,7 +227,49 @@
      "raw_file": {
       "file": "cbond_综合指数_净价.csv",
       "bytes": 128530,
-      "sha256_16": "d34e74428ae7ba89"
+      "sha256": "d34e74428ae7ba8956441756ef4f03a4df43ee0e865e8246921de8c45479405d",
+      "sha256_16": "d34e74428ae7ba89",
+      "raw_rows": 6225,
+      "valid_rows": 6225,
+      "empty_cells": 0,
+      "nan_cells": 0,
+      "inf_cells": 0,
+      "non_numeric_cells": 0,
+      "out_of_range_cells": 0,
+      "duplicate_dates": 0,
+      "conflict_dates": 0,
+      "out_of_order_rows": 0,
+      "structure_ok": true,
+      "quality_detail": {
+       "file": "cbond_综合指数_净价.csv",
+       "bytes": 128530,
+       "sha256": "d34e74428ae7ba8956441756ef4f03a4df43ee0e865e8246921de8c45479405d",
+       "structure_ok": true,
+       "missing_columns": [],
+       "header": [
+        "date",
+        "value"
+       ],
+       "raw_rows": 6225,
+       "valid_rows": 6225,
+       "empty_cells": 0,
+       "nan_cells": 0,
+       "inf_cells": 0,
+       "non_numeric_cells": 0,
+       "out_of_range_cells": 0,
+       "empty_date_rows": 0,
+       "bad_date_format_rows": 0,
+       "invalid_date_rows": 0,
+       "duplicate_dates": 0,
+       "out_of_order_rows": 0,
+       "conflict_dates": 0,
+       "conflict_detail": [],
+       "date_min": "2002-01-04",
+       "date_max": "2026-11-24",
+       "max_gap_days": 11,
+       "gap_count_over_threshold": 0,
+       "missing_intervals": []
+      }
      },
      "sample": [
       {
@@ -170,8 +299,11 @@
   },
   {
    "contract_label": "中债综合全价",
-   "used_by_composite": [
-    161005
+   "used_by_composite_ids": [
+    26
+   ],
+   "used_by_fund_codes": [
+    "161005"
    ],
    "candidate_index_name": "综合指数",
    "candidate_index": "综合指数",
@@ -186,7 +318,7 @@
       "indicator": "全价",
       "period": "总值"
      },
-     "called_at": "2026-11-25T10:16:33",
+     "called_at": "2026-11-25T10:44:12",
      "status": "ok",
      "rows": 6225,
      "error": null,
@@ -205,7 +337,49 @@
      "raw_file": {
       "file": "cbond_综合指数_全价.csv",
       "bytes": 129730,
-      "sha256_16": "e72aeae628916dc0"
+      "sha256": "e72aeae628916dc0d86e3e2448c32fc3ac53ef541177342d72dbe377403c8107",
+      "sha256_16": "e72aeae628916dc0",
+      "raw_rows": 6225,
+      "valid_rows": 6225,
+      "empty_cells": 0,
+      "nan_cells": 0,
+      "inf_cells": 0,
+      "non_numeric_cells": 0,
+      "out_of_range_cells": 0,
+      "duplicate_dates": 0,
+      "conflict_dates": 0,
+      "out_of_order_rows": 0,
+      "structure_ok": true,
+      "quality_detail": {
+       "file": "cbond_综合指数_全价.csv",
+       "bytes": 129730,
+       "sha256": "e72aeae628916dc0d86e3e2448c32fc3ac53ef541177342d72dbe377403c8107",
+       "structure_ok": true,
+       "missing_columns": [],
+       "header": [
+        "date",
+        "value"
+       ],
+       "raw_rows": 6225,
+       "valid_rows": 6225,
+       "empty_cells": 0,
+       "nan_cells": 0,
+       "inf_cells": 0,
+       "non_numeric_cells": 0,
+       "out_of_range_cells": 0,
+       "empty_date_rows": 0,
+       "bad_date_format_rows": 0,
+       "invalid_date_rows": 0,
+       "duplicate_dates": 0,
+       "out_of_order_rows": 0,
+       "conflict_dates": 0,
+       "conflict_detail": [],
+       "date_min": "2002-01-04",
+       "date_max": "2026-11-24",
+       "max_gap_days": 11,
+       "gap_count_over_threshold": 0,
+       "missing_intervals": []
+      }
      },
      "sample": [
       {
@@ -235,8 +409,11 @@
   },
   {
    "contract_label": "中证综合债券",
-   "used_by_composite": [
-    1938
+   "used_by_composite_ids": [
+    27
+   ],
+   "used_by_fund_codes": [
+    "001938"
    ],
    "candidate_index_name": null,
    "candidate_index": null,
@@ -254,8 +431,11 @@
   },
   {
    "contract_label": "中债-总全价(总值)",
-   "used_by_composite": [
-    12346
+   "used_by_composite_ids": [
+    28
+   ],
+   "used_by_fund_codes": [
+    "012346"
    ],
    "candidate_index_name": "综合指数",
    "candidate_index": "综合指数",
@@ -270,7 +450,7 @@
       "indicator": "全价",
       "period": "总值"
      },
-     "called_at": "2026-11-25T10:16:38",
+     "called_at": "2026-11-25T10:44:17",
      "status": "ok",
      "rows": 6225,
      "error": null,
@@ -289,7 +469,49 @@
      "raw_file": {
       "file": "cbond_综合指数_全价.csv",
       "bytes": 129730,
-      "sha256_16": "e72aeae628916dc0"
+      "sha256": "e72aeae628916dc0d86e3e2448c32fc3ac53ef541177342d72dbe377403c8107",
+      "sha256_16": "e72aeae628916dc0",
+      "raw_rows": 6225,
+      "valid_rows": 6225,
+      "empty_cells": 0,
+      "nan_cells": 0,
+      "inf_cells": 0,
+      "non_numeric_cells": 0,
+      "out_of_range_cells": 0,
+      "duplicate_dates": 0,
+      "conflict_dates": 0,
+      "out_of_order_rows": 0,
+      "structure_ok": true,
+      "quality_detail": {
+       "file": "cbond_综合指数_全价.csv",
+       "bytes": 129730,
+       "sha256": "e72aeae628916dc0d86e3e2448c32fc3ac53ef541177342d72dbe377403c8107",
+       "structure_ok": true,
+       "missing_columns": [],
+       "header": [
+        "date",
+        "value"
+       ],
+       "raw_rows": 6225,
+       "valid_rows": 6225,
+       "empty_cells": 0,
+       "nan_cells": 0,
+       "inf_cells": 0,
+       "non_numeric_cells": 0,
+       "out_of_range_cells": 0,
+       "empty_date_rows": 0,
+       "bad_date_format_rows": 0,
+       "invalid_date_rows": 0,
+       "duplicate_dates": 0,
+       "out_of_order_rows": 0,
+       "conflict_dates": 0,
+       "conflict_detail": [],
+       "date_min": "2002-01-04",
+       "date_max": "2026-11-24",
+       "max_gap_days": 11,
+       "gap_count_over_threshold": 0,
+       "missing_intervals": []
+      }
      },
      "sample": [
       {
@@ -319,8 +541,11 @@
   },
   {
    "contract_label": "中债综合财富",
-   "used_by_composite": [
-    12344
+   "used_by_composite_ids": [
+    29
+   ],
+   "used_by_fund_codes": [
+    "012344"
    ],
    "candidate_index_name": "综合指数",
    "candidate_index": "综合指数",
@@ -335,7 +560,7 @@
       "indicator": "财富",
       "period": "总值"
      },
-     "called_at": "2026-11-25T10:16:43",
+     "called_at": "2026-11-25T10:44:22",
      "status": "ok",
      "rows": 6225,
      "error": null,
@@ -354,7 +579,49 @@
      "raw_file": {
       "file": "cbond_综合指数_财富.csv",
       "bytes": 130054,
-      "sha256_16": "7844f92dfd42779c"
+      "sha256": "7844f92dfd42779ccf6e7a9b07cca1b84943f53abbe83bcc6133d8e562e0455c",
+      "sha256_16": "7844f92dfd42779c",
+      "raw_rows": 6225,
+      "valid_rows": 6225,
+      "empty_cells": 0,
+      "nan_cells": 0,
+      "inf_cells": 0,
+      "non_numeric_cells": 0,
+      "out_of_range_cells": 0,
+      "duplicate_dates": 0,
+      "conflict_dates": 0,
+      "out_of_order_rows": 0,
+      "structure_ok": true,
+      "quality_detail": {
+       "file": "cbond_综合指数_财富.csv",
+       "bytes": 130054,
+       "sha256": "7844f92dfd42779ccf6e7a9b07cca1b84943f53abbe83bcc6133d8e562e0455c",
+       "structure_ok": true,
+       "missing_columns": [],
+       "header": [
+        "date",
+        "value"
+       ],
+       "raw_rows": 6225,
+       "valid_rows": 6225,
+       "empty_cells": 0,
+       "nan_cells": 0,
+       "inf_cells": 0,
+       "non_numeric_cells": 0,
+       "out_of_range_cells": 0,
+       "empty_date_rows": 0,
+       "bad_date_format_rows": 0,
+       "invalid_date_rows": 0,
+       "duplicate_dates": 0,
+       "out_of_order_rows": 0,
+       "conflict_dates": 0,
+       "conflict_detail": [],
+       "date_min": "2002-01-04",
+       "date_max": "2026-11-24",
+       "max_gap_days": 11,
+       "gap_count_over_threshold": 0,
+       "missing_intervals": []
+      }
      },
      "sample": [
       {
@@ -391,6 +658,15 @@
   "contract_states_basis": 3,
   "all_three_series": 1,
   "official_code_confirmed": 0,
+  "raw_csv_quality": {
+   "files": 6,
+   "total_raw_rows": 37350,
+   "total_valid_rows": 37350,
+   "total_duplicate_dates": 0,
+   "total_conflicts": 0,
+   "all_structure_ok": true,
+   "all_zero_defects": true
+  },
   "methodology_doc_obtained": 0,
   "series_semantics_confirmed": 3,
   "fully_qualified": 0,

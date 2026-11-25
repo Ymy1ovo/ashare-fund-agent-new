@@ -1,0 +1,485 @@
+{
+ "phase": "3B-6.1.2.1",
+ "generated_at": "2026-11-25T10:45:58",
+ "purpose": "记录本轮实际执行过的原始证据检索渠道（不伪造）",
+ "strict_rules": [
+  "未真实请求过的渠道不得写入",
+  "未下载到的文件不得填写 SHA256",
+  "第三方平台文本一律保持 L3，不得升级"
+ ],
+ "target_funds": [
+  {
+   "composite_id": 16,
+   "benchmark_name": "000051 华夏沪深300ETF联接",
+   "fund_code": "000051",
+   "fund_name": "华夏沪深300ETF联接",
+   "fund_company": "华夏基金管理有限公司"
+  },
+  {
+   "composite_id": 17,
+   "benchmark_name": "110020 易方达沪深300ETF联接",
+   "fund_code": "110020",
+   "fund_name": "易方达沪深300ETF联接",
+   "fund_company": "易方达基金管理有限公司"
+  },
+  {
+   "composite_id": 18,
+   "benchmark_name": "161725 招商中证白酒指数(LOF)",
+   "fund_code": "161725",
+   "fund_name": "招商中证白酒指数(LOF)",
+   "fund_company": "招商基金管理有限公司"
+  },
+  {
+   "composite_id": 19,
+   "benchmark_name": "007300 国联安中证半导体ETF联接",
+   "fund_code": "007300",
+   "fund_name": "国联安中证半导体ETF联接",
+   "fund_company": "国联安基金管理有限公司"
+  },
+  {
+   "composite_id": 20,
+   "benchmark_name": "000478 建信中证500指数增强",
+   "fund_code": "000478",
+   "fund_name": "建信中证500指数增强",
+   "fund_company": "建信基金管理有限责任公司"
+  },
+  {
+   "composite_id": 21,
+   "benchmark_name": "000961 天弘沪深300ETF联接",
+   "fund_code": "000961",
+   "fund_name": "天弘沪深300ETF联接",
+   "fund_company": "天弘基金管理有限公司"
+  },
+  {
+   "composite_id": 22,
+   "benchmark_name": "050002 博时裕富沪深300指数",
+   "fund_code": "050002",
+   "fund_name": "博时裕富沪深300指数",
+   "fund_company": "博时基金管理有限公司"
+  },
+  {
+   "composite_id": 23,
+   "benchmark_name": "001052 华夏中证500ETF联接",
+   "fund_code": "001052",
+   "fund_name": "华夏中证500ETF联接",
+   "fund_company": "华夏基金管理有限公司"
+  },
+  {
+   "composite_id": 24,
+   "benchmark_name": "001548 天弘上证50ETF联接",
+   "fund_code": "001548",
+   "fund_name": "天弘上证50ETF联接",
+   "fund_company": "天弘基金管理有限公司"
+  },
+  {
+   "composite_id": 25,
+   "benchmark_name": "110022 易方达消费行业股票",
+   "fund_code": "110022",
+   "fund_name": "易方达消费行业股票",
+   "fund_company": "易方达基金管理有限公司"
+  },
+  {
+   "composite_id": 26,
+   "benchmark_name": "161005 富国天惠成长混合(LOF)",
+   "fund_code": "161005",
+   "fund_name": "富国天惠成长混合(LOF)",
+   "fund_company": "富国基金管理有限公司"
+  },
+  {
+   "composite_id": 27,
+   "benchmark_name": "001938 中欧时代先锋",
+   "fund_code": "001938",
+   "fund_name": "中欧时代先锋",
+   "fund_company": "中欧基金管理公司"
+  },
+  {
+   "composite_id": 28,
+   "benchmark_name": "012346 易方达港股通成长混合",
+   "fund_code": "012346",
+   "fund_name": "易方达港股通成长混合",
+   "fund_company": "易方达基金管理有限公司"
+  },
+  {
+   "composite_id": 29,
+   "benchmark_name": "012344 嘉实领先优势混合",
+   "fund_code": "012344",
+   "fund_name": "嘉实领先优势混合",
+   "fund_company": "嘉实基金管理有限公司"
+  },
+  {
+   "composite_id": 30,
+   "benchmark_name": "519066 汇添富蓝筹稳健混合",
+   "fund_code": "519066",
+   "fund_name": "汇添富蓝筹稳健混合",
+   "fund_company": "汇添富基金公司"
+  }
+ ],
+ "channels_probed": [
+  {
+   "channel": "证监会基金电子披露网站",
+   "url": "http://eid.csrc.gov.cn/fund",
+   "doc_types_searched": [
+    "基金合同",
+    "招募说明书",
+    "产品资料概要",
+    "定期报告"
+   ],
+   "probed_at": "2026-11-25T10:45:46",
+   "http_status": 200,
+   "reachable": true,
+   "error_type": null,
+   "error_message": null,
+   "document_obtained": false,
+   "failure_reason": "站点可访问，但需站内表单检索（按基金代码/名称查询）才能定位具体文件；本轮未完成表单检索与文件下载",
+   "bytes": 191
+  },
+  {
+   "channel": "巨潮资讯网",
+   "url": "http://www.cninfo.com.cn",
+   "doc_types_searched": [
+    "基金合同",
+    "招募说明书"
+   ],
+   "probed_at": "2026-11-25T10:45:48",
+   "http_status": 200,
+   "reachable": true,
+   "error_type": null,
+   "error_message": null,
+   "document_obtained": false,
+   "failure_reason": "站点可访问，但需站内表单检索（按基金代码/名称查询）才能定位具体文件；本轮未完成表单检索与文件下载",
+   "bytes": 109463
+  },
+  {
+   "channel": "华夏基金官网",
+   "url": "https://www.chinaamc.com",
+   "doc_types_searched": [
+    "基金合同",
+    "招募说明书",
+    "公告"
+   ],
+   "probed_at": "2026-11-25T10:45:51",
+   "http_status": 200,
+   "reachable": true,
+   "error_type": null,
+   "error_message": null,
+   "document_obtained": false,
+   "failure_reason": "站点可访问，但需站内表单检索（按基金代码/名称查询）才能定位具体文件；本轮未完成表单检索与文件下载",
+   "bytes": 103157
+  },
+  {
+   "channel": "易方达基金官网",
+   "url": "https://www.efunds.com.cn",
+   "doc_types_searched": [
+    "基金合同",
+    "招募说明书",
+    "公告"
+   ],
+   "probed_at": "2026-11-25T10:45:53",
+   "http_status": 200,
+   "reachable": true,
+   "error_type": null,
+   "error_message": null,
+   "document_obtained": false,
+   "failure_reason": "站点可访问，但需站内表单检索（按基金代码/名称查询）才能定位具体文件；本轮未完成表单检索与文件下载",
+   "bytes": 22403
+  },
+  {
+   "channel": "天弘基金官网",
+   "url": "https://www.thfund.com.cn",
+   "doc_types_searched": [
+    "基金合同",
+    "招募说明书",
+    "公告"
+   ],
+   "probed_at": "2026-11-25T10:45:55",
+   "http_status": 200,
+   "reachable": true,
+   "error_type": null,
+   "error_message": null,
+   "document_obtained": false,
+   "failure_reason": "站点可访问，但需站内表单检索（按基金代码/名称查询）才能定位具体文件；本轮未完成表单检索与文件下载",
+   "bytes": 112090
+  }
+ ],
+ "funds_document_status": [
+  {
+   "composite_id": 16,
+   "fund_code": "000051",
+   "fund_name": "华夏沪深300ETF联接",
+   "fund_company": "华夏基金管理有限公司",
+   "document_types_needed": [
+    "基金合同",
+    "招募说明书",
+    "产品资料概要",
+    "基准变更公告"
+   ],
+   "document_obtained": false,
+   "obtained_document": null,
+   "sha256": null,
+   "failure_reason": "官方渠道需站内表单检索；本轮仅探测站点可达性，未完成按基金代码的检索与文件下载",
+   "current_evidence_grade": "L3",
+   "evidence_source": "platform（第三方平台披露文本）"
+  },
+  {
+   "composite_id": 17,
+   "fund_code": "110020",
+   "fund_name": "易方达沪深300ETF联接",
+   "fund_company": "易方达基金管理有限公司",
+   "document_types_needed": [
+    "基金合同",
+    "招募说明书",
+    "产品资料概要",
+    "基准变更公告"
+   ],
+   "document_obtained": false,
+   "obtained_document": null,
+   "sha256": null,
+   "failure_reason": "官方渠道需站内表单检索；本轮仅探测站点可达性，未完成按基金代码的检索与文件下载",
+   "current_evidence_grade": "L3",
+   "evidence_source": "platform（第三方平台披露文本）"
+  },
+  {
+   "composite_id": 18,
+   "fund_code": "161725",
+   "fund_name": "招商中证白酒指数(LOF)",
+   "fund_company": "招商基金管理有限公司",
+   "document_types_needed": [
+    "基金合同",
+    "招募说明书",
+    "产品资料概要",
+    "基准变更公告"
+   ],
+   "document_obtained": false,
+   "obtained_document": null,
+   "sha256": null,
+   "failure_reason": "官方渠道需站内表单检索；本轮仅探测站点可达性，未完成按基金代码的检索与文件下载",
+   "current_evidence_grade": "L3",
+   "evidence_source": "platform（第三方平台披露文本）"
+  },
+  {
+   "composite_id": 19,
+   "fund_code": "007300",
+   "fund_name": "国联安中证半导体ETF联接",
+   "fund_company": "国联安基金管理有限公司",
+   "document_types_needed": [
+    "基金合同",
+    "招募说明书",
+    "产品资料概要",
+    "基准变更公告"
+   ],
+   "document_obtained": false,
+   "obtained_document": null,
+   "sha256": null,
+   "failure_reason": "官方渠道需站内表单检索；本轮仅探测站点可达性，未完成按基金代码的检索与文件下载",
+   "current_evidence_grade": "L3",
+   "evidence_source": "platform（第三方平台披露文本）"
+  },
+  {
+   "composite_id": 20,
+   "fund_code": "000478",
+   "fund_name": "建信中证500指数增强",
+   "fund_company": "建信基金管理有限责任公司",
+   "document_types_needed": [
+    "基金合同",
+    "招募说明书",
+    "产品资料概要",
+    "基准变更公告"
+   ],
+   "document_obtained": false,
+   "obtained_document": null,
+   "sha256": null,
+   "failure_reason": "官方渠道需站内表单检索；本轮仅探测站点可达性，未完成按基金代码的检索与文件下载",
+   "current_evidence_grade": "L3",
+   "evidence_source": "platform（第三方平台披露文本）"
+  },
+  {
+   "composite_id": 21,
+   "fund_code": "000961",
+   "fund_name": "天弘沪深300ETF联接",
+   "fund_company": "天弘基金管理有限公司",
+   "document_types_needed": [
+    "基金合同",
+    "招募说明书",
+    "产品资料概要",
+    "基准变更公告"
+   ],
+   "document_obtained": false,
+   "obtained_document": null,
+   "sha256": null,
+   "failure_reason": "官方渠道需站内表单检索；本轮仅探测站点可达性，未完成按基金代码的检索与文件下载",
+   "current_evidence_grade": "L3",
+   "evidence_source": "platform（第三方平台披露文本）"
+  },
+  {
+   "composite_id": 22,
+   "fund_code": "050002",
+   "fund_name": "博时裕富沪深300指数",
+   "fund_company": "博时基金管理有限公司",
+   "document_types_needed": [
+    "基金合同",
+    "招募说明书",
+    "产品资料概要",
+    "基准变更公告"
+   ],
+   "document_obtained": false,
+   "obtained_document": null,
+   "sha256": null,
+   "failure_reason": "官方渠道需站内表单检索；本轮仅探测站点可达性，未完成按基金代码的检索与文件下载",
+   "current_evidence_grade": "L3",
+   "evidence_source": "platform（第三方平台披露文本）"
+  },
+  {
+   "composite_id": 23,
+   "fund_code": "001052",
+   "fund_name": "华夏中证500ETF联接",
+   "fund_company": "华夏基金管理有限公司",
+   "document_types_needed": [
+    "基金合同",
+    "招募说明书",
+    "产品资料概要",
+    "基准变更公告"
+   ],
+   "document_obtained": false,
+   "obtained_document": null,
+   "sha256": null,
+   "failure_reason": "官方渠道需站内表单检索；本轮仅探测站点可达性，未完成按基金代码的检索与文件下载",
+   "current_evidence_grade": "L3",
+   "evidence_source": "platform（第三方平台披露文本）"
+  },
+  {
+   "composite_id": 24,
+   "fund_code": "001548",
+   "fund_name": "天弘上证50ETF联接",
+   "fund_company": "天弘基金管理有限公司",
+   "document_types_needed": [
+    "基金合同",
+    "招募说明书",
+    "产品资料概要",
+    "基准变更公告"
+   ],
+   "document_obtained": false,
+   "obtained_document": null,
+   "sha256": null,
+   "failure_reason": "官方渠道需站内表单检索；本轮仅探测站点可达性，未完成按基金代码的检索与文件下载",
+   "current_evidence_grade": "L3",
+   "evidence_source": "platform（第三方平台披露文本）"
+  },
+  {
+   "composite_id": 25,
+   "fund_code": "110022",
+   "fund_name": "易方达消费行业股票",
+   "fund_company": "易方达基金管理有限公司",
+   "document_types_needed": [
+    "基金合同",
+    "招募说明书",
+    "产品资料概要",
+    "基准变更公告"
+   ],
+   "document_obtained": false,
+   "obtained_document": null,
+   "sha256": null,
+   "failure_reason": "官方渠道需站内表单检索；本轮仅探测站点可达性，未完成按基金代码的检索与文件下载",
+   "current_evidence_grade": "L3",
+   "evidence_source": "platform（第三方平台披露文本）"
+  },
+  {
+   "composite_id": 26,
+   "fund_code": "161005",
+   "fund_name": "富国天惠成长混合(LOF)",
+   "fund_company": "富国基金管理有限公司",
+   "document_types_needed": [
+    "基金合同",
+    "招募说明书",
+    "产品资料概要",
+    "基准变更公告"
+   ],
+   "document_obtained": false,
+   "obtained_document": null,
+   "sha256": null,
+   "failure_reason": "官方渠道需站内表单检索；本轮仅探测站点可达性，未完成按基金代码的检索与文件下载",
+   "current_evidence_grade": "L3",
+   "evidence_source": "platform（第三方平台披露文本）"
+  },
+  {
+   "composite_id": 27,
+   "fund_code": "001938",
+   "fund_name": "中欧时代先锋",
+   "fund_company": "中欧基金管理公司",
+   "document_types_needed": [
+    "基金合同",
+    "招募说明书",
+    "产品资料概要",
+    "基准变更公告"
+   ],
+   "document_obtained": false,
+   "obtained_document": null,
+   "sha256": null,
+   "failure_reason": "官方渠道需站内表单检索；本轮仅探测站点可达性，未完成按基金代码的检索与文件下载",
+   "current_evidence_grade": "L3",
+   "evidence_source": "platform（第三方平台披露文本）"
+  },
+  {
+   "composite_id": 28,
+   "fund_code": "012346",
+   "fund_name": "易方达港股通成长混合",
+   "fund_company": "易方达基金管理有限公司",
+   "document_types_needed": [
+    "基金合同",
+    "招募说明书",
+    "产品资料概要",
+    "基准变更公告"
+   ],
+   "document_obtained": false,
+   "obtained_document": null,
+   "sha256": null,
+   "failure_reason": "官方渠道需站内表单检索；本轮仅探测站点可达性，未完成按基金代码的检索与文件下载",
+   "current_evidence_grade": "L3",
+   "evidence_source": "platform（第三方平台披露文本）"
+  },
+  {
+   "composite_id": 29,
+   "fund_code": "012344",
+   "fund_name": "嘉实领先优势混合",
+   "fund_company": "嘉实基金管理有限公司",
+   "document_types_needed": [
+    "基金合同",
+    "招募说明书",
+    "产品资料概要",
+    "基准变更公告"
+   ],
+   "document_obtained": false,
+   "obtained_document": null,
+   "sha256": null,
+   "failure_reason": "官方渠道需站内表单检索；本轮仅探测站点可达性，未完成按基金代码的检索与文件下载",
+   "current_evidence_grade": "L3",
+   "evidence_source": "platform（第三方平台披露文本）"
+  },
+  {
+   "composite_id": 30,
+   "fund_code": "519066",
+   "fund_name": "汇添富蓝筹稳健混合",
+   "fund_company": "汇添富基金公司",
+   "document_types_needed": [
+    "基金合同",
+    "招募说明书",
+    "产品资料概要",
+    "基准变更公告"
+   ],
+   "document_obtained": false,
+   "obtained_document": null,
+   "sha256": null,
+   "failure_reason": "官方渠道需站内表单检索；本轮仅探测站点可达性，未完成按基金代码的检索与文件下载",
+   "current_evidence_grade": "L3",
+   "evidence_source": "platform（第三方平台披露文本）"
+  }
+ ],
+ "summary": {
+  "total_funds": 15,
+  "channels_probed": 5,
+  "channels_reachable": 5,
+  "documents_obtained": 0,
+  "funds_with_l1_evidence": 0,
+  "funds_with_l3_only": 15,
+  "note": "**本轮未取得任何 L1 原始文件**。所有基准文本证据等级维持 L3。"
+ }
+}
