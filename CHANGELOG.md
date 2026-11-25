@@ -1,5 +1,157 @@
 # 变更日志
 
+## 2026-11-25 — 阶段3B-6.2.1.1 基准可用性判定与生命周期统计逻辑修正
+
+**最小范围修正。不重新设计分类体系、不扩展数据采集、不修改数据库。**
+
+**一、问题1：研究评价基准可用性被高估**
+
+原实现中 `has_usable_index` 只判断指数代码是否存在于 `available_index_codes`，
+**没有检查 `index_master.return_basis`**。而当前 10 个已接入指数的 `return_basis`
+**全部为 `unknown`**，因此不能把点位数据直接认定为合格收益序列。
+
+修正：把四个概念严格分开。
+
+| 概念 | 含义 | 修正后 |
+| --- | --- | ---: |
+| `has_index_observation` | 有指数行情点位 | **42** |
+| `has_verified_return_basis` | **收益口径已获证据确认** | **0** |
+| `research_benchmark_candidate` | 具备候选条件，**未通过全部检查** | **42** |
+| `research_benchmark_usable` | **真正满足研究基准使用条件** | **0** |
+
+研究基准现在必须同时满足**六项必要条件**：
+
+1. 指数代码已映射
+2. 存在可用历史数据
+3. **`return_basis` 已确认，不能为 `unknown`**
+4. 收益口径与研究用途相容
+5. 研究基准选择规则明确（规则版本/选择原因/适用类别/与合同基准差异）
+6. 不得把价格指数冒充全收益或净收益指数
+
+**修正前后对比**：
+
+| 项 | 修正前 | 修正后 |
+| --- | ---: | ---: |
+| 有可用收益序列 | 42 | **0** |
+| 可建研究评价基准 | 42 | **0**（候选 42） |
+| 无任何可用基准 | 78 | **120** |
+
+**42 只保留为研究基准候选，但明确标记为待验证。**
+
+**未修改数据库中任何指数的 `return_basis`**（10 个仍全为 `unknown`）。
+
+**二、问题2：research 与 substitute 判定逻辑重叠**
+
+原代码 `research_ok = has_usable_index` 与 `substitute_ok = has_usable_index`
+完全相同，导致替代基准分支**实际不可达**。
+
+修正后三个层级严格递进：
+
+| 层级 | 必要条件 |
+| --- | --- |
+| `contract` | L1 官方合同文件 + 全部成分可算 + 历史权重可验证 |
+| `research` | 六项研究条件全部满足 + 明确不是合同基准 |
+| `substitute` | 由调用方**显式提供六项说明**（原因/来源/与合同基准差异/数据质量/适用范围/失效条件）+ 合同不可复现 |
+| `none` | 以上都不满足，必须给出明确原因 |
+
+**关键约束**：
+
+- **不得为了让三个分支都有数量而人为制造替代基准**；
+- 替代基准**不会因为「有指数数据」就自动产生**；
+- 同一未经确认口径的指数**不能同时**当作 research 和 substitute 可用；
+- 当前数据条件下 **research 与 substitute 的可用数量都是 0**。
+
+| 项 | 修正前 | 修正后 |
+| --- | ---: | ---: |
+| research 可用 | 42 | **0** |
+| substitute 可用 | 42（与 research 相同，分支不可达） | **0**（独立判定） |
+| substitute 候选 | 无此字段 | **42** |
+
+**三、问题3：生命周期 `unknown_status` 统计错误**
+
+原代码：
+
+```python
+unknown_status = sum(1 for r in records
+                     if r["lifecycle_status"] not in ("terminated",))
+```
+
+这实际统计了**所有非 terminated 记录**，不是 `unknown` 状态数量。
+原报告出现 `existing=79 / terminated=41 / unknown_status=79`，语义自相矛盾。
+
+修正：按数据库真实值建立**互斥映射**。
+
+| 原始值 | 数量 | 归类 |
+| --- | ---: | --- |
+| `unknown` | **79** | **`unknown_status`（状态未知）** |
+| `terminated` | **41** | `terminated`（明确终止） |
+
+| 类别 | 修正前 | 修正后 |
+| --- | ---: | ---: |
+| `existing` 明确存续 | 79（错误） | **0** |
+| `terminated` 明确终止 | 41 | **41** |
+| `unknown_status` 状态未知 | 79（与非 terminated 重复计数） | **79** |
+| **合计** | 199（重复计数） | **120**（守恒：**True**） |
+
+**数据库中实际只有 `unknown`（79 只）与 `terminated`（41 只）两种取值，
+没有任何基金被明确标记为存续。**
+
+`unknown` 字面含义就是「状态未知」，**不能作为「存续」的证据**。
+正确算法是按映射规则直接归类，不是「terminated 的反集」。
+
+**四、修正前后统计对照**
+
+| 项 | 修正前 | 修正后 |
+| --- | ---: | ---: |
+| 研究基准可用 | 42 | **0** |
+| research / substitute 分支 | 相同（不可达） | **独立判定** |
+| `existing` | 79 | **0** |
+| `unknown_status` | 79（重复计数） | **79**（互斥） |
+| 三类合计 | 199（>120） | **120**（守恒） |
+| 无任何可用基准 | 78 | **120** |
+
+**五、测试**
+
+新增 25 项，覆盖：
+
+| 类别 | 测试 |
+| --- | --- |
+| `return_basis=unknown` 阻断 | `test_unknown_basis_blocks_research` |
+| 点位 ≠ 合格序列 | `test_observation_not_equal_usable_series` |
+| 口径确认后可进 research | `test_verified_basis_enables_research` |
+| 价格口径需声明 | `test_price_basis_needs_declaration` |
+| 研究规则未声明阻断 | `test_missing_research_rule_blocks` |
+| 替代需显式说明 | `test_substitute_requires_explicit_selection` |
+| **替代可用而 research 不可用** | `test_substitute_usable_but_research_not` |
+| **两者均不可用返回 none** | `test_both_unusable_returns_none` |
+| 两分支条件不同 | `test_research_and_substitute_conditions_differ` |
+| 永不自动升级 | `test_never_auto_promoted` |
+| 生命周期互斥 | `test_lifecycle_buckets_exclusive` |
+| 界面一致 | `test_lifecycle_each_fund_has_bucket` |
+
+全部直接调用 `assess_benchmark_usability()` 真实逻辑，不读预计算 JSON 做自我验证。
+
+**六、数据安全**
+
+| 项 | 值 |
+| --- | --- |
+| 数据库路径 | `D:\ymy\jj-agent\data\fund_agent.db` |
+| 前置 SHA256 | `27e0b54d7a5675892b70fc5061ed38da8dc6b58119139c63a4039e08e0523061` |
+| 后置 SHA256 | `27e0b54d7a5675892b70fc5061ed38da8dc6b58119139c63a4039e08e0523061` |
+| 是否一致 | **是** |
+| `integrity_check` | **ok** |
+| 外键违规 | **0** |
+
+全程 `mode=ro` 只读。**未修改任何指数的 `return_basis`**。
+
+**测试**：新增 26 项；全量 **2338 passed / 0 failed / 0 skipped**（2312 → 2338）。
+
+**门禁不变**：`ready_for_research_analysis=true`，
+`ready_for_backtest=false`，`ready_for_formal_ranking=false`。
+
+**未进入 3B-6.2.2。**
+
+
 ## 2026-11-25 — 阶段3B-6.2.1 支付宝场外公募基金基准分类体系设计
 
 **只做分类体系设计与现有数据映射审计。不实施正式基准接入，不开放回测。**

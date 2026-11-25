@@ -66,7 +66,11 @@ def test_research_cannot_be_labelled_contract():
     parsed = parse_benchmark_text("沪深300指数收益率×95%+活期存款×5%")
     r = assess_benchmark_usability(
         parsed, available_index_codes=AVAILABLE, category="index_plain",
-        contract_evidence_grade="L3")
+        index_return_basis={"000300": "total_return"},
+        contract_evidence_grade="L3",
+        research_rule={"rule_version": "v1", "selection_reason": "r",
+                        "applicable_category": "index_plain",
+                        "divergence_from_contract": "d"})
     assert r["max_kind"] == "research"
     assert any("不得称为合同基准" in x for x in r["reasons"])
 
@@ -336,16 +340,24 @@ def test_survivorship_declared(audit):
     s = audit["summary"]
     assert "幸存者偏差" in s["survivorship_note"]
     assert s["lifecycle"]["terminated"] == 41
-    assert s["lifecycle"]["existing"] == 79
+    # 3B-6.2.1.1 修正：unknown 不等于存续
+    assert s["lifecycle"]["unknown_status"] == 79
+    assert s["lifecycle"]["existing"] == 0
 
 
 def test_terminated_and_existing_split(audit):
-    term = [r for r in audit["funds"] if r["lifecycle_status"] == "terminated"]
-    ex = [r for r in audit["funds"] if r["lifecycle_status"] != "terminated"]
+    """生命周期三类互斥：existing / terminated / unknown_status。"""
+    term = [r for r in audit["funds"] if r["lifecycle_bucket"] == "terminated"]
+    unk = [r for r in audit["funds"] if r["lifecycle_bucket"] == "unknown_status"]
+    ex = [r for r in audit["funds"] if r["lifecycle_bucket"] == "existing"]
     assert len(term) == 41
-    assert len(ex) == 79
-    assert audit["summary"]["lifecycle"]["terminated"] == len(term)
-    assert audit["summary"]["lifecycle"]["existing"] == len(ex)
+    assert len(unk) == 79
+    assert len(ex) == 0
+    lc = audit["summary"]["lifecycle"]
+    assert lc["terminated"] == len(term)
+    assert lc["unknown_status"] == len(unk)
+    assert lc["existing"] == len(ex)
+    assert len(term) + len(unk) + len(ex) == len(audit["funds"])
 
 
 def test_category_counts_from_detail(audit):
@@ -512,3 +524,273 @@ def test_gate_values_in_docs():
     assert "ready_for_backtest` | **False**" in txt
     assert "ready_for_formal_ranking` | **False**" in txt
     assert "ready_for_research_analysis` | **True**" in txt
+
+
+# ============================================================ 3B-6.2.1.1 修正
+
+VERIFIED_BASIS = {"000300": "total_return", "000905": "total_return"}
+UNKNOWN_BASIS = {"000300": "unknown", "000905": "unknown"}
+
+RULE = {
+    "rule_version": "test-v1",
+    "selection_reason": "测试",
+    "applicable_category": "index_plain",
+    "divergence_from_contract": "只覆盖指数部分",
+}
+
+
+def test_unknown_basis_blocks_research():
+    """return_basis=unknown 时研究基准不得判为 available。"""
+    p = parse_benchmark_text("沪深300指数收益率×95%+活期存款×5%")
+    r = assess_benchmark_usability(
+        p, available_index_codes=AVAILABLE, category="index_plain",
+        index_return_basis=UNKNOWN_BASIS, contract_evidence_grade="L3",
+        research_rule=RULE)
+    assert r["has_index_observation"] is True, "有点位数据"
+    assert r["has_verified_return_basis"] is False, "但口径未确认"
+    assert r["research_benchmark_usable"] is False
+    assert r["research_benchmark_candidate"] is True, "只能算候选"
+
+
+def test_observation_not_equal_usable_series():
+    """有指数行情点位 ≠ 有合格收益序列。"""
+    p = parse_benchmark_text("沪深300指数收益率×95%+活期存款×5%")
+    r = assess_benchmark_usability(
+        p, available_index_codes=AVAILABLE, category="index_plain",
+        index_return_basis=UNKNOWN_BASIS)
+    assert r["has_index_observation"] != r["has_verified_return_basis"]
+
+
+def test_verified_basis_enables_research():
+    """口径确认后才能进 research（独立场景：contract 仍不可用）。"""
+    p = parse_benchmark_text("沪深300指数收益率×95%+活期存款×5%")
+    r = assess_benchmark_usability(
+        p, available_index_codes=AVAILABLE, category="index_plain",
+        index_return_basis=VERIFIED_BASIS, contract_evidence_grade="L3",
+        research_rule=RULE)
+    assert r["max_kind"] == "research"
+    assert r["contract_benchmark_usable"] is False
+    assert r["research_benchmark_usable"] is True
+
+
+def test_price_basis_needs_declaration():
+    """价格指数可作为研究基准，但必须声明会被低估。"""
+    p = parse_benchmark_text("沪深300指数收益率×95%+活期存款×5%")
+    r = assess_benchmark_usability(
+        p, available_index_codes=AVAILABLE, category="index_plain",
+        index_return_basis={"000300": "price"}, research_rule=RULE)
+    assert r["basis_needs_declaration"] == ["price"]
+    assert any("系统性低估" in x for x in r["reasons"])
+
+
+def test_missing_research_rule_blocks():
+    """研究选择规则未声明时不得判为可用。"""
+    p = parse_benchmark_text("沪深300指数收益率×95%+活期存款×5%")
+    r = assess_benchmark_usability(
+        p, available_index_codes=AVAILABLE, category="index_plain",
+        index_return_basis=VERIFIED_BASIS, research_rule=None)
+    assert r["research_conditions"]["research_rule_declared"] is False
+    assert r["research_benchmark_usable"] is False
+
+
+def test_substitute_requires_explicit_selection():
+    """替代基准必须显式提供六项说明，不得自动产生。"""
+    p = parse_benchmark_text("沪深300指数收益率×95%+活期存款×5%")
+    r = assess_benchmark_usability(
+        p, available_index_codes=AVAILABLE, category="index_plain",
+        index_return_basis=UNKNOWN_BASIS, substitute_selection=None)
+    assert r["substitute_benchmark_usable"] is False
+    assert r["substitute_benchmark_candidate"] is True
+
+
+def test_substitute_usable_but_research_not():
+    """替代可用但 research 不可用的独立场景。"""
+    p = parse_benchmark_text("沪深300指数收益率×95%+活期存款×5%")
+    sel = {
+        "reason": "合同基准含现金成分无法计算",
+        "source": "中证沪深300价格指数点位",
+        "divergence_from_contract": "缺少 5% 现金成分",
+        "data_quality": "价格口径，低估分红",
+        "applicable_scope": "仅用于相对强弱比较",
+        "invalidation_condition": "取得全收益指数后失效",
+    }
+    r = assess_benchmark_usability(
+        p, available_index_codes=AVAILABLE, category="index_plain",
+        index_return_basis=UNKNOWN_BASIS, research_rule=None,
+        substitute_selection=sel)
+    assert r["substitute_benchmark_usable"] is True
+    assert r["research_benchmark_usable"] is False
+    assert r["max_kind"] == "substitute"
+
+
+def test_both_unusable_returns_none():
+    """两者均不可用必须返回 none。"""
+    p = parse_benchmark_text("中债综合指数收益率×90%+活期存款×10%")
+    r = assess_benchmark_usability(
+        p, available_index_codes=AVAILABLE, category="pure_bond",
+        index_return_basis={}, research_rule=None, substitute_selection=None)
+    assert r["max_kind"] == "none"
+    assert r["research_benchmark_usable"] is False
+    assert r["substitute_benchmark_usable"] is False
+
+
+def test_research_and_substitute_conditions_differ():
+    """research 与 substitute 的判定条件必须不同。"""
+    p = parse_benchmark_text("沪深300指数收益率×95%+活期存款×5%")
+    sel = {
+        "reason": "r", "source": "s", "divergence_from_contract": "d",
+        "data_quality": "q", "applicable_scope": "a",
+        "invalidation_condition": "i",
+    }
+    # 只给 substitute，不给 research 规则
+    r = assess_benchmark_usability(
+        p, available_index_codes=AVAILABLE, category="index_plain",
+        index_return_basis=UNKNOWN_BASIS, research_rule=None,
+        substitute_selection=sel)
+    assert r["substitute_benchmark_usable"] != r["research_benchmark_usable"]
+
+    # 只给 research 规则，不给 substitute
+    r2 = assess_benchmark_usability(
+        p, available_index_codes=AVAILABLE, category="index_plain",
+        index_return_basis=VERIFIED_BASIS, research_rule=RULE,
+        substitute_selection=None)
+    assert r2["research_benchmark_usable"] != r2["substitute_benchmark_usable"]
+
+
+def test_no_contract_without_l1():
+    """即使全部条件满足，无 L1 也不得判 contract。"""
+    p = parse_benchmark_text("沪深300指数收益率×95%+活期存款利率×5%")
+    r = assess_benchmark_usability(
+        p, available_index_codes=AVAILABLE, category="index_plain",
+        index_return_basis=VERIFIED_BASIS, research_rule=RULE)
+    assert r["contract_benchmark_usable"] is False
+    assert r["max_kind"] != "contract"
+
+
+def test_never_auto_promoted():
+    """research/substitute 结果永远不得自动升级为 contract。"""
+    p = parse_benchmark_text("沪深300指数收益率×95%+活期存款×5%")
+    for basis in (UNKNOWN_BASIS, VERIFIED_BASIS):
+        for sub in (None, {"reason": "r", "source": "s",
+                            "divergence_from_contract": "d",
+                            "data_quality": "q", "applicable_scope": "a",
+                            "invalidation_condition": "i"}):
+            r = assess_benchmark_usability(
+                p, available_index_codes=AVAILABLE, category="index_plain",
+                index_return_basis=basis, research_rule=RULE,
+                substitute_selection=sub)
+            assert r["max_kind"] in ("research", "substitute", "none")
+            assert r["contract_benchmark_usable"] is False
+
+
+# ============================================================ lifecycle 互斥
+def test_lifecycle_buckets_exclusive(audit):
+    lc = audit["summary"]["lifecycle"]
+    assert lc["sum_equals_total"] is True
+    assert lc["existing"] + lc["terminated"] + lc["unknown_status"] == lc["total"]
+    assert lc["total"] == audit["summary"]["total_funds_by_fund_id"]
+
+
+def test_lifecycle_buckets_match_detail(audit):
+    from collections import Counter
+    recalc = Counter(r["lifecycle_bucket"] for r in audit["funds"])
+    lc = audit["summary"]["lifecycle"]
+    assert lc["existing"] == recalc.get("existing", 0)
+    assert lc["terminated"] == recalc.get("terminated", 0)
+    assert lc["unknown_status"] == recalc.get("unknown_status", 0)
+
+
+def test_lifecycle_unknown_not_counted_as_existing(audit):
+    """unknown 不得被当作明确存续。"""
+    lc = audit["summary"]["lifecycle"]
+    unknown_raw = lc["raw_value_counts"].get("unknown", 0)
+    assert unknown_raw == 79
+    assert lc["unknown_status"] == 79
+    assert lc["existing"] == 0, "库中无 active/existing 值，存续应为 0"
+
+
+def test_lifecycle_raw_values_all_mapped(audit):
+    """真实状态值必须全部有明确归类。"""
+    lc = audit["summary"]["lifecycle"]
+    assert lc["unmapped_raw_values"] == {}
+    rule = lc["mapping_rule"]
+    for raw in lc["raw_value_counts"]:
+        assert raw in rule, f"{raw} 无映射规则"
+
+
+def test_lifecycle_each_fund_has_bucket(audit):
+    for r in audit["funds"]:
+        assert r["lifecycle_bucket"] in ("existing", "terminated", "unknown_status")
+
+
+# ============================================================ 报告一致性（修正后）
+def test_docs_no_42_research_usable():
+    """报告不得再声称 42 只已拥有可用研究基准。"""
+    txt = _docs_text()
+    assert "可建研究评价基准 | **42**" not in txt
+    assert "**42** 只" not in txt or "候选" in txt
+
+
+def test_docs_lifecycle_three_buckets():
+    txt = _docs_text()
+    assert "unknown_status" in txt or "状态未知" in txt
+    assert "存续" in txt
+
+
+def test_docs_return_basis_unknown_blocks():
+    txt = _docs_text()
+    assert "return_basis" in txt
+    assert "unknown" in txt
+
+
+# ============================================================ 最终一致性
+def test_docs_report_candidates_separately(audit):
+    """报告必须把候选数与可用数分开陈述。"""
+    txt = _docs_text()
+    s = audit["summary"]
+    assert "研究基准候选" in txt
+    assert "研究基准真正可用" in txt
+    assert "替代基准候选" in txt
+    assert "替代基准真正可用" in txt
+    # 数字必须与 JSON 一致
+    assert str(s["research_benchmark_candidate"]) in txt
+    assert str(s["research_benchmark_usable"]) in txt
+
+
+def test_docs_no_stale_usable_42():
+    """不得再把 42 写成「已可用」。"""
+    txt = _docs_text()
+    assert "可建研究评价基准 | 42" not in txt
+    assert "有可用收益序列 | 42" not in txt
+
+
+def test_docs_no_79_as_existing():
+    """不得再把 79 当作存续。"""
+    txt = _docs_text()
+    assert "存续基金 | **79**" not in txt
+    assert "存续基金 | 79" not in txt
+
+
+def test_docs_has_verified_basis_zero(audit):
+    txt = _docs_text()
+    assert audit["summary"]["has_verified_return_basis"] == 0
+    assert "收益口径已确认" in txt
+
+
+def test_all_index_return_basis_unknown(audit):
+    """10 个指数全部 unknown，且不得被修改。"""
+    for i in audit["summary"]["indexes"]["detail"]:
+        assert i["return_basis"] == "unknown", f"{i['index_code']} 口径被改动"
+
+
+def test_db_before_after_identical(audit):
+    assert audit["db_before"]["db_sha256"] == audit["db_after"]["db_sha256"]
+    assert audit["db_before"]["db_bytes"] == audit["db_after"]["db_bytes"]
+
+
+def test_self_check_all_true(audit):
+    """自校验三项必须全为 True。"""
+    sc = audit["summary"]["_self_check"]
+    assert sc["category_sum_equals_total"] is True
+    assert sc["lifecycle_three_buckets_sum_equals_total"] is True
+    assert sc["research_plus_none_le_total"] is True

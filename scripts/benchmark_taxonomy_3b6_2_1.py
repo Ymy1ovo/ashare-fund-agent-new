@@ -443,39 +443,99 @@ def parse_benchmark_text(text: str | None) -> dict:
 
 
 # ------------------------------------------------------------------ 基准可用性
+# 与研究用途相容的收益口径（价格指数不可直接当全收益）
+RESEARCH_COMPATIBLE_BASES = {
+    "total_return", "net_return", "wealth",
+}
+# 可作为研究基准但必须声明的口径（价格类，收益会被低估）
+RESEARCH_DECLARABLE_BASES = {
+    "price", "full_price", "net_price",
+}
+
+
 def assess_benchmark_usability(
     parsed: dict,
     *,
     available_index_codes: set[str],
     category: str,
+    index_return_basis: dict[str, str] | None = None,
     contract_evidence_grade: str = "L3",
     has_official_contract_file: bool = False,
     has_historical_weights: bool = False,
+    research_rule: dict | None = None,
+    substitute_selection: dict | None = None,
 ) -> dict:
     """判定一条基准能达到的最高可用层级。
 
-    返回的 ``max_kind`` 只会是 ``contract`` / ``research`` / ``substitute`` / ``none``
-    之一，且**升级必须满足硬条件**，不得由调用方随意指定。
+    **四个层级严格递进，不满足就降级，不得凭空产生：**
+
+    ``contract``
+        必须有 L1 官方合同文件 + 全部成分可算 + 历史权重可验证。
+
+    ``research``
+        必须有：指数代码已映射 + 有历史行情 + **``return_basis`` 已确认
+        且不为 ``unknown``** + 口径与研究用途相容 + 研究选择规则明确。
+
+    ``substitute``
+        必须在合同不可复现时，由调用方**显式提供** ``substitute_selection``
+        （含替代原因/序列来源/与原基准差异/数据质量/适用范围/失效条件）。
+        **不会因为「有指数数据」就自动产生替代基准。**
+
+    ``none``
+        以上都不满足，必须给出明确原因。
+
+    :param index_return_basis: ``{index_code: return_basis}``，
+        来自 ``index_master.return_basis``；缺省视为全部 ``unknown``。
+    :param research_rule: 研究基准选择规则，至少含
+        ``rule_version`` ``selection_reason`` ``applicable_category``
+        ``divergence_from_contract``。
+    :param substitute_selection: 替代基准选择说明，至少含
+        ``reason`` ``source`` ``divergence_from_contract`` ``data_quality``
+        ``applicable_scope`` ``invalidation_condition``。
     """
     comps = parsed.get("components", [])
+    basis_map = index_return_basis or {}
     reasons: list[str] = []
 
-    # ---- 合同基准：必须有 L1 官方合同文件 ----
-    contract_ok = (
-        contract_evidence_grade == "L1"
-        and has_official_contract_file
-        and parsed.get("parse_status") == "parsed"
-    )
-    if not contract_ok:
-        if contract_evidence_grade != "L1":
-            reasons.append(
-                f"合同基准证据等级为 {contract_evidence_grade}，**必须有 L1 官方合同文件**")
-        if not has_official_contract_file:
-            reasons.append("**未取得基金合同/招募说明书原始文件**")
-        if parsed.get("parse_status") != "parsed":
-            reasons.append("基准文本缺失或无法解析")
+    # ================= 1. 指数观察 vs 收益口径 =================
+    # has_index_observation：有代码且有历史行情点位
+    observed = [c for c in comps
+                if c["component_type"] == "equity_index"
+                and c.get("index_code") in available_index_codes]
+    has_index_observation = bool(observed)
 
-    # ---- 成分可计算性 ----
+    # has_verified_return_basis：口径已确认（非 unknown）
+    verified_basis = []
+    unknown_basis = []
+    for c in observed:
+        b = basis_map.get(c["index_code"], "unknown")
+        if b == "unknown":
+            unknown_basis.append(c["index_code"])
+        else:
+            verified_basis.append((c["index_code"], b))
+    has_verified_return_basis = bool(verified_basis) and not unknown_basis
+
+    # 研究报告用指数若全为 unknown，则不能判定为可用
+    if observed and not has_verified_return_basis:
+        reasons.append(
+            f"**指数 {sorted({c['index_code'] for c in observed})} 的 "
+            "`return_basis` 为 `unknown`，点位数据不得当作合格收益序列**")
+
+    # 口径与研究用途的相容性
+    basis_compatible = False
+    basis_needs_declaration = []
+    if has_verified_return_basis:
+        bases = {b for _, b in verified_basis}
+        if bases & RESEARCH_COMPATIBLE_BASES:
+            basis_compatible = True
+        if bases & RESEARCH_DECLARABLE_BASES:
+            basis_compatible = True
+            basis_needs_declaration = sorted(bases & RESEARCH_DECLARABLE_BASES)
+            reasons.append(
+                f"**使用价格类口径 {basis_needs_declaration}，"
+                "会导致基准收益被系统性低估，必须在研究报告中声明**")
+
+    # ================= 2. 成分可计算性（合同基准用） =================
     uncomputable = []
     for c in comps:
         t = c["component_type"]
@@ -495,38 +555,104 @@ def assess_benchmark_usability(
 
     fully_computable = not uncomputable and bool(comps)
 
-    # ---- 研究评价基准：可用指数序列 + 明确的研究选择规则 ----
-    has_usable_index = any(
-        c["component_type"] == "equity_index"
-        and c.get("index_code") in available_index_codes
-        for c in comps)
-    research_ok = has_usable_index
+    # ================= 3. contract 判定 =================
+    contract_ok = (
+        contract_evidence_grade == "L1"
+        and has_official_contract_file
+        and parsed.get("parse_status") == "parsed"
+    )
+    if not contract_ok:
+        if contract_evidence_grade != "L1":
+            reasons.append(
+                f"合同基准证据等级为 {contract_evidence_grade}，"
+                "**必须有 L1 官方合同文件**")
+        if not has_official_contract_file:
+            reasons.append("**未取得基金合同/招募说明书原始文件**")
+        if parsed.get("parse_status") != "parsed":
+            reasons.append("基准文本缺失或无法解析")
 
-    # ---- 替代基准：至少有一条可用序列，且明确降级 ----
-    substitute_ok = has_usable_index
+    contract_usable = (
+        contract_ok and fully_computable and has_historical_weights)
 
-    if contract_ok and fully_computable and has_historical_weights:
+    # ================= 4. research 判定 =================
+    # 研究基准必须同时满足 6 条，缺一不可
+    rule_ok = bool(research_rule) and all(
+        research_rule.get(k) for k in (
+            "rule_version", "selection_reason", "applicable_category",
+            "divergence_from_contract"))
+    if not rule_ok and has_index_observation:
+        reasons.append("**研究基准选择规则未完整声明**（需规则版本/选择原因/"
+                        "适用类别/与合同基准的差异）")
+
+    research_conditions = {
+        "index_code_mapped": bool(observed),
+        "history_data_available": bool(observed),
+        "return_basis_verified": has_verified_return_basis,
+        "basis_compatible_with_research": basis_compatible,
+        "research_rule_declared": rule_ok,
+        "not_price_index_as_total_return": not (
+            has_verified_return_basis
+            and {b for _, b in verified_basis} == {"price"}),
+    }
+    research_usable = all(research_conditions.values())
+    # 候选：成分已识别 + 有观察数据，但未通过全部检查
+    research_candidate = bool(observed) and not research_usable
+
+    # ================= 5. substitute 判定 =================
+    # 替代基准必须由调用方显式提供 6 项说明，且必须「合同不可复现」
+    sub_keys = ("reason", "source", "divergence_from_contract",
+                "data_quality", "applicable_scope", "invalidation_condition")
+    sub_complete = bool(substitute_selection) and all(
+        substitute_selection.get(k) for k in sub_keys)
+    has_any_series = has_index_observation or bool(verified_basis)
+    substitute_usable = bool(
+        sub_complete
+        and not contract_usable          # 合同可复现时不需要替代
+        and has_any_series)
+    substitute_candidate = bool(has_any_series) and not substitute_usable
+
+    if substitute_selection and not sub_complete:
+        missing = [k for k in sub_keys if not substitute_selection.get(k)]
+        reasons.append(f"**替代基准说明缺项：{missing}**")
+
+    # ================= 6. 最高层级（严格递进） =================
+    if contract_usable:
         max_kind = "contract"
-    elif contract_ok and fully_computable:
-        max_kind = "contract"
-        reasons.append("历史权重与生效区间未核实，**历史期间不可复现**")
-    elif research_ok:
+    elif research_usable:
         max_kind = "research"
         if not contract_ok:
             reasons.append("**只能作为研究评价基准，不得称为合同基准**")
-    elif substitute_ok:
+    elif substitute_usable:
         max_kind = "substitute"
         reasons.append("**只能作为替代基准，结果不得表述为合同基准超额收益**")
     else:
         max_kind = "none"
-        reasons.append("**无任何可用收益序列，无法建立可靠基准**")
+        if not comps:
+            reasons.append("**无基准成分，无法建立任何基准**")
 
     return {
         "max_kind": max_kind,
-        "contract_benchmark_usable": contract_ok and fully_computable,
-        "research_benchmark_usable": research_ok and max_kind in ("contract", "research"),
-        "substitute_benchmark_usable": substitute_ok,
-        "fully_reproducible": contract_ok and fully_computable and has_historical_weights,
+        # ---- 合同 ----
+        "contract_benchmark_usable": contract_usable,
+        "fully_reproducible": contract_usable,
+        # ---- 研究：候选 vs 可用 严格分开 ----
+        "research_benchmark_candidate": research_candidate,
+        "research_benchmark_usable": research_usable,
+        "research_conditions": research_conditions,
+        # ---- 替代：候选 vs 可用 严格分开 ----
+        "substitute_benchmark_candidate": substitute_candidate,
+        "substitute_benchmark_usable": substitute_usable,
+        "substitute_selection_provided": bool(substitute_selection),
+        "substitute_selection_complete": sub_complete,
+        # ---- 数据事实（分开报告，不得混用）----
+        "has_index_observation": has_index_observation,
+        "has_verified_return_basis": has_verified_return_basis,
+        "index_observed_codes": sorted({c["index_code"] for c in observed}),
+        "index_unknown_basis_codes": sorted(set(unknown_basis)),
+        "index_verified_basis": [{"index_code": k, "return_basis": v}
+                                   for k, v in verified_basis],
+        "basis_needs_declaration": basis_needs_declaration,
+        # ---- 诊断 ----
         "uncomputable_components": uncomputable,
         "reasons": reasons,
         "category": category,

@@ -1,7 +1,7 @@
 {
  "phase": "3B-6.2.1",
  "task": "场外公募基金基准分类体系映射审计",
- "generated_at": "2026-11-25T15:51:17",
+ "generated_at": "2026-11-25T16:47:53",
  "baseline_head": "13e95a26bfe94f5574febc263304c7fbbc2bc7ab",
  "read_only": true,
  "db_before": {
@@ -148,9 +148,24 @@
   "funds_with_multiple_shares": 27,
   "survivorship_note": "**幸存者偏差声明**：正式库含 41 只 terminated 基金，但全部无分类与基准文本（fund_type_l1 为 NULL）；存续基金 79 只。任何只基于存续基金的统计都存在幸存者偏差。",
   "lifecycle": {
-   "existing": 79,
+   "existing": 0,
    "terminated": 41,
-   "unknown_status": 79
+   "unknown_status": 79,
+   "total": 120,
+   "sum_equals_total": true,
+   "raw_value_counts": {
+    "unknown": 79,
+    "terminated": 41
+   },
+   "mapping_rule": {
+    "active": "existing",
+    "existing": "existing",
+    "terminated": "terminated",
+    "unknown": "unknown_status",
+    "_note": "**unknown 字面含义即状态未知，不得当作明确存续**；当前库中不存在 active/existing 值"
+   },
+   "unmapped_raw_values": {},
+   "note": "**数据库中实际只有 unknown（79 只）与 terminated（41 只）两种取值**，没有任何基金被明确标记为存续。此前报告把 79 只 unknown 当作「存续」，属统计语义错误。"
   },
   "category_counts_all": {
    "etf_feeder": 26,
@@ -161,7 +176,8 @@
    "money_market": 8,
    "mixed_bond": 17
   },
-  "category_counts_existing": {
+  "category_counts_existing": {},
+  "category_counts_unknown_status": {
    "etf_feeder": 23,
    "lof_offexchange": 3,
    "active_equity": 16,
@@ -191,18 +207,22 @@
   ],
   "required_categories_missing": [],
   "has_benchmark_text": 78,
-  "has_benchmark_text_existing": 78,
+  "has_benchmark_text_existing": 0,
+  "_existing_scope_note": "**`*_existing` 系列字段统计的是明确标记存续的基金，当前库中为 0 只**，故这些字段均为 0；有意义的对照口径是 `primary_scope`",
   "has_index_code": 42,
-  "has_index_code_existing": 42,
-  "has_usable_return_series": 42,
-  "has_usable_return_series_existing": 42,
+  "has_index_code_existing": 0,
+  "has_usable_return_series": 0,
+  "has_usable_return_series_existing": 0,
   "contract_benchmark_usable": 0,
   "fully_reproducible": 0,
-  "research_benchmark_usable": 42,
-  "research_benchmark_usable_existing": 42,
+  "has_index_observation": 42,
+  "has_verified_return_basis": 0,
+  "research_benchmark_candidate": 42,
+  "research_benchmark_usable": 0,
+  "substitute_benchmark_candidate": 42,
+  "substitute_benchmark_usable": 0,
   "substitute_only": 0,
-  "no_usable_benchmark": 78,
-  "no_usable_benchmark_existing": 37,
+  "no_usable_benchmark": 120,
   "component_type_counts": {
    "equity_index": 61,
    "fixed_rate": 2,
@@ -901,16 +921,21 @@
    "total_funds": 73,
    "has_benchmark_text": 73,
    "has_index_code": 37,
-   "has_usable_return_series": 37,
+   "has_usable_return_series": 0,
    "contract_benchmark_usable": 0,
    "fully_reproducible": 0,
-   "research_benchmark_usable": 37,
+   "has_index_observation": 37,
+   "has_verified_return_basis": 0,
+   "research_benchmark_candidate": 37,
+   "research_benchmark_usable": 0,
+   "substitute_benchmark_candidate": 37,
+   "substitute_benchmark_usable": 0,
    "substitute_only": 0,
-   "no_usable_benchmark": 36
+   "no_usable_benchmark": 73
   },
   "_self_check": {
    "category_sum_equals_total": true,
-   "existing_plus_terminated_equals_total": true,
+   "lifecycle_three_buckets_sum_equals_total": true,
    "research_plus_none_le_total": true
   }
  },
@@ -1004,21 +1029,44 @@
     ]
    },
    "usability": {
-    "max_kind": "research",
+    "max_kind": "none",
     "contract_benchmark_usable": false,
-    "research_benchmark_usable": true,
-    "substitute_benchmark_usable": true,
     "fully_reproducible": false,
+    "research_benchmark_candidate": true,
+    "research_benchmark_usable": false,
+    "research_conditions": {
+     "index_code_mapped": true,
+     "history_data_available": true,
+     "return_basis_verified": false,
+     "basis_compatible_with_research": false,
+     "research_rule_declared": true,
+     "not_price_index_as_total_return": true
+    },
+    "substitute_benchmark_candidate": true,
+    "substitute_benchmark_usable": false,
+    "substitute_selection_provided": false,
+    "substitute_selection_complete": false,
+    "has_index_observation": true,
+    "has_verified_return_basis": false,
+    "index_observed_codes": [
+     "000300"
+    ],
+    "index_unknown_basis_codes": [
+     "000300"
+    ],
+    "index_verified_basis": [],
+    "basis_needs_declaration": [],
     "uncomputable_components": [
      "1%（指年收益率，评价时应按期间折算）（折算规则未知）"
     ],
     "reasons": [
+     "**指数 ['000300'] 的 `return_basis` 为 `unknown`，点位数据不得当作合格收益序列**",
      "合同基准证据等级为 L3，**必须有 L1 官方合同文件**",
-     "**未取得基金合同/招募说明书原始文件**",
-     "**只能作为研究评价基准，不得称为合同基准**"
+     "**未取得基金合同/招募说明书原始文件**"
     ],
     "category": "etf_feeder"
-   }
+   },
+   "lifecycle_bucket": "unknown_status"
   },
   {
    "fund_id": 15,
@@ -1108,21 +1156,44 @@
     "notes": []
    },
    "usability": {
-    "max_kind": "research",
+    "max_kind": "none",
     "contract_benchmark_usable": false,
-    "research_benchmark_usable": true,
-    "substitute_benchmark_usable": true,
     "fully_reproducible": false,
+    "research_benchmark_candidate": true,
+    "research_benchmark_usable": false,
+    "research_conditions": {
+     "index_code_mapped": true,
+     "history_data_available": true,
+     "return_basis_verified": false,
+     "basis_compatible_with_research": false,
+     "research_rule_declared": true,
+     "not_price_index_as_total_return": true
+    },
+    "substitute_benchmark_candidate": true,
+    "substitute_benchmark_usable": false,
+    "substitute_selection_provided": false,
+    "substitute_selection_complete": false,
+    "has_index_observation": true,
+    "has_verified_return_basis": false,
+    "index_observed_codes": [
+     "000300"
+    ],
+    "index_unknown_basis_codes": [
+     "000300"
+    ],
+    "index_verified_basis": [],
+    "basis_needs_declaration": [],
     "uncomputable_components": [
      "活期存款利率(税后)X5%（现金利率无历史序列）"
     ],
     "reasons": [
+     "**指数 ['000300'] 的 `return_basis` 为 `unknown`，点位数据不得当作合格收益序列**",
      "合同基准证据等级为 L3，**必须有 L1 官方合同文件**",
-     "**未取得基金合同/招募说明书原始文件**",
-     "**只能作为研究评价基准，不得称为合同基准**"
+     "**未取得基金合同/招募说明书原始文件**"
     ],
     "category": "etf_feeder"
-   }
+   },
+   "lifecycle_bucket": "unknown_status"
   },
   {
    "fund_id": 16,
@@ -1218,21 +1289,44 @@
     "notes": []
    },
    "usability": {
-    "max_kind": "research",
+    "max_kind": "none",
     "contract_benchmark_usable": false,
-    "research_benchmark_usable": true,
-    "substitute_benchmark_usable": true,
     "fully_reproducible": false,
+    "research_benchmark_candidate": true,
+    "research_benchmark_usable": false,
+    "research_conditions": {
+     "index_code_mapped": true,
+     "history_data_available": true,
+     "return_basis_verified": false,
+     "basis_compatible_with_research": false,
+     "research_rule_declared": true,
+     "not_price_index_as_total_return": true
+    },
+    "substitute_benchmark_candidate": true,
+    "substitute_benchmark_usable": false,
+    "substitute_selection_provided": false,
+    "substitute_selection_complete": false,
+    "has_index_observation": true,
+    "has_verified_return_basis": false,
+    "index_observed_codes": [
+     "399997"
+    ],
+    "index_unknown_basis_codes": [
+     "399997"
+    ],
+    "index_verified_basis": [],
+    "basis_needs_declaration": [],
     "uncomputable_components": [
      "金融机构人民币活期存款基准利率（税后）×5%（现金利率无历史序列）"
     ],
     "reasons": [
+     "**指数 ['399997'] 的 `return_basis` 为 `unknown`，点位数据不得当作合格收益序列**",
      "合同基准证据等级为 L3，**必须有 L1 官方合同文件**",
-     "**未取得基金合同/招募说明书原始文件**",
-     "**只能作为研究评价基准，不得称为合同基准**"
+     "**未取得基金合同/招募说明书原始文件**"
     ],
     "category": "lof_offexchange"
-   }
+   },
+   "lifecycle_bucket": "unknown_status"
   },
   {
    "fund_id": 17,
@@ -1328,21 +1422,44 @@
     "notes": []
    },
    "usability": {
-    "max_kind": "research",
+    "max_kind": "none",
     "contract_benchmark_usable": false,
-    "research_benchmark_usable": true,
-    "substitute_benchmark_usable": true,
     "fully_reproducible": false,
+    "research_benchmark_candidate": true,
+    "research_benchmark_usable": false,
+    "research_conditions": {
+     "index_code_mapped": true,
+     "history_data_available": true,
+     "return_basis_verified": false,
+     "basis_compatible_with_research": false,
+     "research_rule_declared": true,
+     "not_price_index_as_total_return": true
+    },
+    "substitute_benchmark_candidate": true,
+    "substitute_benchmark_usable": false,
+    "substitute_selection_provided": false,
+    "substitute_selection_complete": false,
+    "has_index_observation": true,
+    "has_verified_return_basis": false,
+    "index_observed_codes": [
+     "H30184"
+    ],
+    "index_unknown_basis_codes": [
+     "H30184"
+    ],
+    "index_verified_basis": [],
+    "basis_needs_declaration": [],
     "uncomputable_components": [
      "银行活期存款利率（税后）×5%（现金利率无历史序列）"
     ],
     "reasons": [
+     "**指数 ['H30184'] 的 `return_basis` 为 `unknown`，点位数据不得当作合格收益序列**",
      "合同基准证据等级为 L3，**必须有 L1 官方合同文件**",
-     "**未取得基金合同/招募说明书原始文件**",
-     "**只能作为研究评价基准，不得称为合同基准**"
+     "**未取得基金合同/招募说明书原始文件**"
     ],
     "category": "etf_feeder"
-   }
+   },
+   "lifecycle_bucket": "unknown_status"
   },
   {
    "fund_id": 18,
@@ -1432,21 +1549,44 @@
     "notes": []
    },
    "usability": {
-    "max_kind": "research",
+    "max_kind": "none",
     "contract_benchmark_usable": false,
-    "research_benchmark_usable": true,
-    "substitute_benchmark_usable": true,
     "fully_reproducible": false,
+    "research_benchmark_candidate": true,
+    "research_benchmark_usable": false,
+    "research_conditions": {
+     "index_code_mapped": true,
+     "history_data_available": true,
+     "return_basis_verified": false,
+     "basis_compatible_with_research": false,
+     "research_rule_declared": true,
+     "not_price_index_as_total_return": true
+    },
+    "substitute_benchmark_candidate": true,
+    "substitute_benchmark_usable": false,
+    "substitute_selection_provided": false,
+    "substitute_selection_complete": false,
+    "has_index_observation": true,
+    "has_verified_return_basis": false,
+    "index_observed_codes": [
+     "000942"
+    ],
+    "index_unknown_basis_codes": [
+     "000942"
+    ],
+    "index_verified_basis": [],
+    "basis_needs_declaration": [],
     "uncomputable_components": [
      "中债总指数（债券指数未接入）"
     ],
     "reasons": [
+     "**指数 ['000942'] 的 `return_basis` 为 `unknown`，点位数据不得当作合格收益序列**",
      "合同基准证据等级为 L3，**必须有 L1 官方合同文件**",
-     "**未取得基金合同/招募说明书原始文件**",
-     "**只能作为研究评价基准，不得称为合同基准**"
+     "**未取得基金合同/招募说明书原始文件**"
     ],
     "category": "active_equity"
-   }
+   },
+   "lifecycle_bucket": "unknown_status"
   },
   {
    "fund_id": 19,
@@ -1547,22 +1687,45 @@
     "notes": []
    },
    "usability": {
-    "max_kind": "research",
+    "max_kind": "none",
     "contract_benchmark_usable": false,
-    "research_benchmark_usable": true,
-    "substitute_benchmark_usable": true,
     "fully_reproducible": false,
+    "research_benchmark_candidate": true,
+    "research_benchmark_usable": false,
+    "research_conditions": {
+     "index_code_mapped": true,
+     "history_data_available": true,
+     "return_basis_verified": false,
+     "basis_compatible_with_research": false,
+     "research_rule_declared": true,
+     "not_price_index_as_total_return": true
+    },
+    "substitute_benchmark_candidate": true,
+    "substitute_benchmark_usable": false,
+    "substitute_selection_provided": false,
+    "substitute_selection_complete": false,
+    "has_index_observation": true,
+    "has_verified_return_basis": false,
+    "index_observed_codes": [
+     "000300"
+    ],
+    "index_unknown_basis_codes": [
+     "000300"
+    ],
+    "index_verified_basis": [],
+    "basis_needs_declaration": [],
     "uncomputable_components": [
      "中债综合全价指数（债券指数未接入）",
      "同业存款利率×5%（现金利率无历史序列）"
     ],
     "reasons": [
+     "**指数 ['000300'] 的 `return_basis` 为 `unknown`，点位数据不得当作合格收益序列**",
      "合同基准证据等级为 L3，**必须有 L1 官方合同文件**",
-     "**未取得基金合同/招募说明书原始文件**",
-     "**只能作为研究评价基准，不得称为合同基准**"
+     "**未取得基金合同/招募说明书原始文件**"
     ],
     "category": "lof_offexchange"
-   }
+   },
+   "lifecycle_bucket": "unknown_status"
   },
   {
    "fund_id": 20,
@@ -1652,21 +1815,44 @@
     "notes": []
    },
    "usability": {
-    "max_kind": "research",
+    "max_kind": "none",
     "contract_benchmark_usable": false,
-    "research_benchmark_usable": true,
-    "substitute_benchmark_usable": true,
     "fully_reproducible": false,
+    "research_benchmark_candidate": true,
+    "research_benchmark_usable": false,
+    "research_conditions": {
+     "index_code_mapped": true,
+     "history_data_available": true,
+     "return_basis_verified": false,
+     "basis_compatible_with_research": false,
+     "research_rule_declared": true,
+     "not_price_index_as_total_return": true
+    },
+    "substitute_benchmark_candidate": true,
+    "substitute_benchmark_usable": false,
+    "substitute_selection_provided": false,
+    "substitute_selection_complete": false,
+    "has_index_observation": true,
+    "has_verified_return_basis": false,
+    "index_observed_codes": [
+     "000905"
+    ],
+    "index_unknown_basis_codes": [
+     "000905"
+    ],
+    "index_verified_basis": [],
+    "basis_needs_declaration": [],
     "uncomputable_components": [
      "5%×商业银行活期存款利率（税前）（现金利率无历史序列）"
     ],
     "reasons": [
+     "**指数 ['000905'] 的 `return_basis` 为 `unknown`，点位数据不得当作合格收益序列**",
      "合同基准证据等级为 L3，**必须有 L1 官方合同文件**",
-     "**未取得基金合同/招募说明书原始文件**",
-     "**只能作为研究评价基准，不得称为合同基准**"
+     "**未取得基金合同/招募说明书原始文件**"
     ],
     "category": "index_plain"
-   }
+   },
+   "lifecycle_bucket": "unknown_status"
   },
   {
    "fund_id": 21,
@@ -1755,19 +1941,37 @@
    "usability": {
     "max_kind": "none",
     "contract_benchmark_usable": false,
-    "research_benchmark_usable": false,
-    "substitute_benchmark_usable": false,
     "fully_reproducible": false,
+    "research_benchmark_candidate": false,
+    "research_benchmark_usable": false,
+    "research_conditions": {
+     "index_code_mapped": false,
+     "history_data_available": false,
+     "return_basis_verified": false,
+     "basis_compatible_with_research": false,
+     "research_rule_declared": true,
+     "not_price_index_as_total_return": true
+    },
+    "substitute_benchmark_candidate": false,
+    "substitute_benchmark_usable": false,
+    "substitute_selection_provided": false,
+    "substitute_selection_complete": false,
+    "has_index_observation": false,
+    "has_verified_return_basis": false,
+    "index_observed_codes": [],
+    "index_unknown_basis_codes": [],
+    "index_verified_basis": [],
+    "basis_needs_declaration": [],
     "uncomputable_components": [
      "中债综合指数（债券指数未接入）"
     ],
     "reasons": [
      "合同基准证据等级为 L3，**必须有 L1 官方合同文件**",
-     "**未取得基金合同/招募说明书原始文件**",
-     "**无任何可用收益序列，无法建立可靠基准**"
+     "**未取得基金合同/招募说明书原始文件**"
     ],
     "category": "pure_bond"
-   }
+   },
+   "lifecycle_bucket": "unknown_status"
   },
   {
    "fund_id": 22,
@@ -1834,19 +2038,38 @@
    "usability": {
     "max_kind": "none",
     "contract_benchmark_usable": false,
-    "research_benchmark_usable": false,
-    "substitute_benchmark_usable": false,
     "fully_reproducible": false,
+    "research_benchmark_candidate": false,
+    "research_benchmark_usable": false,
+    "research_conditions": {
+     "index_code_mapped": false,
+     "history_data_available": false,
+     "return_basis_verified": false,
+     "basis_compatible_with_research": false,
+     "research_rule_declared": true,
+     "not_price_index_as_total_return": true
+    },
+    "substitute_benchmark_candidate": false,
+    "substitute_benchmark_usable": false,
+    "substitute_selection_provided": false,
+    "substitute_selection_complete": false,
+    "has_index_observation": false,
+    "has_verified_return_basis": false,
+    "index_observed_codes": [],
+    "index_unknown_basis_codes": [],
+    "index_verified_basis": [],
+    "basis_needs_declaration": [],
     "uncomputable_components": [],
     "reasons": [
      "合同基准证据等级为 L3，**必须有 L1 官方合同文件**",
      "**未取得基金合同/招募说明书原始文件**",
      "基准文本缺失或无法解析",
-     "**无任何可用收益序列，无法建立可靠基准**",
+     "**无基准成分，无法建立任何基准**",
      "货币基金使用万份收益/七日年化独立口径，**不与普通净值基金混算**"
     ],
     "category": "money_market"
-   }
+   },
+   "lifecycle_bucket": "unknown_status"
   },
   {
    "fund_id": 23,
@@ -1913,18 +2136,37 @@
    "usability": {
     "max_kind": "none",
     "contract_benchmark_usable": false,
-    "research_benchmark_usable": false,
-    "substitute_benchmark_usable": false,
     "fully_reproducible": false,
+    "research_benchmark_candidate": false,
+    "research_benchmark_usable": false,
+    "research_conditions": {
+     "index_code_mapped": false,
+     "history_data_available": false,
+     "return_basis_verified": false,
+     "basis_compatible_with_research": false,
+     "research_rule_declared": true,
+     "not_price_index_as_total_return": true
+    },
+    "substitute_benchmark_candidate": false,
+    "substitute_benchmark_usable": false,
+    "substitute_selection_provided": false,
+    "substitute_selection_complete": false,
+    "has_index_observation": false,
+    "has_verified_return_basis": false,
+    "index_observed_codes": [],
+    "index_unknown_basis_codes": [],
+    "index_verified_basis": [],
+    "basis_needs_declaration": [],
     "uncomputable_components": [],
     "reasons": [
      "合同基准证据等级为 L3，**必须有 L1 官方合同文件**",
      "**未取得基金合同/招募说明书原始文件**",
      "基准文本缺失或无法解析",
-     "**无任何可用收益序列，无法建立可靠基准**"
+     "**无基准成分，无法建立任何基准**"
     ],
     "category": "mixed_bond"
-   }
+   },
+   "lifecycle_bucket": "terminated"
   },
   {
    "fund_id": 24,
@@ -1997,18 +2239,37 @@
    "usability": {
     "max_kind": "none",
     "contract_benchmark_usable": false,
-    "research_benchmark_usable": false,
-    "substitute_benchmark_usable": false,
     "fully_reproducible": false,
+    "research_benchmark_candidate": false,
+    "research_benchmark_usable": false,
+    "research_conditions": {
+     "index_code_mapped": false,
+     "history_data_available": false,
+     "return_basis_verified": false,
+     "basis_compatible_with_research": false,
+     "research_rule_declared": true,
+     "not_price_index_as_total_return": true
+    },
+    "substitute_benchmark_candidate": false,
+    "substitute_benchmark_usable": false,
+    "substitute_selection_provided": false,
+    "substitute_selection_complete": false,
+    "has_index_observation": false,
+    "has_verified_return_basis": false,
+    "index_observed_codes": [],
+    "index_unknown_basis_codes": [],
+    "index_verified_basis": [],
+    "basis_needs_declaration": [],
     "uncomputable_components": [],
     "reasons": [
      "合同基准证据等级为 L3，**必须有 L1 官方合同文件**",
      "**未取得基金合同/招募说明书原始文件**",
      "基准文本缺失或无法解析",
-     "**无任何可用收益序列，无法建立可靠基准**"
+     "**无基准成分，无法建立任何基准**"
     ],
     "category": "index_plain"
-   }
+   },
+   "lifecycle_bucket": "terminated"
   },
   {
    "fund_id": 25,
@@ -2081,18 +2342,37 @@
    "usability": {
     "max_kind": "none",
     "contract_benchmark_usable": false,
-    "research_benchmark_usable": false,
-    "substitute_benchmark_usable": false,
     "fully_reproducible": false,
+    "research_benchmark_candidate": false,
+    "research_benchmark_usable": false,
+    "research_conditions": {
+     "index_code_mapped": false,
+     "history_data_available": false,
+     "return_basis_verified": false,
+     "basis_compatible_with_research": false,
+     "research_rule_declared": true,
+     "not_price_index_as_total_return": true
+    },
+    "substitute_benchmark_candidate": false,
+    "substitute_benchmark_usable": false,
+    "substitute_selection_provided": false,
+    "substitute_selection_complete": false,
+    "has_index_observation": false,
+    "has_verified_return_basis": false,
+    "index_observed_codes": [],
+    "index_unknown_basis_codes": [],
+    "index_verified_basis": [],
+    "basis_needs_declaration": [],
     "uncomputable_components": [],
     "reasons": [
      "合同基准证据等级为 L3，**必须有 L1 官方合同文件**",
      "**未取得基金合同/招募说明书原始文件**",
      "基准文本缺失或无法解析",
-     "**无任何可用收益序列，无法建立可靠基准**"
+     "**无基准成分，无法建立任何基准**"
     ],
     "category": "mixed_bond"
-   }
+   },
+   "lifecycle_bucket": "terminated"
   },
   {
    "fund_id": 26,
@@ -2159,18 +2439,37 @@
    "usability": {
     "max_kind": "none",
     "contract_benchmark_usable": false,
-    "research_benchmark_usable": false,
-    "substitute_benchmark_usable": false,
     "fully_reproducible": false,
+    "research_benchmark_candidate": false,
+    "research_benchmark_usable": false,
+    "research_conditions": {
+     "index_code_mapped": false,
+     "history_data_available": false,
+     "return_basis_verified": false,
+     "basis_compatible_with_research": false,
+     "research_rule_declared": true,
+     "not_price_index_as_total_return": true
+    },
+    "substitute_benchmark_candidate": false,
+    "substitute_benchmark_usable": false,
+    "substitute_selection_provided": false,
+    "substitute_selection_complete": false,
+    "has_index_observation": false,
+    "has_verified_return_basis": false,
+    "index_observed_codes": [],
+    "index_unknown_basis_codes": [],
+    "index_verified_basis": [],
+    "basis_needs_declaration": [],
     "uncomputable_components": [],
     "reasons": [
      "合同基准证据等级为 L3，**必须有 L1 官方合同文件**",
      "**未取得基金合同/招募说明书原始文件**",
      "基准文本缺失或无法解析",
-     "**无任何可用收益序列，无法建立可靠基准**"
+     "**无基准成分，无法建立任何基准**"
     ],
     "category": "index_plain"
-   }
+   },
+   "lifecycle_bucket": "terminated"
   },
   {
    "fund_id": 27,
@@ -2243,18 +2542,37 @@
    "usability": {
     "max_kind": "none",
     "contract_benchmark_usable": false,
-    "research_benchmark_usable": false,
-    "substitute_benchmark_usable": false,
     "fully_reproducible": false,
+    "research_benchmark_candidate": false,
+    "research_benchmark_usable": false,
+    "research_conditions": {
+     "index_code_mapped": false,
+     "history_data_available": false,
+     "return_basis_verified": false,
+     "basis_compatible_with_research": false,
+     "research_rule_declared": true,
+     "not_price_index_as_total_return": true
+    },
+    "substitute_benchmark_candidate": false,
+    "substitute_benchmark_usable": false,
+    "substitute_selection_provided": false,
+    "substitute_selection_complete": false,
+    "has_index_observation": false,
+    "has_verified_return_basis": false,
+    "index_observed_codes": [],
+    "index_unknown_basis_codes": [],
+    "index_verified_basis": [],
+    "basis_needs_declaration": [],
     "uncomputable_components": [],
     "reasons": [
      "合同基准证据等级为 L3，**必须有 L1 官方合同文件**",
      "**未取得基金合同/招募说明书原始文件**",
      "基准文本缺失或无法解析",
-     "**无任何可用收益序列，无法建立可靠基准**"
+     "**无基准成分，无法建立任何基准**"
     ],
     "category": "pure_bond"
-   }
+   },
+   "lifecycle_bucket": "terminated"
   },
   {
    "fund_id": 28,
@@ -2321,18 +2639,37 @@
    "usability": {
     "max_kind": "none",
     "contract_benchmark_usable": false,
-    "research_benchmark_usable": false,
-    "substitute_benchmark_usable": false,
     "fully_reproducible": false,
+    "research_benchmark_candidate": false,
+    "research_benchmark_usable": false,
+    "research_conditions": {
+     "index_code_mapped": false,
+     "history_data_available": false,
+     "return_basis_verified": false,
+     "basis_compatible_with_research": false,
+     "research_rule_declared": true,
+     "not_price_index_as_total_return": true
+    },
+    "substitute_benchmark_candidate": false,
+    "substitute_benchmark_usable": false,
+    "substitute_selection_provided": false,
+    "substitute_selection_complete": false,
+    "has_index_observation": false,
+    "has_verified_return_basis": false,
+    "index_observed_codes": [],
+    "index_unknown_basis_codes": [],
+    "index_verified_basis": [],
+    "basis_needs_declaration": [],
     "uncomputable_components": [],
     "reasons": [
      "合同基准证据等级为 L3，**必须有 L1 官方合同文件**",
      "**未取得基金合同/招募说明书原始文件**",
      "基准文本缺失或无法解析",
-     "**无任何可用收益序列，无法建立可靠基准**"
+     "**无基准成分，无法建立任何基准**"
     ],
     "category": "index_plain"
-   }
+   },
+   "lifecycle_bucket": "terminated"
   },
   {
    "fund_id": 29,
@@ -2399,18 +2736,37 @@
    "usability": {
     "max_kind": "none",
     "contract_benchmark_usable": false,
-    "research_benchmark_usable": false,
-    "substitute_benchmark_usable": false,
     "fully_reproducible": false,
+    "research_benchmark_candidate": false,
+    "research_benchmark_usable": false,
+    "research_conditions": {
+     "index_code_mapped": false,
+     "history_data_available": false,
+     "return_basis_verified": false,
+     "basis_compatible_with_research": false,
+     "research_rule_declared": true,
+     "not_price_index_as_total_return": true
+    },
+    "substitute_benchmark_candidate": false,
+    "substitute_benchmark_usable": false,
+    "substitute_selection_provided": false,
+    "substitute_selection_complete": false,
+    "has_index_observation": false,
+    "has_verified_return_basis": false,
+    "index_observed_codes": [],
+    "index_unknown_basis_codes": [],
+    "index_verified_basis": [],
+    "basis_needs_declaration": [],
     "uncomputable_components": [],
     "reasons": [
      "合同基准证据等级为 L3，**必须有 L1 官方合同文件**",
      "**未取得基金合同/招募说明书原始文件**",
      "基准文本缺失或无法解析",
-     "**无任何可用收益序列，无法建立可靠基准**"
+     "**无基准成分，无法建立任何基准**"
     ],
     "category": "active_equity"
-   }
+   },
+   "lifecycle_bucket": "terminated"
   },
   {
    "fund_id": 30,
@@ -2483,18 +2839,37 @@
    "usability": {
     "max_kind": "none",
     "contract_benchmark_usable": false,
-    "research_benchmark_usable": false,
-    "substitute_benchmark_usable": false,
     "fully_reproducible": false,
+    "research_benchmark_candidate": false,
+    "research_benchmark_usable": false,
+    "research_conditions": {
+     "index_code_mapped": false,
+     "history_data_available": false,
+     "return_basis_verified": false,
+     "basis_compatible_with_research": false,
+     "research_rule_declared": true,
+     "not_price_index_as_total_return": true
+    },
+    "substitute_benchmark_candidate": false,
+    "substitute_benchmark_usable": false,
+    "substitute_selection_provided": false,
+    "substitute_selection_complete": false,
+    "has_index_observation": false,
+    "has_verified_return_basis": false,
+    "index_observed_codes": [],
+    "index_unknown_basis_codes": [],
+    "index_verified_basis": [],
+    "basis_needs_declaration": [],
     "uncomputable_components": [],
     "reasons": [
      "合同基准证据等级为 L3，**必须有 L1 官方合同文件**",
      "**未取得基金合同/招募说明书原始文件**",
      "基准文本缺失或无法解析",
-     "**无任何可用收益序列，无法建立可靠基准**"
+     "**无基准成分，无法建立任何基准**"
     ],
     "category": "etf_feeder"
-   }
+   },
+   "lifecycle_bucket": "terminated"
   },
   {
    "fund_id": 31,
@@ -2573,18 +2948,37 @@
    "usability": {
     "max_kind": "none",
     "contract_benchmark_usable": false,
-    "research_benchmark_usable": false,
-    "substitute_benchmark_usable": false,
     "fully_reproducible": false,
+    "research_benchmark_candidate": false,
+    "research_benchmark_usable": false,
+    "research_conditions": {
+     "index_code_mapped": false,
+     "history_data_available": false,
+     "return_basis_verified": false,
+     "basis_compatible_with_research": false,
+     "research_rule_declared": true,
+     "not_price_index_as_total_return": true
+    },
+    "substitute_benchmark_candidate": false,
+    "substitute_benchmark_usable": false,
+    "substitute_selection_provided": false,
+    "substitute_selection_complete": false,
+    "has_index_observation": false,
+    "has_verified_return_basis": false,
+    "index_observed_codes": [],
+    "index_unknown_basis_codes": [],
+    "index_verified_basis": [],
+    "basis_needs_declaration": [],
     "uncomputable_components": [],
     "reasons": [
      "合同基准证据等级为 L3，**必须有 L1 官方合同文件**",
      "**未取得基金合同/招募说明书原始文件**",
      "基准文本缺失或无法解析",
-     "**无任何可用收益序列，无法建立可靠基准**"
+     "**无基准成分，无法建立任何基准**"
     ],
     "category": "mixed_bond"
-   }
+   },
+   "lifecycle_bucket": "terminated"
   },
   {
    "fund_id": 32,
@@ -2657,18 +3051,37 @@
    "usability": {
     "max_kind": "none",
     "contract_benchmark_usable": false,
-    "research_benchmark_usable": false,
-    "substitute_benchmark_usable": false,
     "fully_reproducible": false,
+    "research_benchmark_candidate": false,
+    "research_benchmark_usable": false,
+    "research_conditions": {
+     "index_code_mapped": false,
+     "history_data_available": false,
+     "return_basis_verified": false,
+     "basis_compatible_with_research": false,
+     "research_rule_declared": true,
+     "not_price_index_as_total_return": true
+    },
+    "substitute_benchmark_candidate": false,
+    "substitute_benchmark_usable": false,
+    "substitute_selection_provided": false,
+    "substitute_selection_complete": false,
+    "has_index_observation": false,
+    "has_verified_return_basis": false,
+    "index_observed_codes": [],
+    "index_unknown_basis_codes": [],
+    "index_verified_basis": [],
+    "basis_needs_declaration": [],
     "uncomputable_components": [],
     "reasons": [
      "合同基准证据等级为 L3，**必须有 L1 官方合同文件**",
      "**未取得基金合同/招募说明书原始文件**",
      "基准文本缺失或无法解析",
-     "**无任何可用收益序列，无法建立可靠基准**"
+     "**无基准成分，无法建立任何基准**"
     ],
     "category": "active_equity"
-   }
+   },
+   "lifecycle_bucket": "terminated"
   },
   {
    "fund_id": 33,
@@ -2741,18 +3154,37 @@
    "usability": {
     "max_kind": "none",
     "contract_benchmark_usable": false,
-    "research_benchmark_usable": false,
-    "substitute_benchmark_usable": false,
     "fully_reproducible": false,
+    "research_benchmark_candidate": false,
+    "research_benchmark_usable": false,
+    "research_conditions": {
+     "index_code_mapped": false,
+     "history_data_available": false,
+     "return_basis_verified": false,
+     "basis_compatible_with_research": false,
+     "research_rule_declared": true,
+     "not_price_index_as_total_return": true
+    },
+    "substitute_benchmark_candidate": false,
+    "substitute_benchmark_usable": false,
+    "substitute_selection_provided": false,
+    "substitute_selection_complete": false,
+    "has_index_observation": false,
+    "has_verified_return_basis": false,
+    "index_observed_codes": [],
+    "index_unknown_basis_codes": [],
+    "index_verified_basis": [],
+    "basis_needs_declaration": [],
     "uncomputable_components": [],
     "reasons": [
      "合同基准证据等级为 L3，**必须有 L1 官方合同文件**",
      "**未取得基金合同/招募说明书原始文件**",
      "基准文本缺失或无法解析",
-     "**无任何可用收益序列，无法建立可靠基准**"
+     "**无基准成分，无法建立任何基准**"
     ],
     "category": "active_equity"
-   }
+   },
+   "lifecycle_bucket": "terminated"
   },
   {
    "fund_id": 34,
@@ -2825,18 +3257,37 @@
    "usability": {
     "max_kind": "none",
     "contract_benchmark_usable": false,
-    "research_benchmark_usable": false,
-    "substitute_benchmark_usable": false,
     "fully_reproducible": false,
+    "research_benchmark_candidate": false,
+    "research_benchmark_usable": false,
+    "research_conditions": {
+     "index_code_mapped": false,
+     "history_data_available": false,
+     "return_basis_verified": false,
+     "basis_compatible_with_research": false,
+     "research_rule_declared": true,
+     "not_price_index_as_total_return": true
+    },
+    "substitute_benchmark_candidate": false,
+    "substitute_benchmark_usable": false,
+    "substitute_selection_provided": false,
+    "substitute_selection_complete": false,
+    "has_index_observation": false,
+    "has_verified_return_basis": false,
+    "index_observed_codes": [],
+    "index_unknown_basis_codes": [],
+    "index_verified_basis": [],
+    "basis_needs_declaration": [],
     "uncomputable_components": [],
     "reasons": [
      "合同基准证据等级为 L3，**必须有 L1 官方合同文件**",
      "**未取得基金合同/招募说明书原始文件**",
      "基准文本缺失或无法解析",
-     "**无任何可用收益序列，无法建立可靠基准**"
+     "**无基准成分，无法建立任何基准**"
     ],
     "category": "active_equity"
-   }
+   },
+   "lifecycle_bucket": "terminated"
   },
   {
    "fund_id": 35,
@@ -2903,18 +3354,37 @@
    "usability": {
     "max_kind": "none",
     "contract_benchmark_usable": false,
-    "research_benchmark_usable": false,
-    "substitute_benchmark_usable": false,
     "fully_reproducible": false,
+    "research_benchmark_candidate": false,
+    "research_benchmark_usable": false,
+    "research_conditions": {
+     "index_code_mapped": false,
+     "history_data_available": false,
+     "return_basis_verified": false,
+     "basis_compatible_with_research": false,
+     "research_rule_declared": true,
+     "not_price_index_as_total_return": true
+    },
+    "substitute_benchmark_candidate": false,
+    "substitute_benchmark_usable": false,
+    "substitute_selection_provided": false,
+    "substitute_selection_complete": false,
+    "has_index_observation": false,
+    "has_verified_return_basis": false,
+    "index_observed_codes": [],
+    "index_unknown_basis_codes": [],
+    "index_verified_basis": [],
+    "basis_needs_declaration": [],
     "uncomputable_components": [],
     "reasons": [
      "合同基准证据等级为 L3，**必须有 L1 官方合同文件**",
      "**未取得基金合同/招募说明书原始文件**",
      "基准文本缺失或无法解析",
-     "**无任何可用收益序列，无法建立可靠基准**"
+     "**无基准成分，无法建立任何基准**"
     ],
     "category": "active_equity"
-   }
+   },
+   "lifecycle_bucket": "terminated"
   },
   {
    "fund_id": 36,
@@ -2987,18 +3457,37 @@
    "usability": {
     "max_kind": "none",
     "contract_benchmark_usable": false,
-    "research_benchmark_usable": false,
-    "substitute_benchmark_usable": false,
     "fully_reproducible": false,
+    "research_benchmark_candidate": false,
+    "research_benchmark_usable": false,
+    "research_conditions": {
+     "index_code_mapped": false,
+     "history_data_available": false,
+     "return_basis_verified": false,
+     "basis_compatible_with_research": false,
+     "research_rule_declared": true,
+     "not_price_index_as_total_return": true
+    },
+    "substitute_benchmark_candidate": false,
+    "substitute_benchmark_usable": false,
+    "substitute_selection_provided": false,
+    "substitute_selection_complete": false,
+    "has_index_observation": false,
+    "has_verified_return_basis": false,
+    "index_observed_codes": [],
+    "index_unknown_basis_codes": [],
+    "index_verified_basis": [],
+    "basis_needs_declaration": [],
     "uncomputable_components": [],
     "reasons": [
      "合同基准证据等级为 L3，**必须有 L1 官方合同文件**",
      "**未取得基金合同/招募说明书原始文件**",
      "基准文本缺失或无法解析",
-     "**无任何可用收益序列，无法建立可靠基准**"
+     "**无基准成分，无法建立任何基准**"
     ],
     "category": "active_equity"
-   }
+   },
+   "lifecycle_bucket": "terminated"
   },
   {
    "fund_id": 37,
@@ -3071,18 +3560,37 @@
    "usability": {
     "max_kind": "none",
     "contract_benchmark_usable": false,
-    "research_benchmark_usable": false,
-    "substitute_benchmark_usable": false,
     "fully_reproducible": false,
+    "research_benchmark_candidate": false,
+    "research_benchmark_usable": false,
+    "research_conditions": {
+     "index_code_mapped": false,
+     "history_data_available": false,
+     "return_basis_verified": false,
+     "basis_compatible_with_research": false,
+     "research_rule_declared": true,
+     "not_price_index_as_total_return": true
+    },
+    "substitute_benchmark_candidate": false,
+    "substitute_benchmark_usable": false,
+    "substitute_selection_provided": false,
+    "substitute_selection_complete": false,
+    "has_index_observation": false,
+    "has_verified_return_basis": false,
+    "index_observed_codes": [],
+    "index_unknown_basis_codes": [],
+    "index_verified_basis": [],
+    "basis_needs_declaration": [],
     "uncomputable_components": [],
     "reasons": [
      "合同基准证据等级为 L3，**必须有 L1 官方合同文件**",
      "**未取得基金合同/招募说明书原始文件**",
      "基准文本缺失或无法解析",
-     "**无任何可用收益序列，无法建立可靠基准**"
+     "**无基准成分，无法建立任何基准**"
     ],
     "category": "index_plain"
-   }
+   },
+   "lifecycle_bucket": "terminated"
   },
   {
    "fund_id": 38,
@@ -3155,18 +3663,37 @@
    "usability": {
     "max_kind": "none",
     "contract_benchmark_usable": false,
-    "research_benchmark_usable": false,
-    "substitute_benchmark_usable": false,
     "fully_reproducible": false,
+    "research_benchmark_candidate": false,
+    "research_benchmark_usable": false,
+    "research_conditions": {
+     "index_code_mapped": false,
+     "history_data_available": false,
+     "return_basis_verified": false,
+     "basis_compatible_with_research": false,
+     "research_rule_declared": true,
+     "not_price_index_as_total_return": true
+    },
+    "substitute_benchmark_candidate": false,
+    "substitute_benchmark_usable": false,
+    "substitute_selection_provided": false,
+    "substitute_selection_complete": false,
+    "has_index_observation": false,
+    "has_verified_return_basis": false,
+    "index_observed_codes": [],
+    "index_unknown_basis_codes": [],
+    "index_verified_basis": [],
+    "basis_needs_declaration": [],
     "uncomputable_components": [],
     "reasons": [
      "合同基准证据等级为 L3，**必须有 L1 官方合同文件**",
      "**未取得基金合同/招募说明书原始文件**",
      "基准文本缺失或无法解析",
-     "**无任何可用收益序列，无法建立可靠基准**"
+     "**无基准成分，无法建立任何基准**"
     ],
     "category": "active_equity"
-   }
+   },
+   "lifecycle_bucket": "terminated"
   },
   {
    "fund_id": 39,
@@ -3239,18 +3766,37 @@
    "usability": {
     "max_kind": "none",
     "contract_benchmark_usable": false,
-    "research_benchmark_usable": false,
-    "substitute_benchmark_usable": false,
     "fully_reproducible": false,
+    "research_benchmark_candidate": false,
+    "research_benchmark_usable": false,
+    "research_conditions": {
+     "index_code_mapped": false,
+     "history_data_available": false,
+     "return_basis_verified": false,
+     "basis_compatible_with_research": false,
+     "research_rule_declared": true,
+     "not_price_index_as_total_return": true
+    },
+    "substitute_benchmark_candidate": false,
+    "substitute_benchmark_usable": false,
+    "substitute_selection_provided": false,
+    "substitute_selection_complete": false,
+    "has_index_observation": false,
+    "has_verified_return_basis": false,
+    "index_observed_codes": [],
+    "index_unknown_basis_codes": [],
+    "index_verified_basis": [],
+    "basis_needs_declaration": [],
     "uncomputable_components": [],
     "reasons": [
      "合同基准证据等级为 L3，**必须有 L1 官方合同文件**",
      "**未取得基金合同/招募说明书原始文件**",
      "基准文本缺失或无法解析",
-     "**无任何可用收益序列，无法建立可靠基准**"
+     "**无基准成分，无法建立任何基准**"
     ],
     "category": "active_equity"
-   }
+   },
+   "lifecycle_bucket": "terminated"
   },
   {
    "fund_id": 40,
@@ -3323,18 +3869,37 @@
    "usability": {
     "max_kind": "none",
     "contract_benchmark_usable": false,
-    "research_benchmark_usable": false,
-    "substitute_benchmark_usable": false,
     "fully_reproducible": false,
+    "research_benchmark_candidate": false,
+    "research_benchmark_usable": false,
+    "research_conditions": {
+     "index_code_mapped": false,
+     "history_data_available": false,
+     "return_basis_verified": false,
+     "basis_compatible_with_research": false,
+     "research_rule_declared": true,
+     "not_price_index_as_total_return": true
+    },
+    "substitute_benchmark_candidate": false,
+    "substitute_benchmark_usable": false,
+    "substitute_selection_provided": false,
+    "substitute_selection_complete": false,
+    "has_index_observation": false,
+    "has_verified_return_basis": false,
+    "index_observed_codes": [],
+    "index_unknown_basis_codes": [],
+    "index_verified_basis": [],
+    "basis_needs_declaration": [],
     "uncomputable_components": [],
     "reasons": [
      "合同基准证据等级为 L3，**必须有 L1 官方合同文件**",
      "**未取得基金合同/招募说明书原始文件**",
      "基准文本缺失或无法解析",
-     "**无任何可用收益序列，无法建立可靠基准**"
+     "**无基准成分，无法建立任何基准**"
     ],
     "category": "active_equity"
-   }
+   },
+   "lifecycle_bucket": "terminated"
   },
   {
    "fund_id": 41,
@@ -3401,18 +3966,37 @@
    "usability": {
     "max_kind": "none",
     "contract_benchmark_usable": false,
-    "research_benchmark_usable": false,
-    "substitute_benchmark_usable": false,
     "fully_reproducible": false,
+    "research_benchmark_candidate": false,
+    "research_benchmark_usable": false,
+    "research_conditions": {
+     "index_code_mapped": false,
+     "history_data_available": false,
+     "return_basis_verified": false,
+     "basis_compatible_with_research": false,
+     "research_rule_declared": true,
+     "not_price_index_as_total_return": true
+    },
+    "substitute_benchmark_candidate": false,
+    "substitute_benchmark_usable": false,
+    "substitute_selection_provided": false,
+    "substitute_selection_complete": false,
+    "has_index_observation": false,
+    "has_verified_return_basis": false,
+    "index_observed_codes": [],
+    "index_unknown_basis_codes": [],
+    "index_verified_basis": [],
+    "basis_needs_declaration": [],
     "uncomputable_components": [],
     "reasons": [
      "合同基准证据等级为 L3，**必须有 L1 官方合同文件**",
      "**未取得基金合同/招募说明书原始文件**",
      "基准文本缺失或无法解析",
-     "**无任何可用收益序列，无法建立可靠基准**"
+     "**无基准成分，无法建立任何基准**"
     ],
     "category": "active_equity"
-   }
+   },
+   "lifecycle_bucket": "terminated"
   },
   {
    "fund_id": 42,
@@ -3491,18 +4075,37 @@
    "usability": {
     "max_kind": "none",
     "contract_benchmark_usable": false,
-    "research_benchmark_usable": false,
-    "substitute_benchmark_usable": false,
     "fully_reproducible": false,
+    "research_benchmark_candidate": false,
+    "research_benchmark_usable": false,
+    "research_conditions": {
+     "index_code_mapped": false,
+     "history_data_available": false,
+     "return_basis_verified": false,
+     "basis_compatible_with_research": false,
+     "research_rule_declared": true,
+     "not_price_index_as_total_return": true
+    },
+    "substitute_benchmark_candidate": false,
+    "substitute_benchmark_usable": false,
+    "substitute_selection_provided": false,
+    "substitute_selection_complete": false,
+    "has_index_observation": false,
+    "has_verified_return_basis": false,
+    "index_observed_codes": [],
+    "index_unknown_basis_codes": [],
+    "index_verified_basis": [],
+    "basis_needs_declaration": [],
     "uncomputable_components": [],
     "reasons": [
      "合同基准证据等级为 L3，**必须有 L1 官方合同文件**",
      "**未取得基金合同/招募说明书原始文件**",
      "基准文本缺失或无法解析",
-     "**无任何可用收益序列，无法建立可靠基准**"
+     "**无基准成分，无法建立任何基准**"
     ],
     "category": "mixed_bond"
-   }
+   },
+   "lifecycle_bucket": "terminated"
   },
   {
    "fund_id": 43,
@@ -3569,18 +4172,37 @@
    "usability": {
     "max_kind": "none",
     "contract_benchmark_usable": false,
-    "research_benchmark_usable": false,
-    "substitute_benchmark_usable": false,
     "fully_reproducible": false,
+    "research_benchmark_candidate": false,
+    "research_benchmark_usable": false,
+    "research_conditions": {
+     "index_code_mapped": false,
+     "history_data_available": false,
+     "return_basis_verified": false,
+     "basis_compatible_with_research": false,
+     "research_rule_declared": true,
+     "not_price_index_as_total_return": true
+    },
+    "substitute_benchmark_candidate": false,
+    "substitute_benchmark_usable": false,
+    "substitute_selection_provided": false,
+    "substitute_selection_complete": false,
+    "has_index_observation": false,
+    "has_verified_return_basis": false,
+    "index_observed_codes": [],
+    "index_unknown_basis_codes": [],
+    "index_verified_basis": [],
+    "basis_needs_declaration": [],
     "uncomputable_components": [],
     "reasons": [
      "合同基准证据等级为 L3，**必须有 L1 官方合同文件**",
      "**未取得基金合同/招募说明书原始文件**",
      "基准文本缺失或无法解析",
-     "**无任何可用收益序列，无法建立可靠基准**"
+     "**无基准成分，无法建立任何基准**"
     ],
     "category": "etf_feeder"
-   }
+   },
+   "lifecycle_bucket": "terminated"
   },
   {
    "fund_id": 44,
@@ -3653,18 +4275,37 @@
    "usability": {
     "max_kind": "none",
     "contract_benchmark_usable": false,
-    "research_benchmark_usable": false,
-    "substitute_benchmark_usable": false,
     "fully_reproducible": false,
+    "research_benchmark_candidate": false,
+    "research_benchmark_usable": false,
+    "research_conditions": {
+     "index_code_mapped": false,
+     "history_data_available": false,
+     "return_basis_verified": false,
+     "basis_compatible_with_research": false,
+     "research_rule_declared": true,
+     "not_price_index_as_total_return": true
+    },
+    "substitute_benchmark_candidate": false,
+    "substitute_benchmark_usable": false,
+    "substitute_selection_provided": false,
+    "substitute_selection_complete": false,
+    "has_index_observation": false,
+    "has_verified_return_basis": false,
+    "index_observed_codes": [],
+    "index_unknown_basis_codes": [],
+    "index_verified_basis": [],
+    "basis_needs_declaration": [],
     "uncomputable_components": [],
     "reasons": [
      "合同基准证据等级为 L3，**必须有 L1 官方合同文件**",
      "**未取得基金合同/招募说明书原始文件**",
      "基准文本缺失或无法解析",
-     "**无任何可用收益序列，无法建立可靠基准**"
+     "**无基准成分，无法建立任何基准**"
     ],
     "category": "mixed_bond"
-   }
+   },
+   "lifecycle_bucket": "terminated"
   },
   {
    "fund_id": 45,
@@ -3731,18 +4372,37 @@
    "usability": {
     "max_kind": "none",
     "contract_benchmark_usable": false,
-    "research_benchmark_usable": false,
-    "substitute_benchmark_usable": false,
     "fully_reproducible": false,
+    "research_benchmark_candidate": false,
+    "research_benchmark_usable": false,
+    "research_conditions": {
+     "index_code_mapped": false,
+     "history_data_available": false,
+     "return_basis_verified": false,
+     "basis_compatible_with_research": false,
+     "research_rule_declared": true,
+     "not_price_index_as_total_return": true
+    },
+    "substitute_benchmark_candidate": false,
+    "substitute_benchmark_usable": false,
+    "substitute_selection_provided": false,
+    "substitute_selection_complete": false,
+    "has_index_observation": false,
+    "has_verified_return_basis": false,
+    "index_observed_codes": [],
+    "index_unknown_basis_codes": [],
+    "index_verified_basis": [],
+    "basis_needs_declaration": [],
     "uncomputable_components": [],
     "reasons": [
      "合同基准证据等级为 L3，**必须有 L1 官方合同文件**",
      "**未取得基金合同/招募说明书原始文件**",
      "基准文本缺失或无法解析",
-     "**无任何可用收益序列，无法建立可靠基准**"
+     "**无基准成分，无法建立任何基准**"
     ],
     "category": "mixed_bond"
-   }
+   },
+   "lifecycle_bucket": "terminated"
   },
   {
    "fund_id": 46,
@@ -3815,18 +4475,37 @@
    "usability": {
     "max_kind": "none",
     "contract_benchmark_usable": false,
-    "research_benchmark_usable": false,
-    "substitute_benchmark_usable": false,
     "fully_reproducible": false,
+    "research_benchmark_candidate": false,
+    "research_benchmark_usable": false,
+    "research_conditions": {
+     "index_code_mapped": false,
+     "history_data_available": false,
+     "return_basis_verified": false,
+     "basis_compatible_with_research": false,
+     "research_rule_declared": true,
+     "not_price_index_as_total_return": true
+    },
+    "substitute_benchmark_candidate": false,
+    "substitute_benchmark_usable": false,
+    "substitute_selection_provided": false,
+    "substitute_selection_complete": false,
+    "has_index_observation": false,
+    "has_verified_return_basis": false,
+    "index_observed_codes": [],
+    "index_unknown_basis_codes": [],
+    "index_verified_basis": [],
+    "basis_needs_declaration": [],
     "uncomputable_components": [],
     "reasons": [
      "合同基准证据等级为 L3，**必须有 L1 官方合同文件**",
      "**未取得基金合同/招募说明书原始文件**",
      "基准文本缺失或无法解析",
-     "**无任何可用收益序列，无法建立可靠基准**"
+     "**无基准成分，无法建立任何基准**"
     ],
     "category": "etf_feeder"
-   }
+   },
+   "lifecycle_bucket": "terminated"
   },
   {
    "fund_id": 47,
@@ -3899,18 +4578,37 @@
    "usability": {
     "max_kind": "none",
     "contract_benchmark_usable": false,
-    "research_benchmark_usable": false,
-    "substitute_benchmark_usable": false,
     "fully_reproducible": false,
+    "research_benchmark_candidate": false,
+    "research_benchmark_usable": false,
+    "research_conditions": {
+     "index_code_mapped": false,
+     "history_data_available": false,
+     "return_basis_verified": false,
+     "basis_compatible_with_research": false,
+     "research_rule_declared": true,
+     "not_price_index_as_total_return": true
+    },
+    "substitute_benchmark_candidate": false,
+    "substitute_benchmark_usable": false,
+    "substitute_selection_provided": false,
+    "substitute_selection_complete": false,
+    "has_index_observation": false,
+    "has_verified_return_basis": false,
+    "index_observed_codes": [],
+    "index_unknown_basis_codes": [],
+    "index_verified_basis": [],
+    "basis_needs_declaration": [],
     "uncomputable_components": [],
     "reasons": [
      "合同基准证据等级为 L3，**必须有 L1 官方合同文件**",
      "**未取得基金合同/招募说明书原始文件**",
      "基准文本缺失或无法解析",
-     "**无任何可用收益序列，无法建立可靠基准**"
+     "**无基准成分，无法建立任何基准**"
     ],
     "category": "index_plain"
-   }
+   },
+   "lifecycle_bucket": "terminated"
   },
   {
    "fund_id": 48,
@@ -3977,19 +4675,38 @@
    "usability": {
     "max_kind": "none",
     "contract_benchmark_usable": false,
-    "research_benchmark_usable": false,
-    "substitute_benchmark_usable": false,
     "fully_reproducible": false,
+    "research_benchmark_candidate": false,
+    "research_benchmark_usable": false,
+    "research_conditions": {
+     "index_code_mapped": false,
+     "history_data_available": false,
+     "return_basis_verified": false,
+     "basis_compatible_with_research": false,
+     "research_rule_declared": true,
+     "not_price_index_as_total_return": true
+    },
+    "substitute_benchmark_candidate": false,
+    "substitute_benchmark_usable": false,
+    "substitute_selection_provided": false,
+    "substitute_selection_complete": false,
+    "has_index_observation": false,
+    "has_verified_return_basis": false,
+    "index_observed_codes": [],
+    "index_unknown_basis_codes": [],
+    "index_verified_basis": [],
+    "basis_needs_declaration": [],
     "uncomputable_components": [],
     "reasons": [
      "合同基准证据等级为 L3，**必须有 L1 官方合同文件**",
      "**未取得基金合同/招募说明书原始文件**",
      "基准文本缺失或无法解析",
-     "**无任何可用收益序列，无法建立可靠基准**",
+     "**无基准成分，无法建立任何基准**",
      "货币基金使用万份收益/七日年化独立口径，**不与普通净值基金混算**"
     ],
     "category": "money_market"
-   }
+   },
+   "lifecycle_bucket": "terminated"
   },
   {
    "fund_id": 49,
@@ -4056,18 +4773,37 @@
    "usability": {
     "max_kind": "none",
     "contract_benchmark_usable": false,
-    "research_benchmark_usable": false,
-    "substitute_benchmark_usable": false,
     "fully_reproducible": false,
+    "research_benchmark_candidate": false,
+    "research_benchmark_usable": false,
+    "research_conditions": {
+     "index_code_mapped": false,
+     "history_data_available": false,
+     "return_basis_verified": false,
+     "basis_compatible_with_research": false,
+     "research_rule_declared": true,
+     "not_price_index_as_total_return": true
+    },
+    "substitute_benchmark_candidate": false,
+    "substitute_benchmark_usable": false,
+    "substitute_selection_provided": false,
+    "substitute_selection_complete": false,
+    "has_index_observation": false,
+    "has_verified_return_basis": false,
+    "index_observed_codes": [],
+    "index_unknown_basis_codes": [],
+    "index_verified_basis": [],
+    "basis_needs_declaration": [],
     "uncomputable_components": [],
     "reasons": [
      "合同基准证据等级为 L3，**必须有 L1 官方合同文件**",
      "**未取得基金合同/招募说明书原始文件**",
      "基准文本缺失或无法解析",
-     "**无任何可用收益序列，无法建立可靠基准**"
+     "**无基准成分，无法建立任何基准**"
     ],
     "category": "active_equity"
-   }
+   },
+   "lifecycle_bucket": "terminated"
   },
   {
    "fund_id": 50,
@@ -4134,18 +4870,37 @@
    "usability": {
     "max_kind": "none",
     "contract_benchmark_usable": false,
-    "research_benchmark_usable": false,
-    "substitute_benchmark_usable": false,
     "fully_reproducible": false,
+    "research_benchmark_candidate": false,
+    "research_benchmark_usable": false,
+    "research_conditions": {
+     "index_code_mapped": false,
+     "history_data_available": false,
+     "return_basis_verified": false,
+     "basis_compatible_with_research": false,
+     "research_rule_declared": true,
+     "not_price_index_as_total_return": true
+    },
+    "substitute_benchmark_candidate": false,
+    "substitute_benchmark_usable": false,
+    "substitute_selection_provided": false,
+    "substitute_selection_complete": false,
+    "has_index_observation": false,
+    "has_verified_return_basis": false,
+    "index_observed_codes": [],
+    "index_unknown_basis_codes": [],
+    "index_verified_basis": [],
+    "basis_needs_declaration": [],
     "uncomputable_components": [],
     "reasons": [
      "合同基准证据等级为 L3，**必须有 L1 官方合同文件**",
      "**未取得基金合同/招募说明书原始文件**",
      "基准文本缺失或无法解析",
-     "**无任何可用收益序列，无法建立可靠基准**"
+     "**无基准成分，无法建立任何基准**"
     ],
     "category": "active_equity"
-   }
+   },
+   "lifecycle_bucket": "terminated"
   },
   {
    "fund_id": 51,
@@ -4212,18 +4967,37 @@
    "usability": {
     "max_kind": "none",
     "contract_benchmark_usable": false,
-    "research_benchmark_usable": false,
-    "substitute_benchmark_usable": false,
     "fully_reproducible": false,
+    "research_benchmark_candidate": false,
+    "research_benchmark_usable": false,
+    "research_conditions": {
+     "index_code_mapped": false,
+     "history_data_available": false,
+     "return_basis_verified": false,
+     "basis_compatible_with_research": false,
+     "research_rule_declared": true,
+     "not_price_index_as_total_return": true
+    },
+    "substitute_benchmark_candidate": false,
+    "substitute_benchmark_usable": false,
+    "substitute_selection_provided": false,
+    "substitute_selection_complete": false,
+    "has_index_observation": false,
+    "has_verified_return_basis": false,
+    "index_observed_codes": [],
+    "index_unknown_basis_codes": [],
+    "index_verified_basis": [],
+    "basis_needs_declaration": [],
     "uncomputable_components": [],
     "reasons": [
      "合同基准证据等级为 L3，**必须有 L1 官方合同文件**",
      "**未取得基金合同/招募说明书原始文件**",
      "基准文本缺失或无法解析",
-     "**无任何可用收益序列，无法建立可靠基准**"
+     "**无基准成分，无法建立任何基准**"
     ],
     "category": "active_equity"
-   }
+   },
+   "lifecycle_bucket": "terminated"
   },
   {
    "fund_id": 52,
@@ -4290,18 +5064,37 @@
    "usability": {
     "max_kind": "none",
     "contract_benchmark_usable": false,
-    "research_benchmark_usable": false,
-    "substitute_benchmark_usable": false,
     "fully_reproducible": false,
+    "research_benchmark_candidate": false,
+    "research_benchmark_usable": false,
+    "research_conditions": {
+     "index_code_mapped": false,
+     "history_data_available": false,
+     "return_basis_verified": false,
+     "basis_compatible_with_research": false,
+     "research_rule_declared": true,
+     "not_price_index_as_total_return": true
+    },
+    "substitute_benchmark_candidate": false,
+    "substitute_benchmark_usable": false,
+    "substitute_selection_provided": false,
+    "substitute_selection_complete": false,
+    "has_index_observation": false,
+    "has_verified_return_basis": false,
+    "index_observed_codes": [],
+    "index_unknown_basis_codes": [],
+    "index_verified_basis": [],
+    "basis_needs_declaration": [],
     "uncomputable_components": [],
     "reasons": [
      "合同基准证据等级为 L3，**必须有 L1 官方合同文件**",
      "**未取得基金合同/招募说明书原始文件**",
      "基准文本缺失或无法解析",
-     "**无任何可用收益序列，无法建立可靠基准**"
+     "**无基准成分，无法建立任何基准**"
     ],
     "category": "index_plain"
-   }
+   },
+   "lifecycle_bucket": "terminated"
   },
   {
    "fund_id": 53,
@@ -4368,18 +5161,37 @@
    "usability": {
     "max_kind": "none",
     "contract_benchmark_usable": false,
-    "research_benchmark_usable": false,
-    "substitute_benchmark_usable": false,
     "fully_reproducible": false,
+    "research_benchmark_candidate": false,
+    "research_benchmark_usable": false,
+    "research_conditions": {
+     "index_code_mapped": false,
+     "history_data_available": false,
+     "return_basis_verified": false,
+     "basis_compatible_with_research": false,
+     "research_rule_declared": true,
+     "not_price_index_as_total_return": true
+    },
+    "substitute_benchmark_candidate": false,
+    "substitute_benchmark_usable": false,
+    "substitute_selection_provided": false,
+    "substitute_selection_complete": false,
+    "has_index_observation": false,
+    "has_verified_return_basis": false,
+    "index_observed_codes": [],
+    "index_unknown_basis_codes": [],
+    "index_verified_basis": [],
+    "basis_needs_declaration": [],
     "uncomputable_components": [],
     "reasons": [
      "合同基准证据等级为 L3，**必须有 L1 官方合同文件**",
      "**未取得基金合同/招募说明书原始文件**",
      "基准文本缺失或无法解析",
-     "**无任何可用收益序列，无法建立可靠基准**"
+     "**无基准成分，无法建立任何基准**"
     ],
     "category": "index_plain"
-   }
+   },
+   "lifecycle_bucket": "terminated"
   },
   {
    "fund_id": 54,
@@ -4446,18 +5258,37 @@
    "usability": {
     "max_kind": "none",
     "contract_benchmark_usable": false,
-    "research_benchmark_usable": false,
-    "substitute_benchmark_usable": false,
     "fully_reproducible": false,
+    "research_benchmark_candidate": false,
+    "research_benchmark_usable": false,
+    "research_conditions": {
+     "index_code_mapped": false,
+     "history_data_available": false,
+     "return_basis_verified": false,
+     "basis_compatible_with_research": false,
+     "research_rule_declared": true,
+     "not_price_index_as_total_return": true
+    },
+    "substitute_benchmark_candidate": false,
+    "substitute_benchmark_usable": false,
+    "substitute_selection_provided": false,
+    "substitute_selection_complete": false,
+    "has_index_observation": false,
+    "has_verified_return_basis": false,
+    "index_observed_codes": [],
+    "index_unknown_basis_codes": [],
+    "index_verified_basis": [],
+    "basis_needs_declaration": [],
     "uncomputable_components": [],
     "reasons": [
      "合同基准证据等级为 L3，**必须有 L1 官方合同文件**",
      "**未取得基金合同/招募说明书原始文件**",
      "基准文本缺失或无法解析",
-     "**无任何可用收益序列，无法建立可靠基准**"
+     "**无基准成分，无法建立任何基准**"
     ],
     "category": "active_equity"
-   }
+   },
+   "lifecycle_bucket": "terminated"
   },
   {
    "fund_id": 55,
@@ -4524,18 +5355,37 @@
    "usability": {
     "max_kind": "none",
     "contract_benchmark_usable": false,
-    "research_benchmark_usable": false,
-    "substitute_benchmark_usable": false,
     "fully_reproducible": false,
+    "research_benchmark_candidate": false,
+    "research_benchmark_usable": false,
+    "research_conditions": {
+     "index_code_mapped": false,
+     "history_data_available": false,
+     "return_basis_verified": false,
+     "basis_compatible_with_research": false,
+     "research_rule_declared": true,
+     "not_price_index_as_total_return": true
+    },
+    "substitute_benchmark_candidate": false,
+    "substitute_benchmark_usable": false,
+    "substitute_selection_provided": false,
+    "substitute_selection_complete": false,
+    "has_index_observation": false,
+    "has_verified_return_basis": false,
+    "index_observed_codes": [],
+    "index_unknown_basis_codes": [],
+    "index_verified_basis": [],
+    "basis_needs_declaration": [],
     "uncomputable_components": [],
     "reasons": [
      "合同基准证据等级为 L3，**必须有 L1 官方合同文件**",
      "**未取得基金合同/招募说明书原始文件**",
      "基准文本缺失或无法解析",
-     "**无任何可用收益序列，无法建立可靠基准**"
+     "**无基准成分，无法建立任何基准**"
     ],
     "category": "active_equity"
-   }
+   },
+   "lifecycle_bucket": "terminated"
   },
   {
    "fund_id": 56,
@@ -4602,18 +5452,37 @@
    "usability": {
     "max_kind": "none",
     "contract_benchmark_usable": false,
-    "research_benchmark_usable": false,
-    "substitute_benchmark_usable": false,
     "fully_reproducible": false,
+    "research_benchmark_candidate": false,
+    "research_benchmark_usable": false,
+    "research_conditions": {
+     "index_code_mapped": false,
+     "history_data_available": false,
+     "return_basis_verified": false,
+     "basis_compatible_with_research": false,
+     "research_rule_declared": true,
+     "not_price_index_as_total_return": true
+    },
+    "substitute_benchmark_candidate": false,
+    "substitute_benchmark_usable": false,
+    "substitute_selection_provided": false,
+    "substitute_selection_complete": false,
+    "has_index_observation": false,
+    "has_verified_return_basis": false,
+    "index_observed_codes": [],
+    "index_unknown_basis_codes": [],
+    "index_verified_basis": [],
+    "basis_needs_declaration": [],
     "uncomputable_components": [],
     "reasons": [
      "合同基准证据等级为 L3，**必须有 L1 官方合同文件**",
      "**未取得基金合同/招募说明书原始文件**",
      "基准文本缺失或无法解析",
-     "**无任何可用收益序列，无法建立可靠基准**"
+     "**无基准成分，无法建立任何基准**"
     ],
     "category": "active_equity"
-   }
+   },
+   "lifecycle_bucket": "terminated"
   },
   {
    "fund_id": 57,
@@ -4686,18 +5555,37 @@
    "usability": {
     "max_kind": "none",
     "contract_benchmark_usable": false,
-    "research_benchmark_usable": false,
-    "substitute_benchmark_usable": false,
     "fully_reproducible": false,
+    "research_benchmark_candidate": false,
+    "research_benchmark_usable": false,
+    "research_conditions": {
+     "index_code_mapped": false,
+     "history_data_available": false,
+     "return_basis_verified": false,
+     "basis_compatible_with_research": false,
+     "research_rule_declared": true,
+     "not_price_index_as_total_return": true
+    },
+    "substitute_benchmark_candidate": false,
+    "substitute_benchmark_usable": false,
+    "substitute_selection_provided": false,
+    "substitute_selection_complete": false,
+    "has_index_observation": false,
+    "has_verified_return_basis": false,
+    "index_observed_codes": [],
+    "index_unknown_basis_codes": [],
+    "index_verified_basis": [],
+    "basis_needs_declaration": [],
     "uncomputable_components": [],
     "reasons": [
      "合同基准证据等级为 L3，**必须有 L1 官方合同文件**",
      "**未取得基金合同/招募说明书原始文件**",
      "基准文本缺失或无法解析",
-     "**无任何可用收益序列，无法建立可靠基准**"
+     "**无基准成分，无法建立任何基准**"
     ],
     "category": "active_equity"
-   }
+   },
+   "lifecycle_bucket": "terminated"
   },
   {
    "fund_id": 58,
@@ -4770,18 +5658,37 @@
    "usability": {
     "max_kind": "none",
     "contract_benchmark_usable": false,
-    "research_benchmark_usable": false,
-    "substitute_benchmark_usable": false,
     "fully_reproducible": false,
+    "research_benchmark_candidate": false,
+    "research_benchmark_usable": false,
+    "research_conditions": {
+     "index_code_mapped": false,
+     "history_data_available": false,
+     "return_basis_verified": false,
+     "basis_compatible_with_research": false,
+     "research_rule_declared": true,
+     "not_price_index_as_total_return": true
+    },
+    "substitute_benchmark_candidate": false,
+    "substitute_benchmark_usable": false,
+    "substitute_selection_provided": false,
+    "substitute_selection_complete": false,
+    "has_index_observation": false,
+    "has_verified_return_basis": false,
+    "index_observed_codes": [],
+    "index_unknown_basis_codes": [],
+    "index_verified_basis": [],
+    "basis_needs_declaration": [],
     "uncomputable_components": [],
     "reasons": [
      "合同基准证据等级为 L3，**必须有 L1 官方合同文件**",
      "**未取得基金合同/招募说明书原始文件**",
      "基准文本缺失或无法解析",
-     "**无任何可用收益序列，无法建立可靠基准**"
+     "**无基准成分，无法建立任何基准**"
     ],
     "category": "active_equity"
-   }
+   },
+   "lifecycle_bucket": "terminated"
   },
   {
    "fund_id": 59,
@@ -4848,18 +5755,37 @@
    "usability": {
     "max_kind": "none",
     "contract_benchmark_usable": false,
-    "research_benchmark_usable": false,
-    "substitute_benchmark_usable": false,
     "fully_reproducible": false,
+    "research_benchmark_candidate": false,
+    "research_benchmark_usable": false,
+    "research_conditions": {
+     "index_code_mapped": false,
+     "history_data_available": false,
+     "return_basis_verified": false,
+     "basis_compatible_with_research": false,
+     "research_rule_declared": true,
+     "not_price_index_as_total_return": true
+    },
+    "substitute_benchmark_candidate": false,
+    "substitute_benchmark_usable": false,
+    "substitute_selection_provided": false,
+    "substitute_selection_complete": false,
+    "has_index_observation": false,
+    "has_verified_return_basis": false,
+    "index_observed_codes": [],
+    "index_unknown_basis_codes": [],
+    "index_verified_basis": [],
+    "basis_needs_declaration": [],
     "uncomputable_components": [],
     "reasons": [
      "合同基准证据等级为 L3，**必须有 L1 官方合同文件**",
      "**未取得基金合同/招募说明书原始文件**",
      "基准文本缺失或无法解析",
-     "**无任何可用收益序列，无法建立可靠基准**"
+     "**无基准成分，无法建立任何基准**"
     ],
     "category": "active_equity"
-   }
+   },
+   "lifecycle_bucket": "terminated"
   },
   {
    "fund_id": 60,
@@ -4932,18 +5858,37 @@
    "usability": {
     "max_kind": "none",
     "contract_benchmark_usable": false,
-    "research_benchmark_usable": false,
-    "substitute_benchmark_usable": false,
     "fully_reproducible": false,
+    "research_benchmark_candidate": false,
+    "research_benchmark_usable": false,
+    "research_conditions": {
+     "index_code_mapped": false,
+     "history_data_available": false,
+     "return_basis_verified": false,
+     "basis_compatible_with_research": false,
+     "research_rule_declared": true,
+     "not_price_index_as_total_return": true
+    },
+    "substitute_benchmark_candidate": false,
+    "substitute_benchmark_usable": false,
+    "substitute_selection_provided": false,
+    "substitute_selection_complete": false,
+    "has_index_observation": false,
+    "has_verified_return_basis": false,
+    "index_observed_codes": [],
+    "index_unknown_basis_codes": [],
+    "index_verified_basis": [],
+    "basis_needs_declaration": [],
     "uncomputable_components": [],
     "reasons": [
      "合同基准证据等级为 L3，**必须有 L1 官方合同文件**",
      "**未取得基金合同/招募说明书原始文件**",
      "基准文本缺失或无法解析",
-     "**无任何可用收益序列，无法建立可靠基准**"
+     "**无基准成分，无法建立任何基准**"
     ],
     "category": "index_plain"
-   }
+   },
+   "lifecycle_bucket": "terminated"
   },
   {
    "fund_id": 61,
@@ -5010,18 +5955,37 @@
    "usability": {
     "max_kind": "none",
     "contract_benchmark_usable": false,
-    "research_benchmark_usable": false,
-    "substitute_benchmark_usable": false,
     "fully_reproducible": false,
+    "research_benchmark_candidate": false,
+    "research_benchmark_usable": false,
+    "research_conditions": {
+     "index_code_mapped": false,
+     "history_data_available": false,
+     "return_basis_verified": false,
+     "basis_compatible_with_research": false,
+     "research_rule_declared": true,
+     "not_price_index_as_total_return": true
+    },
+    "substitute_benchmark_candidate": false,
+    "substitute_benchmark_usable": false,
+    "substitute_selection_provided": false,
+    "substitute_selection_complete": false,
+    "has_index_observation": false,
+    "has_verified_return_basis": false,
+    "index_observed_codes": [],
+    "index_unknown_basis_codes": [],
+    "index_verified_basis": [],
+    "basis_needs_declaration": [],
     "uncomputable_components": [],
     "reasons": [
      "合同基准证据等级为 L3，**必须有 L1 官方合同文件**",
      "**未取得基金合同/招募说明书原始文件**",
      "基准文本缺失或无法解析",
-     "**无任何可用收益序列，无法建立可靠基准**"
+     "**无基准成分，无法建立任何基准**"
     ],
     "category": "index_plain"
-   }
+   },
+   "lifecycle_bucket": "terminated"
   },
   {
    "fund_id": 62,
@@ -5088,18 +6052,37 @@
    "usability": {
     "max_kind": "none",
     "contract_benchmark_usable": false,
-    "research_benchmark_usable": false,
-    "substitute_benchmark_usable": false,
     "fully_reproducible": false,
+    "research_benchmark_candidate": false,
+    "research_benchmark_usable": false,
+    "research_conditions": {
+     "index_code_mapped": false,
+     "history_data_available": false,
+     "return_basis_verified": false,
+     "basis_compatible_with_research": false,
+     "research_rule_declared": true,
+     "not_price_index_as_total_return": true
+    },
+    "substitute_benchmark_candidate": false,
+    "substitute_benchmark_usable": false,
+    "substitute_selection_provided": false,
+    "substitute_selection_complete": false,
+    "has_index_observation": false,
+    "has_verified_return_basis": false,
+    "index_observed_codes": [],
+    "index_unknown_basis_codes": [],
+    "index_verified_basis": [],
+    "basis_needs_declaration": [],
     "uncomputable_components": [],
     "reasons": [
      "合同基准证据等级为 L3，**必须有 L1 官方合同文件**",
      "**未取得基金合同/招募说明书原始文件**",
      "基准文本缺失或无法解析",
-     "**无任何可用收益序列，无法建立可靠基准**"
+     "**无基准成分，无法建立任何基准**"
     ],
     "category": "index_plain"
-   }
+   },
+   "lifecycle_bucket": "terminated"
   },
   {
    "fund_id": 63,
@@ -5166,18 +6149,37 @@
    "usability": {
     "max_kind": "none",
     "contract_benchmark_usable": false,
-    "research_benchmark_usable": false,
-    "substitute_benchmark_usable": false,
     "fully_reproducible": false,
+    "research_benchmark_candidate": false,
+    "research_benchmark_usable": false,
+    "research_conditions": {
+     "index_code_mapped": false,
+     "history_data_available": false,
+     "return_basis_verified": false,
+     "basis_compatible_with_research": false,
+     "research_rule_declared": true,
+     "not_price_index_as_total_return": true
+    },
+    "substitute_benchmark_candidate": false,
+    "substitute_benchmark_usable": false,
+    "substitute_selection_provided": false,
+    "substitute_selection_complete": false,
+    "has_index_observation": false,
+    "has_verified_return_basis": false,
+    "index_observed_codes": [],
+    "index_unknown_basis_codes": [],
+    "index_verified_basis": [],
+    "basis_needs_declaration": [],
     "uncomputable_components": [],
     "reasons": [
      "合同基准证据等级为 L3，**必须有 L1 官方合同文件**",
      "**未取得基金合同/招募说明书原始文件**",
      "基准文本缺失或无法解析",
-     "**无任何可用收益序列，无法建立可靠基准**"
+     "**无基准成分，无法建立任何基准**"
     ],
     "category": "index_plain"
-   }
+   },
+   "lifecycle_bucket": "terminated"
   },
   {
    "fund_id": 66,
@@ -5267,21 +6269,44 @@
     "notes": []
    },
    "usability": {
-    "max_kind": "research",
+    "max_kind": "none",
     "contract_benchmark_usable": false,
-    "research_benchmark_usable": true,
-    "substitute_benchmark_usable": true,
     "fully_reproducible": false,
+    "research_benchmark_candidate": true,
+    "research_benchmark_usable": false,
+    "research_conditions": {
+     "index_code_mapped": true,
+     "history_data_available": true,
+     "return_basis_verified": false,
+     "basis_compatible_with_research": false,
+     "research_rule_declared": true,
+     "not_price_index_as_total_return": true
+    },
+    "substitute_benchmark_candidate": true,
+    "substitute_benchmark_usable": false,
+    "substitute_selection_provided": false,
+    "substitute_selection_complete": false,
+    "has_index_observation": true,
+    "has_verified_return_basis": false,
+    "index_observed_codes": [
+     "000300"
+    ],
+    "index_unknown_basis_codes": [
+     "000300"
+    ],
+    "index_verified_basis": [],
+    "basis_needs_declaration": [],
     "uncomputable_components": [
      "银行活期存款利率（税后）×5%（现金利率无历史序列）"
     ],
     "reasons": [
+     "**指数 ['000300'] 的 `return_basis` 为 `unknown`，点位数据不得当作合格收益序列**",
      "合同基准证据等级为 L3，**必须有 L1 官方合同文件**",
-     "**未取得基金合同/招募说明书原始文件**",
-     "**只能作为研究评价基准，不得称为合同基准**"
+     "**未取得基金合同/招募说明书原始文件**"
     ],
     "category": "etf_feeder"
-   }
+   },
+   "lifecycle_bucket": "unknown_status"
   },
   {
    "fund_id": 67,
@@ -5387,21 +6412,46 @@
     "notes": []
    },
    "usability": {
-    "max_kind": "research",
+    "max_kind": "none",
     "contract_benchmark_usable": false,
-    "research_benchmark_usable": true,
-    "substitute_benchmark_usable": true,
     "fully_reproducible": false,
+    "research_benchmark_candidate": true,
+    "research_benchmark_usable": false,
+    "research_conditions": {
+     "index_code_mapped": true,
+     "history_data_available": true,
+     "return_basis_verified": false,
+     "basis_compatible_with_research": false,
+     "research_rule_declared": true,
+     "not_price_index_as_total_return": true
+    },
+    "substitute_benchmark_candidate": true,
+    "substitute_benchmark_usable": false,
+    "substitute_selection_provided": false,
+    "substitute_selection_complete": false,
+    "has_index_observation": true,
+    "has_verified_return_basis": false,
+    "index_observed_codes": [
+     "000905",
+     "930930"
+    ],
+    "index_unknown_basis_codes": [
+     "000905",
+     "930930"
+    ],
+    "index_verified_basis": [],
+    "basis_needs_declaration": [],
     "uncomputable_components": [
      "中债-总全价(总值)指数（债券指数未接入）"
     ],
     "reasons": [
+     "**指数 ['000905', '930930'] 的 `return_basis` 为 `unknown`，点位数据不得当作合格收益序列**",
      "合同基准证据等级为 L3，**必须有 L1 官方合同文件**",
-     "**未取得基金合同/招募说明书原始文件**",
-     "**只能作为研究评价基准，不得称为合同基准**"
+     "**未取得基金合同/招募说明书原始文件**"
     ],
     "category": "active_equity"
-   }
+   },
+   "lifecycle_bucket": "unknown_status"
   },
   {
    "fund_id": 68,
@@ -5508,22 +6558,45 @@
     "notes": []
    },
    "usability": {
-    "max_kind": "research",
+    "max_kind": "none",
     "contract_benchmark_usable": false,
-    "research_benchmark_usable": true,
-    "substitute_benchmark_usable": true,
     "fully_reproducible": false,
+    "research_benchmark_candidate": true,
+    "research_benchmark_usable": false,
+    "research_conditions": {
+     "index_code_mapped": true,
+     "history_data_available": true,
+     "return_basis_verified": false,
+     "basis_compatible_with_research": false,
+     "research_rule_declared": true,
+     "not_price_index_as_total_return": true
+    },
+    "substitute_benchmark_candidate": true,
+    "substitute_benchmark_usable": false,
+    "substitute_selection_provided": false,
+    "substitute_selection_complete": false,
+    "has_index_observation": true,
+    "has_verified_return_basis": false,
+    "index_observed_codes": [
+     "000300"
+    ],
+    "index_unknown_basis_codes": [
+     "000300"
+    ],
+    "index_verified_basis": [],
+    "basis_needs_declaration": [],
     "uncomputable_components": [
      "恒生指数（未映射代码）",
      "中债综合财富指数（债券指数未接入）"
     ],
     "reasons": [
+     "**指数 ['000300'] 的 `return_basis` 为 `unknown`，点位数据不得当作合格收益序列**",
      "合同基准证据等级为 L3，**必须有 L1 官方合同文件**",
-     "**未取得基金合同/招募说明书原始文件**",
-     "**只能作为研究评价基准，不得称为合同基准**"
+     "**未取得基金合同/招募说明书原始文件**"
     ],
     "category": "active_equity"
-   }
+   },
+   "lifecycle_bucket": "unknown_status"
   },
   {
    "fund_id": 69,
@@ -5613,21 +6686,44 @@
     "notes": []
    },
    "usability": {
-    "max_kind": "research",
+    "max_kind": "none",
     "contract_benchmark_usable": false,
-    "research_benchmark_usable": true,
-    "substitute_benchmark_usable": true,
     "fully_reproducible": false,
+    "research_benchmark_candidate": true,
+    "research_benchmark_usable": false,
+    "research_conditions": {
+     "index_code_mapped": true,
+     "history_data_available": true,
+     "return_basis_verified": false,
+     "basis_compatible_with_research": false,
+     "research_rule_declared": true,
+     "not_price_index_as_total_return": true
+    },
+    "substitute_benchmark_candidate": true,
+    "substitute_benchmark_usable": false,
+    "substitute_selection_provided": false,
+    "substitute_selection_complete": false,
+    "has_index_observation": true,
+    "has_verified_return_basis": false,
+    "index_observed_codes": [
+     "000300"
+    ],
+    "index_unknown_basis_codes": [
+     "000300"
+    ],
+    "index_verified_basis": [],
+    "basis_needs_declaration": [],
     "uncomputable_components": [
      "5%*银行同业存款利率（现金利率无历史序列）"
     ],
     "reasons": [
+     "**指数 ['000300'] 的 `return_basis` 为 `unknown`，点位数据不得当作合格收益序列**",
      "合同基准证据等级为 L3，**必须有 L1 官方合同文件**",
-     "**未取得基金合同/招募说明书原始文件**",
-     "**只能作为研究评价基准，不得称为合同基准**"
+     "**未取得基金合同/招募说明书原始文件**"
     ],
     "category": "index_plain"
-   }
+   },
+   "lifecycle_bucket": "unknown_status"
   },
   {
    "fund_id": 70,
@@ -5717,21 +6813,44 @@
     "notes": []
    },
    "usability": {
-    "max_kind": "research",
+    "max_kind": "none",
     "contract_benchmark_usable": false,
-    "research_benchmark_usable": true,
-    "substitute_benchmark_usable": true,
     "fully_reproducible": false,
+    "research_benchmark_candidate": true,
+    "research_benchmark_usable": false,
+    "research_conditions": {
+     "index_code_mapped": true,
+     "history_data_available": true,
+     "return_basis_verified": false,
+     "basis_compatible_with_research": false,
+     "research_rule_declared": true,
+     "not_price_index_as_total_return": true
+    },
+    "substitute_benchmark_candidate": true,
+    "substitute_benchmark_usable": false,
+    "substitute_selection_provided": false,
+    "substitute_selection_complete": false,
+    "has_index_observation": true,
+    "has_verified_return_basis": false,
+    "index_observed_codes": [
+     "000905"
+    ],
+    "index_unknown_basis_codes": [
+     "000905"
+    ],
+    "index_verified_basis": [],
+    "basis_needs_declaration": [],
     "uncomputable_components": [
      "人民币活期存款税后利率×5%（现金利率无历史序列）"
     ],
     "reasons": [
+     "**指数 ['000905'] 的 `return_basis` 为 `unknown`，点位数据不得当作合格收益序列**",
      "合同基准证据等级为 L3，**必须有 L1 官方合同文件**",
-     "**未取得基金合同/招募说明书原始文件**",
-     "**只能作为研究评价基准，不得称为合同基准**"
+     "**未取得基金合同/招募说明书原始文件**"
     ],
     "category": "etf_feeder"
-   }
+   },
+   "lifecycle_bucket": "unknown_status"
   },
   {
    "fund_id": 71,
@@ -5821,21 +6940,44 @@
     "notes": []
    },
    "usability": {
-    "max_kind": "research",
+    "max_kind": "none",
     "contract_benchmark_usable": false,
-    "research_benchmark_usable": true,
-    "substitute_benchmark_usable": true,
     "fully_reproducible": false,
+    "research_benchmark_candidate": true,
+    "research_benchmark_usable": false,
+    "research_conditions": {
+     "index_code_mapped": true,
+     "history_data_available": true,
+     "return_basis_verified": false,
+     "basis_compatible_with_research": false,
+     "research_rule_declared": true,
+     "not_price_index_as_total_return": true
+    },
+    "substitute_benchmark_candidate": true,
+    "substitute_benchmark_usable": false,
+    "substitute_selection_provided": false,
+    "substitute_selection_complete": false,
+    "has_index_observation": true,
+    "has_verified_return_basis": false,
+    "index_observed_codes": [
+     "000905"
+    ],
+    "index_unknown_basis_codes": [
+     "000905"
+    ],
+    "index_verified_basis": [],
+    "basis_needs_declaration": [],
     "uncomputable_components": [
      "中证综合债券指数（债券指数未接入）"
     ],
     "reasons": [
+     "**指数 ['000905'] 的 `return_basis` 为 `unknown`，点位数据不得当作合格收益序列**",
      "合同基准证据等级为 L3，**必须有 L1 官方合同文件**",
-     "**未取得基金合同/招募说明书原始文件**",
-     "**只能作为研究评价基准，不得称为合同基准**"
+     "**未取得基金合同/招募说明书原始文件**"
     ],
     "category": "active_equity"
-   }
+   },
+   "lifecycle_bucket": "unknown_status"
   },
   {
    "fund_id": 72,
@@ -5937,22 +7079,45 @@
     "notes": []
    },
    "usability": {
-    "max_kind": "research",
+    "max_kind": "none",
     "contract_benchmark_usable": false,
-    "research_benchmark_usable": true,
-    "substitute_benchmark_usable": true,
     "fully_reproducible": false,
+    "research_benchmark_candidate": true,
+    "research_benchmark_usable": false,
+    "research_conditions": {
+     "index_code_mapped": true,
+     "history_data_available": true,
+     "return_basis_verified": false,
+     "basis_compatible_with_research": false,
+     "research_rule_declared": true,
+     "not_price_index_as_total_return": true
+    },
+    "substitute_benchmark_candidate": true,
+    "substitute_benchmark_usable": false,
+    "substitute_selection_provided": false,
+    "substitute_selection_complete": false,
+    "has_index_observation": true,
+    "has_verified_return_basis": false,
+    "index_observed_codes": [
+     "000906"
+    ],
+    "index_unknown_basis_codes": [
+     "000906"
+    ],
+    "index_verified_basis": [],
+    "basis_needs_declaration": [],
     "uncomputable_components": [
      "上证国债指数（债券指数未接入）",
      "活期存款基准利率*5%（现金利率无历史序列）"
     ],
     "reasons": [
+     "**指数 ['000906'] 的 `return_basis` 为 `unknown`，点位数据不得当作合格收益序列**",
      "合同基准证据等级为 L3，**必须有 L1 官方合同文件**",
-     "**未取得基金合同/招募说明书原始文件**",
-     "**只能作为研究评价基准，不得称为合同基准**"
+     "**未取得基金合同/招募说明书原始文件**"
     ],
     "category": "active_equity"
-   }
+   },
+   "lifecycle_bucket": "unknown_status"
   },
   {
    "fund_id": 73,
@@ -6040,19 +7205,37 @@
    "usability": {
     "max_kind": "none",
     "contract_benchmark_usable": false,
-    "research_benchmark_usable": false,
-    "substitute_benchmark_usable": false,
     "fully_reproducible": false,
+    "research_benchmark_candidate": false,
+    "research_benchmark_usable": false,
+    "research_conditions": {
+     "index_code_mapped": false,
+     "history_data_available": false,
+     "return_basis_verified": false,
+     "basis_compatible_with_research": false,
+     "research_rule_declared": true,
+     "not_price_index_as_total_return": true
+    },
+    "substitute_benchmark_candidate": false,
+    "substitute_benchmark_usable": false,
+    "substitute_selection_provided": false,
+    "substitute_selection_complete": false,
+    "has_index_observation": false,
+    "has_verified_return_basis": false,
+    "index_observed_codes": [],
+    "index_unknown_basis_codes": [],
+    "index_verified_basis": [],
+    "basis_needs_declaration": [],
     "uncomputable_components": [
      "中债-优选投资级信用债财富指数（债券指数未接入）"
     ],
     "reasons": [
      "合同基准证据等级为 L3，**必须有 L1 官方合同文件**",
-     "**未取得基金合同/招募说明书原始文件**",
-     "**无任何可用收益序列，无法建立可靠基准**"
+     "**未取得基金合同/招募说明书原始文件**"
     ],
     "category": "pure_bond"
-   }
+   },
+   "lifecycle_bucket": "unknown_status"
   },
   {
    "fund_id": 74,
@@ -6135,20 +7318,38 @@
    "usability": {
     "max_kind": "none",
     "contract_benchmark_usable": false,
-    "research_benchmark_usable": false,
-    "substitute_benchmark_usable": false,
     "fully_reproducible": false,
+    "research_benchmark_candidate": false,
+    "research_benchmark_usable": false,
+    "research_conditions": {
+     "index_code_mapped": false,
+     "history_data_available": false,
+     "return_basis_verified": false,
+     "basis_compatible_with_research": false,
+     "research_rule_declared": true,
+     "not_price_index_as_total_return": true
+    },
+    "substitute_benchmark_candidate": false,
+    "substitute_benchmark_usable": false,
+    "substitute_selection_provided": false,
+    "substitute_selection_complete": false,
+    "has_index_observation": false,
+    "has_verified_return_basis": false,
+    "index_observed_codes": [],
+    "index_unknown_basis_codes": [],
+    "index_verified_basis": [],
+    "basis_needs_declaration": [],
     "uncomputable_components": [
      "活期存款利率（税后）（现金利率无历史序列）"
     ],
     "reasons": [
      "合同基准证据等级为 L3，**必须有 L1 官方合同文件**",
      "**未取得基金合同/招募说明书原始文件**",
-     "**无任何可用收益序列，无法建立可靠基准**",
      "货币基金使用万份收益/七日年化独立口径，**不与普通净值基金混算**"
     ],
     "category": "money_market"
-   }
+   },
+   "lifecycle_bucket": "unknown_status"
   },
   {
    "fund_id": 75,
@@ -6244,21 +7445,44 @@
     "notes": []
    },
    "usability": {
-    "max_kind": "research",
+    "max_kind": "none",
     "contract_benchmark_usable": false,
-    "research_benchmark_usable": true,
-    "substitute_benchmark_usable": true,
     "fully_reproducible": false,
+    "research_benchmark_candidate": true,
+    "research_benchmark_usable": false,
+    "research_conditions": {
+     "index_code_mapped": true,
+     "history_data_available": true,
+     "return_basis_verified": false,
+     "basis_compatible_with_research": false,
+     "research_rule_declared": true,
+     "not_price_index_as_total_return": true
+    },
+    "substitute_benchmark_candidate": true,
+    "substitute_benchmark_usable": false,
+    "substitute_selection_provided": false,
+    "substitute_selection_complete": false,
+    "has_index_observation": true,
+    "has_verified_return_basis": false,
+    "index_observed_codes": [
+     "000016"
+    ],
+    "index_unknown_basis_codes": [
+     "000016"
+    ],
+    "index_verified_basis": [],
+    "basis_needs_declaration": [],
     "uncomputable_components": [
      "银行活期存款利率（税后）×5%（现金利率无历史序列）"
     ],
     "reasons": [
+     "**指数 ['000016'] 的 `return_basis` 为 `unknown`，点位数据不得当作合格收益序列**",
      "合同基准证据等级为 L3，**必须有 L1 官方合同文件**",
-     "**未取得基金合同/招募说明书原始文件**",
-     "**只能作为研究评价基准，不得称为合同基准**"
+     "**未取得基金合同/招募说明书原始文件**"
     ],
     "category": "etf_feeder"
-   }
+   },
+   "lifecycle_bucket": "unknown_status"
   },
   {
    "fund_id": 76,
@@ -6347,21 +7571,44 @@
     "notes": []
    },
    "usability": {
-    "max_kind": "research",
+    "max_kind": "none",
     "contract_benchmark_usable": false,
-    "research_benchmark_usable": true,
-    "substitute_benchmark_usable": true,
     "fully_reproducible": false,
+    "research_benchmark_candidate": true,
+    "research_benchmark_usable": false,
+    "research_conditions": {
+     "index_code_mapped": true,
+     "history_data_available": true,
+     "return_basis_verified": false,
+     "basis_compatible_with_research": false,
+     "research_rule_declared": true,
+     "not_price_index_as_total_return": true
+    },
+    "substitute_benchmark_candidate": true,
+    "substitute_benchmark_usable": false,
+    "substitute_selection_provided": false,
+    "substitute_selection_complete": false,
+    "has_index_observation": true,
+    "has_verified_return_basis": false,
+    "index_observed_codes": [
+     "000906"
+    ],
+    "index_unknown_basis_codes": [
+     "000906"
+    ],
+    "index_verified_basis": [],
+    "basis_needs_declaration": [],
     "uncomputable_components": [
      "中债-综合全价（总值）指数（债券指数未接入）"
     ],
     "reasons": [
+     "**指数 ['000906'] 的 `return_basis` 为 `unknown`，点位数据不得当作合格收益序列**",
      "合同基准证据等级为 L3，**必须有 L1 官方合同文件**",
-     "**未取得基金合同/招募说明书原始文件**",
-     "**只能作为研究评价基准，不得称为合同基准**"
+     "**未取得基金合同/招募说明书原始文件**"
     ],
     "category": "active_equity"
-   }
+   },
+   "lifecycle_bucket": "unknown_status"
   },
   {
    "fund_id": 77,
@@ -6453,20 +7700,38 @@
    "usability": {
     "max_kind": "none",
     "contract_benchmark_usable": false,
-    "research_benchmark_usable": false,
-    "substitute_benchmark_usable": false,
     "fully_reproducible": false,
+    "research_benchmark_candidate": false,
+    "research_benchmark_usable": false,
+    "research_conditions": {
+     "index_code_mapped": false,
+     "history_data_available": false,
+     "return_basis_verified": false,
+     "basis_compatible_with_research": false,
+     "research_rule_declared": true,
+     "not_price_index_as_total_return": true
+    },
+    "substitute_benchmark_candidate": false,
+    "substitute_benchmark_usable": false,
+    "substitute_selection_provided": false,
+    "substitute_selection_complete": false,
+    "has_index_observation": false,
+    "has_verified_return_basis": false,
+    "index_observed_codes": [],
+    "index_unknown_basis_codes": [],
+    "index_verified_basis": [],
+    "basis_needs_declaration": [],
     "uncomputable_components": [
      "中证全指指数（未映射代码）",
      "中债-综合全价（总值）指数（债券指数未接入）"
     ],
     "reasons": [
      "合同基准证据等级为 L3，**必须有 L1 官方合同文件**",
-     "**未取得基金合同/招募说明书原始文件**",
-     "**无任何可用收益序列，无法建立可靠基准**"
+     "**未取得基金合同/招募说明书原始文件**"
     ],
     "category": "active_equity"
-   }
+   },
+   "lifecycle_bucket": "unknown_status"
   },
   {
    "fund_id": 78,
@@ -6559,20 +7824,38 @@
    "usability": {
     "max_kind": "none",
     "contract_benchmark_usable": false,
-    "research_benchmark_usable": false,
-    "substitute_benchmark_usable": false,
     "fully_reproducible": false,
+    "research_benchmark_candidate": false,
+    "research_benchmark_usable": false,
+    "research_conditions": {
+     "index_code_mapped": false,
+     "history_data_available": false,
+     "return_basis_verified": false,
+     "basis_compatible_with_research": false,
+     "research_rule_declared": true,
+     "not_price_index_as_total_return": true
+    },
+    "substitute_benchmark_candidate": false,
+    "substitute_benchmark_usable": false,
+    "substitute_selection_provided": false,
+    "substitute_selection_complete": false,
+    "has_index_observation": false,
+    "has_verified_return_basis": false,
+    "index_observed_codes": [],
+    "index_unknown_basis_codes": [],
+    "index_verified_basis": [],
+    "basis_needs_declaration": [],
     "uncomputable_components": [
      "中证A500指数（未映射代码）",
      "上证国债指数（债券指数未接入）"
     ],
     "reasons": [
      "合同基准证据等级为 L3，**必须有 L1 官方合同文件**",
-     "**未取得基金合同/招募说明书原始文件**",
-     "**无任何可用收益序列，无法建立可靠基准**"
+     "**未取得基金合同/招募说明书原始文件**"
     ],
     "category": "active_equity"
-   }
+   },
+   "lifecycle_bucket": "unknown_status"
   },
   {
    "fund_id": 79,
@@ -6662,21 +7945,44 @@
     "notes": []
    },
    "usability": {
-    "max_kind": "research",
+    "max_kind": "none",
     "contract_benchmark_usable": false,
-    "research_benchmark_usable": true,
-    "substitute_benchmark_usable": true,
     "fully_reproducible": false,
+    "research_benchmark_candidate": true,
+    "research_benchmark_usable": false,
+    "research_conditions": {
+     "index_code_mapped": true,
+     "history_data_available": true,
+     "return_basis_verified": false,
+     "basis_compatible_with_research": false,
+     "research_rule_declared": true,
+     "not_price_index_as_total_return": true
+    },
+    "substitute_benchmark_candidate": true,
+    "substitute_benchmark_usable": false,
+    "substitute_selection_provided": false,
+    "substitute_selection_complete": false,
+    "has_index_observation": true,
+    "has_verified_return_basis": false,
+    "index_observed_codes": [
+     "000300"
+    ],
+    "index_unknown_basis_codes": [
+     "000300"
+    ],
+    "index_verified_basis": [],
+    "basis_needs_declaration": [],
     "uncomputable_components": [
      "上证国债指数（债券指数未接入）"
     ],
     "reasons": [
+     "**指数 ['000300'] 的 `return_basis` 为 `unknown`，点位数据不得当作合格收益序列**",
      "合同基准证据等级为 L3，**必须有 L1 官方合同文件**",
-     "**未取得基金合同/招募说明书原始文件**",
-     "**只能作为研究评价基准，不得称为合同基准**"
+     "**未取得基金合同/招募说明书原始文件**"
     ],
     "category": "active_equity"
-   }
+   },
+   "lifecycle_bucket": "unknown_status"
   },
   {
    "fund_id": 80,
@@ -6766,21 +8072,44 @@
     "notes": []
    },
    "usability": {
-    "max_kind": "research",
+    "max_kind": "none",
     "contract_benchmark_usable": false,
-    "research_benchmark_usable": true,
-    "substitute_benchmark_usable": true,
     "fully_reproducible": false,
+    "research_benchmark_candidate": true,
+    "research_benchmark_usable": false,
+    "research_conditions": {
+     "index_code_mapped": true,
+     "history_data_available": true,
+     "return_basis_verified": false,
+     "basis_compatible_with_research": false,
+     "research_rule_declared": true,
+     "not_price_index_as_total_return": true
+    },
+    "substitute_benchmark_candidate": true,
+    "substitute_benchmark_usable": false,
+    "substitute_selection_provided": false,
+    "substitute_selection_complete": false,
+    "has_index_observation": true,
+    "has_verified_return_basis": false,
+    "index_observed_codes": [
+     "000300"
+    ],
+    "index_unknown_basis_codes": [
+     "000300"
+    ],
+    "index_verified_basis": [],
+    "basis_needs_declaration": [],
     "uncomputable_components": [
      "中证全债指数（债券指数未接入）"
     ],
     "reasons": [
+     "**指数 ['000300'] 的 `return_basis` 为 `unknown`，点位数据不得当作合格收益序列**",
      "合同基准证据等级为 L3，**必须有 L1 官方合同文件**",
-     "**未取得基金合同/招募说明书原始文件**",
-     "**只能作为研究评价基准，不得称为合同基准**"
+     "**未取得基金合同/招募说明书原始文件**"
     ],
     "category": "active_equity"
-   }
+   },
+   "lifecycle_bucket": "unknown_status"
   },
   {
    "fund_id": 81,
@@ -6869,21 +8198,44 @@
     "notes": []
    },
    "usability": {
-    "max_kind": "research",
+    "max_kind": "none",
     "contract_benchmark_usable": false,
-    "research_benchmark_usable": true,
-    "substitute_benchmark_usable": true,
     "fully_reproducible": false,
+    "research_benchmark_candidate": true,
+    "research_benchmark_usable": false,
+    "research_conditions": {
+     "index_code_mapped": true,
+     "history_data_available": true,
+     "return_basis_verified": false,
+     "basis_compatible_with_research": false,
+     "research_rule_declared": true,
+     "not_price_index_as_total_return": true
+    },
+    "substitute_benchmark_candidate": true,
+    "substitute_benchmark_usable": false,
+    "substitute_selection_provided": false,
+    "substitute_selection_complete": false,
+    "has_index_observation": true,
+    "has_verified_return_basis": false,
+    "index_observed_codes": [
+     "000906"
+    ],
+    "index_unknown_basis_codes": [
+     "000906"
+    ],
+    "index_verified_basis": [],
+    "basis_needs_declaration": [],
     "uncomputable_components": [
      "中债-综合财富（总值）指数（债券指数未接入）"
     ],
     "reasons": [
+     "**指数 ['000906'] 的 `return_basis` 为 `unknown`，点位数据不得当作合格收益序列**",
      "合同基准证据等级为 L3，**必须有 L1 官方合同文件**",
-     "**未取得基金合同/招募说明书原始文件**",
-     "**只能作为研究评价基准，不得称为合同基准**"
+     "**未取得基金合同/招募说明书原始文件**"
     ],
     "category": "active_equity"
-   }
+   },
+   "lifecycle_bucket": "unknown_status"
   },
   {
    "fund_id": 82,
@@ -6973,21 +8325,44 @@
     "notes": []
    },
    "usability": {
-    "max_kind": "research",
+    "max_kind": "none",
     "contract_benchmark_usable": false,
-    "research_benchmark_usable": true,
-    "substitute_benchmark_usable": true,
     "fully_reproducible": false,
+    "research_benchmark_candidate": true,
+    "research_benchmark_usable": false,
+    "research_conditions": {
+     "index_code_mapped": true,
+     "history_data_available": true,
+     "return_basis_verified": false,
+     "basis_compatible_with_research": false,
+     "research_rule_declared": true,
+     "not_price_index_as_total_return": true
+    },
+    "substitute_benchmark_candidate": true,
+    "substitute_benchmark_usable": false,
+    "substitute_selection_provided": false,
+    "substitute_selection_complete": false,
+    "has_index_observation": true,
+    "has_verified_return_basis": false,
+    "index_observed_codes": [
+     "000300"
+    ],
+    "index_unknown_basis_codes": [
+     "000300"
+    ],
+    "index_verified_basis": [],
+    "basis_needs_declaration": [],
     "uncomputable_components": [
      "中债综合指数（债券指数未接入）"
     ],
     "reasons": [
+     "**指数 ['000300'] 的 `return_basis` 为 `unknown`，点位数据不得当作合格收益序列**",
      "合同基准证据等级为 L3，**必须有 L1 官方合同文件**",
-     "**未取得基金合同/招募说明书原始文件**",
-     "**只能作为研究评价基准，不得称为合同基准**"
+     "**未取得基金合同/招募说明书原始文件**"
     ],
     "category": "active_equity"
-   }
+   },
+   "lifecycle_bucket": "unknown_status"
   },
   {
    "fund_id": 83,
@@ -7088,22 +8463,45 @@
     "notes": []
    },
    "usability": {
-    "max_kind": "research",
+    "max_kind": "none",
     "contract_benchmark_usable": false,
-    "research_benchmark_usable": true,
-    "substitute_benchmark_usable": true,
     "fully_reproducible": false,
+    "research_benchmark_candidate": true,
+    "research_benchmark_usable": false,
+    "research_conditions": {
+     "index_code_mapped": true,
+     "history_data_available": true,
+     "return_basis_verified": false,
+     "basis_compatible_with_research": false,
+     "research_rule_declared": true,
+     "not_price_index_as_total_return": true
+    },
+    "substitute_benchmark_candidate": true,
+    "substitute_benchmark_usable": false,
+    "substitute_selection_provided": false,
+    "substitute_selection_complete": false,
+    "has_index_observation": true,
+    "has_verified_return_basis": false,
+    "index_observed_codes": [
+     "000300"
+    ],
+    "index_unknown_basis_codes": [
+     "000300"
+    ],
+    "index_verified_basis": [],
+    "basis_needs_declaration": [],
     "uncomputable_components": [
      "中债-总财富（1-3年）指数（债券指数未接入）",
      "活期存款基准利率×5%（现金利率无历史序列）"
     ],
     "reasons": [
+     "**指数 ['000300'] 的 `return_basis` 为 `unknown`，点位数据不得当作合格收益序列**",
      "合同基准证据等级为 L3，**必须有 L1 官方合同文件**",
-     "**未取得基金合同/招募说明书原始文件**",
-     "**只能作为研究评价基准，不得称为合同基准**"
+     "**未取得基金合同/招募说明书原始文件**"
     ],
     "category": "active_equity"
-   }
+   },
+   "lifecycle_bucket": "unknown_status"
   },
   {
    "fund_id": 84,
@@ -7208,9 +8606,27 @@
    "usability": {
     "max_kind": "none",
     "contract_benchmark_usable": false,
-    "research_benchmark_usable": false,
-    "substitute_benchmark_usable": false,
     "fully_reproducible": false,
+    "research_benchmark_candidate": false,
+    "research_benchmark_usable": false,
+    "research_conditions": {
+     "index_code_mapped": false,
+     "history_data_available": false,
+     "return_basis_verified": false,
+     "basis_compatible_with_research": false,
+     "research_rule_declared": true,
+     "not_price_index_as_total_return": true
+    },
+    "substitute_benchmark_candidate": false,
+    "substitute_benchmark_usable": false,
+    "substitute_selection_provided": false,
+    "substitute_selection_complete": false,
+    "has_index_observation": false,
+    "has_verified_return_basis": false,
+    "index_observed_codes": [],
+    "index_unknown_basis_codes": [],
+    "index_verified_basis": [],
+    "basis_needs_declaration": [],
     "uncomputable_components": [
      "中证可转换债券指数（债券指数未接入）",
      "中证综合债指数（债券指数未接入）",
@@ -7218,11 +8634,11 @@
     ],
     "reasons": [
      "合同基准证据等级为 L3，**必须有 L1 官方合同文件**",
-     "**未取得基金合同/招募说明书原始文件**",
-     "**无任何可用收益序列，无法建立可靠基准**"
+     "**未取得基金合同/招募说明书原始文件**"
     ],
     "category": "mixed_bond"
-   }
+   },
+   "lifecycle_bucket": "unknown_status"
   },
   {
    "fund_id": 85,
@@ -7338,9 +8754,27 @@
    "usability": {
     "max_kind": "none",
     "contract_benchmark_usable": false,
-    "research_benchmark_usable": false,
-    "substitute_benchmark_usable": false,
     "fully_reproducible": false,
+    "research_benchmark_candidate": false,
+    "research_benchmark_usable": false,
+    "research_conditions": {
+     "index_code_mapped": false,
+     "history_data_available": false,
+     "return_basis_verified": false,
+     "basis_compatible_with_research": false,
+     "research_rule_declared": true,
+     "not_price_index_as_total_return": true
+    },
+    "substitute_benchmark_candidate": false,
+    "substitute_benchmark_usable": false,
+    "substitute_selection_provided": false,
+    "substitute_selection_complete": false,
+    "has_index_observation": false,
+    "has_verified_return_basis": false,
+    "index_observed_codes": [],
+    "index_unknown_basis_codes": [],
+    "index_verified_basis": [],
+    "basis_needs_declaration": [],
     "uncomputable_components": [
      "中证A500指数（未映射代码）",
      "中债-新综合财富（1-3年）指数（债券指数未接入）",
@@ -7349,11 +8783,11 @@
     ],
     "reasons": [
      "合同基准证据等级为 L3，**必须有 L1 官方合同文件**",
-     "**未取得基金合同/招募说明书原始文件**",
-     "**无任何可用收益序列，无法建立可靠基准**"
+     "**未取得基金合同/招募说明书原始文件**"
     ],
     "category": "mixed_bond"
-   }
+   },
+   "lifecycle_bucket": "unknown_status"
   },
   {
    "fund_id": 86,
@@ -7442,21 +8876,44 @@
     "notes": []
    },
    "usability": {
-    "max_kind": "research",
+    "max_kind": "none",
     "contract_benchmark_usable": false,
-    "research_benchmark_usable": true,
-    "substitute_benchmark_usable": true,
     "fully_reproducible": false,
+    "research_benchmark_candidate": true,
+    "research_benchmark_usable": false,
+    "research_conditions": {
+     "index_code_mapped": true,
+     "history_data_available": true,
+     "return_basis_verified": false,
+     "basis_compatible_with_research": false,
+     "research_rule_declared": true,
+     "not_price_index_as_total_return": true
+    },
+    "substitute_benchmark_candidate": true,
+    "substitute_benchmark_usable": false,
+    "substitute_selection_provided": false,
+    "substitute_selection_complete": false,
+    "has_index_observation": true,
+    "has_verified_return_basis": false,
+    "index_observed_codes": [
+     "000300"
+    ],
+    "index_unknown_basis_codes": [
+     "000300"
+    ],
+    "index_verified_basis": [],
+    "basis_needs_declaration": [],
     "uncomputable_components": [
      "中债-优选投资级信用债全价（总值）指数（债券指数未接入）"
     ],
     "reasons": [
+     "**指数 ['000300'] 的 `return_basis` 为 `unknown`，点位数据不得当作合格收益序列**",
      "合同基准证据等级为 L3，**必须有 L1 官方合同文件**",
-     "**未取得基金合同/招募说明书原始文件**",
-     "**只能作为研究评价基准，不得称为合同基准**"
+     "**未取得基金合同/招募说明书原始文件**"
     ],
     "category": "mixed_bond"
-   }
+   },
+   "lifecycle_bucket": "unknown_status"
   },
   {
    "fund_id": 87,
@@ -7548,20 +9005,38 @@
    "usability": {
     "max_kind": "none",
     "contract_benchmark_usable": false,
-    "research_benchmark_usable": false,
-    "substitute_benchmark_usable": false,
     "fully_reproducible": false,
+    "research_benchmark_candidate": false,
+    "research_benchmark_usable": false,
+    "research_conditions": {
+     "index_code_mapped": false,
+     "history_data_available": false,
+     "return_basis_verified": false,
+     "basis_compatible_with_research": false,
+     "research_rule_declared": true,
+     "not_price_index_as_total_return": true
+    },
+    "substitute_benchmark_candidate": false,
+    "substitute_benchmark_usable": false,
+    "substitute_selection_provided": false,
+    "substitute_selection_complete": false,
+    "has_index_observation": false,
+    "has_verified_return_basis": false,
+    "index_observed_codes": [],
+    "index_unknown_basis_codes": [],
+    "index_verified_basis": [],
+    "basis_needs_declaration": [],
     "uncomputable_components": [
      "三年期银行定期存款利率(税后)（现金利率无历史序列）",
      "1.5%（无法识别）"
     ],
     "reasons": [
      "合同基准证据等级为 L3，**必须有 L1 官方合同文件**",
-     "**未取得基金合同/招募说明书原始文件**",
-     "**无任何可用收益序列，无法建立可靠基准**"
+     "**未取得基金合同/招募说明书原始文件**"
     ],
     "category": "mixed_bond"
-   }
+   },
+   "lifecycle_bucket": "unknown_status"
   },
   {
    "fund_id": 88,
@@ -7663,22 +9138,45 @@
     "notes": []
    },
    "usability": {
-    "max_kind": "research",
+    "max_kind": "none",
     "contract_benchmark_usable": false,
-    "research_benchmark_usable": true,
-    "substitute_benchmark_usable": true,
     "fully_reproducible": false,
+    "research_benchmark_candidate": true,
+    "research_benchmark_usable": false,
+    "research_conditions": {
+     "index_code_mapped": true,
+     "history_data_available": true,
+     "return_basis_verified": false,
+     "basis_compatible_with_research": false,
+     "research_rule_declared": true,
+     "not_price_index_as_total_return": true
+    },
+    "substitute_benchmark_candidate": true,
+    "substitute_benchmark_usable": false,
+    "substitute_selection_provided": false,
+    "substitute_selection_complete": false,
+    "has_index_observation": true,
+    "has_verified_return_basis": false,
+    "index_observed_codes": [
+     "000300"
+    ],
+    "index_unknown_basis_codes": [
+     "000300"
+    ],
+    "index_verified_basis": [],
+    "basis_needs_declaration": [],
     "uncomputable_components": [
      "中证可转换债券指数（债券指数未接入）",
      "一年期定期存款基准利率×5%（现金利率无历史序列）"
     ],
     "reasons": [
+     "**指数 ['000300'] 的 `return_basis` 为 `unknown`，点位数据不得当作合格收益序列**",
      "合同基准证据等级为 L3，**必须有 L1 官方合同文件**",
-     "**未取得基金合同/招募说明书原始文件**",
-     "**只能作为研究评价基准，不得称为合同基准**"
+     "**未取得基金合同/招募说明书原始文件**"
     ],
     "category": "mixed_bond"
-   }
+   },
+   "lifecycle_bucket": "unknown_status"
   },
   {
    "fund_id": 89,
@@ -7767,21 +9265,44 @@
     "notes": []
    },
    "usability": {
-    "max_kind": "research",
+    "max_kind": "none",
     "contract_benchmark_usable": false,
-    "research_benchmark_usable": true,
-    "substitute_benchmark_usable": true,
     "fully_reproducible": false,
+    "research_benchmark_candidate": true,
+    "research_benchmark_usable": false,
+    "research_conditions": {
+     "index_code_mapped": true,
+     "history_data_available": true,
+     "return_basis_verified": false,
+     "basis_compatible_with_research": false,
+     "research_rule_declared": true,
+     "not_price_index_as_total_return": true
+    },
+    "substitute_benchmark_candidate": true,
+    "substitute_benchmark_usable": false,
+    "substitute_selection_provided": false,
+    "substitute_selection_complete": false,
+    "has_index_observation": true,
+    "has_verified_return_basis": false,
+    "index_observed_codes": [
+     "000300"
+    ],
+    "index_unknown_basis_codes": [
+     "000300"
+    ],
+    "index_verified_basis": [],
+    "basis_needs_declaration": [],
     "uncomputable_components": [
      "中债综合全价指数（债券指数未接入）"
     ],
     "reasons": [
+     "**指数 ['000300'] 的 `return_basis` 为 `unknown`，点位数据不得当作合格收益序列**",
      "合同基准证据等级为 L3，**必须有 L1 官方合同文件**",
-     "**未取得基金合同/招募说明书原始文件**",
-     "**只能作为研究评价基准，不得称为合同基准**"
+     "**未取得基金合同/招募说明书原始文件**"
     ],
     "category": "mixed_bond"
-   }
+   },
+   "lifecycle_bucket": "unknown_status"
   },
   {
    "fund_id": 90,
@@ -7873,20 +9394,38 @@
    "usability": {
     "max_kind": "none",
     "contract_benchmark_usable": false,
-    "research_benchmark_usable": false,
-    "substitute_benchmark_usable": false,
     "fully_reproducible": false,
+    "research_benchmark_candidate": false,
+    "research_benchmark_usable": false,
+    "research_conditions": {
+     "index_code_mapped": false,
+     "history_data_available": false,
+     "return_basis_verified": false,
+     "basis_compatible_with_research": false,
+     "research_rule_declared": true,
+     "not_price_index_as_total_return": true
+    },
+    "substitute_benchmark_candidate": false,
+    "substitute_benchmark_usable": false,
+    "substitute_selection_provided": false,
+    "substitute_selection_complete": false,
+    "has_index_observation": false,
+    "has_verified_return_basis": false,
+    "index_observed_codes": [],
+    "index_unknown_basis_codes": [],
+    "index_verified_basis": [],
+    "basis_needs_declaration": [],
     "uncomputable_components": [
      "一年期银行定期存款税后收益率（现金利率无历史序列）",
      "1.2%（无法识别）"
     ],
     "reasons": [
      "合同基准证据等级为 L3，**必须有 L1 官方合同文件**",
-     "**未取得基金合同/招募说明书原始文件**",
-     "**无任何可用收益序列，无法建立可靠基准**"
+     "**未取得基金合同/招募说明书原始文件**"
     ],
     "category": "mixed_bond"
-   }
+   },
+   "lifecycle_bucket": "unknown_status"
   },
   {
    "fund_id": 91,
@@ -7978,20 +9517,38 @@
    "usability": {
     "max_kind": "none",
     "contract_benchmark_usable": false,
-    "research_benchmark_usable": false,
-    "substitute_benchmark_usable": false,
     "fully_reproducible": false,
+    "research_benchmark_candidate": false,
+    "research_benchmark_usable": false,
+    "research_conditions": {
+     "index_code_mapped": false,
+     "history_data_available": false,
+     "return_basis_verified": false,
+     "basis_compatible_with_research": false,
+     "research_rule_declared": true,
+     "not_price_index_as_total_return": true
+    },
+    "substitute_benchmark_candidate": false,
+    "substitute_benchmark_usable": false,
+    "substitute_selection_provided": false,
+    "substitute_selection_complete": false,
+    "has_index_observation": false,
+    "has_verified_return_basis": false,
+    "index_observed_codes": [],
+    "index_unknown_basis_codes": [],
+    "index_verified_basis": [],
+    "basis_needs_declaration": [],
     "uncomputable_components": [
      "一年期定期存款税后利率（现金利率无历史序列）",
      "1.2%（无法识别）"
     ],
     "reasons": [
      "合同基准证据等级为 L3，**必须有 L1 官方合同文件**",
-     "**未取得基金合同/招募说明书原始文件**",
-     "**无任何可用收益序列，无法建立可靠基准**"
+     "**未取得基金合同/招募说明书原始文件**"
     ],
     "category": "mixed_bond"
-   }
+   },
+   "lifecycle_bucket": "unknown_status"
   },
   {
    "fund_id": 92,
@@ -8094,9 +9651,27 @@
    "usability": {
     "max_kind": "none",
     "contract_benchmark_usable": false,
-    "research_benchmark_usable": false,
-    "substitute_benchmark_usable": false,
     "fully_reproducible": false,
+    "research_benchmark_candidate": false,
+    "research_benchmark_usable": false,
+    "research_conditions": {
+     "index_code_mapped": false,
+     "history_data_available": false,
+     "return_basis_verified": false,
+     "basis_compatible_with_research": false,
+     "research_rule_declared": true,
+     "not_price_index_as_total_return": true
+    },
+    "substitute_benchmark_candidate": false,
+    "substitute_benchmark_usable": false,
+    "substitute_selection_provided": false,
+    "substitute_selection_complete": false,
+    "has_index_observation": false,
+    "has_verified_return_basis": false,
+    "index_observed_codes": [],
+    "index_unknown_basis_codes": [],
+    "index_verified_basis": [],
+    "basis_needs_declaration": [],
     "uncomputable_components": [
      "中债-企业债总全价（总值）指数（债券指数未接入）",
      "中债-国债总全价（总值）指数（债券指数未接入）",
@@ -8104,11 +9679,11 @@
     ],
     "reasons": [
      "合同基准证据等级为 L3，**必须有 L1 官方合同文件**",
-     "**未取得基金合同/招募说明书原始文件**",
-     "**无任何可用收益序列，无法建立可靠基准**"
+     "**未取得基金合同/招募说明书原始文件**"
     ],
     "category": "mixed_bond"
-   }
+   },
+   "lifecycle_bucket": "unknown_status"
   },
   {
    "fund_id": 93,
@@ -8200,20 +9775,38 @@
    "usability": {
     "max_kind": "none",
     "contract_benchmark_usable": false,
-    "research_benchmark_usable": false,
-    "substitute_benchmark_usable": false,
     "fully_reproducible": false,
+    "research_benchmark_candidate": false,
+    "research_benchmark_usable": false,
+    "research_conditions": {
+     "index_code_mapped": false,
+     "history_data_available": false,
+     "return_basis_verified": false,
+     "basis_compatible_with_research": false,
+     "research_rule_declared": true,
+     "not_price_index_as_total_return": true
+    },
+    "substitute_benchmark_candidate": false,
+    "substitute_benchmark_usable": false,
+    "substitute_selection_provided": false,
+    "substitute_selection_complete": false,
+    "has_index_observation": false,
+    "has_verified_return_basis": false,
+    "index_observed_codes": [],
+    "index_unknown_basis_codes": [],
+    "index_verified_basis": [],
+    "basis_needs_declaration": [],
     "uncomputable_components": [
      "中债-优选投资级信用债财富（总值）指数（债券指数未接入）",
      "活期存款基准利率×5%（现金利率无历史序列）"
     ],
     "reasons": [
      "合同基准证据等级为 L3，**必须有 L1 官方合同文件**",
-     "**未取得基金合同/招募说明书原始文件**",
-     "**无任何可用收益序列，无法建立可靠基准**"
+     "**未取得基金合同/招募说明书原始文件**"
     ],
     "category": "pure_bond"
-   }
+   },
+   "lifecycle_bucket": "unknown_status"
   },
   {
    "fund_id": 94,
@@ -8304,20 +9897,38 @@
    "usability": {
     "max_kind": "none",
     "contract_benchmark_usable": false,
-    "research_benchmark_usable": false,
-    "substitute_benchmark_usable": false,
     "fully_reproducible": false,
+    "research_benchmark_candidate": false,
+    "research_benchmark_usable": false,
+    "research_conditions": {
+     "index_code_mapped": false,
+     "history_data_available": false,
+     "return_basis_verified": false,
+     "basis_compatible_with_research": false,
+     "research_rule_declared": true,
+     "not_price_index_as_total_return": true
+    },
+    "substitute_benchmark_candidate": false,
+    "substitute_benchmark_usable": false,
+    "substitute_selection_provided": false,
+    "substitute_selection_complete": false,
+    "has_index_observation": false,
+    "has_verified_return_basis": false,
+    "index_observed_codes": [],
+    "index_unknown_basis_codes": [],
+    "index_verified_basis": [],
+    "basis_needs_declaration": [],
     "uncomputable_components": [
      "中债-综合全价（1-3年）指数（债券指数未接入）",
      "中证可转换债券（全价）指数（债券指数未接入）"
     ],
     "reasons": [
      "合同基准证据等级为 L3，**必须有 L1 官方合同文件**",
-     "**未取得基金合同/招募说明书原始文件**",
-     "**无任何可用收益序列，无法建立可靠基准**"
+     "**未取得基金合同/招募说明书原始文件**"
     ],
     "category": "mixed_bond"
-   }
+   },
+   "lifecycle_bucket": "unknown_status"
   },
   {
    "fund_id": 95,
@@ -8400,19 +10011,37 @@
    "usability": {
     "max_kind": "none",
     "contract_benchmark_usable": false,
-    "research_benchmark_usable": false,
-    "substitute_benchmark_usable": false,
     "fully_reproducible": false,
+    "research_benchmark_candidate": false,
+    "research_benchmark_usable": false,
+    "research_conditions": {
+     "index_code_mapped": false,
+     "history_data_available": false,
+     "return_basis_verified": false,
+     "basis_compatible_with_research": false,
+     "research_rule_declared": true,
+     "not_price_index_as_total_return": true
+    },
+    "substitute_benchmark_candidate": false,
+    "substitute_benchmark_usable": false,
+    "substitute_selection_provided": false,
+    "substitute_selection_complete": false,
+    "has_index_observation": false,
+    "has_verified_return_basis": false,
+    "index_observed_codes": [],
+    "index_unknown_basis_codes": [],
+    "index_verified_basis": [],
+    "basis_needs_declaration": [],
     "uncomputable_components": [
      "中债总指数（债券指数未接入）"
     ],
     "reasons": [
      "合同基准证据等级为 L3，**必须有 L1 官方合同文件**",
-     "**未取得基金合同/招募说明书原始文件**",
-     "**无任何可用收益序列，无法建立可靠基准**"
+     "**未取得基金合同/招募说明书原始文件**"
     ],
     "category": "pure_bond"
-   }
+   },
+   "lifecycle_bucket": "unknown_status"
   },
   {
    "fund_id": 96,
@@ -8502,21 +10131,44 @@
     "notes": []
    },
    "usability": {
-    "max_kind": "research",
+    "max_kind": "none",
     "contract_benchmark_usable": false,
-    "research_benchmark_usable": true,
-    "substitute_benchmark_usable": true,
     "fully_reproducible": false,
+    "research_benchmark_candidate": true,
+    "research_benchmark_usable": false,
+    "research_conditions": {
+     "index_code_mapped": true,
+     "history_data_available": true,
+     "return_basis_verified": false,
+     "basis_compatible_with_research": false,
+     "research_rule_declared": true,
+     "not_price_index_as_total_return": true
+    },
+    "substitute_benchmark_candidate": true,
+    "substitute_benchmark_usable": false,
+    "substitute_selection_provided": false,
+    "substitute_selection_complete": false,
+    "has_index_observation": true,
+    "has_verified_return_basis": false,
+    "index_observed_codes": [
+     "000905"
+    ],
+    "index_unknown_basis_codes": [
+     "000905"
+    ],
+    "index_verified_basis": [],
+    "basis_needs_declaration": [],
     "uncomputable_components": [
      "银行活期存款税后利率*5%（现金利率无历史序列）"
     ],
     "reasons": [
+     "**指数 ['000905'] 的 `return_basis` 为 `unknown`，点位数据不得当作合格收益序列**",
      "合同基准证据等级为 L3，**必须有 L1 官方合同文件**",
-     "**未取得基金合同/招募说明书原始文件**",
-     "**只能作为研究评价基准，不得称为合同基准**"
+     "**未取得基金合同/招募说明书原始文件**"
     ],
     "category": "etf_feeder"
-   }
+   },
+   "lifecycle_bucket": "unknown_status"
   },
   {
    "fund_id": 97,
@@ -8606,21 +10258,44 @@
     "notes": []
    },
    "usability": {
-    "max_kind": "research",
+    "max_kind": "none",
     "contract_benchmark_usable": false,
-    "research_benchmark_usable": true,
-    "substitute_benchmark_usable": true,
     "fully_reproducible": false,
+    "research_benchmark_candidate": true,
+    "research_benchmark_usable": false,
+    "research_conditions": {
+     "index_code_mapped": true,
+     "history_data_available": true,
+     "return_basis_verified": false,
+     "basis_compatible_with_research": false,
+     "research_rule_declared": true,
+     "not_price_index_as_total_return": true
+    },
+    "substitute_benchmark_candidate": true,
+    "substitute_benchmark_usable": false,
+    "substitute_selection_provided": false,
+    "substitute_selection_complete": false,
+    "has_index_observation": true,
+    "has_verified_return_basis": false,
+    "index_observed_codes": [
+     "000905"
+    ],
+    "index_unknown_basis_codes": [
+     "000905"
+    ],
+    "index_verified_basis": [],
+    "basis_needs_declaration": [],
     "uncomputable_components": [
      "银行活期存款利率（税后）×5%（现金利率无历史序列）"
     ],
     "reasons": [
+     "**指数 ['000905'] 的 `return_basis` 为 `unknown`，点位数据不得当作合格收益序列**",
      "合同基准证据等级为 L3，**必须有 L1 官方合同文件**",
-     "**未取得基金合同/招募说明书原始文件**",
-     "**只能作为研究评价基准，不得称为合同基准**"
+     "**未取得基金合同/招募说明书原始文件**"
     ],
     "category": "index_plain"
-   }
+   },
+   "lifecycle_bucket": "unknown_status"
   },
   {
    "fund_id": 98,
@@ -8710,21 +10385,44 @@
     "notes": []
    },
    "usability": {
-    "max_kind": "research",
+    "max_kind": "none",
     "contract_benchmark_usable": false,
-    "research_benchmark_usable": true,
-    "substitute_benchmark_usable": true,
     "fully_reproducible": false,
+    "research_benchmark_candidate": true,
+    "research_benchmark_usable": false,
+    "research_conditions": {
+     "index_code_mapped": true,
+     "history_data_available": true,
+     "return_basis_verified": false,
+     "basis_compatible_with_research": false,
+     "research_rule_declared": true,
+     "not_price_index_as_total_return": true
+    },
+    "substitute_benchmark_candidate": true,
+    "substitute_benchmark_usable": false,
+    "substitute_selection_provided": false,
+    "substitute_selection_complete": false,
+    "has_index_observation": true,
+    "has_verified_return_basis": false,
+    "index_observed_codes": [
+     "000905"
+    ],
+    "index_unknown_basis_codes": [
+     "000905"
+    ],
+    "index_verified_basis": [],
+    "basis_needs_declaration": [],
     "uncomputable_components": [
      "5%*银行活期存款利率（税后）（现金利率无历史序列）"
     ],
     "reasons": [
+     "**指数 ['000905'] 的 `return_basis` 为 `unknown`，点位数据不得当作合格收益序列**",
      "合同基准证据等级为 L3，**必须有 L1 官方合同文件**",
-     "**未取得基金合同/招募说明书原始文件**",
-     "**只能作为研究评价基准，不得称为合同基准**"
+     "**未取得基金合同/招募说明书原始文件**"
     ],
     "category": "etf_feeder"
-   }
+   },
+   "lifecycle_bucket": "unknown_status"
   },
   {
    "fund_id": 99,
@@ -8807,20 +10505,38 @@
    "usability": {
     "max_kind": "none",
     "contract_benchmark_usable": false,
-    "research_benchmark_usable": false,
-    "substitute_benchmark_usable": false,
     "fully_reproducible": false,
+    "research_benchmark_candidate": false,
+    "research_benchmark_usable": false,
+    "research_conditions": {
+     "index_code_mapped": false,
+     "history_data_available": false,
+     "return_basis_verified": false,
+     "basis_compatible_with_research": false,
+     "research_rule_declared": true,
+     "not_price_index_as_total_return": true
+    },
+    "substitute_benchmark_candidate": false,
+    "substitute_benchmark_usable": false,
+    "substitute_selection_provided": false,
+    "substitute_selection_complete": false,
+    "has_index_observation": false,
+    "has_verified_return_basis": false,
+    "index_observed_codes": [],
+    "index_unknown_basis_codes": [],
+    "index_verified_basis": [],
+    "basis_needs_declaration": [],
     "uncomputable_components": [
      "活期存款基准利率×(1－利息税税率)（现金利率无历史序列）"
     ],
     "reasons": [
      "合同基准证据等级为 L3，**必须有 L1 官方合同文件**",
      "**未取得基金合同/招募说明书原始文件**",
-     "**无任何可用收益序列，无法建立可靠基准**",
      "货币基金使用万份收益/七日年化独立口径，**不与普通净值基金混算**"
     ],
     "category": "money_market"
-   }
+   },
+   "lifecycle_bucket": "unknown_status"
   },
   {
    "fund_id": 100,
@@ -8903,20 +10619,38 @@
    "usability": {
     "max_kind": "none",
     "contract_benchmark_usable": false,
-    "research_benchmark_usable": false,
-    "substitute_benchmark_usable": false,
     "fully_reproducible": false,
+    "research_benchmark_candidate": false,
+    "research_benchmark_usable": false,
+    "research_conditions": {
+     "index_code_mapped": false,
+     "history_data_available": false,
+     "return_basis_verified": false,
+     "basis_compatible_with_research": false,
+     "research_rule_declared": true,
+     "not_price_index_as_total_return": true
+    },
+    "substitute_benchmark_candidate": false,
+    "substitute_benchmark_usable": false,
+    "substitute_selection_provided": false,
+    "substitute_selection_complete": false,
+    "has_index_observation": false,
+    "has_verified_return_basis": false,
+    "index_observed_codes": [],
+    "index_unknown_basis_codes": [],
+    "index_verified_basis": [],
+    "basis_needs_declaration": [],
     "uncomputable_components": [
      "同期7天通知存款利率（税后）（现金利率无历史序列）"
     ],
     "reasons": [
      "合同基准证据等级为 L3，**必须有 L1 官方合同文件**",
      "**未取得基金合同/招募说明书原始文件**",
-     "**无任何可用收益序列，无法建立可靠基准**",
      "货币基金使用万份收益/七日年化独立口径，**不与普通净值基金混算**"
     ],
     "category": "money_market"
-   }
+   },
+   "lifecycle_bucket": "unknown_status"
   },
   {
    "fund_id": 101,
@@ -8999,20 +10733,38 @@
    "usability": {
     "max_kind": "none",
     "contract_benchmark_usable": false,
-    "research_benchmark_usable": false,
-    "substitute_benchmark_usable": false,
     "fully_reproducible": false,
+    "research_benchmark_candidate": false,
+    "research_benchmark_usable": false,
+    "research_conditions": {
+     "index_code_mapped": false,
+     "history_data_available": false,
+     "return_basis_verified": false,
+     "basis_compatible_with_research": false,
+     "research_rule_declared": true,
+     "not_price_index_as_total_return": true
+    },
+    "substitute_benchmark_candidate": false,
+    "substitute_benchmark_usable": false,
+    "substitute_selection_provided": false,
+    "substitute_selection_complete": false,
+    "has_index_observation": false,
+    "has_verified_return_basis": false,
+    "index_observed_codes": [],
+    "index_unknown_basis_codes": [],
+    "index_verified_basis": [],
+    "basis_needs_declaration": [],
     "uncomputable_components": [
      "人民币活期存款利率(税后)（现金利率无历史序列）"
     ],
     "reasons": [
      "合同基准证据等级为 L3，**必须有 L1 官方合同文件**",
      "**未取得基金合同/招募说明书原始文件**",
-     "**无任何可用收益序列，无法建立可靠基准**",
      "货币基金使用万份收益/七日年化独立口径，**不与普通净值基金混算**"
     ],
     "category": "money_market"
-   }
+   },
+   "lifecycle_bucket": "unknown_status"
   },
   {
    "fund_id": 102,
@@ -9095,20 +10847,38 @@
    "usability": {
     "max_kind": "none",
     "contract_benchmark_usable": false,
-    "research_benchmark_usable": false,
-    "substitute_benchmark_usable": false,
     "fully_reproducible": false,
+    "research_benchmark_candidate": false,
+    "research_benchmark_usable": false,
+    "research_conditions": {
+     "index_code_mapped": false,
+     "history_data_available": false,
+     "return_basis_verified": false,
+     "basis_compatible_with_research": false,
+     "research_rule_declared": true,
+     "not_price_index_as_total_return": true
+    },
+    "substitute_benchmark_candidate": false,
+    "substitute_benchmark_usable": false,
+    "substitute_selection_provided": false,
+    "substitute_selection_complete": false,
+    "has_index_observation": false,
+    "has_verified_return_basis": false,
+    "index_observed_codes": [],
+    "index_unknown_basis_codes": [],
+    "index_verified_basis": [],
+    "basis_needs_declaration": [],
     "uncomputable_components": [
      "七天通知存款利率(税后)（现金利率无历史序列）"
     ],
     "reasons": [
      "合同基准证据等级为 L3，**必须有 L1 官方合同文件**",
      "**未取得基金合同/招募说明书原始文件**",
-     "**无任何可用收益序列，无法建立可靠基准**",
      "货币基金使用万份收益/七日年化独立口径，**不与普通净值基金混算**"
     ],
     "category": "money_market"
-   }
+   },
+   "lifecycle_bucket": "unknown_status"
   },
   {
    "fund_id": 103,
@@ -9191,20 +10961,38 @@
    "usability": {
     "max_kind": "none",
     "contract_benchmark_usable": false,
-    "research_benchmark_usable": false,
-    "substitute_benchmark_usable": false,
     "fully_reproducible": false,
+    "research_benchmark_candidate": false,
+    "research_benchmark_usable": false,
+    "research_conditions": {
+     "index_code_mapped": false,
+     "history_data_available": false,
+     "return_basis_verified": false,
+     "basis_compatible_with_research": false,
+     "research_rule_declared": true,
+     "not_price_index_as_total_return": true
+    },
+    "substitute_benchmark_candidate": false,
+    "substitute_benchmark_usable": false,
+    "substitute_selection_provided": false,
+    "substitute_selection_complete": false,
+    "has_index_observation": false,
+    "has_verified_return_basis": false,
+    "index_observed_codes": [],
+    "index_unknown_basis_codes": [],
+    "index_verified_basis": [],
+    "basis_needs_declaration": [],
     "uncomputable_components": [
      "七天通知存款利率（税后）（现金利率无历史序列）"
     ],
     "reasons": [
      "合同基准证据等级为 L3，**必须有 L1 官方合同文件**",
      "**未取得基金合同/招募说明书原始文件**",
-     "**无任何可用收益序列，无法建立可靠基准**",
      "货币基金使用万份收益/七日年化独立口径，**不与普通净值基金混算**"
     ],
     "category": "money_market"
-   }
+   },
+   "lifecycle_bucket": "unknown_status"
   },
   {
    "fund_id": 104,
@@ -9294,21 +11082,44 @@
     "notes": []
    },
    "usability": {
-    "max_kind": "research",
+    "max_kind": "none",
     "contract_benchmark_usable": false,
-    "research_benchmark_usable": true,
-    "substitute_benchmark_usable": true,
     "fully_reproducible": false,
+    "research_benchmark_candidate": true,
+    "research_benchmark_usable": false,
+    "research_conditions": {
+     "index_code_mapped": true,
+     "history_data_available": true,
+     "return_basis_verified": false,
+     "basis_compatible_with_research": false,
+     "research_rule_declared": true,
+     "not_price_index_as_total_return": true
+    },
+    "substitute_benchmark_candidate": true,
+    "substitute_benchmark_usable": false,
+    "substitute_selection_provided": false,
+    "substitute_selection_complete": false,
+    "has_index_observation": true,
+    "has_verified_return_basis": false,
+    "index_observed_codes": [
+     "000300"
+    ],
+    "index_unknown_basis_codes": [
+     "000300"
+    ],
+    "index_verified_basis": [],
+    "basis_needs_declaration": [],
     "uncomputable_components": [
      "银行活期存款利率（税后）×5%（现金利率无历史序列）"
     ],
     "reasons": [
+     "**指数 ['000300'] 的 `return_basis` 为 `unknown`，点位数据不得当作合格收益序列**",
      "合同基准证据等级为 L3，**必须有 L1 官方合同文件**",
-     "**未取得基金合同/招募说明书原始文件**",
-     "**只能作为研究评价基准，不得称为合同基准**"
+     "**未取得基金合同/招募说明书原始文件**"
     ],
     "category": "etf_feeder"
-   }
+   },
+   "lifecycle_bucket": "unknown_status"
   },
   {
    "fund_id": 105,
@@ -9398,21 +11209,44 @@
     "notes": []
    },
    "usability": {
-    "max_kind": "research",
+    "max_kind": "none",
     "contract_benchmark_usable": false,
-    "research_benchmark_usable": true,
-    "substitute_benchmark_usable": true,
     "fully_reproducible": false,
+    "research_benchmark_candidate": true,
+    "research_benchmark_usable": false,
+    "research_conditions": {
+     "index_code_mapped": true,
+     "history_data_available": true,
+     "return_basis_verified": false,
+     "basis_compatible_with_research": false,
+     "research_rule_declared": true,
+     "not_price_index_as_total_return": true
+    },
+    "substitute_benchmark_candidate": true,
+    "substitute_benchmark_usable": false,
+    "substitute_selection_provided": false,
+    "substitute_selection_complete": false,
+    "has_index_observation": true,
+    "has_verified_return_basis": false,
+    "index_observed_codes": [
+     "000300"
+    ],
+    "index_unknown_basis_codes": [
+     "000300"
+    ],
+    "index_verified_basis": [],
+    "basis_needs_declaration": [],
     "uncomputable_components": [
      "5%×银行活期存款利率（税后）（现金利率无历史序列）"
     ],
     "reasons": [
+     "**指数 ['000300'] 的 `return_basis` 为 `unknown`，点位数据不得当作合格收益序列**",
      "合同基准证据等级为 L3，**必须有 L1 官方合同文件**",
-     "**未取得基金合同/招募说明书原始文件**",
-     "**只能作为研究评价基准，不得称为合同基准**"
+     "**未取得基金合同/招募说明书原始文件**"
     ],
     "category": "etf_feeder"
-   }
+   },
+   "lifecycle_bucket": "unknown_status"
   },
   {
    "fund_id": 106,
@@ -9502,21 +11336,44 @@
     "notes": []
    },
    "usability": {
-    "max_kind": "research",
+    "max_kind": "none",
     "contract_benchmark_usable": false,
-    "research_benchmark_usable": true,
-    "substitute_benchmark_usable": true,
     "fully_reproducible": false,
+    "research_benchmark_candidate": true,
+    "research_benchmark_usable": false,
+    "research_conditions": {
+     "index_code_mapped": true,
+     "history_data_available": true,
+     "return_basis_verified": false,
+     "basis_compatible_with_research": false,
+     "research_rule_declared": true,
+     "not_price_index_as_total_return": true
+    },
+    "substitute_benchmark_candidate": true,
+    "substitute_benchmark_usable": false,
+    "substitute_selection_provided": false,
+    "substitute_selection_complete": false,
+    "has_index_observation": true,
+    "has_verified_return_basis": false,
+    "index_observed_codes": [
+     "000300"
+    ],
+    "index_unknown_basis_codes": [
+     "000300"
+    ],
+    "index_verified_basis": [],
+    "basis_needs_declaration": [],
     "uncomputable_components": [
      "银行活期存款利率（税后）×5%（现金利率无历史序列）"
     ],
     "reasons": [
+     "**指数 ['000300'] 的 `return_basis` 为 `unknown`，点位数据不得当作合格收益序列**",
      "合同基准证据等级为 L3，**必须有 L1 官方合同文件**",
-     "**未取得基金合同/招募说明书原始文件**",
-     "**只能作为研究评价基准，不得称为合同基准**"
+     "**未取得基金合同/招募说明书原始文件**"
     ],
     "category": "index_plain"
-   }
+   },
+   "lifecycle_bucket": "unknown_status"
   },
   {
    "fund_id": 107,
@@ -9607,21 +11464,44 @@
     ]
    },
    "usability": {
-    "max_kind": "research",
+    "max_kind": "none",
     "contract_benchmark_usable": false,
-    "research_benchmark_usable": true,
-    "substitute_benchmark_usable": true,
     "fully_reproducible": false,
+    "research_benchmark_candidate": true,
+    "research_benchmark_usable": false,
+    "research_conditions": {
+     "index_code_mapped": true,
+     "history_data_available": true,
+     "return_basis_verified": false,
+     "basis_compatible_with_research": false,
+     "research_rule_declared": true,
+     "not_price_index_as_total_return": true
+    },
+    "substitute_benchmark_candidate": true,
+    "substitute_benchmark_usable": false,
+    "substitute_selection_provided": false,
+    "substitute_selection_complete": false,
+    "has_index_observation": true,
+    "has_verified_return_basis": false,
+    "index_observed_codes": [
+     "000300"
+    ],
+    "index_unknown_basis_codes": [
+     "000300"
+    ],
+    "index_verified_basis": [],
+    "basis_needs_declaration": [],
     "uncomputable_components": [
      "1.5%(指年收益率,评价时按期间折算)（折算规则未知）"
     ],
     "reasons": [
+     "**指数 ['000300'] 的 `return_basis` 为 `unknown`，点位数据不得当作合格收益序列**",
      "合同基准证据等级为 L3，**必须有 L1 官方合同文件**",
-     "**未取得基金合同/招募说明书原始文件**",
-     "**只能作为研究评价基准，不得称为合同基准**"
+     "**未取得基金合同/招募说明书原始文件**"
     ],
     "category": "index_plain"
-   }
+   },
+   "lifecycle_bucket": "unknown_status"
   },
   {
    "fund_id": 108,
@@ -9711,21 +11591,44 @@
     "notes": []
    },
    "usability": {
-    "max_kind": "research",
+    "max_kind": "none",
     "contract_benchmark_usable": false,
-    "research_benchmark_usable": true,
-    "substitute_benchmark_usable": true,
     "fully_reproducible": false,
+    "research_benchmark_candidate": true,
+    "research_benchmark_usable": false,
+    "research_conditions": {
+     "index_code_mapped": true,
+     "history_data_available": true,
+     "return_basis_verified": false,
+     "basis_compatible_with_research": false,
+     "research_rule_declared": true,
+     "not_price_index_as_total_return": true
+    },
+    "substitute_benchmark_candidate": true,
+    "substitute_benchmark_usable": false,
+    "substitute_selection_provided": false,
+    "substitute_selection_complete": false,
+    "has_index_observation": true,
+    "has_verified_return_basis": false,
+    "index_observed_codes": [
+     "000300"
+    ],
+    "index_unknown_basis_codes": [
+     "000300"
+    ],
+    "index_verified_basis": [],
+    "basis_needs_declaration": [],
     "uncomputable_components": [
      "5%×同期商业银行税后活期存款基准利率（现金利率无历史序列）"
     ],
     "reasons": [
+     "**指数 ['000300'] 的 `return_basis` 为 `unknown`，点位数据不得当作合格收益序列**",
      "合同基准证据等级为 L3，**必须有 L1 官方合同文件**",
-     "**未取得基金合同/招募说明书原始文件**",
-     "**只能作为研究评价基准，不得称为合同基准**"
+     "**未取得基金合同/招募说明书原始文件**"
     ],
     "category": "index_plain"
-   }
+   },
+   "lifecycle_bucket": "unknown_status"
   },
   {
    "fund_id": 109,
@@ -9815,21 +11718,44 @@
     "notes": []
    },
    "usability": {
-    "max_kind": "research",
+    "max_kind": "none",
     "contract_benchmark_usable": false,
-    "research_benchmark_usable": true,
-    "substitute_benchmark_usable": true,
     "fully_reproducible": false,
+    "research_benchmark_candidate": true,
+    "research_benchmark_usable": false,
+    "research_conditions": {
+     "index_code_mapped": true,
+     "history_data_available": true,
+     "return_basis_verified": false,
+     "basis_compatible_with_research": false,
+     "research_rule_declared": true,
+     "not_price_index_as_total_return": true
+    },
+    "substitute_benchmark_candidate": true,
+    "substitute_benchmark_usable": false,
+    "substitute_selection_provided": false,
+    "substitute_selection_complete": false,
+    "has_index_observation": true,
+    "has_verified_return_basis": false,
+    "index_observed_codes": [
+     "000905"
+    ],
+    "index_unknown_basis_codes": [
+     "000905"
+    ],
+    "index_verified_basis": [],
+    "basis_needs_declaration": [],
     "uncomputable_components": [
      "活期存款利率（税后）*5%（现金利率无历史序列）"
     ],
     "reasons": [
+     "**指数 ['000905'] 的 `return_basis` 为 `unknown`，点位数据不得当作合格收益序列**",
      "合同基准证据等级为 L3，**必须有 L1 官方合同文件**",
-     "**未取得基金合同/招募说明书原始文件**",
-     "**只能作为研究评价基准，不得称为合同基准**"
+     "**未取得基金合同/招募说明书原始文件**"
     ],
     "category": "index_plain"
-   }
+   },
+   "lifecycle_bucket": "unknown_status"
   },
   {
    "fund_id": 110,
@@ -9919,21 +11845,44 @@
     "notes": []
    },
    "usability": {
-    "max_kind": "research",
+    "max_kind": "none",
     "contract_benchmark_usable": false,
-    "research_benchmark_usable": true,
-    "substitute_benchmark_usable": true,
     "fully_reproducible": false,
+    "research_benchmark_candidate": true,
+    "research_benchmark_usable": false,
+    "research_conditions": {
+     "index_code_mapped": true,
+     "history_data_available": true,
+     "return_basis_verified": false,
+     "basis_compatible_with_research": false,
+     "research_rule_declared": true,
+     "not_price_index_as_total_return": true
+    },
+    "substitute_benchmark_candidate": true,
+    "substitute_benchmark_usable": false,
+    "substitute_selection_provided": false,
+    "substitute_selection_complete": false,
+    "has_index_observation": true,
+    "has_verified_return_basis": false,
+    "index_observed_codes": [
+     "000905"
+    ],
+    "index_unknown_basis_codes": [
+     "000905"
+    ],
+    "index_verified_basis": [],
+    "basis_needs_declaration": [],
     "uncomputable_components": [
      "一年期银行储蓄存款利率（税后）×5%（现金利率无历史序列）"
     ],
     "reasons": [
+     "**指数 ['000905'] 的 `return_basis` 为 `unknown`，点位数据不得当作合格收益序列**",
      "合同基准证据等级为 L3，**必须有 L1 官方合同文件**",
-     "**未取得基金合同/招募说明书原始文件**",
-     "**只能作为研究评价基准，不得称为合同基准**"
+     "**未取得基金合同/招募说明书原始文件**"
     ],
     "category": "index_plain"
-   }
+   },
+   "lifecycle_bucket": "unknown_status"
   },
   {
    "fund_id": 111,
@@ -10023,21 +11972,44 @@
     "notes": []
    },
    "usability": {
-    "max_kind": "research",
+    "max_kind": "none",
     "contract_benchmark_usable": false,
-    "research_benchmark_usable": true,
-    "substitute_benchmark_usable": true,
     "fully_reproducible": false,
+    "research_benchmark_candidate": true,
+    "research_benchmark_usable": false,
+    "research_conditions": {
+     "index_code_mapped": true,
+     "history_data_available": true,
+     "return_basis_verified": false,
+     "basis_compatible_with_research": false,
+     "research_rule_declared": true,
+     "not_price_index_as_total_return": true
+    },
+    "substitute_benchmark_candidate": true,
+    "substitute_benchmark_usable": false,
+    "substitute_selection_provided": false,
+    "substitute_selection_complete": false,
+    "has_index_observation": true,
+    "has_verified_return_basis": false,
+    "index_observed_codes": [
+     "000905"
+    ],
+    "index_unknown_basis_codes": [
+     "000905"
+    ],
+    "index_verified_basis": [],
+    "basis_needs_declaration": [],
     "uncomputable_components": [
      "银行活期存款税后利率×5%（现金利率无历史序列）"
     ],
     "reasons": [
+     "**指数 ['000905'] 的 `return_basis` 为 `unknown`，点位数据不得当作合格收益序列**",
      "合同基准证据等级为 L3，**必须有 L1 官方合同文件**",
-     "**未取得基金合同/招募说明书原始文件**",
-     "**只能作为研究评价基准，不得称为合同基准**"
+     "**未取得基金合同/招募说明书原始文件**"
     ],
     "category": "index_plain"
-   }
+   },
+   "lifecycle_bucket": "unknown_status"
   },
   {
    "fund_id": 112,
@@ -10120,19 +12092,37 @@
    "usability": {
     "max_kind": "none",
     "contract_benchmark_usable": false,
-    "research_benchmark_usable": false,
-    "substitute_benchmark_usable": false,
     "fully_reproducible": false,
+    "research_benchmark_candidate": false,
+    "research_benchmark_usable": false,
+    "research_conditions": {
+     "index_code_mapped": false,
+     "history_data_available": false,
+     "return_basis_verified": false,
+     "basis_compatible_with_research": false,
+     "research_rule_declared": true,
+     "not_price_index_as_total_return": true
+    },
+    "substitute_benchmark_candidate": false,
+    "substitute_benchmark_usable": false,
+    "substitute_selection_provided": false,
+    "substitute_selection_complete": false,
+    "has_index_observation": false,
+    "has_verified_return_basis": false,
+    "index_observed_codes": [],
+    "index_unknown_basis_codes": [],
+    "index_verified_basis": [],
+    "basis_needs_declaration": [],
     "uncomputable_components": [
      "中债综合指数（债券指数未接入）"
     ],
     "reasons": [
      "合同基准证据等级为 L3，**必须有 L1 官方合同文件**",
-     "**未取得基金合同/招募说明书原始文件**",
-     "**无任何可用收益序列，无法建立可靠基准**"
+     "**未取得基金合同/招募说明书原始文件**"
     ],
     "category": "lof_offexchange"
-   }
+   },
+   "lifecycle_bucket": "unknown_status"
   },
   {
    "fund_id": 113,
@@ -10222,21 +12212,44 @@
     "notes": []
    },
    "usability": {
-    "max_kind": "research",
+    "max_kind": "none",
     "contract_benchmark_usable": false,
-    "research_benchmark_usable": true,
-    "substitute_benchmark_usable": true,
     "fully_reproducible": false,
+    "research_benchmark_candidate": true,
+    "research_benchmark_usable": false,
+    "research_conditions": {
+     "index_code_mapped": true,
+     "history_data_available": true,
+     "return_basis_verified": false,
+     "basis_compatible_with_research": false,
+     "research_rule_declared": true,
+     "not_price_index_as_total_return": true
+    },
+    "substitute_benchmark_candidate": true,
+    "substitute_benchmark_usable": false,
+    "substitute_selection_provided": false,
+    "substitute_selection_complete": false,
+    "has_index_observation": true,
+    "has_verified_return_basis": false,
+    "index_observed_codes": [
+     "000906"
+    ],
+    "index_unknown_basis_codes": [
+     "000906"
+    ],
+    "index_verified_basis": [],
+    "basis_needs_declaration": [],
     "uncomputable_components": [
      "中证全债指数（债券指数未接入）"
     ],
     "reasons": [
+     "**指数 ['000906'] 的 `return_basis` 为 `unknown`，点位数据不得当作合格收益序列**",
      "合同基准证据等级为 L3，**必须有 L1 官方合同文件**",
-     "**未取得基金合同/招募说明书原始文件**",
-     "**只能作为研究评价基准，不得称为合同基准**"
+     "**未取得基金合同/招募说明书原始文件**"
     ],
     "category": "active_equity"
-   }
+   },
+   "lifecycle_bucket": "unknown_status"
   },
   {
    "fund_id": 114,
@@ -10325,21 +12338,44 @@
     "notes": []
    },
    "usability": {
-    "max_kind": "research",
+    "max_kind": "none",
     "contract_benchmark_usable": false,
-    "research_benchmark_usable": true,
-    "substitute_benchmark_usable": true,
     "fully_reproducible": false,
+    "research_benchmark_candidate": true,
+    "research_benchmark_usable": false,
+    "research_conditions": {
+     "index_code_mapped": true,
+     "history_data_available": true,
+     "return_basis_verified": false,
+     "basis_compatible_with_research": false,
+     "research_rule_declared": true,
+     "not_price_index_as_total_return": true
+    },
+    "substitute_benchmark_candidate": true,
+    "substitute_benchmark_usable": false,
+    "substitute_selection_provided": false,
+    "substitute_selection_complete": false,
+    "has_index_observation": true,
+    "has_verified_return_basis": false,
+    "index_observed_codes": [
+     "000906"
+    ],
+    "index_unknown_basis_codes": [
+     "000906"
+    ],
+    "index_verified_basis": [],
+    "basis_needs_declaration": [],
     "uncomputable_components": [
      "中债-综合全价(总值)指数（债券指数未接入）"
     ],
     "reasons": [
+     "**指数 ['000906'] 的 `return_basis` 为 `unknown`，点位数据不得当作合格收益序列**",
      "合同基准证据等级为 L3，**必须有 L1 官方合同文件**",
-     "**未取得基金合同/招募说明书原始文件**",
-     "**只能作为研究评价基准，不得称为合同基准**"
+     "**未取得基金合同/招募说明书原始文件**"
     ],
     "category": "active_equity"
-   }
+   },
+   "lifecycle_bucket": "unknown_status"
   },
   {
    "fund_id": 115,
@@ -10429,21 +12465,44 @@
     "notes": []
    },
    "usability": {
-    "max_kind": "research",
+    "max_kind": "none",
     "contract_benchmark_usable": false,
-    "research_benchmark_usable": true,
-    "substitute_benchmark_usable": true,
     "fully_reproducible": false,
+    "research_benchmark_candidate": true,
+    "research_benchmark_usable": false,
+    "research_conditions": {
+     "index_code_mapped": true,
+     "history_data_available": true,
+     "return_basis_verified": false,
+     "basis_compatible_with_research": false,
+     "research_rule_declared": true,
+     "not_price_index_as_total_return": true
+    },
+    "substitute_benchmark_candidate": true,
+    "substitute_benchmark_usable": false,
+    "substitute_selection_provided": false,
+    "substitute_selection_complete": false,
+    "has_index_observation": true,
+    "has_verified_return_basis": false,
+    "index_observed_codes": [
+     "000300"
+    ],
+    "index_unknown_basis_codes": [
+     "000300"
+    ],
+    "index_verified_basis": [],
+    "basis_needs_declaration": [],
     "uncomputable_components": [
      "中证全债指数（债券指数未接入）"
     ],
     "reasons": [
+     "**指数 ['000300'] 的 `return_basis` 为 `unknown`，点位数据不得当作合格收益序列**",
      "合同基准证据等级为 L3，**必须有 L1 官方合同文件**",
-     "**未取得基金合同/招募说明书原始文件**",
-     "**只能作为研究评价基准，不得称为合同基准**"
+     "**未取得基金合同/招募说明书原始文件**"
     ],
     "category": "active_equity"
-   }
+   },
+   "lifecycle_bucket": "unknown_status"
   },
   {
    "fund_id": 116,
@@ -10535,20 +12594,38 @@
    "usability": {
     "max_kind": "none",
     "contract_benchmark_usable": false,
-    "research_benchmark_usable": false,
-    "substitute_benchmark_usable": false,
     "fully_reproducible": false,
+    "research_benchmark_candidate": false,
+    "research_benchmark_usable": false,
+    "research_conditions": {
+     "index_code_mapped": false,
+     "history_data_available": false,
+     "return_basis_verified": false,
+     "basis_compatible_with_research": false,
+     "research_rule_declared": true,
+     "not_price_index_as_total_return": true
+    },
+    "substitute_benchmark_candidate": false,
+    "substitute_benchmark_usable": false,
+    "substitute_selection_provided": false,
+    "substitute_selection_complete": false,
+    "has_index_observation": false,
+    "has_verified_return_basis": false,
+    "index_observed_codes": [],
+    "index_unknown_basis_codes": [],
+    "index_verified_basis": [],
+    "basis_needs_declaration": [],
     "uncomputable_components": [
      "中债-1-5年债券综合全价（总值）指数（债券指数未接入）",
      "中证可转换债券指数（债券指数未接入）"
     ],
     "reasons": [
      "合同基准证据等级为 L3，**必须有 L1 官方合同文件**",
-     "**未取得基金合同/招募说明书原始文件**",
-     "**无任何可用收益序列，无法建立可靠基准**"
+     "**未取得基金合同/招募说明书原始文件**"
     ],
     "category": "mixed_bond"
-   }
+   },
+   "lifecycle_bucket": "unknown_status"
   },
   {
    "fund_id": 117,
@@ -10630,19 +12707,37 @@
    "usability": {
     "max_kind": "none",
     "contract_benchmark_usable": false,
-    "research_benchmark_usable": false,
-    "substitute_benchmark_usable": false,
     "fully_reproducible": false,
+    "research_benchmark_candidate": false,
+    "research_benchmark_usable": false,
+    "research_conditions": {
+     "index_code_mapped": false,
+     "history_data_available": false,
+     "return_basis_verified": false,
+     "basis_compatible_with_research": false,
+     "research_rule_declared": true,
+     "not_price_index_as_total_return": true
+    },
+    "substitute_benchmark_candidate": false,
+    "substitute_benchmark_usable": false,
+    "substitute_selection_provided": false,
+    "substitute_selection_complete": false,
+    "has_index_observation": false,
+    "has_verified_return_basis": false,
+    "index_observed_codes": [],
+    "index_unknown_basis_codes": [],
+    "index_verified_basis": [],
+    "basis_needs_declaration": [],
     "uncomputable_components": [
      "中债-优选投资级信用债全价(总值)指数（债券指数未接入）"
     ],
     "reasons": [
      "合同基准证据等级为 L3，**必须有 L1 官方合同文件**",
-     "**未取得基金合同/招募说明书原始文件**",
-     "**无任何可用收益序列，无法建立可靠基准**"
+     "**未取得基金合同/招募说明书原始文件**"
     ],
     "category": "pure_bond"
-   }
+   },
+   "lifecycle_bucket": "unknown_status"
   },
   {
    "fund_id": 118,
@@ -10732,21 +12827,44 @@
     "notes": []
    },
    "usability": {
-    "max_kind": "research",
+    "max_kind": "none",
     "contract_benchmark_usable": false,
-    "research_benchmark_usable": true,
-    "substitute_benchmark_usable": true,
     "fully_reproducible": false,
+    "research_benchmark_candidate": true,
+    "research_benchmark_usable": false,
+    "research_conditions": {
+     "index_code_mapped": true,
+     "history_data_available": true,
+     "return_basis_verified": false,
+     "basis_compatible_with_research": false,
+     "research_rule_declared": true,
+     "not_price_index_as_total_return": true
+    },
+    "substitute_benchmark_candidate": true,
+    "substitute_benchmark_usable": false,
+    "substitute_selection_provided": false,
+    "substitute_selection_complete": false,
+    "has_index_observation": true,
+    "has_verified_return_basis": false,
+    "index_observed_codes": [
+     "000016"
+    ],
+    "index_unknown_basis_codes": [
+     "000016"
+    ],
+    "index_verified_basis": [],
+    "basis_needs_declaration": [],
     "uncomputable_components": [
      "人民币活期存款税后利率×5%（现金利率无历史序列）"
     ],
     "reasons": [
+     "**指数 ['000016'] 的 `return_basis` 为 `unknown`，点位数据不得当作合格收益序列**",
      "合同基准证据等级为 L3，**必须有 L1 官方合同文件**",
-     "**未取得基金合同/招募说明书原始文件**",
-     "**只能作为研究评价基准，不得称为合同基准**"
+     "**未取得基金合同/招募说明书原始文件**"
     ],
     "category": "etf_feeder"
-   }
+   },
+   "lifecycle_bucket": "unknown_status"
   },
   {
    "fund_id": 119,
@@ -10836,21 +12954,44 @@
     "notes": []
    },
    "usability": {
-    "max_kind": "research",
+    "max_kind": "none",
     "contract_benchmark_usable": false,
-    "research_benchmark_usable": true,
-    "substitute_benchmark_usable": true,
     "fully_reproducible": false,
+    "research_benchmark_candidate": true,
+    "research_benchmark_usable": false,
+    "research_conditions": {
+     "index_code_mapped": true,
+     "history_data_available": true,
+     "return_basis_verified": false,
+     "basis_compatible_with_research": false,
+     "research_rule_declared": true,
+     "not_price_index_as_total_return": true
+    },
+    "substitute_benchmark_candidate": true,
+    "substitute_benchmark_usable": false,
+    "substitute_selection_provided": false,
+    "substitute_selection_complete": false,
+    "has_index_observation": true,
+    "has_verified_return_basis": false,
+    "index_observed_codes": [
+     "000016"
+    ],
+    "index_unknown_basis_codes": [
+     "000016"
+    ],
+    "index_verified_basis": [],
+    "basis_needs_declaration": [],
     "uncomputable_components": [
      "银行活期存款税后利率×5%（现金利率无历史序列）"
     ],
     "reasons": [
+     "**指数 ['000016'] 的 `return_basis` 为 `unknown`，点位数据不得当作合格收益序列**",
      "合同基准证据等级为 L3，**必须有 L1 官方合同文件**",
-     "**未取得基金合同/招募说明书原始文件**",
-     "**只能作为研究评价基准，不得称为合同基准**"
+     "**未取得基金合同/招募说明书原始文件**"
     ],
     "category": "etf_feeder"
-   }
+   },
+   "lifecycle_bucket": "unknown_status"
   },
   {
    "fund_id": 120,
@@ -10943,20 +13084,38 @@
    "usability": {
     "max_kind": "none",
     "contract_benchmark_usable": false,
-    "research_benchmark_usable": false,
-    "substitute_benchmark_usable": false,
     "fully_reproducible": false,
+    "research_benchmark_candidate": false,
+    "research_benchmark_usable": false,
+    "research_conditions": {
+     "index_code_mapped": false,
+     "history_data_available": false,
+     "return_basis_verified": false,
+     "basis_compatible_with_research": false,
+     "research_rule_declared": true,
+     "not_price_index_as_total_return": true
+    },
+    "substitute_benchmark_candidate": false,
+    "substitute_benchmark_usable": false,
+    "substitute_selection_provided": false,
+    "substitute_selection_complete": false,
+    "has_index_observation": false,
+    "has_verified_return_basis": false,
+    "index_observed_codes": [],
+    "index_unknown_basis_codes": [],
+    "index_verified_basis": [],
+    "basis_needs_declaration": [],
     "uncomputable_components": [
      "创业板指数（未映射代码）",
      "银行活期存款利率（税后）×5%（现金利率无历史序列）"
     ],
     "reasons": [
      "合同基准证据等级为 L3，**必须有 L1 官方合同文件**",
-     "**未取得基金合同/招募说明书原始文件**",
-     "**无任何可用收益序列，无法建立可靠基准**"
+     "**未取得基金合同/招募说明书原始文件**"
     ],
     "category": "etf_feeder"
-   }
+   },
+   "lifecycle_bucket": "unknown_status"
   },
   {
    "fund_id": 121,
@@ -11049,20 +13208,38 @@
    "usability": {
     "max_kind": "none",
     "contract_benchmark_usable": false,
-    "research_benchmark_usable": false,
-    "substitute_benchmark_usable": false,
     "fully_reproducible": false,
+    "research_benchmark_candidate": false,
+    "research_benchmark_usable": false,
+    "research_conditions": {
+     "index_code_mapped": false,
+     "history_data_available": false,
+     "return_basis_verified": false,
+     "basis_compatible_with_research": false,
+     "research_rule_declared": true,
+     "not_price_index_as_total_return": true
+    },
+    "substitute_benchmark_candidate": false,
+    "substitute_benchmark_usable": false,
+    "substitute_selection_provided": false,
+    "substitute_selection_complete": false,
+    "has_index_observation": false,
+    "has_verified_return_basis": false,
+    "index_observed_codes": [],
+    "index_unknown_basis_codes": [],
+    "index_verified_basis": [],
+    "basis_needs_declaration": [],
     "uncomputable_components": [
      "创业板指数（未映射代码）",
      "银行人民币活期存款利率（税后）×5%（现金利率无历史序列）"
     ],
     "reasons": [
      "合同基准证据等级为 L3，**必须有 L1 官方合同文件**",
-     "**未取得基金合同/招募说明书原始文件**",
-     "**无任何可用收益序列，无法建立可靠基准**"
+     "**未取得基金合同/招募说明书原始文件**"
     ],
     "category": "etf_feeder"
-   }
+   },
+   "lifecycle_bucket": "unknown_status"
   },
   {
    "fund_id": 122,
@@ -11155,20 +13332,38 @@
    "usability": {
     "max_kind": "none",
     "contract_benchmark_usable": false,
-    "research_benchmark_usable": false,
-    "substitute_benchmark_usable": false,
     "fully_reproducible": false,
+    "research_benchmark_candidate": false,
+    "research_benchmark_usable": false,
+    "research_conditions": {
+     "index_code_mapped": false,
+     "history_data_available": false,
+     "return_basis_verified": false,
+     "basis_compatible_with_research": false,
+     "research_rule_declared": true,
+     "not_price_index_as_total_return": true
+    },
+    "substitute_benchmark_candidate": false,
+    "substitute_benchmark_usable": false,
+    "substitute_selection_provided": false,
+    "substitute_selection_complete": false,
+    "has_index_observation": false,
+    "has_verified_return_basis": false,
+    "index_observed_codes": [],
+    "index_unknown_basis_codes": [],
+    "index_verified_basis": [],
+    "basis_needs_declaration": [],
     "uncomputable_components": [
      "创业板指数（未映射代码）",
      "银行活期存款利率(税后)×5%（现金利率无历史序列）"
     ],
     "reasons": [
      "合同基准证据等级为 L3，**必须有 L1 官方合同文件**",
-     "**未取得基金合同/招募说明书原始文件**",
-     "**无任何可用收益序列，无法建立可靠基准**"
+     "**未取得基金合同/招募说明书原始文件**"
     ],
     "category": "index_plain"
-   }
+   },
+   "lifecycle_bucket": "unknown_status"
   },
   {
    "fund_id": 123,
@@ -11261,20 +13456,38 @@
    "usability": {
     "max_kind": "none",
     "contract_benchmark_usable": false,
-    "research_benchmark_usable": false,
-    "substitute_benchmark_usable": false,
     "fully_reproducible": false,
+    "research_benchmark_candidate": false,
+    "research_benchmark_usable": false,
+    "research_conditions": {
+     "index_code_mapped": false,
+     "history_data_available": false,
+     "return_basis_verified": false,
+     "basis_compatible_with_research": false,
+     "research_rule_declared": true,
+     "not_price_index_as_total_return": true
+    },
+    "substitute_benchmark_candidate": false,
+    "substitute_benchmark_usable": false,
+    "substitute_selection_provided": false,
+    "substitute_selection_complete": false,
+    "has_index_observation": false,
+    "has_verified_return_basis": false,
+    "index_observed_codes": [],
+    "index_unknown_basis_codes": [],
+    "index_verified_basis": [],
+    "basis_needs_declaration": [],
     "uncomputable_components": [
      "创业板指数（未映射代码）",
      "5%×银行活期存款利率（税后）（现金利率无历史序列）"
     ],
     "reasons": [
      "合同基准证据等级为 L3，**必须有 L1 官方合同文件**",
-     "**未取得基金合同/招募说明书原始文件**",
-     "**无任何可用收益序列，无法建立可靠基准**"
+     "**未取得基金合同/招募说明书原始文件**"
     ],
     "category": "etf_feeder"
-   }
+   },
+   "lifecycle_bucket": "unknown_status"
   },
   {
    "fund_id": 124,
@@ -11354,19 +13567,42 @@
     ]
    },
    "usability": {
-    "max_kind": "research",
+    "max_kind": "none",
     "contract_benchmark_usable": false,
-    "research_benchmark_usable": true,
-    "substitute_benchmark_usable": true,
     "fully_reproducible": false,
+    "research_benchmark_candidate": true,
+    "research_benchmark_usable": false,
+    "research_conditions": {
+     "index_code_mapped": true,
+     "history_data_available": true,
+     "return_basis_verified": false,
+     "basis_compatible_with_research": false,
+     "research_rule_declared": true,
+     "not_price_index_as_total_return": true
+    },
+    "substitute_benchmark_candidate": true,
+    "substitute_benchmark_usable": false,
+    "substitute_selection_provided": false,
+    "substitute_selection_complete": false,
+    "has_index_observation": true,
+    "has_verified_return_basis": false,
+    "index_observed_codes": [
+     "000016"
+    ],
+    "index_unknown_basis_codes": [
+     "000016"
+    ],
+    "index_verified_basis": [],
+    "basis_needs_declaration": [],
     "uncomputable_components": [],
     "reasons": [
+     "**指数 ['000016'] 的 `return_basis` 为 `unknown`，点位数据不得当作合格收益序列**",
      "合同基准证据等级为 L3，**必须有 L1 官方合同文件**",
-     "**未取得基金合同/招募说明书原始文件**",
-     "**只能作为研究评价基准，不得称为合同基准**"
+     "**未取得基金合同/招募说明书原始文件**"
     ],
     "category": "index_plain"
-   }
+   },
+   "lifecycle_bucket": "unknown_status"
   },
   {
    "fund_id": 125,
@@ -11456,21 +13692,44 @@
     "notes": []
    },
    "usability": {
-    "max_kind": "research",
+    "max_kind": "none",
     "contract_benchmark_usable": false,
-    "research_benchmark_usable": true,
-    "substitute_benchmark_usable": true,
     "fully_reproducible": false,
+    "research_benchmark_candidate": true,
+    "research_benchmark_usable": false,
+    "research_conditions": {
+     "index_code_mapped": true,
+     "history_data_available": true,
+     "return_basis_verified": false,
+     "basis_compatible_with_research": false,
+     "research_rule_declared": true,
+     "not_price_index_as_total_return": true
+    },
+    "substitute_benchmark_candidate": true,
+    "substitute_benchmark_usable": false,
+    "substitute_selection_provided": false,
+    "substitute_selection_complete": false,
+    "has_index_observation": true,
+    "has_verified_return_basis": false,
+    "index_observed_codes": [
+     "000016"
+    ],
+    "index_unknown_basis_codes": [
+     "000016"
+    ],
+    "index_verified_basis": [],
+    "basis_needs_declaration": [],
     "uncomputable_components": [
      "银行活期存款税后利率×5%（现金利率无历史序列）"
     ],
     "reasons": [
+     "**指数 ['000016'] 的 `return_basis` 为 `unknown`，点位数据不得当作合格收益序列**",
      "合同基准证据等级为 L3，**必须有 L1 官方合同文件**",
-     "**未取得基金合同/招募说明书原始文件**",
-     "**只能作为研究评价基准，不得称为合同基准**"
+     "**未取得基金合同/招募说明书原始文件**"
     ],
     "category": "etf_feeder"
-   }
+   },
+   "lifecycle_bucket": "unknown_status"
   },
   {
    "fund_id": 126,
@@ -11563,20 +13822,38 @@
    "usability": {
     "max_kind": "none",
     "contract_benchmark_usable": false,
-    "research_benchmark_usable": false,
-    "substitute_benchmark_usable": false,
     "fully_reproducible": false,
+    "research_benchmark_candidate": false,
+    "research_benchmark_usable": false,
+    "research_conditions": {
+     "index_code_mapped": false,
+     "history_data_available": false,
+     "return_basis_verified": false,
+     "basis_compatible_with_research": false,
+     "research_rule_declared": true,
+     "not_price_index_as_total_return": true
+    },
+    "substitute_benchmark_candidate": false,
+    "substitute_benchmark_usable": false,
+    "substitute_selection_provided": false,
+    "substitute_selection_complete": false,
+    "has_index_observation": false,
+    "has_verified_return_basis": false,
+    "index_observed_codes": [],
+    "index_unknown_basis_codes": [],
+    "index_verified_basis": [],
+    "basis_needs_declaration": [],
     "uncomputable_components": [
      "上证科创板50成份指数（未映射代码）",
      "活期存款利率（税后）×5%（现金利率无历史序列）"
     ],
     "reasons": [
      "合同基准证据等级为 L3，**必须有 L1 官方合同文件**",
-     "**未取得基金合同/招募说明书原始文件**",
-     "**无任何可用收益序列，无法建立可靠基准**"
+     "**未取得基金合同/招募说明书原始文件**"
     ],
     "category": "etf_feeder"
-   }
+   },
+   "lifecycle_bucket": "unknown_status"
   },
   {
    "fund_id": 127,
@@ -11669,20 +13946,38 @@
    "usability": {
     "max_kind": "none",
     "contract_benchmark_usable": false,
-    "research_benchmark_usable": false,
-    "substitute_benchmark_usable": false,
     "fully_reproducible": false,
+    "research_benchmark_candidate": false,
+    "research_benchmark_usable": false,
+    "research_conditions": {
+     "index_code_mapped": false,
+     "history_data_available": false,
+     "return_basis_verified": false,
+     "basis_compatible_with_research": false,
+     "research_rule_declared": true,
+     "not_price_index_as_total_return": true
+    },
+    "substitute_benchmark_candidate": false,
+    "substitute_benchmark_usable": false,
+    "substitute_selection_provided": false,
+    "substitute_selection_complete": false,
+    "has_index_observation": false,
+    "has_verified_return_basis": false,
+    "index_observed_codes": [],
+    "index_unknown_basis_codes": [],
+    "index_verified_basis": [],
+    "basis_needs_declaration": [],
     "uncomputable_components": [
      "上证科创板50成份指数（未映射代码）",
      "活期存款利率（税后）×5%（现金利率无历史序列）"
     ],
     "reasons": [
      "合同基准证据等级为 L3，**必须有 L1 官方合同文件**",
-     "**未取得基金合同/招募说明书原始文件**",
-     "**无任何可用收益序列，无法建立可靠基准**"
+     "**未取得基金合同/招募说明书原始文件**"
     ],
     "category": "etf_feeder"
-   }
+   },
+   "lifecycle_bucket": "unknown_status"
   },
   {
    "fund_id": 128,
@@ -11775,20 +14070,38 @@
    "usability": {
     "max_kind": "none",
     "contract_benchmark_usable": false,
-    "research_benchmark_usable": false,
-    "substitute_benchmark_usable": false,
     "fully_reproducible": false,
+    "research_benchmark_candidate": false,
+    "research_benchmark_usable": false,
+    "research_conditions": {
+     "index_code_mapped": false,
+     "history_data_available": false,
+     "return_basis_verified": false,
+     "basis_compatible_with_research": false,
+     "research_rule_declared": true,
+     "not_price_index_as_total_return": true
+    },
+    "substitute_benchmark_candidate": false,
+    "substitute_benchmark_usable": false,
+    "substitute_selection_provided": false,
+    "substitute_selection_complete": false,
+    "has_index_observation": false,
+    "has_verified_return_basis": false,
+    "index_observed_codes": [],
+    "index_unknown_basis_codes": [],
+    "index_verified_basis": [],
+    "basis_needs_declaration": [],
     "uncomputable_components": [
      "上证科创板50成份指数（未映射代码）",
      "银行活期存款利率（税后）×5%（现金利率无历史序列）"
     ],
     "reasons": [
      "合同基准证据等级为 L3，**必须有 L1 官方合同文件**",
-     "**未取得基金合同/招募说明书原始文件**",
-     "**无任何可用收益序列，无法建立可靠基准**"
+     "**未取得基金合同/招募说明书原始文件**"
     ],
     "category": "etf_feeder"
-   }
+   },
+   "lifecycle_bucket": "unknown_status"
   },
   {
    "fund_id": 129,
@@ -11881,20 +14194,38 @@
    "usability": {
     "max_kind": "none",
     "contract_benchmark_usable": false,
-    "research_benchmark_usable": false,
-    "substitute_benchmark_usable": false,
     "fully_reproducible": false,
+    "research_benchmark_candidate": false,
+    "research_benchmark_usable": false,
+    "research_conditions": {
+     "index_code_mapped": false,
+     "history_data_available": false,
+     "return_basis_verified": false,
+     "basis_compatible_with_research": false,
+     "research_rule_declared": true,
+     "not_price_index_as_total_return": true
+    },
+    "substitute_benchmark_candidate": false,
+    "substitute_benchmark_usable": false,
+    "substitute_selection_provided": false,
+    "substitute_selection_complete": false,
+    "has_index_observation": false,
+    "has_verified_return_basis": false,
+    "index_observed_codes": [],
+    "index_unknown_basis_codes": [],
+    "index_verified_basis": [],
+    "basis_needs_declaration": [],
     "uncomputable_components": [
      "上证科创板50成份指数（未映射代码）",
      "人民币活期存款税后利率×5%（现金利率无历史序列）"
     ],
     "reasons": [
      "合同基准证据等级为 L3，**必须有 L1 官方合同文件**",
-     "**未取得基金合同/招募说明书原始文件**",
-     "**无任何可用收益序列，无法建立可靠基准**"
+     "**未取得基金合同/招募说明书原始文件**"
     ],
     "category": "etf_feeder"
-   }
+   },
+   "lifecycle_bucket": "unknown_status"
   },
   {
    "fund_id": 130,
@@ -11987,20 +14318,38 @@
    "usability": {
     "max_kind": "none",
     "contract_benchmark_usable": false,
-    "research_benchmark_usable": false,
-    "substitute_benchmark_usable": false,
     "fully_reproducible": false,
+    "research_benchmark_candidate": false,
+    "research_benchmark_usable": false,
+    "research_conditions": {
+     "index_code_mapped": false,
+     "history_data_available": false,
+     "return_basis_verified": false,
+     "basis_compatible_with_research": false,
+     "research_rule_declared": true,
+     "not_price_index_as_total_return": true
+    },
+    "substitute_benchmark_candidate": false,
+    "substitute_benchmark_usable": false,
+    "substitute_selection_provided": false,
+    "substitute_selection_complete": false,
+    "has_index_observation": false,
+    "has_verified_return_basis": false,
+    "index_observed_codes": [],
+    "index_unknown_basis_codes": [],
+    "index_verified_basis": [],
+    "basis_needs_declaration": [],
     "uncomputable_components": [
      "中证A500指数（未映射代码）",
      "人民币银行活期存款利率（税后）×5%（现金利率无历史序列）"
     ],
     "reasons": [
      "合同基准证据等级为 L3，**必须有 L1 官方合同文件**",
-     "**未取得基金合同/招募说明书原始文件**",
-     "**无任何可用收益序列，无法建立可靠基准**"
+     "**未取得基金合同/招募说明书原始文件**"
     ],
     "category": "etf_feeder"
-   }
+   },
+   "lifecycle_bucket": "unknown_status"
   },
   {
    "fund_id": 131,
@@ -12093,20 +14442,38 @@
    "usability": {
     "max_kind": "none",
     "contract_benchmark_usable": false,
-    "research_benchmark_usable": false,
-    "substitute_benchmark_usable": false,
     "fully_reproducible": false,
+    "research_benchmark_candidate": false,
+    "research_benchmark_usable": false,
+    "research_conditions": {
+     "index_code_mapped": false,
+     "history_data_available": false,
+     "return_basis_verified": false,
+     "basis_compatible_with_research": false,
+     "research_rule_declared": true,
+     "not_price_index_as_total_return": true
+    },
+    "substitute_benchmark_candidate": false,
+    "substitute_benchmark_usable": false,
+    "substitute_selection_provided": false,
+    "substitute_selection_complete": false,
+    "has_index_observation": false,
+    "has_verified_return_basis": false,
+    "index_observed_codes": [],
+    "index_unknown_basis_codes": [],
+    "index_verified_basis": [],
+    "basis_needs_declaration": [],
     "uncomputable_components": [
      "中证A500指数（未映射代码）",
      "银行活期存款利率（税后）×5%（现金利率无历史序列）"
     ],
     "reasons": [
      "合同基准证据等级为 L3，**必须有 L1 官方合同文件**",
-     "**未取得基金合同/招募说明书原始文件**",
-     "**无任何可用收益序列，无法建立可靠基准**"
+     "**未取得基金合同/招募说明书原始文件**"
     ],
     "category": "etf_feeder"
-   }
+   },
+   "lifecycle_bucket": "unknown_status"
   },
   {
    "fund_id": 132,
@@ -12199,20 +14566,38 @@
    "usability": {
     "max_kind": "none",
     "contract_benchmark_usable": false,
-    "research_benchmark_usable": false,
-    "substitute_benchmark_usable": false,
     "fully_reproducible": false,
+    "research_benchmark_candidate": false,
+    "research_benchmark_usable": false,
+    "research_conditions": {
+     "index_code_mapped": false,
+     "history_data_available": false,
+     "return_basis_verified": false,
+     "basis_compatible_with_research": false,
+     "research_rule_declared": true,
+     "not_price_index_as_total_return": true
+    },
+    "substitute_benchmark_candidate": false,
+    "substitute_benchmark_usable": false,
+    "substitute_selection_provided": false,
+    "substitute_selection_complete": false,
+    "has_index_observation": false,
+    "has_verified_return_basis": false,
+    "index_observed_codes": [],
+    "index_unknown_basis_codes": [],
+    "index_verified_basis": [],
+    "basis_needs_declaration": [],
     "uncomputable_components": [
      "中证A500指数（未映射代码）",
      "金融机构人民币活期存款利率（税后）*5%（现金利率无历史序列）"
     ],
     "reasons": [
      "合同基准证据等级为 L3，**必须有 L1 官方合同文件**",
-     "**未取得基金合同/招募说明书原始文件**",
-     "**无任何可用收益序列，无法建立可靠基准**"
+     "**未取得基金合同/招募说明书原始文件**"
     ],
     "category": "etf_feeder"
-   }
+   },
+   "lifecycle_bucket": "unknown_status"
   },
   {
    "fund_id": 133,
@@ -12305,20 +14690,38 @@
    "usability": {
     "max_kind": "none",
     "contract_benchmark_usable": false,
-    "research_benchmark_usable": false,
-    "substitute_benchmark_usable": false,
     "fully_reproducible": false,
+    "research_benchmark_candidate": false,
+    "research_benchmark_usable": false,
+    "research_conditions": {
+     "index_code_mapped": false,
+     "history_data_available": false,
+     "return_basis_verified": false,
+     "basis_compatible_with_research": false,
+     "research_rule_declared": true,
+     "not_price_index_as_total_return": true
+    },
+    "substitute_benchmark_candidate": false,
+    "substitute_benchmark_usable": false,
+    "substitute_selection_provided": false,
+    "substitute_selection_complete": false,
+    "has_index_observation": false,
+    "has_verified_return_basis": false,
+    "index_observed_codes": [],
+    "index_unknown_basis_codes": [],
+    "index_verified_basis": [],
+    "basis_needs_declaration": [],
     "uncomputable_components": [
      "中证A500指数（未映射代码）",
      "银行活期存款利率（税后）*5%（现金利率无历史序列）"
     ],
     "reasons": [
      "合同基准证据等级为 L3，**必须有 L1 官方合同文件**",
-     "**未取得基金合同/招募说明书原始文件**",
-     "**无任何可用收益序列，无法建立可靠基准**"
+     "**未取得基金合同/招募说明书原始文件**"
     ],
     "category": "index_plain"
-   }
+   },
+   "lifecycle_bucket": "unknown_status"
   },
   {
    "fund_id": 134,
@@ -12411,20 +14814,38 @@
    "usability": {
     "max_kind": "none",
     "contract_benchmark_usable": false,
-    "research_benchmark_usable": false,
-    "substitute_benchmark_usable": false,
     "fully_reproducible": false,
+    "research_benchmark_candidate": false,
+    "research_benchmark_usable": false,
+    "research_conditions": {
+     "index_code_mapped": false,
+     "history_data_available": false,
+     "return_basis_verified": false,
+     "basis_compatible_with_research": false,
+     "research_rule_declared": true,
+     "not_price_index_as_total_return": true
+    },
+    "substitute_benchmark_candidate": false,
+    "substitute_benchmark_usable": false,
+    "substitute_selection_provided": false,
+    "substitute_selection_complete": false,
+    "has_index_observation": false,
+    "has_verified_return_basis": false,
+    "index_observed_codes": [],
+    "index_unknown_basis_codes": [],
+    "index_verified_basis": [],
+    "basis_needs_declaration": [],
     "uncomputable_components": [
      "中证A500指数（未映射代码）",
      "银行活期存款利率（税后）×5%（现金利率无历史序列）"
     ],
     "reasons": [
      "合同基准证据等级为 L3，**必须有 L1 官方合同文件**",
-     "**未取得基金合同/招募说明书原始文件**",
-     "**无任何可用收益序列，无法建立可靠基准**"
+     "**未取得基金合同/招募说明书原始文件**"
     ],
     "category": "index_plain"
-   }
+   },
+   "lifecycle_bucket": "unknown_status"
   },
   {
    "fund_id": 135,
@@ -12517,20 +14938,38 @@
    "usability": {
     "max_kind": "none",
     "contract_benchmark_usable": false,
-    "research_benchmark_usable": false,
-    "substitute_benchmark_usable": false,
     "fully_reproducible": false,
+    "research_benchmark_candidate": false,
+    "research_benchmark_usable": false,
+    "research_conditions": {
+     "index_code_mapped": false,
+     "history_data_available": false,
+     "return_basis_verified": false,
+     "basis_compatible_with_research": false,
+     "research_rule_declared": true,
+     "not_price_index_as_total_return": true
+    },
+    "substitute_benchmark_candidate": false,
+    "substitute_benchmark_usable": false,
+    "substitute_selection_provided": false,
+    "substitute_selection_complete": false,
+    "has_index_observation": false,
+    "has_verified_return_basis": false,
+    "index_observed_codes": [],
+    "index_unknown_basis_codes": [],
+    "index_verified_basis": [],
+    "basis_needs_declaration": [],
     "uncomputable_components": [
      "中证A500指数（未映射代码）",
      "银行活期存款利率（税后）×5%（现金利率无历史序列）"
     ],
     "reasons": [
      "合同基准证据等级为 L3，**必须有 L1 官方合同文件**",
-     "**未取得基金合同/招募说明书原始文件**",
-     "**无任何可用收益序列，无法建立可靠基准**"
+     "**未取得基金合同/招募说明书原始文件**"
     ],
     "category": "index_plain"
-   }
+   },
+   "lifecycle_bucket": "unknown_status"
   }
  ]
 }

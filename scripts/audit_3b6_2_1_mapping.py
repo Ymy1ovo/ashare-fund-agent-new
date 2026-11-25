@@ -160,6 +160,8 @@ def main() -> int:
     con.close()
 
     available_codes = idx["available_codes"]
+    # index_code -> return_basis（全部来自 index_master，不修改）
+    basis_map = {i["index_code"]: i["return_basis"] for i in idx["indexes"]}
 
     # ---------------- 逐基金分类与基准判定 ----------------
     records = []
@@ -171,13 +173,27 @@ def main() -> int:
         grade = "L3"
         has_official = False
 
+        rule = cls["required_category"]
+        research_rule = {
+            "rule_version": "3B-6.2.1-v1",
+            "selection_reason": (
+                f"按类别 {rule} 的基准选择规则，选取合同基准中"
+                "已映射的股票/综合指数作为研究比较序列"),
+            "applicable_category": rule,
+            "divergence_from_contract": (
+                "研究基准只覆盖合同基准中的股票指数部分，"
+                "不含债券指数/现金/固定收益率成分，因此不等于合同基准"),
+        }
         usability = assess_benchmark_usability(
             parsed,
             available_index_codes=available_codes,
             category=cls["required_category"],
+            index_return_basis=basis_map,
             contract_evidence_grade=grade,
             has_official_contract_file=has_official,
             has_historical_weights=False,
+            research_rule=research_rule,
+            substitute_selection=None,
         )
 
         # 货币基金特殊口径
@@ -219,12 +235,33 @@ def main() -> int:
     def by_category(pred):
         return sum(1 for r in records if pred(r))
 
-    existing = [r for r in records if r["lifecycle_status"] != "terminated"]
-    terminated = [r for r in records if r["lifecycle_status"] == "terminated"]
+    # ---- 生命周期互斥分类（3B-6.2.1.1 修正）----
+    LIFECYCLE_MAP = {
+        "active": "existing",
+        "existing": "existing",
+        "terminated": "terminated",
+        "unknown": "unknown_status",
+    }
+    lifecycle_buckets = Counter()
+    lifecycle_unmapped = Counter()
+    for r in records:
+        raw = r["lifecycle_status"]
+        bucket = LIFECYCLE_MAP.get(raw)
+        if bucket is None:
+            lifecycle_unmapped[raw] += 1
+            bucket = "unknown_status"
+        r["lifecycle_bucket"] = bucket
+        lifecycle_buckets[bucket] += 1
+
+    existing = [r for r in records if r["lifecycle_bucket"] == "existing"]
+    terminated = [r for r in records if r["lifecycle_bucket"] == "terminated"]
+    unknown_status = [r for r in records if r["lifecycle_bucket"] == "unknown_status"]
 
     cat_counts = Counter(r["classification"]["required_category"] for r in records)
     cat_counts_existing = Counter(
         r["classification"]["required_category"] for r in existing)
+    cat_counts_unknown = Counter(
+        r["classification"]["required_category"] for r in unknown_status)
 
     has_benchmark = by_category(lambda r: bool(r["benchmark_parse"]["raw_text"]))
     has_benchmark_existing = sum(1 for r in existing
@@ -242,14 +279,20 @@ def main() -> int:
 
     contract_usable = by_category(lambda r: r["usability"]["contract_benchmark_usable"])
     fully_repro = by_category(lambda r: r["usability"]["fully_reproducible"])
+    research_candidate = by_category(
+        lambda r: r["usability"]["research_benchmark_candidate"])
     research_usable = by_category(lambda r: r["usability"]["research_benchmark_usable"])
-    research_usable_existing = sum(
-        1 for r in existing if r["usability"]["research_benchmark_usable"])
+    substitute_candidate = by_category(
+        lambda r: r["usability"]["substitute_benchmark_candidate"])
+    substitute_usable = by_category(
+        lambda r: r["usability"]["substitute_benchmark_usable"])
     substitute_only = by_category(
         lambda r: r["usability"]["max_kind"] == "substitute")
     none_usable = by_category(lambda r: r["usability"]["max_kind"] == "none")
-    none_usable_existing = sum(
-        1 for r in existing if r["usability"]["max_kind"] == "none")
+    has_index_observation = by_category(
+        lambda r: r["usability"]["has_index_observation"])
+    has_verified_basis = by_category(
+        lambda r: r["usability"]["has_verified_return_basis"])
 
     summary = {
         "total_funds_by_fund_id": len(records),
@@ -262,11 +305,28 @@ def main() -> int:
         "lifecycle": {
             "existing": len(existing),
             "terminated": len(terminated),
-            "unknown_status": sum(1 for r in records
-                                   if r["lifecycle_status"] not in ("terminated",)),
+            "unknown_status": len(unknown_status),
+            "total": len(records),
+            "sum_equals_total": (len(existing) + len(terminated)
+                                  + len(unknown_status) == len(records)),
+            "raw_value_counts": dict(Counter(
+                r["lifecycle_status"] for r in records)),
+            "mapping_rule": {
+                "active": "existing",
+                "existing": "existing",
+                "terminated": "terminated",
+                "unknown": "unknown_status",
+                "_note": ("**unknown 字面含义即状态未知，不得当作明确存续**；"
+                            "当前库中不存在 active/existing 值"),
+            },
+            "unmapped_raw_values": dict(lifecycle_unmapped),
+            "note": ("**数据库中实际只有 unknown（79 只）与 terminated（41 只）"
+                      "两种取值**，没有任何基金被明确标记为存续。"
+                      "此前报告把 79 只 unknown 当作「存续」，属统计语义错误。"),
         },
         "category_counts_all": dict(cat_counts),
         "category_counts_existing": dict(cat_counts_existing),
+        "category_counts_unknown_status": dict(cat_counts_unknown),
         "category_labels": CATEGORY_LABELS,
         "required_categories_covered": sorted(
             set(cat_counts) & set(REQUIRED_CATEGORIES)),
@@ -274,17 +334,23 @@ def main() -> int:
             set(REQUIRED_CATEGORIES) - set(cat_counts)),
         "has_benchmark_text": has_benchmark,
         "has_benchmark_text_existing": has_benchmark_existing,
+        "_existing_scope_note": (
+            "**`*_existing` 系列字段统计的是明确标记存续的基金，当前库中为 0 只**，"
+            "故这些字段均为 0；有意义的对照口径是 `primary_scope`"),
         "has_index_code": has_index_code,
         "has_index_code_existing": has_index_code_existing,
         "has_usable_return_series": has_series,
         "has_usable_return_series_existing": has_series_existing,
         "contract_benchmark_usable": contract_usable,
         "fully_reproducible": fully_repro,
+        "has_index_observation": has_index_observation,
+        "has_verified_return_basis": has_verified_basis,
+        "research_benchmark_candidate": research_candidate,
         "research_benchmark_usable": research_usable,
-        "research_benchmark_usable_existing": research_usable_existing,
+        "substitute_benchmark_candidate": substitute_candidate,
+        "substitute_benchmark_usable": substitute_usable,
         "substitute_only": substitute_only,
         "no_usable_benchmark": none_usable,
-        "no_usable_benchmark_existing": none_usable_existing,
         "component_type_counts": dict(Counter(
             c["component_type"]
             for r in records for c in r["benchmark_parse"]["components"])),
@@ -340,8 +406,20 @@ def main() -> int:
             1 for r in primary if r["usability"]["contract_benchmark_usable"]),
         "fully_reproducible": sum(
             1 for r in primary if r["usability"]["fully_reproducible"]),
+        "has_index_observation": sum(
+            1 for r in primary if r["usability"]["has_index_observation"]),
+        "has_verified_return_basis": sum(
+            1 for r in primary if r["usability"]["has_verified_return_basis"]),
+        "research_benchmark_candidate": sum(
+            1 for r in primary
+            if r["usability"]["research_benchmark_candidate"]),
         "research_benchmark_usable": sum(
             1 for r in primary if r["usability"]["research_benchmark_usable"]),
+        "substitute_benchmark_candidate": sum(
+            1 for r in primary
+            if r["usability"]["substitute_benchmark_candidate"]),
+        "substitute_benchmark_usable": sum(
+            1 for r in primary if r["usability"]["substitute_benchmark_usable"]),
         "substitute_only": sum(
             1 for r in primary if r["usability"]["max_kind"] == "substitute"),
         "no_usable_benchmark": sum(
@@ -352,8 +430,8 @@ def main() -> int:
     summary["_self_check"] = {
         "category_sum_equals_total": (
             sum(cat_counts.values()) == len(records)),
-        "existing_plus_terminated_equals_total": (
-            len(existing) + len(terminated) == len(records)),
+        "lifecycle_three_buckets_sum_equals_total": (
+            len(existing) + len(terminated) + len(unknown_status) == len(records)),
         "research_plus_none_le_total": (
             research_usable + none_usable <= len(records)),
     }
@@ -383,15 +461,21 @@ def main() -> int:
     out.write_text(json.dumps(doc, ensure_ascii=False, indent=1), encoding="utf-8")
 
     print(f"基金 {len(records)} 只（fund_id 去重）/ 份额 {share_stats['total_share_classes']}")
-    print(f"  存续 {len(existing)} / 清盘 {len(terminated)}")
-    print(f"  有基准文本 {has_benchmark}（存续 {has_benchmark_existing}）")
-    print(f"  能识别指数代码 {has_index_code}（存续 {has_index_code_existing}）")
-    print(f"  有可用收益序列 {has_series}（存续 {has_series_existing}）")
+    print(f"  生命周期：明确存续 {len(existing)} / 终止 {len(terminated)} / "
+          f"状态未知 {len(unknown_status)}"
+          f"（合计 {len(existing)+len(terminated)+len(unknown_status)}"
+          f" {'=' if summary['lifecycle']['sum_equals_total'] else '!='} {len(records)}）")
+    print(f"  有基准文本 {has_benchmark}")
+    print(f"  能识别指数代码 {has_index_code}")
+    print(f"  有可用收益序列 {has_series}")
     print(f"  合同基准可用 {contract_usable}")
     print(f"  完整可复现 {fully_repro}")
-    print(f"  可建研究基准 {research_usable}（存续 {research_usable_existing}）")
+    print(f"  有指数点位 {has_index_observation}")
+    print(f"  收益口径已确认 {has_verified_basis}")
+    print(f"  研究基准候选 {research_candidate} / 真正可用 {research_usable}")
+    print(f"  替代基准候选 {substitute_candidate} / 真正可用 {substitute_usable}")
     print(f"  仅替代基准 {substitute_only}")
-    print(f"  无可用基准 {none_usable}（存续 {none_usable_existing}）")
+    print(f"  无可用基准 {none_usable}")
     print()
     print(f"分类质量：主口径 {len(primary)} / 降级 {len(degraded)}")
     print()
@@ -399,7 +483,7 @@ def main() -> int:
     print()
     print("类别分布：")
     for c in REQUIRED_CATEGORIES:
-        print(f"  {c:18} {cat_counts.get(c, 0):3}  （存续 {cat_counts_existing.get(c, 0)}）")
+        print(f"  {c:18} {cat_counts.get(c, 0):3}  （状态未知 {cat_counts_unknown.get(c, 0)}）")
     print()
     print(f"数据库指纹：{before['db_sha256'][:16]}… → {after['db_sha256'][:16]}… "
           f"{'一致' if doc['db_unchanged'] else '不一致'}")
