@@ -1,7 +1,7 @@
 {
  "phase": "3B-6.2.1",
  "task": "场外公募基金基准分类体系映射审计",
- "generated_at": "2026-11-25T16:47:53",
+ "generated_at": "2026-11-25T17:19:00",
  "baseline_head": "13e95a26bfe94f5574febc263304c7fbbc2bc7ab",
  "read_only": true,
  "db_before": {
@@ -146,7 +146,7 @@
   "total_funds_by_fund_id": 120,
   "total_share_classes": 149,
   "funds_with_multiple_shares": 27,
-  "survivorship_note": "**幸存者偏差声明**：正式库含 41 只 terminated 基金，但全部无分类与基准文本（fund_type_l1 为 NULL）；存续基金 79 只。任何只基于存续基金的统计都存在幸存者偏差。",
+  "survivorship_note": "**幸存者偏差声明**：正式库包含 **41 只明确终止基金**、**79 只生命周期状态未知基金**，**没有明确标记为存续的基金**。由于历史终止基金的分类字段和基准资料缺失，研究样本仍存在明显幸存者偏差，**不能把状态未知基金视为存续基金**。",
   "lifecycle": {
    "existing": 0,
    "terminated": 41,

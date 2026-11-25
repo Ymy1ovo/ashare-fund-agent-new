@@ -794,3 +794,88 @@ def test_self_check_all_true(audit):
     assert sc["category_sum_equals_total"] is True
     assert sc["lifecycle_three_buckets_sum_equals_total"] is True
     assert sc["research_plus_none_le_total"] is True
+
+
+# ============================================================ 3B-6.2.1.1.1 文献一致性
+SURVIVOR_KW = ("41 只明确终止", "79 只生命周期状态未知",
+               "没有明确标记为存续", "不能把状态未知基金视为存续基金")
+
+
+def _strip_md(text: str) -> str:
+    return text.replace("**", "")
+
+
+def test_docs_survivorship_note_correct():
+    """报告中的幸存者偏差说明不得把 79 只 unknown 称为存续。"""
+    txt = _strip_md(_docs_text())
+    for kw in SURVIVOR_KW:
+        assert kw in txt, f"缺关键表述：{kw}"
+    assert "存续基金 79 只" not in txt
+    assert "存续基金79只" not in txt
+
+
+def test_json_survivorship_note_correct(audit):
+    note = _strip_md(audit["summary"]["survivorship_note"])
+    for kw in SURVIVOR_KW:
+        assert kw in note, f"JSON 缺关键表述：{kw}"
+    assert "存续基金 79 只" not in note
+
+
+def test_json_and_docs_survivorship_identical(audit):
+    """JSON 与文档的说明必须一致。"""
+    jnote = _strip_md(audit["summary"]["survivorship_note"]).strip()
+    for doc in DOCS:
+        txt = _strip_md(doc.read_text(encoding="utf-8"))
+        assert jnote in txt, f"{doc.name} 的说明与 JSON 不一致"
+
+
+def test_changelog_survivorship_correct():
+    """CHANGELOG 的**确认性**幸存者偏差声明不得把 79 只 unknown 称为存续。
+
+    引用旧表述（修正前后对照表、历史说明、检索结果）属正常记录，不在此列。
+    """
+    chg = _strip_md(
+        (ROOT / "CHANGELOG.md").read_text(encoding="utf-8"))
+    # 旧确认性表述的完整句子
+    assert "存续基金 79 只。任何只基于存续基金的统计都存在幸存者偏差" not in chg
+    # 把跨行的引用块合并成逻辑段落后再判定
+    blocks, buf = [], []
+    for line in chg.splitlines():
+        st = line.strip()
+        if st.startswith(">"):
+            buf.append(st.lstrip(">").strip())
+        else:
+            if buf:
+                blocks.append("".join(buf)); buf = []
+            if st:
+                blocks.append(st)
+    if buf:
+        blocks.append("".join(buf))
+
+    for blk in blocks:
+        if blk.startswith("幸存者偏差声明"):
+            assert "存续基金 79 只" not in blk, f"错误表述：{blk[:80]}"
+            assert ("没有明确标记为存续" in blk
+                    or "不能把状态未知基金视为存续" in blk), f"缺修正表述：{blk[:80]}"
+
+
+def test_changelog_test_count_consistent():
+    """CHANGELOG 中本轮的新增测试数必须唯一且与全量差值一致。"""
+    chg = (ROOT / "CHANGELOG.md").read_text(encoding="utf-8")
+    idx = chg.find("3B-6.2.1.1 基准可用性判定")
+    assert idx > 0
+    end = chg.find("## ", idx + 10)
+    section = chg[idx:end if end > 0 else idx + 8000]
+    assert "新增 25 项" not in section, "本轮段落仍有「新增 25 项」"
+    assert "新增 26 项" in section
+    assert "2312 → 2338" in section
+
+
+def test_actual_test_count():
+    """测试文件函数数必须与文件内声明的数字一致（防止后续漂移）。"""
+    import re
+    src = (ROOT / "tests" / "test_3b6_2_1_benchmark_taxonomy.py").read_text(
+        encoding="utf-8")
+    n = len(re.findall(r"^def test_", src, re.M))
+    # 3B-6.2.1: 64 项；3B-6.2.1.1: +26 = 90；3B-6.2.1.1.1: +6 = 96
+    assert n == 96, f"测试函数数 {n} != 96"

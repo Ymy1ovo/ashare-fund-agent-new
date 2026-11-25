@@ -1,5 +1,119 @@
 # 变更日志
 
+## 2026-11-25 — 阶段3B-6.2.1.1.1 生命周期说明及测试统计残留口径修正
+
+**只修正文档与报告残留统计，不重构业务逻辑。**
+
+**一、幸存者偏差说明修正**
+
+原说明把 79 只 `unknown` 状态基金写成「**存续基金 79 只**」，
+与生命周期三态互斥统计（`existing=0 / terminated=41 / unknown_status=79`）矛盾。
+
+修正为统一表述：
+
+> **幸存者偏差声明**：正式库包含 **41 只明确终止基金**、
+> **79 只生命周期状态未知基金**，**没有明确标记为存续的基金**。
+> 由于历史终止基金的分类字段和基准资料缺失，研究样本仍存在明显幸存者偏差，
+> **不能把状态未知基金视为存续基金**。
+
+同步修正位置：
+
+| 位置 | 修正前 | 修正后 |
+| --- | --- | --- |
+| `audit_3b6_2_1_mapping.py` → `survivorship_note` | 「存续基金 79 只」 | **三态明确表述** |
+| `phase3B6_2_1_mapping_audit.json` | 同上 | **同步** |
+| `phase3B6_2_1_design.md` | 同上 | **同步** |
+| `phase3B6_2_1_recommendation.md` | 同上 | **同步** |
+| `CHANGELOG.md` | 同上 | **同步**（并修复重复的「**幸存者偏差声明**：**幸存者偏差声明**：」） |
+
+**数据库统计未改变**：`existing=0 / terminated=41 / unknown_status=79 / total=120`。
+
+**二、测试数量描述修正**
+
+CHANGELOG 中同一轮出现「新增 25 项」与「新增 26 项」两种说法。
+
+**核实方式**：不是凭全量差值推断，而是**逐函数比对**上一版与当前测试文件。
+
+| 项 | 值 |
+| --- | ---: |
+| 上一版测试函数数（`git show HEAD~1`） | **64** |
+| 当前测试函数数 | **90** |
+| **实际新增** | **26** |
+| 删除 | **0** |
+
+新增的 26 项：
+
+| # | 测试 |
+| ---: | --- |
+| 1 | `test_unknown_basis_blocks_research` |
+| 2 | `test_observation_not_equal_usable_series` |
+| 3 | `test_verified_basis_enables_research` |
+| 4 | `test_price_basis_needs_declaration` |
+| 5 | `test_missing_research_rule_blocks` |
+| 6 | `test_substitute_requires_explicit_selection` |
+| 7 | `test_substitute_usable_but_research_not` |
+| 8 | `test_both_unusable_returns_none` |
+| 9 | `test_research_and_substitute_conditions_differ` |
+| 10 | `test_no_contract_without_l1` |
+| 11 | `test_never_auto_promoted` |
+| 12 | `test_lifecycle_buckets_exclusive` |
+| 13 | `test_lifecycle_buckets_match_detail` |
+| 14 | `test_lifecycle_unknown_not_counted_as_existing` |
+| 15 | `test_lifecycle_raw_values_all_mapped` |
+| 16 | `test_lifecycle_each_fund_has_bucket` |
+| 17 | `test_docs_no_42_research_usable` |
+| 18 | `test_docs_lifecycle_three_buckets` |
+| 19 | `test_docs_no_stale_usable_42` |
+| 20 | `test_docs_no_79_as_existing` |
+| 21 | `test_docs_report_candidates_separately` |
+| 22 | `test_docs_has_verified_basis_zero` |
+| 23 | `test_docs_return_basis_unknown_blocks` |
+| 24 | `test_all_index_return_basis_unknown` |
+| 25 | `test_db_before_after_identical` |
+| 26 | `test_self_check_all_true` |
+
+**统一为「新增 26 项 / 全量 2312 → 2338」。**
+
+**三、本轮新增测试（6 项）**
+
+| # | 测试 | 断言 |
+| ---: | --- | --- |
+| 1 | `test_docs_survivorship_note_correct` | 文档含四项关键表述，且不含「存续基金 79 只」 |
+| 2 | `test_json_survivorship_note_correct` | JSON 同样修正 |
+| 3 | `test_json_and_docs_survivorship_identical` | JSON 与文档表述完全一致 |
+| 4 | `test_changelog_survivorship_correct` | CHANGELOG 无未标注的错误表述 |
+| 5 | `test_changelog_test_count_consistent` | 本轮段落无「新增 25 项」，有「新增 26 项」与「2312 → 2338」 |
+| 6 | `test_actual_test_count` | 测试文件实际函数数为 96 |
+
+**四、全文检索结果**
+
+| 检索项 | 结果 |
+| --- | --- |
+| `存续基金 79 只`（在确认性语句中） | **0 处** |
+| `existing=79 / terminated=41 / unknown_status=79` | **1 处**，位于历史说明「原报告出现…语义自相矛盾」，**属正确的历史记录** |
+| `新增 25 项，覆盖` | **0 处** |
+| `新增 26 项` | **2 处**（本轮声明 + 全量行） |
+
+**五、测试**
+
+新增 6 项；专项 **96 passed**；
+全量 **2344 passed / 0 failed / 0 skipped**（2338 → 2344）。
+
+**六、数据安全**
+
+| 项 | 值 |
+| --- | --- |
+| 数据库 SHA256 | `27e0b54d7a5675892b70fc5061ed38da8dc6b58119139c63a4039e08e0523061` |
+| 是否变化 | **否** |
+| `integrity_check` | **ok** |
+| 外键违规 | **0** |
+
+本轮未访问、未修改正式数据库。
+
+**门禁不变**：`ready_for_research_analysis=true`，
+`ready_for_backtest=false`，`ready_for_formal_ranking=false`。
+
+
 ## 2026-11-25 — 阶段3B-6.2.1.1 基准可用性判定与生命周期统计逻辑修正
 
 **最小范围修正。不重新设计分类体系、不扩展数据采集、不修改数据库。**
@@ -112,7 +226,7 @@ unknown_status = sum(1 for r in records
 
 **五、测试**
 
-新增 25 项，覆盖：
+新增 26 项，覆盖：
 
 | 类别 | 测试 |
 | --- | --- |
@@ -215,7 +329,7 @@ unknown_status = sum(1 for r in records
 
 41 只清盘基金的 `fund_type_l1/l2` 全为 `NULL`，只能靠全名降级推断。
 
-**幸存者偏差声明**：**幸存者偏差声明**：正式库含 41 只 terminated 基金，但全部无分类与基准文本（fund_type_l1 为 NULL）；存续基金 79 只。任何只基于存续基金的统计都存在幸存者偏差。
+**幸存者偏差声明**：正式库包含 **41 只明确终止基金**、**79 只生命周期状态未知基金**，**没有明确标记为存续的基金**。由于历史终止基金的分类字段和基准资料缺失，研究样本仍存在明显幸存者偏差，**不能把状态未知基金视为存续基金**。
 
 **六、证据链断裂（0 合同基准的根本原因）**
 

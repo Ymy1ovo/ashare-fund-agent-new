@@ -299,9 +299,11 @@ def main() -> int:
         "total_share_classes": share_stats["total_share_classes"],
         "funds_with_multiple_shares": share_stats["funds_with_multiple_shares"],
         "survivorship_note": (
-            "**幸存者偏差声明**：正式库含 41 只 terminated 基金，"
-            "但全部无分类与基准文本（fund_type_l1 为 NULL）；"
-            "存续基金 79 只。任何只基于存续基金的统计都存在幸存者偏差。"),
+            "**幸存者偏差声明**：正式库包含 **41 只明确终止基金**、"
+            "**79 只生命周期状态未知基金**，**没有明确标记为存续的基金**。"
+            "由于历史终止基金的分类字段和基准资料缺失，"
+            "研究样本仍存在明显幸存者偏差，"
+            "**不能把状态未知基金视为存续基金**。"),
         "lifecycle": {
             "existing": len(existing),
             "terminated": len(terminated),
