@@ -145,6 +145,10 @@ def probe(candidate_index: str, indicator: str) -> dict:
         "out_of_range_cells": quality["out_of_range_cells"],
         "duplicate_dates": quality["duplicate_dates"],
         "conflict_dates": quality["conflict_dates"],
+        # 同日重复中至少一条数值异常的日期数（3B-6.1.2.1.1.1 显式传递）
+        "invalid_value_duplicate_dates":
+            quality["invalid_value_duplicate_dates"],
+        "valid_date_rows": quality["valid_date_rows"],
         "out_of_order_rows": quality["out_of_order_rows"],
         "structure_ok": quality["structure_ok"],
         "quality_detail": {k: v for k, v in quality.items()
@@ -192,9 +196,9 @@ def _build_csv_quality(targets: list[dict]) -> dict:
         "total_duplicate_dates": sum(rf["duplicate_dates"]
                                        for rf in unique.values()),
         "total_conflicts": sum(rf["conflict_dates"] for rf in unique.values()),
+        # 严格取字段：缺失即 KeyError，避免静默漏报
         "total_invalid_value_duplicate_dates": sum(
-            rf.get("invalid_value_duplicate_dates", 0)
-            for rf in unique.values()),
+            rf["invalid_value_duplicate_dates"] for rf in unique.values()),
         "total_out_of_order": sum(rf["out_of_order_rows"]
                                    for rf in unique.values()),
         "total_empty_cells": sum(rf["empty_cells"] for rf in unique.values()),
@@ -210,6 +214,7 @@ def _build_csv_quality(targets: list[dict]) -> dict:
             for k in ("empty_cells", "nan_cells", "inf_cells",
                        "non_numeric_cells", "out_of_range_cells",
                        "duplicate_dates", "conflict_dates",
+                       "invalid_value_duplicate_dates",
                        "out_of_order_rows")),
         "note": ("**探测次数 ≠ 独立文件数**："
                   "6 次成功探测仅引用 3 份独立 CSV；"

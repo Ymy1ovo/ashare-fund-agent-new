@@ -150,6 +150,23 @@
 同 SHA256 被多次引用只计一次；同名但 SHA256 不同视为不同文件，不合并。
 **每份 CSV 的完整 64 位 SHA256 已记录**，测试直接读文件复核。
 
+
+### 5.2 `invalid_value_duplicate_dates` 字段传递路径
+
+该字段必须从扫描器一路传递到审计汇总，任一处断裂都会导致漏报。
+
+| 环节 | 文件 | 内容 |
+| --- | --- | --- |
+| 计算 | `scripts/scan_bond_index_csv.py` → `scan_csv()` | 统计「重复日期中至少一条数值异常」的日期数 |
+| 传递 | `scripts/audit_3b6_1_2_bond_index.py` → `probe()` | 写入 `raw_file["invalid_value_duplicate_dates"]` |
+| 汇总 | 同上 → `_build_csv_quality()` | **严格取字段**（缺失即 `KeyError`，不用 `.get(...,0)` 静默兜底） |
+| 落盘 | `phase3B6_1_2_bond_index_audit.json` | `summary.raw_csv_quality.total_invalid_value_duplicate_dates` |
+
+**为什么不能 `.get(..., 0)`**：字段缺失时会静默返回 0，
+真实存在异常重复日期时会被漏报成「零缺陷」，这正是本轮修正的问题。
+
+**真实数据**：3 份独立 CSV 的 `total_invalid_value_duplicate_dates = 0`。
+
 ---
 
 ## 6. 文本一致性（明细复算）

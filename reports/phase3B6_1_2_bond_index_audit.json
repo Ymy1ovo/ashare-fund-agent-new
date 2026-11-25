@@ -1,7 +1,7 @@
 {
  "phase": "3B-6.1.2",
  "task": "bond_index_component_audit",
- "generated_at": "2026-11-25T13:13:49",
+ "generated_at": "2026-11-25T13:38:31",
  "source": "akshare.bond_index_general_cbond",
  "upstream": "https://yield.chinabond.com.cn/cbweb-mn/indices/singleIndexQueryResult",
  "publisher": "中债金融估值中心（中债登）",
@@ -36,7 +36,7 @@
       "indicator": "财富",
       "period": "总值"
      },
-     "called_at": "2026-11-25T13:13:49",
+     "called_at": "2026-11-25T13:38:31",
      "status": "ok",
      "rows": 6225,
      "error": null,
@@ -66,6 +66,8 @@
       "out_of_range_cells": 0,
       "duplicate_dates": 0,
       "conflict_dates": 0,
+      "invalid_value_duplicate_dates": 0,
+      "valid_date_rows": 6225,
       "out_of_order_rows": 0,
       "structure_ok": true,
       "quality_detail": {
@@ -125,7 +127,7 @@
       "indicator": "全价",
       "period": "总值"
      },
-     "called_at": "2026-11-25T13:13:58",
+     "called_at": "2026-11-25T13:38:40",
      "status": "ok",
      "rows": 6225,
      "error": null,
@@ -155,6 +157,8 @@
       "out_of_range_cells": 0,
       "duplicate_dates": 0,
       "conflict_dates": 0,
+      "invalid_value_duplicate_dates": 0,
+      "valid_date_rows": 6225,
       "out_of_order_rows": 0,
       "structure_ok": true,
       "quality_detail": {
@@ -214,7 +218,7 @@
       "indicator": "净价",
       "period": "总值"
      },
-     "called_at": "2026-11-25T13:14:03",
+     "called_at": "2026-11-25T13:38:45",
      "status": "ok",
      "rows": 6225,
      "error": null,
@@ -244,6 +248,8 @@
       "out_of_range_cells": 0,
       "duplicate_dates": 0,
       "conflict_dates": 0,
+      "invalid_value_duplicate_dates": 0,
+      "valid_date_rows": 6225,
       "out_of_order_rows": 0,
       "structure_ok": true,
       "quality_detail": {
@@ -327,7 +333,7 @@
       "indicator": "全价",
       "period": "总值"
      },
-     "called_at": "2026-11-25T13:14:08",
+     "called_at": "2026-11-25T13:38:51",
      "status": "ok",
      "rows": 6225,
      "error": null,
@@ -357,6 +363,8 @@
       "out_of_range_cells": 0,
       "duplicate_dates": 0,
       "conflict_dates": 0,
+      "invalid_value_duplicate_dates": 0,
+      "valid_date_rows": 6225,
       "out_of_order_rows": 0,
       "structure_ok": true,
       "quality_detail": {
@@ -462,7 +470,7 @@
       "indicator": "全价",
       "period": "总值"
      },
-     "called_at": "2026-11-25T13:14:14",
+     "called_at": "2026-11-25T13:38:56",
      "status": "ok",
      "rows": 6225,
      "error": null,
@@ -492,6 +500,8 @@
       "out_of_range_cells": 0,
       "duplicate_dates": 0,
       "conflict_dates": 0,
+      "invalid_value_duplicate_dates": 0,
+      "valid_date_rows": 6225,
       "out_of_order_rows": 0,
       "structure_ok": true,
       "quality_detail": {
@@ -575,7 +585,7 @@
       "indicator": "财富",
       "period": "总值"
      },
-     "called_at": "2026-11-25T13:14:19",
+     "called_at": "2026-11-25T13:39:01",
      "status": "ok",
      "rows": 6225,
      "error": null,
@@ -605,6 +615,8 @@
       "out_of_range_cells": 0,
       "duplicate_dates": 0,
       "conflict_dates": 0,
+      "invalid_value_duplicate_dates": 0,
+      "valid_date_rows": 6225,
       "out_of_order_rows": 0,
       "structure_ok": true,
       "quality_detail": {
