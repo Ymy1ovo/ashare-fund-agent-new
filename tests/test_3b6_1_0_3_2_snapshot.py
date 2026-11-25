@@ -211,17 +211,23 @@ def test_historical_records_not_deleted(readme):
 
 # ============================================================ 其他一致性
 def test_readme_coverage_rates_match_json(readme, r01):
-    """3B-6.1.x 章节里的覆盖率必须能在 JSON 找到对应。"""
+    """指数覆盖章节（74~77）里的覆盖率必须能在 JSON 找到对应。
+
+    78 节是中债国债收益率审计，用的是 99.5% 这类不同口径的覆盖率，
+    不属于指数收益口径，因此范围限定到 77 节为止。
+    """
     valid = {f"{x['total_return_quality']['coverage_ratio']:.1%}"
              for x in r01["indexes"] if x.get("total_return_quality")}
     start = readme.find("## 74. 阶段3B-6.1.0")
+    end = readme.find("## 78. 阶段3B-6.1.1")
     assert start > 0
-    scope = readme[start:]
+    assert end > start, "README 章节结构变化，请更新本测试范围"
+    scope = readme[start:end]
     for m in re.finditer(r"(\d{2,3}\.\d%)", scope):
         rate = m.group(1)
         v = float(rate.rstrip("%"))
         if 40 <= v <= 100:
-            assert rate in valid, f"3B-6.1.x 出现无法对应 JSON 的覆盖率 {rate}"
+            assert rate in valid, f"指数覆盖章节出现无法对应 JSON 的覆盖率 {rate}"
 
 
 def test_gate_unchanged(r01):
