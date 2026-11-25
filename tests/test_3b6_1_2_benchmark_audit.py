@@ -670,3 +670,45 @@ def test_evidence_log_covers_all_15_funds():
     assert len(d["funds_document_status"]) == 15
     codes = {f["fund_code"] for f in d["funds_document_status"]}
     assert len(codes) == 15
+
+
+# ============================================================ 3B-6.1.2.1.1
+def test_docs_no_stale_cash_fixed_count():
+    """报告不得残留「16 个现金/固定成分」的旧描述。"""
+    txt = _read_docs()
+    assert "16 个现金/固定成分" not in txt
+    assert "16个现金" not in txt
+
+
+def test_docs_no_blanket_cash_statement():
+    """不得声称「每条基准都有 5%~10% 的现金类成分」。"""
+    txt = _read_docs()
+    # 允许出现在「不能说」的否定语境里，但不能作为断言出现
+    for line in txt.splitlines():
+        if "5%~10%" in line or "5%～10%" in line:
+            assert ("不能说" in line or "不得" in line or "**" in line), \
+                f"出现未经限定的现金比例断言：{line}"
+
+
+def test_docs_cash_fixed_separately_stated():
+    """报告必须明确 fixed_rate 不属于 cash。"""
+    txt = _read_docs()
+    assert "`fixed_rate` 不属于 `cash`" in txt or \
+        "`fixed_rate`（1 个）不得计入 `cash`" in txt
+
+
+def test_docs_category_numbers_match_detail(audit, comp):
+    """报告分类数字必须与 34 条明细一致。"""
+    from collections import Counter
+    cnt = Counter(c["component_category"] for c in comp["components"])
+    txt = _read_docs()
+    import re as _re
+    for cat, n in cnt.items():
+        pat = r"`" + cat + r"`\s*\|\s*\**" + str(n) + r"\**"
+        assert _re.search(pat, txt), f"报告中缺 {cat}={n}"
+
+
+def test_docs_unexplained_residual_not_inferred():
+    """000051 剩余 5% 不得被推断为现金或其他资产。"""
+    txt = _read_docs()
+    assert "不得推断" in txt or "没有说明" in txt

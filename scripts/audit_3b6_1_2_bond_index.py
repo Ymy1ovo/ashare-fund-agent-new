@@ -154,6 +154,68 @@ def probe(candidate_index: str, indicator: str) -> dict:
     return rec
 
 
+
+
+def _build_csv_quality(targets: list[dict]) -> dict:
+    """把「探测引用」与「独立原始文件」两套统计分开。
+
+    独立文件以 (文件名, 完整 SHA256) 共同识别：
+    - 同 SHA256 被多个探测引用 → 只计一次；
+    - 同名但 SHA256 不同 → 视为不同文件，不合并。
+    """
+    probes_ok = [p for t in targets for p in t["probes"]
+                  if p["status"] == "ok"]
+
+    unique = {}
+    for p in probes_ok:
+        rf = p["raw_file"]
+        key = (rf["file"], rf["sha256"])
+        if key not in unique:
+            unique[key] = rf
+
+    return {
+        # ---- 探测维度 ----
+        "successful_probe_count": len(probes_ok),
+        "probe_referenced_rows_total": sum(
+            p["raw_file"]["raw_rows"] for p in probes_ok),
+        # ---- 独立文件维度 ----
+        "unique_raw_file_count": len(unique),
+        "unique_raw_rows_total": sum(rf["raw_rows"] for rf in unique.values()),
+        "unique_raw_valid_rows_total": sum(
+            rf["valid_rows"] for rf in unique.values()),
+        "unique_files": [
+            {"file": rf["file"], "sha256": rf["sha256"],
+              "bytes": rf["bytes"], "raw_rows": rf["raw_rows"],
+              "valid_rows": rf["valid_rows"]}
+            for rf in sorted(unique.values(), key=lambda x: x["file"])],
+        # ---- 质量（按独立文件统计，避免重复计数）----
+        "total_duplicate_dates": sum(rf["duplicate_dates"]
+                                       for rf in unique.values()),
+        "total_conflicts": sum(rf["conflict_dates"] for rf in unique.values()),
+        "total_invalid_value_duplicate_dates": sum(
+            rf.get("invalid_value_duplicate_dates", 0)
+            for rf in unique.values()),
+        "total_out_of_order": sum(rf["out_of_order_rows"]
+                                   for rf in unique.values()),
+        "total_empty_cells": sum(rf["empty_cells"] for rf in unique.values()),
+        "total_nan_cells": sum(rf["nan_cells"] for rf in unique.values()),
+        "total_inf_cells": sum(rf["inf_cells"] for rf in unique.values()),
+        "total_non_numeric_cells": sum(rf["non_numeric_cells"]
+                                        for rf in unique.values()),
+        "total_out_of_range_cells": sum(rf["out_of_range_cells"]
+                                         for rf in unique.values()),
+        "all_structure_ok": all(rf["structure_ok"] for rf in unique.values()),
+        "all_zero_defects": all(
+            rf[k] == 0 for rf in unique.values()
+            for k in ("empty_cells", "nan_cells", "inf_cells",
+                       "non_numeric_cells", "out_of_range_cells",
+                       "duplicate_dates", "conflict_dates",
+                       "out_of_order_rows")),
+        "note": ("**探测次数 ≠ 独立文件数**："
+                  "6 次成功探测仅引用 3 份独立 CSV；"
+                  "行数按独立文件统计为 18,675，按探测引用累计为 37,350"),
+    }
+
 def main() -> int:
     EV.mkdir(parents=True, exist_ok=True)
     out = {
@@ -253,33 +315,7 @@ def main() -> int:
                                  and all(p["status"] == "ok" for p in t["probes"])),
         "official_code_confirmed": sum(1 for t in out["targets"]
                                         if t["official_code"]),
-        "raw_csv_quality": {
-            "files": sum(len([p for p in t["probes"] if p["status"] == "ok"])
-                          for t in out["targets"]),
-            "total_raw_rows": sum(p["raw_file"]["raw_rows"]
-                                   for t in out["targets"] for p in t["probes"]
-                                   if p["status"] == "ok"),
-            "total_valid_rows": sum(p["raw_file"]["valid_rows"]
-                                     for t in out["targets"] for p in t["probes"]
-                                     if p["status"] == "ok"),
-            "total_duplicate_dates": sum(p["raw_file"]["duplicate_dates"]
-                                          for t in out["targets"] for p in t["probes"]
-                                          if p["status"] == "ok"),
-            "total_conflicts": sum(p["raw_file"]["conflict_dates"]
-                                    for t in out["targets"] for p in t["probes"]
-                                    if p["status"] == "ok"),
-            "all_structure_ok": all(p["raw_file"]["structure_ok"]
-                                     for t in out["targets"] for p in t["probes"]
-                                     if p["status"] == "ok"),
-            "all_zero_defects": all(
-                p["raw_file"][k] == 0
-                for t in out["targets"] for p in t["probes"]
-                if p["status"] == "ok"
-                for k in ("empty_cells", "nan_cells", "inf_cells",
-                           "non_numeric_cells", "out_of_range_cells",
-                           "duplicate_dates", "conflict_dates",
-                           "out_of_order_rows")),
-        },
+        "raw_csv_quality": _build_csv_quality(out["targets"]),
         "methodology_doc_obtained": sum(1 for t in out["targets"]
                                          if t["methodology_doc_obtained"]),
         "series_semantics_confirmed": sum(1 for t in out["targets"]
@@ -297,6 +333,10 @@ def main() -> int:
     print(f"债券成分 {s['total_bond_components']} 个")
     print(f"  有接口 {s['interface_available']} / 阻断 {s['interface_blocked']}")
     print(f"  探测成功 {s['probes_ok']} 次")
+    q = s["raw_csv_quality"]
+    print(f"  独立原始 CSV {q['unique_raw_file_count']} 份 / "
+          f"{q['unique_raw_rows_total']:,} 行")
+    print(f"  探测引用行数 {q['probe_referenced_rows_total']:,} 行")
     print(f"  合同明说口径 {s['contract_states_basis']}")
     print(f"  官方代码确认 {s['official_code_confirmed']}")
     print(f"  完全合格 {s['fully_qualified']}")
