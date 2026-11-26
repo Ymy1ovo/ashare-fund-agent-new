@@ -506,6 +506,10 @@ def assess_benchmark_usability(
                 if c["component_type"] == "equity_index"
                 and c.get("index_code") in available_index_codes]
     has_index_observation = bool(observed)
+    # 有可识别的候选指数成分（哪怕代码未映射/无序列/未接入），
+    # 用于区分「无候选映射(D)」与「有候选但必要成分缺失(C)」
+    has_candidate_mapping = any(
+        c["component_type"] in ("equity_index", "bond_index") for c in comps)
 
     # has_verified_return_basis：口径已确认（非 unknown）
     verified_basis = []
@@ -539,23 +543,52 @@ def assess_benchmark_usability(
                 "会导致基准收益被系统性低估，必须在研究报告中声明**")
 
     # ================= 2. 成分可计算性（合同基准用） =================
+    # 缺口分两级：**关键缺口**影响基准身份或必要成分的确认（必须降 C），
+    # **非关键缺口**只影响能否计算（可评 B，但基准仍不可用）。
     uncomputable = []
+    critical_gaps: list[str] = []
+    non_critical_gaps: list[str] = []
     for c in comps:
         t = c["component_type"]
         if t == "equity_index":
             if not c.get("index_code"):
-                uncomputable.append(f"{c['name']}（未映射代码）")
+                msg = f"{c['name']}（未映射代码）"
+                uncomputable.append(msg)
+                critical_gaps.append(msg)
             elif c["index_code"] not in available_index_codes:
-                uncomputable.append(f"{c['name']}（无收益序列）")
+                msg = f"{c['name']}（无收益序列）"
+                uncomputable.append(msg)
+                critical_gaps.append(msg)
         elif t == "bond_index":
-            uncomputable.append(f"{c['name']}（债券指数未接入）")
+            msg = f"{c['name']}（债券指数未接入）"
+            uncomputable.append(msg)
+            critical_gaps.append(msg)
         elif t == "cash":
-            uncomputable.append(f"{c['name']}（现金利率无历史序列）")
+            msg = f"{c['name']}（现金利率无历史序列）"
+            uncomputable.append(msg)
+            non_critical_gaps.append(msg)
         elif t == "fixed_rate":
-            uncomputable.append(f"{c['name']}（折算规则未知）")
+            msg = f"{c['name']}（折算规则未知）"
+            uncomputable.append(msg)
+            non_critical_gaps.append(msg)
         else:
-            uncomputable.append(f"{c['name'] or c['raw_term']}（无法识别）")
+            msg = f"{c['name'] or c['raw_term']}（无法识别）"
+            uncomputable.append(msg)
+            critical_gaps.append(msg)
 
+    # 复合基准：必要权重/成分无法确认 → 关键缺口
+    if len(comps) > 1:
+        residual = parsed.get("unexplained_residual")
+        if residual:
+            critical_gaps.append(
+                f"未解释的剩余 {residual:.0%} 权重"
+                "（复合基准成分构成无法确认）")
+        unparsed = [c["raw_term"] for c in comps if c["weight"] is None]
+        if unparsed:
+            critical_gaps.append(
+                f"复合基准成分权重无法确认 {unparsed}")
+
+    has_critical_mapping_gap = bool(critical_gaps)
     fully_computable = not uncomputable and bool(comps)
 
     # ================= 3. contract 判定 =================
@@ -649,6 +682,7 @@ def assess_benchmark_usability(
         "substitute_selection_complete": sub_complete,
         # ---- 数据事实（分开报告，不得混用）----
         "has_index_observation": has_index_observation,
+        "has_candidate_mapping": has_candidate_mapping,
         "has_verified_return_basis": has_verified_return_basis,
         "index_observed_codes": sorted({c["index_code"] for c in observed}),
         "index_unknown_basis_codes": sorted(set(unknown_basis)),
@@ -657,6 +691,11 @@ def assess_benchmark_usability(
         "basis_needs_declaration": basis_needs_declaration,
         # ---- 诊断 ----
         "uncomputable_components": uncomputable,
+        # ---- 缺口分级（关键 vs 非关键，两者必须分开判断）----
+        "has_critical_mapping_gap": has_critical_mapping_gap,
+        "critical_gaps": critical_gaps,
+        "non_critical_gaps": non_critical_gaps,
+        "required_components_complete": not has_critical_mapping_gap,
         "reasons": reasons,
         "category": category,
     }

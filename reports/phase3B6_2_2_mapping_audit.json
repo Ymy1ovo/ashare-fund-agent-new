@@ -1,7 +1,7 @@
 {
  "phase": "3B-6.2.2",
  "task": "场外公募基金与基准映射规则实现",
- "generated_at": "2026-11-26T09:18:16",
+ "generated_at": "2026-11-26T10:09:27",
  "baseline_head": "e9fcd3cd197c7f58d3267d3a20825caa6e320548",
  "mapping_rule_version": "3B-6.2.2-v1",
  "read_only": true,
@@ -35,17 +35,19 @@
   },
   "B": {
    "label": "中高",
-   "definition": "映射关系有可靠的 L1/L2 证据，存在非关键缺口，但不影响基准身份及主要映射关系",
+   "definition": "映射关系有可靠的 L1/L2 证据，基准身份明确，不存在关键映射缺口，但存在非关键缺口",
    "requires": [
     "L1 或 L2 映射证据",
-    "基准身份（用哪个指数）明确"
+    "基准身份（用哪个指数）明确",
+    "不存在关键映射缺口（必要成分完整、可确认）"
    ],
    "non_critical_gaps_allowed": true,
    "non_critical_gap_examples": [
     "收益口径未确认（不影响「是哪只指数」，只影响能否算）",
-    "非必要成分缺失"
+    "现金利率/固定收益率等非必要成分无法计算",
+    "未持有官方合同原始文件（不影响身份，只影响合同基准准入）"
    ],
-   "critical_gap_note": "**仅凭 L3 第三方平台文本，不能评为 B 级**",
+   "critical_gap_note": "**仅凭 L3 第三方平台文本，不能评为 B 级**；**必要成分缺失（指数未映射、债券指数未接入、复合基准权重无法确认）属关键缺口，L1/L2 证据也只能评 C**",
    "can_bypass_usability": false
   },
   "C": {
@@ -57,7 +59,7 @@
    "critical_gaps": [
     "仅有 L3 第三方资料（映射关系未获官方证据确认）",
     "收益口径未确认",
-    "必要成分不完整"
+    "必要成分缺失或无法确认（指数未映射/债券指数未接入/复合基准权重无法确认）"
    ],
    "can_bypass_usability": false
   },
@@ -385,10 +387,25 @@
   ],
   "required_categories_missing": [],
   "confidence_distribution": {
-   "C": 42,
-   "D": 78
+   "C": 69,
+   "D": 51
   },
   "confidence_note": "**置信度不能替代基准可用性判定**：即使置信度为 A，只要收益口径、历史权重或必要成分不满足条件，也不能判为可回测",
+  "gap_classification": {
+   "with_critical_gap": 50,
+   "without_critical_gap": 70,
+   "with_non_critical_gap": 53,
+   "critical_gap_buckets": {
+    "债券指数未接入": 37,
+    "未映射代码": 18,
+    "无法识别": 3,
+    "复合基准成分构成无法确认": 2,
+    "复合基准成分权重无法确认 ['三年期银行定期存款利率(税后)']": 1,
+    "复合基准成分权重无法确认 ['一年期银行定期存款税后收益率']": 1,
+    "复合基准成分权重无法确认 ['一年期定期存款税后利率']": 1
+   },
+   "rule": "关键缺口=必要成分缺失/无法确认（指数未映射、债券指数未接入、复合基准权重无法确认）；非关键缺口=现金利率/固定收益率无法计算、收益口径未确认。**关键缺口存在时 L1/L2 也只能评 C**"
+  },
   "contract": {
    "total_with_text": 78,
    "available": 0
@@ -456,8 +473,7 @@
    "substitute_available": 0,
    "allowed_to_next_stage": 0,
    "confidence_distribution": {
-    "C": 2,
-    "D": 1
+    "C": 3
    },
    "no_usable": 3
   },
@@ -473,8 +489,8 @@
    "substitute_available": 0,
    "allowed_to_next_stage": 0,
    "confidence_distribution": {
-    "C": 13,
-    "D": 13
+    "C": 23,
+    "D": 3
    },
    "no_usable": 26
   },
@@ -490,8 +506,8 @@
    "substitute_available": 0,
    "allowed_to_next_stage": 0,
    "confidence_distribution": {
-    "C": 10,
-    "D": 15
+    "C": 14,
+    "D": 11
    },
    "no_usable": 25
   },
@@ -507,8 +523,8 @@
    "substitute_available": 0,
    "allowed_to_next_stage": 0,
    "confidence_distribution": {
-    "C": 14,
-    "D": 21
+    "C": 16,
+    "D": 19
    },
    "no_usable": 35
   },
@@ -524,7 +540,8 @@
    "substitute_available": 0,
    "allowed_to_next_stage": 0,
    "confidence_distribution": {
-    "D": 6
+    "C": 5,
+    "D": 1
    },
    "no_usable": 6
   },
@@ -540,8 +557,8 @@
    "substitute_available": 0,
    "allowed_to_next_stage": 0,
    "confidence_distribution": {
-    "D": 14,
-    "C": 3
+    "D": 9,
+    "C": 8
    },
    "no_usable": 17
   }
@@ -1411,11 +1428,19 @@
    "confidence": "C",
    "confidence_notes": [
     "仅有 L3 第三方资料，**无法证明合同里写的确实是该指数**",
+    "**存在关键映射缺口：必要成分缺失或无法确认**",
+    "关键缺口：未解释的剩余 5% 权重（复合基准成分构成无法确认）",
     "未取得基金合同/招募说明书原始文件",
-    "收益口径未确认（关键证据缺失）",
-    "必要成分不完整"
+    "收益口径未确认（关键证据缺失）"
    ],
    "confidence_is_not_usability": true,
+   "has_critical_mapping_gap": true,
+   "critical_gaps": [
+    "未解释的剩余 5% 权重（复合基准成分构成无法确认）"
+   ],
+   "non_critical_gaps": [
+    "1%（指年收益率，评价时应按期间折算）（折算规则未知）"
+   ],
    "benchmarks": {
     "contract": {
      "kind": "contract",
@@ -1545,9 +1570,14 @@
     "仅有 L3 第三方资料，**无法证明合同里写的确实是该指数**",
     "未取得基金合同/招募说明书原始文件",
     "收益口径未确认（关键证据缺失）",
-    "必要成分不完整"
+    "存在不可计算成分（非关键缺口），但证据等级不足，仍评 C"
    ],
    "confidence_is_not_usability": true,
+   "has_critical_mapping_gap": false,
+   "critical_gaps": [],
+   "non_critical_gaps": [
+    "活期存款利率(税后)X5%（现金利率无历史序列）"
+   ],
    "benchmarks": {
     "contract": {
      "kind": "contract",
@@ -1679,9 +1709,14 @@
     "仅有 L3 第三方资料，**无法证明合同里写的确实是该指数**",
     "未取得基金合同/招募说明书原始文件",
     "收益口径未确认（关键证据缺失）",
-    "必要成分不完整"
+    "存在不可计算成分（非关键缺口），但证据等级不足，仍评 C"
    ],
    "confidence_is_not_usability": true,
+   "has_critical_mapping_gap": false,
+   "critical_gaps": [],
+   "non_critical_gaps": [
+    "金融机构人民币活期存款基准利率（税后）×5%（现金利率无历史序列）"
+   ],
    "benchmarks": {
     "contract": {
      "kind": "contract",
@@ -1813,9 +1848,14 @@
     "仅有 L3 第三方资料，**无法证明合同里写的确实是该指数**",
     "未取得基金合同/招募说明书原始文件",
     "收益口径未确认（关键证据缺失）",
-    "必要成分不完整"
+    "存在不可计算成分（非关键缺口），但证据等级不足，仍评 C"
    ],
    "confidence_is_not_usability": true,
+   "has_critical_mapping_gap": false,
+   "critical_gaps": [],
+   "non_critical_gaps": [
+    "银行活期存款利率（税后）×5%（现金利率无历史序列）"
+   ],
    "benchmarks": {
     "contract": {
      "kind": "contract",
@@ -1944,11 +1984,17 @@
    "confidence": "C",
    "confidence_notes": [
     "仅有 L3 第三方资料，**无法证明合同里写的确实是该指数**",
+    "**存在关键映射缺口：必要成分缺失或无法确认**",
+    "关键缺口：中债总指数（债券指数未接入）",
     "未取得基金合同/招募说明书原始文件",
-    "收益口径未确认（关键证据缺失）",
-    "必要成分不完整"
+    "收益口径未确认（关键证据缺失）"
    ],
    "confidence_is_not_usability": true,
+   "has_critical_mapping_gap": true,
+   "critical_gaps": [
+    "中债总指数（债券指数未接入）"
+   ],
+   "non_critical_gaps": [],
    "benchmarks": {
     "contract": {
      "kind": "contract",
@@ -2077,11 +2123,19 @@
    "confidence": "C",
    "confidence_notes": [
     "仅有 L3 第三方资料，**无法证明合同里写的确实是该指数**",
+    "**存在关键映射缺口：必要成分缺失或无法确认**",
+    "关键缺口：中债综合全价指数（债券指数未接入）",
     "未取得基金合同/招募说明书原始文件",
-    "收益口径未确认（关键证据缺失）",
-    "必要成分不完整"
+    "收益口径未确认（关键证据缺失）"
    ],
    "confidence_is_not_usability": true,
+   "has_critical_mapping_gap": true,
+   "critical_gaps": [
+    "中债综合全价指数（债券指数未接入）"
+   ],
+   "non_critical_gaps": [
+    "同业存款利率×5%（现金利率无历史序列）"
+   ],
    "benchmarks": {
     "contract": {
      "kind": "contract",
@@ -2224,9 +2278,14 @@
     "仅有 L3 第三方资料，**无法证明合同里写的确实是该指数**",
     "未取得基金合同/招募说明书原始文件",
     "收益口径未确认（关键证据缺失）",
-    "必要成分不完整"
+    "存在不可计算成分（非关键缺口），但证据等级不足，仍评 C"
    ],
    "confidence_is_not_usability": true,
+   "has_critical_mapping_gap": false,
+   "critical_gaps": [],
+   "non_critical_gaps": [
+    "5%×商业银行活期存款利率（税前）（现金利率无历史序列）"
+   ],
    "benchmarks": {
     "contract": {
      "kind": "contract",
@@ -2353,11 +2412,20 @@
    "mapping_rule_version": "3B-6.2.2-v1",
    "category_rule_id": "R-PUREBOND",
    "max_kind": "none",
-   "confidence": "D",
+   "confidence": "C",
    "confidence_notes": [
-    "无已映射的候选指数，无法建立映射关系"
+    "仅有 L3 第三方资料，**无法证明合同里写的确实是该指数**",
+    "**存在关键映射缺口：必要成分缺失或无法确认**",
+    "关键缺口：中债综合指数（债券指数未接入）",
+    "未取得基金合同/招募说明书原始文件",
+    "收益口径未确认（关键证据缺失）"
    ],
    "confidence_is_not_usability": true,
+   "has_critical_mapping_gap": true,
+   "critical_gaps": [
+    "中债综合指数（债券指数未接入）"
+   ],
+   "non_critical_gaps": [],
    "benchmarks": {
     "contract": {
      "kind": "contract",
@@ -2464,6 +2532,9 @@
     "货币基金需独立口径，当前无万份收益/七日年化数据"
    ],
    "confidence_is_not_usability": true,
+   "has_critical_mapping_gap": false,
+   "critical_gaps": [],
+   "non_critical_gaps": [],
    "benchmarks": {
     "contract": {
      "kind": "contract",
@@ -2557,6 +2628,9 @@
     "分类字段不足，已降级分类，无法建立可靠映射关系"
    ],
    "confidence_is_not_usability": true,
+   "has_critical_mapping_gap": false,
+   "critical_gaps": [],
+   "non_critical_gaps": [],
    "benchmarks": {
     "contract": {
      "kind": "contract",
@@ -2651,6 +2725,9 @@
     "分类字段不足，已降级分类，无法建立可靠映射关系"
    ],
    "confidence_is_not_usability": true,
+   "has_critical_mapping_gap": false,
+   "critical_gaps": [],
+   "non_critical_gaps": [],
    "benchmarks": {
     "contract": {
      "kind": "contract",
@@ -2745,6 +2822,9 @@
     "分类字段不足，已降级分类，无法建立可靠映射关系"
    ],
    "confidence_is_not_usability": true,
+   "has_critical_mapping_gap": false,
+   "critical_gaps": [],
+   "non_critical_gaps": [],
    "benchmarks": {
     "contract": {
      "kind": "contract",
@@ -2838,6 +2918,9 @@
     "分类字段不足，已降级分类，无法建立可靠映射关系"
    ],
    "confidence_is_not_usability": true,
+   "has_critical_mapping_gap": false,
+   "critical_gaps": [],
+   "non_critical_gaps": [],
    "benchmarks": {
     "contract": {
      "kind": "contract",
@@ -2932,6 +3015,9 @@
     "分类字段不足，已降级分类，无法建立可靠映射关系"
    ],
    "confidence_is_not_usability": true,
+   "has_critical_mapping_gap": false,
+   "critical_gaps": [],
+   "non_critical_gaps": [],
    "benchmarks": {
     "contract": {
      "kind": "contract",
@@ -3025,6 +3111,9 @@
     "分类字段不足，已降级分类，无法建立可靠映射关系"
    ],
    "confidence_is_not_usability": true,
+   "has_critical_mapping_gap": false,
+   "critical_gaps": [],
+   "non_critical_gaps": [],
    "benchmarks": {
     "contract": {
      "kind": "contract",
@@ -3118,6 +3207,9 @@
     "分类字段不足，已降级分类，无法建立可靠映射关系"
    ],
    "confidence_is_not_usability": true,
+   "has_critical_mapping_gap": false,
+   "critical_gaps": [],
+   "non_critical_gaps": [],
    "benchmarks": {
     "contract": {
      "kind": "contract",
@@ -3212,6 +3304,9 @@
     "分类字段不足，已降级分类，无法建立可靠映射关系"
    ],
    "confidence_is_not_usability": true,
+   "has_critical_mapping_gap": false,
+   "critical_gaps": [],
+   "non_critical_gaps": [],
    "benchmarks": {
     "contract": {
      "kind": "contract",
@@ -3307,6 +3402,9 @@
     "分类字段不足，已降级分类，无法建立可靠映射关系"
    ],
    "confidence_is_not_usability": true,
+   "has_critical_mapping_gap": false,
+   "critical_gaps": [],
+   "non_critical_gaps": [],
    "benchmarks": {
     "contract": {
      "kind": "contract",
@@ -3401,6 +3499,9 @@
     "分类字段不足，已降级分类，无法建立可靠映射关系"
    ],
    "confidence_is_not_usability": true,
+   "has_critical_mapping_gap": false,
+   "critical_gaps": [],
+   "non_critical_gaps": [],
    "benchmarks": {
     "contract": {
      "kind": "contract",
@@ -3495,6 +3596,9 @@
     "分类字段不足，已降级分类，无法建立可靠映射关系"
    ],
    "confidence_is_not_usability": true,
+   "has_critical_mapping_gap": false,
+   "critical_gaps": [],
+   "non_critical_gaps": [],
    "benchmarks": {
     "contract": {
      "kind": "contract",
@@ -3589,6 +3693,9 @@
     "分类字段不足，已降级分类，无法建立可靠映射关系"
    ],
    "confidence_is_not_usability": true,
+   "has_critical_mapping_gap": false,
+   "critical_gaps": [],
+   "non_critical_gaps": [],
    "benchmarks": {
     "contract": {
      "kind": "contract",
@@ -3682,6 +3789,9 @@
     "分类字段不足，已降级分类，无法建立可靠映射关系"
    ],
    "confidence_is_not_usability": true,
+   "has_critical_mapping_gap": false,
+   "critical_gaps": [],
+   "non_critical_gaps": [],
    "benchmarks": {
     "contract": {
      "kind": "contract",
@@ -3776,6 +3886,9 @@
     "分类字段不足，已降级分类，无法建立可靠映射关系"
    ],
    "confidence_is_not_usability": true,
+   "has_critical_mapping_gap": false,
+   "critical_gaps": [],
+   "non_critical_gaps": [],
    "benchmarks": {
     "contract": {
      "kind": "contract",
@@ -3870,6 +3983,9 @@
     "分类字段不足，已降级分类，无法建立可靠映射关系"
    ],
    "confidence_is_not_usability": true,
+   "has_critical_mapping_gap": false,
+   "critical_gaps": [],
+   "non_critical_gaps": [],
    "benchmarks": {
     "contract": {
      "kind": "contract",
@@ -3964,6 +4080,9 @@
     "分类字段不足，已降级分类，无法建立可靠映射关系"
    ],
    "confidence_is_not_usability": true,
+   "has_critical_mapping_gap": false,
+   "critical_gaps": [],
+   "non_critical_gaps": [],
    "benchmarks": {
     "contract": {
      "kind": "contract",
@@ -4058,6 +4177,9 @@
     "分类字段不足，已降级分类，无法建立可靠映射关系"
    ],
    "confidence_is_not_usability": true,
+   "has_critical_mapping_gap": false,
+   "critical_gaps": [],
+   "non_critical_gaps": [],
    "benchmarks": {
     "contract": {
      "kind": "contract",
@@ -4152,6 +4274,9 @@
     "分类字段不足，已降级分类，无法建立可靠映射关系"
    ],
    "confidence_is_not_usability": true,
+   "has_critical_mapping_gap": false,
+   "critical_gaps": [],
+   "non_critical_gaps": [],
    "benchmarks": {
     "contract": {
      "kind": "contract",
@@ -4245,6 +4370,9 @@
     "分类字段不足，已降级分类，无法建立可靠映射关系"
    ],
    "confidence_is_not_usability": true,
+   "has_critical_mapping_gap": false,
+   "critical_gaps": [],
+   "non_critical_gaps": [],
    "benchmarks": {
     "contract": {
      "kind": "contract",
@@ -4340,6 +4468,9 @@
     "分类字段不足，已降级分类，无法建立可靠映射关系"
    ],
    "confidence_is_not_usability": true,
+   "has_critical_mapping_gap": false,
+   "critical_gaps": [],
+   "non_critical_gaps": [],
    "benchmarks": {
     "contract": {
      "kind": "contract",
@@ -4433,6 +4564,9 @@
     "分类字段不足，已降级分类，无法建立可靠映射关系"
    ],
    "confidence_is_not_usability": true,
+   "has_critical_mapping_gap": false,
+   "critical_gaps": [],
+   "non_critical_gaps": [],
    "benchmarks": {
     "contract": {
      "kind": "contract",
@@ -4527,6 +4661,9 @@
     "分类字段不足，已降级分类，无法建立可靠映射关系"
    ],
    "confidence_is_not_usability": true,
+   "has_critical_mapping_gap": false,
+   "critical_gaps": [],
+   "non_critical_gaps": [],
    "benchmarks": {
     "contract": {
      "kind": "contract",
@@ -4620,6 +4757,9 @@
     "分类字段不足，已降级分类，无法建立可靠映射关系"
    ],
    "confidence_is_not_usability": true,
+   "has_critical_mapping_gap": false,
+   "critical_gaps": [],
+   "non_critical_gaps": [],
    "benchmarks": {
     "contract": {
      "kind": "contract",
@@ -4714,6 +4854,9 @@
     "分类字段不足，已降级分类，无法建立可靠映射关系"
    ],
    "confidence_is_not_usability": true,
+   "has_critical_mapping_gap": false,
+   "critical_gaps": [],
+   "non_critical_gaps": [],
    "benchmarks": {
     "contract": {
      "kind": "contract",
@@ -4808,6 +4951,9 @@
     "分类字段不足，已降级分类，无法建立可靠映射关系"
    ],
    "confidence_is_not_usability": true,
+   "has_critical_mapping_gap": false,
+   "critical_gaps": [],
+   "non_critical_gaps": [],
    "benchmarks": {
     "contract": {
      "kind": "contract",
@@ -4901,6 +5047,9 @@
     "分类字段不足，已降级分类，无法建立可靠映射关系"
    ],
    "confidence_is_not_usability": true,
+   "has_critical_mapping_gap": false,
+   "critical_gaps": [],
+   "non_critical_gaps": [],
    "benchmarks": {
     "contract": {
      "kind": "contract",
@@ -4994,6 +5143,9 @@
     "分类字段不足，已降级分类，无法建立可靠映射关系"
    ],
    "confidence_is_not_usability": true,
+   "has_critical_mapping_gap": false,
+   "critical_gaps": [],
+   "non_critical_gaps": [],
    "benchmarks": {
     "contract": {
      "kind": "contract",
@@ -5087,6 +5239,9 @@
     "分类字段不足，已降级分类，无法建立可靠映射关系"
    ],
    "confidence_is_not_usability": true,
+   "has_critical_mapping_gap": false,
+   "critical_gaps": [],
+   "non_critical_gaps": [],
    "benchmarks": {
     "contract": {
      "kind": "contract",
@@ -5180,6 +5335,9 @@
     "分类字段不足，已降级分类，无法建立可靠映射关系"
    ],
    "confidence_is_not_usability": true,
+   "has_critical_mapping_gap": false,
+   "critical_gaps": [],
+   "non_critical_gaps": [],
    "benchmarks": {
     "contract": {
      "kind": "contract",
@@ -5273,6 +5431,9 @@
     "分类字段不足，已降级分类，无法建立可靠映射关系"
    ],
    "confidence_is_not_usability": true,
+   "has_critical_mapping_gap": false,
+   "critical_gaps": [],
+   "non_critical_gaps": [],
    "benchmarks": {
     "contract": {
      "kind": "contract",
@@ -5366,6 +5527,9 @@
     "分类字段不足，已降级分类，无法建立可靠映射关系"
    ],
    "confidence_is_not_usability": true,
+   "has_critical_mapping_gap": false,
+   "critical_gaps": [],
+   "non_critical_gaps": [],
    "benchmarks": {
     "contract": {
      "kind": "contract",
@@ -5459,6 +5623,9 @@
     "分类字段不足，已降级分类，无法建立可靠映射关系"
    ],
    "confidence_is_not_usability": true,
+   "has_critical_mapping_gap": false,
+   "critical_gaps": [],
+   "non_critical_gaps": [],
    "benchmarks": {
     "contract": {
      "kind": "contract",
@@ -5552,6 +5719,9 @@
     "分类字段不足，已降级分类，无法建立可靠映射关系"
    ],
    "confidence_is_not_usability": true,
+   "has_critical_mapping_gap": false,
+   "critical_gaps": [],
+   "non_critical_gaps": [],
    "benchmarks": {
     "contract": {
      "kind": "contract",
@@ -5645,6 +5815,9 @@
     "分类字段不足，已降级分类，无法建立可靠映射关系"
    ],
    "confidence_is_not_usability": true,
+   "has_critical_mapping_gap": false,
+   "critical_gaps": [],
+   "non_critical_gaps": [],
    "benchmarks": {
     "contract": {
      "kind": "contract",
@@ -5739,6 +5912,9 @@
     "分类字段不足，已降级分类，无法建立可靠映射关系"
    ],
    "confidence_is_not_usability": true,
+   "has_critical_mapping_gap": false,
+   "critical_gaps": [],
+   "non_critical_gaps": [],
    "benchmarks": {
     "contract": {
      "kind": "contract",
@@ -5833,6 +6009,9 @@
     "分类字段不足，已降级分类，无法建立可靠映射关系"
    ],
    "confidence_is_not_usability": true,
+   "has_critical_mapping_gap": false,
+   "critical_gaps": [],
+   "non_critical_gaps": [],
    "benchmarks": {
     "contract": {
      "kind": "contract",
@@ -5926,6 +6105,9 @@
     "分类字段不足，已降级分类，无法建立可靠映射关系"
    ],
    "confidence_is_not_usability": true,
+   "has_critical_mapping_gap": false,
+   "critical_gaps": [],
+   "non_critical_gaps": [],
    "benchmarks": {
     "contract": {
      "kind": "contract",
@@ -6020,6 +6202,9 @@
     "分类字段不足，已降级分类，无法建立可靠映射关系"
    ],
    "confidence_is_not_usability": true,
+   "has_critical_mapping_gap": false,
+   "critical_gaps": [],
+   "non_critical_gaps": [],
    "benchmarks": {
     "contract": {
      "kind": "contract",
@@ -6113,6 +6298,9 @@
     "分类字段不足，已降级分类，无法建立可靠映射关系"
    ],
    "confidence_is_not_usability": true,
+   "has_critical_mapping_gap": false,
+   "critical_gaps": [],
+   "non_critical_gaps": [],
    "benchmarks": {
     "contract": {
      "kind": "contract",
@@ -6206,6 +6394,9 @@
     "分类字段不足，已降级分类，无法建立可靠映射关系"
    ],
    "confidence_is_not_usability": true,
+   "has_critical_mapping_gap": false,
+   "critical_gaps": [],
+   "non_critical_gaps": [],
    "benchmarks": {
     "contract": {
      "kind": "contract",
@@ -6299,6 +6490,9 @@
     "分类字段不足，已降级分类，无法建立可靠映射关系"
    ],
    "confidence_is_not_usability": true,
+   "has_critical_mapping_gap": false,
+   "critical_gaps": [],
+   "non_critical_gaps": [],
    "benchmarks": {
     "contract": {
      "kind": "contract",
@@ -6392,9 +6586,14 @@
     "仅有 L3 第三方资料，**无法证明合同里写的确实是该指数**",
     "未取得基金合同/招募说明书原始文件",
     "收益口径未确认（关键证据缺失）",
-    "必要成分不完整"
+    "存在不可计算成分（非关键缺口），但证据等级不足，仍评 C"
    ],
    "confidence_is_not_usability": true,
+   "has_critical_mapping_gap": false,
+   "critical_gaps": [],
+   "non_critical_gaps": [
+    "银行活期存款利率（税后）×5%（现金利率无历史序列）"
+   ],
    "benchmarks": {
     "contract": {
      "kind": "contract",
@@ -6524,11 +6723,17 @@
    "confidence": "C",
    "confidence_notes": [
     "仅有 L3 第三方资料，**无法证明合同里写的确实是该指数**",
+    "**存在关键映射缺口：必要成分缺失或无法确认**",
+    "关键缺口：中债-总全价(总值)指数（债券指数未接入）",
     "未取得基金合同/招募说明书原始文件",
-    "收益口径未确认（关键证据缺失）",
-    "必要成分不完整"
+    "收益口径未确认（关键证据缺失）"
    ],
    "confidence_is_not_usability": true,
+   "has_critical_mapping_gap": true,
+   "critical_gaps": [
+    "中债-总全价(总值)指数（债券指数未接入）"
+   ],
+   "non_critical_gaps": [],
    "benchmarks": {
     "contract": {
      "kind": "contract",
@@ -6679,11 +6884,19 @@
    "confidence": "C",
    "confidence_notes": [
     "仅有 L3 第三方资料，**无法证明合同里写的确实是该指数**",
+    "**存在关键映射缺口：必要成分缺失或无法确认**",
+    "关键缺口：恒生指数（未映射代码）",
+    "关键缺口：中债综合财富指数（债券指数未接入）",
     "未取得基金合同/招募说明书原始文件",
-    "收益口径未确认（关键证据缺失）",
-    "必要成分不完整"
+    "收益口径未确认（关键证据缺失）"
    ],
    "confidence_is_not_usability": true,
+   "has_critical_mapping_gap": true,
+   "critical_gaps": [
+    "恒生指数（未映射代码）",
+    "中债综合财富指数（债券指数未接入）"
+   ],
+   "non_critical_gaps": [],
    "benchmarks": {
     "contract": {
      "kind": "contract",
@@ -6838,9 +7051,14 @@
     "仅有 L3 第三方资料，**无法证明合同里写的确实是该指数**",
     "未取得基金合同/招募说明书原始文件",
     "收益口径未确认（关键证据缺失）",
-    "必要成分不完整"
+    "存在不可计算成分（非关键缺口），但证据等级不足，仍评 C"
    ],
    "confidence_is_not_usability": true,
+   "has_critical_mapping_gap": false,
+   "critical_gaps": [],
+   "non_critical_gaps": [
+    "5%*银行同业存款利率（现金利率无历史序列）"
+   ],
    "benchmarks": {
     "contract": {
      "kind": "contract",
@@ -6971,9 +7189,14 @@
     "仅有 L3 第三方资料，**无法证明合同里写的确实是该指数**",
     "未取得基金合同/招募说明书原始文件",
     "收益口径未确认（关键证据缺失）",
-    "必要成分不完整"
+    "存在不可计算成分（非关键缺口），但证据等级不足，仍评 C"
    ],
    "confidence_is_not_usability": true,
+   "has_critical_mapping_gap": false,
+   "critical_gaps": [],
+   "non_critical_gaps": [
+    "人民币活期存款税后利率×5%（现金利率无历史序列）"
+   ],
    "benchmarks": {
     "contract": {
      "kind": "contract",
@@ -7102,11 +7325,17 @@
    "confidence": "C",
    "confidence_notes": [
     "仅有 L3 第三方资料，**无法证明合同里写的确实是该指数**",
+    "**存在关键映射缺口：必要成分缺失或无法确认**",
+    "关键缺口：中证综合债券指数（债券指数未接入）",
     "未取得基金合同/招募说明书原始文件",
-    "收益口径未确认（关键证据缺失）",
-    "必要成分不完整"
+    "收益口径未确认（关键证据缺失）"
    ],
    "confidence_is_not_usability": true,
+   "has_critical_mapping_gap": true,
+   "critical_gaps": [
+    "中证综合债券指数（债券指数未接入）"
+   ],
+   "non_critical_gaps": [],
    "benchmarks": {
     "contract": {
      "kind": "contract",
@@ -7235,11 +7464,19 @@
    "confidence": "C",
    "confidence_notes": [
     "仅有 L3 第三方资料，**无法证明合同里写的确实是该指数**",
+    "**存在关键映射缺口：必要成分缺失或无法确认**",
+    "关键缺口：上证国债指数（债券指数未接入）",
     "未取得基金合同/招募说明书原始文件",
-    "收益口径未确认（关键证据缺失）",
-    "必要成分不完整"
+    "收益口径未确认（关键证据缺失）"
    ],
    "confidence_is_not_usability": true,
+   "has_critical_mapping_gap": true,
+   "critical_gaps": [
+    "上证国债指数（债券指数未接入）"
+   ],
+   "non_critical_gaps": [
+    "活期存款基准利率*5%（现金利率无历史序列）"
+   ],
    "benchmarks": {
     "contract": {
      "kind": "contract",
@@ -7379,11 +7616,20 @@
    "mapping_rule_version": "3B-6.2.2-v1",
    "category_rule_id": "R-PUREBOND",
    "max_kind": "none",
-   "confidence": "D",
+   "confidence": "C",
    "confidence_notes": [
-    "无已映射的候选指数，无法建立映射关系"
+    "仅有 L3 第三方资料，**无法证明合同里写的确实是该指数**",
+    "**存在关键映射缺口：必要成分缺失或无法确认**",
+    "关键缺口：中债-优选投资级信用债财富指数（债券指数未接入）",
+    "未取得基金合同/招募说明书原始文件",
+    "收益口径未确认（关键证据缺失）"
    ],
    "confidence_is_not_usability": true,
+   "has_critical_mapping_gap": true,
+   "critical_gaps": [
+    "中债-优选投资级信用债财富指数（债券指数未接入）"
+   ],
+   "non_critical_gaps": [],
    "benchmarks": {
     "contract": {
      "kind": "contract",
@@ -7489,6 +7735,11 @@
     "货币基金需独立口径，当前无万份收益/七日年化数据"
    ],
    "confidence_is_not_usability": true,
+   "has_critical_mapping_gap": false,
+   "critical_gaps": [],
+   "non_critical_gaps": [
+    "活期存款利率（税后）（现金利率无历史序列）"
+   ],
    "benchmarks": {
     "contract": {
      "kind": "contract",
@@ -7596,9 +7847,14 @@
     "仅有 L3 第三方资料，**无法证明合同里写的确实是该指数**",
     "未取得基金合同/招募说明书原始文件",
     "收益口径未确认（关键证据缺失）",
-    "必要成分不完整"
+    "存在不可计算成分（非关键缺口），但证据等级不足，仍评 C"
    ],
    "confidence_is_not_usability": true,
+   "has_critical_mapping_gap": false,
+   "critical_gaps": [],
+   "non_critical_gaps": [
+    "银行活期存款利率（税后）×5%（现金利率无历史序列）"
+   ],
    "benchmarks": {
     "contract": {
      "kind": "contract",
@@ -7727,11 +7983,17 @@
    "confidence": "C",
    "confidence_notes": [
     "仅有 L3 第三方资料，**无法证明合同里写的确实是该指数**",
+    "**存在关键映射缺口：必要成分缺失或无法确认**",
+    "关键缺口：中债-综合全价（总值）指数（债券指数未接入）",
     "未取得基金合同/招募说明书原始文件",
-    "收益口径未确认（关键证据缺失）",
-    "必要成分不完整"
+    "收益口径未确认（关键证据缺失）"
    ],
    "confidence_is_not_usability": true,
+   "has_critical_mapping_gap": true,
+   "critical_gaps": [
+    "中债-综合全价（总值）指数（债券指数未接入）"
+   ],
+   "non_critical_gaps": [],
    "benchmarks": {
     "contract": {
      "kind": "contract",
@@ -7856,11 +8118,22 @@
    "mapping_rule_version": "3B-6.2.2-v1",
    "category_rule_id": "R-ACTIVE",
    "max_kind": "none",
-   "confidence": "D",
+   "confidence": "C",
    "confidence_notes": [
-    "无已映射的候选指数，无法建立映射关系"
+    "仅有 L3 第三方资料，**无法证明合同里写的确实是该指数**",
+    "**存在关键映射缺口：必要成分缺失或无法确认**",
+    "关键缺口：中证全指指数（未映射代码）",
+    "关键缺口：中债-综合全价（总值）指数（债券指数未接入）",
+    "未取得基金合同/招募说明书原始文件",
+    "收益口径未确认（关键证据缺失）"
    ],
    "confidence_is_not_usability": true,
+   "has_critical_mapping_gap": true,
+   "critical_gaps": [
+    "中证全指指数（未映射代码）",
+    "中债-综合全价（总值）指数（债券指数未接入）"
+   ],
+   "non_critical_gaps": [],
    "benchmarks": {
     "contract": {
      "kind": "contract",
@@ -7987,11 +8260,22 @@
    "mapping_rule_version": "3B-6.2.2-v1",
    "category_rule_id": "R-ACTIVE",
    "max_kind": "none",
-   "confidence": "D",
+   "confidence": "C",
    "confidence_notes": [
-    "无已映射的候选指数，无法建立映射关系"
+    "仅有 L3 第三方资料，**无法证明合同里写的确实是该指数**",
+    "**存在关键映射缺口：必要成分缺失或无法确认**",
+    "关键缺口：中证A500指数（未映射代码）",
+    "关键缺口：上证国债指数（债券指数未接入）",
+    "未取得基金合同/招募说明书原始文件",
+    "收益口径未确认（关键证据缺失）"
    ],
    "confidence_is_not_usability": true,
+   "has_critical_mapping_gap": true,
+   "critical_gaps": [
+    "中证A500指数（未映射代码）",
+    "上证国债指数（债券指数未接入）"
+   ],
+   "non_critical_gaps": [],
    "benchmarks": {
     "contract": {
      "kind": "contract",
@@ -8122,11 +8406,17 @@
    "confidence": "C",
    "confidence_notes": [
     "仅有 L3 第三方资料，**无法证明合同里写的确实是该指数**",
+    "**存在关键映射缺口：必要成分缺失或无法确认**",
+    "关键缺口：上证国债指数（债券指数未接入）",
     "未取得基金合同/招募说明书原始文件",
-    "收益口径未确认（关键证据缺失）",
-    "必要成分不完整"
+    "收益口径未确认（关键证据缺失）"
    ],
    "confidence_is_not_usability": true,
+   "has_critical_mapping_gap": true,
+   "critical_gaps": [
+    "上证国债指数（债券指数未接入）"
+   ],
+   "non_critical_gaps": [],
    "benchmarks": {
     "contract": {
      "kind": "contract",
@@ -8255,11 +8545,17 @@
    "confidence": "C",
    "confidence_notes": [
     "仅有 L3 第三方资料，**无法证明合同里写的确实是该指数**",
+    "**存在关键映射缺口：必要成分缺失或无法确认**",
+    "关键缺口：中证全债指数（债券指数未接入）",
     "未取得基金合同/招募说明书原始文件",
-    "收益口径未确认（关键证据缺失）",
-    "必要成分不完整"
+    "收益口径未确认（关键证据缺失）"
    ],
    "confidence_is_not_usability": true,
+   "has_critical_mapping_gap": true,
+   "critical_gaps": [
+    "中证全债指数（债券指数未接入）"
+   ],
+   "non_critical_gaps": [],
    "benchmarks": {
     "contract": {
      "kind": "contract",
@@ -8388,11 +8684,17 @@
    "confidence": "C",
    "confidence_notes": [
     "仅有 L3 第三方资料，**无法证明合同里写的确实是该指数**",
+    "**存在关键映射缺口：必要成分缺失或无法确认**",
+    "关键缺口：中债-综合财富（总值）指数（债券指数未接入）",
     "未取得基金合同/招募说明书原始文件",
-    "收益口径未确认（关键证据缺失）",
-    "必要成分不完整"
+    "收益口径未确认（关键证据缺失）"
    ],
    "confidence_is_not_usability": true,
+   "has_critical_mapping_gap": true,
+   "critical_gaps": [
+    "中债-综合财富（总值）指数（债券指数未接入）"
+   ],
+   "non_critical_gaps": [],
    "benchmarks": {
     "contract": {
      "kind": "contract",
@@ -8520,11 +8822,17 @@
    "confidence": "C",
    "confidence_notes": [
     "仅有 L3 第三方资料，**无法证明合同里写的确实是该指数**",
+    "**存在关键映射缺口：必要成分缺失或无法确认**",
+    "关键缺口：中债综合指数（债券指数未接入）",
     "未取得基金合同/招募说明书原始文件",
-    "收益口径未确认（关键证据缺失）",
-    "必要成分不完整"
+    "收益口径未确认（关键证据缺失）"
    ],
    "confidence_is_not_usability": true,
+   "has_critical_mapping_gap": true,
+   "critical_gaps": [
+    "中债综合指数（债券指数未接入）"
+   ],
+   "non_critical_gaps": [],
    "benchmarks": {
     "contract": {
      "kind": "contract",
@@ -8653,11 +8961,19 @@
    "confidence": "C",
    "confidence_notes": [
     "仅有 L3 第三方资料，**无法证明合同里写的确实是该指数**",
+    "**存在关键映射缺口：必要成分缺失或无法确认**",
+    "关键缺口：中债-总财富（1-3年）指数（债券指数未接入）",
     "未取得基金合同/招募说明书原始文件",
-    "收益口径未确认（关键证据缺失）",
-    "必要成分不完整"
+    "收益口径未确认（关键证据缺失）"
    ],
    "confidence_is_not_usability": true,
+   "has_critical_mapping_gap": true,
+   "critical_gaps": [
+    "中债-总财富（1-3年）指数（债券指数未接入）"
+   ],
+   "non_critical_gaps": [
+    "活期存款基准利率×5%（现金利率无历史序列）"
+   ],
    "benchmarks": {
     "contract": {
      "kind": "contract",
@@ -8795,11 +9111,24 @@
    "mapping_rule_version": "3B-6.2.2-v1",
    "category_rule_id": "R-MIXEDBOND",
    "max_kind": "none",
-   "confidence": "D",
+   "confidence": "C",
    "confidence_notes": [
-    "无已映射的候选指数，无法建立映射关系"
+    "仅有 L3 第三方资料，**无法证明合同里写的确实是该指数**",
+    "**存在关键映射缺口：必要成分缺失或无法确认**",
+    "关键缺口：中证可转换债券指数（债券指数未接入）",
+    "关键缺口：中证综合债指数（债券指数未接入）",
+    "未取得基金合同/招募说明书原始文件",
+    "收益口径未确认（关键证据缺失）"
    ],
    "confidence_is_not_usability": true,
+   "has_critical_mapping_gap": true,
+   "critical_gaps": [
+    "中证可转换债券指数（债券指数未接入）",
+    "中证综合债指数（债券指数未接入）"
+   ],
+   "non_critical_gaps": [
+    "活期存款基准利率*5%（现金利率无历史序列）"
+   ],
    "benchmarks": {
     "contract": {
      "kind": "contract",
@@ -8927,11 +9256,26 @@
    "mapping_rule_version": "3B-6.2.2-v1",
    "category_rule_id": "R-MIXEDBOND",
    "max_kind": "none",
-   "confidence": "D",
+   "confidence": "C",
    "confidence_notes": [
-    "无已映射的候选指数，无法建立映射关系"
+    "仅有 L3 第三方资料，**无法证明合同里写的确实是该指数**",
+    "**存在关键映射缺口：必要成分缺失或无法确认**",
+    "关键缺口：中证A500指数（未映射代码）",
+    "关键缺口：中债-新综合财富（1-3年）指数（债券指数未接入）",
+    "关键缺口：中证可转换债券指数（债券指数未接入）",
+    "未取得基金合同/招募说明书原始文件",
+    "收益口径未确认（关键证据缺失）"
    ],
    "confidence_is_not_usability": true,
+   "has_critical_mapping_gap": true,
+   "critical_gaps": [
+    "中证A500指数（未映射代码）",
+    "中债-新综合财富（1-3年）指数（债券指数未接入）",
+    "中证可转换债券指数（债券指数未接入）"
+   ],
+   "non_critical_gaps": [
+    "活期存款基准利率×5%（现金利率无历史序列）"
+   ],
    "benchmarks": {
     "contract": {
      "kind": "contract",
@@ -9087,11 +9431,17 @@
    "confidence": "C",
    "confidence_notes": [
     "仅有 L3 第三方资料，**无法证明合同里写的确实是该指数**",
+    "**存在关键映射缺口：必要成分缺失或无法确认**",
+    "关键缺口：中债-优选投资级信用债全价（总值）指数（债券指数未接入）",
     "未取得基金合同/招募说明书原始文件",
-    "收益口径未确认（关键证据缺失）",
-    "必要成分不完整"
+    "收益口径未确认（关键证据缺失）"
    ],
    "confidence_is_not_usability": true,
+   "has_critical_mapping_gap": true,
+   "critical_gaps": [
+    "中债-优选投资级信用债全价（总值）指数（债券指数未接入）"
+   ],
+   "non_critical_gaps": [],
    "benchmarks": {
     "contract": {
      "kind": "contract",
@@ -9221,6 +9571,14 @@
     "无已映射的候选指数，无法建立映射关系"
    ],
    "confidence_is_not_usability": true,
+   "has_critical_mapping_gap": true,
+   "critical_gaps": [
+    "1.5%（无法识别）",
+    "复合基准成分权重无法确认 ['三年期银行定期存款利率(税后)']"
+   ],
+   "non_critical_gaps": [
+    "三年期银行定期存款利率(税后)（现金利率无历史序列）"
+   ],
    "benchmarks": {
     "contract": {
      "kind": "contract",
@@ -9335,11 +9693,19 @@
    "confidence": "C",
    "confidence_notes": [
     "仅有 L3 第三方资料，**无法证明合同里写的确实是该指数**",
+    "**存在关键映射缺口：必要成分缺失或无法确认**",
+    "关键缺口：中证可转换债券指数（债券指数未接入）",
     "未取得基金合同/招募说明书原始文件",
-    "收益口径未确认（关键证据缺失）",
-    "必要成分不完整"
+    "收益口径未确认（关键证据缺失）"
    ],
    "confidence_is_not_usability": true,
+   "has_critical_mapping_gap": true,
+   "critical_gaps": [
+    "中证可转换债券指数（债券指数未接入）"
+   ],
+   "non_critical_gaps": [
+    "一年期定期存款基准利率×5%（现金利率无历史序列）"
+   ],
    "benchmarks": {
     "contract": {
      "kind": "contract",
@@ -9481,11 +9847,17 @@
    "confidence": "C",
    "confidence_notes": [
     "仅有 L3 第三方资料，**无法证明合同里写的确实是该指数**",
+    "**存在关键映射缺口：必要成分缺失或无法确认**",
+    "关键缺口：中债综合全价指数（债券指数未接入）",
     "未取得基金合同/招募说明书原始文件",
-    "收益口径未确认（关键证据缺失）",
-    "必要成分不完整"
+    "收益口径未确认（关键证据缺失）"
    ],
    "confidence_is_not_usability": true,
+   "has_critical_mapping_gap": true,
+   "critical_gaps": [
+    "中债综合全价指数（债券指数未接入）"
+   ],
+   "non_critical_gaps": [],
    "benchmarks": {
     "contract": {
      "kind": "contract",
@@ -9615,6 +9987,14 @@
     "无已映射的候选指数，无法建立映射关系"
    ],
    "confidence_is_not_usability": true,
+   "has_critical_mapping_gap": true,
+   "critical_gaps": [
+    "1.2%（无法识别）",
+    "复合基准成分权重无法确认 ['一年期银行定期存款税后收益率']"
+   ],
+   "non_critical_gaps": [
+    "一年期银行定期存款税后收益率（现金利率无历史序列）"
+   ],
    "benchmarks": {
     "contract": {
      "kind": "contract",
@@ -9731,6 +10111,14 @@
     "无已映射的候选指数，无法建立映射关系"
    ],
    "confidence_is_not_usability": true,
+   "has_critical_mapping_gap": true,
+   "critical_gaps": [
+    "1.2%（无法识别）",
+    "复合基准成分权重无法确认 ['一年期定期存款税后利率']"
+   ],
+   "non_critical_gaps": [
+    "一年期定期存款税后利率（现金利率无历史序列）"
+   ],
    "benchmarks": {
     "contract": {
      "kind": "contract",
@@ -9842,11 +10230,24 @@
    "mapping_rule_version": "3B-6.2.2-v1",
    "category_rule_id": "R-MIXEDBOND",
    "max_kind": "none",
-   "confidence": "D",
+   "confidence": "C",
    "confidence_notes": [
-    "无已映射的候选指数，无法建立映射关系"
+    "仅有 L3 第三方资料，**无法证明合同里写的确实是该指数**",
+    "**存在关键映射缺口：必要成分缺失或无法确认**",
+    "关键缺口：中债-企业债总全价（总值）指数（债券指数未接入）",
+    "关键缺口：中债-国债总全价（总值）指数（债券指数未接入）",
+    "关键缺口：中证可转换债券指数（债券指数未接入）",
+    "未取得基金合同/招募说明书原始文件",
+    "收益口径未确认（关键证据缺失）"
    ],
    "confidence_is_not_usability": true,
+   "has_critical_mapping_gap": true,
+   "critical_gaps": [
+    "中债-企业债总全价（总值）指数（债券指数未接入）",
+    "中债-国债总全价（总值）指数（债券指数未接入）",
+    "中证可转换债券指数（债券指数未接入）"
+   ],
+   "non_critical_gaps": [],
    "benchmarks": {
     "contract": {
      "kind": "contract",
@@ -9972,11 +10373,22 @@
    "mapping_rule_version": "3B-6.2.2-v1",
    "category_rule_id": "R-PUREBOND",
    "max_kind": "none",
-   "confidence": "D",
+   "confidence": "C",
    "confidence_notes": [
-    "无已映射的候选指数，无法建立映射关系"
+    "仅有 L3 第三方资料，**无法证明合同里写的确实是该指数**",
+    "**存在关键映射缺口：必要成分缺失或无法确认**",
+    "关键缺口：中债-优选投资级信用债财富（总值）指数（债券指数未接入）",
+    "未取得基金合同/招募说明书原始文件",
+    "收益口径未确认（关键证据缺失）"
    ],
    "confidence_is_not_usability": true,
+   "has_critical_mapping_gap": true,
+   "critical_gaps": [
+    "中债-优选投资级信用债财富（总值）指数（债券指数未接入）"
+   ],
+   "non_critical_gaps": [
+    "活期存款基准利率×5%（现金利率无历史序列）"
+   ],
    "benchmarks": {
     "contract": {
      "kind": "contract",
@@ -10090,11 +10502,22 @@
    "mapping_rule_version": "3B-6.2.2-v1",
    "category_rule_id": "R-MIXEDBOND",
    "max_kind": "none",
-   "confidence": "D",
+   "confidence": "C",
    "confidence_notes": [
-    "无已映射的候选指数，无法建立映射关系"
+    "仅有 L3 第三方资料，**无法证明合同里写的确实是该指数**",
+    "**存在关键映射缺口：必要成分缺失或无法确认**",
+    "关键缺口：中债-综合全价（1-3年）指数（债券指数未接入）",
+    "关键缺口：中证可转换债券（全价）指数（债券指数未接入）",
+    "未取得基金合同/招募说明书原始文件",
+    "收益口径未确认（关键证据缺失）"
    ],
    "confidence_is_not_usability": true,
+   "has_critical_mapping_gap": true,
+   "critical_gaps": [
+    "中债-综合全价（1-3年）指数（债券指数未接入）",
+    "中证可转换债券（全价）指数（债券指数未接入）"
+   ],
+   "non_critical_gaps": [],
    "benchmarks": {
     "contract": {
      "kind": "contract",
@@ -10207,11 +10630,20 @@
    "mapping_rule_version": "3B-6.2.2-v1",
    "category_rule_id": "R-PUREBOND",
    "max_kind": "none",
-   "confidence": "D",
+   "confidence": "C",
    "confidence_notes": [
-    "无已映射的候选指数，无法建立映射关系"
+    "仅有 L3 第三方资料，**无法证明合同里写的确实是该指数**",
+    "**存在关键映射缺口：必要成分缺失或无法确认**",
+    "关键缺口：中债总指数（债券指数未接入）",
+    "未取得基金合同/招募说明书原始文件",
+    "收益口径未确认（关键证据缺失）"
    ],
    "confidence_is_not_usability": true,
+   "has_critical_mapping_gap": true,
+   "critical_gaps": [
+    "中债总指数（债券指数未接入）"
+   ],
+   "non_critical_gaps": [],
    "benchmarks": {
     "contract": {
      "kind": "contract",
@@ -10318,9 +10750,14 @@
     "仅有 L3 第三方资料，**无法证明合同里写的确实是该指数**",
     "未取得基金合同/招募说明书原始文件",
     "收益口径未确认（关键证据缺失）",
-    "必要成分不完整"
+    "存在不可计算成分（非关键缺口），但证据等级不足，仍评 C"
    ],
    "confidence_is_not_usability": true,
+   "has_critical_mapping_gap": false,
+   "critical_gaps": [],
+   "non_critical_gaps": [
+    "银行活期存款税后利率*5%（现金利率无历史序列）"
+   ],
    "benchmarks": {
     "contract": {
      "kind": "contract",
@@ -10451,9 +10888,14 @@
     "仅有 L3 第三方资料，**无法证明合同里写的确实是该指数**",
     "未取得基金合同/招募说明书原始文件",
     "收益口径未确认（关键证据缺失）",
-    "必要成分不完整"
+    "存在不可计算成分（非关键缺口），但证据等级不足，仍评 C"
    ],
    "confidence_is_not_usability": true,
+   "has_critical_mapping_gap": false,
+   "critical_gaps": [],
+   "non_critical_gaps": [
+    "银行活期存款利率（税后）×5%（现金利率无历史序列）"
+   ],
    "benchmarks": {
     "contract": {
      "kind": "contract",
@@ -10584,9 +11026,14 @@
     "仅有 L3 第三方资料，**无法证明合同里写的确实是该指数**",
     "未取得基金合同/招募说明书原始文件",
     "收益口径未确认（关键证据缺失）",
-    "必要成分不完整"
+    "存在不可计算成分（非关键缺口），但证据等级不足，仍评 C"
    ],
    "confidence_is_not_usability": true,
+   "has_critical_mapping_gap": false,
+   "critical_gaps": [],
+   "non_critical_gaps": [
+    "5%*银行活期存款利率（税后）（现金利率无历史序列）"
+   ],
    "benchmarks": {
     "contract": {
      "kind": "contract",
@@ -10717,6 +11164,11 @@
     "货币基金需独立口径，当前无万份收益/七日年化数据"
    ],
    "confidence_is_not_usability": true,
+   "has_critical_mapping_gap": false,
+   "critical_gaps": [],
+   "non_critical_gaps": [
+    "活期存款基准利率×(1－利息税税率)（现金利率无历史序列）"
+   ],
    "benchmarks": {
     "contract": {
      "kind": "contract",
@@ -10823,6 +11275,11 @@
     "货币基金需独立口径，当前无万份收益/七日年化数据"
    ],
    "confidence_is_not_usability": true,
+   "has_critical_mapping_gap": false,
+   "critical_gaps": [],
+   "non_critical_gaps": [
+    "同期7天通知存款利率（税后）（现金利率无历史序列）"
+   ],
    "benchmarks": {
     "contract": {
      "kind": "contract",
@@ -10929,6 +11386,11 @@
     "货币基金需独立口径，当前无万份收益/七日年化数据"
    ],
    "confidence_is_not_usability": true,
+   "has_critical_mapping_gap": false,
+   "critical_gaps": [],
+   "non_critical_gaps": [
+    "人民币活期存款利率(税后)（现金利率无历史序列）"
+   ],
    "benchmarks": {
     "contract": {
      "kind": "contract",
@@ -11035,6 +11497,11 @@
     "货币基金需独立口径，当前无万份收益/七日年化数据"
    ],
    "confidence_is_not_usability": true,
+   "has_critical_mapping_gap": false,
+   "critical_gaps": [],
+   "non_critical_gaps": [
+    "七天通知存款利率(税后)（现金利率无历史序列）"
+   ],
    "benchmarks": {
     "contract": {
      "kind": "contract",
@@ -11141,6 +11608,11 @@
     "货币基金需独立口径，当前无万份收益/七日年化数据"
    ],
    "confidence_is_not_usability": true,
+   "has_critical_mapping_gap": false,
+   "critical_gaps": [],
+   "non_critical_gaps": [
+    "七天通知存款利率（税后）（现金利率无历史序列）"
+   ],
    "benchmarks": {
     "contract": {
      "kind": "contract",
@@ -11247,9 +11719,14 @@
     "仅有 L3 第三方资料，**无法证明合同里写的确实是该指数**",
     "未取得基金合同/招募说明书原始文件",
     "收益口径未确认（关键证据缺失）",
-    "必要成分不完整"
+    "存在不可计算成分（非关键缺口），但证据等级不足，仍评 C"
    ],
    "confidence_is_not_usability": true,
+   "has_critical_mapping_gap": false,
+   "critical_gaps": [],
+   "non_critical_gaps": [
+    "银行活期存款利率（税后）×5%（现金利率无历史序列）"
+   ],
    "benchmarks": {
     "contract": {
      "kind": "contract",
@@ -11380,9 +11857,14 @@
     "仅有 L3 第三方资料，**无法证明合同里写的确实是该指数**",
     "未取得基金合同/招募说明书原始文件",
     "收益口径未确认（关键证据缺失）",
-    "必要成分不完整"
+    "存在不可计算成分（非关键缺口），但证据等级不足，仍评 C"
    ],
    "confidence_is_not_usability": true,
+   "has_critical_mapping_gap": false,
+   "critical_gaps": [],
+   "non_critical_gaps": [
+    "5%×银行活期存款利率（税后）（现金利率无历史序列）"
+   ],
    "benchmarks": {
     "contract": {
      "kind": "contract",
@@ -11513,9 +11995,14 @@
     "仅有 L3 第三方资料，**无法证明合同里写的确实是该指数**",
     "未取得基金合同/招募说明书原始文件",
     "收益口径未确认（关键证据缺失）",
-    "必要成分不完整"
+    "存在不可计算成分（非关键缺口），但证据等级不足，仍评 C"
    ],
    "confidence_is_not_usability": true,
+   "has_critical_mapping_gap": false,
+   "critical_gaps": [],
+   "non_critical_gaps": [
+    "银行活期存款利率（税后）×5%（现金利率无历史序列）"
+   ],
    "benchmarks": {
     "contract": {
      "kind": "contract",
@@ -11644,11 +12131,19 @@
    "confidence": "C",
    "confidence_notes": [
     "仅有 L3 第三方资料，**无法证明合同里写的确实是该指数**",
+    "**存在关键映射缺口：必要成分缺失或无法确认**",
+    "关键缺口：未解释的剩余 5% 权重（复合基准成分构成无法确认）",
     "未取得基金合同/招募说明书原始文件",
-    "收益口径未确认（关键证据缺失）",
-    "必要成分不完整"
+    "收益口径未确认（关键证据缺失）"
    ],
    "confidence_is_not_usability": true,
+   "has_critical_mapping_gap": true,
+   "critical_gaps": [
+    "未解释的剩余 5% 权重（复合基准成分构成无法确认）"
+   ],
+   "non_critical_gaps": [
+    "1.5%(指年收益率,评价时按期间折算)（折算规则未知）"
+   ],
    "benchmarks": {
     "contract": {
      "kind": "contract",
@@ -11778,9 +12273,14 @@
     "仅有 L3 第三方资料，**无法证明合同里写的确实是该指数**",
     "未取得基金合同/招募说明书原始文件",
     "收益口径未确认（关键证据缺失）",
-    "必要成分不完整"
+    "存在不可计算成分（非关键缺口），但证据等级不足，仍评 C"
    ],
    "confidence_is_not_usability": true,
+   "has_critical_mapping_gap": false,
+   "critical_gaps": [],
+   "non_critical_gaps": [
+    "5%×同期商业银行税后活期存款基准利率（现金利率无历史序列）"
+   ],
    "benchmarks": {
     "contract": {
      "kind": "contract",
@@ -11911,9 +12411,14 @@
     "仅有 L3 第三方资料，**无法证明合同里写的确实是该指数**",
     "未取得基金合同/招募说明书原始文件",
     "收益口径未确认（关键证据缺失）",
-    "必要成分不完整"
+    "存在不可计算成分（非关键缺口），但证据等级不足，仍评 C"
    ],
    "confidence_is_not_usability": true,
+   "has_critical_mapping_gap": false,
+   "critical_gaps": [],
+   "non_critical_gaps": [
+    "活期存款利率（税后）*5%（现金利率无历史序列）"
+   ],
    "benchmarks": {
     "contract": {
      "kind": "contract",
@@ -12044,9 +12549,14 @@
     "仅有 L3 第三方资料，**无法证明合同里写的确实是该指数**",
     "未取得基金合同/招募说明书原始文件",
     "收益口径未确认（关键证据缺失）",
-    "必要成分不完整"
+    "存在不可计算成分（非关键缺口），但证据等级不足，仍评 C"
    ],
    "confidence_is_not_usability": true,
+   "has_critical_mapping_gap": false,
+   "critical_gaps": [],
+   "non_critical_gaps": [
+    "一年期银行储蓄存款利率（税后）×5%（现金利率无历史序列）"
+   ],
    "benchmarks": {
     "contract": {
      "kind": "contract",
@@ -12177,9 +12687,14 @@
     "仅有 L3 第三方资料，**无法证明合同里写的确实是该指数**",
     "未取得基金合同/招募说明书原始文件",
     "收益口径未确认（关键证据缺失）",
-    "必要成分不完整"
+    "存在不可计算成分（非关键缺口），但证据等级不足，仍评 C"
    ],
    "confidence_is_not_usability": true,
+   "has_critical_mapping_gap": false,
+   "critical_gaps": [],
+   "non_critical_gaps": [
+    "银行活期存款税后利率×5%（现金利率无历史序列）"
+   ],
    "benchmarks": {
     "contract": {
      "kind": "contract",
@@ -12305,11 +12820,20 @@
    "mapping_rule_version": "3B-6.2.2-v1",
    "category_rule_id": "R-LOF",
    "max_kind": "none",
-   "confidence": "D",
+   "confidence": "C",
    "confidence_notes": [
-    "无已映射的候选指数，无法建立映射关系"
+    "仅有 L3 第三方资料，**无法证明合同里写的确实是该指数**",
+    "**存在关键映射缺口：必要成分缺失或无法确认**",
+    "关键缺口：中债综合指数（债券指数未接入）",
+    "未取得基金合同/招募说明书原始文件",
+    "收益口径未确认（关键证据缺失）"
    ],
    "confidence_is_not_usability": true,
+   "has_critical_mapping_gap": true,
+   "critical_gaps": [
+    "中债综合指数（债券指数未接入）"
+   ],
+   "non_critical_gaps": [],
    "benchmarks": {
     "contract": {
      "kind": "contract",
@@ -12414,11 +12938,17 @@
    "confidence": "C",
    "confidence_notes": [
     "仅有 L3 第三方资料，**无法证明合同里写的确实是该指数**",
+    "**存在关键映射缺口：必要成分缺失或无法确认**",
+    "关键缺口：中证全债指数（债券指数未接入）",
     "未取得基金合同/招募说明书原始文件",
-    "收益口径未确认（关键证据缺失）",
-    "必要成分不完整"
+    "收益口径未确认（关键证据缺失）"
    ],
    "confidence_is_not_usability": true,
+   "has_critical_mapping_gap": true,
+   "critical_gaps": [
+    "中证全债指数（债券指数未接入）"
+   ],
+   "non_critical_gaps": [],
    "benchmarks": {
     "contract": {
      "kind": "contract",
@@ -12547,11 +13077,17 @@
    "confidence": "C",
    "confidence_notes": [
     "仅有 L3 第三方资料，**无法证明合同里写的确实是该指数**",
+    "**存在关键映射缺口：必要成分缺失或无法确认**",
+    "关键缺口：中债-综合全价(总值)指数（债券指数未接入）",
     "未取得基金合同/招募说明书原始文件",
-    "收益口径未确认（关键证据缺失）",
-    "必要成分不完整"
+    "收益口径未确认（关键证据缺失）"
    ],
    "confidence_is_not_usability": true,
+   "has_critical_mapping_gap": true,
+   "critical_gaps": [
+    "中债-综合全价(总值)指数（债券指数未接入）"
+   ],
+   "non_critical_gaps": [],
    "benchmarks": {
     "contract": {
      "kind": "contract",
@@ -12679,11 +13215,17 @@
    "confidence": "C",
    "confidence_notes": [
     "仅有 L3 第三方资料，**无法证明合同里写的确实是该指数**",
+    "**存在关键映射缺口：必要成分缺失或无法确认**",
+    "关键缺口：中证全债指数（债券指数未接入）",
     "未取得基金合同/招募说明书原始文件",
-    "收益口径未确认（关键证据缺失）",
-    "必要成分不完整"
+    "收益口径未确认（关键证据缺失）"
    ],
    "confidence_is_not_usability": true,
+   "has_critical_mapping_gap": true,
+   "critical_gaps": [
+    "中证全债指数（债券指数未接入）"
+   ],
+   "non_critical_gaps": [],
    "benchmarks": {
     "contract": {
      "kind": "contract",
@@ -12809,11 +13351,22 @@
    "mapping_rule_version": "3B-6.2.2-v1",
    "category_rule_id": "R-MIXEDBOND",
    "max_kind": "none",
-   "confidence": "D",
+   "confidence": "C",
    "confidence_notes": [
-    "无已映射的候选指数，无法建立映射关系"
+    "仅有 L3 第三方资料，**无法证明合同里写的确实是该指数**",
+    "**存在关键映射缺口：必要成分缺失或无法确认**",
+    "关键缺口：中债-1-5年债券综合全价（总值）指数（债券指数未接入）",
+    "关键缺口：中证可转换债券指数（债券指数未接入）",
+    "未取得基金合同/招募说明书原始文件",
+    "收益口径未确认（关键证据缺失）"
    ],
    "confidence_is_not_usability": true,
+   "has_critical_mapping_gap": true,
+   "critical_gaps": [
+    "中债-1-5年债券综合全价（总值）指数（债券指数未接入）",
+    "中证可转换债券指数（债券指数未接入）"
+   ],
+   "non_critical_gaps": [],
    "benchmarks": {
     "contract": {
      "kind": "contract",
@@ -12927,11 +13480,20 @@
    "mapping_rule_version": "3B-6.2.2-v1",
    "category_rule_id": "R-PUREBOND",
    "max_kind": "none",
-   "confidence": "D",
+   "confidence": "C",
    "confidence_notes": [
-    "无已映射的候选指数，无法建立映射关系"
+    "仅有 L3 第三方资料，**无法证明合同里写的确实是该指数**",
+    "**存在关键映射缺口：必要成分缺失或无法确认**",
+    "关键缺口：中债-优选投资级信用债全价(总值)指数（债券指数未接入）",
+    "未取得基金合同/招募说明书原始文件",
+    "收益口径未确认（关键证据缺失）"
    ],
    "confidence_is_not_usability": true,
+   "has_critical_mapping_gap": true,
+   "critical_gaps": [
+    "中债-优选投资级信用债全价(总值)指数（债券指数未接入）"
+   ],
+   "non_critical_gaps": [],
    "benchmarks": {
     "contract": {
      "kind": "contract",
@@ -13037,9 +13599,14 @@
     "仅有 L3 第三方资料，**无法证明合同里写的确实是该指数**",
     "未取得基金合同/招募说明书原始文件",
     "收益口径未确认（关键证据缺失）",
-    "必要成分不完整"
+    "存在不可计算成分（非关键缺口），但证据等级不足，仍评 C"
    ],
    "confidence_is_not_usability": true,
+   "has_critical_mapping_gap": false,
+   "critical_gaps": [],
+   "non_critical_gaps": [
+    "人民币活期存款税后利率×5%（现金利率无历史序列）"
+   ],
    "benchmarks": {
     "contract": {
      "kind": "contract",
@@ -13170,9 +13737,14 @@
     "仅有 L3 第三方资料，**无法证明合同里写的确实是该指数**",
     "未取得基金合同/招募说明书原始文件",
     "收益口径未确认（关键证据缺失）",
-    "必要成分不完整"
+    "存在不可计算成分（非关键缺口），但证据等级不足，仍评 C"
    ],
    "confidence_is_not_usability": true,
+   "has_critical_mapping_gap": false,
+   "critical_gaps": [],
+   "non_critical_gaps": [
+    "银行活期存款税后利率×5%（现金利率无历史序列）"
+   ],
    "benchmarks": {
     "contract": {
      "kind": "contract",
@@ -13298,11 +13870,22 @@
    "mapping_rule_version": "3B-6.2.2-v1",
    "category_rule_id": "R-FEEDER",
    "max_kind": "none",
-   "confidence": "D",
+   "confidence": "C",
    "confidence_notes": [
-    "无已映射的候选指数，无法建立映射关系"
+    "仅有 L3 第三方资料，**无法证明合同里写的确实是该指数**",
+    "**存在关键映射缺口：必要成分缺失或无法确认**",
+    "关键缺口：创业板指数（未映射代码）",
+    "未取得基金合同/招募说明书原始文件",
+    "收益口径未确认（关键证据缺失）"
    ],
    "confidence_is_not_usability": true,
+   "has_critical_mapping_gap": true,
+   "critical_gaps": [
+    "创业板指数（未映射代码）"
+   ],
+   "non_critical_gaps": [
+    "银行活期存款利率（税后）×5%（现金利率无历史序列）"
+   ],
    "benchmarks": {
     "contract": {
      "kind": "contract",
@@ -13430,11 +14013,22 @@
    "mapping_rule_version": "3B-6.2.2-v1",
    "category_rule_id": "R-FEEDER",
    "max_kind": "none",
-   "confidence": "D",
+   "confidence": "C",
    "confidence_notes": [
-    "无已映射的候选指数，无法建立映射关系"
+    "仅有 L3 第三方资料，**无法证明合同里写的确实是该指数**",
+    "**存在关键映射缺口：必要成分缺失或无法确认**",
+    "关键缺口：创业板指数（未映射代码）",
+    "未取得基金合同/招募说明书原始文件",
+    "收益口径未确认（关键证据缺失）"
    ],
    "confidence_is_not_usability": true,
+   "has_critical_mapping_gap": true,
+   "critical_gaps": [
+    "创业板指数（未映射代码）"
+   ],
+   "non_critical_gaps": [
+    "银行人民币活期存款利率（税后）×5%（现金利率无历史序列）"
+   ],
    "benchmarks": {
     "contract": {
      "kind": "contract",
@@ -13562,11 +14156,22 @@
    "mapping_rule_version": "3B-6.2.2-v1",
    "category_rule_id": "R-INDEX",
    "max_kind": "none",
-   "confidence": "D",
+   "confidence": "C",
    "confidence_notes": [
-    "无已映射的候选指数，无法建立映射关系"
+    "仅有 L3 第三方资料，**无法证明合同里写的确实是该指数**",
+    "**存在关键映射缺口：必要成分缺失或无法确认**",
+    "关键缺口：创业板指数（未映射代码）",
+    "未取得基金合同/招募说明书原始文件",
+    "收益口径未确认（关键证据缺失）"
    ],
    "confidence_is_not_usability": true,
+   "has_critical_mapping_gap": true,
+   "critical_gaps": [
+    "创业板指数（未映射代码）"
+   ],
+   "non_critical_gaps": [
+    "银行活期存款利率(税后)×5%（现金利率无历史序列）"
+   ],
    "benchmarks": {
     "contract": {
      "kind": "contract",
@@ -13694,11 +14299,22 @@
    "mapping_rule_version": "3B-6.2.2-v1",
    "category_rule_id": "R-FEEDER",
    "max_kind": "none",
-   "confidence": "D",
+   "confidence": "C",
    "confidence_notes": [
-    "无已映射的候选指数，无法建立映射关系"
+    "仅有 L3 第三方资料，**无法证明合同里写的确实是该指数**",
+    "**存在关键映射缺口：必要成分缺失或无法确认**",
+    "关键缺口：创业板指数（未映射代码）",
+    "未取得基金合同/招募说明书原始文件",
+    "收益口径未确认（关键证据缺失）"
    ],
    "confidence_is_not_usability": true,
+   "has_critical_mapping_gap": true,
+   "critical_gaps": [
+    "创业板指数（未映射代码）"
+   ],
+   "non_critical_gaps": [
+    "5%×银行活期存款利率（税后）（现金利率无历史序列）"
+   ],
    "benchmarks": {
     "contract": {
      "kind": "contract",
@@ -13833,6 +14449,9 @@
     "收益口径未确认（关键证据缺失）"
    ],
    "confidence_is_not_usability": true,
+   "has_critical_mapping_gap": false,
+   "critical_gaps": [],
+   "non_critical_gaps": [],
    "benchmarks": {
     "contract": {
      "kind": "contract",
@@ -13949,9 +14568,14 @@
     "仅有 L3 第三方资料，**无法证明合同里写的确实是该指数**",
     "未取得基金合同/招募说明书原始文件",
     "收益口径未确认（关键证据缺失）",
-    "必要成分不完整"
+    "存在不可计算成分（非关键缺口），但证据等级不足，仍评 C"
    ],
    "confidence_is_not_usability": true,
+   "has_critical_mapping_gap": false,
+   "critical_gaps": [],
+   "non_critical_gaps": [
+    "银行活期存款税后利率×5%（现金利率无历史序列）"
+   ],
    "benchmarks": {
     "contract": {
      "kind": "contract",
@@ -14077,11 +14701,22 @@
    "mapping_rule_version": "3B-6.2.2-v1",
    "category_rule_id": "R-FEEDER",
    "max_kind": "none",
-   "confidence": "D",
+   "confidence": "C",
    "confidence_notes": [
-    "无已映射的候选指数，无法建立映射关系"
+    "仅有 L3 第三方资料，**无法证明合同里写的确实是该指数**",
+    "**存在关键映射缺口：必要成分缺失或无法确认**",
+    "关键缺口：上证科创板50成份指数（未映射代码）",
+    "未取得基金合同/招募说明书原始文件",
+    "收益口径未确认（关键证据缺失）"
    ],
    "confidence_is_not_usability": true,
+   "has_critical_mapping_gap": true,
+   "critical_gaps": [
+    "上证科创板50成份指数（未映射代码）"
+   ],
+   "non_critical_gaps": [
+    "活期存款利率（税后）×5%（现金利率无历史序列）"
+   ],
    "benchmarks": {
     "contract": {
      "kind": "contract",
@@ -14209,11 +14844,22 @@
    "mapping_rule_version": "3B-6.2.2-v1",
    "category_rule_id": "R-FEEDER",
    "max_kind": "none",
-   "confidence": "D",
+   "confidence": "C",
    "confidence_notes": [
-    "无已映射的候选指数，无法建立映射关系"
+    "仅有 L3 第三方资料，**无法证明合同里写的确实是该指数**",
+    "**存在关键映射缺口：必要成分缺失或无法确认**",
+    "关键缺口：上证科创板50成份指数（未映射代码）",
+    "未取得基金合同/招募说明书原始文件",
+    "收益口径未确认（关键证据缺失）"
    ],
    "confidence_is_not_usability": true,
+   "has_critical_mapping_gap": true,
+   "critical_gaps": [
+    "上证科创板50成份指数（未映射代码）"
+   ],
+   "non_critical_gaps": [
+    "活期存款利率（税后）×5%（现金利率无历史序列）"
+   ],
    "benchmarks": {
     "contract": {
      "kind": "contract",
@@ -14341,11 +14987,22 @@
    "mapping_rule_version": "3B-6.2.2-v1",
    "category_rule_id": "R-FEEDER",
    "max_kind": "none",
-   "confidence": "D",
+   "confidence": "C",
    "confidence_notes": [
-    "无已映射的候选指数，无法建立映射关系"
+    "仅有 L3 第三方资料，**无法证明合同里写的确实是该指数**",
+    "**存在关键映射缺口：必要成分缺失或无法确认**",
+    "关键缺口：上证科创板50成份指数（未映射代码）",
+    "未取得基金合同/招募说明书原始文件",
+    "收益口径未确认（关键证据缺失）"
    ],
    "confidence_is_not_usability": true,
+   "has_critical_mapping_gap": true,
+   "critical_gaps": [
+    "上证科创板50成份指数（未映射代码）"
+   ],
+   "non_critical_gaps": [
+    "银行活期存款利率（税后）×5%（现金利率无历史序列）"
+   ],
    "benchmarks": {
     "contract": {
      "kind": "contract",
@@ -14473,11 +15130,22 @@
    "mapping_rule_version": "3B-6.2.2-v1",
    "category_rule_id": "R-FEEDER",
    "max_kind": "none",
-   "confidence": "D",
+   "confidence": "C",
    "confidence_notes": [
-    "无已映射的候选指数，无法建立映射关系"
+    "仅有 L3 第三方资料，**无法证明合同里写的确实是该指数**",
+    "**存在关键映射缺口：必要成分缺失或无法确认**",
+    "关键缺口：上证科创板50成份指数（未映射代码）",
+    "未取得基金合同/招募说明书原始文件",
+    "收益口径未确认（关键证据缺失）"
    ],
    "confidence_is_not_usability": true,
+   "has_critical_mapping_gap": true,
+   "critical_gaps": [
+    "上证科创板50成份指数（未映射代码）"
+   ],
+   "non_critical_gaps": [
+    "人民币活期存款税后利率×5%（现金利率无历史序列）"
+   ],
    "benchmarks": {
     "contract": {
      "kind": "contract",
@@ -14605,11 +15273,22 @@
    "mapping_rule_version": "3B-6.2.2-v1",
    "category_rule_id": "R-FEEDER",
    "max_kind": "none",
-   "confidence": "D",
+   "confidence": "C",
    "confidence_notes": [
-    "无已映射的候选指数，无法建立映射关系"
+    "仅有 L3 第三方资料，**无法证明合同里写的确实是该指数**",
+    "**存在关键映射缺口：必要成分缺失或无法确认**",
+    "关键缺口：中证A500指数（未映射代码）",
+    "未取得基金合同/招募说明书原始文件",
+    "收益口径未确认（关键证据缺失）"
    ],
    "confidence_is_not_usability": true,
+   "has_critical_mapping_gap": true,
+   "critical_gaps": [
+    "中证A500指数（未映射代码）"
+   ],
+   "non_critical_gaps": [
+    "人民币银行活期存款利率（税后）×5%（现金利率无历史序列）"
+   ],
    "benchmarks": {
     "contract": {
      "kind": "contract",
@@ -14737,11 +15416,22 @@
    "mapping_rule_version": "3B-6.2.2-v1",
    "category_rule_id": "R-FEEDER",
    "max_kind": "none",
-   "confidence": "D",
+   "confidence": "C",
    "confidence_notes": [
-    "无已映射的候选指数，无法建立映射关系"
+    "仅有 L3 第三方资料，**无法证明合同里写的确实是该指数**",
+    "**存在关键映射缺口：必要成分缺失或无法确认**",
+    "关键缺口：中证A500指数（未映射代码）",
+    "未取得基金合同/招募说明书原始文件",
+    "收益口径未确认（关键证据缺失）"
    ],
    "confidence_is_not_usability": true,
+   "has_critical_mapping_gap": true,
+   "critical_gaps": [
+    "中证A500指数（未映射代码）"
+   ],
+   "non_critical_gaps": [
+    "银行活期存款利率（税后）×5%（现金利率无历史序列）"
+   ],
    "benchmarks": {
     "contract": {
      "kind": "contract",
@@ -14869,11 +15559,22 @@
    "mapping_rule_version": "3B-6.2.2-v1",
    "category_rule_id": "R-FEEDER",
    "max_kind": "none",
-   "confidence": "D",
+   "confidence": "C",
    "confidence_notes": [
-    "无已映射的候选指数，无法建立映射关系"
+    "仅有 L3 第三方资料，**无法证明合同里写的确实是该指数**",
+    "**存在关键映射缺口：必要成分缺失或无法确认**",
+    "关键缺口：中证A500指数（未映射代码）",
+    "未取得基金合同/招募说明书原始文件",
+    "收益口径未确认（关键证据缺失）"
    ],
    "confidence_is_not_usability": true,
+   "has_critical_mapping_gap": true,
+   "critical_gaps": [
+    "中证A500指数（未映射代码）"
+   ],
+   "non_critical_gaps": [
+    "金融机构人民币活期存款利率（税后）*5%（现金利率无历史序列）"
+   ],
    "benchmarks": {
     "contract": {
      "kind": "contract",
@@ -15001,11 +15702,22 @@
    "mapping_rule_version": "3B-6.2.2-v1",
    "category_rule_id": "R-INDEX",
    "max_kind": "none",
-   "confidence": "D",
+   "confidence": "C",
    "confidence_notes": [
-    "无已映射的候选指数，无法建立映射关系"
+    "仅有 L3 第三方资料，**无法证明合同里写的确实是该指数**",
+    "**存在关键映射缺口：必要成分缺失或无法确认**",
+    "关键缺口：中证A500指数（未映射代码）",
+    "未取得基金合同/招募说明书原始文件",
+    "收益口径未确认（关键证据缺失）"
    ],
    "confidence_is_not_usability": true,
+   "has_critical_mapping_gap": true,
+   "critical_gaps": [
+    "中证A500指数（未映射代码）"
+   ],
+   "non_critical_gaps": [
+    "银行活期存款利率（税后）*5%（现金利率无历史序列）"
+   ],
    "benchmarks": {
     "contract": {
      "kind": "contract",
@@ -15133,11 +15845,22 @@
    "mapping_rule_version": "3B-6.2.2-v1",
    "category_rule_id": "R-INDEX",
    "max_kind": "none",
-   "confidence": "D",
+   "confidence": "C",
    "confidence_notes": [
-    "无已映射的候选指数，无法建立映射关系"
+    "仅有 L3 第三方资料，**无法证明合同里写的确实是该指数**",
+    "**存在关键映射缺口：必要成分缺失或无法确认**",
+    "关键缺口：中证A500指数（未映射代码）",
+    "未取得基金合同/招募说明书原始文件",
+    "收益口径未确认（关键证据缺失）"
    ],
    "confidence_is_not_usability": true,
+   "has_critical_mapping_gap": true,
+   "critical_gaps": [
+    "中证A500指数（未映射代码）"
+   ],
+   "non_critical_gaps": [
+    "银行活期存款利率（税后）×5%（现金利率无历史序列）"
+   ],
    "benchmarks": {
     "contract": {
      "kind": "contract",
@@ -15265,11 +15988,22 @@
    "mapping_rule_version": "3B-6.2.2-v1",
    "category_rule_id": "R-INDEX",
    "max_kind": "none",
-   "confidence": "D",
+   "confidence": "C",
    "confidence_notes": [
-    "无已映射的候选指数，无法建立映射关系"
+    "仅有 L3 第三方资料，**无法证明合同里写的确实是该指数**",
+    "**存在关键映射缺口：必要成分缺失或无法确认**",
+    "关键缺口：中证A500指数（未映射代码）",
+    "未取得基金合同/招募说明书原始文件",
+    "收益口径未确认（关键证据缺失）"
    ],
    "confidence_is_not_usability": true,
+   "has_critical_mapping_gap": true,
+   "critical_gaps": [
+    "中证A500指数（未映射代码）"
+   ],
+   "non_critical_gaps": [
+    "银行活期存款利率（税后）×5%（现金利率无历史序列）"
+   ],
    "benchmarks": {
     "contract": {
      "kind": "contract",

@@ -54,19 +54,23 @@ CONFIDENCE_LEVELS = {
     "B": {
         "label": "中高",
         "definition": (
-            "映射关系有可靠的 L1/L2 证据，存在非关键缺口，"
-            "但不影响基准身份及主要映射关系"),
+            "映射关系有可靠的 L1/L2 证据，基准身份明确，"
+            "不存在关键映射缺口，但存在非关键缺口"),
         "requires": [
             "L1 或 L2 映射证据",
             "基准身份（用哪个指数）明确",
+            "不存在关键映射缺口（必要成分完整、可确认）",
         ],
         "non_critical_gaps_allowed": True,
         "non_critical_gap_examples": [
             "收益口径未确认（不影响「是哪只指数」，只影响能否算）",
-            "非必要成分缺失",
+            "现金利率/固定收益率等非必要成分无法计算",
+            "未持有官方合同原始文件（不影响身份，只影响合同基准准入）",
         ],
         "critical_gap_note": (
-            "**仅凭 L3 第三方平台文本，不能评为 B 级**"),
+            "**仅凭 L3 第三方平台文本，不能评为 B 级**；"
+            "**必要成分缺失（指数未映射、债券指数未接入、复合基准权重"
+            "无法确认）属关键缺口，L1/L2 证据也只能评 C**"),
         "can_bypass_usability": False,
     },
     "C": {
@@ -80,7 +84,8 @@ CONFIDENCE_LEVELS = {
         "critical_gaps": [
             "仅有 L3 第三方资料（映射关系未获官方证据确认）",
             "收益口径未确认",
-            "必要成分不完整",
+            "必要成分缺失或无法确认（指数未映射/债券指数未接入/"
+            "复合基准权重无法确认）",
         ],
         "can_bypass_usability": False,
     },
@@ -246,6 +251,10 @@ def compute_confidence(
     has_verified_basis: bool,
     all_components_computable: bool,
     category: str,
+    has_critical_mapping_gap: bool = False,
+    critical_gaps: list[str] | None = None,
+    non_critical_gaps: list[str] | None = None,
+    has_candidate_mapping: bool | None = None,
 ) -> tuple[str, list[str]]:
     """按**映射证据强度**计算置信度（A/B/C/D）。
 
@@ -255,13 +264,21 @@ def compute_confidence(
 
     - **仅有 L3 第三方平台文本 → 最高只能 C**，
       因为无法证明「合同里写的确实是这只指数」。
-    - L1/L2 证据下，收益口径 ``unknown`` 或成分不完整属**非关键缺口**
-      （不影响「是哪只指数」这一身份判断），可评 B，但基准仍不可用。
+    - L1/L2 证据下，收益口径 ``unknown`` 或现金/固定收益率成分缺失属
+      **非关键缺口**（不影响「是哪只指数」这一身份判断），可评 B，
+      但基准仍不可用。
+    - **必要成分缺失（指数代码未映射、债券指数未接入、复合基准权重
+      无法确认）属关键缺口**，即使有 L1/L2 证据也只能评 C。
     - 无论哪一级，``can_bypass_usability`` 恒为 ``False``。
 
     :param mapping_evidence_grade: 映射关系的证据等级 L1/L2/L3/L4
+    :param has_critical_mapping_gap: 是否存在关键映射缺口
+    :param critical_gaps: 关键缺口明细（用于说明）
+    :param non_critical_gaps: 非关键缺口明细（用于说明）
     """
     notes: list[str] = []
+    critical_gaps = critical_gaps or []
+    non_critical_gaps = non_critical_gaps or []
 
     # ---- D：分类依据严重不足 ----
     if classification_confidence == "low":
@@ -269,7 +286,10 @@ def compute_confidence(
         return "D", notes
 
     # ---- D：无任何候选映射 ----
-    if not has_index_observation:
+    # 有候选指数成分但代码未映射/无序列 → 属关键缺口，走 C，不是 D
+    if has_candidate_mapping is None:
+        has_candidate_mapping = has_index_observation
+    if not has_index_observation and not has_candidate_mapping:
         if category == "money_market":
             notes.append("货币基金需独立口径，当前无万份收益/七日年化数据")
         else:
@@ -278,13 +298,14 @@ def compute_confidence(
 
     reliable = mapping_evidence_grade in ("L1", "L2")
 
-    # ---- A：L1 + 官方合同 + 口径确认 + 全成分可算 ----
+    # ---- A：L1 + 官方合同 + 口径确认 + 全成分可算 + 无关键缺口 ----
     if (mapping_evidence_grade == "L1" and has_official_contract
-            and has_verified_basis and all_components_computable):
+            and has_verified_basis and all_components_computable
+            and not has_critical_mapping_gap):
         return "A", notes
 
-    # ---- B：L1/L2 证据 + 仅有非关键缺口 ----
-    if reliable:
+    # ---- B：L1/L2 证据 + 基准身份明确 + **无关键映射缺口** ----
+    if reliable and not has_critical_mapping_gap:
         notes.append(
             f"映射关系有 {mapping_evidence_grade} 证据支持，基准身份明确")
         if not has_official_contract:
@@ -294,19 +315,26 @@ def compute_confidence(
                 "收益口径未确认（**非关键缺口**：不影响是哪只指数，"
                 "但基准**不可用**）")
         if not all_components_computable:
-            notes.append("存在不可计算成分（**非关键缺口**，不予补齐）")
+            notes.append("存在不可计算的非必要成分（**非关键缺口**，不予补齐）")
+        for g in non_critical_gaps:
+            notes.append(f"非关键缺口：{g}")
         return "B", notes
 
-    # ---- C：仅有 L3 及以下资料，或关键证据缺失 ----
-    notes.append(
-        f"仅有 {mapping_evidence_grade} 第三方资料，"
-        "**无法证明合同里写的确实是该指数**")
+    # ---- C：关键证据缺失（L3 资料 / 关键映射缺口） ----
+    if not reliable:
+        notes.append(
+            f"仅有 {mapping_evidence_grade} 第三方资料，"
+            "**无法证明合同里写的确实是该指数**")
+    if has_critical_mapping_gap:
+        notes.append("**存在关键映射缺口：必要成分缺失或无法确认**")
+        for g in critical_gaps:
+            notes.append(f"关键缺口：{g}")
     if not has_official_contract:
         notes.append("未取得基金合同/招募说明书原始文件")
     if not has_verified_basis:
         notes.append("收益口径未确认（关键证据缺失）")
-    if not all_components_computable:
-        notes.append("必要成分不完整")
+    if not all_components_computable and not has_critical_mapping_gap:
+        notes.append("存在不可计算成分（非关键缺口），但证据等级不足，仍评 C")
     return "C", notes
 
 
@@ -373,6 +401,11 @@ def map_fund_benchmark(
         has_verified_basis=usability["has_verified_return_basis"],
         all_components_computable=all_computable,
         category=category,
+        # 关键缺口状态来自真实解析结果，不是测试手工传入
+        has_critical_mapping_gap=usability["has_critical_mapping_gap"],
+        critical_gaps=usability["critical_gaps"],
+        non_critical_gaps=usability["non_critical_gaps"],
+        has_candidate_mapping=usability["has_candidate_mapping"],
     )
 
     # ---- 三类基准独立记录 ----
@@ -456,6 +489,9 @@ def map_fund_benchmark(
         "confidence": confidence,
         "confidence_notes": conf_notes,
         "confidence_is_not_usability": True,
+        "has_critical_mapping_gap": usability["has_critical_mapping_gap"],
+        "critical_gaps": usability["critical_gaps"],
+        "non_critical_gaps": usability["non_critical_gaps"],
         "benchmarks": {
             "contract": contract_record,
             "research": research_record,

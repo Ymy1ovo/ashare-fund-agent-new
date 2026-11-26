@@ -1,5 +1,112 @@
 # 变更日志
 
+## 2026-11-26 — 阶段3B-6.2.2.1.1 关键缺口与非关键缺口区分修正
+
+**只修正 `compute_confidence()` 的缺口判断边界，不改三类基准可用性判定、不改数据库。**
+
+**一、问题**
+
+`compute_confidence()` 原逻辑只要映射证据为 L1/L2 就直接进入 B 分支：
+
+```python
+if reliable:                      # reliable = L1 或 L2
+    ...
+    return "B", notes
+```
+
+**即使 `all_components_computable=False`（必要成分缺失）也仍然评 B。**
+同时 `test_confidence_B_with_l2_evidence` 把不可计算成分直接当作非关键缺口，
+无法证明关键成分缺失时会正确降级。
+
+**二、修正：缺口分级**
+
+`assess_benchmark_usability()` 新增输出（来自**真实解析结果**）：
+
+| 字段 | 含义 |
+| --- | --- |
+| `has_critical_mapping_gap` | 是否存在关键映射缺口 |
+| `critical_gaps` | 关键缺口明细 |
+| `non_critical_gaps` | 非关键缺口明细 |
+| `required_components_complete` | 必要成分是否完整 |
+| `has_candidate_mapping` | 是否有可识别候选指数（区分 D 与 C） |
+
+| 缺口类型 | 具体情形 | 后果 |
+| --- | --- | --- |
+| **关键** | 指数代码未映射 / 债券指数未接入 / 成分无法识别 | L1/L2 也只能 **C** |
+| **关键** | 复合基准未解释剩余权重 / 成分权重无法确认 | L1/L2 也只能 **C** |
+| 非关键 | 收益口径 `unknown` / 现金利率无序列 / 固定收益率折算未知 / 未持有官方合同 | 可评 **B**，基准仍不可用 |
+
+`map_fund_benchmark()` 把该状态从真实映射解析结果传给 `compute_confidence()`，
+不是测试手工构造。
+
+**三、B 级必须同时满足**
+
+1. L1/L2 映射证据；
+2. 基准身份明确；
+3. **无关键映射缺口**。
+
+**四、D 级边界收窄**
+
+原逻辑「无指数观察点位」即判 D，导致**识别到指数名但代码未映射/债券指数未接入**
+的基金被误判 D。修正后 D 只由「无任何可识别候选映射」或「分类降级」触发，
+上述情形改判 **C**（有合理候选 + 关键证据缺失）。
+
+**五、评级变化（真实 120 只，非硬编码）**
+
+| 级别 | 3B-6.2.2.1 | 本轮 | 变化 |
+| --- | ---: | ---: | --- |
+| A | 0 | **0** | — |
+| B | 0 | **0** | — |
+| C | 42 | **69** | **+27** |
+| D | 78 | **51** | **−27** |
+| 合计 | 120 | **120** | — |
+
+**每一类变化的原因**：
+
+| 变化 | 数量 | 原因 |
+| --- | ---: | --- |
+| D → C | 27 | 基准文本中**识别到指数成分**（中证A500 8、上证科创50 4、创业板指 3、中债系列 8、中证全指/中证可转债等 4），仅代码未映射或债券指数未接入 |
+| 仍 D | 42 | 无基准文本 |
+| 仍 D | 8 | 货币基金，需万份收益/七日年化独立口径 |
+| 仍 D | 1 | 基准为纯存款利率+固定加点，无指数候选 |
+
+**`004746` 仍为 C**（未受本轮影响）。
+
+**六、缺口实际统计**
+
+| 项 | 数量 |
+| --- | ---: |
+| 有关键缺口 | **50** |
+| 无关键缺口 | **70** |
+| 有非关键缺口 | **53** |
+
+关键缺口：债券指数未接入 37、指数代码未映射 18、成分无法识别 3、
+复合基准成分构成无法确认 2、复合基准权重无法确认 3。
+
+**七、测试**
+
+- 修正 `test_confidence_B_with_l2_evidence`：不再用
+  `all_components_computable=False` 不加区分断言 B，改为「无关键缺口 + 仅口径未确认 → B」。
+- 新增 13 项：`test_l2_with_critical_gap_is_C`、`test_l2_with_bond_index_gap_is_C`、
+  `test_l2_with_composite_weight_gap_is_C`、`test_l2_with_only_noncritical_gap_is_B`、
+  `test_real_entry_passes_critical_gap_state`、`test_real_entry_critical_gap_for_unmapped_index`、
+  `test_real_entry_composite_weight_gap_is_critical`、`test_real_entry_cash_gap_is_non_critical`、
+  `test_real_entry_l3_without_gap_still_C`、`test_audit_critical_gap_distribution`、
+  `test_critical_gap_never_rated_B_even_with_l2`、`test_non_critical_gap_with_l2_can_be_B`、
+  `test_docs_gap_counts_match_json`。
+- 专项测试 100 → **113**；全量 2444 → **2457**。
+
+**八、边界未变**
+
+不修改正式数据库、不修改 Schema、不接入新数据、不改净值与收益公式、
+不执行回测、不生成正式排名、七类分类规则不变、三类基准隔离不变、
+15 条复合基准复现条件不放宽。
+
+门禁：`ready_for_research_analysis=true`、`ready_for_backtest=false`、
+`ready_for_formal_ranking=false`。
+
+---
+
 ## 2026-11-26 — 阶段3B-6.2.2.1 基金基准映射置信度评级边界修正
 
 **只修正置信度评级逻辑，不改三类基准可用性判定、不改统计口径、不改数据库。**

@@ -313,6 +313,19 @@ def main() -> int:
                                                 - set(cat_counts)),
         "confidence_distribution": dict(conf_counts),
         "confidence_note": CONFIDENCE_NOTE,
+        "gap_classification": {
+            "with_critical_gap": cnt(lambda r: r["has_critical_mapping_gap"]),
+            "without_critical_gap": cnt(
+                lambda r: not r["has_critical_mapping_gap"]),
+            "with_non_critical_gap": cnt(lambda r: bool(r["non_critical_gaps"])),
+            "critical_gap_buckets": dict(Counter(
+                g.split("（")[-1].rstrip("）")
+                for r in records for g in r["critical_gaps"]).most_common(15)),
+            "rule": (
+                "关键缺口=必要成分缺失/无法确认（指数未映射、债券指数未接入、"
+                "复合基准权重无法确认）；非关键缺口=现金利率/固定收益率"
+                "无法计算、收益口径未确认。**关键缺口存在时 L1/L2 也只能评 C**"),
+        },
         "contract": {
             "total_with_text": cnt(
                 lambda r: bool(r["benchmarks"]["contract"]["name"])),

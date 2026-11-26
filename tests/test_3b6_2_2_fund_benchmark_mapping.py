@@ -254,6 +254,10 @@ def test_confidence_A_needs_all_four():
         kw = dict(base)
         kw[key] = False
         assert compute_confidence(**kw)[0] != "A", f"{key}=False 仍评为 A"
+    kw = dict(base)
+    kw["has_critical_mapping_gap"] = True
+    kw["critical_gaps"] = ["某指数（未映射代码）"]
+    assert compute_confidence(**kw)[0] == "C", "有 L1 但存在关键缺口不得评 A"
 
 
 def test_mapping_identity_requires_l1_or_l2():
@@ -263,18 +267,68 @@ def test_mapping_identity_requires_l1_or_l2():
     assert "L3" in CONFIDENCE_LEVELS["B"]["critical_gap_note"]
     assert "仅凭 L3 第三方平台文本，不能评为 B 级" in \
         CONFIDENCE_LEVELS["B"]["critical_gap_note"].replace("**", "")
+    assert any("不存在关键映射缺口" in r
+               for r in CONFIDENCE_LEVELS["B"]["requires"])
 
 
 def test_confidence_B_with_l2_evidence():
-    """B 级：L1/L2 证据 + 非关键缺口（口径未确认/成分不全）。"""
+    """B 级：L2 证据 + 基准身份明确 + **只有非关键缺口**（口径未确认）。"""
+    c, notes = compute_confidence(
+        classification_confidence="high", mapping_evidence_grade="L2",
+        has_official_contract=False, has_index_observation=True,
+        has_verified_basis=False, all_components_computable=True,
+        category="index_plain", has_critical_mapping_gap=False,
+        non_critical_gaps=["现金利率无历史序列"])
+    assert c == "B", "L2 + 无关键缺口 + 仅口径未确认，应评 B"
+    assert any("非关键缺口" in n for n in notes)
+    assert any("不可用" in n for n in notes)
+
+
+def test_l2_with_critical_gap_is_C():
+    """**L2 + 必要指数成分缺失 → C，不得因为有 L2 就评 B。**"""
     c, notes = compute_confidence(
         classification_confidence="high", mapping_evidence_grade="L2",
         has_official_contract=False, has_index_observation=True,
         has_verified_basis=False, all_components_computable=False,
-        category="index_plain")
+        category="index_plain", has_critical_mapping_gap=True,
+        critical_gaps=["某指数（未映射代码）"])
+    assert c == "C", "关键映射缺口存在时 L1/L2 也只能评 C"
+    assert any("关键映射缺口" in n for n in notes)
+
+
+def test_l2_with_bond_index_gap_is_C():
+    """L2 + 必要债券指数成分无法映射 → C。"""
+    c, notes = compute_confidence(
+        classification_confidence="high", mapping_evidence_grade="L2",
+        has_official_contract=False, has_index_observation=True,
+        has_verified_basis=False, all_components_computable=False,
+        category="mixed_bond", has_critical_mapping_gap=True,
+        critical_gaps=["中债-综合全价（总值）指数（债券指数未接入）"])
+    assert c == "C"
+    assert any("债券指数未接入" in n for n in notes)
+
+
+def test_l2_with_composite_weight_gap_is_C():
+    """L2 + 复合基准必要权重/成分无法确认 → C。"""
+    c, _ = compute_confidence(
+        classification_confidence="high", mapping_evidence_grade="L2",
+        has_official_contract=False, has_index_observation=True,
+        has_verified_basis=True, all_components_computable=False,
+        category="mixed_bond", has_critical_mapping_gap=True,
+        critical_gaps=["复合基准成分权重无法确认 ['某债券指数']"])
+    assert c == "C", "复合基准权重无法确认属关键缺口，必须降 C"
+
+
+def test_l2_with_only_noncritical_gap_is_B():
+    """L2 + 非必要成分（现金/固定收益率）无法计算，身份明确 → B。"""
+    c, notes = compute_confidence(
+        classification_confidence="high", mapping_evidence_grade="L2",
+        has_official_contract=False, has_index_observation=True,
+        has_verified_basis=False, all_components_computable=False,
+        category="index_plain", has_critical_mapping_gap=False,
+        non_critical_gaps=["活期存款利率(税后)（现金利率无历史序列）"])
     assert c == "B"
-    assert any("非关键缺口" in n for n in notes)
-    assert any("不可用" in n for n in notes)
+    assert any("非必要成分" in n for n in notes)
 
 
 def test_confidence_B_without_official_but_l1():
@@ -316,7 +370,7 @@ def test_confidence_C_with_uncomputable():
         has_verified_basis=False, all_components_computable=False,
         category="index_plain")
     assert c == "C"
-    assert any("必要成分不完整" in n for n in notes)
+    assert any("无法证明合同里写的确实是该指数" in n for n in notes)
 
 
 def test_unknown_basis_alone_not_D():
@@ -869,6 +923,142 @@ def test_004746_rated_C(audit):
     notes = " ".join(rec["confidence_notes"])
     assert "L3" in notes
     assert "无法证明合同里写的确实是该指数" in notes
+
+
+# ============================================================ 关键缺口端到端
+def test_real_entry_passes_critical_gap_state():
+    """真实入口必须从解析结果传关键缺口状态，而不是测试手工传入。"""
+    # 纯指数、有序列、无关键缺口
+    f = dict(FUND_INDEX)
+    f["benchmark"] = "沪深300指数收益率×100%"
+    rec = _map(f, rule=RULE, grade="L2")
+    assert rec["has_critical_mapping_gap"] is False
+    assert rec["critical_gaps"] == []
+    assert rec["confidence"] == "B", "L2 + 无关键缺口应评 B"
+
+    # 同一基金加入未接入债券指数 → 真实解析出关键缺口 → C
+    f2 = dict(FUND_INDEX)
+    f2["benchmark"] = "沪深300指数收益率×85%+中债-综合全价（总值）指数收益率×15%"
+    rec2 = _map(f2, rule=RULE, grade="L2")
+    assert rec2["has_critical_mapping_gap"] is True
+    assert any("债券指数未接入" in g for g in rec2["critical_gaps"])
+    assert rec2["confidence"] == "C", "必要债券指数缺失必须降 C"
+
+
+def test_real_entry_critical_gap_for_unmapped_index():
+    """指数未映射代码 → 真实解析判关键缺口 → C。"""
+    f = dict(FUND_INDEX)
+    f["benchmark"] = "某未接入指数收益率×100%"
+    rec = _map(f, codes=set(), rule=RULE, grade="L2")
+    assert rec["has_critical_mapping_gap"] is True
+    assert rec["confidence"] == "C"
+
+
+def test_real_entry_composite_weight_gap_is_critical():
+    """复合基准未解释剩余权重 → 关键缺口 → C。"""
+    f = dict(FUND_INDEX)
+    f["benchmark"] = "沪深300指数收益率×60%+中证500指数收益率×20%"
+    rec = _map(f, rule=RULE, grade="L2")
+    assert rec["has_critical_mapping_gap"] is True
+    assert any("无法确认" in g for g in rec["critical_gaps"])
+    assert rec["confidence"] == "C"
+
+
+def test_real_entry_cash_gap_is_non_critical():
+    """现金成分无法计算属非关键缺口 → 有 L2 时评 B。"""
+    rec = _map(FUND_INDEX, rule=RULE, grade="L2")   # 含 5% 活期存款
+    assert rec["has_critical_mapping_gap"] is False
+    assert any("现金利率无历史序列" in g for g in rec["non_critical_gaps"])
+    assert rec["confidence"] == "B"
+
+
+def test_real_entry_l3_without_gap_still_C():
+    """L3 + 全成分可算 + 无关键缺口，仍只能 C。"""
+    f = dict(FUND_INDEX)
+    f["benchmark"] = "沪深300指数收益率×100%"
+    rec = _map(f, rule=RULE, grade="L3")
+    assert rec["has_critical_mapping_gap"] is False
+    assert rec["confidence"] == "C", "仅有 L3 不得评 B"
+
+
+def test_critical_gap_never_rated_B_even_with_l2(audit):
+    """用真实缺口状态 + L2 证据重算：有关键缺口的基金一律不得评 B。"""
+    checked = 0
+    for r in audit["funds"]:
+        if not r["has_critical_mapping_gap"]:
+            continue
+        c, notes = compute_confidence(
+            classification_confidence=r["classification"]["confidence"],
+            mapping_evidence_grade="L2",
+            has_official_contract=True,
+            has_index_observation=r["data_quality"]["index_observation"],
+            has_verified_basis=r["data_quality"]["index_verified_basis"],
+            all_components_computable=not r["benchmarks"]["contract"][
+                "uncomputable_components"],
+            category=r["category"],
+            has_critical_mapping_gap=True,
+            critical_gaps=r["critical_gaps"],
+            non_critical_gaps=r["non_critical_gaps"],
+            has_candidate_mapping=bool(r["benchmarks"]["contract"]["name"]),
+        )
+        assert c == "C", f"{r['fund_code']} 有关键缺口却评 {c}"
+        assert any("关键映射缺口" in n for n in notes)
+        checked += 1
+    assert checked == audit["summary"]["gap_classification"][
+        "with_critical_gap"] > 0
+
+
+def test_non_critical_gap_with_l2_can_be_B(audit):
+    """无关键缺口 + L2 + 有候选映射 → 允许 B（但基准仍不可用）。"""
+    ok = 0
+    for r in audit["funds"]:
+        if r["has_critical_mapping_gap"]:
+            continue
+        if not r["data_quality"]["index_observation"]:
+            continue
+        c, _ = compute_confidence(
+            classification_confidence=r["classification"]["confidence"],
+            mapping_evidence_grade="L2",
+            has_official_contract=False,
+            has_index_observation=True,
+            has_verified_basis=False,
+            all_components_computable=not r["benchmarks"]["contract"][
+                "uncomputable_components"],
+            category=r["category"],
+            has_critical_mapping_gap=False,
+            non_critical_gaps=r["non_critical_gaps"],
+            has_candidate_mapping=True,
+        )
+        assert c == "B", f"{r['fund_code']} 无关键缺口却评 {c}"
+        ok += 1
+    assert ok > 0
+
+
+def test_docs_gap_counts_match_json(audit):
+    """文档中的关键/非关键缺口数量与 JSON 一致。"""
+    txt = (REPORTS / "phase3B6_2_2_design.md").read_text(
+        encoding="utf-8").replace("**", "")
+    rec = (REPORTS / "phase3B6_2_2_recommendation.md").read_text(
+        encoding="utf-8").replace("**", "")
+    gc = audit["summary"]["gap_classification"]
+    for doc in (txt, rec):
+        assert "关键缺口" in doc and "非关键缺口" in doc
+    assert str(gc["with_critical_gap"]) in rec
+    assert str(gc["without_critical_gap"]) in rec
+    dist = audit["summary"]["confidence_distribution"]
+    assert f"C {dist.get('C', 0)}" in rec or f"| {dist.get('C', 0)} |" in rec
+
+
+def test_audit_critical_gap_distribution(audit):
+    """审计 JSON 的缺口分级与实际明细一致。"""
+    from collections import Counter
+    gc = audit["summary"]["gap_classification"]
+    assert gc["with_critical_gap"] == sum(
+        1 for r in audit["funds"] if r["has_critical_mapping_gap"])
+    assert gc["without_critical_gap"] == sum(
+        1 for r in audit["funds"] if not r["has_critical_mapping_gap"])
+    assert gc["with_critical_gap"] + gc["without_critical_gap"] == 120
+    assert sum(Counter(r["confidence"] for r in audit["funds"]).values()) == 120
 
 
 def test_no_fund_rated_above_evidence(audit):
