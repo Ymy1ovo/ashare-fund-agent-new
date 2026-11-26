@@ -337,9 +337,15 @@ def test_gates_not_opened(cov, pit, tr, conn):
     cont = {"indexes": [audit_continuity(c, conn) for c in INDEX_CODES]}
     p = audit_point_in_time(conn)
     rv = audit_revision_risk(conn)
-    t = {"indexes": [
-        {"base_index": c, "candidates": [], "has_total_return": False,
-         "total_return_obtainable": False} for c in INDEX_CODES]}
+    from scripts.audit_3b6_2_3_0_2_continuity import (
+        CONFIRMED_STOCK_PRICE_INDEXES, _tr_coverage)
+    fake_idx = [{"base_index": c, "candidates": [],
+                 "has_total_return": False, "total_return_obtainable": False,
+                 "has_gross_total_return": False,
+                 "has_net_total_return": False,
+                 "gross_total_return_obtainable": False,
+                 "net_total_return_obtainable": False} for c in INDEX_CODES]
+    t = {"indexes": fake_idx, "coverage": _tr_coverage(fake_idx)}
     s = summarize(cont, p, t, rv)
     g = s["gates"]
     assert g["ready_for_3b6_2_3_1_series_build"] is False
@@ -373,3 +379,185 @@ def test_no_vacuous_assertion():
     txt = Path(__file__).read_text(encoding="utf-8")
     assert ("or " + "True") not in txt
     assert ("assert " + "True") not in txt
+
+
+# ============================================================ 3B-6.2.3.0.2.1 修正
+def test_stock_denominator_is_eight_confirmed():
+    """1. 8 个已确认股票价格指数作为统计分母。"""
+    from scripts.audit_3b6_2_3_0_2_continuity import (
+        CONFIRMED_STOCK_PRICE_INDEXES)
+    assert len(CONFIRMED_STOCK_PRICE_INDEXES) == 8
+    assert set(CONFIRMED_STOCK_PRICE_INDEXES) == {
+        "000300", "000905", "000906", "000016",
+        "399997", "H30184", "000942", "000922"}
+
+
+def test_930930_not_in_stock_denominator(tr):
+    """2. 930930 不能计入已确认股票价格指数分母。"""
+    cov = tr["coverage"]
+    assert "930930" not in cov["confirmed_stock_price_indexes"]
+    assert cov["confirmed_stock_price_indexes_total"] == 8
+    assert cov["hk_index_derivative_candidate_count"] == 1
+    hk = cov["hk_index_derivative_candidates"][0]
+    assert hk["base_index"] == "930930"
+    assert hk["counts_in_stock_denominator"] is False
+
+
+def test_000012_bond_counted_separately(tr):
+    """3. 000012 债券衍生序列独立统计。"""
+    cov = tr["coverage"]
+    assert "000012" not in cov["confirmed_stock_price_indexes"]
+    assert cov["bond_index_derivative_candidate_count"] == 1
+    bond = cov["bond_index_derivative_candidates"][0]
+    assert bond["base_index"] == "000012"
+    assert bond["counts_in_stock_denominator"] is False
+    assert set(bond["kinds"]) == {"bond_clean_price",
+                                  "bond_interest_reinvestment"}
+
+
+def test_gross_and_net_counted_separately(tr):
+    """4. 全收益和净收益口径严格区分。"""
+    cov = tr["coverage"]
+    assert cov["confirmed_stock_indexes_with_gross_total_return"] == 8
+    assert cov["confirmed_stock_indexes_with_net_total_return"] == 5
+    # 全收益代码不得出现在净收益列表里
+    assert not set(cov["confirmed_stock_gross_total_return_codes"]) & \
+        set(cov["confirmed_stock_net_total_return_codes"])
+    for r in tr["indexes"]:
+        for c in r["candidates"]:
+            if c["kind"] == "gross_total_return":
+                assert "全收益" in (c["official_full_name"] or "")
+            if c["kind"] == "net_total_return":
+                assert "净收益" in (c["official_full_name"] or "")
+
+
+def test_unconfirmed_basis_not_passed(tr):
+    """5. 未经官方证据确认的衍生口径不得判定通过。"""
+    for r in tr["indexes"]:
+        for c in r["candidates"]:
+            if not c["identity_verified"]:
+                assert c["kind"] == "unknown", \
+                    f"{c['code']} 无官方证据却给了口径 {c['kind']}"
+    # 930930 主序列口径 unknown → 其衍生不得计入已确认分母
+    hk = next(r for r in tr["indexes"] if r["base_index"] == "930930")
+    assert hk["counts_in_confirmed_stock_denominator"] is False
+
+
+def test_no_annual_estimate_without_full_series(tr):
+    """6. 不存在完整历史序列时不得生成 1.5%~2.5% 年化差异结论。"""
+    d = tr["return_difference_estimate"]
+    assert d["quantitative_estimate_produced"] is False
+    assert d["quantitative_estimate"] is None
+    assert d["both_full_series_available"] is False
+    assert "1.5%" in d["removed_claim"] or "1.5" in d["removed_claim"]
+    assert d["requirements_for_future_estimate"]
+    # 该数值只允许出现在「已删除」声明语境中，不得作为结论使用
+    txt = (REPORTS / "phase3B6_2_3_0_2_recommendation.md").read_text(
+        encoding="utf-8")
+    lines = txt.splitlines()
+    for i, line in enumerate(lines):
+        if "1.5" not in line:
+            continue
+        ctx = line + (lines[i - 1] if i else "")
+        assert ("已删除" in ctx or "删除理由" in ctx
+                or "不足以" in ctx), \
+            f"第 {i + 1} 行仍把年化差异当结论：{line.strip()}"
+
+
+def test_suspect_rows_still_exist(conn, cov):
+    """7. 10 条 suspect 记录仍然存在。"""
+    n = conn.execute(
+        "select count(*) from index_daily where quality_status<>'valid'"
+    ).fetchone()[0]
+    assert n == 10
+    for r in cov["indexes"]:
+        assert len(r["placeholder_rows"]) == 1
+        assert r["placeholder_rows"][0]["trade_date"] == "2004-01-01"
+
+
+def test_h30184_zero_still_present(conn, cov):
+    """8. H30184 零值记录仍然存在且未被修改。"""
+    row = conn.execute(
+        "select trade_date, close, quality_status from index_daily "
+        "where index_code='H30184' and close<=0").fetchone()
+    assert row is not None
+    assert row[0] == "2013-06-28"
+    assert row[1] == 0.0
+    assert row[2] == "valid"
+    rec = next(r for r in cov["indexes"] if r["index_code"] == "H30184")
+    assert rec["non_positive_close"] == 1
+
+
+def test_database_evidence_complete(cov):
+    """9. 正式数据库只读证据必须完整（含 64 位 SHA256）。"""
+    db = cov["database_evidence"]
+    assert db["read_only"] is True
+    assert len(db["database_sha256"]) == 64
+    assert all(ch in "0123456789abcdef" for ch in db["database_sha256"])
+    assert db["integrity_check"] == "ok"
+    assert db["foreign_key_violations"] == 0
+    assert db["index_daily_total_rows"] == 50603
+    assert db["suspect_placeholder_count"] == 10
+    assert db["non_positive_close_count"] == 1
+    assert db["h30184_zero_row_present"] is True
+    assert len(db["per_index_rows"]) == 10
+    for code, v in db["per_index_rows"].items():
+        assert v["raw_rows"] == v["valid_rows"] + v["suspect_rows"]
+
+
+def test_coverage_auto_computed(tr):
+    """10. 汇总统计由逐指数明细自动计算。"""
+    cov = tr["coverage"]
+    recs = tr["indexes"]
+    stock = [r for r in recs
+             if r["base_index"] in cov["confirmed_stock_price_indexes"]]
+    assert cov["confirmed_stock_price_indexes_total"] == len(stock) == 8
+    assert cov["confirmed_stock_indexes_with_gross_total_return"] == sum(
+        1 for r in stock if r["gross_total_return_obtainable"])
+    assert cov["confirmed_stock_indexes_with_net_total_return"] == sum(
+        1 for r in stock if r["net_total_return_obtainable"])
+    assert cov["total_return_series_in_database"] == sum(
+        1 for r in recs for c in r["candidates"] if c["already_in_database"])
+
+
+def test_gates_all_closed(tr):
+    """11. 所有门禁保持关闭。"""
+    txt = (REPORTS / "phase3B6_2_3_0_2_recommendation.md").read_text(
+        encoding="utf-8")
+    for gate in ("ready_for_research_analysis", "ready_for_backtest",
+                 "ready_for_formal_ranking",
+                 "ready_for_3b6_2_3_1_series_build"):
+        assert gate in txt, f"缺门禁 {gate}"
+    assert tr["coverage"]["total_return_series_in_database"] == 0
+
+
+def test_continuity_wording_accurate():
+    """连续性措辞必须准确，不得把代理日历结果说成官方连续性证明。"""
+    for name in ("phase3B6_2_3_0_2_recommendation.md",
+                 "phase3B6_2_3_0_2_design.md"):
+        txt = (REPORTS / name).read_text(encoding="utf-8")
+        assert "A 股交易日历代理" in txt or "A股交易日历代理" in txt
+        # 该措辞只允许出现在否定语境（"不能/不得/更不"）
+        for i, line in enumerate(txt.splitlines()):
+            if "官方历史行情完全连续" in line:
+                ctx = line + (txt.splitlines()[i - 1] if i else "")
+                assert ("不能" in ctx or "不得" in ctx or "更不" in ctx), \
+                    f"{name} 第 {i + 1} 行把代理日历说成了官方连续证明"
+    design = (REPORTS / "phase3B6_2_3_0_2_design.md").read_text(
+        encoding="utf-8")
+    assert "连续性 unknown" in design
+    assert "连续性不通过" in design
+
+
+def test_derivative_codes_have_official_evidence(tr):
+    """所有衍生序列必须带官方证据（名称 + 样本 + URL）。"""
+    for r in tr["indexes"]:
+        for c in r["candidates"]:
+            assert c["official_full_name"], f"{c['code']} 缺官方全称"
+            assert c["publisher"] == "中证指数有限公司"
+            if c["official_api_available"]:
+                got = [s for s in c["official_api_samples"]
+                       if s.get("close") is not None]
+                assert got, f"{c['code']} 声称可取但无样本"
+                for s in got:
+                    assert s.get("url"), f"{c['code']} 样本缺 URL"

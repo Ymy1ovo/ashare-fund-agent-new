@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-26T14:22:35",
+ "generated_at": "2026-11-26T15:11:59",
  "summary": {
   "continuity": {
    "total_indexes": 10,
@@ -24,6 +24,12 @@
    "reason": "库内 index_daily 每个 (index_code, trade_date) 仅一行，无历史快照表、无修订记录；collected_at 仅为当前采集时间，**不能证明该行情在历史交易日当时已公开**；row_fingerprint 只证明当前行内容，不证明历史版本未被修订"
   },
   "total_return": {
+   "confirmed_stock_price_indexes_total": 8,
+   "confirmed_stock_indexes_with_gross_total_return": 8,
+   "confirmed_stock_indexes_with_net_total_return": 5,
+   "hk_index_derivative_candidate_count": 1,
+   "bond_index_derivative_candidate_count": 1,
+   "total_return_series_in_database": 0,
    "indexes_with_tr_candidate": 9,
    "indexes_with_tr_obtainable": 9,
    "indexes_with_tr_not_obtainable": 1
@@ -44,7 +50,38 @@
    "total_return_count_matches": true,
    "revision_count_matches": true,
    "continuity_partition_ok": true,
-   "placeholder_total_is_10": true
+   "placeholder_total_is_10": true,
+   "stock_denominator_is_8": true,
+   "hk_not_in_stock_denominator": true,
+   "bond_not_in_stock_denominator": true,
+   "gross_net_counted_separately": true
   }
+ },
+ "database_evidence": {
+  "database_path": "D:\\ymy\\jj-agent\\data\\fund_agent.db",
+  "database_sha256": "27e0b54d7a5675892b70fc5061ed38da8dc6b58119139c63a4039e08e0523061",
+  "integrity_check": "ok",
+  "foreign_key_violations": 0,
+  "suspect_placeholder_count": 10,
+  "non_positive_close_count": 1,
+  "note": "本轮只能证明当前数据库状态；如未取得任务开始前指纹，不得声称完成前后一致比较"
+ },
+ "return_difference_estimate": {
+  "price_series_rows": 42046,
+  "total_return_series_rows": 0,
+  "both_full_series_available": false,
+  "quantitative_estimate_produced": false,
+  "quantitative_estimate": null,
+  "removed_claim": "8个股票指数年化低估约1.5%~2.5%",
+  "removal_reason": "本轮仅有 3 个日期的官方抽样值，**不足以推导长期年化差异**；且正式库未接入全收益序列，无法做同起止、同交易日对齐的完整比对",
+  "qualitative_statement": "价格指数不包含股息再投资，与基金累计净值（含分红再投资）在收益口径上存在差异；差异大小需用完整官方序列计算，本阶段不给出数值",
+  "requirements_for_future_estimate": [
+   "相同起止日期",
+   "相同交易日对齐",
+   "完整官方历史序列（价格 + 全收益）",
+   "公开计算公式",
+   "公开数据范围",
+   "公开缺失处理规则"
+  ]
  }
 }

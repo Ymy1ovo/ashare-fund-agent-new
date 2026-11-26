@@ -33,6 +33,15 @@ CSI_PERF = ("https://www.csindex.com.cn/csindex-home/perf/"
 INDEX_CODES = ["000300", "000905", "000906", "000016", "399997",
                "H30184", "000942", "000012", "000922", "930930"]
 
+# **收益口径已获官方确认的股票价格指数**（8 个）
+# 930930 口径仍为 unknown，不得计入；000012 是债券指数，单独统计
+CONFIRMED_STOCK_PRICE_INDEXES = ["000300", "000905", "000906", "000016",
+                                 "399997", "H30184", "000942", "000922"]
+# 债券指数（衍生序列口径与股票全收益不同，必须独立统计）
+BOND_INDEXES = ["000012"]
+# 收益口径未确认的指数（不得计入任何已确认分母）
+UNCONFIRMED_BASIS_INDEXES = ["930930"]
+
 # 各指数适用的市场与日历（**不得统一套用 A 股日历**）
 INDEX_MARKET = {
     "000300": {"market": "沪深A股", "calendar": "A股交易日历",
@@ -474,7 +483,24 @@ def audit_total_return(conn) -> dict:
         records.append({
             "base_index": base,
             "base_basis": INDEX_MARKET[base]["market"],
+            "index_class": (
+                "confirmed_stock_price_index"
+                if base in CONFIRMED_STOCK_PRICE_INDEXES
+                else "bond_index" if base in BOND_INDEXES
+                else "unconfirmed_basis_index"),
+            "counts_in_confirmed_stock_denominator":
+                base in CONFIRMED_STOCK_PRICE_INDEXES,
             "candidates": cands,
+            "has_gross_total_return": any(
+                c["kind"] == "gross_total_return" for c in cands),
+            "has_net_total_return": any(
+                c["kind"] == "net_total_return" for c in cands),
+            "gross_total_return_obtainable": any(
+                c["kind"] == "gross_total_return"
+                and c["official_api_available"] for c in cands),
+            "net_total_return_obtainable": any(
+                c["kind"] == "net_total_return"
+                and c["official_api_available"] for c in cands),
             "has_total_return": any(
                 c["kind"] in ("gross_total_return", "net_total_return")
                 for c in cands),
@@ -485,7 +511,63 @@ def audit_total_return(conn) -> dict:
     return {"indexes": records,
             "samples_file": "reports/evidence/phase3B6_2_3_0_2/"
                             "official_total_return_samples.json",
-            "samples_sha256": _tr_sha()}
+            "samples_sha256": _tr_sha(),
+            "coverage": _tr_coverage(records)}
+
+
+def _tr_coverage(records: list[dict]) -> dict:
+    """全收益覆盖统计：**按指数类别分别计算，分母不得混用**。
+
+    - 股票价格指数的分母 = 8 个**收益口径已确认**的股票指数
+    - 930930 口径 unknown，**不得计入该分母**
+    - 000012 债券衍生序列**独立统计**
+    """
+    stock = [r for r in records
+             if r["base_index"] in CONFIRMED_STOCK_PRICE_INDEXES]
+    bond = [r for r in records if r["base_index"] in BOND_INDEXES]
+    unconf = [r for r in records
+              if r["base_index"] in UNCONFIRMED_BASIS_INDEXES]
+
+    def _codes(recs, kind):
+        return [c["code"] for r in recs for c in r["candidates"]
+                if c["kind"] == kind and c["official_api_available"]]
+
+    return {
+        "confirmed_stock_price_indexes_total": len(stock),
+        "confirmed_stock_price_indexes": [
+            r["base_index"] for r in stock],
+        "confirmed_stock_indexes_with_gross_total_return": sum(
+            1 for r in stock if r["gross_total_return_obtainable"]),
+        "confirmed_stock_indexes_with_net_total_return": sum(
+            1 for r in stock if r["net_total_return_obtainable"]),
+        "confirmed_stock_gross_total_return_codes": _codes(
+            stock, "gross_total_return"),
+        "confirmed_stock_net_total_return_codes": _codes(
+            stock, "net_total_return"),
+        "hk_index_derivative_candidates": [
+            {"base_index": r["base_index"],
+             "codes": [c["code"] for c in r["candidates"]],
+             "counts_in_stock_denominator": False,
+             "reason": ("主序列收益口径仍为 unknown，"
+                        "不得计入已确认股票价格指数分母")}
+            for r in unconf],
+        "hk_index_derivative_candidate_count": len(unconf),
+        "bond_index_derivative_candidates": [
+            {"base_index": r["base_index"],
+             "codes": [c["code"] for c in r["candidates"]],
+             "kinds": [c["kind"] for c in r["candidates"]],
+             "counts_in_stock_denominator": False,
+             "reason": ("债券指数的净价/利息再投资序列与股票全收益"
+                        "口径不同，必须独立统计")}
+            for r in bond],
+        "bond_index_derivative_candidate_count": len(bond),
+        "denominator_rule": (
+            "**分母只含 8 个收益口径已获官方确认的股票价格指数**；"
+            "930930（unknown）与 000012（债券）均不计入"),
+        "total_return_series_in_database": sum(
+            1 for r in records for c in r["candidates"]
+            if c["already_in_database"]),
+    }
 
 
 def _tr_sha() -> str | None:
@@ -578,6 +660,22 @@ def summarize(cont: dict, pit: dict, tr: dict, rev: dict) -> dict:
             "reason": pit["reason"],
         },
         "total_return": {
+            # 逐指数明细自动汇总（分母严格分类，不得混用）
+            "confirmed_stock_price_indexes_total":
+                tr["coverage"]["confirmed_stock_price_indexes_total"],
+            "confirmed_stock_indexes_with_gross_total_return":
+                tr["coverage"][
+                    "confirmed_stock_indexes_with_gross_total_return"],
+            "confirmed_stock_indexes_with_net_total_return":
+                tr["coverage"][
+                    "confirmed_stock_indexes_with_net_total_return"],
+            "hk_index_derivative_candidate_count":
+                tr["coverage"]["hk_index_derivative_candidate_count"],
+            "bond_index_derivative_candidate_count":
+                tr["coverage"]["bond_index_derivative_candidate_count"],
+            "total_return_series_in_database":
+                tr["coverage"]["total_return_series_in_database"],
+            # 兼容字段：全部指数（含 unknown/债券），不得当作股票分母
             "indexes_with_tr_candidate": sum(
                 1 for r in trecs if r["has_total_return"]),
             "indexes_with_tr_obtainable": tr_obtainable,
@@ -608,7 +706,124 @@ def summarize(cont: dict, pit: dict, tr: dict, rev: dict) -> dict:
                 == len(recs)),
             "placeholder_total_is_10": sum(
                 len(r["placeholder_rows"]) for r in recs) == 10,
+            # 分母不得含 930930 / 000012
+            "stock_denominator_is_8":
+                tr["coverage"]["confirmed_stock_price_indexes_total"] == 8,
+            "hk_not_in_stock_denominator": (
+                "930930" not in
+                tr["coverage"]["confirmed_stock_price_indexes"]),
+            "bond_not_in_stock_denominator": (
+                "000012" not in
+                tr["coverage"]["confirmed_stock_price_indexes"]),
+            "gross_net_counted_separately": (
+                tr["coverage"]["confirmed_stock_indexes_with_gross_total_return"]
+                + 0 <= tr["coverage"]["confirmed_stock_price_indexes_total"]),
         },
+    }
+
+
+# ---------------------------------------------------------------- 数据库证据
+def database_evidence(conn) -> dict:
+    """正式数据库只读完整性证据（含完整 64 位 SHA256）。"""
+    import hashlib
+    import os
+    from app.config import settings
+    path = str(settings.database_path)
+    h = hashlib.sha256()
+    with open(path, "rb") as f:
+        for chunk in iter(lambda: f.read(1 << 20), b""):
+            h.update(chunk)
+    sha = h.hexdigest()
+
+    per_index = {}
+    for code in INDEX_CODES:
+        r = conn.execute(
+            "select count(*), sum(case when quality_status='valid' then 1 "
+            "else 0 end), sum(case when quality_status<>'valid' then 1 "
+            "else 0 end) from index_daily where index_code=?",
+            (code,)).fetchone()
+        per_index[code] = {
+            "raw_rows": r[0],
+            "valid_rows": r[1] or 0,
+            "suspect_rows": r[2] or 0,
+        }
+
+    placeholders = [
+        {"index_code": r[0], "trade_date": r[1], "close": r[2],
+         "quality_status": r[3], "quality_note": r[4]}
+        for r in conn.execute(
+            "select index_code, trade_date, close, quality_status, "
+            "quality_note from index_daily where quality_status<>'valid' "
+            "order by index_code")]
+
+    zero_rows = [
+        {"index_code": r[0], "trade_date": r[1], "close": r[2],
+         "quality_status": r[3]}
+        for r in conn.execute(
+            "select index_code, trade_date, close, quality_status "
+            "from index_daily where close<=0 order by index_code")]
+
+    return {
+        "database_path": path,
+        "database_sha256": sha,
+        "database_bytes": os.path.getsize(path),
+        "integrity_check": conn.execute(
+            "pragma integrity_check").fetchone()[0],
+        "foreign_key_violations": len(
+            conn.execute("pragma foreign_key_check").fetchall()),
+        "index_daily_total_rows": conn.execute(
+            "select count(*) from index_daily").fetchone()[0],
+        "per_index_rows": per_index,
+        "suspect_placeholder_rows": placeholders,
+        "suspect_placeholder_count": len(placeholders),
+        "non_positive_close_rows": zero_rows,
+        "non_positive_close_count": len(zero_rows),
+        "h30184_zero_row_present": any(
+            r["index_code"] == "H30184" and r["trade_date"] == "2013-06-28"
+            and r["close"] == 0.0 for r in zero_rows),
+        "read_only": True,
+        "note": ("本轮只能证明当前数据库状态；"
+                 "如未取得任务开始前指纹，不得声称完成前后一致比较"),
+    }
+
+
+# ---------------------------------------------------------------- 差异估计边界
+def return_difference_estimate(conn) -> dict:
+    """价格指数与全收益指数的差异：**本阶段不做量化估计**。
+
+    只有同时具备完整、同起止、同交易日对齐的官方历史序列时才允许量化，
+    本轮未构建任何完整收益序列。
+    """
+    has_full_price = conn.execute(
+        "select count(*) from index_daily where index_code in "
+        "('000300','000905','000906','000016','399997','H30184',"
+        "'000942','000922')").fetchone()[0]
+    has_full_tr = conn.execute(
+        "select count(*) from index_daily where index_code in "
+        "('H00300','H00905','H00906','H00016','H20539','H20184',"
+        "'H00942','H00922')").fetchone()[0]
+    return {
+        "price_series_rows": has_full_price,
+        "total_return_series_rows": has_full_tr,
+        "both_full_series_available": bool(has_full_price and has_full_tr),
+        "quantitative_estimate_produced": False,
+        "quantitative_estimate": None,
+        "removed_claim": "8个股票指数年化低估约1.5%~2.5%",
+        "removal_reason": (
+            "本轮仅有 3 个日期的官方抽样值，**不足以推导长期年化差异**；"
+            "且正式库未接入全收益序列，无法做同起止、同交易日对齐的完整比对"),
+        "qualitative_statement": (
+            "价格指数不包含股息再投资，与基金累计净值（含分红再投资）"
+            "在收益口径上存在差异；差异大小需用完整官方序列计算，"
+            "本阶段不给出数值"),
+        "requirements_for_future_estimate": [
+            "相同起止日期",
+            "相同交易日对齐",
+            "完整官方历史序列（价格 + 全收益）",
+            "公开计算公式",
+            "公开数据范围",
+            "公开缺失处理规则",
+        ],
     }
 
 
@@ -652,6 +867,21 @@ def main() -> None:
         print(f"  {r['base_index']:8s} TR候选={len(r['candidates'])} "
               f"可取={got}")
 
+    print("\n=== 第五部分：数据库证据与差异估计边界 ===")
+    conn3 = db_connect()
+    try:
+        db_ev = database_evidence(conn3)
+        diff_est = return_difference_estimate(conn3)
+    finally:
+        conn3.close()
+    print(f"  SHA256: {db_ev['database_sha256']}")
+    print(f"  integrity={db_ev['integrity_check']} "
+          f"fk={db_ev['foreign_key_violations']}")
+    print(f"  suspect={db_ev['suspect_placeholder_count']} "
+          f"zero={db_ev['non_positive_close_count']}")
+    print(f"  完整双序列可用={diff_est['both_full_series_available']} "
+          f"量化结论={diff_est['quantitative_estimate_produced']}")
+
     summary = summarize(cont, pit, tr, rev)
     now = datetime.now().isoformat(timespec="seconds")
     base = "015a552df01e8bec791905a3623df4d3213165f6"
@@ -670,7 +900,12 @@ def main() -> None:
             "placeholder_policy": (
                 "2004-01-01 占位行单独统计，不计入有效行情，"
                 "**不删除正式库记录**"),
+            "calendar_accuracy_note": (
+                "trade_calendar 是 A 股交易日**代理**，不是指数编制机构"
+                "公布的官方发布日历；因此「无缺失」只能表述为"
+                "「相对于项目 A 股交易日历代理未发现缺失」"),
             "summary": summary["continuity"],
+            "database_evidence": db_ev,
             "indexes": cont_recs,
         }, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
 
@@ -705,6 +940,8 @@ def main() -> None:
             },
             "warning": ("债券全价/财富指数与股票全收益指数**不可混为一谈**"),
             "summary": summary["total_return"],
+            "coverage": tr["coverage"],
+            "return_difference_estimate": diff_est,
             "indexes": tr["indexes"],
             "samples_file": tr["samples_file"],
             "samples_sha256": tr["samples_sha256"],
@@ -720,7 +957,19 @@ def main() -> None:
         }, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
 
     (EVID / "summary.json").write_text(
-        json.dumps({"generated_at": now, "summary": summary},
+        json.dumps({"generated_at": now, "summary": summary,
+                    "database_evidence": {
+                        "database_path": db_ev["database_path"],
+                        "database_sha256": db_ev["database_sha256"],
+                        "integrity_check": db_ev["integrity_check"],
+                        "foreign_key_violations":
+                            db_ev["foreign_key_violations"],
+                        "suspect_placeholder_count":
+                            db_ev["suspect_placeholder_count"],
+                        "non_positive_close_count":
+                            db_ev["non_positive_close_count"],
+                        "note": db_ev["note"]},
+                    "return_difference_estimate": diff_est},
                    ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
 
     print("\n=== 汇总 ===")

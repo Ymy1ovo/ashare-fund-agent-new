@@ -1,7 +1,7 @@
 {
  "phase": "3B-6.2.3.0.2",
  "task": "全收益指数与研究基准可行性审计",
- "generated_at": "2026-11-26T14:22:35",
+ "generated_at": "2026-11-26T15:11:59",
  "baseline_head": "015a552df01e8bec791905a3623df4d3213165f6",
  "read_only": true,
  "rule": "全收益/净收益代码必须来自官方基本信息接口，**不得按命名规律猜测**",
@@ -16,14 +16,101 @@
  },
  "warning": "债券全价/财富指数与股票全收益指数**不可混为一谈**",
  "summary": {
+  "confirmed_stock_price_indexes_total": 8,
+  "confirmed_stock_indexes_with_gross_total_return": 8,
+  "confirmed_stock_indexes_with_net_total_return": 5,
+  "hk_index_derivative_candidate_count": 1,
+  "bond_index_derivative_candidate_count": 1,
+  "total_return_series_in_database": 0,
   "indexes_with_tr_candidate": 9,
   "indexes_with_tr_obtainable": 9,
   "indexes_with_tr_not_obtainable": 1
+ },
+ "coverage": {
+  "confirmed_stock_price_indexes_total": 8,
+  "confirmed_stock_price_indexes": [
+   "000300",
+   "000905",
+   "000906",
+   "000016",
+   "399997",
+   "H30184",
+   "000942",
+   "000922"
+  ],
+  "confirmed_stock_indexes_with_gross_total_return": 8,
+  "confirmed_stock_indexes_with_net_total_return": 5,
+  "confirmed_stock_gross_total_return_codes": [
+   "H00300",
+   "H00905",
+   "H00906",
+   "H00016",
+   "H20539",
+   "H20184",
+   "H00942",
+   "H00922"
+  ],
+  "confirmed_stock_net_total_return_codes": [
+   "N00300",
+   "N00905",
+   "N00906",
+   "N00016",
+   "399997CNY02"
+  ],
+  "hk_index_derivative_candidates": [
+   {
+    "base_index": "930930",
+    "codes": [
+     "H20930"
+    ],
+    "counts_in_stock_denominator": false,
+    "reason": "主序列收益口径仍为 unknown，不得计入已确认股票价格指数分母"
+   }
+  ],
+  "hk_index_derivative_candidate_count": 1,
+  "bond_index_derivative_candidates": [
+   {
+    "base_index": "000012",
+    "codes": [
+     "H00012",
+     "N00012"
+    ],
+    "kinds": [
+     "bond_clean_price",
+     "bond_interest_reinvestment"
+    ],
+    "counts_in_stock_denominator": false,
+    "reason": "债券指数的净价/利息再投资序列与股票全收益口径不同，必须独立统计"
+   }
+  ],
+  "bond_index_derivative_candidate_count": 1,
+  "denominator_rule": "**分母只含 8 个收益口径已获官方确认的股票价格指数**；930930（unknown）与 000012（债券）均不计入",
+  "total_return_series_in_database": 0
+ },
+ "return_difference_estimate": {
+  "price_series_rows": 42046,
+  "total_return_series_rows": 0,
+  "both_full_series_available": false,
+  "quantitative_estimate_produced": false,
+  "quantitative_estimate": null,
+  "removed_claim": "8个股票指数年化低估约1.5%~2.5%",
+  "removal_reason": "本轮仅有 3 个日期的官方抽样值，**不足以推导长期年化差异**；且正式库未接入全收益序列，无法做同起止、同交易日对齐的完整比对",
+  "qualitative_statement": "价格指数不包含股息再投资，与基金累计净值（含分红再投资）在收益口径上存在差异；差异大小需用完整官方序列计算，本阶段不给出数值",
+  "requirements_for_future_estimate": [
+   "相同起止日期",
+   "相同交易日对齐",
+   "完整官方历史序列（价格 + 全收益）",
+   "公开计算公式",
+   "公开数据范围",
+   "公开缺失处理规则"
+  ]
  },
  "indexes": [
   {
    "base_index": "000300",
    "base_basis": "沪深A股",
+   "index_class": "confirmed_stock_price_index",
+   "counts_in_confirmed_stock_denominator": true,
    "candidates": [
     {
      "code": "H00300",
@@ -94,12 +181,18 @@
      "database_rows": 0
     }
    ],
+   "has_gross_total_return": true,
+   "has_net_total_return": true,
+   "gross_total_return_obtainable": true,
+   "net_total_return_obtainable": true,
    "has_total_return": true,
    "total_return_obtainable": true
   },
   {
    "base_index": "000905",
    "base_basis": "沪深A股",
+   "index_class": "confirmed_stock_price_index",
+   "counts_in_confirmed_stock_denominator": true,
    "candidates": [
     {
      "code": "H00905",
@@ -170,12 +263,18 @@
      "database_rows": 0
     }
    ],
+   "has_gross_total_return": true,
+   "has_net_total_return": true,
+   "gross_total_return_obtainable": true,
+   "net_total_return_obtainable": true,
    "has_total_return": true,
    "total_return_obtainable": true
   },
   {
    "base_index": "000906",
    "base_basis": "沪深A股",
+   "index_class": "confirmed_stock_price_index",
+   "counts_in_confirmed_stock_denominator": true,
    "candidates": [
     {
      "code": "H00906",
@@ -246,12 +345,18 @@
      "database_rows": 0
     }
    ],
+   "has_gross_total_return": true,
+   "has_net_total_return": true,
+   "gross_total_return_obtainable": true,
+   "net_total_return_obtainable": true,
    "has_total_return": true,
    "total_return_obtainable": true
   },
   {
    "base_index": "000016",
    "base_basis": "上海A股",
+   "index_class": "confirmed_stock_price_index",
+   "counts_in_confirmed_stock_denominator": true,
    "candidates": [
     {
      "code": "H00016",
@@ -322,12 +427,18 @@
      "database_rows": 0
     }
    ],
+   "has_gross_total_return": true,
+   "has_net_total_return": true,
+   "gross_total_return_obtainable": true,
+   "net_total_return_obtainable": true,
    "has_total_return": true,
    "total_return_obtainable": true
   },
   {
    "base_index": "399997",
    "base_basis": "沪深A股",
+   "index_class": "confirmed_stock_price_index",
+   "counts_in_confirmed_stock_denominator": true,
    "candidates": [
     {
      "code": "H20539",
@@ -398,12 +509,18 @@
      "database_rows": 0
     }
    ],
+   "has_gross_total_return": true,
+   "has_net_total_return": true,
+   "gross_total_return_obtainable": true,
+   "net_total_return_obtainable": true,
    "has_total_return": true,
    "total_return_obtainable": true
   },
   {
    "base_index": "H30184",
    "base_basis": "沪深A股",
+   "index_class": "confirmed_stock_price_index",
+   "counts_in_confirmed_stock_denominator": true,
    "candidates": [
     {
      "code": "H20184",
@@ -440,12 +557,18 @@
      "database_rows": 0
     }
    ],
+   "has_gross_total_return": true,
+   "has_net_total_return": false,
+   "gross_total_return_obtainable": true,
+   "net_total_return_obtainable": false,
    "has_total_return": true,
    "total_return_obtainable": true
   },
   {
    "base_index": "000942",
    "base_basis": "沪深A股",
+   "index_class": "confirmed_stock_price_index",
+   "counts_in_confirmed_stock_denominator": true,
    "candidates": [
     {
      "code": "H00942",
@@ -482,12 +605,18 @@
      "database_rows": 0
     }
    ],
+   "has_gross_total_return": true,
+   "has_net_total_return": false,
+   "gross_total_return_obtainable": true,
+   "net_total_return_obtainable": false,
    "has_total_return": true,
    "total_return_obtainable": true
   },
   {
    "base_index": "000012",
    "base_basis": "上海证券交易所（债券）",
+   "index_class": "bond_index",
+   "counts_in_confirmed_stock_denominator": false,
    "candidates": [
     {
      "code": "H00012",
@@ -558,12 +687,18 @@
      "database_rows": 0
     }
    ],
+   "has_gross_total_return": false,
+   "has_net_total_return": false,
+   "gross_total_return_obtainable": false,
+   "net_total_return_obtainable": false,
    "has_total_return": false,
    "total_return_obtainable": false
   },
   {
    "base_index": "000922",
    "base_basis": "沪深A股",
+   "index_class": "confirmed_stock_price_index",
+   "counts_in_confirmed_stock_denominator": true,
    "candidates": [
     {
      "code": "H00922",
@@ -600,12 +735,18 @@
      "database_rows": 0
     }
    ],
+   "has_gross_total_return": true,
+   "has_net_total_return": false,
+   "gross_total_return_obtainable": true,
+   "net_total_return_obtainable": false,
    "has_total_return": true,
    "total_return_obtainable": true
   },
   {
    "base_index": "930930",
    "base_basis": "港股通（香港市场）",
+   "index_class": "unconfirmed_basis_index",
+   "counts_in_confirmed_stock_denominator": false,
    "candidates": [
     {
      "code": "H20930",
@@ -642,6 +783,10 @@
      "database_rows": 0
     }
    ],
+   "has_gross_total_return": true,
+   "has_net_total_return": false,
+   "gross_total_return_obtainable": true,
+   "net_total_return_obtainable": false,
    "has_total_return": true,
    "total_return_obtainable": true
   }

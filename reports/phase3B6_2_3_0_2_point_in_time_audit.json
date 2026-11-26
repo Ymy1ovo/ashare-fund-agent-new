@@ -1,7 +1,7 @@
 {
  "phase": "3B-6.2.3.0.2",
  "task": "历史时点可用性审计",
- "generated_at": "2026-11-26T14:22:35",
+ "generated_at": "2026-11-26T15:11:59",
  "baseline_head": "015a552df01e8bec791905a3623df4d3213165f6",
  "read_only": true,
  "audit": {

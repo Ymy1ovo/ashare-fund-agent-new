@@ -1,11 +1,12 @@
 {
  "phase": "3B-6.2.3.0.2",
  "task": "10 个指数历史连续性审计",
- "generated_at": "2026-11-26T14:22:35",
+ "generated_at": "2026-11-26T15:11:59",
  "baseline_head": "015a552df01e8bec791905a3623df4d3213165f6",
  "read_only": true,
  "calendar_policy": "按指数实际市场选择日历；A股日历仅对沪深A股指数适用；000012（上交所债券）与 930930（港股通）的专属日历未独立取得，**不做缺失日核验**，避免用错误日历误判缺口",
  "placeholder_policy": "2004-01-01 占位行单独统计，不计入有效行情，**不删除正式库记录**",
+ "calendar_accuracy_note": "trade_calendar 是 A 股交易日**代理**，不是指数编制机构公布的官方发布日历；因此「无缺失」只能表述为「相对于项目 A 股交易日历代理未发现缺失」",
  "summary": {
   "total_indexes": 10,
   "calendar_available": 8,
@@ -22,6 +23,151 @@
   "non_positive_close_total": 1,
   "null_close_total": 0,
   "missing_trading_days_total": 0
+ },
+ "database_evidence": {
+  "database_path": "D:\\ymy\\jj-agent\\data\\fund_agent.db",
+  "database_sha256": "27e0b54d7a5675892b70fc5061ed38da8dc6b58119139c63a4039e08e0523061",
+  "database_bytes": 334032896,
+  "integrity_check": "ok",
+  "foreign_key_violations": 0,
+  "index_daily_total_rows": 50603,
+  "per_index_rows": {
+   "000300": {
+    "raw_rows": 5558,
+    "valid_rows": 5557,
+    "suspect_rows": 1
+   },
+   "000905": {
+    "raw_rows": 5317,
+    "valid_rows": 5316,
+    "suspect_rows": 1
+   },
+   "000906": {
+    "raw_rows": 5317,
+    "valid_rows": 5316,
+    "suspect_rows": 1
+   },
+   "000016": {
+    "raw_rows": 5559,
+    "valid_rows": 5558,
+    "suspect_rows": 1
+   },
+   "399997": {
+    "raw_rows": 4345,
+    "valid_rows": 4344,
+    "suspect_rows": 1
+   },
+   "H30184": {
+    "raw_rows": 5316,
+    "valid_rows": 5315,
+    "suspect_rows": 1
+   },
+   "000942": {
+    "raw_rows": 5317,
+    "valid_rows": 5316,
+    "suspect_rows": 1
+   },
+   "000012": {
+    "raw_rows": 5558,
+    "valid_rows": 5557,
+    "suspect_rows": 1
+   },
+   "000922": {
+    "raw_rows": 5317,
+    "valid_rows": 5316,
+    "suspect_rows": 1
+   },
+   "930930": {
+    "raw_rows": 2999,
+    "valid_rows": 2998,
+    "suspect_rows": 1
+   }
+  },
+  "suspect_placeholder_rows": [
+   {
+    "index_code": "000012",
+    "trade_date": "2004-01-01",
+    "close": 99.22,
+    "quality_status": "suspect",
+    "quality_note": "接口基线占位行：日期与第二行间隔异常或非交易日，不是真实行情"
+   },
+   {
+    "index_code": "000016",
+    "trade_date": "2004-01-01",
+    "close": 1011.35,
+    "quality_status": "suspect",
+    "quality_note": "接口基线占位行：日期与第二行间隔异常或非交易日，不是真实行情"
+   },
+   {
+    "index_code": "000300",
+    "trade_date": "2004-01-01",
+    "close": 1204.61,
+    "quality_status": "suspect",
+    "quality_note": "接口基线占位行：日期与第二行间隔异常或非交易日，不是真实行情"
+   },
+   {
+    "index_code": "000905",
+    "trade_date": "2004-01-01",
+    "close": 1000.0,
+    "quality_status": "suspect",
+    "quality_note": "接口基线占位行：日期与第二行间隔异常或非交易日，不是真实行情"
+   },
+   {
+    "index_code": "000906",
+    "trade_date": "2004-01-01",
+    "close": 1000.0,
+    "quality_status": "suspect",
+    "quality_note": "接口基线占位行：日期与第二行间隔异常或非交易日，不是真实行情"
+   },
+   {
+    "index_code": "000922",
+    "trade_date": "2004-01-01",
+    "close": 1000.0,
+    "quality_status": "suspect",
+    "quality_note": "接口基线占位行：日期与第二行间隔异常或非交易日，不是真实行情"
+   },
+   {
+    "index_code": "000942",
+    "trade_date": "2004-01-01",
+    "close": 1000.0,
+    "quality_status": "suspect",
+    "quality_note": "接口基线占位行：日期与第二行间隔异常或非交易日，不是真实行情"
+   },
+   {
+    "index_code": "399997",
+    "trade_date": "2004-01-01",
+    "close": 1028.64,
+    "quality_status": "suspect",
+    "quality_note": "接口基线占位行：日期与第二行间隔异常或非交易日，不是真实行情"
+   },
+   {
+    "index_code": "930930",
+    "trade_date": "2004-01-01",
+    "close": 3000.0,
+    "quality_status": "suspect",
+    "quality_note": "接口基线占位行：日期与第二行间隔异常或非交易日，不是真实行情"
+   },
+   {
+    "index_code": "H30184",
+    "trade_date": "2004-01-01",
+    "close": 994.47,
+    "quality_status": "suspect",
+    "quality_note": "接口基线占位行：日期与第二行间隔异常或非交易日，不是真实行情"
+   }
+  ],
+  "suspect_placeholder_count": 10,
+  "non_positive_close_rows": [
+   {
+    "index_code": "H30184",
+    "trade_date": "2013-06-28",
+    "close": 0.0,
+    "quality_status": "valid"
+   }
+  ],
+  "non_positive_close_count": 1,
+  "h30184_zero_row_present": true,
+  "read_only": true,
+  "note": "本轮只能证明当前数据库状态；如未取得任务开始前指纹，不得声称完成前后一致比较"
  },
  "indexes": [
   {
