@@ -1,0 +1,37 @@
+{
+ "single_20130628": {
+  "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=H30184&startDate=20130628&endDate=20130628",
+  "bytes": 55,
+  "sha256": "8309cff714d5f872cea03bfa413b0270b30b5db6545e99d9dd2b59bc489344eb",
+  "file": "reports/evidence/phase3B6_2_3_0_3/single_20130628.json",
+  "obtained_at": "2026-11-26T16:38:25"
+ },
+ "range_20130624_20130703": {
+  "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=H30184&startDate=20130624&endDate=20130703",
+  "bytes": 2979,
+  "sha256": "ccbbb38316fab0f9c24a56d79a7c15af7559e114399253da4b5cbbb660b609e5",
+  "file": "reports/evidence/phase3B6_2_3_0_3/range_20130624_20130703.json",
+  "obtained_at": "2026-11-26T16:38:27"
+ },
+ "single_20130627": {
+  "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=H30184&startDate=20130627&endDate=20130627",
+  "bytes": 55,
+  "sha256": "8309cff714d5f872cea03bfa413b0270b30b5db6545e99d9dd2b59bc489344eb",
+  "file": "reports/evidence/phase3B6_2_3_0_3/single_20130627.json",
+  "obtained_at": "2026-11-26T16:38:30"
+ },
+ "single_20130701": {
+  "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=H30184&startDate=20130701&endDate=20130701",
+  "bytes": 55,
+  "sha256": "8309cff714d5f872cea03bfa413b0270b30b5db6545e99d9dd2b59bc489344eb",
+  "file": "reports/evidence/phase3B6_2_3_0_3/single_20130701.json",
+  "obtained_at": "2026-11-26T16:38:33"
+ },
+ "basic_info": {
+  "url": "https://www.csindex.com.cn/csindex-home/indexInfo/index-basic-info/H30184",
+  "bytes": 1460,
+  "sha256": "69c1bc656ff884f0187ed261b085eef794cd2d3285f4700adb0e5d7f9a8e0f9b",
+  "file": "reports/evidence/phase3B6_2_3_0_3/basic_info.json",
+  "obtained_at": "2026-11-26T16:38:35"
+ }
+}

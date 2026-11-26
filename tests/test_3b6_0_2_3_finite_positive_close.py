@@ -299,19 +299,15 @@ def test_evaluate_reevaluates_after_inf_injected(conn):
 # 五、正式库守恒（只读断言）
 # ================================================================
 def test_production_no_infinite_close():
-    """正式库没有 inf/-inf/负收盘；**存在 1 条 close=0.0 的历史遗留行**。
+    """正式库 valid 序列没有 inf/-inf/NaN/非正收盘。
 
-    本轮实际发现的真实数据问题：
-    ``H30184`` / ``2013-06-28`` / ``close=0.0`` / ``quality_status='valid'``。
+    历史背景：本测试最初（3B-6.0.2.3）发现 ``H30184`` / ``2013-06-28``
+    存在 ``close=0.0`` 且标记 ``valid`` 的记录，当时任务禁止修改行情，
+    故如实记录为「已知遗留 1 条」。
 
-    这条是本轮任务（禁止修改 50,603 条行情）下**不能就地修**的数据，
-    如实记录而不是隐藏。它对结论无影响：
-
-    - ``H30184`` 共 5,316 行，去掉这 1 条仍有 5,315 条有效；
-    - 它本来就卡在 ``return_basis='unknown'``，不可用；
-    - 修复前该行会被 ``c <= 0`` 排除，修复后同样被 ``c > 0`` 排除。
-
-    因此该行**从未被计入有效观测**，不影响任何既有判定。
+    **3B-6.2.3.0.3 已按官方证据复核并标记为 ``suspect``**
+    （官方接口对该日返回 close=0.0，无法确认真实点位），
+    因此 ``valid`` 序列中现已无任何非正收盘。
     """
     with get_index_connection() as c:
         rows = c.execute(
@@ -333,8 +329,9 @@ def test_production_no_infinite_close():
 
     # 绝不能有 inf / -inf / NaN
     assert infinite == []
-    # 已知遗留 1 条 0.0，不在本轮授权范围内修改
-    assert non_positive == [("H30184", "2013-06-28", 0.0)]
+    # 3B-6.2.3.0.3 已把 H30184/2013-06-28 那条 0.0 标记为 suspect，
+    # 因此 valid 序列中不应再有任何非正收盘。
+    assert non_positive == []
 
 
 def test_production_zero_close_never_counted():
@@ -345,8 +342,9 @@ def test_production_zero_close_never_counted():
             "WHERE index_code='H30184' AND quality_status='valid'"
         ).fetchone()[0]
         valid = count_effective_observations(c, "H30184")
-    assert total == 5315           # 5,316 行中基线行是 suspect
-    assert valid == 5314           # 再排除那条 0.0
+    # 3B-6.2.3.0.3 后：5,316 行中 suspect = 基线行 + 目标 0.0 行 = 2
+    assert total == 5314
+    assert valid == 5314
     assert valid >= MIN_VALID_OBSERVATIONS
 
 

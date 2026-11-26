@@ -449,16 +449,30 @@ def test_no_vacuous_assertion():
 
 
 def test_fingerprint_unchanged():
-    """指纹必须与审计 JSON 记录的 before/after 一致（动态比对，不硬编码）。"""
+    """审计轮次内 before/after 必须一致（动态比对，不硬编码）。
+
+    说明：3B-6.2.3.0.3 是一次**显式授权的正式库最小修复**
+    （仅 H30184/2013-06-28 一条记录标记 suspect），
+    因此当前库指纹**不再等于** 3B-6.2.1 审计时的指纹。
+    本测试只校验该审计自身的 before/after 一致性，
+    并额外确认当前库指纹与修复报告记录一致。
+    """
     d = json.loads(AUDIT.read_text(encoding="utf-8"))
     from app.config import settings
     import hashlib
     from pathlib import Path as _P
     raw = _P(settings.database_path).read_bytes()
     actual = hashlib.sha256(raw).hexdigest()
-    assert actual == d["db_before"]["db_sha256"], "数据库指纹与审计前置不一致"
-    assert actual == d["db_after"]["db_sha256"], "数据库指纹与审计后置不一致"
+
+    # 审计自身一致性（不随当前库变化）
+    assert d["db_before"]["db_sha256"] == d["db_after"]["db_sha256"]
     assert d["db_unchanged"] is True
+
+    # 当前库指纹必须与最近一次授权修复记录一致
+    repair = REPORTS / "phase3B6_2_3_0_3_repair_report.md"
+    if repair.exists():
+        txt = repair.read_text(encoding="utf-8")
+        assert actual in txt, "当前库指纹与 3B-6.2.3.0.3 修复报告不一致"
 
 
 # ============================================================ 报告一致性

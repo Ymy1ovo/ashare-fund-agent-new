@@ -1,0 +1,271 @@
+{
+ "decision": "B",
+ "decision_reason": "官方接口对 2013-06-28 返回 close=0.0 且 open/high/low 全为 null；单一日期查询返回空数组。**官方未提供可确认的真实收盘点位**，按情况 B 标记 suspect，不做任何插值或推算",
+ "dry_run": false,
+ "before": {
+  "captured_at": "2026-11-26T16:39:47",
+  "database_path": "D:\\ymy\\jj-agent\\data\\fund_agent.db",
+  "database_sha256": "27e0b54d7a5675892b70fc5061ed38da8dc6b58119139c63a4039e08e0523061",
+  "index_daily_total_rows": 50603,
+  "integrity_check": "ok",
+  "foreign_key_violations": 0,
+  "target_record": {
+   "index_code": "H30184",
+   "trade_date": "2013-06-28",
+   "open": null,
+   "high": null,
+   "low": null,
+   "close": 0.0,
+   "volume": null,
+   "amount": null,
+   "source": "akshare.stock_zh_index_hist_csindex",
+   "raw_basis": "raw",
+   "run_id": 266,
+   "collected_at": "2026-11-23T17:38:31",
+   "row_fingerprint": "0084f7d807800fc23855387e55d7ea24131619d8ad2c1d9bb78c30a4ab23e702",
+   "quality_status": "valid",
+   "quality_note": null
+  },
+  "index_fingerprints": {
+   "000012": {
+    "rows": 5558,
+    "fingerprint": "4b395035989a298ad01dcb4a7c833b61a9891b09346b2f9d389ff11be10a1218"
+   },
+   "000016": {
+    "rows": 5559,
+    "fingerprint": "182ac85ab20f6bcc5fe8f732c8d1f584ba8605fbc6c29ff33fdb133fcaddfce5"
+   },
+   "000300": {
+    "rows": 5558,
+    "fingerprint": "aaed243ab58d1e10496fc3132c9f6838b889f95b039a4bd2458d688fb584c0d6"
+   },
+   "000905": {
+    "rows": 5317,
+    "fingerprint": "e816e052b1b43a0fd1110b5d2ec58a9519f8c278bcd4ed5c6806cc91ebd99878"
+   },
+   "000906": {
+    "rows": 5317,
+    "fingerprint": "4b930c3963131ae8f27d22852900d01f6607907f84bf9db22a91bd47f6abf5e7"
+   },
+   "000922": {
+    "rows": 5317,
+    "fingerprint": "618e7df46abbbc39688b46d02e651f201074d4a53d126afc261b19c334771e9d"
+   },
+   "000942": {
+    "rows": 5317,
+    "fingerprint": "59f5e404123d65da3ed6ce83e5306d83825e9390b0965f398c48d9b4b80da8c6"
+   },
+   "399997": {
+    "rows": 4345,
+    "fingerprint": "e987cb6b820ebb987c67abe0277fb91a5731a562755aa90240a5c76ea5e7f33c"
+   },
+   "930930": {
+    "rows": 2999,
+    "fingerprint": "b15a2b0073b37a39bf83686d892cf042339f4e5b18460369f51bcb7ea53729ad"
+   },
+   "H30184": {
+    "rows": 5316,
+    "fingerprint": "f38216777390bc15ca84cd6b9d994ac8e7caaa683311df9e04ffd4ef51c11b3f"
+   }
+  },
+  "suspect_rows": [
+   {
+    "index_code": "000012",
+    "trade_date": "2004-01-01",
+    "close": 99.22,
+    "quality_status": "suspect"
+   },
+   {
+    "index_code": "000016",
+    "trade_date": "2004-01-01",
+    "close": 1011.35,
+    "quality_status": "suspect"
+   },
+   {
+    "index_code": "000300",
+    "trade_date": "2004-01-01",
+    "close": 1204.61,
+    "quality_status": "suspect"
+   },
+   {
+    "index_code": "000905",
+    "trade_date": "2004-01-01",
+    "close": 1000.0,
+    "quality_status": "suspect"
+   },
+   {
+    "index_code": "000906",
+    "trade_date": "2004-01-01",
+    "close": 1000.0,
+    "quality_status": "suspect"
+   },
+   {
+    "index_code": "000922",
+    "trade_date": "2004-01-01",
+    "close": 1000.0,
+    "quality_status": "suspect"
+   },
+   {
+    "index_code": "000942",
+    "trade_date": "2004-01-01",
+    "close": 1000.0,
+    "quality_status": "suspect"
+   },
+   {
+    "index_code": "399997",
+    "trade_date": "2004-01-01",
+    "close": 1028.64,
+    "quality_status": "suspect"
+   },
+   {
+    "index_code": "930930",
+    "trade_date": "2004-01-01",
+    "close": 3000.0,
+    "quality_status": "suspect"
+   },
+   {
+    "index_code": "H30184",
+    "trade_date": "2004-01-01",
+    "close": 994.47,
+    "quality_status": "suspect"
+   }
+  ]
+ },
+ "affected_rows": 1,
+ "after": {
+  "captured_at": "2026-11-26T16:39:53",
+  "database_path": "D:\\ymy\\jj-agent\\data\\fund_agent.db",
+  "database_sha256": "1671e4037cd265a2dead8b78d43614189a782385ca450ac6c2de3c4ff36ee873",
+  "index_daily_total_rows": 50603,
+  "integrity_check": "ok",
+  "foreign_key_violations": 0,
+  "target_record": {
+   "index_code": "H30184",
+   "trade_date": "2013-06-28",
+   "open": null,
+   "high": null,
+   "low": null,
+   "close": 0.0,
+   "volume": null,
+   "amount": null,
+   "source": "akshare.stock_zh_index_hist_csindex",
+   "raw_basis": "raw",
+   "run_id": 266,
+   "collected_at": "2026-11-23T17:38:31",
+   "row_fingerprint": "0084f7d807800fc23855387e55d7ea24131619d8ad2c1d9bb78c30a4ab23e702",
+   "quality_status": "suspect",
+   "quality_note": "**官方无法确认真实收盘点位**：中证指数官网接口对该日返回 close=0.0 且 OHLC 全为 null，单一日期查询返回空数组；原值 close=0.0、原质量状态 valid 予以保留，本条不再参与有效行情与收益计算（3B-6.2.3.0.3）"
+  },
+  "index_fingerprints": {
+   "000012": {
+    "rows": 5558,
+    "fingerprint": "4b395035989a298ad01dcb4a7c833b61a9891b09346b2f9d389ff11be10a1218"
+   },
+   "000016": {
+    "rows": 5559,
+    "fingerprint": "182ac85ab20f6bcc5fe8f732c8d1f584ba8605fbc6c29ff33fdb133fcaddfce5"
+   },
+   "000300": {
+    "rows": 5558,
+    "fingerprint": "aaed243ab58d1e10496fc3132c9f6838b889f95b039a4bd2458d688fb584c0d6"
+   },
+   "000905": {
+    "rows": 5317,
+    "fingerprint": "e816e052b1b43a0fd1110b5d2ec58a9519f8c278bcd4ed5c6806cc91ebd99878"
+   },
+   "000906": {
+    "rows": 5317,
+    "fingerprint": "4b930c3963131ae8f27d22852900d01f6607907f84bf9db22a91bd47f6abf5e7"
+   },
+   "000922": {
+    "rows": 5317,
+    "fingerprint": "618e7df46abbbc39688b46d02e651f201074d4a53d126afc261b19c334771e9d"
+   },
+   "000942": {
+    "rows": 5317,
+    "fingerprint": "59f5e404123d65da3ed6ce83e5306d83825e9390b0965f398c48d9b4b80da8c6"
+   },
+   "399997": {
+    "rows": 4345,
+    "fingerprint": "e987cb6b820ebb987c67abe0277fb91a5731a562755aa90240a5c76ea5e7f33c"
+   },
+   "930930": {
+    "rows": 2999,
+    "fingerprint": "b15a2b0073b37a39bf83686d892cf042339f4e5b18460369f51bcb7ea53729ad"
+   },
+   "H30184": {
+    "rows": 5316,
+    "fingerprint": "f38216777390bc15ca84cd6b9d994ac8e7caaa683311df9e04ffd4ef51c11b3f"
+   }
+  },
+  "suspect_rows": [
+   {
+    "index_code": "000012",
+    "trade_date": "2004-01-01",
+    "close": 99.22,
+    "quality_status": "suspect"
+   },
+   {
+    "index_code": "000016",
+    "trade_date": "2004-01-01",
+    "close": 1011.35,
+    "quality_status": "suspect"
+   },
+   {
+    "index_code": "000300",
+    "trade_date": "2004-01-01",
+    "close": 1204.61,
+    "quality_status": "suspect"
+   },
+   {
+    "index_code": "000905",
+    "trade_date": "2004-01-01",
+    "close": 1000.0,
+    "quality_status": "suspect"
+   },
+   {
+    "index_code": "000906",
+    "trade_date": "2004-01-01",
+    "close": 1000.0,
+    "quality_status": "suspect"
+   },
+   {
+    "index_code": "000922",
+    "trade_date": "2004-01-01",
+    "close": 1000.0,
+    "quality_status": "suspect"
+   },
+   {
+    "index_code": "000942",
+    "trade_date": "2004-01-01",
+    "close": 1000.0,
+    "quality_status": "suspect"
+   },
+   {
+    "index_code": "399997",
+    "trade_date": "2004-01-01",
+    "close": 1028.64,
+    "quality_status": "suspect"
+   },
+   {
+    "index_code": "930930",
+    "trade_date": "2004-01-01",
+    "close": 3000.0,
+    "quality_status": "suspect"
+   },
+   {
+    "index_code": "H30184",
+    "trade_date": "2004-01-01",
+    "close": 994.47,
+    "quality_status": "suspect"
+   },
+   {
+    "index_code": "H30184",
+    "trade_date": "2013-06-28",
+    "close": 0.0,
+    "quality_status": "suspect"
+   }
+  ]
+ },
+ "modified": true
+}

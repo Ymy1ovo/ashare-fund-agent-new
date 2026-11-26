@@ -1,0 +1,1 @@
+{"code":"200","msg":"Success","data":[{"tradeDate":"20130628","indexCode":"000300","indexNameCnAll":"沪深300指数","indexNameCn":"沪深300","indexNameEnAll":"CSI 300 Index","indexNameEn":"CSI 300","open":2149.03,"high":2227.46,"low":2139.37,"close":2200.64,"change":39.9,"changePct":1.85,"tradingVol":7.9451327E9,"tradingValue":641.06,"consNumber":300.0,"peg":9.09}],"success":true}

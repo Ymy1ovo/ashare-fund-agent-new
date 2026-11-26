@@ -465,25 +465,37 @@ def test_no_annual_estimate_without_full_series(tr):
 
 
 def test_suspect_rows_still_exist(conn, cov):
-    """7. 10 条 suspect 记录仍然存在。"""
+    """7. 10 条 suspect 占位记录仍然存在。
+
+    3B-6.2.3.0.3 把 H30184/2013-06-28 的零值行也标记为 suspect，
+    因此库内 suspect 总数为 11，其中 10 条是 2004-01-01 占位行。
+    """
     n = conn.execute(
         "select count(*) from index_daily where quality_status<>'valid'"
     ).fetchone()[0]
-    assert n == 10
+    assert n == 11
+    placeholders = conn.execute(
+        "select count(*) from index_daily where quality_status<>'valid' "
+        "and trade_date='2004-01-01'").fetchone()[0]
+    assert placeholders == 10
     for r in cov["indexes"]:
         assert len(r["placeholder_rows"]) == 1
         assert r["placeholder_rows"][0]["trade_date"] == "2004-01-01"
 
 
 def test_h30184_zero_still_present(conn, cov):
-    """8. H30184 零值记录仍然存在且未被修改。"""
+    """8. H30184 零值记录仍存在，close 原值未被修改。
+
+    3B-6.2.3.0.3 按官方证据把它标记为 suspect（官方无法确认真实点位），
+    但**没有插值、没有改 close**。
+    """
     row = conn.execute(
         "select trade_date, close, quality_status from index_daily "
         "where index_code='H30184' and close<=0").fetchone()
     assert row is not None
     assert row[0] == "2013-06-28"
-    assert row[1] == 0.0
-    assert row[2] == "valid"
+    assert row[1] == 0.0, "close 原值必须保留"
+    assert row[2] == "suspect", "应已标记 suspect"
     rec = next(r for r in cov["indexes"] if r["index_code"] == "H30184")
     assert rec["non_positive_close"] == 1
 
