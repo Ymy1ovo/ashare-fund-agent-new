@@ -1,0 +1,207 @@
+{
+ "phase": "3B-6.2.2",
+ "mapping_rule_version": "3B-6.2.2-v1",
+ "generated_at": "2026-11-26T08:47:19",
+ "benchmark_kinds": {
+  "contract": "合同业绩比较基准（需 L1）",
+  "research": "研究评价基准（需收益口径确认 + 选择规则）",
+  "substitute": "替代基准（需调用方显式选择）"
+ },
+ "promotion_forbidden": {
+  "research -> contract": "研究基准不得升级为合同基准",
+  "substitute -> contract": "替代基准不得升级为合同基准",
+  "substitute -> research": "替代基准不得升级为研究基准",
+  "current_weight -> historical_weight": "不得用当前权重回填历史权重",
+  "L3 -> L1": "第三方平台文本不得升级为官方合同证据",
+  "etf_market_price -> index_return": "ETF 场内价格不得当作指数收益",
+  "lof_exchange_price -> otc_nav": "LOF 场内价格不得当作场外净值",
+  "price_index -> total_return": "价格指数不得冒充全收益指数",
+  "full_price -> wealth": "债券全价指数不得当财富指数",
+  "net_price -> wealth": "债券净价指数不得当财富指数",
+  "fixed_rate -> asset_weight": "固定年化收益率不得当资产权重",
+  "cash_rate -> repo_rate": "现金存款利率不得当银行间回购利率"
+ },
+ "confidence_levels": {
+  "A": {
+   "label": "高",
+   "definition": "官方合同和基准数据证据完整，映射关系明确",
+   "requires": [
+    "L1 官方合同文件",
+    "全部成分可计算",
+    "收益口径已确认"
+   ],
+   "can_bypass_usability": false
+  },
+  "B": {
+   "label": "中高",
+   "definition": "主要映射关系有可靠证据，但存在非关键缺口",
+   "requires": [
+    "成分已识别",
+    "至少一个可用序列"
+   ],
+   "can_bypass_usability": false
+  },
+  "C": {
+   "label": "中低",
+   "definition": "有合理候选关系，但存在关键证据缺失",
+   "requires": [
+    "成分已识别"
+   ],
+   "can_bypass_usability": false
+  },
+  "D": {
+   "label": "低",
+   "definition": "数据不足、类别不明或映射依据不可靠",
+   "requires": [],
+   "can_bypass_usability": false
+  }
+ },
+ "confidence_note": "**置信度不能替代基准可用性判定**：即使置信度为 A，只要收益口径、历史权重或必要成分不满足条件，也不能判为可回测",
+ "category_mapping_rules": {
+  "index_plain": {
+   "rule_id": "R-INDEX",
+   "primary_source": "目标指数",
+   "must_separate": [
+    "目标指数代码",
+    "目标指数的收益口径"
+   ],
+   "forbidden": [
+    "不得统一映射到沪深300",
+    "不得用价格指数冒充全收益指数",
+    "不得因基金名称含行业词就猜行业指数"
+   ],
+   "candidate_condition": "指数代码已映射且有历史行情",
+   "usable_condition": "**收益口径已确认（非 unknown）** + 研究规则已声明",
+   "downgrade_when": "收益口径 unknown → 只能标记候选"
+  },
+  "etf_feeder": {
+   "rule_id": "R-FEEDER",
+   "primary_source": "目标指数（非目标 ETF 的市场价格）",
+   "must_separate": [
+    "目标 ETF 代码",
+    "目标 ETF 场内价格",
+    "目标指数代码"
+   ],
+   "forbidden": [
+    "**不得把目标 ETF 的二级市场价格收益当作指数收益**",
+    "不得用 ETF 折溢价代替指数表现",
+    "不得因为目标 ETF 有价格就认定指数收益可用"
+   ],
+   "candidate_condition": "目标指数已映射且有历史行情",
+   "usable_condition": "目标指数收益口径已确认",
+   "downgrade_when": "仅有 ETF 价格、无指数口径 → 置信度降为 C"
+  },
+  "active_equity": {
+   "rule_id": "R-ACTIVE",
+   "primary_source": "合同基准 + 投资范围 + 可比研究指数",
+   "must_separate": [
+    "A股暴露",
+    "港股暴露",
+    "行业主题暴露"
+   ],
+   "forbidden": [
+    "不得把研究选择的指数写成合同基准",
+    "不得仅因名称相似就强制匹配指数",
+    "不得跨市场混用（A股指数替代港股基准）"
+   ],
+   "candidate_condition": "合同基准含已映射指数，或投资范围明确可对标",
+   "usable_condition": "收益口径已确认 + 研究选择理由已声明",
+   "downgrade_when": "无投资范围证据 → 置信度降为 C"
+  },
+  "pure_bond": {
+   "rule_id": "R-PUREBOND",
+   "primary_source": "与久期/债券类型匹配的债券指数",
+   "must_separate": [
+    "利率债 / 信用债",
+    "短债 / 中长期",
+    "净价 / 全价 / 财富"
+   ],
+   "forbidden": [
+    "**不得用国债收益率曲线替代债券指数收益序列**",
+    "不得把净价、全价、财富指数混用",
+    "久期不匹配时不得直接映射"
+   ],
+   "candidate_condition": "债券指数已接入且口径匹配",
+   "usable_condition": "债券指数口径已确认 + 久期类型匹配",
+   "downgrade_when": "债券指数全部未接入 → 置信度 D，不可用"
+  },
+  "mixed_bond": {
+   "rule_id": "R-MIXEDBOND",
+   "primary_source": "债券指数 + 权益指数的复合（保留全部成分与权重）",
+   "must_separate": [
+    "权益仓位",
+    "可转债风险",
+    "债券类型"
+   ],
+   "forbidden": [
+    "不得把可转债简单归类为纯债",
+    "不得忽略权益仓位",
+    "缺乏证据时不得假设仓位为 0"
+   ],
+   "candidate_condition": "成分全部识别且至少一个可用序列",
+   "usable_condition": "全部成分可计算 + 口径已确认",
+   "downgrade_when": "缺权益或债券成分证据 → 置信度 C/D"
+  },
+  "money_market": {
+   "rule_id": "R-MONEY",
+   "primary_source": "万份收益 / 七日年化（独立口径）",
+   "must_separate": [
+    "万份收益",
+    "七日年化",
+    "节假收益结转规则"
+   ],
+   "forbidden": [
+    "**不得与普通净值基金混算**",
+    "不得直接把 Shibor 或国债收益率当成货币基金收益",
+    "不得用净值增长率替代万份收益"
+   ],
+   "candidate_condition": "有万份收益或七日年化数据",
+   "usable_condition": "展示口径与结转规则均已确认",
+   "downgrade_when": "仅有普通净值 → 置信度 D，不可用"
+  },
+  "lof_offexchange": {
+   "rule_id": "R-LOF",
+   "primary_source": "**场外份额净值**（非场内交易价格）",
+   "must_separate": [
+    "场内交易代码",
+    "场外申购代码",
+    "A/C 份额"
+   ],
+   "forbidden": [
+    "**不得使用场内市场价格或折溢价替代场外净值**",
+    "不得因名称含 LOF 就套用场内价格",
+    "A/C 份额不得重复统计基金本体"
+   ],
+   "candidate_condition": "场外份额净值可得",
+   "usable_condition": "场外净值口径确认 + 底层投资类型基准可用",
+   "downgrade_when": "仅有场内价格 → 置信度 D，不可用"
+  }
+ },
+ "composite_rules": {
+  "rule_version": "3B-6.2.2-v1",
+  "must_keep_all_components": true,
+  "forbidden_simplification": "**不得把复合基准简化为单一指数**",
+  "weight_separation": "固定年化收益率（``fixed_rate``）与资产配置权重（``asset_weight``）必须严格区分，不得相加",
+  "rate_separation": "现金利率 / 存款利率 / 回购利率 / 固定收益率分属不同类别，不得混为一类",
+  "basis_separation": "价格指数 / 全收益指数 / 债券净价 / 全价 / 财富指数不得混用",
+  "unknown_weight_policy": "权重无法验证时必须标记 ``None``，不得推断",
+  "historical_weight_policy": "**历史权重和基准变更生效日期未知时，不得假设当前权重在历史上一直有效**",
+  "blocking_rule": "**任一必要成分不可计算，完整合同基准就不能标记为可复现**",
+  "no_relaxation": "不得为了提高可用数量而放宽标准；此前已审计的 15 条复合基准均不可完整复现，本轮结论不变"
+ },
+ "required_categories": [
+  "money_market",
+  "lof_offexchange",
+  "etf_feeder",
+  "index_plain",
+  "active_equity",
+  "pure_bond",
+  "mixed_bond"
+ ],
+ "lifecycle_mapping": {
+  "active": "existing",
+  "existing": "existing",
+  "terminated": "terminated",
+  "unknown": "unknown_status"
+ }
+}

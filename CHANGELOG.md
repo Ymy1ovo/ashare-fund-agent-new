@@ -1,5 +1,160 @@
 # 变更日志
 
+## 2026-11-26 — 阶段3B-6.2.2 支付宝场外公募基金与基准映射规则实现
+
+**只做映射规则建设与只读审计。不接入基准收益序列，不开放回测。**
+
+**一、新增映射规则模块** `scripts/fund_benchmark_mapping_3b6_2_2.py`
+
+映射规则版本 `3B-6.2.2-v1`。核心函数：
+
+| 函数 | 作用 |
+| --- | --- |
+| `map_fund_benchmark()` | 为单只基金生成三类基准的独立映射记录 |
+| `compute_confidence()` | 按证据完整度计算 A/B/C/D 置信度 |
+| `assert_no_promotion()` | 禁止升级关系的硬校验 |
+| `get_category_mapping_rule()` | 读取七类之一映射规则 |
+
+**二、三类基准独立记录**
+
+每只基金输出 `contract` / `research` / `substitute` **三条互相独立**的记录，
+字段含 `available` / `candidate` / `evidence_grade` / `unavailable_reason`。
+**三条记录绝不互相赋值。**
+
+**三、七类基金映射规则**（逐类制定，不统一套用沪深300）
+
+| 类别 | 规则 ID | 主基准来源 |
+| --- | --- | --- |
+| `index_plain` | `R-INDEX` | 目标指数 |
+| `etf_feeder` | `R-FEEDER` | **目标指数**（非目标 ETF 市场价格） |
+| `active_equity` | `R-ACTIVE` | 合同基准 + 投资范围 + 可比指数 |
+| `pure_bond` | `R-PUREBOND` | 久期/类型匹配的债券指数 |
+| `mixed_bond` | `R-MIXEDBOND` | 债券 + 权益复合 |
+| `money_market` | `R-MONEY` | 万份收益 / 七日年化 |
+| `lof_offexchange` | `R-LOF` | **场外份额净值** |
+
+**四、映射置信度（四级，不能绕过可用性）**
+
+| 级别 | 定义 | 本轮数量 |
+| --- | --- | ---: |
+| A | 官方合同和基准数据证据完整 | **0** |
+| B | 主要映射有可靠证据，存在非关键缺口 | **1** |
+| C | 有合理候选关系，存在关键证据缺失 | **41** |
+| D | 数据不足、类别不明或依据不可靠 | **78** |
+
+**置信度不能替代基准可用性判定**——A 级也不能绕过收益口径/历史权重/成分完整性门槛。
+
+**五、禁止升级关系**（12 条）
+
+`research→contract`、`substitute→contract`、`substitute→research`、
+`current_weight→historical_weight`、`L3→L1`、
+`etf_market_price→index_return`、`lof_exchange_price→otc_nav`、
+`price_index→total_return`、`full_price→wealth`、`net_price→wealth`、
+`fixed_rate→asset_weight`、`cash_rate→repo_rate`。
+
+**六、真实数据库只读审计（120 只基金本体）**
+
+以 `fund_id` 为统计单位，A/C 份额归并。
+
+| 项 | 值 |
+| --- | ---: |
+| 基金本体 | **120** |
+| 份额类别 | **149** |
+| 明确存续 / 明确终止 / 状态未知 | **0 / 41 / 79** |
+| 三类合计守恒 | **True** |
+
+**七类基金的映射统计**
+
+| 类别 | 数量 | 合同可用 | 研究候选 | 研究可用 | 替代可用 | 下一阶段 |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| `index_plain`（普通指数基金） | 25 | 0 | 10 | 0 | 0 | 0 |
+| `etf_feeder`（ETF联接基金） | 26 | 0 | 13 | 0 | 0 | 0 |
+| `active_equity`（主动权益基金） | 35 | 0 | 14 | 0 | 0 | 0 |
+| `pure_bond`（纯债基金） | 6 | 0 | 0 | 0 | 0 | 0 |
+| `mixed_bond`（混合债券基金） | 17 | 0 | 3 | 0 | 0 | 0 |
+| `money_market`（货币基金） | 8 | 0 | 0 | 0 | 0 | 0 |
+| `lof_offexchange`（LOF场外份额） | 3 | 0 | 2 | 0 | 0 | 0 |
+| **合计** | **120** | **0** | **42** | **0** | **0** | **0** |
+
+**七、三种基准的候选 / 可用**
+
+| 类型 | 候选 | 可用 |
+| --- | ---: | ---: |
+| `contract` | 78（有文本） | **0** |
+| `research` | **42** | **0** |
+| `substitute` | **42** | **0** |
+
+**不可用原因**：
+
+| # | 原因 |
+| ---: | --- |
+| 1 | **未取得基金合同/招募说明书原始文件**（78 只全部） |
+| 2 | 合同基准证据等级为 L3，必须有 L1 官方合同文件 |
+| 3 | 含不可计算成分：现金利率无历史序列 |
+| 4 | 含不可计算成分：债券指数未接入 |
+| 5 | 含不可计算成分：固定收益率折算规则未知 |
+| 6 | 历史权重与生效区间未核实 |
+| 7 | **指数 `return_basis` 全为 `unknown`**（研究/替代均不通过） |
+| 8 | 未提供显式替代选择（替代基准不自动产生） |
+
+**八、15 条复合基准逐条审计**
+
+| 项 | 值 |
+| --- | ---: |
+| 复合基准总数 | **15** |
+| 成分总数 | **34** |
+| 有不可计算成分 | **15** |
+| 有历史权重 | **0** |
+| 被简化为单一指数 | **0** |
+| **可完整复现** | **0** |
+
+**与 3B-6.1.2 结论一致，未放宽标准。**
+
+**九、复合基准映射规则**
+
+- **不得把复合基准简化为单一指数**
+- 固定年化收益率与资产配置权重必须严格区分
+- 现金利率 / 存款利率 / 回购利率 / 固定收益率不得混为一类
+- 价格指数 / 全收益 / 债券净价 / 全价 / 财富指数不得混用
+- 权重无法验证时必须标记未知
+- **历史权重与生效日期未知时，不得假设当前权重历史上一直有效**
+- **任一必要成分不可计算，完整合同基准就不能标记为可复现**
+
+**十、数据安全**
+
+| 项 | 值 |
+| --- | --- |
+| 数据库路径 | `D:\ymy\jj-agent\data\fund_agent.db` |
+| 前置 SHA256 | `27e0b54d7a5675892b70fc5061ed38da8dc6b58119139c63a4039e08e0523061` |
+| 后置 SHA256 | `27e0b54d7a5675892b70fc5061ed38da8dc6b58119139c63a4039e08e0523061` |
+| 是否一致 | **是** |
+| `integrity_check` | **ok** |
+| 外键违规 | **0** |
+
+**十一、测试**
+
+新增专项测试 `tests/test_3b6_2_2_fund_benchmark_mapping.py`（**84 项**），
+全部直接调用 `map_fund_benchmark()` / `compute_confidence()` 真实逻辑，
+使用固定输入，不读取预计算 JSON 自我验证。
+
+全量 **2344 → 2428 passed / 0 failed / 0 skipped**。
+
+**十二、交付文件**
+
+- `reports/phase3B6_2_2_design.md`
+- `reports/phase3B6_2_2_mapping_rules.json`
+- `reports/phase3B6_2_2_mapping_audit.json`
+- `reports/phase3B6_2_2_recommendation.md`
+- `scripts/fund_benchmark_mapping_3b6_2_2.py`
+- `scripts/audit_3b6_2_2_mapping.py`
+- `tests/test_3b6_2_2_fund_benchmark_mapping.py`
+
+**门禁不变**：`ready_for_research_analysis=true`，
+`ready_for_backtest=false`，`ready_for_formal_ranking=false`。
+
+**本阶段通过不代表可以开始回测。**
+
+
 ## 2026-11-25 — 阶段3B-6.2.1.1.1 生命周期说明及测试统计残留口径修正
 
 **只修正文档与报告残留统计，不重构业务逻辑。**
