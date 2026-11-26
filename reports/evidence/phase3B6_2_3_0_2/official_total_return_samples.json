@@ -1,0 +1,482 @@
+{
+ "399997CNY02|20180102": {
+  "close": 6939.72,
+  "code": "399997CNY02",
+  "date": "20180102",
+  "obtained_at": "2026-11-26T14:22:30",
+  "official_code": "399997CNY02",
+  "official_name": "中证白酒净收益指数",
+  "source": "中证指数有限公司官网行情接口",
+  "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=399997CNY02&startDate=20180102&endDate=20180102"
+ },
+ "399997CNY02|20200102": {
+  "close": 9884.36,
+  "code": "399997CNY02",
+  "date": "20200102",
+  "obtained_at": "2026-11-26T14:22:29",
+  "official_code": "399997CNY02",
+  "official_name": "中证白酒净收益指数",
+  "source": "中证指数有限公司官网行情接口",
+  "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=399997CNY02&startDate=20200102&endDate=20200102"
+ },
+ "399997CNY02|20240102": {
+  "close": 15253.58,
+  "code": "399997CNY02",
+  "date": "20240102",
+  "obtained_at": "2026-11-26T14:22:29",
+  "official_code": "399997CNY02",
+  "official_name": "中证白酒净收益指数",
+  "source": "中证指数有限公司官网行情接口",
+  "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=399997CNY02&startDate=20240102&endDate=20240102"
+ },
+ "H00012|20180102": {
+  "close": 99.31,
+  "code": "H00012",
+  "date": "20180102",
+  "obtained_at": "2026-11-26T14:22:32",
+  "official_code": "H00012",
+  "official_name": "上证国债指数(净价)",
+  "source": "中证指数有限公司官网行情接口",
+  "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=H00012&startDate=20180102&endDate=20180102"
+ },
+ "H00012|20200102": {
+  "close": 102.08,
+  "code": "H00012",
+  "date": "20200102",
+  "obtained_at": "2026-11-26T14:22:32",
+  "official_code": "H00012",
+  "official_name": "上证国债指数(净价)",
+  "source": "中证指数有限公司官网行情接口",
+  "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=H00012&startDate=20200102&endDate=20200102"
+ },
+ "H00012|20240102": {
+  "close": 104.65,
+  "code": "H00012",
+  "date": "20240102",
+  "obtained_at": "2026-11-26T14:22:32",
+  "official_code": "H00012",
+  "official_name": "上证国债指数(净价)",
+  "source": "中证指数有限公司官网行情接口",
+  "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=H00012&startDate=20240102&endDate=20240102"
+ },
+ "H00016|20180102": {
+  "close": 3899.46,
+  "code": "H00016",
+  "date": "20180102",
+  "obtained_at": "2026-11-26T14:22:28",
+  "official_code": "H00016",
+  "official_name": "上证50全收益指数",
+  "source": "中证指数有限公司官网行情接口",
+  "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=H00016&startDate=20180102&endDate=20180102"
+ },
+ "H00016|20200102": {
+  "close": 4384.5,
+  "code": "H00016",
+  "date": "20200102",
+  "obtained_at": "2026-11-26T14:22:27",
+  "official_code": "H00016",
+  "official_name": "上证50全收益指数",
+  "source": "中证指数有限公司官网行情接口",
+  "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=H00016&startDate=20200102&endDate=20200102"
+ },
+ "H00016|20240102": {
+  "close": 3634.97,
+  "code": "H00016",
+  "date": "20240102",
+  "obtained_at": "2026-11-26T14:22:27",
+  "official_code": "H00016",
+  "official_name": "上证50全收益指数",
+  "source": "中证指数有限公司官网行情接口",
+  "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=H00016&startDate=20240102&endDate=20240102"
+ },
+ "H00300|20180102": {
+  "close": 4987.52,
+  "code": "H00300",
+  "date": "20180102",
+  "obtained_at": "2026-11-26T14:22:15",
+  "official_code": "H00300",
+  "official_name": "沪深300全收益指数",
+  "source": "中证指数有限公司官网行情接口",
+  "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=H00300&startDate=20180102&endDate=20180102"
+ },
+ "H00300|20200102": {
+  "close": 5298.75,
+  "code": "H00300",
+  "date": "20200102",
+  "obtained_at": "2026-11-26T14:22:14",
+  "official_code": "H00300",
+  "official_name": "沪深300全收益指数",
+  "source": "中证指数有限公司官网行情接口",
+  "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=H00300&startDate=20200102&endDate=20200102"
+ },
+ "H00300|20240102": {
+  "close": 4709.92,
+  "code": "H00300",
+  "date": "20240102",
+  "obtained_at": "2026-11-26T14:22:14",
+  "official_code": "H00300",
+  "official_name": "沪深300全收益指数",
+  "source": "中证指数有限公司官网行情接口",
+  "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=H00300&startDate=20240102&endDate=20240102"
+ },
+ "H00905|20180102": {
+  "close": 6959.15,
+  "code": "H00905",
+  "date": "20180102",
+  "obtained_at": "2026-11-26T14:22:22",
+  "official_code": "H00905",
+  "official_name": "中证小盘500全收益指数",
+  "source": "中证指数有限公司官网行情接口",
+  "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=H00905&startDate=20180102&endDate=20180102"
+ },
+ "H00905|20200102": {
+  "close": 6049.61,
+  "code": "H00905",
+  "date": "20200102",
+  "obtained_at": "2026-11-26T14:22:18",
+  "official_code": "H00905",
+  "official_name": "中证小盘500全收益指数",
+  "source": "中证指数有限公司官网行情接口",
+  "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=H00905&startDate=20200102&endDate=20200102"
+ },
+ "H00905|20240102": {
+  "close": 6471.93,
+  "code": "H00905",
+  "date": "20240102",
+  "obtained_at": "2026-11-26T14:22:18",
+  "official_code": "H00905",
+  "official_name": "中证小盘500全收益指数",
+  "source": "中证指数有限公司官网行情接口",
+  "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=H00905&startDate=20240102&endDate=20240102"
+ },
+ "H00906|20180102": {
+  "close": 5385.06,
+  "code": "H00906",
+  "date": "20180102",
+  "obtained_at": "2026-11-26T14:22:25",
+  "official_code": "H00906",
+  "official_name": "中证800全收益指数",
+  "source": "中证指数有限公司官网行情接口",
+  "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=H00906&startDate=20180102&endDate=20180102"
+ },
+ "H00906|20200102": {
+  "close": 5448.06,
+  "code": "H00906",
+  "date": "20200102",
+  "obtained_at": "2026-11-26T14:22:25",
+  "official_code": "H00906",
+  "official_name": "中证800全收益指数",
+  "source": "中证指数有限公司官网行情接口",
+  "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=H00906&startDate=20200102&endDate=20200102"
+ },
+ "H00906|20240102": {
+  "close": 5062.96,
+  "code": "H00906",
+  "date": "20240102",
+  "obtained_at": "2026-11-26T14:22:25",
+  "official_code": "H00906",
+  "official_name": "中证800全收益指数",
+  "source": "中证指数有限公司官网行情接口",
+  "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=H00906&startDate=20240102&endDate=20240102"
+ },
+ "H00922|20180102": {
+  "close": 6932.76,
+  "code": "H00922",
+  "date": "20180102",
+  "obtained_at": "2026-11-26T14:22:34",
+  "official_code": "H00922",
+  "official_name": "中证红利全收益指数",
+  "source": "中证指数有限公司官网行情接口",
+  "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=H00922&startDate=20180102&endDate=20180102"
+ },
+ "H00922|20200102": {
+  "close": 6999.68,
+  "code": "H00922",
+  "date": "20200102",
+  "obtained_at": "2026-11-26T14:22:34",
+  "official_code": "H00922",
+  "official_name": "中证红利全收益指数",
+  "source": "中证指数有限公司官网行情接口",
+  "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=H00922&startDate=20200102&endDate=20200102"
+ },
+ "H00922|20240102": {
+  "close": 9447.69,
+  "code": "H00922",
+  "date": "20240102",
+  "obtained_at": "2026-11-26T14:22:33",
+  "official_code": "H00922",
+  "official_name": "中证红利全收益指数",
+  "source": "中证指数有限公司官网行情接口",
+  "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=H00922&startDate=20240102&endDate=20240102"
+ },
+ "H00942|20180102": {
+  "close": 10654.51,
+  "code": "H00942",
+  "date": "20180102",
+  "obtained_at": "2026-11-26T14:22:31",
+  "official_code": "H00942",
+  "official_name": "中证内地消费主题全收益指数",
+  "source": "中证指数有限公司官网行情接口",
+  "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=H00942&startDate=20180102&endDate=20180102"
+ },
+ "H00942|20200102": {
+  "close": 12665.44,
+  "code": "H00942",
+  "date": "20200102",
+  "obtained_at": "2026-11-26T14:22:31",
+  "official_code": "H00942",
+  "official_name": "中证内地消费主题全收益指数",
+  "source": "中证指数有限公司官网行情接口",
+  "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=H00942&startDate=20200102&endDate=20200102"
+ },
+ "H00942|20240102": {
+  "close": 13585.15,
+  "code": "H00942",
+  "date": "20240102",
+  "obtained_at": "2026-11-26T14:22:31",
+  "official_code": "H00942",
+  "official_name": "中证内地消费主题全收益指数",
+  "source": "中证指数有限公司官网行情接口",
+  "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=H00942&startDate=20240102&endDate=20240102"
+ },
+ "H20184|20180102": {
+  "close": 4198.23,
+  "code": "H20184",
+  "date": "20180102",
+  "obtained_at": "2026-11-26T14:22:31",
+  "official_code": "H20184",
+  "official_name": "中证全指半导体产品与设备全收益指数",
+  "source": "中证指数有限公司官网行情接口",
+  "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=H20184&startDate=20180102&endDate=20180102"
+ },
+ "H20184|20200102": {
+  "close": 4992.12,
+  "code": "H20184",
+  "date": "20200102",
+  "obtained_at": "2026-11-26T14:22:30",
+  "official_code": "H20184",
+  "official_name": "中证全指半导体产品与设备全收益指数",
+  "source": "中证指数有限公司官网行情接口",
+  "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=H20184&startDate=20200102&endDate=20200102"
+ },
+ "H20184|20240102": {
+  "close": 5305.09,
+  "code": "H20184",
+  "date": "20240102",
+  "obtained_at": "2026-11-26T14:22:30",
+  "official_code": "H20184",
+  "official_name": "中证全指半导体产品与设备全收益指数",
+  "source": "中证指数有限公司官网行情接口",
+  "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=H20184&startDate=20240102&endDate=20240102"
+ },
+ "H20539|20180102": {
+  "close": 7054.65,
+  "code": "H20539",
+  "date": "20180102",
+  "obtained_at": "2026-11-26T14:22:29",
+  "official_code": "H20539",
+  "official_name": "中证白酒全收益指数",
+  "source": "中证指数有限公司官网行情接口",
+  "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=H20539&startDate=20180102&endDate=20180102"
+ },
+ "H20539|20200102": {
+  "close": 10081.11,
+  "code": "H20539",
+  "date": "20200102",
+  "obtained_at": "2026-11-26T14:22:29",
+  "official_code": "H20539",
+  "official_name": "中证白酒全收益指数",
+  "source": "中证指数有限公司官网行情接口",
+  "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=H20539&startDate=20200102&endDate=20200102"
+ },
+ "H20539|20240102": {
+  "close": 15644.68,
+  "code": "H20539",
+  "date": "20240102",
+  "obtained_at": "2026-11-26T14:22:29",
+  "official_code": "H20539",
+  "official_name": "中证白酒全收益指数",
+  "source": "中证指数有限公司官网行情接口",
+  "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=H20539&startDate=20240102&endDate=20240102"
+ },
+ "H20930|20180102": {
+  "close": 4262.65,
+  "code": "H20930",
+  "date": "20180102",
+  "obtained_at": "2026-11-26T14:22:35",
+  "official_code": "H20930",
+  "official_name": "中证港股通综合全收益指数",
+  "source": "中证指数有限公司官网行情接口",
+  "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=H20930&startDate=20180102&endDate=20180102"
+ },
+ "H20930|20200102": {
+  "close": 4205.0,
+  "code": "H20930",
+  "date": "20200102",
+  "obtained_at": "2026-11-26T14:22:35",
+  "official_code": "H20930",
+  "official_name": "中证港股通综合全收益指数",
+  "source": "中证指数有限公司官网行情接口",
+  "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=H20930&startDate=20200102&endDate=20200102"
+ },
+ "H20930|20240102": {
+  "close": 3266.65,
+  "code": "H20930",
+  "date": "20240102",
+  "obtained_at": "2026-11-26T14:22:35",
+  "official_code": "H20930",
+  "official_name": "中证港股通综合全收益指数",
+  "source": "中证指数有限公司官网行情接口",
+  "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=H20930&startDate=20240102&endDate=20240102"
+ },
+ "N00012|20180102": {
+  "close": 119.52,
+  "code": "N00012",
+  "date": "20180102",
+  "obtained_at": "2026-11-26T14:22:33",
+  "official_code": "N00012",
+  "official_name": "上证国债指数(利息及再投资)",
+  "source": "中证指数有限公司官网行情接口",
+  "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=N00012&startDate=20180102&endDate=20180102"
+ },
+ "N00012|20200102": {
+  "close": 128.18,
+  "code": "N00012",
+  "date": "20200102",
+  "obtained_at": "2026-11-26T14:22:33",
+  "official_code": "N00012",
+  "official_name": "上证国债指数(利息及再投资)",
+  "source": "中证指数有限公司官网行情接口",
+  "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=N00012&startDate=20200102&endDate=20200102"
+ },
+ "N00012|20240102": {
+  "close": 145.71,
+  "code": "N00012",
+  "date": "20240102",
+  "obtained_at": "2026-11-26T14:22:32",
+  "official_code": "N00012",
+  "official_name": "上证国债指数(利息及再投资)",
+  "source": "中证指数有限公司官网行情接口",
+  "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=N00012&startDate=20240102&endDate=20240102"
+ },
+ "N00016|20180102": {
+  "close": 3762.84,
+  "code": "N00016",
+  "date": "20180102",
+  "obtained_at": "2026-11-26T14:22:28",
+  "official_code": "N00016",
+  "official_name": "上证50净收益指数",
+  "source": "中证指数有限公司官网行情接口",
+  "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=N00016&startDate=20180102&endDate=20180102"
+ },
+ "N00016|20200102": {
+  "close": 4207.01,
+  "code": "N00016",
+  "date": "20200102",
+  "obtained_at": "2026-11-26T14:22:28",
+  "official_code": "N00016",
+  "official_name": "上证50净收益指数",
+  "source": "中证指数有限公司官网行情接口",
+  "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=N00016&startDate=20200102&endDate=20200102"
+ },
+ "N00016|20240102": {
+  "close": 3449.16,
+  "code": "N00016",
+  "date": "20240102",
+  "obtained_at": "2026-11-26T14:22:28",
+  "official_code": "N00016",
+  "official_name": "上证50净收益指数",
+  "source": "中证指数有限公司官网行情接口",
+  "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=N00016&startDate=20240102&endDate=20240102"
+ },
+ "N00300|20180102": {
+  "close": 4899.69,
+  "code": "N00300",
+  "date": "20180102",
+  "obtained_at": "2026-11-26T14:22:18",
+  "official_code": "N00300",
+  "official_name": "沪深300净收益指数",
+  "source": "中证指数有限公司官网行情接口",
+  "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=N00300&startDate=20180102&endDate=20180102"
+ },
+ "N00300|20200102": {
+  "close": 5181.84,
+  "code": "N00300",
+  "date": "20200102",
+  "obtained_at": "2026-11-26T14:22:17",
+  "official_code": "N00300",
+  "official_name": "沪深300净收益指数",
+  "source": "中证指数有限公司官网行情接口",
+  "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=N00300&startDate=20200102&endDate=20200102"
+ },
+ "N00300|20240102": {
+  "close": 4566.09,
+  "code": "N00300",
+  "date": "20240102",
+  "obtained_at": "2026-11-26T14:22:17",
+  "official_code": "N00300",
+  "official_name": "沪深300净收益指数",
+  "source": "中证指数有限公司官网行情接口",
+  "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=N00300&startDate=20240102&endDate=20240102"
+ },
+ "N00905|20180102": {
+  "close": 6850.1,
+  "code": "N00905",
+  "date": "20180102",
+  "obtained_at": "2026-11-26T14:22:24",
+  "official_code": "N00905",
+  "official_name": "中证小盘500净收益指数",
+  "source": "中证指数有限公司官网行情接口",
+  "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=N00905&startDate=20180102&endDate=20180102"
+ },
+ "N00905|20200102": {
+  "close": 5938.97,
+  "code": "N00905",
+  "date": "20200102",
+  "obtained_at": "2026-11-26T14:22:24",
+  "official_code": "N00905",
+  "official_name": "中证小盘500净收益指数",
+  "source": "中证指数有限公司官网行情接口",
+  "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=N00905&startDate=20200102&endDate=20200102"
+ },
+ "N00905|20240102": {
+  "close": 6314.88,
+  "code": "N00905",
+  "date": "20240102",
+  "obtained_at": "2026-11-26T14:22:23",
+  "official_code": "N00905",
+  "official_name": "中证小盘500净收益指数",
+  "source": "中证指数有限公司官网行情接口",
+  "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=N00905&startDate=20240102&endDate=20240102"
+ },
+ "N00906|20180102": {
+  "close": 5286.56,
+  "code": "N00906",
+  "date": "20180102",
+  "obtained_at": "2026-11-26T14:22:27",
+  "official_code": "N00906",
+  "official_name": "中证800净收益指数",
+  "source": "中证指数有限公司官网行情接口",
+  "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=N00906&startDate=20180102&endDate=20180102"
+ },
+ "N00906|20200102": {
+  "close": 5326.58,
+  "code": "N00906",
+  "date": "20200102",
+  "obtained_at": "2026-11-26T14:22:27",
+  "official_code": "N00906",
+  "official_name": "中证800净收益指数",
+  "source": "中证指数有限公司官网行情接口",
+  "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=N00906&startDate=20200102&endDate=20200102"
+ },
+ "N00906|20240102": {
+  "close": 4910.4,
+  "code": "N00906",
+  "date": "20240102",
+  "obtained_at": "2026-11-26T14:22:25",
+  "official_code": "N00906",
+  "official_name": "中证800净收益指数",
+  "source": "中证指数有限公司官网行情接口",
+  "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=N00906&startDate=20240102&endDate=20240102"
+ }
+}

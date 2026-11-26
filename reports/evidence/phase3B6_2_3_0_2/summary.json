@@ -1,0 +1,50 @@
+{
+ "generated_at": "2026-11-26T14:22:35",
+ "summary": {
+  "continuity": {
+   "total_indexes": 10,
+   "calendar_available": 8,
+   "calendar_unavailable": 2,
+   "continuity_verified": 7,
+   "continuity_unverified": 3,
+   "total_raw_rows": 50603,
+   "total_valid_rows": 50593,
+   "total_suspect_rows": 10,
+   "placeholder_row_count": 10,
+   "duplicate_dates_total": 0,
+   "descending_total": 0,
+   "illegal_dates_total": 0,
+   "non_positive_close_total": 1,
+   "null_close_total": 0,
+   "missing_trading_days_total": 0
+  },
+  "point_in_time": {
+   "point_in_time_verified": false,
+   "indexes_verified": 0,
+   "reason": "库内 index_daily 每个 (index_code, trade_date) 仅一行，无历史快照表、无修订记录；collected_at 仅为当前采集时间，**不能证明该行情在历史交易日当时已公开**；row_fingerprint 只证明当前行内容，不证明历史版本未被修订"
+  },
+  "total_return": {
+   "indexes_with_tr_candidate": 9,
+   "indexes_with_tr_obtainable": 9,
+   "indexes_with_tr_not_obtainable": 1
+  },
+  "revision_risk": {
+   "revision_risk_verified": false,
+   "indexes_with_unknown_revision": 10
+  },
+  "gates": {
+   "historical_continuity_verified": 7,
+   "point_in_time_verified": false,
+   "total_return_obtainable_count": 9,
+   "ready_for_3b6_2_3_1_series_build": false,
+   "note": "连续性仅对 A 股日历可用的指数完成；时点可用性全部未通过；全收益序列官方可取但**尚未接入**；不得进入收益序列建设"
+  },
+  "_self_check": {
+   "continuity_count_matches": true,
+   "total_return_count_matches": true,
+   "revision_count_matches": true,
+   "continuity_partition_ok": true,
+   "placeholder_total_is_10": true
+  }
+ }
+}

@@ -1,0 +1,77 @@
+{
+ "phase": "3B-6.2.3.0.2",
+ "task": "历史时点可用性审计",
+ "generated_at": "2026-11-26T14:22:35",
+ "baseline_head": "015a552df01e8bec791905a3623df4d3213165f6",
+ "read_only": true,
+ "audit": {
+  "snapshot_tables_found": [
+   "corporate_action_versions",
+   "etf_adjustment_snapshots",
+   "fund_aum_history",
+   "fund_manager_history"
+  ],
+  "index_snapshot_tables_found": [],
+  "index_daily_multi_version_rows": 0,
+  "collected_at_distinct_dates": [
+   "2026-11-23"
+  ],
+  "collected_at_is_single_batch": true,
+  "ingest_runs": {
+   "count": 10,
+   "first_requested_at": "2026-11-23T17:37:29",
+   "last_requested_at": "2026-11-23T17:39:19"
+  },
+  "row_fingerprint_rows": 50603,
+  "total_rows": 50603,
+  "row_fingerprint_semantics": "**仅证明当前数据行内容指纹**，不证明历史版本未被修订",
+  "raw_archive_files_count": 45,
+  "raw_archive_files_sample": [
+   "reports/evidence/phase3B6_1_1/raw/bond_gov_20060101_20060630.csv",
+   "reports/evidence/phase3B6_1_1/raw/bond_gov_20060701_20061231.csv",
+   "reports/evidence/phase3B6_1_1/raw/bond_gov_20070101_20070630.csv",
+   "reports/evidence/phase3B6_1_1/raw/bond_gov_20070701_20071231.csv",
+   "reports/evidence/phase3B6_1_1/raw/bond_gov_20080101_20080630.csv",
+   "reports/evidence/phase3B6_1_1/raw/bond_gov_20080701_20081231.csv",
+   "reports/evidence/phase3B6_1_1/raw/bond_gov_20090101_20090630.csv",
+   "reports/evidence/phase3B6_1_1/raw/bond_gov_20090701_20091231.csv",
+   "reports/evidence/phase3B6_1_1/raw/bond_gov_20100101_20100630.csv",
+   "reports/evidence/phase3B6_1_1/raw/bond_gov_20100701_20101231.csv",
+   "reports/evidence/phase3B6_1_1/raw/bond_gov_20110101_20110630.csv",
+   "reports/evidence/phase3B6_1_1/raw/bond_gov_20110701_20111231.csv",
+   "reports/evidence/phase3B6_1_1/raw/bond_gov_20120101_20120630.csv",
+   "reports/evidence/phase3B6_1_1/raw/bond_gov_20120701_20121231.csv",
+   "reports/evidence/phase3B6_1_1/raw/bond_gov_20130101_20130630.csv",
+   "reports/evidence/phase3B6_1_1/raw/bond_gov_20130701_20131231.csv",
+   "reports/evidence/phase3B6_1_1/raw/bond_gov_20140101_20140630.csv",
+   "reports/evidence/phase3B6_1_1/raw/bond_gov_20140701_20141231.csv",
+   "reports/evidence/phase3B6_1_1/raw/bond_gov_20150101_20150630.csv",
+   "reports/evidence/phase3B6_1_1/raw/bond_gov_20150701_20151231.csv"
+  ],
+  "raw_archive_contains_index_daily": false,
+  "checks": {
+   "saves_raw_download_files": false,
+   "saves_each_ingest_batch": true,
+   "saves_version_number": true,
+   "same_date_multiple_versions": false,
+   "has_revision_records": false,
+   "can_confirm_public_at_the_time": false,
+   "all_collected_in_one_period": true,
+   "fingerprint_proves_history": false
+  },
+  "conclusion": {
+   "historical_quotes_exist": true,
+   "current_collection_time_traceable": true,
+   "historical_data_version_traceable": false,
+   "historical_publication_time_provable": false,
+   "point_in_time_availability_provable": false
+  },
+  "reason": "库内 index_daily 每个 (index_code, trade_date) 仅一行，无历史快照表、无修订记录；collected_at 仅为当前采集时间，**不能证明该行情在历史交易日当时已公开**；row_fingerprint 只证明当前行内容，不证明历史版本未被修订",
+  "point_in_time_verified": false
+ },
+ "summary": {
+  "point_in_time_verified": false,
+  "indexes_verified": 0,
+  "reason": "库内 index_daily 每个 (index_code, trade_date) 仅一行，无历史快照表、无修订记录；collected_at 仅为当前采集时间，**不能证明该行情在历史交易日当时已公开**；row_fingerprint 只证明当前行内容，不证明历史版本未被修订"
+ }
+}

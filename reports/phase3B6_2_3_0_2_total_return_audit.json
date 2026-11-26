@@ -1,0 +1,651 @@
+{
+ "phase": "3B-6.2.3.0.2",
+ "task": "全收益指数与研究基准可行性审计",
+ "generated_at": "2026-11-26T14:22:35",
+ "baseline_head": "015a552df01e8bec791905a3623df4d3213165f6",
+ "read_only": true,
+ "rule": "全收益/净收益代码必须来自官方基本信息接口，**不得按命名规律猜测**",
+ "basis_taxonomy": {
+  "price": "价格指数（除息自然回落）",
+  "gross_total_return": "全收益指数（税前红利再投资）",
+  "net_total_return": "净收益指数（税后红利再投资）",
+  "bond_clean_price": "债券净价指数（不含应计利息）",
+  "bond_full_price": "债券全价指数（含应计利息，不含再投资）",
+  "bond_interest_reinvestment": "利息及再投资指数",
+  "wealth": "财富指数（含利息及再投资）"
+ },
+ "warning": "债券全价/财富指数与股票全收益指数**不可混为一谈**",
+ "summary": {
+  "indexes_with_tr_candidate": 9,
+  "indexes_with_tr_obtainable": 9,
+  "indexes_with_tr_not_obtainable": 1
+ },
+ "indexes": [
+  {
+   "base_index": "000300",
+   "base_basis": "沪深A股",
+   "candidates": [
+    {
+     "code": "H00300",
+     "kind": "gross_total_return",
+     "official_full_name": "沪深300全收益指数",
+     "official_short_name": "300收益",
+     "publisher": "中证指数有限公司",
+     "publish_date": "2005-04-08",
+     "basic_date": "2004-12-31",
+     "identity_verified": true,
+     "official_api_samples": [
+      {
+       "date": "20240102",
+       "close": 4709.92,
+       "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=H00300&startDate=20240102&endDate=20240102",
+       "reason": null
+      },
+      {
+       "date": "20200102",
+       "close": 5298.75,
+       "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=H00300&startDate=20200102&endDate=20200102",
+       "reason": null
+      },
+      {
+       "date": "20180102",
+       "close": 4987.52,
+       "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=H00300&startDate=20180102&endDate=20180102",
+       "reason": null
+      }
+     ],
+     "official_api_available": true,
+     "official_api_sample_count": 3,
+     "already_in_database": false,
+     "database_rows": 0
+    },
+    {
+     "code": "N00300",
+     "kind": "net_total_return",
+     "official_full_name": "沪深300净收益指数",
+     "official_short_name": "沪深300净收益",
+     "publisher": "中证指数有限公司",
+     "publish_date": "2013-02-08",
+     "basic_date": "2004-12-31",
+     "identity_verified": true,
+     "official_api_samples": [
+      {
+       "date": "20240102",
+       "close": 4566.09,
+       "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=N00300&startDate=20240102&endDate=20240102",
+       "reason": null
+      },
+      {
+       "date": "20200102",
+       "close": 5181.84,
+       "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=N00300&startDate=20200102&endDate=20200102",
+       "reason": null
+      },
+      {
+       "date": "20180102",
+       "close": 4899.69,
+       "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=N00300&startDate=20180102&endDate=20180102",
+       "reason": null
+      }
+     ],
+     "official_api_available": true,
+     "official_api_sample_count": 3,
+     "already_in_database": false,
+     "database_rows": 0
+    }
+   ],
+   "has_total_return": true,
+   "total_return_obtainable": true
+  },
+  {
+   "base_index": "000905",
+   "base_basis": "沪深A股",
+   "candidates": [
+    {
+     "code": "H00905",
+     "kind": "gross_total_return",
+     "official_full_name": "中证小盘500全收益指数",
+     "official_short_name": "500收益",
+     "publisher": "中证指数有限公司",
+     "publish_date": "2007-01-15",
+     "basic_date": "2004-12-31",
+     "identity_verified": true,
+     "official_api_samples": [
+      {
+       "date": "20240102",
+       "close": 6471.93,
+       "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=H00905&startDate=20240102&endDate=20240102",
+       "reason": null
+      },
+      {
+       "date": "20200102",
+       "close": 6049.61,
+       "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=H00905&startDate=20200102&endDate=20200102",
+       "reason": null
+      },
+      {
+       "date": "20180102",
+       "close": 6959.15,
+       "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=H00905&startDate=20180102&endDate=20180102",
+       "reason": null
+      }
+     ],
+     "official_api_available": true,
+     "official_api_sample_count": 3,
+     "already_in_database": false,
+     "database_rows": 0
+    },
+    {
+     "code": "N00905",
+     "kind": "net_total_return",
+     "official_full_name": "中证小盘500净收益指数",
+     "official_short_name": "中证500净收益",
+     "publisher": "中证指数有限公司",
+     "publish_date": "2013-02-08",
+     "basic_date": "2004-12-31",
+     "identity_verified": true,
+     "official_api_samples": [
+      {
+       "date": "20240102",
+       "close": 6314.88,
+       "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=N00905&startDate=20240102&endDate=20240102",
+       "reason": null
+      },
+      {
+       "date": "20200102",
+       "close": 5938.97,
+       "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=N00905&startDate=20200102&endDate=20200102",
+       "reason": null
+      },
+      {
+       "date": "20180102",
+       "close": 6850.1,
+       "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=N00905&startDate=20180102&endDate=20180102",
+       "reason": null
+      }
+     ],
+     "official_api_available": true,
+     "official_api_sample_count": 3,
+     "already_in_database": false,
+     "database_rows": 0
+    }
+   ],
+   "has_total_return": true,
+   "total_return_obtainable": true
+  },
+  {
+   "base_index": "000906",
+   "base_basis": "沪深A股",
+   "candidates": [
+    {
+     "code": "H00906",
+     "kind": "gross_total_return",
+     "official_full_name": "中证800全收益指数",
+     "official_short_name": "800收益",
+     "publisher": "中证指数有限公司",
+     "publish_date": "2007-01-15",
+     "basic_date": "2004-12-31",
+     "identity_verified": true,
+     "official_api_samples": [
+      {
+       "date": "20240102",
+       "close": 5062.96,
+       "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=H00906&startDate=20240102&endDate=20240102",
+       "reason": null
+      },
+      {
+       "date": "20200102",
+       "close": 5448.06,
+       "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=H00906&startDate=20200102&endDate=20200102",
+       "reason": null
+      },
+      {
+       "date": "20180102",
+       "close": 5385.06,
+       "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=H00906&startDate=20180102&endDate=20180102",
+       "reason": null
+      }
+     ],
+     "official_api_available": true,
+     "official_api_sample_count": 3,
+     "already_in_database": false,
+     "database_rows": 0
+    },
+    {
+     "code": "N00906",
+     "kind": "net_total_return",
+     "official_full_name": "中证800净收益指数",
+     "official_short_name": "中证800净收益",
+     "publisher": "中证指数有限公司",
+     "publish_date": "2013-02-08",
+     "basic_date": "2004-12-31",
+     "identity_verified": true,
+     "official_api_samples": [
+      {
+       "date": "20240102",
+       "close": 4910.4,
+       "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=N00906&startDate=20240102&endDate=20240102",
+       "reason": null
+      },
+      {
+       "date": "20200102",
+       "close": 5326.58,
+       "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=N00906&startDate=20200102&endDate=20200102",
+       "reason": null
+      },
+      {
+       "date": "20180102",
+       "close": 5286.56,
+       "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=N00906&startDate=20180102&endDate=20180102",
+       "reason": null
+      }
+     ],
+     "official_api_available": true,
+     "official_api_sample_count": 3,
+     "already_in_database": false,
+     "database_rows": 0
+    }
+   ],
+   "has_total_return": true,
+   "total_return_obtainable": true
+  },
+  {
+   "base_index": "000016",
+   "base_basis": "上海A股",
+   "candidates": [
+    {
+     "code": "H00016",
+     "kind": "gross_total_return",
+     "official_full_name": "上证50全收益指数",
+     "official_short_name": "50收益",
+     "publisher": "中证指数有限公司",
+     "publish_date": "2004-01-02",
+     "basic_date": "2003-12-31",
+     "identity_verified": true,
+     "official_api_samples": [
+      {
+       "date": "20240102",
+       "close": 3634.97,
+       "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=H00016&startDate=20240102&endDate=20240102",
+       "reason": null
+      },
+      {
+       "date": "20200102",
+       "close": 4384.5,
+       "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=H00016&startDate=20200102&endDate=20200102",
+       "reason": null
+      },
+      {
+       "date": "20180102",
+       "close": 3899.46,
+       "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=H00016&startDate=20180102&endDate=20180102",
+       "reason": null
+      }
+     ],
+     "official_api_available": true,
+     "official_api_sample_count": 3,
+     "already_in_database": false,
+     "database_rows": 0
+    },
+    {
+     "code": "N00016",
+     "kind": "net_total_return",
+     "official_full_name": "上证50净收益指数",
+     "official_short_name": "上证50净收益",
+     "publisher": "中证指数有限公司",
+     "publish_date": "2013-02-08",
+     "basic_date": "2003-12-31",
+     "identity_verified": true,
+     "official_api_samples": [
+      {
+       "date": "20240102",
+       "close": 3449.16,
+       "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=N00016&startDate=20240102&endDate=20240102",
+       "reason": null
+      },
+      {
+       "date": "20200102",
+       "close": 4207.01,
+       "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=N00016&startDate=20200102&endDate=20200102",
+       "reason": null
+      },
+      {
+       "date": "20180102",
+       "close": 3762.84,
+       "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=N00016&startDate=20180102&endDate=20180102",
+       "reason": null
+      }
+     ],
+     "official_api_available": true,
+     "official_api_sample_count": 3,
+     "already_in_database": false,
+     "database_rows": 0
+    }
+   ],
+   "has_total_return": true,
+   "total_return_obtainable": true
+  },
+  {
+   "base_index": "399997",
+   "base_basis": "沪深A股",
+   "candidates": [
+    {
+     "code": "H20539",
+     "kind": "gross_total_return",
+     "official_full_name": "中证白酒全收益指数",
+     "official_short_name": "中证白酒全收益",
+     "publisher": "中证指数有限公司",
+     "publish_date": "2015-01-21",
+     "basic_date": "2008-12-31",
+     "identity_verified": true,
+     "official_api_samples": [
+      {
+       "date": "20240102",
+       "close": 15644.68,
+       "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=H20539&startDate=20240102&endDate=20240102",
+       "reason": null
+      },
+      {
+       "date": "20200102",
+       "close": 10081.11,
+       "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=H20539&startDate=20200102&endDate=20200102",
+       "reason": null
+      },
+      {
+       "date": "20180102",
+       "close": 7054.65,
+       "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=H20539&startDate=20180102&endDate=20180102",
+       "reason": null
+      }
+     ],
+     "official_api_available": true,
+     "official_api_sample_count": 3,
+     "already_in_database": false,
+     "database_rows": 0
+    },
+    {
+     "code": "399997CNY02",
+     "kind": "net_total_return",
+     "official_full_name": "中证白酒净收益指数",
+     "official_short_name": "中证白酒净收益",
+     "publisher": "中证指数有限公司",
+     "publish_date": "2015-01-21",
+     "basic_date": "2008-12-31",
+     "identity_verified": true,
+     "official_api_samples": [
+      {
+       "date": "20240102",
+       "close": 15253.58,
+       "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=399997CNY02&startDate=20240102&endDate=20240102",
+       "reason": null
+      },
+      {
+       "date": "20200102",
+       "close": 9884.36,
+       "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=399997CNY02&startDate=20200102&endDate=20200102",
+       "reason": null
+      },
+      {
+       "date": "20180102",
+       "close": 6939.72,
+       "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=399997CNY02&startDate=20180102&endDate=20180102",
+       "reason": null
+      }
+     ],
+     "official_api_available": true,
+     "official_api_sample_count": 3,
+     "already_in_database": false,
+     "database_rows": 0
+    }
+   ],
+   "has_total_return": true,
+   "total_return_obtainable": true
+  },
+  {
+   "base_index": "H30184",
+   "base_basis": "沪深A股",
+   "candidates": [
+    {
+     "code": "H20184",
+     "kind": "gross_total_return",
+     "official_full_name": "中证全指半导体产品与设备全收益指数",
+     "official_short_name": "半导体全收益",
+     "publisher": "中证指数有限公司",
+     "publish_date": "2013-07-15",
+     "basic_date": "2004-12-31",
+     "identity_verified": true,
+     "official_api_samples": [
+      {
+       "date": "20240102",
+       "close": 5305.09,
+       "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=H20184&startDate=20240102&endDate=20240102",
+       "reason": null
+      },
+      {
+       "date": "20200102",
+       "close": 4992.12,
+       "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=H20184&startDate=20200102&endDate=20200102",
+       "reason": null
+      },
+      {
+       "date": "20180102",
+       "close": 4198.23,
+       "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=H20184&startDate=20180102&endDate=20180102",
+       "reason": null
+      }
+     ],
+     "official_api_available": true,
+     "official_api_sample_count": 3,
+     "already_in_database": false,
+     "database_rows": 0
+    }
+   ],
+   "has_total_return": true,
+   "total_return_obtainable": true
+  },
+  {
+   "base_index": "000942",
+   "base_basis": "沪深A股",
+   "candidates": [
+    {
+     "code": "H00942",
+     "kind": "gross_total_return",
+     "official_full_name": "中证内地消费主题全收益指数",
+     "official_short_name": "内地消收",
+     "publisher": "中证指数有限公司",
+     "publish_date": "2009-10-28",
+     "basic_date": "2004-12-31",
+     "identity_verified": true,
+     "official_api_samples": [
+      {
+       "date": "20240102",
+       "close": 13585.15,
+       "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=H00942&startDate=20240102&endDate=20240102",
+       "reason": null
+      },
+      {
+       "date": "20200102",
+       "close": 12665.44,
+       "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=H00942&startDate=20200102&endDate=20200102",
+       "reason": null
+      },
+      {
+       "date": "20180102",
+       "close": 10654.51,
+       "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=H00942&startDate=20180102&endDate=20180102",
+       "reason": null
+      }
+     ],
+     "official_api_available": true,
+     "official_api_sample_count": 3,
+     "already_in_database": false,
+     "database_rows": 0
+    }
+   ],
+   "has_total_return": true,
+   "total_return_obtainable": true
+  },
+  {
+   "base_index": "000012",
+   "base_basis": "上海证券交易所（债券）",
+   "candidates": [
+    {
+     "code": "H00012",
+     "kind": "bond_clean_price",
+     "official_full_name": "上证国债指数(净价)",
+     "official_short_name": "国债指数(净)",
+     "publisher": "中证指数有限公司",
+     "publish_date": "2018-01-02",
+     "basic_date": "2012-12-31",
+     "identity_verified": true,
+     "official_api_samples": [
+      {
+       "date": "20240102",
+       "close": 104.65,
+       "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=H00012&startDate=20240102&endDate=20240102",
+       "reason": null
+      },
+      {
+       "date": "20200102",
+       "close": 102.08,
+       "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=H00012&startDate=20200102&endDate=20200102",
+       "reason": null
+      },
+      {
+       "date": "20180102",
+       "close": 99.31,
+       "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=H00012&startDate=20180102&endDate=20180102",
+       "reason": null
+      }
+     ],
+     "official_api_available": true,
+     "official_api_sample_count": 3,
+     "already_in_database": false,
+     "database_rows": 0
+    },
+    {
+     "code": "N00012",
+     "kind": "bond_interest_reinvestment",
+     "official_full_name": "上证国债指数(利息及再投资)",
+     "official_short_name": "国债指数(利)",
+     "publisher": "中证指数有限公司",
+     "publish_date": "2018-01-02",
+     "basic_date": "2012-12-31",
+     "identity_verified": true,
+     "official_api_samples": [
+      {
+       "date": "20240102",
+       "close": 145.71,
+       "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=N00012&startDate=20240102&endDate=20240102",
+       "reason": null
+      },
+      {
+       "date": "20200102",
+       "close": 128.18,
+       "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=N00012&startDate=20200102&endDate=20200102",
+       "reason": null
+      },
+      {
+       "date": "20180102",
+       "close": 119.52,
+       "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=N00012&startDate=20180102&endDate=20180102",
+       "reason": null
+      }
+     ],
+     "official_api_available": true,
+     "official_api_sample_count": 3,
+     "already_in_database": false,
+     "database_rows": 0
+    }
+   ],
+   "has_total_return": false,
+   "total_return_obtainable": false
+  },
+  {
+   "base_index": "000922",
+   "base_basis": "沪深A股",
+   "candidates": [
+    {
+     "code": "H00922",
+     "kind": "gross_total_return",
+     "official_full_name": "中证红利全收益指数",
+     "official_short_name": "中红收益",
+     "publisher": "中证指数有限公司",
+     "publish_date": "2008-05-26",
+     "basic_date": "2004-12-31",
+     "identity_verified": true,
+     "official_api_samples": [
+      {
+       "date": "20240102",
+       "close": 9447.69,
+       "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=H00922&startDate=20240102&endDate=20240102",
+       "reason": null
+      },
+      {
+       "date": "20200102",
+       "close": 6999.68,
+       "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=H00922&startDate=20200102&endDate=20200102",
+       "reason": null
+      },
+      {
+       "date": "20180102",
+       "close": 6932.76,
+       "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=H00922&startDate=20180102&endDate=20180102",
+       "reason": null
+      }
+     ],
+     "official_api_available": true,
+     "official_api_sample_count": 3,
+     "already_in_database": false,
+     "database_rows": 0
+    }
+   ],
+   "has_total_return": true,
+   "total_return_obtainable": true
+  },
+  {
+   "base_index": "930930",
+   "base_basis": "港股通（香港市场）",
+   "candidates": [
+    {
+     "code": "H20930",
+     "kind": "gross_total_return",
+     "official_full_name": "中证港股通综合全收益指数",
+     "official_short_name": "港股综合(全)",
+     "publisher": "中证指数有限公司",
+     "publish_date": "2017-01-16",
+     "basic_date": "2014-11-14",
+     "identity_verified": true,
+     "official_api_samples": [
+      {
+       "date": "20240102",
+       "close": 3266.65,
+       "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=H20930&startDate=20240102&endDate=20240102",
+       "reason": null
+      },
+      {
+       "date": "20200102",
+       "close": 4205.0,
+       "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=H20930&startDate=20200102&endDate=20200102",
+       "reason": null
+      },
+      {
+       "date": "20180102",
+       "close": 4262.65,
+       "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=H20930&startDate=20180102&endDate=20180102",
+       "reason": null
+      }
+     ],
+     "official_api_available": true,
+     "official_api_sample_count": 3,
+     "already_in_database": false,
+     "database_rows": 0
+    }
+   ],
+   "has_total_return": true,
+   "total_return_obtainable": true
+  }
+ ],
+ "samples_file": "reports/evidence/phase3B6_2_3_0_2/official_total_return_samples.json",
+ "samples_sha256": "8e44da10779985ceaeb64a2ffee7e89d5f13c6b95f630e52d8668466f839e8dc"
+}
