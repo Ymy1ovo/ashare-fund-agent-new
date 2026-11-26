@@ -1,0 +1,3741 @@
+{
+ "phase": "3B-6.2.3.0",
+ "task": "78 只基金 L1 合同原件获取审计",
+ "generated_at": "2026-11-26T11:19:20",
+ "baseline_head": "bc490c339f959b6f5262c90290853612329695e3",
+ "read_only": true,
+ "source": "巨潮资讯网（中国证监会指定信息披露网站）",
+ "strict_rules": [
+  "未真实下载到的文件不得填写 SHA256",
+  "无官方来源的文件不得标 L1",
+  "不得用当前文件冒充历史版本",
+  "无法获取原件时保留 L3，不得升级"
+ ],
+ "summary": {
+  "index_summary": {
+   "total_indexes": 10,
+   "official_document_obtained": 10,
+   "methodology_obtained": 8,
+   "factsheet_only": 2,
+   "return_basis_confirmed": 9,
+   "return_basis_still_unknown": 1,
+   "series_matches_official": 10,
+   "grade_counts": {
+    "L1": 10
+   },
+   "basis_counts": {
+    "full_price": 1,
+    "price": 8,
+    "unknown": 1
+   }
+  },
+  "fund_summary": {
+   "total_funds": 78,
+   "l1_contract_obtained": 9,
+   "prospectus_only": 0,
+   "still_l3_only": 69,
+   "not_obtained": 69,
+   "text_conflict_with_l3": 1,
+   "text_consistent_with_l3": 8,
+   "history_versions_missing": 69,
+   "grade_counts": {
+    "L1": 9,
+    "L3": 69
+   }
+  },
+  "gates": {
+   "at_least_one_index_basis_l1": true,
+   "at_least_one_fund_l1_contract": true,
+   "series_matches_official_basis": true,
+   "ready_for_3b6_2_3_1_series_build": false,
+   "note": "即使官方口径确认，历史连续覆盖与时点可用性仍未确认，不得直接进入指数收益序列建设"
+  },
+  "_self_check": {
+   "index_count_matches_detail": true,
+   "fund_count_matches_detail": true,
+   "index_partition_ok": true,
+   "fund_partition_ok": true
+  }
+ },
+ "funds": [
+  {
+   "fund_id": 14,
+   "fund_code": "000051",
+   "fund_name": "华夏沪深300ETF联接",
+   "fund_full_name": "华夏沪深300交易型开放式指数证券投资基金联接基金",
+   "fund_company": "华夏基金管理有限公司",
+   "category": "etf_feeder",
+   "l3_benchmark_text": "沪深300指数收益率×95%＋1%（指年收益率，评价时应按期间折算）",
+   "cninfo": {
+    "error": "巨潮未检索到该基金代码"
+   },
+   "channel": "未获取（巨潮基金频道仅覆盖场内品种）",
+   "contract_found": false,
+   "prospectus_found": false,
+   "evidence_grade": "L3",
+   "not_obtained_reason": "巨潮资讯基金频道仅收录 LOF/封闭式/ETF 等场内品种，该基金为场外品种，未在巨潮收录；管理人官网渠道未实现",
+   "current_contract": null,
+   "current_prospectus": null,
+   "history_versions": [],
+   "history_versions_missing": true
+  },
+  {
+   "fund_id": 15,
+   "fund_code": "110020",
+   "fund_name": "易方达沪深300ETF联接",
+   "fund_full_name": "易方达沪深300交易型开放式指数发起式证券投资基金联接基金",
+   "fund_company": "易方达基金管理有限公司",
+   "category": "etf_feeder",
+   "l3_benchmark_text": "沪深300指数收益率X95%+活期存款利率(税后)X5%",
+   "cninfo": {
+    "org_id": "9900000461",
+    "short_name": "贴债2379",
+    "category": "国债"
+   },
+   "channel": "管理人官方网站（易方达基金）",
+   "contract_found": true,
+   "prospectus_found": true,
+   "current_contract": {
+    "obtained": true,
+    "url": "https://cdn.efunds.com.cn/owch/data/bulletin/20250319/%E6%98%93%E6%96%B9%E8%BE%BE%E6%B2%AA%E6%B7%B1300%E4%BA%A4%E6%98%93%E5%9E%8B%E5%BC%80%E6%94%BE%E5%BC%8F%E6%8C%87%E6%95%B0%E5%8F%91%E8%B5%B7%E5%BC%8F%E8%AF%81%E5%88%B8%E6%8A%95%E8%B5%84%E5%9F%BA%E9%87%91%E8%81%94%E6%8E%A5%E5%9F%BA%E9%87%91%E5%9F%BA%E9%87%91%E5%90%88%E5%90%8C.pdf",
+    "file": "reports/evidence/phase3B6_2_3_0/fund_contracts/110020_基金合同.pdf",
+    "bytes": 1246902,
+    "sha256": "80bb2aa2b003bf9a9b8cff813979e09176ab0f73f2eb6db914ff146851de2ff4",
+    "readable": true,
+    "text_chars": 70476,
+    "benchmark_excerpt": {
+     "found": true,
+     "excerpts": [
+      "业绩比较基准沪深300指数收益率×95%+活期存款利率(税后)×5%。未来若出现标的指数不符合法律法规及监管的要求（因成份股价格波动等指数编制方法变动之外的因素致使标的指数不符合要求的情形除外）、指数编制机构退出等情形，基金管理人应当自该情形发生之日起十个工作日向中国证监会报告并提出解决方案，如更换基金标的指数、转换运作方式、与其他基金合并、或者终止基金合同等，并在6个月内召集基金份额持有人大会进行表决。自指数编制机构停止标的指数的编制及发布至解决方案确定期间，基金管理人应按"
+     ],
+     "primary": "业绩比较基准沪深300指数收益率×95%+活期存款利率(税后)×5%。未来若出现标的指数不符合法律法规及监管的要求（因成份股价格波动等指数编制方法变动之外的因素致使标的指数不符合要求的情形除外）、指数编制机构退出等情形，基金管理人应当自该情形发生之日起十个工作日向中国证监会报告并提出解决方案，如更换基金标的指数、转换运作方式、与其他基金合并、或者终止基金合同等，并在6个月内召集基金份额持有人大会进行表决。自指数编制机构停止标的指数的编制及发布至解决方案确定期间，基金管理人应按"
+    },
+    "obtained_at": "2026-11-26T11:17:39",
+    "disclosed_date": "2025-03-19",
+    "doc_type": "基金合同",
+    "title": "易方达沪深300交易型开放式指数发起式证券投资基金联接基金基金合同"
+   },
+   "current_prospectus": {
+    "obtained": true,
+    "url": "https://cdn.efunds.com.cn/owch/data/bulletin/20260131/%E6%98%93%E6%96%B9%E8%BE%BE%E6%B2%AA%E6%B7%B1300%E4%BA%A4%E6%98%93%E5%9E%8B%E5%BC%80%E6%94%BE%E5%BC%8F%E6%8C%87%E6%95%B0%E5%8F%91%E8%B5%B7%E5%BC%8F%E8%AF%81%E5%88%B8%E6%8A%95%E8%B5%84%E5%9F%BA%E9%87%91%E8%81%94%E6%8E%A5%E5%9F%BA%E9%87%91%E6%9B%B4%E6%96%B0%E7%9A%84%E6%8B%9B%E5%8B%9F%E8%AF%B4%E6%98%8E%E4%B9%A6.pdf",
+    "file": "reports/evidence/phase3B6_2_3_0/fund_contracts/110020_招募说明书.pdf",
+    "bytes": 1716426,
+    "sha256": "b3fbbedf9b61bb034129a2f7d9b2c229fa504d9f3cef4f57a5b6c65dd869a825",
+    "readable": true,
+    "text_chars": 104774,
+    "benchmark_excerpt": {
+     "found": true,
+     "excerpts": [
+      "业绩比较基准沪深300指数收益率×95%+活期存款利率(税后)×5%。未来若出现标的指数不符合法律法规及监管的要求（因成份股价格波动等指数编制方46法变动之外的因素致使标的指数不符合要求的情形除外）、指数编制机构退出等情形，基金管理人应当自该情形发生之日起十个工作日向中国证监会报告并提出解决方案，如更换基金标的指数、转换运作方式、与其他基金合并、或者终止基金合同等，并在6个月内召集基金份额持有人大会进行表决。自指数编制机构停止标的指数的编制及发布至解决方案确定期间，基金管理人",
+      "业绩比较基准收益率比较阶段净值增长率（1）净值增长率标准差（2）业绩比较基准收益率（3）业绩比较基准收益率标准差（4）（1）-（3）（2）-（4）2016年1月1日至2016年12月31日-8.04%1.31%-10.63%1.33%2.59%-0.02%2017年1月1日至2017年12月31日22.63%0.60%20.63%0.60%2.00%0.00%2018年1月1日至2018年12月31日-22.20%1.25%-24.12%1.27%1.92%-0.02%201",
+      "业绩比较基准收益率（3）业绩比较基准收益率标准差（4）（1）-（3）（2）-（4）2016年1月1日至2016年12月31日-8.04%1.31%-10.63%1.33%2.59%-0.02%2017年1月1日至2017年12月31日22.63%0.60%20.63%0.60%2.00%0.00%2018年1月1日至2018年12月31日-22.20%1.25%-24.12%1.27%1.92%-0.02%2019年1月1日至2019年12月31日35.81%1.17%34."
+     ],
+     "primary": "业绩比较基准沪深300指数收益率×95%+活期存款利率(税后)×5%。未来若出现标的指数不符合法律法规及监管的要求（因成份股价格波动等指数编制方46法变动之外的因素致使标的指数不符合要求的情形除外）、指数编制机构退出等情形，基金管理人应当自该情形发生之日起十个工作日向中国证监会报告并提出解决方案，如更换基金标的指数、转换运作方式、与其他基金合并、或者终止基金合同等，并在6个月内召集基金份额持有人大会进行表决。自指数编制机构停止标的指数的编制及发布至解决方案确定期间，基金管理人"
+    },
+    "obtained_at": "2026-11-26T11:17:45",
+    "disclosed_date": "2026-01-31",
+    "doc_type": "招募说明书",
+    "title": "易方达沪深300交易型开放式指数发起式证券投资基金联接基金更新的招募说明书"
+   },
+   "history_versions": [
+    {
+     "title": "易方达沪深300交易型开放式指数发起式证券投资基金联接基金基金合同",
+     "url": "https://cdn.efunds.com.cn/owch/data/bulletin/20241212/%E6%98%93%E6%96%B9%E8%BE%BE%E6%B2%AA%E6%B7%B1300%E4%BA%A4%E6%98%93%E5%9E%8B%E5%BC%80%E6%94%BE%E5%BC%8F%E6%8C%87%E6%95%B0%E5%8F%91%E8%B5%B7%E5%BC%8F%E8%AF%81%E5%88%B8%E6%8A%95%E8%B5%84%E5%9F%BA%E9%87%91%E8%81%94%E6%8E%A5%E5%9F%BA%E9%87%91%E5%9F%BA%E9%87%91%E5%90%88%E5%90%8C.pdf",
+     "date": "2024-12-12",
+     "catalog": "基金合同",
+     "doc_type": "基金合同"
+    },
+    {
+     "title": "易方达沪深300交易型开放式指数发起式证券投资基金联接基金基金合同",
+     "url": "https://cdn.efunds.com.cn/owch/data/notice/20210330/%E6%98%93%E6%96%B9%E8%BE%BE%E6%B2%AA%E6%B7%B1300%E4%BA%A4%E6%98%93%E5%9E%8B%E5%BC%80%E6%94%BE%E5%BC%8F%E6%8C%87%E6%95%B0%E5%8F%91%E8%B5%B7%E5%BC%8F%E8%AF%81%E5%88%B8%E6%8A%95%E8%B5%84%E5%9F%BA%E9%87%91%E8%81%94%E6%8E%A5%E5%9F%BA%E9%87%91%E5%9F%BA%E9%87%91%E5%90%88%E5%90%8C.pdf",
+     "date": "2021-03-30",
+     "catalog": "基金合同",
+     "doc_type": "基金合同"
+    },
+    {
+     "title": "易方达沪深300交易型开放式指数发起式证券投资基金联接基金基金合同",
+     "url": "https://cdn.efunds.com.cn/owch/data/notice/20201014/%E6%98%93%E6%96%B9%E8%BE%BE%E6%B2%AA%E6%B7%B1300%E4%BA%A4%E6%98%93%E5%9E%8B%E5%BC%80%E6%94%BE%E5%BC%8F%E6%8C%87%E6%95%B0%E5%8F%91%E8%B5%B7%E5%BC%8F%E8%AF%81%E5%88%B8%E6%8A%95%E8%B5%84%E5%9F%BA%E9%87%91%E8%81%94%E6%8E%A5%E5%9F%BA%E9%87%91%E5%9F%BA%E9%87%91%E5%90%88%E5%90%8C.pdf",
+     "date": "2020-10-14",
+     "catalog": "基金合同",
+     "doc_type": "基金合同"
+    },
+    {
+     "title": "易方达沪深300交易型开放式指数发起式证券投资基金联接基金基金合同",
+     "url": "https://cdn.efunds.com.cn/owch/data/bulletin/20191231/%E6%98%93%E6%96%B9%E8%BE%BE%E6%B2%AA%E6%B7%B1300%E4%BA%A4%E6%98%93%E5%9E%8B%E5%BC%80%E6%94%BE%E5%BC%8F%E6%8C%87%E6%95%B0%E5%8F%91%E8%B5%B7%E5%BC%8F%E8%AF%81%E5%88%B8%E6%8A%95%E8%B5%84%E5%9F%BA%E9%87%91%E8%81%94%E6%8E%A5%E5%9F%BA%E9%87%91%E5%9F%BA%E9%87%91%E5%90%88%E5%90%8C.pdf",
+     "date": "2019-12-31",
+     "catalog": "基金合同",
+     "doc_type": "基金合同"
+    },
+    {
+     "title": "易方达沪深300交易型开放式指数发起式证券投资基金联接基金基金合同",
+     "url": "https://cdn.efunds.com.cn/owch/data/bulletin/20190523/%E6%98%93%E6%96%B9%E8%BE%BE%E6%B2%AA%E6%B7%B1300%E4%BA%A4%E6%98%93%E5%9E%8B%E5%BC%80%E6%94%BE%E5%BC%8F%E6%8C%87%E6%95%B0%E5%8F%91%E8%B5%B7%E5%BC%8F%E8%AF%81%E5%88%B8%E6%8A%95%E8%B5%84%E5%9F%BA%E9%87%91%E8%81%94%E6%8E%A5%E5%9F%BA%E9%87%91%E5%9F%BA%E9%87%91%E5%90%88%E5%90%8C.pdf",
+     "date": "2019-05-24",
+     "catalog": "基金合同",
+     "doc_type": "基金合同"
+    },
+    {
+     "title": "易方达沪深300交易型开放式指数发起式证券投资基金联接基金基金合同",
+     "url": "https://cdn.efunds.com.cn/owch/data/bulletin/20190423/%E6%98%93%E6%96%B9%E8%BE%BE%E6%B2%AA%E6%B7%B1300%E4%BA%A4%E6%98%93%E5%9E%8B%E5%BC%80%E6%94%BE%E5%BC%8F%E6%8C%87%E6%95%B0%E5%8F%91%E8%B5%B7%E5%BC%8F%E8%AF%81%E5%88%B8%E6%8A%95%E8%B5%84%E5%9F%BA%E9%87%91%E8%81%94%E6%8E%A5%E5%9F%BA%E9%87%91%E5%9F%BA%E9%87%91%E5%90%88%E5%90%8C.pdf",
+     "date": "2019-04-24",
+     "catalog": "基金合同",
+     "doc_type": "基金合同"
+    },
+    {
+     "title": "易方达沪深300交易型开放式指数发起式证券投资基金联接基金基金合同",
+     "url": "https://cdn.efunds.com.cn/owch/data/bulletin/20180321/%E6%98%93%E6%96%B9%E8%BE%BE%E6%B2%AA%E6%B7%B1300%E4%BA%A4%E6%98%93%E5%9E%8B%E5%BC%80%E6%94%BE%E5%BC%8F%E6%8C%87%E6%95%B0%E5%8F%91%E8%B5%B7%E5%BC%8F%E8%AF%81%E5%88%B8%E6%8A%95%E8%B5%84%E5%9F%BA%E9%87%91%E8%81%94%E6%8E%A5%E5%9F%BA%E9%87%91%E5%9F%BA%E9%87%91%E5%90%88%E5%90%8C.pdf",
+     "date": "2018-03-22",
+     "catalog": "基金合同",
+     "doc_type": "基金合同"
+    },
+    {
+     "title": "易方达沪深300交易型开放式指数发起式证券投资基金联接基金基金合同",
+     "url": "https://cdn.efunds.com.cn/owch/data/2015/01/20150130193854_0_b.pdf",
+     "date": "2015-01-31",
+     "catalog": "基金合同",
+     "doc_type": "基金合同"
+    },
+    {
+     "title": "易方达沪深300交易型开放式指数发起式证券投资基金联接基金基金合同",
+     "url": "https://cdn.efunds.com.cn/owch/data/2013/09/20130918104247_0_3.pdf",
+     "date": "2013-09-18",
+     "catalog": "基金合同",
+     "doc_type": "基金合同"
+    },
+    {
+     "title": "易方达沪深300交易型开放式指数发起式证券投资基金联接基金更新的招募说明书",
+     "url": "https://cdn.efunds.com.cn/owch/data/bulletin/20250321/%E6%98%93%E6%96%B9%E8%BE%BE%E6%B2%AA%E6%B7%B1300%E4%BA%A4%E6%98%93%E5%9E%8B%E5%BC%80%E6%94%BE%E5%BC%8F%E6%8C%87%E6%95%B0%E5%8F%91%E8%B5%B7%E5%BC%8F%E8%AF%81%E5%88%B8%E6%8A%95%E8%B5%84%E5%9F%BA%E9%87%91%E8%81%94%E6%8E%A5%E5%9F%BA%E9%87%91%E6%9B%B4%E6%96%B0%E7%9A%84%E6%8B%9B%E5%8B%9F%E8%AF%B4%E6%98%8E%E4%B9%A6.pdf",
+     "date": "2025-03-21",
+     "catalog": "招募说明书",
+     "doc_type": "招募说明书"
+    },
+    {
+     "title": "易方达沪深300交易型开放式指数发起式证券投资基金联接基金更新的招募说明书",
+     "url": "https://cdn.efunds.com.cn/owch/data/bulletin/20250228/%E6%98%93%E6%96%B9%E8%BE%BE%E6%B2%AA%E6%B7%B1300%E4%BA%A4%E6%98%93%E5%9E%8B%E5%BC%80%E6%94%BE%E5%BC%8F%E6%8C%87%E6%95%B0%E5%8F%91%E8%B5%B7%E5%BC%8F%E8%AF%81%E5%88%B8%E6%8A%95%E8%B5%84%E5%9F%BA%E9%87%91%E8%81%94%E6%8E%A5%E5%9F%BA%E9%87%91%E6%9B%B4%E6%96%B0%E7%9A%84%E6%8B%9B%E5%8B%9F%E8%AF%B4%E6%98%8E%E4%B9%A6.pdf",
+     "date": "2025-02-28",
+     "catalog": "招募说明书",
+     "doc_type": "招募说明书"
+    },
+    {
+     "title": "易方达沪深300交易型开放式指数发起式证券投资基金联接基金更新的招募说明书",
+     "url": "https://cdn.efunds.com.cn/owch/data/bulletin/20241212/%E6%98%93%E6%96%B9%E8%BE%BE%E6%B2%AA%E6%B7%B1300%E4%BA%A4%E6%98%93%E5%9E%8B%E5%BC%80%E6%94%BE%E5%BC%8F%E6%8C%87%E6%95%B0%E5%8F%91%E8%B5%B7%E5%BC%8F%E8%AF%81%E5%88%B8%E6%8A%95%E8%B5%84%E5%9F%BA%E9%87%91%E8%81%94%E6%8E%A5%E5%9F%BA%E9%87%91%E6%9B%B4%E6%96%B0%E7%9A%84%E6%8B%9B%E5%8B%9F%E8%AF%B4%E6%98%8E%E4%B9%A6.pdf",
+     "date": "2024-12-12",
+     "catalog": "招募说明书",
+     "doc_type": "招募说明书"
+    },
+    {
+     "title": "易方达沪深300交易型开放式指数发起式证券投资基金联接基金更新的招募说明书",
+     "url": "https://cdn.efunds.com.cn/owch/data/bulletin/20241207/%E6%98%93%E6%96%B9%E8%BE%BE%E6%B2%AA%E6%B7%B1300%E4%BA%A4%E6%98%93%E5%9E%8B%E5%BC%80%E6%94%BE%E5%BC%8F%E6%8C%87%E6%95%B0%E5%8F%91%E8%B5%B7%E5%BC%8F%E8%AF%81%E5%88%B8%E6%8A%95%E8%B5%84%E5%9F%BA%E9%87%91%E8%81%94%E6%8E%A5%E5%9F%BA%E9%87%91%E6%9B%B4%E6%96%B0%E7%9A%84%E6%8B%9B%E5%8B%9F%E8%AF%B4%E6%98%8E%E4%B9%A6.pdf",
+     "date": "2024-12-07",
+     "catalog": "招募说明书",
+     "doc_type": "招募说明书"
+    },
+    {
+     "title": "易方达沪深300交易型开放式指数发起式证券投资基金联接基金更新的招募说明书",
+     "url": "https://cdn.efunds.com.cn/owch/data/bulletin/20240330/%E6%98%93%E6%96%B9%E8%BE%BE%E6%B2%AA%E6%B7%B1300%E4%BA%A4%E6%98%93%E5%9E%8B%E5%BC%80%E6%94%BE%E5%BC%8F%E6%8C%87%E6%95%B0%E5%8F%91%E8%B5%B7%E5%BC%8F%E8%AF%81%E5%88%B8%E6%8A%95%E8%B5%84%E5%9F%BA%E9%87%91%E8%81%94%E6%8E%A5%E5%9F%BA%E9%87%91%E6%9B%B4%E6%96%B0%E7%9A%84%E6%8B%9B%E5%8B%9F%E8%AF%B4%E6%98%8E%E4%B9%A6.pdf",
+     "date": "2024-03-30",
+     "catalog": "招募说明书",
+     "doc_type": "招募说明书"
+    },
+    {
+     "title": "易方达沪深300交易型开放式指数发起式证券投资基金联接基金更新的招募说明书",
+     "url": "https://cdn.efunds.com.cn/owch/data/bulletin/20230429/%E6%98%93%E6%96%B9%E8%BE%BE%E6%B2%AA%E6%B7%B1300%E4%BA%A4%E6%98%93%E5%9E%8B%E5%BC%80%E6%94%BE%E5%BC%8F%E6%8C%87%E6%95%B0%E5%8F%91%E8%B5%B7%E5%BC%8F%E8%AF%81%E5%88%B8%E6%8A%95%E8%B5%84%E5%9F%BA%E9%87%91%E8%81%94%E6%8E%A5%E5%9F%BA%E9%87%91%E6%9B%B4%E6%96%B0%E7%9A%84%E6%8B%9B%E5%8B%9F%E8%AF%B4%E6%98%8E%E4%B9%A6.pdf",
+     "date": "2023-04-29",
+     "catalog": "招募说明书",
+     "doc_type": "招募说明书"
+    },
+    {
+     "title": "易方达沪深300交易型开放式指数发起式证券投资基金联接基金更新的招募说明书",
+     "url": "https://cdn.efunds.com.cn/owch/data/bulletin/20221220/%E6%98%93%E6%96%B9%E8%BE%BE%E6%B2%AA%E6%B7%B1300%E4%BA%A4%E6%98%93%E5%9E%8B%E5%BC%80%E6%94%BE%E5%BC%8F%E6%8C%87%E6%95%B0%E5%8F%91%E8%B5%B7%E5%BC%8F%E8%AF%81%E5%88%B8%E6%8A%95%E8%B5%84%E5%9F%BA%E9%87%91%E8%81%94%E6%8E%A5%E5%9F%BA%E9%87%91%E6%9B%B4%E6%96%B0%E7%9A%84%E6%8B%9B%E5%8B%9F%E8%AF%B4%E6%98%8E%E4%B9%A6.pdf",
+     "date": "2022-12-20",
+     "catalog": "招募说明书",
+     "doc_type": "招募说明书"
+    },
+    {
+     "title": "易方达沪深300交易型开放式指数发起式证券投资基金联接基金更新的招募说明书",
+     "url": "https://cdn.efunds.com.cn/owch/data/bulletin/20220528/%E6%98%93%E6%96%B9%E8%BE%BE%E6%B2%AA%E6%B7%B1300%E4%BA%A4%E6%98%93%E5%9E%8B%E5%BC%80%E6%94%BE%E5%BC%8F%E6%8C%87%E6%95%B0%E5%8F%91%E8%B5%B7%E5%BC%8F%E8%AF%81%E5%88%B8%E6%8A%95%E8%B5%84%E5%9F%BA%E9%87%91%E8%81%94%E6%8E%A5%E5%9F%BA%E9%87%91%E6%9B%B4%E6%96%B0%E7%9A%84%E6%8B%9B%E5%8B%9F%E8%AF%B4%E6%98%8E%E4%B9%A6.pdf",
+     "date": "2022-05-28",
+     "catalog": "招募说明书",
+     "doc_type": "招募说明书"
+    },
+    {
+     "title": "易方达沪深300交易型开放式指数发起式证券投资基金联接基金更新的招募说明书",
+     "url": "https://cdn.efunds.com.cn/owch/data/notice/20210630/%E6%98%93%E6%96%B9%E8%BE%BE%E6%B2%AA%E6%B7%B1300%E4%BA%A4%E6%98%93%E5%9E%8B%E5%BC%80%E6%94%BE%E5%BC%8F%E6%8C%87%E6%95%B0%E5%8F%91%E8%B5%B7%E5%BC%8F%E8%AF%81%E5%88%B8%E6%8A%95%E8%B5%84%E5%9F%BA%E9%87%91%E8%81%94%E6%8E%A5%E5%9F%BA%E9%87%91%E6%9B%B4%E6%96%B0%E7%9A%84%E6%8B%9B%E5%8B%9F%E8%AF%B4%E6%98%8E%E4%B9%A6.pdf",
+     "date": "2021-06-30",
+     "catalog": "招募说明书",
+     "doc_type": "招募说明书"
+    },
+    {
+     "title": "易方达沪深300交易型开放式指数发起式证券投资基金联接基金更新的招募说明书",
+     "url": "https://cdn.efunds.com.cn/owch/data/notice/20210406/%E6%98%93%E6%96%B9%E8%BE%BE%E6%B2%AA%E6%B7%B1300%E4%BA%A4%E6%98%93%E5%9E%8B%E5%BC%80%E6%94%BE%E5%BC%8F%E6%8C%87%E6%95%B0%E5%8F%91%E8%B5%B7%E5%BC%8F%E8%AF%81%E5%88%B8%E6%8A%95%E8%B5%84%E5%9F%BA%E9%87%91%E8%81%94%E6%8E%A5%E5%9F%BA%E9%87%91%E6%9B%B4%E6%96%B0%E7%9A%84%E6%8B%9B%E5%8B%9F%E8%AF%B4%E6%98%8E%E4%B9%A6.pdf",
+     "date": "2021-04-06",
+     "catalog": "招募说明书",
+     "doc_type": "招募说明书"
+    },
+    {
+     "title": "易方达沪深300交易型开放式指数发起式证券投资基金联接基金更新的招募说明书",
+     "url": "https://cdn.efunds.com.cn/owch/data/bulletin/20201019/%E6%98%93%E6%96%B9%E8%BE%BE%E6%B2%AA%E6%B7%B1300%E4%BA%A4%E6%98%93%E5%9E%8B%E5%BC%80%E6%94%BE%E5%BC%8F%E6%8C%87%E6%95%B0%E5%8F%91%E8%B5%B7%E5%BC%8F%E8%AF%81%E5%88%B8%E6%8A%95%E8%B5%84%E5%9F%BA%E9%87%91%E8%81%94%E6%8E%A5%E5%9F%BA%E9%87%91%E6%9B%B4%E6%96%B0%E7%9A%84%E6%8B%9B%E5%8B%9F%E8%AF%B4%E6%98%8E%E4%B9%A6.pdf",
+     "date": "2020-10-19",
+     "catalog": "招募说明书",
+     "doc_type": "招募说明书"
+    }
+   ],
+   "history_count": 49,
+   "history_versions_missing": false,
+   "text_consistent_with_l3": true,
+   "text_comparison": {
+    "comparable": true,
+    "consistent": true,
+    "l3_weights": [
+     "95%",
+     "5%"
+    ],
+    "contract_weights": [
+     "95%",
+     "5%"
+    ],
+    "normalized_l3": "沪深300指数收益率*95%+活期存款利率(税后)*5%",
+    "normalized_contract": "业绩比较基准沪深300指数收益率*95%+活期存款利率(税后)*5%。未来若出现标的指数不符合法律法规及监管的要求(因成份股价格波动等指数编制方法变动之外的因素致使标的指数不符合要求的情形除外)、指数编制机构退出等情形，基金管理人应当自该情形发生之日起十个工作日向中国证监会报告并提出解决方案，如更换基金标的指数、转换运作方式、与其他基金合并、或者终止基金合同等，并在6个月内召集基金份额持有人大会进行表决。自指数编制机构停止标的指数的编制及发布至解决方案确定期间，基金管理人应按",
+    "note": "第三方文本与合同原文一致"
+   },
+   "evidence_grade": "L1",
+   "not_obtained_reason": null,
+   "disclosed_date": "2025-03-19",
+   "sha256": "80bb2aa2b003bf9a9b8cff813979e09176ab0f73f2eb6db914ff146851de2ff4"
+  },
+  {
+   "fund_id": 16,
+   "fund_code": "161725",
+   "fund_name": "招商中证白酒指数(LOF)",
+   "fund_full_name": "招商中证白酒指数证券投资基金",
+   "fund_company": "招商基金管理有限公司",
+   "category": "lof_offexchange",
+   "l3_benchmark_text": "中证白酒指数收益率×95%＋金融机构人民币活期存款基准利率（税后）×5%",
+   "cninfo": {
+    "org_id": "jjjl0000060",
+    "short_name": "白酒基金LOF",
+    "category": "LOF"
+   },
+   "channel": "巨潮资讯网（证监会指定信息披露网站）",
+   "contract_found": true,
+   "prospectus_found": true,
+   "current_contract": {
+    "obtained": true,
+    "url": "https://static.cninfo.com.cn/finalpage/2025-03-20/1222843411.PDF",
+    "file": "reports/evidence/phase3B6_2_3_0/fund_contracts/161725_基金合同.pdf",
+    "bytes": 827126,
+    "sha256": "364f716c9928dfd3ce12b2331b2a514bd6906228a55d1919a6867a7cc643a248",
+    "readable": true,
+    "text_chars": 59520,
+    "benchmark_excerpt": {
+     "found": true,
+     "excerpts": [
+      "业绩比较基准：中证白酒指数收益率×95％＋金融机构人民币活期存款基准利率（税后）×5%招商基金管理有限公司基金合同52由"
+     ],
+     "primary": "业绩比较基准：中证白酒指数收益率×95％＋金融机构人民币活期存款基准利率（税后）×5%招商基金管理有限公司基金合同52由"
+    },
+    "obtained_at": "2026-11-26T11:17:52",
+    "disclosed_date": "2025-03-20",
+    "doc_type": "基金合同",
+    "title": "招商中证白酒指数证券投资基金基金合同（2025年3月21日修订）"
+   },
+   "current_prospectus": {
+    "obtained": true,
+    "url": "https://static.cninfo.com.cn/finalpage/2026-05-26/1225328714.PDF",
+    "file": "reports/evidence/phase3B6_2_3_0/fund_contracts/161725_招募说明书.pdf",
+    "bytes": 679716,
+    "sha256": "d29c9c99a925991829d041d71ab76e8cdce671159633a92211f27cc4d1c96944",
+    "readable": true,
+    "text_chars": 101863,
+    "benchmark_excerpt": {
+     "found": true,
+     "excerpts": [
+      "业绩比较基准：中证白酒指数收益率×95％＋金融机构人民币活期存款基准利率（税后）×5%。"
+     ],
+     "primary": "业绩比较基准：中证白酒指数收益率×95％＋金融机构人民币活期存款基准利率（税后）×5%。"
+    },
+    "obtained_at": "2026-11-26T11:17:59",
+    "disclosed_date": "2026-05-26",
+    "doc_type": "招募说明书",
+    "title": "招商中证白酒指数证券投资基金更新的招募说明书（二零二六年第一号）"
+   },
+   "history_versions": [
+    {
+     "title": "招商中证白酒指数证券投资基金更新的招募说明书（二零二五年第二号）",
+     "url": "finalpage/2025-05-26/1223645017.PDF",
+     "date": "2025-05-26",
+     "sec_name": "白酒基金LOF",
+     "doc_type": "招募说明书"
+    },
+    {
+     "title": "招商中证白酒指数证券投资基金更新的招募说明书（二零二五年第一号）",
+     "url": "finalpage/2025-03-21/1222856843.PDF",
+     "date": "2025-03-21",
+     "sec_name": "白酒基金LOF",
+     "doc_type": "招募说明书"
+    },
+    {
+     "title": "关于招商基金管理有限公司旗下部分指数基金指数使用费调整为基金管理人承担并修订基金合同的公告",
+     "url": "finalpage/2025-03-20/1222843409.PDF",
+     "date": "2025-03-20",
+     "sec_name": "白酒基金LOF",
+     "doc_type": "基金合同"
+    },
+    {
+     "title": "招商中证白酒指数证券投资基金更新的招募说明书（二零二四年第一号）",
+     "url": "finalpage/2024-05-24/1220145499.PDF",
+     "date": "2024-05-24",
+     "sec_name": "白酒基金LOF",
+     "doc_type": "招募说明书"
+    },
+    {
+     "title": "招商中证白酒指数证券投资基金更新的招募说明书（二零二三年第二号）",
+     "url": "finalpage/2023-07-13/1217284441.PDF",
+     "date": "2023-07-13",
+     "sec_name": "白酒基金LOF",
+     "doc_type": "招募说明书"
+    },
+    {
+     "title": "招商中证白酒指数证券投资基金基金合同（2023年7月10日修订）",
+     "url": "finalpage/2023-07-10/1217255852.PDF",
+     "date": "2023-07-10",
+     "sec_name": "白酒基金LOF",
+     "doc_type": "基金合同"
+    },
+    {
+     "title": "招商中证白酒指数证券投资基金更新的招募说明书（二零二三年第一号）",
+     "url": "finalpage/2023-05-26/1216907928.PDF",
+     "date": "2023-05-26",
+     "sec_name": "白酒基金LOF",
+     "doc_type": "招募说明书"
+    },
+    {
+     "title": "招商中证白酒指数证券投资基金更新的招募说明书（二零二二年第一号）",
+     "url": "finalpage/2022-05-26/1213498222.PDF",
+     "date": "2022-05-26",
+     "sec_name": "白酒基金LOF",
+     "doc_type": "招募说明书"
+    },
+    {
+     "title": "更新招募说明书",
+     "url": "finalpage/2021-05-26/1210087051.PDF",
+     "date": "2021-05-26",
+     "sec_name": "白酒基金",
+     "doc_type": "招募说明书"
+    },
+    {
+     "title": "更新招募说明书",
+     "url": "finalpage/2021-05-21/1210026583.PDF",
+     "date": "2021-05-21",
+     "sec_name": "白酒基金",
+     "doc_type": "招募说明书"
+    },
+    {
+     "title": "基金合同（修订后）",
+     "url": "finalpage/2021-05-18/1209995127.PDF",
+     "date": "2021-05-18",
+     "sec_name": "白酒基金",
+     "doc_type": "基金合同"
+    },
+    {
+     "title": "更新招募说明书",
+     "url": "finalpage/2021-04-06/1209638717.PDF",
+     "date": "2021-04-06",
+     "sec_name": "白酒基金",
+     "doc_type": "招募说明书"
+    },
+    {
+     "title": "基金合同（修订后）",
+     "url": "finalpage/2021-03-31/1209487154.PDF",
+     "date": "2021-03-31",
+     "sec_name": "白酒基金",
+     "doc_type": "基金合同"
+    },
+    {
+     "title": "关于修订旗下部分公募基金基金合同的公告",
+     "url": "finalpage/2021-03-31/1209487153.PDF",
+     "date": "2021-03-31",
+     "sec_name": "白酒基金",
+     "doc_type": "基金合同"
+    },
+    {
+     "title": "更新招募说明书",
+     "url": "finalpage/2021-02-19/1209280189.PDF",
+     "date": "2021-02-19",
+     "sec_name": "白酒基金",
+     "doc_type": "招募说明书"
+    },
+    {
+     "title": "基金合同（修订后）",
+     "url": "finalpage/2021-02-09/1209258159.PDF",
+     "date": "2021-02-09",
+     "sec_name": "白酒基金",
+     "doc_type": "基金合同"
+    },
+    {
+     "title": "关于修订基金合同的公告",
+     "url": "finalpage/2021-02-09/1209258158.PDF",
+     "date": "2021-02-09",
+     "sec_name": "白酒基金",
+     "doc_type": "基金合同"
+    },
+    {
+     "title": "更新招募说明书",
+     "url": "finalpage/2021-01-04/1209033151.PDF",
+     "date": "2021-01-04",
+     "sec_name": "白酒基金",
+     "doc_type": "招募说明书"
+    },
+    {
+     "title": "基金合同（修订后）",
+     "url": "finalpage/2020-12-02/1208828176.PDF",
+     "date": "2020-12-02",
+     "sec_name": "白酒分级",
+     "doc_type": "基金合同"
+    },
+    {
+     "title": "更新招募说明书",
+     "url": "finalpage/2020-11-23/1208773302.PDF",
+     "date": "2020-11-23",
+     "sec_name": "白酒分级",
+     "doc_type": "招募说明书"
+    }
+   ],
+   "history_count": 47,
+   "history_versions_missing": false,
+   "text_consistent_with_l3": true,
+   "text_comparison": {
+    "comparable": true,
+    "consistent": true,
+    "l3_weights": [
+     "95%",
+     "5%"
+    ],
+    "contract_weights": [
+     "95%",
+     "5%"
+    ],
+    "normalized_l3": "中证白酒指数收益率*95%+金融机构人民币活期存款基准利率(税后)*5%",
+    "normalized_contract": "业绩比较基准：中证白酒指数收益率*95%+金融机构人民币活期存款基准利率(税后)*5%招商基金管理有限公司基金合同52由",
+    "note": "第三方文本与合同原文一致"
+   },
+   "evidence_grade": "L1",
+   "not_obtained_reason": null,
+   "disclosed_date": "2025-03-20",
+   "sha256": "364f716c9928dfd3ce12b2331b2a514bd6906228a55d1919a6867a7cc643a248"
+  },
+  {
+   "fund_id": 17,
+   "fund_code": "007300",
+   "fund_name": "国联安中证半导体ETF联接",
+   "fund_full_name": "国联安中证全指半导体产品与设备交易型开放式指数证券投资基金联接基金",
+   "fund_company": "国联安基金管理有限公司",
+   "category": "etf_feeder",
+   "l3_benchmark_text": "中证全指半导体产品与设备指数收益率×95%＋银行活期存款利率（税后）×5%",
+   "cninfo": {
+    "error": "巨潮未检索到该基金代码"
+   },
+   "channel": "未获取（巨潮基金频道仅覆盖场内品种）",
+   "contract_found": false,
+   "prospectus_found": false,
+   "evidence_grade": "L3",
+   "not_obtained_reason": "巨潮资讯基金频道仅收录 LOF/封闭式/ETF 等场内品种，该基金为场外品种，未在巨潮收录；管理人官网渠道未实现",
+   "current_contract": null,
+   "current_prospectus": null,
+   "history_versions": [],
+   "history_versions_missing": true
+  },
+  {
+   "fund_id": 18,
+   "fund_code": "110022",
+   "fund_name": "易方达消费行业股票",
+   "fund_full_name": "易方达消费行业股票型证券投资基金",
+   "fund_company": "易方达基金管理有限公司",
+   "category": "active_equity",
+   "l3_benchmark_text": "中证内地消费主题指数收益率×85%+中债总指数收益率×15%",
+   "cninfo": {
+    "org_id": "9900000461",
+    "short_name": "贴债2381",
+    "category": "国债"
+   },
+   "channel": "管理人官方网站（易方达基金）",
+   "contract_found": true,
+   "prospectus_found": true,
+   "current_contract": {
+    "obtained": true,
+    "url": "https://cdn.efunds.com.cn/owch/data/bulletin/20230708/%E6%98%93%E6%96%B9%E8%BE%BE%E6%B6%88%E8%B4%B9%E8%A1%8C%E4%B8%9A%E8%82%A1%E7%A5%A8%E5%9E%8B%E8%AF%81%E5%88%B8%E6%8A%95%E8%B5%84%E5%9F%BA%E9%87%91%E5%9F%BA%E9%87%91%E5%90%88%E5%90%8C.pdf",
+    "file": "reports/evidence/phase3B6_2_3_0/fund_contracts/110022_基金合同.pdf",
+    "bytes": 976710,
+    "sha256": "e679b433528a8aed8a43212d4cdcb645a56c8f3d793f007e2bceb899dd00b5a9",
+    "readable": true,
+    "text_chars": 69835,
+    "benchmark_excerpt": {
+     "found": true,
+     "excerpts": [
+      "业绩比较基准中证内地消费主题指数收益率×85%+中债总指数收益率×15%本基金股票部分主要投资于主要消费行业和可选消费行业股票。中证内地消费主题指数成份股由主要消费行业股票和可选消费行业股票组成，具有较强的代表性，因此股票部分的业绩基准采用中证内地消费主题指数。固定收益部分的业绩基准则采用了市场上通用的中债总指数。此外，本基金还按照预期的大类资产平均配置比例设置了业绩基准的权重。如果指数编制单位停止计算编制该指数或更改指数名称、或有更适当的、更能为市场普遍接受的业绩比较基准推"
+     ],
+     "primary": "业绩比较基准中证内地消费主题指数收益率×85%+中债总指数收益率×15%本基金股票部分主要投资于主要消费行业和可选消费行业股票。中证内地消费主题指数成份股由主要消费行业股票和可选消费行业股票组成，具有较强的代表性，因此股票部分的业绩基准采用中证内地消费主题指数。固定收益部分的业绩基准则采用了市场上通用的中债总指数。此外，本基金还按照预期的大类资产平均配置比例设置了业绩基准的权重。如果指数编制单位停止计算编制该指数或更改指数名称、或有更适当的、更能为市场普遍接受的业绩比较基准推"
+    },
+    "obtained_at": "2026-11-26T11:18:03",
+    "disclosed_date": "2023-07-08",
+    "doc_type": "基金合同",
+    "title": "易方达消费行业股票型证券投资基金基金合同"
+   },
+   "current_prospectus": {
+    "obtained": true,
+    "url": "https://cdn.efunds.com.cn/owch/data/bulletin/20260131/%E6%98%93%E6%96%B9%E8%BE%BE%E6%B6%88%E8%B4%B9%E8%A1%8C%E4%B8%9A%E8%82%A1%E7%A5%A8%E5%9E%8B%E8%AF%81%E5%88%B8%E6%8A%95%E8%B5%84%E5%9F%BA%E9%87%91%E6%9B%B4%E6%96%B0%E7%9A%84%E6%8B%9B%E5%8B%9F%E8%AF%B4%E6%98%8E%E4%B9%A6.pdf",
+    "file": "reports/evidence/phase3B6_2_3_0/fund_contracts/110022_招募说明书.pdf",
+    "bytes": 1065242,
+    "sha256": "749d31ed94d9b0f700ef4a8c64c174b536a0f11bb8e9a1a78dbd4351d98bd129",
+    "readable": true,
+    "text_chars": 99000,
+    "benchmark_excerpt": {
+     "found": true,
+     "excerpts": [
+      "业绩比较基准中证内地消费主题指数收益率×85%+中债总指数收益率×15%本基金股票部分主要投资于主要消费行业和可选消费行业股票。中证内地消费主题指数成份股由主要消费行业股票和可选消费行业股票组成，具有较强的代表性，因此股票部分的业绩基准采用中证内地消费主题指数。固定收益部分的业绩基准则采用了市场上通用的中债总指数。此外，本基金还按照预期的大类资产平均配置比例设置了业绩基准的权重。43如果指数编制单位停止计算编制该指数或更改指数名称、或有更适当的、更能为市场普遍接受的业绩比较基",
+      "业绩比较基准收益率（3）业绩比较基准收益率标准差（4）(1)-(3)(2)-(4)2016年1月1日至2016年12月31日7.21%1.46%-5.37%1.27%12.58%0.19%2017年1月1日至2017年12月31日64.97%1.06%41.69%0.84%23.28%0.22%2018年1月1日至2018年12月31日-23.47%1.69%-21.93%1.44%-1.54%0.25%2019年1月1日至2019年12月31日71.36%1.45%47.5",
+      "业绩比较基准收益率标准差（4）(1)-(3)(2)-(4)2016年1月1日至2016年12月31日7.21%1.46%-5.37%1.27%12.58%0.19%2017年1月1日至2017年12月31日64.97%1.06%41.69%0.84%23.28%0.22%2018年1月1日至2018年12月31日-23.47%1.69%-21.93%1.44%-1.54%0.25%2019年1月1日至2019年12月31日71.36%1.45%47.56%1.19%23.80"
+     ],
+     "primary": "业绩比较基准中证内地消费主题指数收益率×85%+中债总指数收益率×15%本基金股票部分主要投资于主要消费行业和可选消费行业股票。中证内地消费主题指数成份股由主要消费行业股票和可选消费行业股票组成，具有较强的代表性，因此股票部分的业绩基准采用中证内地消费主题指数。固定收益部分的业绩基准则采用了市场上通用的中债总指数。此外，本基金还按照预期的大类资产平均配置比例设置了业绩基准的权重。43如果指数编制单位停止计算编制该指数或更改指数名称、或有更适当的、更能为市场普遍接受的业绩比较基"
+    },
+    "obtained_at": "2026-11-26T11:18:07",
+    "disclosed_date": "2026-01-31",
+    "doc_type": "招募说明书",
+    "title": "易方达消费行业股票型证券投资基金更新的招募说明书"
+   },
+   "history_versions": [
+    {
+     "title": "易方达消费行业股票型证券投资基金基金合同",
+     "url": "https://cdn.efunds.com.cn/owch/data/bulletin/20201015/%E6%98%93%E6%96%B9%E8%BE%BE%E6%B6%88%E8%B4%B9%E8%A1%8C%E4%B8%9A%E8%82%A1%E7%A5%A8%E5%9E%8B%E8%AF%81%E5%88%B8%E6%8A%95%E8%B5%84%E5%9F%BA%E9%87%91%E5%9F%BA%E9%87%91%E5%90%88%E5%90%8C.pdf",
+     "date": "2020-10-15",
+     "catalog": "基金合同",
+     "doc_type": "基金合同"
+    },
+    {
+     "title": "易方达消费行业股票型证券投资基金基金合同",
+     "url": "https://cdn.efunds.com.cn/owch/data/bulletin/20200711/%E6%98%93%E6%96%B9%E8%BE%BE%E6%B6%88%E8%B4%B9%E8%A1%8C%E4%B8%9A%E8%82%A1%E7%A5%A8%E5%9E%8B%E8%AF%81%E5%88%B8%E6%8A%95%E8%B5%84%E5%9F%BA%E9%87%91%E5%9F%BA%E9%87%91%E5%90%88%E5%90%8C.pdf",
+     "date": "2020-07-11",
+     "catalog": "基金合同",
+     "doc_type": "基金合同"
+    },
+    {
+     "title": "易方达消费行业股票型证券投资基金基金合同",
+     "url": "https://cdn.efunds.com.cn/owch/data/bulletin/20191231/%E6%98%93%E6%96%B9%E8%BE%BE%E6%B6%88%E8%B4%B9%E8%A1%8C%E4%B8%9A%E8%82%A1%E7%A5%A8%E5%9E%8B%E8%AF%81%E5%88%B8%E6%8A%95%E8%B5%84%E5%9F%BA%E9%87%91%E5%9F%BA%E9%87%91%E5%90%88%E5%90%8C.pdf",
+     "date": "2019-12-31",
+     "catalog": "基金合同",
+     "doc_type": "基金合同"
+    },
+    {
+     "title": "易方达消费行业股票型证券投资基金基金合同",
+     "url": "https://cdn.efunds.com.cn/owch/data/bulletin/20180321/%E6%98%93%E6%96%B9%E8%BE%BE%E6%B6%88%E8%B4%B9%E8%A1%8C%E4%B8%9A%E8%82%A1%E7%A5%A8%E5%9E%8B%E8%AF%81%E5%88%B8%E6%8A%95%E8%B5%84%E5%9F%BA%E9%87%91%E5%9F%BA%E9%87%91%E5%90%88%E5%90%8C.pdf",
+     "date": "2018-03-22",
+     "catalog": "基金合同",
+     "doc_type": "基金合同"
+    },
+    {
+     "title": "易方达消费行业股票型证券投资基金基金合同",
+     "url": "https://cdn.efunds.com.cn/owch/data/2010/11/20101116141348_0_hetong.pdf",
+     "date": "2010-07-20",
+     "catalog": "基金合同",
+     "doc_type": "基金合同"
+    },
+    {
+     "title": "易方达消费行业股票型证券投资基金更新的招募说明书",
+     "url": "https://cdn.efunds.com.cn/owch/data/bulletin/20250416/%E6%98%93%E6%96%B9%E8%BE%BE%E6%B6%88%E8%B4%B9%E8%A1%8C%E4%B8%9A%E8%82%A1%E7%A5%A8%E5%9E%8B%E8%AF%81%E5%88%B8%E6%8A%95%E8%B5%84%E5%9F%BA%E9%87%91%E6%9B%B4%E6%96%B0%E7%9A%84%E6%8B%9B%E5%8B%9F%E8%AF%B4%E6%98%8E%E4%B9%A6.pdf",
+     "date": "2025-04-16",
+     "catalog": "招募说明书",
+     "doc_type": "招募说明书"
+    },
+    {
+     "title": "易方达消费行业股票型证券投资基金更新的招募说明书",
+     "url": "https://cdn.efunds.com.cn/owch/data/bulletin/20250228/%E6%98%93%E6%96%B9%E8%BE%BE%E6%B6%88%E8%B4%B9%E8%A1%8C%E4%B8%9A%E8%82%A1%E7%A5%A8%E5%9E%8B%E8%AF%81%E5%88%B8%E6%8A%95%E8%B5%84%E5%9F%BA%E9%87%91%E6%9B%B4%E6%96%B0%E7%9A%84%E6%8B%9B%E5%8B%9F%E8%AF%B4%E6%98%8E%E4%B9%A6.pdf",
+     "date": "2025-02-28",
+     "catalog": "招募说明书",
+     "doc_type": "招募说明书"
+    },
+    {
+     "title": "易方达消费行业股票型证券投资基金更新的招募说明书",
+     "url": "https://cdn.efunds.com.cn/owch/data/bulletin/20240330/%E6%98%93%E6%96%B9%E8%BE%BE%E6%B6%88%E8%B4%B9%E8%A1%8C%E4%B8%9A%E8%82%A1%E7%A5%A8%E5%9E%8B%E8%AF%81%E5%88%B8%E6%8A%95%E8%B5%84%E5%9F%BA%E9%87%91%E6%9B%B4%E6%96%B0%E7%9A%84%E6%8B%9B%E5%8B%9F%E8%AF%B4%E6%98%8E%E4%B9%A6.pdf",
+     "date": "2024-03-30",
+     "catalog": "招募说明书",
+     "doc_type": "招募说明书"
+    },
+    {
+     "title": "易方达消费行业股票型证券投资基金更新的招募说明书",
+     "url": "https://cdn.efunds.com.cn/owch/data/bulletin/20230711/%E6%98%93%E6%96%B9%E8%BE%BE%E6%B6%88%E8%B4%B9%E8%A1%8C%E4%B8%9A%E8%82%A1%E7%A5%A8%E5%9E%8B%E8%AF%81%E5%88%B8%E6%8A%95%E8%B5%84%E5%9F%BA%E9%87%91%E6%9B%B4%E6%96%B0%E7%9A%84%E6%8B%9B%E5%8B%9F%E8%AF%B4%E6%98%8E%E4%B9%A6.pdf",
+     "date": "2023-07-11",
+     "catalog": "招募说明书",
+     "doc_type": "招募说明书"
+    },
+    {
+     "title": "易方达消费行业股票型证券投资基金更新的招募说明书",
+     "url": "https://cdn.efunds.com.cn/owch/data/bulletin/20230429/%E6%98%93%E6%96%B9%E8%BE%BE%E6%B6%88%E8%B4%B9%E8%A1%8C%E4%B8%9A%E8%82%A1%E7%A5%A8%E5%9E%8B%E8%AF%81%E5%88%B8%E6%8A%95%E8%B5%84%E5%9F%BA%E9%87%91%E6%9B%B4%E6%96%B0%E7%9A%84%E6%8B%9B%E5%8B%9F%E8%AF%B4%E6%98%8E%E4%B9%A6.pdf",
+     "date": "2023-04-29",
+     "catalog": "招募说明书",
+     "doc_type": "招募说明书"
+    },
+    {
+     "title": "易方达消费行业股票型证券投资基金更新的招募说明书",
+     "url": "https://cdn.efunds.com.cn/owch/data/bulletin/20220531/%E6%98%93%E6%96%B9%E8%BE%BE%E6%B6%88%E8%B4%B9%E8%A1%8C%E4%B8%9A%E8%82%A1%E7%A5%A8%E5%9E%8B%E8%AF%81%E5%88%B8%E6%8A%95%E8%B5%84%E5%9F%BA%E9%87%91%E6%9B%B4%E6%96%B0%E7%9A%84%E6%8B%9B%E5%8B%9F%E8%AF%B4%E6%98%8E%E4%B9%A6.pdf",
+     "date": "2022-05-31",
+     "catalog": "招募说明书",
+     "doc_type": "招募说明书"
+    },
+    {
+     "title": "易方达消费行业股票型证券投资基金更新的招募说明书",
+     "url": "https://cdn.efunds.com.cn/owch/data/bulletin/20210701/%E6%98%93%E6%96%B9%E8%BE%BE%E6%B6%88%E8%B4%B9%E8%A1%8C%E4%B8%9A%E8%82%A1%E7%A5%A8%E5%9E%8B%E8%AF%81%E5%88%B8%E6%8A%95%E8%B5%84%E5%9F%BA%E9%87%91%E6%9B%B4%E6%96%B0%E7%9A%84%E6%8B%9B%E5%8B%9F%E8%AF%B4%E6%98%8E%E4%B9%A6.pdf",
+     "date": "2021-07-01",
+     "catalog": "招募说明书",
+     "doc_type": "招募说明书"
+    },
+    {
+     "title": "易方达消费行业股票型证券投资基金更新的招募说明书",
+     "url": "https://cdn.efunds.com.cn/owch/data/bulletin/20210120/%E6%98%93%E6%96%B9%E8%BE%BE%E6%B6%88%E8%B4%B9%E8%A1%8C%E4%B8%9A%E8%82%A1%E7%A5%A8%E5%9E%8B%E8%AF%81%E5%88%B8%E6%8A%95%E8%B5%84%E5%9F%BA%E9%87%91%E6%9B%B4%E6%96%B0%E7%9A%84%E6%8B%9B%E5%8B%9F%E8%AF%B4%E6%98%8E%E4%B9%A6.pdf",
+     "date": "2021-01-20",
+     "catalog": "招募说明书",
+     "doc_type": "招募说明书"
+    },
+    {
+     "title": "易方达消费行业股票型证券投资基金更新的招募说明书",
+     "url": "https://cdn.efunds.com.cn/owch/data/bulletin/20201020/%E6%98%93%E6%96%B9%E8%BE%BE%E6%B6%88%E8%B4%B9%E8%A1%8C%E4%B8%9A%E8%82%A1%E7%A5%A8%E5%9E%8B%E8%AF%81%E5%88%B8%E6%8A%95%E8%B5%84%E5%9F%BA%E9%87%91%E6%9B%B4%E6%96%B0%E7%9A%84%E6%8B%9B%E5%8B%9F%E8%AF%B4%E6%98%8E%E4%B9%A6.pdf",
+     "date": "2020-10-20",
+     "catalog": "招募说明书",
+     "doc_type": "招募说明书"
+    },
+    {
+     "title": "易方达消费行业股票型证券投资基金更新的招募说明书摘要",
+     "url": "https://cdn.efunds.com.cn/owch/data/bulletin/20200730/%E6%98%93%E6%96%B9%E8%BE%BE%E6%B6%88%E8%B4%B9%E8%A1%8C%E4%B8%9A%E8%82%A1%E7%A5%A8%E5%9E%8B%E8%AF%81%E5%88%B8%E6%8A%95%E8%B5%84%E5%9F%BA%E9%87%91%E6%9B%B4%E6%96%B0%E7%9A%84%E6%8B%9B%E5%8B%9F%E8%AF%B4%E6%98%8E%E4%B9%A6%E6%91%98%E8%A6%81.pdf",
+     "date": "2020-07-30",
+     "catalog": "招募说明书",
+     "doc_type": "招募说明书"
+    },
+    {
+     "title": "易方达消费行业股票型证券投资基金更新的招募说明书",
+     "url": "https://cdn.efunds.com.cn/owch/data/bulletin/20200730/%E6%98%93%E6%96%B9%E8%BE%BE%E6%B6%88%E8%B4%B9%E8%A1%8C%E4%B8%9A%E8%82%A1%E7%A5%A8%E5%9E%8B%E8%AF%81%E5%88%B8%E6%8A%95%E8%B5%84%E5%9F%BA%E9%87%91%E6%9B%B4%E6%96%B0%E7%9A%84%E6%8B%9B%E5%8B%9F%E8%AF%B4%E6%98%8E%E4%B9%A6.pdf",
+     "date": "2020-07-30",
+     "catalog": "招募说明书",
+     "doc_type": "招募说明书"
+    },
+    {
+     "title": "易方达消费行业股票型证券投资基金更新的招募说明书摘要",
+     "url": "https://cdn.efunds.com.cn/owch/data/bulletin/20200715/%E6%98%93%E6%96%B9%E8%BE%BE%E6%B6%88%E8%B4%B9%E8%A1%8C%E4%B8%9A%E8%82%A1%E7%A5%A8%E5%9E%8B%E8%AF%81%E5%88%B8%E6%8A%95%E8%B5%84%E5%9F%BA%E9%87%91%E6%9B%B4%E6%96%B0%E7%9A%84%E6%8B%9B%E5%8B%9F%E8%AF%B4%E6%98%8E%E4%B9%A6%E6%91%98%E8%A6%81.pdf",
+     "date": "2020-07-15",
+     "catalog": "招募说明书",
+     "doc_type": "招募说明书"
+    },
+    {
+     "title": "易方达消费行业股票型证券投资基金更新的招募说明书",
+     "url": "https://cdn.efunds.com.cn/owch/data/bulletin/20200715/%E6%98%93%E6%96%B9%E8%BE%BE%E6%B6%88%E8%B4%B9%E8%A1%8C%E4%B8%9A%E8%82%A1%E7%A5%A8%E5%9E%8B%E8%AF%81%E5%88%B8%E6%8A%95%E8%B5%84%E5%9F%BA%E9%87%91%E6%9B%B4%E6%96%B0%E7%9A%84%E6%8B%9B%E5%8B%9F%E8%AF%B4%E6%98%8E%E4%B9%A6.pdf",
+     "date": "2020-07-15",
+     "catalog": "招募说明书",
+     "doc_type": "招募说明书"
+    },
+    {
+     "title": "易方达消费行业股票型证券投资基金更新的招募说明书摘要",
+     "url": "https://cdn.efunds.com.cn/owch/data/bulletin/20200103/%E6%98%93%E6%96%B9%E8%BE%BE%E6%B6%88%E8%B4%B9%E8%A1%8C%E4%B8%9A%E8%82%A1%E7%A5%A8%E5%9E%8B%E8%AF%81%E5%88%B8%E6%8A%95%E8%B5%84%E5%9F%BA%E9%87%91%E6%9B%B4%E6%96%B0%E7%9A%84%E6%8B%9B%E5%8B%9F%E8%AF%B4%E6%98%8E%E4%B9%A6%E6%91%98%E8%A6%81.pdf",
+     "date": "2020-01-03",
+     "catalog": "招募说明书",
+     "doc_type": "招募说明书"
+    },
+    {
+     "title": "易方达消费行业股票型证券投资基金更新的招募说明书",
+     "url": "https://cdn.efunds.com.cn/owch/data/bulletin/20200103/%E6%98%93%E6%96%B9%E8%BE%BE%E6%B6%88%E8%B4%B9%E8%A1%8C%E4%B8%9A%E8%82%A1%E7%A5%A8%E5%9E%8B%E8%AF%81%E5%88%B8%E6%8A%95%E8%B5%84%E5%9F%BA%E9%87%91%E6%9B%B4%E6%96%B0%E7%9A%84%E6%8B%9B%E5%8B%9F%E8%AF%B4%E6%98%8E%E4%B9%A6.pdf",
+     "date": "2020-01-03",
+     "catalog": "招募说明书",
+     "doc_type": "招募说明书"
+    }
+   ],
+   "history_count": 57,
+   "history_versions_missing": false,
+   "text_consistent_with_l3": true,
+   "text_comparison": {
+    "comparable": true,
+    "consistent": true,
+    "l3_weights": [
+     "85%",
+     "15%"
+    ],
+    "contract_weights": [
+     "85%",
+     "15%"
+    ],
+    "normalized_l3": "中证内地消费主题指数收益率*85%+中债总指数收益率*15%",
+    "normalized_contract": "业绩比较基准中证内地消费主题指数收益率*85%+中债总指数收益率*15%本基金股票部分主要投资于主要消费行业和可选消费行业股票。中证内地消费主题指数成份股由主要消费行业股票和可选消费行业股票组成，具有较强的代表性，因此股票部分的业绩基准采用中证内地消费主题指数。固定收益部分的业绩基准则采用了市场上通用的中债总指数。此外，本基金还按照预期的大类资产平均配置比例设置了业绩基准的权重。如果指数编制单位停止计算编制该指数或更改指数名称、或有更适当的、更能为市场普遍接受的业绩比较基准推",
+    "note": "第三方文本与合同原文一致"
+   },
+   "evidence_grade": "L1",
+   "not_obtained_reason": null,
+   "disclosed_date": "2023-07-08",
+   "sha256": "e679b433528a8aed8a43212d4cdcb645a56c8f3d793f007e2bceb899dd00b5a9"
+  },
+  {
+   "fund_id": 19,
+   "fund_code": "161005",
+   "fund_name": "富国天惠成长混合(LOF)",
+   "fund_full_name": "富国天惠精选成长混合型证券投资基金(LOF)",
+   "fund_company": "富国基金管理有限公司",
+   "category": "lof_offexchange",
+   "l3_benchmark_text": "沪深300指数收益率×70%+中债综合全价指数收益率×25%+同业存款利率×5%",
+   "cninfo": {
+    "org_id": "jjjl0000040",
+    "short_name": "富国天惠LOF",
+    "category": "LOF"
+   },
+   "channel": "巨潮资讯网（证监会指定信息披露网站）",
+   "contract_found": true,
+   "prospectus_found": true,
+   "current_contract": {
+    "obtained": true,
+    "url": "https://static.cninfo.com.cn/finalpage/2026-10-31/1225650213.PDF",
+    "file": "reports/evidence/phase3B6_2_3_0/fund_contracts/161005_基金合同.pdf",
+    "bytes": 1565429,
+    "sha256": "c4c67d135aeac27af6f8f475785a1028dc3608d72f5d15404686ef5888a44b7e",
+    "readable": true,
+    "text_chars": 54066,
+    "benchmark_excerpt": {
+     "found": true,
+     "excerpts": [
+      "业绩比较基准：沪深300指数收益率*90%+中债-国债总全价（1-3年）指数收益率*5%+同业存款利率*5%1",
+      "业绩比较基准是表征产品风格、衡量产品业绩、约束投资行为的参考标准，并非本"
+     ],
+     "primary": "业绩比较基准：沪深300指数收益率*90%+中债-国债总全价（1-3年）指数收益率*5%+同业存款利率*5%1"
+    },
+    "obtained_at": "2026-11-26T11:18:15",
+    "disclosed_date": "2026-10-31",
+    "doc_type": "基金合同",
+    "title": "富国天惠精选成长混合型证券投资基金（LOF）基金合同"
+   },
+   "current_prospectus": {
+    "obtained": true,
+    "url": "https://static.cninfo.com.cn/finalpage/2026-06-16/1225371978.PDF",
+    "file": "reports/evidence/phase3B6_2_3_0/fund_contracts/161005_招募说明书.pdf",
+    "bytes": 2054442,
+    "sha256": "32dad677bfea7ef5e41a66f2bdc3fab33bb9c6c55892fbf5700b0ff9e9673baa",
+    "readable": true,
+    "text_chars": 116325,
+    "benchmark_excerpt": {
+     "found": true,
+     "excerpts": [
+      "业绩比较基准为：沪深300指数收益率×70%+中债综合全价指数收益率×25%+同业存款利率×5%。"
+     ],
+     "primary": "业绩比较基准为：沪深300指数收益率×70%+中债综合全价指数收益率×25%+同业存款利率×5%。"
+    },
+    "obtained_at": "2026-11-26T11:18:24",
+    "disclosed_date": "2026-06-16",
+    "doc_type": "招募说明书",
+    "title": "富国天惠精选成长混合型证券投资基金（LOF）招募说明书（更新）(2026年第1号)"
+   },
+   "history_versions": [
+    {
+     "title": "富国基金管理有限公司关于旗下部分基金调整业绩比较基准并修订基金合同等法律文件的公告",
+     "url": "finalpage/2026-10-31/1225650168.PDF",
+     "date": "2026-10-31",
+     "sec_name": "富国天惠LOF",
+     "doc_type": "基金合同"
+    },
+    {
+     "title": "富国天惠精选成长混合型证券投资基金（LOF）招募说明书（更新）(2025年第1号)",
+     "url": "finalpage/2025-05-29/1223713224.PDF",
+     "date": "2025-05-29",
+     "sec_name": "富国天惠LOF",
+     "doc_type": "招募说明书"
+    },
+    {
+     "title": "富国天惠精选成长混合型证券投资基金（LOF）招募说明书（更新）(2024年第2号)",
+     "url": "finalpage/2024-11-18/1221741888.PDF",
+     "date": "2024-11-18",
+     "sec_name": "富国天惠LOF",
+     "doc_type": "招募说明书"
+    },
+    {
+     "title": "富国天惠精选成长混合型证券投资基金（LOF）基金合同",
+     "url": "finalpage/2024-11-18/1221741886.PDF",
+     "date": "2024-11-18",
+     "sec_name": "富国天惠LOF",
+     "doc_type": "基金合同"
+    },
+    {
+     "title": "富国天惠精选成长混合型证券投资基金（LOF）招募说明书（更新）(2024年第1号)",
+     "url": "finalpage/2024-05-10/1220021626.PDF",
+     "date": "2024-05-10",
+     "sec_name": "富国天惠LOF",
+     "doc_type": "招募说明书"
+    },
+    {
+     "title": "富国天惠精选成长混合型证券投资基金（LOF）招募说明书（更新）(2023年第2号)",
+     "url": "finalpage/2023-07-11/1217265526.PDF",
+     "date": "2023-07-11",
+     "sec_name": "富国天惠LOF",
+     "doc_type": "招募说明书"
+    },
+    {
+     "title": "富国天惠精选成长混合型证券投资基金（LOF）基金合同",
+     "url": "finalpage/2023-07-10/1217247977.PDF",
+     "date": "2023-07-10",
+     "sec_name": "富国天惠LOF",
+     "doc_type": "基金合同"
+    },
+    {
+     "title": "富国天惠精选成长混合型证券投资基金（LOF）招募说明书（更新）(2023年第1号)",
+     "url": "finalpage/2023-05-24/1216884778.PDF",
+     "date": "2023-05-24",
+     "sec_name": "富国天惠LOF",
+     "doc_type": "招募说明书"
+    },
+    {
+     "title": "富国天惠精选成长混合型证券投资基金（LOF）招募说明书（更新）(2022年第1号)",
+     "url": "finalpage/2022-06-16/1213722033.PDF",
+     "date": "2022-06-16",
+     "sec_name": "富国天惠LOF",
+     "doc_type": "招募说明书"
+    },
+    {
+     "title": "更新招募说明书",
+     "url": "finalpage/2021-06-08/1210183618.PDF",
+     "date": "2021-06-08",
+     "sec_name": "富国天惠",
+     "doc_type": "招募说明书"
+    },
+    {
+     "title": "更新招募说明书",
+     "url": "finalpage/2020-12-30/1209015576.PDF",
+     "date": "2020-12-30",
+     "sec_name": "富国天惠",
+     "doc_type": "招募说明书"
+    },
+    {
+     "title": "更新招募说明书摘要",
+     "url": "finalpage/2020-06-05/1207897422.PDF",
+     "date": "2020-06-05",
+     "sec_name": "富国天惠",
+     "doc_type": "招募说明书"
+    },
+    {
+     "title": "更新招募说明书",
+     "url": "finalpage/2020-06-05/1207897421.PDF",
+     "date": "2020-06-05",
+     "sec_name": "富国天惠",
+     "doc_type": "招募说明书"
+    },
+    {
+     "title": "关于根据《公开募集证券投资基金信息披露管理办法》修订旗下公募基金基金合同的公告",
+     "url": "finalpage/2020-01-20/1207264825.PDF",
+     "date": "2020-01-20",
+     "sec_name": "富国天惠",
+     "doc_type": "基金合同"
+    },
+    {
+     "title": "更新招募说明书摘要",
+     "url": "finalpage/2020-01-20/1207264390.PDF",
+     "date": "2020-01-20",
+     "sec_name": "富国天惠",
+     "doc_type": "招募说明书"
+    },
+    {
+     "title": "更新招募说明书",
+     "url": "finalpage/2020-01-20/1207264389.PDF",
+     "date": "2020-01-20",
+     "sec_name": "富国天惠",
+     "doc_type": "招募说明书"
+    },
+    {
+     "title": "更新招募说明书摘要（2019年第1号）",
+     "url": "finalpage/2019-06-18/1206361509.PDF",
+     "date": "2019-06-18",
+     "sec_name": "富国天惠",
+     "doc_type": "招募说明书"
+    },
+    {
+     "title": "更新招募说明书（2019年第1号）",
+     "url": "finalpage/2019-06-18/1206361508.PDF",
+     "date": "2019-06-18",
+     "sec_name": "富国天惠",
+     "doc_type": "招募说明书"
+    },
+    {
+     "title": "更新招募说明书摘要（2018年第2号）",
+     "url": "finalpage/2018-12-27/1205696042.PDF",
+     "date": "2018-12-27",
+     "sec_name": "富国天惠",
+     "doc_type": "招募说明书"
+    },
+    {
+     "title": "更新招募说明书（2018年第2号）",
+     "url": "finalpage/2018-12-27/1205696041.PDF",
+     "date": "2018-12-27",
+     "sec_name": "富国天惠",
+     "doc_type": "招募说明书"
+    }
+   ],
+   "history_count": 68,
+   "history_versions_missing": false,
+   "text_consistent_with_l3": false,
+   "text_comparison": {
+    "comparable": true,
+    "consistent": false,
+    "l3_weights": [
+     "70%",
+     "25%",
+     "5%"
+    ],
+    "contract_weights": [
+     "90%",
+     "5%",
+     "5%"
+    ],
+    "normalized_l3": "沪深300指数收益率*70%+中债综合全价指数收益率*25%+同业存款利率*5%",
+    "normalized_contract": "业绩比较基准：沪深300指数收益率*90%+中债-国债总全价(1-3年)指数收益率*5%+同业存款利率*5%1",
+    "note": "第三方文本与合同原文**不一致**（可能为历史版本或第三方转录误差）"
+   },
+   "evidence_grade": "L1",
+   "not_obtained_reason": null,
+   "disclosed_date": "2026-10-31",
+   "sha256": "c4c67d135aeac27af6f8f475785a1028dc3608d72f5d15404686ef5888a44b7e"
+  },
+  {
+   "fund_id": 20,
+   "fund_code": "000478",
+   "fund_name": "建信中证500指数增强",
+   "fund_full_name": "建信中证500指数增强型证券投资基金",
+   "fund_company": "建信基金管理有限责任公司",
+   "category": "index_plain",
+   "l3_benchmark_text": "95%×中证500指数收益率+5%×商业银行活期存款利率（税前）",
+   "cninfo": {
+    "error": "巨潮未检索到该基金代码"
+   },
+   "channel": "未获取（巨潮基金频道仅覆盖场内品种）",
+   "contract_found": false,
+   "prospectus_found": false,
+   "evidence_grade": "L3",
+   "not_obtained_reason": "巨潮资讯基金频道仅收录 LOF/封闭式/ETF 等场内品种，该基金为场外品种，未在巨潮收录；管理人官网渠道未实现",
+   "current_contract": null,
+   "current_prospectus": null,
+   "history_versions": [],
+   "history_versions_missing": true
+  },
+  {
+   "fund_id": 21,
+   "fund_code": "000015",
+   "fund_name": "华夏纯债债券",
+   "fund_full_name": "华夏纯债债券型证券投资基金",
+   "fund_company": "华夏基金管理有限公司",
+   "category": "pure_bond",
+   "l3_benchmark_text": "中债综合指数",
+   "cninfo": {
+    "org_id": "gssz0000015",
+    "short_name": "PT中浩Ａ",
+    "category": "A股"
+   },
+   "channel": "巨潮资讯网（证监会指定信息披露网站）",
+   "contract_found": false,
+   "prospectus_found": false,
+   "current_contract": {
+    "obtained": false,
+    "reason": "未检索到官方公告"
+   },
+   "current_prospectus": {
+    "obtained": false,
+    "reason": "未检索到官方公告"
+   },
+   "history_versions": [],
+   "history_count": 0,
+   "history_versions_missing": true,
+   "text_consistent_with_l3": null,
+   "text_comparison": {
+    "comparable": false
+   },
+   "evidence_grade": "L3",
+   "not_obtained_reason": "未检索到官方公告",
+   "disclosed_date": null,
+   "sha256": null
+  },
+  {
+   "fund_id": 66,
+   "fund_code": "000961",
+   "fund_name": "天弘沪深300ETF联接",
+   "fund_full_name": "天弘沪深300交易型开放式指数证券投资基金联接基金",
+   "fund_company": "天弘基金管理有限公司",
+   "category": "etf_feeder",
+   "l3_benchmark_text": "沪深300指数收益率×95%＋银行活期存款利率（税后）×5%",
+   "cninfo": {
+    "org_id": "gssz0000961",
+    "short_name": "ST中南",
+    "category": "A股"
+   },
+   "channel": "巨潮资讯网（证监会指定信息披露网站）",
+   "contract_found": false,
+   "prospectus_found": false,
+   "current_contract": {
+    "obtained": false,
+    "reason": "未检索到官方公告"
+   },
+   "current_prospectus": {
+    "obtained": false,
+    "reason": "未检索到官方公告"
+   },
+   "history_versions": [],
+   "history_count": 0,
+   "history_versions_missing": true,
+   "text_consistent_with_l3": null,
+   "text_comparison": {
+    "comparable": false
+   },
+   "evidence_grade": "L3",
+   "not_obtained_reason": "未检索到官方公告",
+   "disclosed_date": null,
+   "sha256": null
+  },
+  {
+   "fund_id": 67,
+   "fund_code": "012346",
+   "fund_name": "易方达港股通成长混合",
+   "fund_full_name": "易方达港股通成长混合型证券投资基金",
+   "fund_company": "易方达基金管理有限公司",
+   "category": "active_equity",
+   "l3_benchmark_text": "中证港股通综合指数(人民币)收益率×75%+中证500指数收益率×10%+中债-总全价(总值)指数收益率×15%",
+   "cninfo": {
+    "error": "巨潮未检索到该基金代码"
+   },
+   "channel": "管理人官方网站（易方达基金）",
+   "contract_found": true,
+   "prospectus_found": true,
+   "current_contract": {
+    "obtained": true,
+    "url": "https://cdn.efunds.com.cn/owch/data/bulletin/20260821/%E6%98%93%E6%96%B9%E8%BE%BE%E6%B8%AF%E8%82%A1%E9%80%9A%E6%88%90%E9%95%BF%E6%B7%B7%E5%90%88%E5%9E%8B%E8%AF%81%E5%88%B8%E6%8A%95%E8%B5%84%E5%9F%BA%E9%87%91%E5%9F%BA%E9%87%91%E5%90%88%E5%90%8C.pdf",
+    "file": "reports/evidence/phase3B6_2_3_0/fund_contracts/012346_基金合同.pdf",
+    "bytes": 1214530,
+    "sha256": "f9d0eeff17205d7090b25cde7d0fa16888eb05a2d1f185ca2ec0adff61400bdc",
+    "readable": true,
+    "text_chars": 77179,
+    "benchmark_excerpt": {
+     "found": true,
+     "excerpts": [
+      "业绩比较基准为：中证港股通综合指数（人民币）收益率×75%+中证500指数收益率×10%+中债-总全价（总值）指数收益率×15%1",
+      "业绩比较基准是表征产品风格、衡量产品业绩、约束投资行为的参考标准，并非本"
+     ],
+     "primary": "业绩比较基准为：中证港股通综合指数（人民币）收益率×75%+中证500指数收益率×10%+中债-总全价（总值）指数收益率×15%1"
+    },
+    "obtained_at": "2026-11-26T11:18:29",
+    "disclosed_date": "2026-08-21",
+    "doc_type": "基金合同",
+    "title": "易方达港股通成长混合型证券投资基金基金合同"
+   },
+   "current_prospectus": {
+    "obtained": true,
+    "url": "https://cdn.efunds.com.cn/owch/data/bulletin/20260928/%E6%98%93%E6%96%B9%E8%BE%BE%E6%B8%AF%E8%82%A1%E9%80%9A%E6%88%90%E9%95%BF%E6%B7%B7%E5%90%88%E5%9E%8B%E8%AF%81%E5%88%B8%E6%8A%95%E8%B5%84%E5%9F%BA%E9%87%91%E6%9B%B4%E6%96%B0%E7%9A%84%E6%8B%9B%E5%8B%9F%E8%AF%B4%E6%98%8E%E4%B9%A6.pdf",
+    "file": "reports/evidence/phase3B6_2_3_0/fund_contracts/012346_招募说明书.pdf",
+    "bytes": 967266,
+    "sha256": "33903bb16b18933e958546acc1e053401fe9263065d8e9b2acb7d1f7714ea718",
+    "readable": true,
+    "text_chars": 108541,
+    "benchmark_excerpt": {
+     "found": true,
+     "excerpts": [
+      "业绩比较基准为：中证港股通综合指数（人民币）收益率×75%+中证500指数收益率×10%+中债-总全价（总值）指数收益率×15%1",
+      "业绩比较基准是表征产品风格、衡量产品业绩、约束投资行为的参考标准，并非本"
+     ],
+     "primary": "业绩比较基准为：中证港股通综合指数（人民币）收益率×75%+中证500指数收益率×10%+中债-总全价（总值）指数收益率×15%1"
+    },
+    "obtained_at": "2026-11-26T11:18:33",
+    "disclosed_date": "2026-09-28",
+    "doc_type": "招募说明书",
+    "title": "易方达港股通成长混合型证券投资基金更新的招募说明书"
+   },
+   "history_versions": [
+    {
+     "title": "易方达港股通成长混合型证券投资基金基金合同",
+     "url": "https://cdn.efunds.com.cn/owch/data/bulletin/20230708/%E6%98%93%E6%96%B9%E8%BE%BE%E6%B8%AF%E8%82%A1%E9%80%9A%E6%88%90%E9%95%BF%E6%B7%B7%E5%90%88%E5%9E%8B%E8%AF%81%E5%88%B8%E6%8A%95%E8%B5%84%E5%9F%BA%E9%87%91%E5%9F%BA%E9%87%91%E5%90%88%E5%90%8C.pdf",
+     "date": "2023-07-08",
+     "catalog": "基金合同",
+     "doc_type": "基金合同"
+    },
+    {
+     "title": "易方达港股通成长混合型证券投资基金基金合同",
+     "url": "https://cdn.efunds.com.cn/owch/data/bulletin/20210722/%E6%98%93%E6%96%B9%E8%BE%BE%E6%B8%AF%E8%82%A1%E9%80%9A%E6%88%90%E9%95%BF%E6%B7%B7%E5%90%88%E5%9E%8B%E8%AF%81%E5%88%B8%E6%8A%95%E8%B5%84%E5%9F%BA%E9%87%91%E5%9F%BA%E9%87%91%E5%90%88%E5%90%8C.pdf",
+     "date": "2021-07-22",
+     "catalog": "基金合同",
+     "doc_type": "基金合同"
+    },
+    {
+     "title": "易方达港股通成长混合型证券投资基金更新的招募说明书",
+     "url": "https://cdn.efunds.com.cn/owch/data/bulletin/20260921/%E6%98%93%E6%96%B9%E8%BE%BE%E6%B8%AF%E8%82%A1%E9%80%9A%E6%88%90%E9%95%BF%E6%B7%B7%E5%90%88%E5%9E%8B%E8%AF%81%E5%88%B8%E6%8A%95%E8%B5%84%E5%9F%BA%E9%87%91%E6%9B%B4%E6%96%B0%E7%9A%84%E6%8B%9B%E5%8B%9F%E8%AF%B4%E6%98%8E%E4%B9%A6.pdf",
+     "date": "2026-09-21",
+     "catalog": "招募说明书",
+     "doc_type": "招募说明书"
+    },
+    {
+     "title": "易方达港股通成长混合型证券投资基金更新的招募说明书",
+     "url": "https://cdn.efunds.com.cn/owch/data/bulletin/20260228/%E6%98%93%E6%96%B9%E8%BE%BE%E6%B8%AF%E8%82%A1%E9%80%9A%E6%88%90%E9%95%BF%E6%B7%B7%E5%90%88%E5%9E%8B%E8%AF%81%E5%88%B8%E6%8A%95%E8%B5%84%E5%9F%BA%E9%87%91%E6%9B%B4%E6%96%B0%E7%9A%84%E6%8B%9B%E5%8B%9F%E8%AF%B4%E6%98%8E%E4%B9%A6.pdf",
+     "date": "2026-02-28",
+     "catalog": "招募说明书",
+     "doc_type": "招募说明书"
+    },
+    {
+     "title": "易方达港股通成长混合型证券投资基金更新的招募说明书",
+     "url": "https://cdn.efunds.com.cn/owch/data/bulletin/20250407/%E6%98%93%E6%96%B9%E8%BE%BE%E6%B8%AF%E8%82%A1%E9%80%9A%E6%88%90%E9%95%BF%E6%B7%B7%E5%90%88%E5%9E%8B%E8%AF%81%E5%88%B8%E6%8A%95%E8%B5%84%E5%9F%BA%E9%87%91%E6%9B%B4%E6%96%B0%E7%9A%84%E6%8B%9B%E5%8B%9F%E8%AF%B4%E6%98%8E%E4%B9%A6.pdf",
+     "date": "2025-04-07",
+     "catalog": "招募说明书",
+     "doc_type": "招募说明书"
+    },
+    {
+     "title": "易方达港股通成长混合型证券投资基金更新的招募说明书",
+     "url": "https://cdn.efunds.com.cn/owch/data/bulletin/20241207/%E6%98%93%E6%96%B9%E8%BE%BE%E6%B8%AF%E8%82%A1%E9%80%9A%E6%88%90%E9%95%BF%E6%B7%B7%E5%90%88%E5%9E%8B%E8%AF%81%E5%88%B8%E6%8A%95%E8%B5%84%E5%9F%BA%E9%87%91%E6%9B%B4%E6%96%B0%E7%9A%84%E6%8B%9B%E5%8B%9F%E8%AF%B4%E6%98%8E%E4%B9%A6.pdf",
+     "date": "2024-12-07",
+     "catalog": "招募说明书",
+     "doc_type": "招募说明书"
+    },
+    {
+     "title": "易方达港股通成长混合型证券投资基金更新的招募说明书",
+     "url": "https://cdn.efunds.com.cn/owch/data/bulletin/20240430/%E6%98%93%E6%96%B9%E8%BE%BE%E6%B8%AF%E8%82%A1%E9%80%9A%E6%88%90%E9%95%BF%E6%B7%B7%E5%90%88%E5%9E%8B%E8%AF%81%E5%88%B8%E6%8A%95%E8%B5%84%E5%9F%BA%E9%87%91%E6%9B%B4%E6%96%B0%E7%9A%84%E6%8B%9B%E5%8B%9F%E8%AF%B4%E6%98%8E%E4%B9%A6.pdf",
+     "date": "2024-04-30",
+     "catalog": "招募说明书",
+     "doc_type": "招募说明书"
+    },
+    {
+     "title": "易方达港股通成长混合型证券投资基金更新的招募说明书",
+     "url": "https://cdn.efunds.com.cn/owch/data/bulletin/20230711/%E6%98%93%E6%96%B9%E8%BE%BE%E6%B8%AF%E8%82%A1%E9%80%9A%E6%88%90%E9%95%BF%E6%B7%B7%E5%90%88%E5%9E%8B%E8%AF%81%E5%88%B8%E6%8A%95%E8%B5%84%E5%9F%BA%E9%87%91%E6%9B%B4%E6%96%B0%E7%9A%84%E6%8B%9B%E5%8B%9F%E8%AF%B4%E6%98%8E%E4%B9%A6.pdf",
+     "date": "2023-07-11",
+     "catalog": "招募说明书",
+     "doc_type": "招募说明书"
+    },
+    {
+     "title": "易方达港股通成长混合型证券投资基金更新的招募说明书",
+     "url": "https://cdn.efunds.com.cn/owch/data/bulletin/20230531/%E6%98%93%E6%96%B9%E8%BE%BE%E6%B8%AF%E8%82%A1%E9%80%9A%E6%88%90%E9%95%BF%E6%B7%B7%E5%90%88%E5%9E%8B%E8%AF%81%E5%88%B8%E6%8A%95%E8%B5%84%E5%9F%BA%E9%87%91%E6%9B%B4%E6%96%B0%E7%9A%84%E6%8B%9B%E5%8B%9F%E8%AF%B4%E6%98%8E%E4%B9%A6.pdf",
+     "date": "2023-05-31",
+     "catalog": "招募说明书",
+     "doc_type": "招募说明书"
+    },
+    {
+     "title": "易方达港股通成长混合型证券投资基金更新的招募说明书",
+     "url": "https://cdn.efunds.com.cn/owch/data/bulletin/20220629/%E6%98%93%E6%96%B9%E8%BE%BE%E6%B8%AF%E8%82%A1%E9%80%9A%E6%88%90%E9%95%BF%E6%B7%B7%E5%90%88%E5%9E%8B%E8%AF%81%E5%88%B8%E6%8A%95%E8%B5%84%E5%9F%BA%E9%87%91%E6%9B%B4%E6%96%B0%E7%9A%84%E6%8B%9B%E5%8B%9F%E8%AF%B4%E6%98%8E%E4%B9%A6.pdf",
+     "date": "2022-06-29",
+     "catalog": "招募说明书",
+     "doc_type": "招募说明书"
+    },
+    {
+     "title": "易方达港股通成长混合型证券投资基金招募说明书",
+     "url": "https://cdn.efunds.com.cn/owch/data/bulletin/20210722/%E6%98%93%E6%96%B9%E8%BE%BE%E6%B8%AF%E8%82%A1%E9%80%9A%E6%88%90%E9%95%BF%E6%B7%B7%E5%90%88%E5%9E%8B%E8%AF%81%E5%88%B8%E6%8A%95%E8%B5%84%E5%9F%BA%E9%87%91%E6%8B%9B%E5%8B%9F%E8%AF%B4%E6%98%8E%E4%B9%A6.pdf",
+     "date": "2021-07-22",
+     "catalog": "招募说明书",
+     "doc_type": "招募说明书"
+    }
+   ],
+   "history_count": 11,
+   "history_versions_missing": false,
+   "text_consistent_with_l3": true,
+   "text_comparison": {
+    "comparable": true,
+    "consistent": true,
+    "l3_weights": [
+     "75%",
+     "10%",
+     "15%"
+    ],
+    "contract_weights": [
+     "75%",
+     "10%",
+     "15%"
+    ],
+    "normalized_l3": "中证港股通综合指数(人民币)收益率*75%+中证500指数收益率*10%+中债-总全价(总值)指数收益率*15%",
+    "normalized_contract": "业绩比较基准为：中证港股通综合指数(人民币)收益率*75%+中证500指数收益率*10%+中债-总全价(总值)指数收益率*15%1",
+    "note": "第三方文本与合同原文一致"
+   },
+   "evidence_grade": "L1",
+   "not_obtained_reason": null,
+   "disclosed_date": "2026-08-21",
+   "sha256": "f9d0eeff17205d7090b25cde7d0fa16888eb05a2d1f185ca2ec0adff61400bdc"
+  },
+  {
+   "fund_id": 68,
+   "fund_code": "012344",
+   "fund_name": "嘉实领先优势混合",
+   "fund_full_name": "嘉实领先优势混合型证券投资基金",
+   "fund_company": "嘉实基金管理有限公司",
+   "category": "active_equity",
+   "l3_benchmark_text": "沪深300指数收益率×60%+恒生指数收益率（人民币计价）×30%+中债综合财富指数收益率×10%",
+   "cninfo": {
+    "error": "巨潮未检索到该基金代码"
+   },
+   "channel": "未获取（巨潮基金频道仅覆盖场内品种）",
+   "contract_found": false,
+   "prospectus_found": false,
+   "evidence_grade": "L3",
+   "not_obtained_reason": "巨潮资讯基金频道仅收录 LOF/封闭式/ETF 等场内品种，该基金为场外品种，未在巨潮收录；管理人官网渠道未实现",
+   "current_contract": null,
+   "current_prospectus": null,
+   "history_versions": [],
+   "history_versions_missing": true
+  },
+  {
+   "fund_id": 69,
+   "fund_code": "050002",
+   "fund_name": "博时裕富沪深300指数",
+   "fund_full_name": "博时裕富沪深300指数证券投资基金",
+   "fund_company": "博时基金管理有限公司",
+   "category": "index_plain",
+   "l3_benchmark_text": "95%*沪深300指数+5%*银行同业存款利率",
+   "cninfo": {
+    "error": "巨潮未检索到该基金代码"
+   },
+   "channel": "未获取（巨潮基金频道仅覆盖场内品种）",
+   "contract_found": false,
+   "prospectus_found": false,
+   "evidence_grade": "L3",
+   "not_obtained_reason": "巨潮资讯基金频道仅收录 LOF/封闭式/ETF 等场内品种，该基金为场外品种，未在巨潮收录；管理人官网渠道未实现",
+   "current_contract": null,
+   "current_prospectus": null,
+   "history_versions": [],
+   "history_versions_missing": true
+  },
+  {
+   "fund_id": 70,
+   "fund_code": "001052",
+   "fund_name": "华夏中证500ETF联接",
+   "fund_full_name": "华夏中证500交易型开放式指数证券投资基金联接基金",
+   "fund_company": "华夏基金管理有限公司",
+   "category": "etf_feeder",
+   "l3_benchmark_text": "中证500指数收益率×95%＋人民币活期存款税后利率×5%",
+   "cninfo": {
+    "error": "巨潮未检索到该基金代码"
+   },
+   "channel": "未获取（巨潮基金频道仅覆盖场内品种）",
+   "contract_found": false,
+   "prospectus_found": false,
+   "evidence_grade": "L3",
+   "not_obtained_reason": "巨潮资讯基金频道仅收录 LOF/封闭式/ETF 等场内品种，该基金为场外品种，未在巨潮收录；管理人官网渠道未实现",
+   "current_contract": null,
+   "current_prospectus": null,
+   "history_versions": [],
+   "history_versions_missing": true
+  },
+  {
+   "fund_id": 71,
+   "fund_code": "001938",
+   "fund_name": "中欧时代先锋",
+   "fund_full_name": "中欧时代先锋股票型发起式证券投资基金",
+   "fund_company": "中欧基金管理公司",
+   "category": "active_equity",
+   "l3_benchmark_text": "90%×中证500指数收益率+10%×中证综合债券指数收益率",
+   "cninfo": {
+    "error": "巨潮未检索到该基金代码"
+   },
+   "channel": "未获取（巨潮基金频道仅覆盖场内品种）",
+   "contract_found": false,
+   "prospectus_found": false,
+   "evidence_grade": "L3",
+   "not_obtained_reason": "巨潮资讯基金频道仅收录 LOF/封闭式/ETF 等场内品种，该基金为场外品种，未在巨潮收录；管理人官网渠道未实现",
+   "current_contract": null,
+   "current_prospectus": null,
+   "history_versions": [],
+   "history_versions_missing": true
+  },
+  {
+   "fund_id": 72,
+   "fund_code": "519066",
+   "fund_name": "汇添富蓝筹稳健混合",
+   "fund_full_name": "汇添富蓝筹稳健灵活配置混合型证券投资基金",
+   "fund_company": "汇添富基金公司",
+   "category": "active_equity",
+   "l3_benchmark_text": "中证800指数收益率*70%+上证国债指数收益率*25%+活期存款基准利率*5%",
+   "cninfo": {
+    "error": "巨潮未检索到该基金代码"
+   },
+   "channel": "未获取（巨潮基金频道仅覆盖场内品种）",
+   "contract_found": false,
+   "prospectus_found": false,
+   "evidence_grade": "L3",
+   "not_obtained_reason": "巨潮资讯基金频道仅收录 LOF/封闭式/ETF 等场内品种，该基金为场外品种，未在巨潮收录；管理人官网渠道未实现",
+   "current_contract": null,
+   "current_prospectus": null,
+   "history_versions": [],
+   "history_versions_missing": true
+  },
+  {
+   "fund_id": 73,
+   "fund_code": "000032",
+   "fund_name": "易方达信用债",
+   "fund_full_name": "易方达信用债债券型证券投资基金",
+   "fund_company": "易方达基金管理有限公司",
+   "category": "pure_bond",
+   "l3_benchmark_text": "中债-优选投资级信用债财富指数",
+   "cninfo": {
+    "org_id": "gssz0000032",
+    "short_name": "深桑达Ａ",
+    "category": "A股"
+   },
+   "channel": "管理人官方网站（易方达基金）",
+   "contract_found": true,
+   "prospectus_found": true,
+   "current_contract": {
+    "obtained": true,
+    "url": "https://cdn.efunds.com.cn/owch/data/bulletin/20231128/%E6%98%93%E6%96%B9%E8%BE%BE%E4%BF%A1%E7%94%A8%E5%80%BA%E5%80%BA%E5%88%B8%E5%9E%8B%E8%AF%81%E5%88%B8%E6%8A%95%E8%B5%84%E5%9F%BA%E9%87%91%E5%9F%BA%E9%87%91%E5%90%88%E5%90%8C.pdf",
+    "file": "reports/evidence/phase3B6_2_3_0/fund_contracts/000032_基金合同.pdf",
+    "bytes": 1320699,
+    "sha256": "0c1558df18a2e5ada1e6ea8e8f7436f8d4d07d9bd3e4af40bc0d04837bc11d84",
+    "readable": true,
+    "text_chars": 71211,
+    "benchmark_excerpt": {
+     "found": true,
+     "excerpts": [
+      "业绩比较基准为：中债-优选投资级信用债财富指数。"
+     ],
+     "primary": "业绩比较基准为：中债-优选投资级信用债财富指数。"
+    },
+    "obtained_at": "2026-11-26T11:18:38",
+    "disclosed_date": "2023-11-28",
+    "doc_type": "基金合同",
+    "title": "易方达信用债债券型证券投资基金基金合同"
+   },
+   "current_prospectus": {
+    "obtained": true,
+    "url": "https://cdn.efunds.com.cn/owch/data/bulletin/20260829/%E6%98%93%E6%96%B9%E8%BE%BE%E4%BF%A1%E7%94%A8%E5%80%BA%E5%80%BA%E5%88%B8%E5%9E%8B%E8%AF%81%E5%88%B8%E6%8A%95%E8%B5%84%E5%9F%BA%E9%87%91%E6%9B%B4%E6%96%B0%E7%9A%84%E6%8B%9B%E5%8B%9F%E8%AF%B4%E6%98%8E%E4%B9%A6.pdf",
+    "file": "reports/evidence/phase3B6_2_3_0/fund_contracts/000032_招募说明书.pdf",
+    "bytes": 1070710,
+    "sha256": "7522c5918189d2c9e854b6217dcf0e9fb9636680ddbd5d623cbd3fd68b78179f",
+    "readable": true,
+    "text_chars": 103253,
+    "benchmark_excerpt": {
+     "found": true,
+     "excerpts": [
+      "业绩比较基准为：中债-优选投资级信用债财富指数中债-优选投资级信用债财富指数由中债金融估值中心有限公司编制，该"
+     ],
+     "primary": "业绩比较基准为：中债-优选投资级信用债财富指数中债-优选投资级信用债财富指数由中债金融估值中心有限公司编制，该"
+    },
+    "obtained_at": "2026-11-26T11:18:42",
+    "disclosed_date": "2026-08-29",
+    "doc_type": "招募说明书",
+    "title": "易方达信用债债券型证券投资基金更新的招募说明书"
+   },
+   "history_versions": [
+    {
+     "title": "易方达信用债债券型证券投资基金基金合同",
+     "url": "https://cdn.efunds.com.cn/owch/data/bulletin/20221213/%E6%98%93%E6%96%B9%E8%BE%BE%E4%BF%A1%E7%94%A8%E5%80%BA%E5%80%BA%E5%88%B8%E5%9E%8B%E8%AF%81%E5%88%B8%E6%8A%95%E8%B5%84%E5%9F%BA%E9%87%91%E5%9F%BA%E9%87%91%E5%90%88%E5%90%8C.pdf",
+     "date": "2022-12-13",
+     "catalog": "基金合同",
+     "doc_type": "基金合同"
+    },
+    {
+     "title": "易方达信用债债券型证券投资基金基金合同",
+     "url": "https://cdn.efunds.com.cn/owch/data/notice/20210430/%E6%98%93%E6%96%B9%E8%BE%BE%E4%BF%A1%E7%94%A8%E5%80%BA%E5%80%BA%E5%88%B8%E5%9E%8B%E8%AF%81%E5%88%B8%E6%8A%95%E8%B5%84%E5%9F%BA%E9%87%91%E5%9F%BA%E9%87%91%E5%90%88%E5%90%8C.pdf",
+     "date": "2021-04-30",
+     "catalog": "基金合同",
+     "doc_type": "基金合同"
+    },
+    {
+     "title": "易方达信用债债券型证券投资基金基金合同",
+     "url": "https://cdn.efunds.com.cn/owch/data/notice/20201218/%E6%98%93%E6%96%B9%E8%BE%BE%E4%BF%A1%E7%94%A8%E5%80%BA%E5%80%BA%E5%88%B8%E5%9E%8B%E8%AF%81%E5%88%B8%E6%8A%95%E8%B5%84%E5%9F%BA%E9%87%91%E5%9F%BA%E9%87%91%E5%90%88%E5%90%8C.pdf",
+     "date": "2020-12-18",
+     "catalog": "基金合同",
+     "doc_type": "基金合同"
+    },
+    {
+     "title": "易方达信用债债券型证券投资基金基金合同",
+     "url": "https://cdn.efunds.com.cn/owch/data/bulletin/20191231/%E6%98%93%E6%96%B9%E8%BE%BE%E4%BF%A1%E7%94%A8%E5%80%BA%E5%80%BA%E5%88%B8%E5%9E%8B%E8%AF%81%E5%88%B8%E6%8A%95%E8%B5%84%E5%9F%BA%E9%87%91%E5%9F%BA%E9%87%91%E5%90%88%E5%90%8C.pdf",
+     "date": "2019-12-31",
+     "catalog": "基金合同",
+     "doc_type": "基金合同"
+    },
+    {
+     "title": "易方达信用债债券型证券投资基金基金合同",
+     "url": "https://cdn.efunds.com.cn/owch/data/bulletin/20180321/%E6%98%93%E6%96%B9%E8%BE%BE%E4%BF%A1%E7%94%A8%E5%80%BA%E5%80%BA%E5%88%B8%E5%9E%8B%E8%AF%81%E5%88%B8%E6%8A%95%E8%B5%84%E5%9F%BA%E9%87%91%E5%9F%BA%E9%87%91%E5%90%88%E5%90%8C.pdf",
+     "date": "2018-03-22",
+     "catalog": "基金合同",
+     "doc_type": "基金合同"
+    },
+    {
+     "title": "易方达信用债债券型证券投资基金基金合同",
+     "url": "https://cdn.efunds.com.cn/owch/data/2013/03/20130318083626_0_2.pdf",
+     "date": "2013-03-18",
+     "catalog": "基金合同",
+     "doc_type": "基金合同"
+    },
+    {
+     "title": "易方达信用债债券型证券投资基金更新的招募说明书",
+     "url": "https://cdn.efunds.com.cn/owch/data/bulletin/20250926/%E6%98%93%E6%96%B9%E8%BE%BE%E4%BF%A1%E7%94%A8%E5%80%BA%E5%80%BA%E5%88%B8%E5%9E%8B%E8%AF%81%E5%88%B8%E6%8A%95%E8%B5%84%E5%9F%BA%E9%87%91%E6%9B%B4%E6%96%B0%E7%9A%84%E6%8B%9B%E5%8B%9F%E8%AF%B4%E6%98%8E%E4%B9%A6.pdf",
+     "date": "2025-09-26",
+     "catalog": "招募说明书",
+     "doc_type": "招募说明书"
+    },
+    {
+     "title": "易方达信用债债券型证券投资基金更新的招募说明书",
+     "url": "https://cdn.efunds.com.cn/owch/data/bulletin/20241101/%E6%98%93%E6%96%B9%E8%BE%BE%E4%BF%A1%E7%94%A8%E5%80%BA%E5%80%BA%E5%88%B8%E5%9E%8B%E8%AF%81%E5%88%B8%E6%8A%95%E8%B5%84%E5%9F%BA%E9%87%91%E6%9B%B4%E6%96%B0%E7%9A%84%E6%8B%9B%E5%8B%9F%E8%AF%B4%E6%98%8E%E4%B9%A6.pdf",
+     "date": "2024-11-01",
+     "catalog": "招募说明书",
+     "doc_type": "招募说明书"
+    },
+    {
+     "title": "易方达信用债债券型证券投资基金更新的招募说明书",
+     "url": "https://cdn.efunds.com.cn/owch/data/bulletin/20240607/%E6%98%93%E6%96%B9%E8%BE%BE%E4%BF%A1%E7%94%A8%E5%80%BA%E5%80%BA%E5%88%B8%E5%9E%8B%E8%AF%81%E5%88%B8%E6%8A%95%E8%B5%84%E5%9F%BA%E9%87%91%E6%9B%B4%E6%96%B0%E7%9A%84%E6%8B%9B%E5%8B%9F%E8%AF%B4%E6%98%8E%E4%B9%A6.pdf",
+     "date": "2024-06-07",
+     "catalog": "招募说明书",
+     "doc_type": "招募说明书"
+    },
+    {
+     "title": "易方达信用债债券型证券投资基金更新的招募说明书",
+     "url": "https://cdn.efunds.com.cn/owch/data/bulletin/20231130/%E6%98%93%E6%96%B9%E8%BE%BE%E4%BF%A1%E7%94%A8%E5%80%BA%E5%80%BA%E5%88%B8%E5%9E%8B%E8%AF%81%E5%88%B8%E6%8A%95%E8%B5%84%E5%9F%BA%E9%87%91%E6%9B%B4%E6%96%B0%E7%9A%84%E6%8B%9B%E5%8B%9F%E8%AF%B4%E6%98%8E%E4%B9%A6.pdf",
+     "date": "2023-11-30",
+     "catalog": "招募说明书",
+     "doc_type": "招募说明书"
+    },
+    {
+     "title": "易方达信用债债券型证券投资基金更新的招募说明书",
+     "url": "https://cdn.efunds.com.cn/owch/data/bulletin/20231128/%E6%98%93%E6%96%B9%E8%BE%BE%E4%BF%A1%E7%94%A8%E5%80%BA%E5%80%BA%E5%88%B8%E5%9E%8B%E8%AF%81%E5%88%B8%E6%8A%95%E8%B5%84%E5%9F%BA%E9%87%91%E6%9B%B4%E6%96%B0%E7%9A%84%E6%8B%9B%E5%8B%9F%E8%AF%B4%E6%98%8E%E4%B9%A6.pdf",
+     "date": "2023-11-28",
+     "catalog": "招募说明书",
+     "doc_type": "招募说明书"
+    },
+    {
+     "title": "易方达信用债债券型证券投资基金更新的招募说明书",
+     "url": "https://cdn.efunds.com.cn/owch/data/bulletin/20221230/%E6%98%93%E6%96%B9%E8%BE%BE%E4%BF%A1%E7%94%A8%E5%80%BA%E5%80%BA%E5%88%B8%E5%9E%8B%E8%AF%81%E5%88%B8%E6%8A%95%E8%B5%84%E5%9F%BA%E9%87%91%E6%9B%B4%E6%96%B0%E7%9A%84%E6%8B%9B%E5%8B%9F%E8%AF%B4%E6%98%8E%E4%B9%A6.pdf",
+     "date": "2022-12-30",
+     "catalog": "招募说明书",
+     "doc_type": "招募说明书"
+    },
+    {
+     "title": "易方达信用债债券型证券投资基金更新的招募说明书",
+     "url": "https://cdn.efunds.com.cn/owch/data/bulletin/20221213/%E6%98%93%E6%96%B9%E8%BE%BE%E4%BF%A1%E7%94%A8%E5%80%BA%E5%80%BA%E5%88%B8%E5%9E%8B%E8%AF%81%E5%88%B8%E6%8A%95%E8%B5%84%E5%9F%BA%E9%87%91%E6%9B%B4%E6%96%B0%E7%9A%84%E6%8B%9B%E5%8B%9F%E8%AF%B4%E6%98%8E%E4%B9%A6.pdf",
+     "date": "2022-12-13",
+     "catalog": "招募说明书",
+     "doc_type": "招募说明书"
+    },
+    {
+     "title": "易方达信用债债券型证券投资基金更新的招募说明书",
+     "url": "https://cdn.efunds.com.cn/owch/data/bulletin/20220129/%E6%98%93%E6%96%B9%E8%BE%BE%E4%BF%A1%E7%94%A8%E5%80%BA%E5%80%BA%E5%88%B8%E5%9E%8B%E8%AF%81%E5%88%B8%E6%8A%95%E8%B5%84%E5%9F%BA%E9%87%91%E6%9B%B4%E6%96%B0%E7%9A%84%E6%8B%9B%E5%8B%9F%E8%AF%B4%E6%98%8E%E4%B9%A6.pdf",
+     "date": "2022-01-29",
+     "catalog": "招募说明书",
+     "doc_type": "招募说明书"
+    },
+    {
+     "title": "易方达信用债债券型证券投资基金更新的招募说明书",
+     "url": "https://cdn.efunds.com.cn/owch/data/bulletin/20210512/%E6%98%93%E6%96%B9%E8%BE%BE%E4%BF%A1%E7%94%A8%E5%80%BA%E5%80%BA%E5%88%B8%E5%9E%8B%E8%AF%81%E5%88%B8%E6%8A%95%E8%B5%84%E5%9F%BA%E9%87%91%E6%9B%B4%E6%96%B0%E7%9A%84%E6%8B%9B%E5%8B%9F%E8%AF%B4%E6%98%8E%E4%B9%A6.pdf",
+     "date": "2021-05-12",
+     "catalog": "招募说明书",
+     "doc_type": "招募说明书"
+    },
+    {
+     "title": "易方达信用债债券型证券投资基金更新的招募说明书",
+     "url": "https://cdn.efunds.com.cn/owch/data/bulletin/20210303/%E6%98%93%E6%96%B9%E8%BE%BE%E4%BF%A1%E7%94%A8%E5%80%BA%E5%80%BA%E5%88%B8%E5%9E%8B%E8%AF%81%E5%88%B8%E6%8A%95%E8%B5%84%E5%9F%BA%E9%87%91%E6%9B%B4%E6%96%B0%E7%9A%84%E6%8B%9B%E5%8B%9F%E8%AF%B4%E6%98%8E%E4%B9%A6.pdf",
+     "date": "2021-03-03",
+     "catalog": "招募说明书",
+     "doc_type": "招募说明书"
+    },
+    {
+     "title": "易方达信用债债券型证券投资基金更新的招募说明书",
+     "url": "https://cdn.efunds.com.cn/owch/data/bulletin/20201223/%E6%98%93%E6%96%B9%E8%BE%BE%E4%BF%A1%E7%94%A8%E5%80%BA%E5%80%BA%E5%88%B8%E5%9E%8B%E8%AF%81%E5%88%B8%E6%8A%95%E8%B5%84%E5%9F%BA%E9%87%91%E6%9B%B4%E6%96%B0%E7%9A%84%E6%8B%9B%E5%8B%9F%E8%AF%B4%E6%98%8E%E4%B9%A6.pdf",
+     "date": "2020-12-23",
+     "catalog": "招募说明书",
+     "doc_type": "招募说明书"
+    },
+    {
+     "title": "易方达信用债债券型证券投资基金更新的招募说明书摘要",
+     "url": "https://cdn.efunds.com.cn/owch/data/bulletin/20200429/%E6%98%93%E6%96%B9%E8%BE%BE%E4%BF%A1%E7%94%A8%E5%80%BA%E5%80%BA%E5%88%B8%E5%9E%8B%E8%AF%81%E5%88%B8%E6%8A%95%E8%B5%84%E5%9F%BA%E9%87%91%E6%9B%B4%E6%96%B0%E7%9A%84%E6%8B%9B%E5%8B%9F%E8%AF%B4%E6%98%8E%E4%B9%A6%E6%91%98%E8%A6%81.pdf",
+     "date": "2020-04-29",
+     "catalog": "招募说明书",
+     "doc_type": "招募说明书"
+    },
+    {
+     "title": "易方达信用债债券型证券投资基金更新的招募说明书",
+     "url": "https://cdn.efunds.com.cn/owch/data/bulletin/20200429/%E6%98%93%E6%96%B9%E8%BE%BE%E4%BF%A1%E7%94%A8%E5%80%BA%E5%80%BA%E5%88%B8%E5%9E%8B%E8%AF%81%E5%88%B8%E6%8A%95%E8%B5%84%E5%9F%BA%E9%87%91%E6%9B%B4%E6%96%B0%E7%9A%84%E6%8B%9B%E5%8B%9F%E8%AF%B4%E6%98%8E%E4%B9%A6.pdf",
+     "date": "2020-04-29",
+     "catalog": "招募说明书",
+     "doc_type": "招募说明书"
+    },
+    {
+     "title": "易方达信用债债券型证券投资基金更新的招募说明书摘要",
+     "url": "https://cdn.efunds.com.cn/owch/data/bulletin/20200103/%E6%98%93%E6%96%B9%E8%BE%BE%E4%BF%A1%E7%94%A8%E5%80%BA%E5%80%BA%E5%88%B8%E5%9E%8B%E8%AF%81%E5%88%B8%E6%8A%95%E8%B5%84%E5%9F%BA%E9%87%91%E6%9B%B4%E6%96%B0%E7%9A%84%E6%8B%9B%E5%8B%9F%E8%AF%B4%E6%98%8E%E4%B9%A6%E6%91%98%E8%A6%81.pdf",
+     "date": "2020-01-03",
+     "catalog": "招募说明书",
+     "doc_type": "招募说明书"
+    }
+   ],
+   "history_count": 46,
+   "history_versions_missing": false,
+   "text_consistent_with_l3": true,
+   "text_comparison": {
+    "comparable": true,
+    "consistent": true,
+    "l3_weights": [],
+    "contract_weights": [],
+    "normalized_l3": "中债-优选投资级信用债财富指数",
+    "normalized_contract": "业绩比较基准为：中债-优选投资级信用债财富指数。",
+    "note": "第三方文本与合同原文一致"
+   },
+   "evidence_grade": "L1",
+   "not_obtained_reason": null,
+   "disclosed_date": "2023-11-28",
+   "sha256": "0c1558df18a2e5ada1e6ea8e8f7436f8d4d07d9bd3e4af40bc0d04837bc11d84"
+  },
+  {
+   "fund_id": 74,
+   "fund_code": "000509",
+   "fund_name": "广发钱袋子货币",
+   "fund_full_name": "广发钱袋子货币市场基金",
+   "fund_company": "广发基金管理有限公司",
+   "category": "money_market",
+   "l3_benchmark_text": "活期存款利率（税后）",
+   "cninfo": {
+    "org_id": "gssz0000509",
+    "short_name": "华塑控股",
+    "category": "A股"
+   },
+   "channel": "巨潮资讯网（证监会指定信息披露网站）",
+   "contract_found": false,
+   "prospectus_found": false,
+   "current_contract": {
+    "obtained": false,
+    "reason": "未检索到官方公告"
+   },
+   "current_prospectus": {
+    "obtained": false,
+    "reason": "未检索到官方公告"
+   },
+   "history_versions": [],
+   "history_count": 0,
+   "history_versions_missing": true,
+   "text_consistent_with_l3": null,
+   "text_comparison": {
+    "comparable": false
+   },
+   "evidence_grade": "L3",
+   "not_obtained_reason": "未检索到官方公告",
+   "disclosed_date": null,
+   "sha256": null
+  },
+  {
+   "fund_id": 75,
+   "fund_code": "001548",
+   "fund_name": "天弘上证50ETF联接",
+   "fund_full_name": "天弘上证50交易型开放式指数证券投资基金联接基金",
+   "fund_company": "天弘基金管理有限公司",
+   "category": "etf_feeder",
+   "l3_benchmark_text": "上证50指数收益率×95%＋银行活期存款利率（税后）×5%",
+   "cninfo": {
+    "error": "巨潮未检索到该基金代码"
+   },
+   "channel": "未获取（巨潮基金频道仅覆盖场内品种）",
+   "contract_found": false,
+   "prospectus_found": false,
+   "evidence_grade": "L3",
+   "not_obtained_reason": "巨潮资讯基金频道仅收录 LOF/封闭式/ETF 等场内品种，该基金为场外品种，未在巨潮收录；管理人官网渠道未实现",
+   "current_contract": null,
+   "current_prospectus": null,
+   "history_versions": [],
+   "history_versions_missing": true
+  },
+  {
+   "fund_id": 76,
+   "fund_code": "000001",
+   "fund_name": "华夏成长混合",
+   "fund_full_name": "华夏成长证券投资基金",
+   "fund_company": "华夏基金管理有限公司",
+   "category": "active_equity",
+   "l3_benchmark_text": "中证800成长指数收益率*70%+中债-综合全价（总值）指数收益率*30%",
+   "cninfo": {
+    "org_id": "gssz0000001",
+    "short_name": "平安银行",
+    "category": "A股"
+   },
+   "channel": "巨潮资讯网（证监会指定信息披露网站）",
+   "contract_found": false,
+   "prospectus_found": false,
+   "current_contract": {
+    "obtained": false,
+    "reason": "未检索到官方公告"
+   },
+   "current_prospectus": {
+    "obtained": false,
+    "reason": "未检索到官方公告"
+   },
+   "history_versions": [],
+   "history_count": 0,
+   "history_versions_missing": true,
+   "text_consistent_with_l3": null,
+   "text_comparison": {
+    "comparable": false
+   },
+   "evidence_grade": "L3",
+   "not_obtained_reason": "未检索到官方公告",
+   "disclosed_date": null,
+   "sha256": null
+  },
+  {
+   "fund_id": 77,
+   "fund_code": "000006",
+   "fund_name": "西部利得量化成长混合",
+   "fund_full_name": "西部利得量化成长混合型发起式证券投资基金",
+   "fund_company": "西部利得基金管理有限公司",
+   "category": "active_equity",
+   "l3_benchmark_text": "中证全指指数收益率*85%+中债-综合全价（总值）指数收益率*15%",
+   "cninfo": {
+    "org_id": "gssz0000006",
+    "short_name": "深振业Ａ",
+    "category": "A股"
+   },
+   "channel": "巨潮资讯网（证监会指定信息披露网站）",
+   "contract_found": false,
+   "prospectus_found": false,
+   "current_contract": {
+    "obtained": false,
+    "reason": "未检索到官方公告"
+   },
+   "current_prospectus": {
+    "obtained": false,
+    "reason": "未检索到官方公告"
+   },
+   "history_versions": [],
+   "history_count": 0,
+   "history_versions_missing": true,
+   "text_consistent_with_l3": null,
+   "text_comparison": {
+    "comparable": false
+   },
+   "evidence_grade": "L3",
+   "not_obtained_reason": "未检索到官方公告",
+   "disclosed_date": null,
+   "sha256": null
+  },
+  {
+   "fund_id": 78,
+   "fund_code": "000011",
+   "fund_name": "华夏大盘精选混合",
+   "fund_full_name": "华夏大盘精选证券投资基金",
+   "fund_company": "华夏基金管理有限公司",
+   "category": "active_equity",
+   "l3_benchmark_text": "中证A500指数收益率*85%+上证国债指数收益率*15%",
+   "cninfo": {
+    "org_id": "gssz0000011",
+    "short_name": "深物业A",
+    "category": "A股"
+   },
+   "channel": "巨潮资讯网（证监会指定信息披露网站）",
+   "contract_found": false,
+   "prospectus_found": false,
+   "current_contract": {
+    "obtained": false,
+    "reason": "未检索到官方公告"
+   },
+   "current_prospectus": {
+    "obtained": false,
+    "reason": "未检索到官方公告"
+   },
+   "history_versions": [],
+   "history_count": 0,
+   "history_versions_missing": true,
+   "text_consistent_with_l3": null,
+   "text_comparison": {
+    "comparable": false
+   },
+   "evidence_grade": "L3",
+   "not_obtained_reason": "未检索到官方公告",
+   "disclosed_date": null,
+   "sha256": null
+  },
+  {
+   "fund_id": 79,
+   "fund_code": "000017",
+   "fund_name": "财通可持续混合",
+   "fund_full_name": "财通可持续发展主题混合型证券投资基金",
+   "fund_company": "财通基金管理有限公司",
+   "category": "active_equity",
+   "l3_benchmark_text": "沪深300指数收益率×80%+上证国债指数收益率×20%",
+   "cninfo": {
+    "org_id": "gssz0000017",
+    "short_name": "深中华A",
+    "category": "A股"
+   },
+   "channel": "巨潮资讯网（证监会指定信息披露网站）",
+   "contract_found": false,
+   "prospectus_found": false,
+   "current_contract": {
+    "obtained": false,
+    "reason": "未检索到官方公告"
+   },
+   "current_prospectus": {
+    "obtained": false,
+    "reason": "未检索到官方公告"
+   },
+   "history_versions": [],
+   "history_count": 0,
+   "history_versions_missing": true,
+   "text_consistent_with_l3": null,
+   "text_comparison": {
+    "comparable": false
+   },
+   "evidence_grade": "L3",
+   "not_obtained_reason": "未检索到官方公告",
+   "disclosed_date": null,
+   "sha256": null
+  },
+  {
+   "fund_id": 80,
+   "fund_code": "000020",
+   "fund_name": "景顺长城品质投资",
+   "fund_full_name": "景顺长城品质投资混合型证券投资基金",
+   "fund_company": "景顺长城基金管理有限公司",
+   "category": "active_equity",
+   "l3_benchmark_text": "沪深300指数×80%+中证全债指数×20%",
+   "cninfo": {
+    "org_id": "gssz0000020",
+    "short_name": "深华发Ａ",
+    "category": "A股"
+   },
+   "channel": "巨潮资讯网（证监会指定信息披露网站）",
+   "contract_found": false,
+   "prospectus_found": false,
+   "current_contract": {
+    "obtained": false,
+    "reason": "未检索到官方公告"
+   },
+   "current_prospectus": {
+    "obtained": false,
+    "reason": "未检索到官方公告"
+   },
+   "history_versions": [],
+   "history_count": 0,
+   "history_versions_missing": true,
+   "text_consistent_with_l3": null,
+   "text_comparison": {
+    "comparable": false
+   },
+   "evidence_grade": "L3",
+   "not_obtained_reason": "未检索到官方公告",
+   "disclosed_date": null,
+   "sha256": null
+  },
+  {
+   "fund_id": 81,
+   "fund_code": "000021",
+   "fund_name": "华夏优势增长混合",
+   "fund_full_name": "华夏优势增长混合型证券投资基金",
+   "fund_company": "华夏基金管理有限公司",
+   "category": "active_equity",
+   "l3_benchmark_text": "中证800成长指数收益率*85%+中债-综合财富（总值）指数收益率*15%",
+   "cninfo": {
+    "org_id": "gssz0000021",
+    "short_name": "深科技",
+    "category": "A股"
+   },
+   "channel": "巨潮资讯网（证监会指定信息披露网站）",
+   "contract_found": false,
+   "prospectus_found": false,
+   "current_contract": {
+    "obtained": false,
+    "reason": "未检索到官方公告"
+   },
+   "current_prospectus": {
+    "obtained": false,
+    "reason": "未检索到官方公告"
+   },
+   "history_versions": [],
+   "history_count": 0,
+   "history_versions_missing": true,
+   "text_consistent_with_l3": null,
+   "text_comparison": {
+    "comparable": false
+   },
+   "evidence_grade": "L3",
+   "not_obtained_reason": "未检索到官方公告",
+   "disclosed_date": null,
+   "sha256": null
+  },
+  {
+   "fund_id": 82,
+   "fund_code": "000029",
+   "fund_name": "富国宏观策略灵活配置混合",
+   "fund_full_name": "富国宏观策略灵活配置混合型证券投资基金",
+   "fund_company": "富国基金管理有限公司",
+   "category": "active_equity",
+   "l3_benchmark_text": "沪深300指数收益率×65%+中债综合指数收益率×35%",
+   "cninfo": {
+    "org_id": "gssz0000029",
+    "short_name": "深深房Ａ",
+    "category": "A股"
+   },
+   "channel": "巨潮资讯网（证监会指定信息披露网站）",
+   "contract_found": false,
+   "prospectus_found": false,
+   "current_contract": {
+    "obtained": false,
+    "reason": "未检索到官方公告"
+   },
+   "current_prospectus": {
+    "obtained": false,
+    "reason": "未检索到官方公告"
+   },
+   "history_versions": [],
+   "history_count": 0,
+   "history_versions_missing": true,
+   "text_consistent_with_l3": null,
+   "text_comparison": {
+    "comparable": false
+   },
+   "evidence_grade": "L3",
+   "not_obtained_reason": "未检索到官方公告",
+   "disclosed_date": null,
+   "sha256": null
+  },
+  {
+   "fund_id": 83,
+   "fund_code": "000030",
+   "fund_name": "长城核心优选混合",
+   "fund_full_name": "长城核心优选灵活配置混合型证券投资基金",
+   "fund_company": "长城基金管理公司",
+   "category": "active_equity",
+   "l3_benchmark_text": "沪深300指数收益率×80%+中债-总财富（1-3年）指数收益率×15%+活期存款基准利率×5%",
+   "cninfo": {
+    "org_id": "gssz0000030",
+    "short_name": "富奥股份",
+    "category": "A股"
+   },
+   "channel": "巨潮资讯网（证监会指定信息披露网站）",
+   "contract_found": false,
+   "prospectus_found": false,
+   "current_contract": {
+    "obtained": false,
+    "reason": "未检索到官方公告"
+   },
+   "current_prospectus": {
+    "obtained": false,
+    "reason": "未检索到官方公告"
+   },
+   "history_versions": [],
+   "history_count": 0,
+   "history_versions_missing": true,
+   "text_consistent_with_l3": null,
+   "text_comparison": {
+    "comparable": false
+   },
+   "evidence_grade": "L3",
+   "not_obtained_reason": "未检索到官方公告",
+   "disclosed_date": null,
+   "sha256": null
+  },
+  {
+   "fund_id": 84,
+   "fund_code": "000003",
+   "fund_name": "中海可转换债券",
+   "fund_full_name": "中海可转换债券债券型证券投资基金",
+   "fund_company": "中海基金管理有限公司",
+   "category": "mixed_bond",
+   "l3_benchmark_text": "中证可转换债券指数收益率*80%+中证综合债指数收益率*15%+活期存款基准利率*5%",
+   "cninfo": {
+    "org_id": "gssz0000003",
+    "short_name": "PT金田Ａ",
+    "category": "A股"
+   },
+   "channel": "巨潮资讯网（证监会指定信息披露网站）",
+   "contract_found": false,
+   "prospectus_found": false,
+   "current_contract": {
+    "obtained": false,
+    "reason": "未检索到官方公告"
+   },
+   "current_prospectus": {
+    "obtained": false,
+    "reason": "未检索到官方公告"
+   },
+   "history_versions": [],
+   "history_count": 0,
+   "history_versions_missing": true,
+   "text_consistent_with_l3": null,
+   "text_comparison": {
+    "comparable": false
+   },
+   "evidence_grade": "L3",
+   "not_obtained_reason": "未检索到官方公告",
+   "disclosed_date": null,
+   "sha256": null
+  },
+  {
+   "fund_id": 85,
+   "fund_code": "000028",
+   "fund_name": "华富安鑫债券",
+   "fund_full_name": "华富安鑫债券型证券投资基金",
+   "fund_company": "华富基金管理有限公司",
+   "category": "mixed_bond",
+   "l3_benchmark_text": "中证A500指数收益率×15%+中债-新综合财富（1-3年）指数收益率×70%+中证可转换债券指数收益率×10%+活期存款基准利率×5%",
+   "cninfo": {
+    "org_id": "gssz0000028",
+    "short_name": "国药一致",
+    "category": "A股"
+   },
+   "channel": "巨潮资讯网（证监会指定信息披露网站）",
+   "contract_found": false,
+   "prospectus_found": false,
+   "current_contract": {
+    "obtained": false,
+    "reason": "未检索到官方公告"
+   },
+   "current_prospectus": {
+    "obtained": false,
+    "reason": "未检索到官方公告"
+   },
+   "history_versions": [],
+   "history_count": 0,
+   "history_versions_missing": true,
+   "text_consistent_with_l3": null,
+   "text_comparison": {
+    "comparable": false
+   },
+   "evidence_grade": "L3",
+   "not_obtained_reason": "未检索到官方公告",
+   "disclosed_date": null,
+   "sha256": null
+  },
+  {
+   "fund_id": 86,
+   "fund_code": "000045",
+   "fund_name": "工银产业债券",
+   "fund_full_name": "工银瑞信产业债债券型证券投资基金",
+   "fund_company": "工银瑞信基金管理有限公司",
+   "category": "mixed_bond",
+   "l3_benchmark_text": "中债-优选投资级信用债全价（总值）指数收益率×85%+沪深300指数收益率×15%",
+   "cninfo": {
+    "org_id": "gssz0000045",
+    "short_name": "深纺织Ａ",
+    "category": "A股"
+   },
+   "channel": "巨潮资讯网（证监会指定信息披露网站）",
+   "contract_found": false,
+   "prospectus_found": false,
+   "current_contract": {
+    "obtained": false,
+    "reason": "未检索到官方公告"
+   },
+   "current_prospectus": {
+    "obtained": false,
+    "reason": "未检索到官方公告"
+   },
+   "history_versions": [],
+   "history_count": 0,
+   "history_versions_missing": true,
+   "text_consistent_with_l3": null,
+   "text_comparison": {
+    "comparable": false
+   },
+   "evidence_grade": "L3",
+   "not_obtained_reason": "未检索到官方公告",
+   "disclosed_date": null,
+   "sha256": null
+  },
+  {
+   "fund_id": 87,
+   "fund_code": "000054",
+   "fund_name": "鹏华双债增利债券",
+   "fund_full_name": "鹏华双债增利债券型证券投资基金",
+   "fund_company": "鹏华基金管理有限公司",
+   "category": "mixed_bond",
+   "l3_benchmark_text": "三年期银行定期存款利率(税后)+1.5%",
+   "cninfo": {
+    "error": "巨潮未检索到该基金代码"
+   },
+   "channel": "未获取（巨潮基金频道仅覆盖场内品种）",
+   "contract_found": false,
+   "prospectus_found": false,
+   "evidence_grade": "L3",
+   "not_obtained_reason": "巨潮资讯基金频道仅收录 LOF/封闭式/ETF 等场内品种，该基金为场外品种，未在巨潮收录；管理人官网渠道未实现",
+   "current_contract": null,
+   "current_prospectus": null,
+   "history_versions": [],
+   "history_versions_missing": true
+  },
+  {
+   "fund_id": 88,
+   "fund_code": "000067",
+   "fund_name": "民生加银可转债",
+   "fund_full_name": "民生加银转债优选债券型证券投资基金",
+   "fund_company": "民生加银基金管理有限公司",
+   "category": "mixed_bond",
+   "l3_benchmark_text": "中证可转换债券指数收益率×90%+沪深300指数收益率×5%+一年期定期存款基准利率×5%",
+   "cninfo": {
+    "error": "巨潮未检索到该基金代码"
+   },
+   "channel": "未获取（巨潮基金频道仅覆盖场内品种）",
+   "contract_found": false,
+   "prospectus_found": false,
+   "evidence_grade": "L3",
+   "not_obtained_reason": "巨潮资讯基金频道仅收录 LOF/封闭式/ETF 等场内品种，该基金为场外品种，未在巨潮收录；管理人官网渠道未实现",
+   "current_contract": null,
+   "current_prospectus": null,
+   "history_versions": [],
+   "history_versions_missing": true
+  },
+  {
+   "fund_id": 89,
+   "fund_code": "000107",
+   "fund_name": "富国稳健增强债券",
+   "fund_full_name": "富国稳健增强债券型证券投资基金",
+   "fund_company": "富国基金管理有限公司",
+   "category": "mixed_bond",
+   "l3_benchmark_text": "中债综合全价指数收益率*90%+沪深300指数收益率*10%",
+   "cninfo": {
+    "error": "巨潮未检索到该基金代码"
+   },
+   "channel": "未获取（巨潮基金频道仅覆盖场内品种）",
+   "contract_found": false,
+   "prospectus_found": false,
+   "evidence_grade": "L3",
+   "not_obtained_reason": "巨潮资讯基金频道仅收录 LOF/封闭式/ETF 等场内品种，该基金为场外品种，未在巨潮收录；管理人官网渠道未实现",
+   "current_contract": null,
+   "current_prospectus": null,
+   "history_versions": [],
+   "history_versions_missing": true
+  },
+  {
+   "fund_id": 90,
+   "fund_code": "000005",
+   "fund_name": "嘉实增强信用债券",
+   "fund_full_name": "嘉实增强信用定期开放债券型证券投资基金",
+   "fund_company": "嘉实基金管理有限公司",
+   "category": "mixed_bond",
+   "l3_benchmark_text": "一年期银行定期存款税后收益率+1.2%",
+   "cninfo": {
+    "org_id": "gssz0000005",
+    "short_name": "ST星源",
+    "category": "A股"
+   },
+   "channel": "巨潮资讯网（证监会指定信息披露网站）",
+   "contract_found": false,
+   "prospectus_found": false,
+   "current_contract": {
+    "obtained": false,
+    "reason": "未检索到官方公告"
+   },
+   "current_prospectus": {
+    "obtained": false,
+    "reason": "未检索到官方公告"
+   },
+   "history_versions": [],
+   "history_count": 0,
+   "history_versions_missing": true,
+   "text_consistent_with_l3": null,
+   "text_comparison": {
+    "comparable": false
+   },
+   "evidence_grade": "L3",
+   "not_obtained_reason": "未检索到官方公告",
+   "disclosed_date": null,
+   "sha256": null
+  },
+  {
+   "fund_id": 91,
+   "fund_code": "000014",
+   "fund_name": "华夏聚利债券",
+   "fund_full_name": "华夏聚利债券型证券投资基金",
+   "fund_company": "华夏基金管理有限公司",
+   "category": "mixed_bond",
+   "l3_benchmark_text": "一年期定期存款税后利率+1.2%",
+   "cninfo": {
+    "org_id": "gssz0000014",
+    "short_name": "沙河股份",
+    "category": "A股"
+   },
+   "channel": "巨潮资讯网（证监会指定信息披露网站）",
+   "contract_found": false,
+   "prospectus_found": false,
+   "current_contract": {
+    "obtained": false,
+    "reason": "未检索到官方公告"
+   },
+   "current_prospectus": {
+    "obtained": false,
+    "reason": "未检索到官方公告"
+   },
+   "history_versions": [],
+   "history_count": 0,
+   "history_versions_missing": true,
+   "text_consistent_with_l3": null,
+   "text_comparison": {
+    "comparable": false
+   },
+   "evidence_grade": "L3",
+   "not_obtained_reason": "未检索到官方公告",
+   "disclosed_date": null,
+   "sha256": null
+  },
+  {
+   "fund_id": 92,
+   "fund_code": "000024",
+   "fund_name": "大摩双利增强债券",
+   "fund_full_name": "摩根士丹利双利增强债券型证券投资基金",
+   "fund_company": "摩根士丹利基金管理（中国）有限公司",
+   "category": "mixed_bond",
+   "l3_benchmark_text": "中债-企业债总全价（总值）指数收益率*70%+中债-国债总全价（总值）指数收益率*20%+中证可转换债券指数收益率*10%",
+   "cninfo": {
+    "org_id": "gssz0000024",
+    "short_name": "招商地产",
+    "category": "A股"
+   },
+   "channel": "巨潮资讯网（证监会指定信息披露网站）",
+   "contract_found": false,
+   "prospectus_found": false,
+   "current_contract": {
+    "obtained": false,
+    "reason": "未检索到官方公告"
+   },
+   "current_prospectus": {
+    "obtained": false,
+    "reason": "未检索到官方公告"
+   },
+   "history_versions": [],
+   "history_count": 0,
+   "history_versions_missing": true,
+   "text_consistent_with_l3": null,
+   "text_comparison": {
+    "comparable": false
+   },
+   "evidence_grade": "L3",
+   "not_obtained_reason": "未检索到官方公告",
+   "disclosed_date": null,
+   "sha256": null
+  },
+  {
+   "fund_id": 93,
+   "fund_code": "000037",
+   "fund_name": "广发景宁纯债",
+   "fund_full_name": "广发景宁纯债债券型证券投资基金",
+   "fund_company": "广发基金管理有限公司",
+   "category": "pure_bond",
+   "l3_benchmark_text": "中债-优选投资级信用债财富（总值）指数收益率×95%+活期存款基准利率×5%",
+   "cninfo": {
+    "org_id": "gssz0000037",
+    "short_name": "深南电A",
+    "category": "A股"
+   },
+   "channel": "巨潮资讯网（证监会指定信息披露网站）",
+   "contract_found": false,
+   "prospectus_found": false,
+   "current_contract": {
+    "obtained": false,
+    "reason": "未检索到官方公告"
+   },
+   "current_prospectus": {
+    "obtained": false,
+    "reason": "未检索到官方公告"
+   },
+   "history_versions": [],
+   "history_count": 0,
+   "history_versions_missing": true,
+   "text_consistent_with_l3": null,
+   "text_comparison": {
+    "comparable": false
+   },
+   "evidence_grade": "L3",
+   "not_obtained_reason": "未检索到官方公告",
+   "disclosed_date": null,
+   "sha256": null
+  },
+  {
+   "fund_id": 94,
+   "fund_code": "000047",
+   "fund_name": "华夏双债债券",
+   "fund_full_name": "华夏双债增强债券型证券投资基金",
+   "fund_company": "华夏基金管理有限公司",
+   "category": "mixed_bond",
+   "l3_benchmark_text": "中债-综合全价（1-3年）指数收益率*75%+中证可转换债券（全价）指数收益率*25%",
+   "cninfo": {
+    "org_id": "gssz0000047",
+    "short_name": "ST中侨",
+    "category": "A股"
+   },
+   "channel": "巨潮资讯网（证监会指定信息披露网站）",
+   "contract_found": false,
+   "prospectus_found": false,
+   "current_contract": {
+    "obtained": false,
+    "reason": "未检索到官方公告"
+   },
+   "current_prospectus": {
+    "obtained": false,
+    "reason": "未检索到官方公告"
+   },
+   "history_versions": [],
+   "history_count": 0,
+   "history_versions_missing": true,
+   "text_consistent_with_l3": null,
+   "text_comparison": {
+    "comparable": false
+   },
+   "evidence_grade": "L3",
+   "not_obtained_reason": "未检索到官方公告",
+   "disclosed_date": null,
+   "sha256": null
+  },
+  {
+   "fund_id": 95,
+   "fund_code": "000053",
+   "fund_name": "鹏华永诚一年定开债券",
+   "fund_full_name": "鹏华永诚一年定期开放债券型证券投资基金",
+   "fund_company": "鹏华基金管理有限公司",
+   "category": "pure_bond",
+   "l3_benchmark_text": "中债总指数收益率",
+   "cninfo": {
+    "error": "巨潮未检索到该基金代码"
+   },
+   "channel": "未获取（巨潮基金频道仅覆盖场内品种）",
+   "contract_found": false,
+   "prospectus_found": false,
+   "evidence_grade": "L3",
+   "not_obtained_reason": "巨潮资讯基金频道仅收录 LOF/封闭式/ETF 等场内品种，该基金为场外品种，未在巨潮收录；管理人官网渠道未实现",
+   "current_contract": null,
+   "current_prospectus": null,
+   "history_versions": [],
+   "history_versions_missing": true
+  },
+  {
+   "fund_id": 96,
+   "fund_code": "000008",
+   "fund_name": "嘉实中证500ETF联接",
+   "fund_full_name": "嘉实中证500交易型开放式指数证券投资基金联接基金",
+   "fund_company": "嘉实基金管理有限公司",
+   "category": "etf_feeder",
+   "l3_benchmark_text": "中证500指数收益率*95%+银行活期存款税后利率*5%",
+   "cninfo": {
+    "org_id": "gssz0000008",
+    "short_name": "神州高铁",
+    "category": "A股"
+   },
+   "channel": "巨潮资讯网（证监会指定信息披露网站）",
+   "contract_found": false,
+   "prospectus_found": false,
+   "current_contract": {
+    "obtained": false,
+    "reason": "未检索到官方公告"
+   },
+   "current_prospectus": {
+    "obtained": false,
+    "reason": "未检索到官方公告"
+   },
+   "history_versions": [],
+   "history_count": 0,
+   "history_versions_missing": true,
+   "text_consistent_with_l3": null,
+   "text_comparison": {
+    "comparable": false
+   },
+   "evidence_grade": "L3",
+   "not_obtained_reason": "未检索到官方公告",
+   "disclosed_date": null,
+   "sha256": null
+  },
+  {
+   "fund_id": 97,
+   "fund_code": "000962",
+   "fund_name": "天弘中证500指数",
+   "fund_full_name": "天弘中证500交易型开放式指数证券投资基金联接基金",
+   "fund_company": "天弘基金管理有限公司",
+   "category": "index_plain",
+   "l3_benchmark_text": "中证500指数收益率×95%＋银行活期存款利率（税后）×5%",
+   "cninfo": {
+    "org_id": "gssz0000962",
+    "short_name": "东方钽业",
+    "category": "A股"
+   },
+   "channel": "巨潮资讯网（证监会指定信息披露网站）",
+   "contract_found": false,
+   "prospectus_found": false,
+   "current_contract": {
+    "obtained": false,
+    "reason": "未检索到官方公告"
+   },
+   "current_prospectus": {
+    "obtained": false,
+    "reason": "未检索到官方公告"
+   },
+   "history_versions": [],
+   "history_count": 0,
+   "history_versions_missing": true,
+   "text_consistent_with_l3": null,
+   "text_comparison": {
+    "comparable": false
+   },
+   "evidence_grade": "L3",
+   "not_obtained_reason": "未检索到官方公告",
+   "disclosed_date": null,
+   "sha256": null
+  },
+  {
+   "fund_id": 98,
+   "fund_code": "001214",
+   "fund_name": "华泰柏瑞中证500ETF联接",
+   "fund_full_name": "华泰柏瑞中证500交易型开放式指数证券投资基金联接基金",
+   "fund_company": "华泰柏瑞基金管理有限公司",
+   "category": "etf_feeder",
+   "l3_benchmark_text": "95%*中证500指数收益率+5%*银行活期存款利率（税后）",
+   "cninfo": {
+    "error": "巨潮未检索到该基金代码"
+   },
+   "channel": "未获取（巨潮基金频道仅覆盖场内品种）",
+   "contract_found": false,
+   "prospectus_found": false,
+   "evidence_grade": "L3",
+   "not_obtained_reason": "巨潮资讯基金频道仅收录 LOF/封闭式/ETF 等场内品种，该基金为场外品种，未在巨潮收录；管理人官网渠道未实现",
+   "current_contract": null,
+   "current_prospectus": null,
+   "history_versions": [],
+   "history_versions_missing": true
+  },
+  {
+   "fund_id": 99,
+   "fund_code": "000009",
+   "fund_name": "易方达天天理财货币",
+   "fund_full_name": "易方达天天理财货币市场基金",
+   "fund_company": "易方达基金管理有限公司",
+   "category": "money_market",
+   "l3_benchmark_text": "活期存款基准利率×(1－利息税税率)",
+   "cninfo": {
+    "org_id": "gssz0000009",
+    "short_name": "中国宝安",
+    "category": "A股"
+   },
+   "channel": "管理人官方网站（易方达基金）",
+   "contract_found": true,
+   "prospectus_found": true,
+   "current_contract": {
+    "obtained": true,
+    "url": "https://cdn.efunds.com.cn/owch/data/bulletin/20260828/%E6%98%93%E6%96%B9%E8%BE%BE%E5%A4%A9%E5%A4%A9%E7%90%86%E8%B4%A2%E8%B4%A7%E5%B8%81%E5%B8%82%E5%9C%BA%E5%9F%BA%E9%87%91%E5%9F%BA%E9%87%91%E5%90%88%E5%90%8C.pdf",
+    "file": "reports/evidence/phase3B6_2_3_0/fund_contracts/000009_基金合同.pdf",
+    "bytes": 1191186,
+    "sha256": "e5f4d1ba2014e6ad29aa3b3354f6b35bb0089594aebc9c60b63b1196092561bd",
+    "readable": true,
+    "text_chars": 67750,
+    "benchmark_excerpt": {
+     "found": true,
+     "excerpts": [
+      "业绩比较基准：中国人民银行公布的活期存款基准利率的税后收益率，即活期存款基准利率×(1－利息税税率)。"
+     ],
+     "primary": "业绩比较基准：中国人民银行公布的活期存款基准利率的税后收益率，即活期存款基准利率×(1－利息税税率)。"
+    },
+    "obtained_at": "2026-11-26T11:18:53",
+    "disclosed_date": "2026-08-28",
+    "doc_type": "基金合同",
+    "title": "易方达天天理财货币市场基金基金合同"
+   },
+   "current_prospectus": {
+    "obtained": true,
+    "url": "https://cdn.efunds.com.cn/owch/data/bulletin/20260901/%E6%98%93%E6%96%B9%E8%BE%BE%E5%A4%A9%E5%A4%A9%E7%90%86%E8%B4%A2%E8%B4%A7%E5%B8%81%E5%B8%82%E5%9C%BA%E5%9F%BA%E9%87%91%E6%9B%B4%E6%96%B0%E7%9A%84%E6%8B%9B%E5%8B%9F%E8%AF%B4%E6%98%8E%E4%B9%A6.pdf",
+    "file": "reports/evidence/phase3B6_2_3_0/fund_contracts/000009_招募说明书.pdf",
+    "bytes": 1052647,
+    "sha256": "2678cbf3a90eff2cc7584947e4f6291d816d2a0441b2b9a782c274939d63c4e1",
+    "readable": true,
+    "text_chars": 112491,
+    "benchmark_excerpt": {
+     "found": true,
+     "excerpts": [
+      "业绩比较基准：中国人民银行公布的活期存款基准利率的税后收益率，即活期存款基准利率×(1－利息税税率)。"
+     ],
+     "primary": "业绩比较基准：中国人民银行公布的活期存款基准利率的税后收益率，即活期存款基准利率×(1－利息税税率)。"
+    },
+    "obtained_at": "2026-11-26T11:18:57",
+    "disclosed_date": "2026-09-01",
+    "doc_type": "招募说明书",
+    "title": "易方达天天理财货币市场基金更新的招募说明书"
+   },
+   "history_versions": [
+    {
+     "title": "易方达天天理财货币市场基金基金合同",
+     "url": "https://cdn.efunds.com.cn/owch/data/bulletin/20260811/%E6%98%93%E6%96%B9%E8%BE%BE%E5%A4%A9%E5%A4%A9%E7%90%86%E8%B4%A2%E8%B4%A7%E5%B8%81%E5%B8%82%E5%9C%BA%E5%9F%BA%E9%87%91%E5%9F%BA%E9%87%91%E5%90%88%E5%90%8C.pdf",
+     "date": "2026-08-11",
+     "catalog": "基金合同",
+     "doc_type": "基金合同"
+    },
+    {
+     "title": "易方达天天理财货币市场基金基金合同",
+     "url": "https://cdn.efunds.com.cn/owch/data/bulletin/20230807/%E6%98%93%E6%96%B9%E8%BE%BE%E5%A4%A9%E5%A4%A9%E7%90%86%E8%B4%A2%E8%B4%A7%E5%B8%81%E5%B8%82%E5%9C%BA%E5%9F%BA%E9%87%91%E5%9F%BA%E9%87%91%E5%90%88%E5%90%8C.pdf",
+     "date": "2023-08-07",
+     "catalog": "基金合同",
+     "doc_type": "基金合同"
+    },
+    {
+     "title": "易方达天天理财货币市场基金基金合同",
+     "url": "https://cdn.efunds.com.cn/owch/data/bulletin/20191231/%E6%98%93%E6%96%B9%E8%BE%BE%E5%A4%A9%E5%A4%A9%E7%90%86%E8%B4%A2%E8%B4%A7%E5%B8%81%E5%B8%82%E5%9C%BA%E5%9F%BA%E9%87%91%E5%9F%BA%E9%87%91%E5%90%88%E5%90%8C.pdf",
+     "date": "2019-12-31",
+     "catalog": "基金合同",
+     "doc_type": "基金合同"
+    },
+    {
+     "title": "易方达天天理财货币市场基金基金合同",
+     "url": "https://cdn.efunds.com.cn/owch/data/bulletin/20180321/%E6%98%93%E6%96%B9%E8%BE%BE%E5%A4%A9%E5%A4%A9%E7%90%86%E8%B4%A2%E8%B4%A7%E5%B8%81%E5%B8%82%E5%9C%BA%E5%9F%BA%E9%87%91%E5%9F%BA%E9%87%91%E5%90%88%E5%90%8C.pdf",
+     "date": "2018-03-22",
+     "catalog": "基金合同",
+     "doc_type": "基金合同"
+    },
+    {
+     "title": "易方达天天理财货币市场基金基金合同",
+     "url": "https://cdn.efunds.com.cn/owch/data/bulletin/20171019/%E6%98%93%E6%96%B9%E8%BE%BE%E5%A4%A9%E5%A4%A9%E7%90%86%E8%B4%A2%E8%B4%A7%E5%B8%81%E5%B8%82%E5%9C%BA%E5%9F%BA%E9%87%91%E5%9F%BA%E9%87%91%E5%90%88%E5%90%8C.pdf",
+     "date": "2017-10-20",
+     "catalog": "基金合同",
+     "doc_type": "基金合同"
+    },
+    {
+     "title": "易方达天天理财货币市场基金基金合同",
+     "url": "https://cdn.efunds.com.cn/owch/data/bulletin/20160819/%E6%98%93%E6%96%B9%E8%BE%BE%E5%A4%A9%E5%A4%A9%E7%90%86%E8%B4%A2%E8%B4%A7%E5%B8%81%E5%B8%82%E5%9C%BA%E5%9F%BA%E9%87%91%E5%9F%BA%E9%87%91%E5%90%88%E5%90%8C.pdf",
+     "date": "2016-08-20",
+     "catalog": "基金合同",
+     "doc_type": "基金合同"
+    },
+    {
+     "title": "易方达天天理财货币市场基金基金合同",
+     "url": "https://cdn.efunds.com.cn/owch/data/2014/06/20140603083758_0_1.pdf",
+     "date": "2014-06-03",
+     "catalog": "基金合同",
+     "doc_type": "基金合同"
+    },
+    {
+     "title": "易方达天天理财货币市场基金基金合同",
+     "url": "https://cdn.efunds.com.cn/owch/data/2013/02/20130205192237_0_1.pdf",
+     "date": "2013-02-06",
+     "catalog": "基金合同",
+     "doc_type": "基金合同"
+    },
+    {
+     "title": "易方达天天理财货币市场基金更新的招募说明书",
+     "url": "https://cdn.efunds.com.cn/owch/data/bulletin/20260814/%E6%98%93%E6%96%B9%E8%BE%BE%E5%A4%A9%E5%A4%A9%E7%90%86%E8%B4%A2%E8%B4%A7%E5%B8%81%E5%B8%82%E5%9C%BA%E5%9F%BA%E9%87%91%E6%9B%B4%E6%96%B0%E7%9A%84%E6%8B%9B%E5%8B%9F%E8%AF%B4%E6%98%8E%E4%B9%A6.pdf",
+     "date": "2026-08-14",
+     "catalog": "招募说明书",
+     "doc_type": "招募说明书"
+    },
+    {
+     "title": "易方达天天理财货币市场基金更新的招募说明书",
+     "url": "https://cdn.efunds.com.cn/owch/data/bulletin/20260731/%E6%98%93%E6%96%B9%E8%BE%BE%E5%A4%A9%E5%A4%A9%E7%90%86%E8%B4%A2%E8%B4%A7%E5%B8%81%E5%B8%82%E5%9C%BA%E5%9F%BA%E9%87%91%E6%9B%B4%E6%96%B0%E7%9A%84%E6%8B%9B%E5%8B%9F%E8%AF%B4%E6%98%8E%E4%B9%A6.pdf",
+     "date": "2026-07-31",
+     "catalog": "招募说明书",
+     "doc_type": "招募说明书"
+    },
+    {
+     "title": "易方达天天理财货币市场基金更新的招募说明书",
+     "url": "https://cdn.efunds.com.cn/owch/data/bulletin/20250830/%E6%98%93%E6%96%B9%E8%BE%BE%E5%A4%A9%E5%A4%A9%E7%90%86%E8%B4%A2%E8%B4%A7%E5%B8%81%E5%B8%82%E5%9C%BA%E5%9F%BA%E9%87%91%E6%9B%B4%E6%96%B0%E7%9A%84%E6%8B%9B%E5%8B%9F%E8%AF%B4%E6%98%8E%E4%B9%A6.pdf",
+     "date": "2025-08-30",
+     "catalog": "招募说明书",
+     "doc_type": "招募说明书"
+    },
+    {
+     "title": "易方达天天理财货币市场基金更新的招募说明书",
+     "url": "https://cdn.efunds.com.cn/owch/data/bulletin/20240928/%E6%98%93%E6%96%B9%E8%BE%BE%E5%A4%A9%E5%A4%A9%E7%90%86%E8%B4%A2%E8%B4%A7%E5%B8%81%E5%B8%82%E5%9C%BA%E5%9F%BA%E9%87%91%E6%9B%B4%E6%96%B0%E7%9A%84%E6%8B%9B%E5%8B%9F%E8%AF%B4%E6%98%8E%E4%B9%A6.pdf",
+     "date": "2024-09-28",
+     "catalog": "招募说明书",
+     "doc_type": "招募说明书"
+    },
+    {
+     "title": "易方达天天理财货币市场基金更新的招募说明书",
+     "url": "https://cdn.efunds.com.cn/owch/data/bulletin/20231101/%E6%98%93%E6%96%B9%E8%BE%BE%E5%A4%A9%E5%A4%A9%E7%90%86%E8%B4%A2%E8%B4%A7%E5%B8%81%E5%B8%82%E5%9C%BA%E5%9F%BA%E9%87%91%E6%9B%B4%E6%96%B0%E7%9A%84%E6%8B%9B%E5%8B%9F%E8%AF%B4%E6%98%8E%E4%B9%A6.pdf",
+     "date": "2023-11-01",
+     "catalog": "招募说明书",
+     "doc_type": "招募说明书"
+    },
+    {
+     "title": "易方达天天理财货币市场基金更新的招募说明书",
+     "url": "https://cdn.efunds.com.cn/owch/data/bulletin/20230807/%E6%98%93%E6%96%B9%E8%BE%BE%E5%A4%A9%E5%A4%A9%E7%90%86%E8%B4%A2%E8%B4%A7%E5%B8%81%E5%B8%82%E5%9C%BA%E5%9F%BA%E9%87%91%E6%9B%B4%E6%96%B0%E7%9A%84%E6%8B%9B%E5%8B%9F%E8%AF%B4%E6%98%8E%E4%B9%A6.pdf",
+     "date": "2023-08-07",
+     "catalog": "招募说明书",
+     "doc_type": "招募说明书"
+    },
+    {
+     "title": "易方达天天理财货币市场基金更新的招募说明书",
+     "url": "https://cdn.efunds.com.cn/owch/data/bulletin/20221129/%E6%98%93%E6%96%B9%E8%BE%BE%E5%A4%A9%E5%A4%A9%E7%90%86%E8%B4%A2%E8%B4%A7%E5%B8%81%E5%B8%82%E5%9C%BA%E5%9F%BA%E9%87%91%E6%9B%B4%E6%96%B0%E7%9A%84%E6%8B%9B%E5%8B%9F%E8%AF%B4%E6%98%8E%E4%B9%A6.pdf",
+     "date": "2022-11-29",
+     "catalog": "招募说明书",
+     "doc_type": "招募说明书"
+    },
+    {
+     "title": "易方达天天理财货币市场基金更新的招募说明书",
+     "url": "https://cdn.efunds.com.cn/owch/data/bulletin/20211229/%E6%98%93%E6%96%B9%E8%BE%BE%E5%A4%A9%E5%A4%A9%E7%90%86%E8%B4%A2%E8%B4%A7%E5%B8%81%E5%B8%82%E5%9C%BA%E5%9F%BA%E9%87%91%E6%9B%B4%E6%96%B0%E7%9A%84%E6%8B%9B%E5%8B%9F%E8%AF%B4%E6%98%8E%E4%B9%A6.pdf",
+     "date": "2021-12-29",
+     "catalog": "招募说明书",
+     "doc_type": "招募说明书"
+    },
+    {
+     "title": "易方达天天理财货币市场基金更新的招募说明书",
+     "url": "https://cdn.efunds.com.cn/owch/data/bulletin/20210130/%E6%98%93%E6%96%B9%E8%BE%BE%E5%A4%A9%E5%A4%A9%E7%90%86%E8%B4%A2%E8%B4%A7%E5%B8%81%E5%B8%82%E5%9C%BA%E5%9F%BA%E9%87%91%E6%9B%B4%E6%96%B0%E7%9A%84%E6%8B%9B%E5%8B%9F%E8%AF%B4%E6%98%8E%E4%B9%A6.pdf",
+     "date": "2021-01-30",
+     "catalog": "招募说明书",
+     "doc_type": "招募说明书"
+    },
+    {
+     "title": "易方达天天理财货币市场基金更新的招募说明书摘要",
+     "url": "https://cdn.efunds.com.cn/owch/data/bulletin/20200326/%E6%98%93%E6%96%B9%E8%BE%BE%E5%A4%A9%E5%A4%A9%E7%90%86%E8%B4%A2%E8%B4%A7%E5%B8%81%E5%B8%82%E5%9C%BA%E5%9F%BA%E9%87%91%E6%9B%B4%E6%96%B0%E7%9A%84%E6%8B%9B%E5%8B%9F%E8%AF%B4%E6%98%8E%E4%B9%A6%E6%91%98%E8%A6%81.pdf",
+     "date": "2020-03-26",
+     "catalog": "招募说明书",
+     "doc_type": "招募说明书"
+    },
+    {
+     "title": "易方达天天理财货币市场基金更新的招募说明书",
+     "url": "https://cdn.efunds.com.cn/owch/data/bulletin/20200326/%E6%98%93%E6%96%B9%E8%BE%BE%E5%A4%A9%E5%A4%A9%E7%90%86%E8%B4%A2%E8%B4%A7%E5%B8%81%E5%B8%82%E5%9C%BA%E5%9F%BA%E9%87%91%E6%9B%B4%E6%96%B0%E7%9A%84%E6%8B%9B%E5%8B%9F%E8%AF%B4%E6%98%8E%E4%B9%A6.pdf",
+     "date": "2020-03-26",
+     "catalog": "招募说明书",
+     "doc_type": "招募说明书"
+    },
+    {
+     "title": "易方达天天理财货币市场基金更新的招募说明书摘要",
+     "url": "https://cdn.efunds.com.cn/owch/data/bulletin/20200103/%E6%98%93%E6%96%B9%E8%BE%BE%E5%A4%A9%E5%A4%A9%E7%90%86%E8%B4%A2%E8%B4%A7%E5%B8%81%E5%B8%82%E5%9C%BA%E5%9F%BA%E9%87%91%E6%9B%B4%E6%96%B0%E7%9A%84%E6%8B%9B%E5%8B%9F%E8%AF%B4%E6%98%8E%E4%B9%A6%E6%91%98%E8%A6%81.pdf",
+     "date": "2020-01-03",
+     "catalog": "招募说明书",
+     "doc_type": "招募说明书"
+    }
+   ],
+   "history_count": 46,
+   "history_versions_missing": false,
+   "text_consistent_with_l3": true,
+   "text_comparison": {
+    "comparable": true,
+    "consistent": true,
+    "l3_weights": [],
+    "contract_weights": [],
+    "normalized_l3": "活期存款基准利率*(1－利息税税率)",
+    "normalized_contract": "业绩比较基准：中国人民银行公布的活期存款基准利率的税后收益率，即活期存款基准利率*(1－利息税税率)。",
+    "note": "第三方文本与合同原文一致"
+   },
+   "evidence_grade": "L1",
+   "not_obtained_reason": null,
+   "disclosed_date": "2026-08-28",
+   "sha256": "e5f4d1ba2014e6ad29aa3b3354f6b35bb0089594aebc9c60b63b1196092561bd"
+  },
+  {
+   "fund_id": 100,
+   "fund_code": "000203",
+   "fund_name": "国富日日收益货币",
+   "fund_full_name": "富兰克林国海日日收益货币市场证券投资基金",
+   "fund_company": "国海富兰克林基金管理有限公司",
+   "category": "money_market",
+   "l3_benchmark_text": "同期7天通知存款利率（税后）",
+   "cninfo": {
+    "error": "巨潮未检索到该基金代码"
+   },
+   "channel": "未获取（巨潮基金频道仅覆盖场内品种）",
+   "contract_found": false,
+   "prospectus_found": false,
+   "evidence_grade": "L3",
+   "not_obtained_reason": "巨潮资讯基金频道仅收录 LOF/封闭式/ETF 等场内品种，该基金为场外品种，未在巨潮收录；管理人官网渠道未实现",
+   "current_contract": null,
+   "current_prospectus": null,
+   "history_versions": [],
+   "history_versions_missing": true
+  },
+  {
+   "fund_id": 101,
+   "fund_code": "000210",
+   "fund_name": "光大现金宝货币",
+   "fund_full_name": "光大保德信现金宝货币市场基金",
+   "fund_company": "光大保德信基金管理有限公司",
+   "category": "money_market",
+   "l3_benchmark_text": "人民币活期存款利率(税后)",
+   "cninfo": {
+    "error": "巨潮未检索到该基金代码"
+   },
+   "channel": "未获取（巨潮基金频道仅覆盖场内品种）",
+   "contract_found": false,
+   "prospectus_found": false,
+   "evidence_grade": "L3",
+   "not_obtained_reason": "巨潮资讯基金频道仅收录 LOF/封闭式/ETF 等场内品种，该基金为场外品种，未在巨潮收录；管理人官网渠道未实现",
+   "current_contract": null,
+   "current_prospectus": null,
+   "history_versions": [],
+   "history_versions_missing": true
+  },
+  {
+   "fund_id": 102,
+   "fund_code": "000300",
+   "fund_name": "德邦德利货币",
+   "fund_full_name": "德邦德利货币市场基金",
+   "fund_company": "德邦基金管理有限公司",
+   "category": "money_market",
+   "l3_benchmark_text": "七天通知存款利率(税后)",
+   "cninfo": {
+    "error": "巨潮未检索到该基金代码"
+   },
+   "channel": "未获取（巨潮基金频道仅覆盖场内品种）",
+   "contract_found": false,
+   "prospectus_found": false,
+   "evidence_grade": "L3",
+   "not_obtained_reason": "巨潮资讯基金频道仅收录 LOF/封闭式/ETF 等场内品种，该基金为场外品种，未在巨潮收录；管理人官网渠道未实现",
+   "current_contract": null,
+   "current_prospectus": null,
+   "history_versions": [],
+   "history_versions_missing": true
+  },
+  {
+   "fund_id": 103,
+   "fund_code": "000324",
+   "fund_name": "华润元大现金收益货币",
+   "fund_full_name": "华润元大现金收益货币市场基金",
+   "fund_company": "华润元大基金管理有限公司",
+   "category": "money_market",
+   "l3_benchmark_text": "七天通知存款利率（税后）",
+   "cninfo": {
+    "error": "巨潮未检索到该基金代码"
+   },
+   "channel": "未获取（巨潮基金频道仅覆盖场内品种）",
+   "contract_found": false,
+   "prospectus_found": false,
+   "evidence_grade": "L3",
+   "not_obtained_reason": "巨潮资讯基金频道仅收录 LOF/封闭式/ETF 等场内品种，该基金为场外品种，未在巨潮收录；管理人官网渠道未实现",
+   "current_contract": null,
+   "current_prospectus": null,
+   "history_versions": [],
+   "history_versions_missing": true
+  },
+  {
+   "fund_id": 104,
+   "fund_code": "000613",
+   "fund_name": "国寿安保沪深300ETF联接",
+   "fund_full_name": "国寿安保沪深300交易型开放式指数证券投资基金联接基金",
+   "fund_company": "国寿安保基金管理有限公司",
+   "category": "etf_feeder",
+   "l3_benchmark_text": "沪深300指数收益率×95%＋银行活期存款利率（税后）×5%",
+   "cninfo": {
+    "org_id": "gssz0000613",
+    "short_name": "东海A退",
+    "category": "A股"
+   },
+   "channel": "巨潮资讯网（证监会指定信息披露网站）",
+   "contract_found": false,
+   "prospectus_found": false,
+   "current_contract": {
+    "obtained": false,
+    "reason": "未检索到官方公告"
+   },
+   "current_prospectus": {
+    "obtained": false,
+    "reason": "未检索到官方公告"
+   },
+   "history_versions": [],
+   "history_count": 0,
+   "history_versions_missing": true,
+   "text_consistent_with_l3": null,
+   "text_comparison": {
+    "comparable": false
+   },
+   "evidence_grade": "L3",
+   "not_obtained_reason": "未检索到官方公告",
+   "disclosed_date": null,
+   "sha256": null
+  },
+  {
+   "fund_id": 105,
+   "fund_code": "002987",
+   "fund_name": "广发沪深300ETF联接",
+   "fund_full_name": "广发沪深300交易型开放式指数证券投资基金联接基金",
+   "fund_company": "广发基金管理有限公司",
+   "category": "etf_feeder",
+   "l3_benchmark_text": "95%×沪深300指数收益率+5%×银行活期存款利率（税后）",
+   "cninfo": {
+    "org_id": "9900038942",
+    "short_name": "京北方",
+    "category": "A股"
+   },
+   "channel": "巨潮资讯网（证监会指定信息披露网站）",
+   "contract_found": false,
+   "prospectus_found": false,
+   "current_contract": {
+    "obtained": false,
+    "reason": "未检索到官方公告"
+   },
+   "current_prospectus": {
+    "obtained": false,
+    "reason": "未检索到官方公告"
+   },
+   "history_versions": [],
+   "history_count": 0,
+   "history_versions_missing": true,
+   "text_consistent_with_l3": null,
+   "text_comparison": {
+    "comparable": false
+   },
+   "evidence_grade": "L3",
+   "not_obtained_reason": "未检索到官方公告",
+   "disclosed_date": null,
+   "sha256": null
+  },
+  {
+   "fund_id": 106,
+   "fund_code": "000176",
+   "fund_name": "嘉实沪深300指数研究增强",
+   "fund_full_name": "嘉实沪深300指数研究增强型证券投资基金",
+   "fund_company": "嘉实基金管理有限公司",
+   "category": "index_plain",
+   "l3_benchmark_text": "沪深300指数收益率×95%+银行活期存款利率（税后）×5%",
+   "cninfo": {
+    "error": "巨潮未检索到该基金代码"
+   },
+   "channel": "未获取（巨潮基金频道仅覆盖场内品种）",
+   "contract_found": false,
+   "prospectus_found": false,
+   "evidence_grade": "L3",
+   "not_obtained_reason": "巨潮资讯基金频道仅收录 LOF/封闭式/ETF 等场内品种，该基金为场外品种，未在巨潮收录；管理人官网渠道未实现",
+   "current_contract": null,
+   "current_prospectus": null,
+   "history_versions": [],
+   "history_versions_missing": true
+  },
+  {
+   "fund_id": 107,
+   "fund_code": "000311",
+   "fund_name": "景顺长城沪深300指数增强",
+   "fund_full_name": "景顺长城沪深300指数增强型证券投资基金",
+   "fund_company": "景顺长城基金管理有限公司",
+   "category": "index_plain",
+   "l3_benchmark_text": "95%×沪深300指数收益率+1.5%(指年收益率,评价时按期间折算)",
+   "cninfo": {
+    "error": "巨潮未检索到该基金代码"
+   },
+   "channel": "未获取（巨潮基金频道仅覆盖场内品种）",
+   "contract_found": false,
+   "prospectus_found": false,
+   "evidence_grade": "L3",
+   "not_obtained_reason": "巨潮资讯基金频道仅收录 LOF/封闭式/ETF 等场内品种，该基金为场外品种，未在巨潮收录；管理人官网渠道未实现",
+   "current_contract": null,
+   "current_prospectus": null,
+   "history_versions": [],
+   "history_versions_missing": true
+  },
+  {
+   "fund_id": 108,
+   "fund_code": "000312",
+   "fund_name": "华安沪深300增强",
+   "fund_full_name": "华安沪深300量化增强证券投资基金",
+   "fund_company": "华安基金管理有限公司",
+   "category": "index_plain",
+   "l3_benchmark_text": "95%×沪深300指数收益率＋5%×同期商业银行税后活期存款基准利率",
+   "cninfo": {
+    "error": "巨潮未检索到该基金代码"
+   },
+   "channel": "未获取（巨潮基金频道仅覆盖场内品种）",
+   "contract_found": false,
+   "prospectus_found": false,
+   "evidence_grade": "L3",
+   "not_obtained_reason": "巨潮资讯基金频道仅收录 LOF/封闭式/ETF 等场内品种，该基金为场外品种，未在巨潮收录；管理人官网渠道未实现",
+   "current_contract": null,
+   "current_prospectus": null,
+   "history_versions": [],
+   "history_versions_missing": true
+  },
+  {
+   "fund_id": 109,
+   "fund_code": "001050",
+   "fund_name": "汇添富中证500指数增强",
+   "fund_full_name": "汇添富中证500指数增强型证券投资基金",
+   "fund_company": "汇添富基金管理股份有限公司",
+   "category": "index_plain",
+   "l3_benchmark_text": "中证500指数收益率*95%+活期存款利率（税后）*5%",
+   "cninfo": {
+    "error": "巨潮未检索到该基金代码"
+   },
+   "channel": "未获取（巨潮基金频道仅覆盖场内品种）",
+   "contract_found": false,
+   "prospectus_found": false,
+   "evidence_grade": "L3",
+   "not_obtained_reason": "巨潮资讯基金频道仅收录 LOF/封闭式/ETF 等场内品种，该基金为场外品种，未在巨潮收录；管理人官网渠道未实现",
+   "current_contract": null,
+   "current_prospectus": null,
+   "history_versions": [],
+   "history_versions_missing": true
+  },
+  {
+   "fund_id": 110,
+   "fund_code": "001351",
+   "fund_name": "诺安中证500增强",
+   "fund_full_name": "诺安中证500指数增强型证券投资基金",
+   "fund_company": "诺安基金管理有限公司",
+   "category": "index_plain",
+   "l3_benchmark_text": "中证500指数收益率×95%+一年期银行储蓄存款利率（税后）×5%",
+   "cninfo": {
+    "error": "巨潮未检索到该基金代码"
+   },
+   "channel": "未获取（巨潮基金频道仅覆盖场内品种）",
+   "contract_found": false,
+   "prospectus_found": false,
+   "evidence_grade": "L3",
+   "not_obtained_reason": "巨潮资讯基金频道仅收录 LOF/封闭式/ETF 等场内品种，该基金为场外品种，未在巨潮收录；管理人官网渠道未实现",
+   "current_contract": null,
+   "current_prospectus": null,
+   "history_versions": [],
+   "history_versions_missing": true
+  },
+  {
+   "fund_id": 111,
+   "fund_code": "001556",
+   "fund_name": "天弘中证500指数增强",
+   "fund_full_name": "天弘中证500指数增强型证券投资基金",
+   "fund_company": "天弘基金管理有限公司",
+   "category": "index_plain",
+   "l3_benchmark_text": "中证500指数收益率×95%+银行活期存款税后利率×5%",
+   "cninfo": {
+    "error": "巨潮未检索到该基金代码"
+   },
+   "channel": "未获取（巨潮基金频道仅覆盖场内品种）",
+   "contract_found": false,
+   "prospectus_found": false,
+   "evidence_grade": "L3",
+   "not_obtained_reason": "巨潮资讯基金频道仅收录 LOF/封闭式/ETF 等场内品种，该基金为场外品种，未在巨潮收录；管理人官网渠道未实现",
+   "current_contract": null,
+   "current_prospectus": null,
+   "history_versions": [],
+   "history_versions_missing": true
+  },
+  {
+   "fund_id": 112,
+   "fund_code": "000673",
+   "fund_name": "融通四季添利债(LOF)",
+   "fund_full_name": "融通四季添利债券型证券投资基金(LOF)",
+   "fund_company": "融通基金管理有限公司",
+   "category": "lof_offexchange",
+   "l3_benchmark_text": "中债综合指数收益率",
+   "cninfo": {
+    "org_id": "gssz0000673",
+    "short_name": "当代退",
+    "category": "A股"
+   },
+   "channel": "巨潮资讯网（证监会指定信息披露网站）",
+   "contract_found": false,
+   "prospectus_found": false,
+   "current_contract": {
+    "obtained": false,
+    "reason": "未检索到官方公告"
+   },
+   "current_prospectus": {
+    "obtained": false,
+    "reason": "未检索到官方公告"
+   },
+   "history_versions": [],
+   "history_count": 0,
+   "history_versions_missing": true,
+   "text_consistent_with_l3": null,
+   "text_comparison": {
+    "comparable": false
+   },
+   "evidence_grade": "L3",
+   "not_obtained_reason": "未检索到官方公告",
+   "disclosed_date": null,
+   "sha256": null
+  },
+  {
+   "fund_id": 113,
+   "fund_code": "001883",
+   "fund_name": "中欧新动力混合",
+   "fund_full_name": "中欧新动力混合型证券投资基金(LOF)",
+   "fund_company": "中欧基金管理公司",
+   "category": "active_equity",
+   "l3_benchmark_text": "中证800指数收益率*85%+中证全债指数收益率*15%",
+   "cninfo": {
+    "error": "巨潮未检索到该基金代码"
+   },
+   "channel": "未获取（巨潮基金频道仅覆盖场内品种）",
+   "contract_found": false,
+   "prospectus_found": false,
+   "evidence_grade": "L3",
+   "not_obtained_reason": "巨潮资讯基金频道仅收录 LOF/封闭式/ETF 等场内品种，该基金为场外品种，未在巨潮收录；管理人官网渠道未实现",
+   "current_contract": null,
+   "current_prospectus": null,
+   "history_versions": [],
+   "history_versions_missing": true
+  },
+  {
+   "fund_id": 114,
+   "fund_code": "001886",
+   "fund_name": "中欧成长",
+   "fund_full_name": "中欧行业成长混合型证券投资基金(LOF)",
+   "fund_company": "中欧基金管理公司",
+   "category": "active_equity",
+   "l3_benchmark_text": "中证800指数收益率*90%+中债-综合全价(总值)指数收益率*10%",
+   "cninfo": {
+    "error": "巨潮未检索到该基金代码"
+   },
+   "channel": "未获取（巨潮基金频道仅覆盖场内品种）",
+   "contract_found": false,
+   "prospectus_found": false,
+   "evidence_grade": "L3",
+   "not_obtained_reason": "巨潮资讯基金频道仅收录 LOF/封闭式/ETF 等场内品种，该基金为场外品种，未在巨潮收录；管理人官网渠道未实现",
+   "current_contract": null,
+   "current_prospectus": null,
+   "history_versions": [],
+   "history_versions_missing": true
+  },
+  {
+   "fund_id": 115,
+   "fund_code": "001888",
+   "fund_name": "中欧盛世成长",
+   "fund_full_name": "中欧盛世成长混合型证券投资基金(LOF)",
+   "fund_company": "中欧基金管理公司",
+   "category": "active_equity",
+   "l3_benchmark_text": "沪深300指数收益率×75%＋中证全债指数收益率×25%",
+   "cninfo": {
+    "error": "巨潮未检索到该基金代码"
+   },
+   "channel": "未获取（巨潮基金频道仅覆盖场内品种）",
+   "contract_found": false,
+   "prospectus_found": false,
+   "evidence_grade": "L3",
+   "not_obtained_reason": "巨潮资讯基金频道仅收录 LOF/封闭式/ETF 等场内品种，该基金为场外品种，未在巨潮收录；管理人官网渠道未实现",
+   "current_contract": null,
+   "current_prospectus": null,
+   "history_versions": [],
+   "history_versions_missing": true
+  },
+  {
+   "fund_id": 116,
+   "fund_code": "001889",
+   "fund_name": "中欧增强回报债券",
+   "fund_full_name": "中欧增强回报债券型证券投资基金(LOF)",
+   "fund_company": "中欧基金管理公司",
+   "category": "mixed_bond",
+   "l3_benchmark_text": "中债-1-5年债券综合全价（总值）指数收益率*90%+中证可转换债券指数收益率*10%",
+   "cninfo": {
+    "error": "巨潮未检索到该基金代码"
+   },
+   "channel": "未获取（巨潮基金频道仅覆盖场内品种）",
+   "contract_found": false,
+   "prospectus_found": false,
+   "evidence_grade": "L3",
+   "not_obtained_reason": "巨潮资讯基金频道仅收录 LOF/封闭式/ETF 等场内品种，该基金为场外品种，未在巨潮收录；管理人官网渠道未实现",
+   "current_contract": null,
+   "current_prospectus": null,
+   "history_versions": [],
+   "history_versions_missing": true
+  },
+  {
+   "fund_id": 117,
+   "fund_code": "002592",
+   "fund_name": "中欧纯债",
+   "fund_full_name": "中欧纯债债券型证券投资基金(LOF)",
+   "fund_company": "中欧基金管理公司",
+   "category": "pure_bond",
+   "l3_benchmark_text": "中债-优选投资级信用债全价(总值)指数收益率",
+   "cninfo": {
+    "org_id": "9900020254",
+    "short_name": "ST八菱",
+    "category": "A股"
+   },
+   "channel": "巨潮资讯网（证监会指定信息披露网站）",
+   "contract_found": false,
+   "prospectus_found": false,
+   "current_contract": {
+    "obtained": false,
+    "reason": "未检索到官方公告"
+   },
+   "current_prospectus": {
+    "obtained": false,
+    "reason": "未检索到官方公告"
+   },
+   "history_versions": [],
+   "history_count": 0,
+   "history_versions_missing": true,
+   "text_consistent_with_l3": null,
+   "text_comparison": {
+    "comparable": false
+   },
+   "evidence_grade": "L3",
+   "not_obtained_reason": "未检索到官方公告",
+   "disclosed_date": null,
+   "sha256": null
+  },
+  {
+   "fund_id": 118,
+   "fund_code": "001051",
+   "fund_name": "华夏上证50ETF联接",
+   "fund_full_name": "华夏上证50交易型开放式指数证券投资基金联接基金",
+   "fund_company": "华夏基金管理有限公司",
+   "category": "etf_feeder",
+   "l3_benchmark_text": "上证50指数收益率×95%＋人民币活期存款税后利率×5%",
+   "cninfo": {
+    "error": "巨潮未检索到该基金代码"
+   },
+   "channel": "未获取（巨潮基金频道仅覆盖场内品种）",
+   "contract_found": false,
+   "prospectus_found": false,
+   "evidence_grade": "L3",
+   "not_obtained_reason": "巨潮资讯基金频道仅收录 LOF/封闭式/ETF 等场内品种，该基金为场外品种，未在巨潮收录；管理人官网渠道未实现",
+   "current_contract": null,
+   "current_prospectus": null,
+   "history_versions": [],
+   "history_versions_missing": true
+  },
+  {
+   "fund_id": 119,
+   "fund_code": "001237",
+   "fund_name": "博时上证50ETF联接",
+   "fund_full_name": "博时上证50交易型开放式指数证券投资基金联接基金",
+   "fund_company": "博时基金管理有限公司",
+   "category": "etf_feeder",
+   "l3_benchmark_text": "上证50指数收益率×95%+银行活期存款税后利率×5%",
+   "cninfo": {
+    "org_id": "9900063097",
+    "short_name": "惠康科技",
+    "category": "A股"
+   },
+   "channel": "巨潮资讯网（证监会指定信息披露网站）",
+   "contract_found": false,
+   "prospectus_found": false,
+   "current_contract": {
+    "obtained": false,
+    "reason": "未检索到官方公告"
+   },
+   "current_prospectus": {
+    "obtained": false,
+    "reason": "未检索到官方公告"
+   },
+   "history_versions": [],
+   "history_count": 0,
+   "history_versions_missing": true,
+   "text_consistent_with_l3": null,
+   "text_comparison": {
+    "comparable": false
+   },
+   "evidence_grade": "L3",
+   "not_obtained_reason": "未检索到官方公告",
+   "disclosed_date": null,
+   "sha256": null
+  },
+  {
+   "fund_id": 120,
+   "fund_code": "001592",
+   "fund_name": "天弘创业板ETF联接",
+   "fund_full_name": "天弘创业板交易型开放式指数证券投资基金联接基金",
+   "fund_company": "天弘基金管理有限公司",
+   "category": "etf_feeder",
+   "l3_benchmark_text": "创业板指数收益率×95%＋银行活期存款利率（税后）×5%",
+   "cninfo": {
+    "error": "巨潮未检索到该基金代码"
+   },
+   "channel": "未获取（巨潮基金频道仅覆盖场内品种）",
+   "contract_found": false,
+   "prospectus_found": false,
+   "evidence_grade": "L3",
+   "not_obtained_reason": "巨潮资讯基金频道仅收录 LOF/封闭式/ETF 等场内品种，该基金为场外品种，未在巨潮收录；管理人官网渠道未实现",
+   "current_contract": null,
+   "current_prospectus": null,
+   "history_versions": [],
+   "history_versions_missing": true
+  },
+  {
+   "fund_id": 121,
+   "fund_code": "002656",
+   "fund_name": "南方创业板ETF联接",
+   "fund_full_name": "南方创业板交易型开放式指数证券投资基金联接基金",
+   "fund_company": "南方基金管理股份有限公司",
+   "category": "etf_feeder",
+   "l3_benchmark_text": "创业板指数收益率×95%+银行人民币活期存款利率（税后）×5%",
+   "cninfo": {
+    "org_id": "9900022094",
+    "short_name": "摩登大道",
+    "category": "A股"
+   },
+   "channel": "巨潮资讯网（证监会指定信息披露网站）",
+   "contract_found": false,
+   "prospectus_found": false,
+   "current_contract": {
+    "obtained": false,
+    "reason": "未检索到官方公告"
+   },
+   "current_prospectus": {
+    "obtained": false,
+    "reason": "未检索到官方公告"
+   },
+   "history_versions": [],
+   "history_count": 0,
+   "history_versions_missing": true,
+   "text_consistent_with_l3": null,
+   "text_comparison": {
+    "comparable": false
+   },
+   "evidence_grade": "L3",
+   "not_obtained_reason": "未检索到官方公告",
+   "disclosed_date": null,
+   "sha256": null
+  },
+  {
+   "fund_id": 122,
+   "fund_code": "001879",
+   "fund_name": "长城创业板指数增强",
+   "fund_full_name": "长城创业板指数增强型发起式证券投资基金",
+   "fund_company": "长城基金管理公司",
+   "category": "index_plain",
+   "l3_benchmark_text": "创业板指数收益率×95%+银行活期存款利率(税后)×5%",
+   "cninfo": {
+    "error": "巨潮未检索到该基金代码"
+   },
+   "channel": "未获取（巨潮基金频道仅覆盖场内品种）",
+   "contract_found": false,
+   "prospectus_found": false,
+   "evidence_grade": "L3",
+   "not_obtained_reason": "巨潮资讯基金频道仅收录 LOF/封闭式/ETF 等场内品种，该基金为场外品种，未在巨潮收录；管理人官网渠道未实现",
+   "current_contract": null,
+   "current_prospectus": null,
+   "history_versions": [],
+   "history_versions_missing": true
+  },
+  {
+   "fund_id": 123,
+   "fund_code": "003765",
+   "fund_name": "广发创业板ETF联接",
+   "fund_full_name": "广发创业板交易型开放式指数证券投资基金发起式联接基金",
+   "fund_company": "广发基金管理有限公司",
+   "category": "etf_feeder",
+   "l3_benchmark_text": "95%×创业板指数收益率+5%×银行活期存款利率（税后）",
+   "cninfo": {
+    "error": "巨潮未检索到该基金代码"
+   },
+   "channel": "未获取（巨潮基金频道仅覆盖场内品种）",
+   "contract_found": false,
+   "prospectus_found": false,
+   "evidence_grade": "L3",
+   "not_obtained_reason": "巨潮资讯基金频道仅收录 LOF/封闭式/ETF 等场内品种，该基金为场外品种，未在巨潮收录；管理人官网渠道未实现",
+   "current_contract": null,
+   "current_prospectus": null,
+   "history_versions": [],
+   "history_versions_missing": true
+  },
+  {
+   "fund_id": 124,
+   "fund_code": "004746",
+   "fund_name": "易方达50指数",
+   "fund_full_name": "易方达上证50指数增强型证券投资基金",
+   "fund_company": "易方达基金管理有限公司",
+   "category": "index_plain",
+   "l3_benchmark_text": "上证50指数",
+   "cninfo": {
+    "error": "巨潮未检索到该基金代码"
+   },
+   "channel": "管理人官方网站（易方达基金）",
+   "contract_found": true,
+   "prospectus_found": true,
+   "current_contract": {
+    "obtained": true,
+    "url": "https://cdn.efunds.com.cn/owch/data/bulletin/20241212/%E6%98%93%E6%96%B9%E8%BE%BE%E4%B8%8A%E8%AF%8150%E6%8C%87%E6%95%B0%E5%A2%9E%E5%BC%BA%E5%9E%8B%E8%AF%81%E5%88%B8%E6%8A%95%E8%B5%84%E5%9F%BA%E9%87%91%E5%9F%BA%E9%87%91%E5%90%88%E5%90%8C.pdf",
+    "file": "reports/evidence/phase3B6_2_3_0/fund_contracts/004746_基金合同.pdf",
+    "bytes": 1118214,
+    "sha256": "3967e08d0885b2c9e28d44414ab19ff59d91adf54ddfe329b7e038f301b12b5a",
+    "readable": true,
+    "text_chars": 57261,
+    "benchmark_excerpt": {
+     "found": true,
+     "excerpts": [
+      "业绩比较基准上证50指数收益率*80%+上证国债指数收益率*20%。在法律法规允许时，本基金将转变为纯股票指数基金，届时其业绩比较基准将相应改为上证50指数。未来若出现标的指数不符合法律法规及监管的要求（因成份股价格波动等指数编制方法变动之外的因素致使标的指数不符合要求的情形除外）、指数编制机构退出等情形，基金管理人应当自该情形发生之日起十个工作日向中国证监会报告并提出解决方案，如更换基金标的指数、转换运作方式、与其他基金合并、或者终止基金合同等，并在6个月内召集基金份额持有"
+     ],
+     "primary": "业绩比较基准上证50指数收益率*80%+上证国债指数收益率*20%。在法律法规允许时，本基金将转变为纯股票指数基金，届时其业绩比较基准将相应改为上证50指数。未来若出现标的指数不符合法律法规及监管的要求（因成份股价格波动等指数编制方法变动之外的因素致使标的指数不符合要求的情形除外）、指数编制机构退出等情形，基金管理人应当自该情形发生之日起十个工作日向中国证监会报告并提出解决方案，如更换基金标的指数、转换运作方式、与其他基金合并、或者终止基金合同等，并在6个月内召集基金份额持有"
+    },
+    "obtained_at": "2026-11-26T11:19:06",
+    "disclosed_date": "2024-12-12",
+    "doc_type": "基金合同",
+    "title": "易方达上证50指数增强型证券投资基金基金合同"
+   },
+   "current_prospectus": {
+    "obtained": true,
+    "url": "https://cdn.efunds.com.cn/owch/data/bulletin/20260731/%E6%98%93%E6%96%B9%E8%BE%BE%E4%B8%8A%E8%AF%8150%E6%8C%87%E6%95%B0%E5%A2%9E%E5%BC%BA%E5%9E%8B%E8%AF%81%E5%88%B8%E6%8A%95%E8%B5%84%E5%9F%BA%E9%87%91%E6%9B%B4%E6%96%B0%E7%9A%84%E6%8B%9B%E5%8B%9F%E8%AF%B4%E6%98%8E%E4%B9%A6.pdf",
+    "file": "reports/evidence/phase3B6_2_3_0/fund_contracts/004746_招募说明书.pdf",
+    "bytes": 949410,
+    "sha256": "1b4b0dffde040c62d2903420fdf016e3e9f9bff94b1a22072e27525ad39eae63",
+    "readable": true,
+    "text_chars": 88866,
+    "benchmark_excerpt": {
+     "found": true,
+     "excerpts": [
+      "业绩比较基准为：上证50指数。"
+     ],
+     "primary": "业绩比较基准为：上证50指数。"
+    },
+    "obtained_at": "2026-11-26T11:19:09",
+    "disclosed_date": "2026-07-31",
+    "doc_type": "招募说明书",
+    "title": "易方达上证50指数增强型证券投资基金更新的招募说明书"
+   },
+   "history_versions": [
+    {
+     "title": "易方达上证50指数增强型证券投资基金基金合同",
+     "url": "https://cdn.efunds.com.cn/owch/data/notice/20210330/%E6%98%93%E6%96%B9%E8%BE%BE%E4%B8%8A%E8%AF%8150%E6%8C%87%E6%95%B0%E5%A2%9E%E5%BC%BA%E5%9E%8B%E8%AF%81%E5%88%B8%E6%8A%95%E8%B5%84%E5%9F%BA%E9%87%91%E5%9F%BA%E9%87%91%E5%90%88%E5%90%8C.pdf",
+     "date": "2021-03-30",
+     "catalog": "基金合同",
+     "doc_type": "基金合同"
+    },
+    {
+     "title": "易方达上证50指数增强型证券投资基金基金合同",
+     "url": "https://cdn.efunds.com.cn/owch/data/bulletin/20210203/%E6%98%93%E6%96%B9%E8%BE%BE%E4%B8%8A%E8%AF%8150%E6%8C%87%E6%95%B0%E5%A2%9E%E5%BC%BA%E5%9E%8B%E8%AF%81%E5%88%B8%E6%8A%95%E8%B5%84%E5%9F%BA%E9%87%91%E5%9F%BA%E9%87%91%E5%90%88%E5%90%8C.pdf",
+     "date": "2021-02-03",
+     "catalog": "基金合同",
+     "doc_type": "基金合同"
+    },
+    {
+     "title": "易方达上证50指数增强型证券投资基金更新的招募说明书",
+     "url": "https://cdn.efunds.com.cn/owch/data/bulletin/20250830/%E6%98%93%E6%96%B9%E8%BE%BE%E4%B8%8A%E8%AF%8150%E6%8C%87%E6%95%B0%E5%A2%9E%E5%BC%BA%E5%9E%8B%E8%AF%81%E5%88%B8%E6%8A%95%E8%B5%84%E5%9F%BA%E9%87%91%E6%9B%B4%E6%96%B0%E7%9A%84%E6%8B%9B%E5%8B%9F%E8%AF%B4%E6%98%8E%E4%B9%A6.pdf",
+     "date": "2025-08-30",
+     "catalog": "招募说明书",
+     "doc_type": "招募说明书"
+    },
+    {
+     "title": "易方达上证50指数增强型证券投资基金更新的招募说明书",
+     "url": "https://cdn.efunds.com.cn/owch/data/bulletin/20241212/%E6%98%93%E6%96%B9%E8%BE%BE%E4%B8%8A%E8%AF%8150%E6%8C%87%E6%95%B0%E5%A2%9E%E5%BC%BA%E5%9E%8B%E8%AF%81%E5%88%B8%E6%8A%95%E8%B5%84%E5%9F%BA%E9%87%91%E6%9B%B4%E6%96%B0%E7%9A%84%E6%8B%9B%E5%8B%9F%E8%AF%B4%E6%98%8E%E4%B9%A6.pdf",
+     "date": "2024-12-12",
+     "catalog": "招募说明书",
+     "doc_type": "招募说明书"
+    },
+    {
+     "title": "易方达上证50指数增强型证券投资基金更新的招募说明书",
+     "url": "https://cdn.efunds.com.cn/owch/data/bulletin/20240928/%E6%98%93%E6%96%B9%E8%BE%BE%E4%B8%8A%E8%AF%8150%E6%8C%87%E6%95%B0%E5%A2%9E%E5%BC%BA%E5%9E%8B%E8%AF%81%E5%88%B8%E6%8A%95%E8%B5%84%E5%9F%BA%E9%87%91%E6%9B%B4%E6%96%B0%E7%9A%84%E6%8B%9B%E5%8B%9F%E8%AF%B4%E6%98%8E%E4%B9%A6.pdf",
+     "date": "2024-09-28",
+     "catalog": "招募说明书",
+     "doc_type": "招募说明书"
+    },
+    {
+     "title": "易方达上证50指数增强型证券投资基金更新的招募说明书",
+     "url": "https://cdn.efunds.com.cn/owch/data/bulletin/20231101/%E6%98%93%E6%96%B9%E8%BE%BE%E4%B8%8A%E8%AF%8150%E6%8C%87%E6%95%B0%E5%A2%9E%E5%BC%BA%E5%9E%8B%E8%AF%81%E5%88%B8%E6%8A%95%E8%B5%84%E5%9F%BA%E9%87%91%E6%9B%B4%E6%96%B0%E7%9A%84%E6%8B%9B%E5%8B%9F%E8%AF%B4%E6%98%8E%E4%B9%A6.pdf",
+     "date": "2023-11-01",
+     "catalog": "招募说明书",
+     "doc_type": "招募说明书"
+    },
+    {
+     "title": "易方达上证50指数增强型证券投资基金更新的招募说明书",
+     "url": "https://cdn.efunds.com.cn/owch/data/bulletin/20221130/%E6%98%93%E6%96%B9%E8%BE%BE%E4%B8%8A%E8%AF%8150%E6%8C%87%E6%95%B0%E5%A2%9E%E5%BC%BA%E5%9E%8B%E8%AF%81%E5%88%B8%E6%8A%95%E8%B5%84%E5%9F%BA%E9%87%91%E6%9B%B4%E6%96%B0%E7%9A%84%E6%8B%9B%E5%8B%9F%E8%AF%B4%E6%98%8E%E4%B9%A6.pdf",
+     "date": "2022-11-30",
+     "catalog": "招募说明书",
+     "doc_type": "招募说明书"
+    },
+    {
+     "title": "易方达上证50指数增强型证券投资基金更新的招募说明书",
+     "url": "https://cdn.efunds.com.cn/owch/data/bulletin/20211229/%E6%98%93%E6%96%B9%E8%BE%BE%E4%B8%8A%E8%AF%8150%E6%8C%87%E6%95%B0%E5%A2%9E%E5%BC%BA%E5%9E%8B%E8%AF%81%E5%88%B8%E6%8A%95%E8%B5%84%E5%9F%BA%E9%87%91%E6%9B%B4%E6%96%B0%E7%9A%84%E6%8B%9B%E5%8B%9F%E8%AF%B4%E6%98%8E%E4%B9%A6.pdf",
+     "date": "2021-12-29",
+     "catalog": "招募说明书",
+     "doc_type": "招募说明书"
+    },
+    {
+     "title": "易方达上证50指数增强型证券投资基金更新的招募说明书",
+     "url": "https://cdn.efunds.com.cn/owch/data/notice/20210406/%E6%98%93%E6%96%B9%E8%BE%BE%E4%B8%8A%E8%AF%8150%E6%8C%87%E6%95%B0%E5%A2%9E%E5%BC%BA%E5%9E%8B%E8%AF%81%E5%88%B8%E6%8A%95%E8%B5%84%E5%9F%BA%E9%87%91%E6%9B%B4%E6%96%B0%E7%9A%84%E6%8B%9B%E5%8B%9F%E8%AF%B4%E6%98%8E%E4%B9%A6.pdf",
+     "date": "2021-04-06",
+     "catalog": "招募说明书",
+     "doc_type": "招募说明书"
+    },
+    {
+     "title": "易方达上证50指数增强型证券投资基金更新的招募说明书",
+     "url": "https://cdn.efunds.com.cn/owch/data/bulletin/20210203/%E6%98%93%E6%96%B9%E8%BE%BE%E4%B8%8A%E8%AF%8150%E6%8C%87%E6%95%B0%E5%A2%9E%E5%BC%BA%E5%9E%8B%E8%AF%81%E5%88%B8%E6%8A%95%E8%B5%84%E5%9F%BA%E9%87%91%E6%9B%B4%E6%96%B0%E7%9A%84%E6%8B%9B%E5%8B%9F%E8%AF%B4%E6%98%8E%E4%B9%A6.pdf",
+     "date": "2021-02-03",
+     "catalog": "招募说明书",
+     "doc_type": "招募说明书"
+    }
+   ],
+   "history_count": 10,
+   "history_versions_missing": false,
+   "text_consistent_with_l3": true,
+   "text_comparison": {
+    "comparable": true,
+    "consistent": true,
+    "l3_weights": [],
+    "contract_weights": [
+     "80%",
+     "20%"
+    ],
+    "normalized_l3": "上证50指数",
+    "normalized_contract": "业绩比较基准上证50指数收益率*80%+上证国债指数收益率*20%。在法律法规允许时，本基金将转变为纯股票指数基金，届时其业绩比较基准将相应改为上证50指数。未来若出现标的指数不符合法律法规及监管的要求(因成份股价格波动等指数编制方法变动之外的因素致使标的指数不符合要求的情形除外)、指数编制机构退出等情形，基金管理人应当自该情形发生之日起十个工作日向中国证监会报告并提出解决方案，如更换基金标的指数、转换运作方式、与其他基金合并、或者终止基金合同等，并在6个月内召集基金份额持有",
+    "note": "第三方文本可在合同原文中找到，但**权重成分不一致**：L3=[] / 合同=['80%', '20%']"
+   },
+   "evidence_grade": "L1",
+   "not_obtained_reason": null,
+   "disclosed_date": "2024-12-12",
+   "sha256": "3967e08d0885b2c9e28d44414ab19ff59d91adf54ddfe329b7e038f301b12b5a"
+  },
+  {
+   "fund_id": 125,
+   "fund_code": "005880",
+   "fund_name": "建信上证50ETF发起联接",
+   "fund_full_name": "建信上证50交易型开放式指数证券投资基金发起式联接基金",
+   "fund_company": "建信基金管理有限责任公司",
+   "category": "etf_feeder",
+   "l3_benchmark_text": "上证50指数收益率×95%+银行活期存款税后利率×5%",
+   "cninfo": {
+    "error": "巨潮未检索到该基金代码"
+   },
+   "channel": "未获取（巨潮基金频道仅覆盖场内品种）",
+   "contract_found": false,
+   "prospectus_found": false,
+   "evidence_grade": "L3",
+   "not_obtained_reason": "巨潮资讯基金频道仅收录 LOF/封闭式/ETF 等场内品种，该基金为场外品种，未在巨潮收录；管理人官网渠道未实现",
+   "current_contract": null,
+   "current_prospectus": null,
+   "history_versions": [],
+   "history_versions_missing": true
+  },
+  {
+   "fund_id": 126,
+   "fund_code": "011608",
+   "fund_name": "易方达上证科创50ETF联接",
+   "fund_full_name": "易方达上证科创板50成份交易型开放式指数证券投资基金联接基金",
+   "fund_company": "易方达基金管理有限公司",
+   "category": "etf_feeder",
+   "l3_benchmark_text": "上证科创板50成份指数收益率×95%＋活期存款利率（税后）×5%",
+   "cninfo": {
+    "error": "巨潮未检索到该基金代码"
+   },
+   "channel": "管理人官方网站（易方达基金）",
+   "contract_found": true,
+   "prospectus_found": true,
+   "current_contract": {
+    "obtained": true,
+    "url": "https://cdn.efunds.com.cn/owch/data/bulletin/20241212/%E6%98%93%E6%96%B9%E8%BE%BE%E4%B8%8A%E8%AF%81%E7%A7%91%E5%88%9B%E6%9D%BF50%E6%88%90%E4%BB%BD%E4%BA%A4%E6%98%93%E5%9E%8B%E5%BC%80%E6%94%BE%E5%BC%8F%E6%8C%87%E6%95%B0%E8%AF%81%E5%88%B8%E6%8A%95%E8%B5%84%E5%9F%BA%E9%87%91%E8%81%94%E6%8E%A5%E5%9F%BA%E9%87%91%E5%9F%BA%E9%87%91%E5%90%88%E5%90%8C.pdf",
+    "file": "reports/evidence/phase3B6_2_3_0/fund_contracts/011608_基金合同.pdf",
+    "bytes": 1321561,
+    "sha256": "2d42d5ddf4e2061e0c791060234c5d75033d491847dc1bb77077770fd2c90204",
+    "readable": true,
+    "text_chars": 77557,
+    "benchmark_excerpt": {
+     "found": true,
+     "excerpts": [
+      "业绩比较基准为上证科创板50成份指数收益率×95%+活期存款利率（税后）×5%本"
+     ],
+     "primary": "业绩比较基准为上证科创板50成份指数收益率×95%+活期存款利率（税后）×5%本"
+    },
+    "obtained_at": "2026-11-26T11:19:13",
+    "disclosed_date": "2024-12-12",
+    "doc_type": "基金合同",
+    "title": "易方达上证科创板50成份交易型开放式指数证券投资基金联接基金基金合同"
+   },
+   "current_prospectus": {
+    "obtained": true,
+    "url": "https://cdn.efunds.com.cn/owch/data/bulletin/20260829/%E6%98%93%E6%96%B9%E8%BE%BE%E4%B8%8A%E8%AF%81%E7%A7%91%E5%88%9B%E6%9D%BF50%E6%88%90%E4%BB%BD%E4%BA%A4%E6%98%93%E5%9E%8B%E5%BC%80%E6%94%BE%E5%BC%8F%E6%8C%87%E6%95%B0%E8%AF%81%E5%88%B8%E6%8A%95%E8%B5%84%E5%9F%BA%E9%87%91%E8%81%94%E6%8E%A5%E5%9F%BA%E9%87%91%E6%9B%B4%E6%96%B0%E7%9A%84%E6%8B%9B%E5%8B%9F%E8%AF%B4%E6%98%8E%E4%B9%A6.pdf",
+    "file": "reports/evidence/phase3B6_2_3_0/fund_contracts/011608_招募说明书.pdf",
+    "bytes": 1196446,
+    "sha256": "a6ab601e90dafa123913153cab21705974bda112fe1ec362a2b93432aa1a44b5",
+    "readable": true,
+    "text_chars": 114600,
+    "benchmark_excerpt": {
+     "found": true,
+     "excerpts": [
+      "业绩比较基准为上证科创板50成份指数收益率×95%+活期存款利率（税后）×5%本"
+     ],
+     "primary": "业绩比较基准为上证科创板50成份指数收益率×95%+活期存款利率（税后）×5%本"
+    },
+    "obtained_at": "2026-11-26T11:19:19",
+    "disclosed_date": "2026-08-29",
+    "doc_type": "招募说明书",
+    "title": "易方达上证科创板50成份交易型开放式指数证券投资基金联接基金更新的招募说明书"
+   },
+   "history_versions": [
+    {
+     "title": "易方达上证科创板50成份交易型开放式指数证券投资基金联接基金基金合同",
+     "url": "https://cdn.efunds.com.cn/owch/data/bulletin/20241119/%E6%98%93%E6%96%B9%E8%BE%BE%E4%B8%8A%E8%AF%81%E7%A7%91%E5%88%9B%E6%9D%BF50%E6%88%90%E4%BB%BD%E4%BA%A4%E6%98%93%E5%9E%8B%E5%BC%80%E6%94%BE%E5%BC%8F%E6%8C%87%E6%95%B0%E8%AF%81%E5%88%B8%E6%8A%95%E8%B5%84%E5%9F%BA%E9%87%91%E8%81%94%E6%8E%A5%E5%9F%BA%E9%87%91%E5%9F%BA%E9%87%91%E5%90%88%E5%90%8C.pdf",
+     "date": "2024-11-19",
+     "catalog": "基金合同",
+     "doc_type": "基金合同"
+    },
+    {
+     "title": "易方达上证科创板50成份交易型开放式指数证券投资基金联接基金基金合同",
+     "url": "https://cdn.efunds.com.cn/owch/data/bulletin/20231202/%E6%98%93%E6%96%B9%E8%BE%BE%E4%B8%8A%E8%AF%81%E7%A7%91%E5%88%9B%E6%9D%BF50%E6%88%90%E4%BB%BD%E4%BA%A4%E6%98%93%E5%9E%8B%E5%BC%80%E6%94%BE%E5%BC%8F%E6%8C%87%E6%95%B0%E8%AF%81%E5%88%B8%E6%8A%95%E8%B5%84%E5%9F%BA%E9%87%91%E8%81%94%E6%8E%A5%E5%9F%BA%E9%87%91%E5%9F%BA%E9%87%91%E5%90%88%E5%90%8C.pdf",
+     "date": "2023-12-02",
+     "catalog": "基金合同",
+     "doc_type": "基金合同"
+    },
+    {
+     "title": "易方达上证科创板50成份交易型开放式指数证券投资基金联接基金基金合同",
+     "url": "https://cdn.efunds.com.cn/owch/data/bulletin/20230905/%E6%98%93%E6%96%B9%E8%BE%BE%E4%B8%8A%E8%AF%81%E7%A7%91%E5%88%9B%E6%9D%BF50%E6%88%90%E4%BB%BD%E4%BA%A4%E6%98%93%E5%9E%8B%E5%BC%80%E6%94%BE%E5%BC%8F%E6%8C%87%E6%95%B0%E8%AF%81%E5%88%B8%E6%8A%95%E8%B5%84%E5%9F%BA%E9%87%91%E8%81%94%E6%8E%A5%E5%9F%BA%E9%87%91%E5%9F%BA%E9%87%91%E5%90%88%E5%90%8C.pdf",
+     "date": "2023-09-05",
+     "catalog": "基金合同",
+     "doc_type": "基金合同"
+    },
+    {
+     "title": "易方达上证科创板50成份交易型开放式指数证券投资基金联接基金基金合同",
+     "url": "https://cdn.efunds.com.cn/owch/data/bulletin/20210217/%E6%98%93%E6%96%B9%E8%BE%BE%E4%B8%8A%E8%AF%81%E7%A7%91%E5%88%9B%E6%9D%BF50%E6%88%90%E4%BB%BD%E4%BA%A4%E6%98%93%E5%9E%8B%E5%BC%80%E6%94%BE%E5%BC%8F%E6%8C%87%E6%95%B0%E8%AF%81%E5%88%B8%E6%8A%95%E8%B5%84%E5%9F%BA%E9%87%91%E8%81%94%E6%8E%A5%E5%9F%BA%E9%87%91%E5%9F%BA%E9%87%91%E5%90%88%E5%90%8C.pdf",
+     "date": "2021-02-17",
+     "catalog": "基金合同",
+     "doc_type": "基金合同"
+    },
+    {
+     "title": "易方达上证科创板50成份交易型开放式指数证券投资基金联接基金更新的招募说明书",
+     "url": "https://cdn.efunds.com.cn/owch/data/bulletin/20250926/%E6%98%93%E6%96%B9%E8%BE%BE%E4%B8%8A%E8%AF%81%E7%A7%91%E5%88%9B%E6%9D%BF50%E6%88%90%E4%BB%BD%E4%BA%A4%E6%98%93%E5%9E%8B%E5%BC%80%E6%94%BE%E5%BC%8F%E6%8C%87%E6%95%B0%E8%AF%81%E5%88%B8%E6%8A%95%E8%B5%84%E5%9F%BA%E9%87%91%E8%81%94%E6%8E%A5%E5%9F%BA%E9%87%91%E6%9B%B4%E6%96%B0%E7%9A%84%E6%8B%9B%E5%8B%9F%E8%AF%B4%E6%98%8E%E4%B9%A6.pdf",
+     "date": "2025-09-26",
+     "catalog": "招募说明书",
+     "doc_type": "招募说明书"
+    },
+    {
+     "title": "易方达上证科创板50成份交易型开放式指数证券投资基金联接基金更新的招募说明书",
+     "url": "https://cdn.efunds.com.cn/owch/data/bulletin/20250909/%E6%98%93%E6%96%B9%E8%BE%BE%E4%B8%8A%E8%AF%81%E7%A7%91%E5%88%9B%E6%9D%BF50%E6%88%90%E4%BB%BD%E4%BA%A4%E6%98%93%E5%9E%8B%E5%BC%80%E6%94%BE%E5%BC%8F%E6%8C%87%E6%95%B0%E8%AF%81%E5%88%B8%E6%8A%95%E8%B5%84%E5%9F%BA%E9%87%91%E8%81%94%E6%8E%A5%E5%9F%BA%E9%87%91%E6%9B%B4%E6%96%B0%E7%9A%84%E6%8B%9B%E5%8B%9F%E8%AF%B4%E6%98%8E%E4%B9%A6.pdf",
+     "date": "2025-09-09",
+     "catalog": "招募说明书",
+     "doc_type": "招募说明书"
+    },
+    {
+     "title": "易方达上证科创板50成份交易型开放式指数证券投资基金联接基金更新的招募说明书",
+     "url": "https://cdn.efunds.com.cn/owch/data/bulletin/20241212/%E6%98%93%E6%96%B9%E8%BE%BE%E4%B8%8A%E8%AF%81%E7%A7%91%E5%88%9B%E6%9D%BF50%E6%88%90%E4%BB%BD%E4%BA%A4%E6%98%93%E5%9E%8B%E5%BC%80%E6%94%BE%E5%BC%8F%E6%8C%87%E6%95%B0%E8%AF%81%E5%88%B8%E6%8A%95%E8%B5%84%E5%9F%BA%E9%87%91%E8%81%94%E6%8E%A5%E5%9F%BA%E9%87%91%E6%9B%B4%E6%96%B0%E7%9A%84%E6%8B%9B%E5%8B%9F%E8%AF%B4%E6%98%8E%E4%B9%A6.pdf",
+     "date": "2024-12-12",
+     "catalog": "招募说明书",
+     "doc_type": "招募说明书"
+    },
+    {
+     "title": "易方达上证科创板50成份交易型开放式指数证券投资基金联接基金更新的招募说明书",
+     "url": "https://cdn.efunds.com.cn/owch/data/bulletin/20241207/%E6%98%93%E6%96%B9%E8%BE%BE%E4%B8%8A%E8%AF%81%E7%A7%91%E5%88%9B%E6%9D%BF50%E6%88%90%E4%BB%BD%E4%BA%A4%E6%98%93%E5%9E%8B%E5%BC%80%E6%94%BE%E5%BC%8F%E6%8C%87%E6%95%B0%E8%AF%81%E5%88%B8%E6%8A%95%E8%B5%84%E5%9F%BA%E9%87%91%E8%81%94%E6%8E%A5%E5%9F%BA%E9%87%91%E6%9B%B4%E6%96%B0%E7%9A%84%E6%8B%9B%E5%8B%9F%E8%AF%B4%E6%98%8E%E4%B9%A6.pdf",
+     "date": "2024-12-07",
+     "catalog": "招募说明书",
+     "doc_type": "招募说明书"
+    },
+    {
+     "title": "易方达上证科创板50成份交易型开放式指数证券投资基金联接基金更新的招募说明书",
+     "url": "https://cdn.efunds.com.cn/owch/data/bulletin/20241121/%E6%98%93%E6%96%B9%E8%BE%BE%E4%B8%8A%E8%AF%81%E7%A7%91%E5%88%9B%E6%9D%BF50%E6%88%90%E4%BB%BD%E4%BA%A4%E6%98%93%E5%9E%8B%E5%BC%80%E6%94%BE%E5%BC%8F%E6%8C%87%E6%95%B0%E8%AF%81%E5%88%B8%E6%8A%95%E8%B5%84%E5%9F%BA%E9%87%91%E8%81%94%E6%8E%A5%E5%9F%BA%E9%87%91%E6%9B%B4%E6%96%B0%E7%9A%84%E6%8B%9B%E5%8B%9F%E8%AF%B4%E6%98%8E%E4%B9%A6.pdf",
+     "date": "2024-11-21",
+     "catalog": "招募说明书",
+     "doc_type": "招募说明书"
+    },
+    {
+     "title": "易方达上证科创板50成份交易型开放式指数证券投资基金联接基金更新的招募说明书",
+     "url": "https://cdn.efunds.com.cn/owch/data/bulletin/20241101/%E6%98%93%E6%96%B9%E8%BE%BE%E4%B8%8A%E8%AF%81%E7%A7%91%E5%88%9B%E6%9D%BF50%E6%88%90%E4%BB%BD%E4%BA%A4%E6%98%93%E5%9E%8B%E5%BC%80%E6%94%BE%E5%BC%8F%E6%8C%87%E6%95%B0%E8%AF%81%E5%88%B8%E6%8A%95%E8%B5%84%E5%9F%BA%E9%87%91%E8%81%94%E6%8E%A5%E5%9F%BA%E9%87%91%E6%9B%B4%E6%96%B0%E7%9A%84%E6%8B%9B%E5%8B%9F%E8%AF%B4%E6%98%8E%E4%B9%A6.pdf",
+     "date": "2024-11-01",
+     "catalog": "招募说明书",
+     "doc_type": "招募说明书"
+    },
+    {
+     "title": "易方达上证科创板50成份交易型开放式指数证券投资基金联接基金更新的招募说明书",
+     "url": "https://cdn.efunds.com.cn/owch/data/bulletin/20231204/%E6%98%93%E6%96%B9%E8%BE%BE%E4%B8%8A%E8%AF%81%E7%A7%91%E5%88%9B%E6%9D%BF50%E6%88%90%E4%BB%BD%E4%BA%A4%E6%98%93%E5%9E%8B%E5%BC%80%E6%94%BE%E5%BC%8F%E6%8C%87%E6%95%B0%E8%AF%81%E5%88%B8%E6%8A%95%E8%B5%84%E5%9F%BA%E9%87%91%E8%81%94%E6%8E%A5%E5%9F%BA%E9%87%91%E6%9B%B4%E6%96%B0%E7%9A%84%E6%8B%9B%E5%8B%9F%E8%AF%B4%E6%98%8E%E4%B9%A6.pdf",
+     "date": "2023-12-04",
+     "catalog": "招募说明书",
+     "doc_type": "招募说明书"
+    },
+    {
+     "title": "易方达上证科创板50成份交易型开放式指数证券投资基金联接基金更新的招募说明书",
+     "url": "https://cdn.efunds.com.cn/owch/data/bulletin/20231130/%E6%98%93%E6%96%B9%E8%BE%BE%E4%B8%8A%E8%AF%81%E7%A7%91%E5%88%9B%E6%9D%BF50%E6%88%90%E4%BB%BD%E4%BA%A4%E6%98%93%E5%9E%8B%E5%BC%80%E6%94%BE%E5%BC%8F%E6%8C%87%E6%95%B0%E8%AF%81%E5%88%B8%E6%8A%95%E8%B5%84%E5%9F%BA%E9%87%91%E8%81%94%E6%8E%A5%E5%9F%BA%E9%87%91%E6%9B%B4%E6%96%B0%E7%9A%84%E6%8B%9B%E5%8B%9F%E8%AF%B4%E6%98%8E%E4%B9%A6.pdf",
+     "date": "2023-11-30",
+     "catalog": "招募说明书",
+     "doc_type": "招募说明书"
+    },
+    {
+     "title": "易方达上证科创板50成份交易型开放式指数证券投资基金联接基金更新的招募说明书",
+     "url": "https://cdn.efunds.com.cn/owch/data/bulletin/20230908/%E6%98%93%E6%96%B9%E8%BE%BE%E4%B8%8A%E8%AF%81%E7%A7%91%E5%88%9B%E6%9D%BF50%E6%88%90%E4%BB%BD%E4%BA%A4%E6%98%93%E5%9E%8B%E5%BC%80%E6%94%BE%E5%BC%8F%E6%8C%87%E6%95%B0%E8%AF%81%E5%88%B8%E6%8A%95%E8%B5%84%E5%9F%BA%E9%87%91%E8%81%94%E6%8E%A5%E5%9F%BA%E9%87%91%E6%9B%B4%E6%96%B0%E7%9A%84%E6%8B%9B%E5%8B%9F%E8%AF%B4%E6%98%8E%E4%B9%A6.pdf",
+     "date": "2023-09-08",
+     "catalog": "招募说明书",
+     "doc_type": "招募说明书"
+    },
+    {
+     "title": "易方达上证科创板50成份交易型开放式指数证券投资基金联接基金更新的招募说明书",
+     "url": "https://cdn.efunds.com.cn/owch/data/bulletin/20230606/%E6%98%93%E6%96%B9%E8%BE%BE%E4%B8%8A%E8%AF%81%E7%A7%91%E5%88%9B%E6%9D%BF50%E6%88%90%E4%BB%BD%E4%BA%A4%E6%98%93%E5%9E%8B%E5%BC%80%E6%94%BE%E5%BC%8F%E6%8C%87%E6%95%B0%E8%AF%81%E5%88%B8%E6%8A%95%E8%B5%84%E5%9F%BA%E9%87%91%E8%81%94%E6%8E%A5%E5%9F%BA%E9%87%91%E6%9B%B4%E6%96%B0%E7%9A%84%E6%8B%9B%E5%8B%9F%E8%AF%B4%E6%98%8E%E4%B9%A6.pdf",
+     "date": "2023-06-06",
+     "catalog": "招募说明书",
+     "doc_type": "招募说明书"
+    },
+    {
+     "title": "易方达上证科创板50成份交易型开放式指数证券投资基金联接基金更新的招募说明书",
+     "url": "https://cdn.efunds.com.cn/owch/data/bulletin/20221231/%E6%98%93%E6%96%B9%E8%BE%BE%E4%B8%8A%E8%AF%81%E7%A7%91%E5%88%9B%E6%9D%BF50%E6%88%90%E4%BB%BD%E4%BA%A4%E6%98%93%E5%9E%8B%E5%BC%80%E6%94%BE%E5%BC%8F%E6%8C%87%E6%95%B0%E8%AF%81%E5%88%B8%E6%8A%95%E8%B5%84%E5%9F%BA%E9%87%91%E8%81%94%E6%8E%A5%E5%9F%BA%E9%87%91%E6%9B%B4%E6%96%B0%E7%9A%84%E6%8B%9B%E5%8B%9F%E8%AF%B4%E6%98%8E%E4%B9%A6.pdf",
+     "date": "2022-12-31",
+     "catalog": "招募说明书",
+     "doc_type": "招募说明书"
+    },
+    {
+     "title": "易方达上证科创板50成份交易型开放式指数证券投资基金联接基金更新的招募说明书",
+     "url": "https://cdn.efunds.com.cn/owch/data/bulletin/20220128/%E6%98%93%E6%96%B9%E8%BE%BE%E4%B8%8A%E8%AF%81%E7%A7%91%E5%88%9B%E6%9D%BF50%E6%88%90%E4%BB%BD%E4%BA%A4%E6%98%93%E5%9E%8B%E5%BC%80%E6%94%BE%E5%BC%8F%E6%8C%87%E6%95%B0%E8%AF%81%E5%88%B8%E6%8A%95%E8%B5%84%E5%9F%BA%E9%87%91%E8%81%94%E6%8E%A5%E5%9F%BA%E9%87%91%E6%9B%B4%E6%96%B0%E7%9A%84%E6%8B%9B%E5%8B%9F%E8%AF%B4%E6%98%8E%E4%B9%A6.pdf",
+     "date": "2022-01-28",
+     "catalog": "招募说明书",
+     "doc_type": "招募说明书"
+    },
+    {
+     "title": "易方达上证科创板50成份交易型开放式指数证券投资基金联接基金招募说明书",
+     "url": "https://cdn.efunds.com.cn/owch/data/bulletin/20210217/%E6%98%93%E6%96%B9%E8%BE%BE%E4%B8%8A%E8%AF%81%E7%A7%91%E5%88%9B%E6%9D%BF50%E6%88%90%E4%BB%BD%E4%BA%A4%E6%98%93%E5%9E%8B%E5%BC%80%E6%94%BE%E5%BC%8F%E6%8C%87%E6%95%B0%E8%AF%81%E5%88%B8%E6%8A%95%E8%B5%84%E5%9F%BA%E9%87%91%E8%81%94%E6%8E%A5%E5%9F%BA%E9%87%91%E6%8B%9B%E5%8B%9F%E8%AF%B4%E6%98%8E%E4%B9%A6.pdf",
+     "date": "2021-02-17",
+     "catalog": "招募说明书",
+     "doc_type": "招募说明书"
+    }
+   ],
+   "history_count": 17,
+   "history_versions_missing": false,
+   "text_consistent_with_l3": true,
+   "text_comparison": {
+    "comparable": true,
+    "consistent": true,
+    "l3_weights": [
+     "95%",
+     "5%"
+    ],
+    "contract_weights": [
+     "95%",
+     "5%"
+    ],
+    "normalized_l3": "上证科创板50成份指数收益率*95%+活期存款利率(税后)*5%",
+    "normalized_contract": "业绩比较基准为上证科创板50成份指数收益率*95%+活期存款利率(税后)*5%本",
+    "note": "第三方文本与合同原文一致"
+   },
+   "evidence_grade": "L1",
+   "not_obtained_reason": null,
+   "disclosed_date": "2024-12-12",
+   "sha256": "2d42d5ddf4e2061e0c791060234c5d75033d491847dc1bb77077770fd2c90204"
+  },
+  {
+   "fund_id": 127,
+   "fund_code": "013810",
+   "fund_name": "广发科创50ETF发起式联接",
+   "fund_full_name": "广发上证科创板50成份交易型开放式指数证券投资基金发起式联接基金",
+   "fund_company": "广发基金管理有限公司",
+   "category": "etf_feeder",
+   "l3_benchmark_text": "上证科创板50成份指数收益率×95%+活期存款利率（税后）×5%",
+   "cninfo": {
+    "error": "巨潮未检索到该基金代码"
+   },
+   "channel": "未获取（巨潮基金频道仅覆盖场内品种）",
+   "contract_found": false,
+   "prospectus_found": false,
+   "evidence_grade": "L3",
+   "not_obtained_reason": "巨潮资讯基金频道仅收录 LOF/封闭式/ETF 等场内品种，该基金为场外品种，未在巨潮收录；管理人官网渠道未实现",
+   "current_contract": null,
+   "current_prospectus": null,
+   "history_versions": [],
+   "history_versions_missing": true
+  },
+  {
+   "fund_id": 128,
+   "fund_code": "011610",
+   "fund_name": "华泰柏瑞科创板50ETF联接",
+   "fund_full_name": "华泰柏瑞上证科创板50成份交易型开放式指数证券投资基金联接基金",
+   "fund_company": "华泰柏瑞基金管理有限公司",
+   "category": "etf_feeder",
+   "l3_benchmark_text": "上证科创板50成份指数收益率×95%＋银行活期存款利率（税后）×5%",
+   "cninfo": {
+    "error": "巨潮未检索到该基金代码"
+   },
+   "channel": "未获取（巨潮基金频道仅覆盖场内品种）",
+   "contract_found": false,
+   "prospectus_found": false,
+   "evidence_grade": "L3",
+   "not_obtained_reason": "巨潮资讯基金频道仅收录 LOF/封闭式/ETF 等场内品种，该基金为场外品种，未在巨潮收录；管理人官网渠道未实现",
+   "current_contract": null,
+   "current_prospectus": null,
+   "history_versions": [],
+   "history_versions_missing": true
+  },
+  {
+   "fund_id": 129,
+   "fund_code": "011612",
+   "fund_name": "华夏科创50ETF联接",
+   "fund_full_name": "华夏上证科创板50成份交易型开放式指数证券投资基金发起式联接基金",
+   "fund_company": "华夏基金管理有限公司",
+   "category": "etf_feeder",
+   "l3_benchmark_text": "上证科创板50成份指数收益率×95%＋人民币活期存款税后利率×5%",
+   "cninfo": {
+    "error": "巨潮未检索到该基金代码"
+   },
+   "channel": "未获取（巨潮基金频道仅覆盖场内品种）",
+   "contract_found": false,
+   "prospectus_found": false,
+   "evidence_grade": "L3",
+   "not_obtained_reason": "巨潮资讯基金频道仅收录 LOF/封闭式/ETF 等场内品种，该基金为场外品种，未在巨潮收录；管理人官网渠道未实现",
+   "current_contract": null,
+   "current_prospectus": null,
+   "history_versions": [],
+   "history_versions_missing": true
+  },
+  {
+   "fund_id": 130,
+   "fund_code": "019510",
+   "fund_name": "华宝中证A500ETF联接",
+   "fund_full_name": "华宝中证A500交易型开放式指数证券投资基金联接基金",
+   "fund_company": "华宝基金管理有限公司",
+   "category": "etf_feeder",
+   "l3_benchmark_text": "中证A500指数收益率×95%+人民币银行活期存款利率（税后）×5%",
+   "cninfo": {
+    "error": "巨潮未检索到该基金代码"
+   },
+   "channel": "未获取（巨潮基金频道仅覆盖场内品种）",
+   "contract_found": false,
+   "prospectus_found": false,
+   "evidence_grade": "L3",
+   "not_obtained_reason": "巨潮资讯基金频道仅收录 LOF/封闭式/ETF 等场内品种，该基金为场外品种，未在巨潮收录；管理人官网渠道未实现",
+   "current_contract": null,
+   "current_prospectus": null,
+   "history_versions": [],
+   "history_versions_missing": true
+  },
+  {
+   "fund_id": 131,
+   "fund_code": "022424",
+   "fund_name": "广发中证A500ETF联接",
+   "fund_full_name": "广发中证A500交易型开放式指数证券投资基金联接基金",
+   "fund_company": "广发基金管理有限公司",
+   "category": "etf_feeder",
+   "l3_benchmark_text": "中证A500指数收益率×95%+银行活期存款利率（税后）×5%",
+   "cninfo": {
+    "error": "巨潮未检索到该基金代码"
+   },
+   "channel": "未获取（巨潮基金频道仅覆盖场内品种）",
+   "contract_found": false,
+   "prospectus_found": false,
+   "evidence_grade": "L3",
+   "not_obtained_reason": "巨潮资讯基金频道仅收录 LOF/封闭式/ETF 等场内品种，该基金为场外品种，未在巨潮收录；管理人官网渠道未实现",
+   "current_contract": null,
+   "current_prospectus": null,
+   "history_versions": [],
+   "history_versions_missing": true
+  },
+  {
+   "fund_id": 132,
+   "fund_code": "022426",
+   "fund_name": "泰康中证A500ETF联接",
+   "fund_full_name": "泰康中证A500交易型开放式指数证券投资基金联接基金",
+   "fund_company": "泰康基金管理有限公司",
+   "category": "etf_feeder",
+   "l3_benchmark_text": "中证A500指数收益率*95%+金融机构人民币活期存款利率（税后）*5%",
+   "cninfo": {
+    "error": "巨潮未检索到该基金代码"
+   },
+   "channel": "未获取（巨潮基金频道仅覆盖场内品种）",
+   "contract_found": false,
+   "prospectus_found": false,
+   "evidence_grade": "L3",
+   "not_obtained_reason": "巨潮资讯基金频道仅收录 LOF/封闭式/ETF 等场内品种，该基金为场外品种，未在巨潮收录；管理人官网渠道未实现",
+   "current_contract": null,
+   "current_prospectus": null,
+   "history_versions": [],
+   "history_versions_missing": true
+  },
+  {
+   "fund_id": 133,
+   "fund_code": "020073",
+   "fund_name": "财通中证A500指数",
+   "fund_full_name": "财通中证A500指数型证券投资基金",
+   "fund_company": "财通基金管理有限公司",
+   "category": "index_plain",
+   "l3_benchmark_text": "中证A500指数收益率*95%+银行活期存款利率（税后）*5%",
+   "cninfo": {
+    "error": "巨潮未检索到该基金代码"
+   },
+   "channel": "未获取（巨潮基金频道仅覆盖场内品种）",
+   "contract_found": false,
+   "prospectus_found": false,
+   "evidence_grade": "L3",
+   "not_obtained_reason": "巨潮资讯基金频道仅收录 LOF/封闭式/ETF 等场内品种，该基金为场外品种，未在巨潮收录；管理人官网渠道未实现",
+   "current_contract": null,
+   "current_prospectus": null,
+   "history_versions": [],
+   "history_versions_missing": true
+  },
+  {
+   "fund_id": 134,
+   "fund_code": "022421",
+   "fund_name": "大成中证A500指数发起式",
+   "fund_full_name": "大成中证A500指数发起式A",
+   "fund_company": "大成基金管理有限公司",
+   "category": "index_plain",
+   "l3_benchmark_text": "中证A500指数收益率×95%+银行活期存款利率（税后）×5%",
+   "cninfo": {
+    "error": "巨潮未检索到该基金代码"
+   },
+   "channel": "未获取（巨潮基金频道仅覆盖场内品种）",
+   "contract_found": false,
+   "prospectus_found": false,
+   "evidence_grade": "L3",
+   "not_obtained_reason": "巨潮资讯基金频道仅收录 LOF/封闭式/ETF 等场内品种，该基金为场外品种，未在巨潮收录；管理人官网渠道未实现",
+   "current_contract": null,
+   "current_prospectus": null,
+   "history_versions": [],
+   "history_versions_missing": true
+  },
+  {
+   "fund_id": 135,
+   "fund_code": "022432",
+   "fund_name": "中欧中证A500指数发起",
+   "fund_full_name": "中欧中证A500指数发起式证券投资基金",
+   "fund_company": "中欧基金管理有限公司",
+   "category": "index_plain",
+   "l3_benchmark_text": "中证A500指数收益率×95%+银行活期存款利率（税后）×5%",
+   "cninfo": {
+    "error": "巨潮未检索到该基金代码"
+   },
+   "channel": "未获取（巨潮基金频道仅覆盖场内品种）",
+   "contract_found": false,
+   "prospectus_found": false,
+   "evidence_grade": "L3",
+   "not_obtained_reason": "巨潮资讯基金频道仅收录 LOF/封闭式/ETF 等场内品种，该基金为场外品种，未在巨潮收录；管理人官网渠道未实现",
+   "current_contract": null,
+   "current_prospectus": null,
+   "history_versions": [],
+   "history_versions_missing": true
+  }
+ ]
+}

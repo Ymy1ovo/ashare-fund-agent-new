@@ -1,0 +1,790 @@
+{
+ "phase": "3B-6.2.3.0",
+ "task": "官方指数收益口径核验与基金合同原件获取审计",
+ "generated_at": "2026-11-26T11:19:20",
+ "baseline_head": "bc490c339f959b6f5262c90290853612329695e3",
+ "read_only": true,
+ "evidence_grade_definition": {
+  "L1": "指数编制机构或官方发布机构原始文件",
+  "L2": "权威正式数据库或官方机构转载",
+  "L3": "第三方聚合资料",
+  "L4": "无法可靠核验的二手资料或推断"
+ },
+ "sources": {
+  "csindex_oss": "https://oss-ch.csindex.com.cn/static/html/csindex/public/uploads/indices/detail/files/zh_CN/",
+  "csindex_basic": "https://www.csindex.com.cn/csindex-home/indexInfo/index-basic-info/",
+  "cninfo": "巨潮资讯网（中国证监会指定信息披露网站）",
+  "cninfo_query": "http://www.cninfo.com.cn/new/hisAnnouncement/query"
+ },
+ "indexes": [
+  {
+   "index_code": "000300",
+   "official": {
+    "index_full_name": "沪深300指数",
+    "index_short_name": "沪深300",
+    "publish_date": "2005-04-08",
+    "basic_date": "2004-12-31",
+    "index_type": "stock",
+    "description": "沪深300指数由沪深市场中规模大、流动性好的最具代表性的300只证券组成，于2005年4月8日正式发布，以反映沪深市场上市公司证券的整体表现。",
+    "publisher": "中证指数有限公司",
+    "source_url": "https://www.csindex.com.cn/csindex-home/indexInfo/index-basic-info/000300",
+    "obtained": true
+   },
+   "document": {
+    "document_type": "编制方案（Index Methodology）",
+    "source_org": "中证指数有限公司",
+    "url": "https://oss-ch.csindex.com.cn/static/html/csindex/public/uploads/indices/detail/files/zh_CN/000300_Index_Methodology_cn.pdf",
+    "disclosed_date": "2023-09",
+    "obtained_at": "2026-11-26T11:17:15",
+    "file": "reports/evidence/phase3B6_2_3_0/index_methodology/000300_Index_Methodology_cn.pdf",
+    "bytes": 1184619,
+    "sha256": "de6491e03e5d57ecf1aca104b1412543643a59e387a5343c9bd21ecbbdeba5b6",
+    "readable": true,
+    "evidence_grade": "L1",
+    "attempts": [
+     {
+      "url": "https://oss-ch.csindex.com.cn/static/html/csindex/public/uploads/indices/detail/files/zh_CN/000300_Index_Methodology_cn.pdf",
+      "status": "ok",
+      "bytes": 1184619
+     }
+    ]
+   },
+   "return_basis_judgement": {
+    "return_basis": "price",
+    "evidence": [
+     "编制方案「5.2.1 除息」明文：凡有样本除息，沪深300指数不予修正，任其自然回落 → 主指数为**价格指数**",
+     "编制方案「4.6 全收益指数和净收益指数」明文：全收益/净收益是沪深300指数的**辅指数** → 主指数不含红利再投资"
+    ],
+    "basis_confirmed": true
+   },
+   "return_basis_confirmed": true,
+   "series_probe": {
+    "request_code": "000300",
+    "returned_code": "000300",
+    "returned_full_name": "沪深300指数",
+    "returned_short_name": "沪深300",
+    "rows": 4,
+    "columns": [
+     "日期",
+     "指数代码",
+     "指数中文全称",
+     "指数中文简称",
+     "指数英文全称",
+     "指数英文简称",
+     "开盘",
+     "最高",
+     "最低",
+     "收盘",
+     "涨跌",
+     "涨跌幅",
+     "成交量",
+     "成交金额",
+     "样本数量",
+     "滚动市盈率"
+    ],
+    "sample_close": [
+     3386.35,
+     3378.3,
+     3347.05,
+     3329.11
+    ],
+    "series_matched": true
+   },
+   "data_series_matches_official": true,
+   "note": "官方口径已确认，且数据接口返回代码与官方一致；但**历史连续覆盖与时点可用性未在本阶段确认**"
+  },
+  {
+   "index_code": "000905",
+   "official": {
+    "index_full_name": "中证小盘500指数",
+    "index_short_name": "中证500",
+    "publish_date": "2007-01-15",
+    "basic_date": "2004-12-31",
+    "index_type": "stock",
+    "description": "中证系列规模指数分别反映沪深市场不同市值规模上市公司证券的整体表现。",
+    "publisher": "中证指数有限公司",
+    "source_url": "https://www.csindex.com.cn/csindex-home/indexInfo/index-basic-info/000905",
+    "obtained": true
+   },
+   "document": {
+    "document_type": "编制方案（Index Methodology）",
+    "source_org": "中证指数有限公司",
+    "url": "https://oss-ch.csindex.com.cn/static/html/csindex/public/uploads/indices/detail/files/zh_CN/000905_Index_Methodology_cn.pdf",
+    "disclosed_date": "2022-05",
+    "obtained_at": "2026-11-26T11:17:18",
+    "file": "reports/evidence/phase3B6_2_3_0/index_methodology/000905_Index_Methodology_cn.pdf",
+    "bytes": 185201,
+    "sha256": "6109ad8390fdad70ed807c799309f7d5cabc1cd949d45754704c7a8acf4d1933",
+    "readable": true,
+    "evidence_grade": "L1",
+    "attempts": [
+     {
+      "url": "https://oss-ch.csindex.com.cn/static/html/csindex/public/uploads/indices/detail/files/zh_CN/000905_Index_Methodology_cn.pdf",
+      "status": "ok",
+      "bytes": 185201
+     }
+    ]
+   },
+   "return_basis_judgement": {
+    "return_basis": "price",
+    "evidence": [
+     "编制方案「四、指数计算」仅使用「证券价格×调整股本数」计算调整市值，全文无全收益/红利再投资表述 → 价格指数口径"
+    ],
+    "basis_confirmed": true
+   },
+   "return_basis_confirmed": true,
+   "series_probe": {
+    "request_code": "000905",
+    "returned_code": "000905",
+    "returned_full_name": "中证小盘500指数",
+    "returned_short_name": "中证500",
+    "rows": 4,
+    "columns": [
+     "日期",
+     "指数代码",
+     "指数中文全称",
+     "指数中文简称",
+     "指数英文全称",
+     "指数英文简称",
+     "开盘",
+     "最高",
+     "最低",
+     "收盘",
+     "涨跌",
+     "涨跌幅",
+     "成交量",
+     "成交金额",
+     "样本数量",
+     "滚动市盈率"
+    ],
+    "sample_close": [
+     5409.46,
+     5401.4,
+     5355.32,
+     5281.87
+    ],
+    "series_matched": true
+   },
+   "data_series_matches_official": true,
+   "note": "官方口径已确认，且数据接口返回代码与官方一致；但**历史连续覆盖与时点可用性未在本阶段确认**"
+  },
+  {
+   "index_code": "000906",
+   "official": {
+    "index_full_name": "中证800指数",
+    "index_short_name": "中证800",
+    "publish_date": "2007-01-15",
+    "basic_date": "2004-12-31",
+    "index_type": "stock",
+    "description": "中证系列规模指数分别反映沪深市场不同市值规模上市公司证券的整体表现。",
+    "publisher": "中证指数有限公司",
+    "source_url": "https://www.csindex.com.cn/csindex-home/indexInfo/index-basic-info/000906",
+    "obtained": true
+   },
+   "document": {
+    "document_type": "编制方案（Index Methodology）",
+    "source_org": "中证指数有限公司",
+    "url": "https://oss-ch.csindex.com.cn/static/html/csindex/public/uploads/indices/detail/files/zh_CN/000906_Index_Methodology_cn.pdf",
+    "disclosed_date": "2022-05",
+    "obtained_at": "2026-11-26T11:17:18",
+    "file": "reports/evidence/phase3B6_2_3_0/index_methodology/000906_Index_Methodology_cn.pdf",
+    "bytes": 185201,
+    "sha256": "6109ad8390fdad70ed807c799309f7d5cabc1cd949d45754704c7a8acf4d1933",
+    "readable": true,
+    "evidence_grade": "L1",
+    "attempts": [
+     {
+      "url": "https://oss-ch.csindex.com.cn/static/html/csindex/public/uploads/indices/detail/files/zh_CN/000906_Index_Methodology_cn.pdf",
+      "status": "ok",
+      "bytes": 185201
+     }
+    ]
+   },
+   "return_basis_judgement": {
+    "return_basis": "price",
+    "evidence": [
+     "编制方案「四、指数计算」仅使用「证券价格×调整股本数」计算调整市值，全文无全收益/红利再投资表述 → 价格指数口径"
+    ],
+    "basis_confirmed": true
+   },
+   "return_basis_confirmed": true,
+   "series_probe": {
+    "request_code": "000906",
+    "returned_code": "000906",
+    "returned_full_name": "中证800指数",
+    "returned_short_name": "中证800",
+    "rows": 4,
+    "columns": [
+     "日期",
+     "指数代码",
+     "指数中文全称",
+     "指数中文简称",
+     "指数英文全称",
+     "指数英文简称",
+     "开盘",
+     "最高",
+     "最低",
+     "收盘",
+     "涨跌",
+     "涨跌幅",
+     "成交量",
+     "成交金额",
+     "样本数量",
+     "滚动市盈率"
+    ],
+    "sample_close": [
+     3727.11,
+     3719.14,
+     3685.47,
+     3657.37
+    ],
+    "series_matched": true
+   },
+   "data_series_matches_official": true,
+   "note": "官方口径已确认，且数据接口返回代码与官方一致；但**历史连续覆盖与时点可用性未在本阶段确认**"
+  },
+  {
+   "index_code": "000016",
+   "official": {
+    "index_full_name": "上证50指数",
+    "index_short_name": "上证50",
+    "publish_date": "2004-01-02",
+    "basic_date": "2003-12-31",
+    "index_type": "stock",
+    "description": "上证50指数以上证180指数样本为样本空间，挑选上海证券市场规模大、流动性好的最具代表性的50只证券作为样本，综合反映上海证券市场最具市场影响力的一批龙头企业的整体表现。",
+    "publisher": "中证指数有限公司",
+    "source_url": "https://www.csindex.com.cn/csindex-home/indexInfo/index-basic-info/000016",
+    "obtained": true
+   },
+   "document": {
+    "document_type": "编制方案（Index Methodology）",
+    "source_org": "中证指数有限公司",
+    "url": "https://oss-ch.csindex.com.cn/static/html/csindex/public/uploads/indices/detail/files/zh_CN/000016_Index_Methodology_cn.pdf",
+    "disclosed_date": "2020-12",
+    "obtained_at": "2026-11-26T11:17:19",
+    "file": "reports/evidence/phase3B6_2_3_0/index_methodology/000016_Index_Methodology_cn.pdf",
+    "bytes": 138004,
+    "sha256": "e8f1ce6045b7f91305fb28a1c898f61fceae8e2159ce665742d12fa4f8ceb5df",
+    "readable": true,
+    "evidence_grade": "L1",
+    "attempts": [
+     {
+      "url": "https://oss-ch.csindex.com.cn/static/html/csindex/public/uploads/indices/detail/files/zh_CN/000016_Index_Methodology_cn.pdf",
+      "status": "ok",
+      "bytes": 138004
+     }
+    ]
+   },
+   "return_basis_judgement": {
+    "return_basis": "price",
+    "evidence": [
+     "编制方案「四、指数计算」仅使用「证券价格×调整股本数」计算调整市值，全文无全收益/红利再投资表述 → 价格指数口径"
+    ],
+    "basis_confirmed": true
+   },
+   "return_basis_confirmed": true,
+   "series_probe": {
+    "request_code": "000016",
+    "returned_code": "000016",
+    "returned_full_name": "上证50指数",
+    "returned_short_name": "上证50",
+    "rows": 4,
+    "columns": [
+     "日期",
+     "指数代码",
+     "指数中文全称",
+     "指数中文简称",
+     "指数英文全称",
+     "指数英文简称",
+     "开盘",
+     "最高",
+     "最低",
+     "收盘",
+     "涨跌",
+     "涨跌幅",
+     "成交量",
+     "成交金额",
+     "样本数量",
+     "滚动市盈率"
+    ],
+    "sample_close": [
+     2292.23,
+     2294.84,
+     2279.04,
+     2268.54
+    ],
+    "series_matched": true
+   },
+   "data_series_matches_official": true,
+   "note": "官方口径已确认，且数据接口返回代码与官方一致；但**历史连续覆盖与时点可用性未在本阶段确认**"
+  },
+  {
+   "index_code": "399997",
+   "official": {
+    "index_full_name": "中证白酒指数",
+    "index_short_name": "中证白酒",
+    "publish_date": "2015-01-21",
+    "basic_date": "2008-12-31",
+    "index_type": "stock",
+    "description": "中证白酒指数选取涉及白酒生产业务相关上市公司证券作为指数样本，为投资者提供更多样化的投资标的。",
+    "publisher": "中证指数有限公司",
+    "source_url": "https://www.csindex.com.cn/csindex-home/indexInfo/index-basic-info/399997",
+    "obtained": true
+   },
+   "document": {
+    "document_type": "编制方案（Index Methodology）",
+    "source_org": "中证指数有限公司",
+    "url": "https://oss-ch.csindex.com.cn/static/html/csindex/public/uploads/indices/detail/files/zh_CN/20231208175434-399997_Index_Methodology_cn.pdf",
+    "disclosed_date": "2023-12",
+    "obtained_at": "2026-11-26T11:17:20",
+    "file": "reports/evidence/phase3B6_2_3_0/index_methodology/399997_Index_Methodology_cn.pdf",
+    "bytes": 334506,
+    "sha256": "62450948684c293063b2fac3307afe40e581d33f38c0d0708b9d1da1099a90ab",
+    "readable": true,
+    "evidence_grade": "L1",
+    "attempts": [
+     {
+      "url": "https://oss-ch.csindex.com.cn/static/html/csindex/public/uploads/indices/detail/files/zh_CN/399997_Index_Methodology_cn.pdf",
+      "status": "failed",
+      "error": "HTTPError"
+     },
+     {
+      "url": "https://oss-ch.csindex.com.cn/static/html/csindex/public/uploads/indices/detail/files/zh_CN/20231208175434-399997_Index_Methodology_cn.pdf",
+      "status": "ok",
+      "bytes": 334506
+     }
+    ]
+   },
+   "return_basis_judgement": {
+    "return_basis": "price",
+    "evidence": [
+     "编制方案「四、指数计算」仅使用「证券价格×调整股本数」计算调整市值，全文无全收益/红利再投资表述 → 价格指数口径"
+    ],
+    "basis_confirmed": true
+   },
+   "return_basis_confirmed": true,
+   "series_probe": {
+    "request_code": "399997",
+    "returned_code": "399997",
+    "returned_full_name": "中证白酒指数",
+    "returned_short_name": "中证白酒",
+    "rows": 4,
+    "columns": [
+     "日期",
+     "指数代码",
+     "指数中文全称",
+     "指数中文简称",
+     "指数英文全称",
+     "指数英文简称",
+     "开盘",
+     "最高",
+     "最低",
+     "收盘",
+     "涨跌",
+     "涨跌幅",
+     "成交量",
+     "成交金额",
+     "样本数量",
+     "滚动市盈率"
+    ],
+    "sample_close": [
+     12206.51,
+     12147.94,
+     11865.42,
+     11761.14
+    ],
+    "series_matched": true
+   },
+   "data_series_matches_official": true,
+   "note": "官方口径已确认，且数据接口返回代码与官方一致；但**历史连续覆盖与时点可用性未在本阶段确认**"
+  },
+  {
+   "index_code": "H30184",
+   "official": {
+    "index_full_name": "中证全指半导体产品与设备指数",
+    "index_short_name": "半导体",
+    "publish_date": "2013-07-15",
+    "basic_date": "2004-12-31",
+    "index_type": "stock",
+    "description": "中证全指半导体产品与设备指数从中证全指指数样本中选取业务涉及半导体产品和半导体设备等领域的上市公司证券作为指数样本，以反映半导体产品与设备上市公司证券的整体表现。",
+    "publisher": "中证指数有限公司",
+    "source_url": "https://www.csindex.com.cn/csindex-home/indexInfo/index-basic-info/H30184",
+    "obtained": true
+   },
+   "document": {
+    "document_type": "编制方案（Index Methodology）",
+    "source_org": "中证指数有限公司",
+    "url": "https://oss-ch.csindex.com.cn/static/html/csindex/public/uploads/indices/detail/files/zh_CN/H30184_Index_Methodology_cn.pdf",
+    "disclosed_date": "2024-11",
+    "obtained_at": "2026-11-26T11:17:21",
+    "file": "reports/evidence/phase3B6_2_3_0/index_methodology/H30184_Index_Methodology_cn.pdf",
+    "bytes": 457088,
+    "sha256": "8b7de8a81c93e5f7d7b2f052484d90a465fdb67c9b322bee5a8f14e3bc0179e7",
+    "readable": true,
+    "evidence_grade": "L1",
+    "attempts": [
+     {
+      "url": "https://oss-ch.csindex.com.cn/static/html/csindex/public/uploads/indices/detail/files/zh_CN/H30184_Index_Methodology_cn.pdf",
+      "status": "ok",
+      "bytes": 457088
+     }
+    ]
+   },
+   "return_basis_judgement": {
+    "return_basis": "price",
+    "evidence": [
+     "编制方案「四、指数计算」仅使用「证券价格×调整股本数」计算调整市值，全文无全收益/红利再投资表述 → 价格指数口径"
+    ],
+    "basis_confirmed": true
+   },
+   "return_basis_confirmed": true,
+   "series_probe": {
+    "request_code": "H30184",
+    "returned_code": "H30184",
+    "returned_full_name": "中证全指半导体产品与设备指数",
+    "returned_short_name": "半导体",
+    "rows": 4,
+    "columns": [
+     "日期",
+     "指数代码",
+     "指数中文全称",
+     "指数中文简称",
+     "指数英文全称",
+     "指数英文简称",
+     "开盘",
+     "最高",
+     "最低",
+     "收盘",
+     "涨跌",
+     "涨跌幅",
+     "成交量",
+     "成交金额",
+     "样本数量",
+     "滚动市盈率"
+    ],
+    "sample_close": [
+     4912.91,
+     4821.91,
+     4752.8,
+     4670.21
+    ],
+    "series_matched": true
+   },
+   "data_series_matches_official": true,
+   "note": "官方口径已确认，且数据接口返回代码与官方一致；但**历史连续覆盖与时点可用性未在本阶段确认**"
+  },
+  {
+   "index_code": "000942",
+   "official": {
+    "index_full_name": "中证内地消费主题指数",
+    "index_short_name": "内地消费",
+    "publish_date": "2009-10-28",
+    "basic_date": "2004-12-31",
+    "index_type": "stock",
+    "description": "中证内地主题系列指数包括中证内地消费主题指数、中证内地资源主题指数、中证内地运输主题指数、中证内地银行主题指数、中证内地地产主题指数等指数，以反映沪深市场各重要主题类上市公司证券的整体表现。",
+    "publisher": "中证指数有限公司",
+    "source_url": "https://www.csindex.com.cn/csindex-home/indexInfo/index-basic-info/000942",
+    "obtained": true
+   },
+   "document": {
+    "document_type": "编制方案（Index Methodology）",
+    "source_org": "中证指数有限公司",
+    "url": "https://oss-ch.csindex.com.cn/static/html/csindex/public/uploads/indices/detail/files/zh_CN/000942_Index_Methodology_cn.pdf",
+    "disclosed_date": "2022-05",
+    "obtained_at": "2026-11-26T11:17:24",
+    "file": "reports/evidence/phase3B6_2_3_0/index_methodology/000942_Index_Methodology_cn.pdf",
+    "bytes": 145567,
+    "sha256": "e2893e60254074f9988a2f9e851f46ab3d0710b116eb078b337e138c317bf0ba",
+    "readable": true,
+    "evidence_grade": "L1",
+    "attempts": [
+     {
+      "url": "https://oss-ch.csindex.com.cn/static/html/csindex/public/uploads/indices/detail/files/zh_CN/000942_Index_Methodology_cn.pdf",
+      "status": "ok",
+      "bytes": 145567
+     }
+    ]
+   },
+   "return_basis_judgement": {
+    "return_basis": "price",
+    "evidence": [
+     "编制方案「四、指数计算」仅使用「证券价格×调整股本数」计算调整市值，全文无全收益/红利再投资表述 → 价格指数口径"
+    ],
+    "basis_confirmed": true
+   },
+   "return_basis_confirmed": true,
+   "series_probe": {
+    "request_code": "000942",
+    "returned_code": "000942",
+    "returned_full_name": "中证内地消费主题指数",
+    "returned_short_name": "内地消费",
+    "rows": 4,
+    "columns": [
+     "日期",
+     "指数代码",
+     "指数中文全称",
+     "指数中文简称",
+     "指数英文全称",
+     "指数英文简称",
+     "开盘",
+     "最高",
+     "最低",
+     "收盘",
+     "涨跌",
+     "涨跌幅",
+     "成交量",
+     "成交金额",
+     "样本数量",
+     "滚动市盈率"
+    ],
+    "sample_close": [
+     9814.16,
+     9756.15,
+     9654.64,
+     9631.7
+    ],
+    "series_matched": true
+   },
+   "data_series_matches_official": true,
+   "note": "官方口径已确认，且数据接口返回代码与官方一致；但**历史连续覆盖与时点可用性未在本阶段确认**"
+  },
+  {
+   "index_code": "000012",
+   "official": {
+    "index_full_name": "上证国债指数",
+    "index_short_name": "国债指数",
+    "publish_date": "2003-01-02",
+    "basic_date": "2002-12-31",
+    "index_type": "bond",
+    "description": "该指数样本券由在上海证券交易所上市的固定利率国债构成，指数采用国债发行量加权计算。",
+    "publisher": "中证指数有限公司",
+    "source_url": "https://www.csindex.com.cn/csindex-home/indexInfo/index-basic-info/000012",
+    "obtained": true
+   },
+   "document": {
+    "document_type": "指数单张（Factsheet）",
+    "source_org": "中证指数有限公司",
+    "url": "https://oss-ch.csindex.com.cn/static/html/csindex/public/uploads/indices/detail/files/zh_CN/000012factsheet.pdf",
+    "disclosed_date": "2002-12",
+    "obtained_at": "2026-11-26T11:17:29",
+    "file": "reports/evidence/phase3B6_2_3_0/index_methodology/000012_factsheet.pdf",
+    "bytes": 421962,
+    "sha256": "21f24570c840ac91b807fd8c9b1edb3ad5a5fc9b5d3bb9ef75fe13caa2e42bea",
+    "readable": true,
+    "obtained": true,
+    "evidence_grade": "L1",
+    "note": "官方编制方案未公开取得，以官方指数单张作为 L1 证据",
+    "attempts": [
+     {
+      "url": "https://oss-ch.csindex.com.cn/static/html/csindex/public/uploads/indices/detail/files/zh_CN/000012_Index_Methodology_cn.pdf",
+      "status": "failed",
+      "error": "HTTPError"
+     },
+     {
+      "url": "https://oss-ch.csindex.com.cn/static/html/csindex/public/uploads/indices/detail/files/zh_CN/20231208175434-000012_Index_Methodology_cn.pdf",
+      "status": "failed",
+      "error": "HTTPError"
+     }
+    ]
+   },
+   "return_basis_judgement": {
+    "return_basis": "full_price",
+    "evidence": [
+     "官方指数单张列出「净价指数」「利息再投资指数」为**衍生指数**，主序列 000012 为全价（含应计利息、不含再投资）"
+    ],
+    "basis_confirmed": true
+   },
+   "return_basis_confirmed": true,
+   "series_probe": {
+    "request_code": "000012",
+    "returned_code": "000012",
+    "returned_full_name": "上证国债指数",
+    "returned_short_name": "国债指数",
+    "rows": 4,
+    "columns": [
+     "日期",
+     "指数代码",
+     "指数中文全称",
+     "指数中文简称",
+     "指数英文全称",
+     "指数英文简称",
+     "开盘",
+     "最高",
+     "最低",
+     "收盘",
+     "涨跌",
+     "涨跌幅",
+     "成交量",
+     "成交金额",
+     "样本数量",
+     "滚动市盈率"
+    ],
+    "sample_close": [
+     206.07,
+     206.02,
+     206.18,
+     206.32
+    ],
+    "series_matched": true
+   },
+   "data_series_matches_official": true,
+   "note": "官方口径已确认，且数据接口返回代码与官方一致；但**历史连续覆盖与时点可用性未在本阶段确认**"
+  },
+  {
+   "index_code": "000922",
+   "official": {
+    "index_full_name": "中证红利指数",
+    "index_short_name": "中证红利",
+    "publish_date": "2008-05-26",
+    "basic_date": "2004-12-31",
+    "index_type": "stock",
+    "description": "中证红利指数选取100只现金股息率高、分红较为稳定，并具有一定规模及流动性的上市公司证券作为指数样本，以反映高股息率上市公司证券的整体表现。",
+    "publisher": "中证指数有限公司",
+    "source_url": "https://www.csindex.com.cn/csindex-home/indexInfo/index-basic-info/000922",
+    "obtained": true
+   },
+   "document": {
+    "document_type": "编制方案（Index Methodology）",
+    "source_org": "中证指数有限公司",
+    "url": "https://oss-ch.csindex.com.cn/static/html/csindex/public/uploads/indices/detail/files/zh_CN/000922_Index_Methodology_cn.pdf",
+    "disclosed_date": "2022-10",
+    "obtained_at": "2026-11-26T11:17:33",
+    "file": "reports/evidence/phase3B6_2_3_0/index_methodology/000922_Index_Methodology_cn.pdf",
+    "bytes": 1137267,
+    "sha256": "6b8053f02ca87a0e32f79075fbe1ca107b5b952c4ca5bd4afb5b8ff4666f4991",
+    "readable": true,
+    "evidence_grade": "L1",
+    "attempts": [
+     {
+      "url": "https://oss-ch.csindex.com.cn/static/html/csindex/public/uploads/indices/detail/files/zh_CN/000922_Index_Methodology_cn.pdf",
+      "status": "ok",
+      "bytes": 1137267
+     }
+    ]
+   },
+   "return_basis_judgement": {
+    "return_basis": "price",
+    "evidence": [
+     "编制方案「四、指数计算」仅使用「证券价格×调整股本数」计算调整市值，全文无全收益/红利再投资表述 → 价格指数口径",
+     "中证红利为**股息率加权**，加权方式不改变「除息自然回落」的价格口径属性"
+    ],
+    "basis_confirmed": true
+   },
+   "return_basis_confirmed": true,
+   "series_probe": {
+    "request_code": "000922",
+    "returned_code": "000922",
+    "returned_full_name": "中证红利指数",
+    "returned_short_name": "中证红利",
+    "rows": 4,
+    "columns": [
+     "日期",
+     "指数代码",
+     "指数中文全称",
+     "指数中文简称",
+     "指数英文全称",
+     "指数英文简称",
+     "开盘",
+     "最高",
+     "最低",
+     "收盘",
+     "涨跌",
+     "涨跌幅",
+     "成交量",
+     "成交金额",
+     "样本数量",
+     "滚动市盈率"
+    ],
+    "sample_close": [
+     5020.99,
+     5074.18,
+     5096.16,
+     5099.25
+    ],
+    "series_matched": true
+   },
+   "data_series_matches_official": true,
+   "note": "官方口径已确认，且数据接口返回代码与官方一致；但**历史连续覆盖与时点可用性未在本阶段确认**"
+  },
+  {
+   "index_code": "930930",
+   "official": {
+    "index_full_name": "中证港股通综合指数",
+    "index_short_name": "港股综合",
+    "publish_date": "2017-01-16",
+    "basic_date": "2014-11-14",
+    "index_type": "stock",
+    "description": "中证港股通综合指数选取符合港股通资格的上市公司证券作为样本，以反映港股通范围内上市公司的整体表现。",
+    "publisher": "中证指数有限公司",
+    "source_url": "https://www.csindex.com.cn/csindex-home/indexInfo/index-basic-info/930930",
+    "obtained": true
+   },
+   "document": {
+    "document_type": "指数单张（Factsheet）",
+    "source_org": "中证指数有限公司",
+    "url": "https://oss-ch.csindex.com.cn/static/html/csindex/public/uploads/indices/detail/files/zh_CN/930930factsheet.pdf",
+    "disclosed_date": "2026-10",
+    "obtained_at": "2026-11-26T11:17:34",
+    "file": "reports/evidence/phase3B6_2_3_0/index_methodology/930930_factsheet.pdf",
+    "bytes": 446156,
+    "sha256": "0bd7e8937145086a21537ab674b009812291156228f7f93efd2b7c8d2a827f7f",
+    "readable": true,
+    "obtained": true,
+    "evidence_grade": "L1",
+    "note": "官方编制方案未公开取得，以官方指数单张作为 L1 证据",
+    "attempts": [
+     {
+      "url": "https://oss-ch.csindex.com.cn/static/html/csindex/public/uploads/indices/detail/files/zh_CN/930930_Index_Methodology_cn.pdf",
+      "status": "failed",
+      "error": "HTTPError"
+     },
+     {
+      "url": "https://oss-ch.csindex.com.cn/static/html/csindex/public/uploads/indices/detail/files/zh_CN/20231208175434-930930_Index_Methodology_cn.pdf",
+      "status": "failed",
+      "error": "HTTPError"
+     }
+    ]
+   },
+   "return_basis_judgement": {
+    "return_basis": "unknown",
+    "evidence": [],
+    "basis_confirmed": false
+   },
+   "return_basis_confirmed": false,
+   "series_probe": {
+    "request_code": "930930",
+    "returned_code": "930930",
+    "returned_full_name": "中证港股通综合指数",
+    "returned_short_name": "港股综合",
+    "rows": 4,
+    "columns": [
+     "日期",
+     "指数代码",
+     "指数中文全称",
+     "指数中文简称",
+     "指数英文全称",
+     "指数英文简称",
+     "开盘",
+     "最高",
+     "最低",
+     "收盘",
+     "涨跌",
+     "涨跌幅",
+     "成交量",
+     "成交金额",
+     "样本数量",
+     "滚动市盈率"
+    ],
+    "sample_close": [
+     2399.31,
+     2383.89,
+     2379.26,
+     2363.75
+    ],
+    "series_matched": true
+   },
+   "data_series_matches_official": true,
+   "note": "口径或序列未确认，保持 unknown"
+  }
+ ]
+}
