@@ -1,0 +1,362 @@
+{
+ "000012|20150105": {
+  "close": 145.8,
+  "date": "20150105",
+  "obtained_at": "2026-11-26T13:40:27",
+  "official_code": "000012",
+  "official_name": "上证国债指数",
+  "source": "中证指数有限公司官网行情接口",
+  "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=000012&startDate=20150105&endDate=20150105"
+ },
+ "000012|20180102": {
+  "close": 160.97,
+  "date": "20180102",
+  "obtained_at": "2026-11-26T13:40:30",
+  "official_code": "000012",
+  "official_name": "上证国债指数",
+  "source": "中证指数有限公司官网行情接口",
+  "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=000012&startDate=20180102&endDate=20180102"
+ },
+ "000012|20200102": {
+  "close": 177.33,
+  "date": "20200102",
+  "obtained_at": "2026-11-26T13:40:24",
+  "official_code": "000012",
+  "official_name": "上证国债指数",
+  "source": "中证指数有限公司官网行情接口",
+  "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=000012&startDate=20200102&endDate=20200102"
+ },
+ "000012|20240102": {
+  "close": 206.07,
+  "date": "20240102",
+  "obtained_at": "2026-11-26T13:40:20",
+  "official_code": "000012",
+  "official_name": "上证国债指数",
+  "source": "中证指数有限公司官网行情接口",
+  "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=000012&startDate=20240102&endDate=20240102"
+ },
+ "000016|20150105": {
+  "close": 2649.64,
+  "date": "20150105",
+  "obtained_at": "2026-11-26T13:29:08",
+  "official_code": "000016",
+  "official_name": "上证50指数",
+  "source": "中证指数有限公司官网行情接口",
+  "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=000016&startDate=20150105&endDate=20150105"
+ },
+ "000016|20180102": {
+  "close": 2908.73,
+  "date": "20180102",
+  "obtained_at": "2026-11-26T13:29:10",
+  "official_code": "000016",
+  "official_name": "上证50指数",
+  "source": "中证指数有限公司官网行情接口",
+  "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=000016&startDate=20180102&endDate=20180102"
+ },
+ "000016|20200102": {
+  "close": 3090.83,
+  "date": "20200102",
+  "obtained_at": "2026-11-26T13:29:07",
+  "official_code": "000016",
+  "official_name": "上证50指数",
+  "source": "中证指数有限公司官网行情接口",
+  "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=000016&startDate=20200102&endDate=20200102"
+ },
+ "000016|20240102": {
+  "close": 2292.23,
+  "date": "20240102",
+  "obtained_at": "2026-11-26T13:29:06",
+  "official_code": "000016",
+  "official_name": "上证50指数",
+  "source": "中证指数有限公司官网行情接口",
+  "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=000016&startDate=20240102&endDate=20240102"
+ },
+ "000300|20150105": {
+  "close": 3641.54,
+  "date": "20150105",
+  "obtained_at": "2026-11-26T13:28:52",
+  "official_code": "000300",
+  "official_name": "沪深300指数",
+  "source": "中证指数有限公司官网行情接口",
+  "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=000300&startDate=20150105&endDate=20150105"
+ },
+ "000300|20180102": {
+  "close": 4087.4,
+  "date": "20180102",
+  "obtained_at": "2026-11-26T13:28:53",
+  "official_code": "000300",
+  "official_name": "沪深300指数",
+  "source": "中证指数有限公司官网行情接口",
+  "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=000300&startDate=20180102&endDate=20180102"
+ },
+ "000300|20200102": {
+  "close": 4152.24,
+  "date": "20200102",
+  "obtained_at": "2026-11-26T13:28:50",
+  "official_code": "000300",
+  "official_name": "沪深300指数",
+  "source": "中证指数有限公司官网行情接口",
+  "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=000300&startDate=20200102&endDate=20200102"
+ },
+ "000300|20240102": {
+  "close": 3386.35,
+  "date": "20240102",
+  "obtained_at": "2026-11-26T13:28:50",
+  "official_code": "000300",
+  "official_name": "沪深300指数",
+  "source": "中证指数有限公司官网行情接口",
+  "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=000300&startDate=20240102&endDate=20240102"
+ },
+ "000905|20150105": {
+  "close": 5417.02,
+  "date": "20150105",
+  "obtained_at": "2026-11-26T13:28:56",
+  "official_code": "000905",
+  "official_name": "中证小盘500指数",
+  "source": "中证指数有限公司官网行情接口",
+  "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=000905&startDate=20150105&endDate=20150105"
+ },
+ "000905|20180102": {
+  "close": 6332.23,
+  "date": "20180102",
+  "obtained_at": "2026-11-26T13:28:59",
+  "official_code": "000905",
+  "official_name": "中证小盘500指数",
+  "source": "中证指数有限公司官网行情接口",
+  "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=000905&startDate=20180102&endDate=20180102"
+ },
+ "000905|20200102": {
+  "close": 5366.14,
+  "date": "20200102",
+  "obtained_at": "2026-11-26T13:28:56",
+  "official_code": "000905",
+  "official_name": "中证小盘500指数",
+  "source": "中证指数有限公司官网行情接口",
+  "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=000905&startDate=20200102&endDate=20200102"
+ },
+ "000905|20240102": {
+  "close": 5409.46,
+  "date": "20240102",
+  "obtained_at": "2026-11-26T13:28:54",
+  "official_code": "000905",
+  "official_name": "中证小盘500指数",
+  "source": "中证指数有限公司官网行情接口",
+  "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=000905&startDate=20240102&endDate=20240102"
+ },
+ "000906|20150105": {
+  "close": 3944.36,
+  "date": "20150105",
+  "obtained_at": "2026-11-26T13:29:04",
+  "official_code": "000906",
+  "official_name": "中证800指数",
+  "source": "中证指数有限公司官网行情接口",
+  "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=000906&startDate=20150105&endDate=20150105"
+ },
+ "000906|20180102": {
+  "close": 4467.28,
+  "date": "20180102",
+  "obtained_at": "2026-11-26T13:29:05",
+  "official_code": "000906",
+  "official_name": "中证800指数",
+  "source": "中证指数有限公司官网行情接口",
+  "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=000906&startDate=20180102&endDate=20180102"
+ },
+ "000906|20200102": {
+  "close": 4341.85,
+  "date": "20200102",
+  "obtained_at": "2026-11-26T13:29:02",
+  "official_code": "000906",
+  "official_name": "中证800指数",
+  "source": "中证指数有限公司官网行情接口",
+  "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=000906&startDate=20200102&endDate=20200102"
+ },
+ "000906|20240102": {
+  "close": 3727.11,
+  "date": "20240102",
+  "obtained_at": "2026-11-26T13:29:02",
+  "official_code": "000906",
+  "official_name": "中证800指数",
+  "source": "中证指数有限公司官网行情接口",
+  "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=000906&startDate=20240102&endDate=20240102"
+ },
+ "000922|20150105": {
+  "close": 3582.31,
+  "date": "20150105",
+  "obtained_at": "2026-11-26T13:40:39",
+  "official_code": "000922",
+  "official_name": "中证红利指数",
+  "source": "中证指数有限公司官网行情接口",
+  "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=000922&startDate=20150105&endDate=20150105"
+ },
+ "000922|20180102": {
+  "close": 4836.08,
+  "date": "20180102",
+  "obtained_at": "2026-11-26T13:40:42",
+  "official_code": "000922",
+  "official_name": "中证红利指数",
+  "source": "中证指数有限公司官网行情接口",
+  "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=000922&startDate=20180102&endDate=20180102"
+ },
+ "000922|20200102": {
+  "close": 4503.09,
+  "date": "20200102",
+  "obtained_at": "2026-11-26T13:40:36",
+  "official_code": "000922",
+  "official_name": "中证红利指数",
+  "source": "中证指数有限公司官网行情接口",
+  "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=000922&startDate=20200102&endDate=20200102"
+ },
+ "000922|20240102": {
+  "close": 5020.99,
+  "date": "20240102",
+  "obtained_at": "2026-11-26T13:40:33",
+  "official_code": "000922",
+  "official_name": "中证红利指数",
+  "source": "中证指数有限公司官网行情接口",
+  "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=000922&startDate=20240102&endDate=20240102"
+ },
+ "000942|20150105": {
+  "close": 5234.5,
+  "date": "20150105",
+  "obtained_at": "2026-11-26T13:29:24",
+  "official_code": "000942",
+  "official_name": "中证内地消费主题指数",
+  "source": "中证指数有限公司官网行情接口",
+  "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=000942&startDate=20150105&endDate=20150105"
+ },
+ "000942|20180102": {
+  "close": 8641.14,
+  "date": "20180102",
+  "obtained_at": "2026-11-26T13:41:10",
+  "official_code": "000942",
+  "official_name": "中证内地消费主题指数",
+  "source": "中证指数有限公司官网行情接口",
+  "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=000942&startDate=20180102&endDate=20180102"
+ },
+ "000942|20200102": {
+  "close": 9864.77,
+  "date": "20200102",
+  "obtained_at": "2026-11-26T13:29:23",
+  "official_code": "000942",
+  "official_name": "中证内地消费主题指数",
+  "source": "中证指数有限公司官网行情接口",
+  "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=000942&startDate=20200102&endDate=20200102"
+ },
+ "000942|20240102": {
+  "close": 9814.16,
+  "date": "20240102",
+  "obtained_at": "2026-11-26T13:29:22",
+  "official_code": "000942",
+  "official_name": "中证内地消费主题指数",
+  "source": "中证指数有限公司官网行情接口",
+  "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=000942&startDate=20240102&endDate=20240102"
+ },
+ "399997|20150105": {
+  "close": 2676.53,
+  "date": "20150105",
+  "obtained_at": "2026-11-26T13:29:14",
+  "official_code": "399997",
+  "official_name": "中证白酒指数",
+  "source": "中证指数有限公司官网行情接口",
+  "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=399997&startDate=20150105&endDate=20150105"
+ },
+ "399997|20180102": {
+  "close": 6008.65,
+  "date": "20180102",
+  "obtained_at": "2026-11-26T13:29:15",
+  "official_code": "399997",
+  "official_name": "中证白酒指数",
+  "source": "中证指数有限公司官网行情接口",
+  "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=399997&startDate=20180102&endDate=20180102"
+ },
+ "399997|20200102": {
+  "close": 8315.02,
+  "date": "20200102",
+  "obtained_at": "2026-11-26T13:29:12",
+  "official_code": "399997",
+  "official_name": "中证白酒指数",
+  "source": "中证指数有限公司官网行情接口",
+  "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=399997&startDate=20200102&endDate=20200102"
+ },
+ "399997|20240102": {
+  "close": 12206.51,
+  "date": "20240102",
+  "obtained_at": "2026-11-26T13:29:11",
+  "official_code": "399997",
+  "official_name": "中证白酒指数",
+  "source": "中证指数有限公司官网行情接口",
+  "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=399997&startDate=20240102&endDate=20240102"
+ },
+ "930930|20150105": {
+  "close": 3001.78,
+  "date": "20150105",
+  "obtained_at": "2026-11-26T13:40:52",
+  "official_code": "930930",
+  "official_name": "中证港股通综合指数",
+  "source": "中证指数有限公司官网行情接口",
+  "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=930930&startDate=20150105&endDate=20150105"
+ },
+ "930930|20180102": {
+  "close": 3845.61,
+  "date": "20180102",
+  "obtained_at": "2026-11-26T13:40:55",
+  "official_code": "930930",
+  "official_name": "中证港股通综合指数",
+  "source": "中证指数有限公司官网行情接口",
+  "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=930930&startDate=20180102&endDate=20180102"
+ },
+ "930930|20200102": {
+  "close": 3548.37,
+  "date": "20200102",
+  "obtained_at": "2026-11-26T13:40:49",
+  "official_code": "930930",
+  "official_name": "中证港股通综合指数",
+  "source": "中证指数有限公司官网行情接口",
+  "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=930930&startDate=20200102&endDate=20200102"
+ },
+ "930930|20240102": {
+  "close": 2399.31,
+  "date": "20240102",
+  "obtained_at": "2026-11-26T13:40:46",
+  "official_code": "930930",
+  "official_name": "中证港股通综合指数",
+  "source": "中证指数有限公司官网行情接口",
+  "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=930930&startDate=20240102&endDate=20240102"
+ },
+ "H30184|20150105": {
+  "close": 2273.23,
+  "date": "20150105",
+  "obtained_at": "2026-11-26T13:29:18",
+  "official_code": "H30184",
+  "official_name": "中证全指半导体产品与设备指数",
+  "source": "中证指数有限公司官网行情接口",
+  "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=H30184&startDate=20150105&endDate=20150105"
+ },
+ "H30184|20180102": {
+  "close": 3958.32,
+  "date": "20180102",
+  "obtained_at": "2026-11-26T13:29:20",
+  "official_code": "H30184",
+  "official_name": "中证全指半导体产品与设备指数",
+  "source": "中证指数有限公司官网行情接口",
+  "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=H30184&startDate=20180102&endDate=20180102"
+ },
+ "H30184|20200102": {
+  "close": 4670.56,
+  "date": "20200102",
+  "obtained_at": "2026-11-26T13:29:17",
+  "official_code": "H30184",
+  "official_name": "中证全指半导体产品与设备指数",
+  "source": "中证指数有限公司官网行情接口",
+  "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=H30184&startDate=20200102&endDate=20200102"
+ },
+ "H30184|20240102": {
+  "close": 4912.91,
+  "date": "20240102",
+  "obtained_at": "2026-11-26T13:29:16",
+  "official_code": "H30184",
+  "official_name": "中证全指半导体产品与设备指数",
+  "source": "中证指数有限公司官网行情接口",
+  "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=H30184&startDate=20240102&endDate=20240102"
+ }
+}

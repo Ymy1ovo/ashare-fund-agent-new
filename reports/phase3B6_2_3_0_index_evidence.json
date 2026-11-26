@@ -1,7 +1,7 @@
 {
  "phase": "3B-6.2.3.0",
  "task": "官方指数收益口径核验与基金合同原件获取审计",
- "generated_at": "2026-11-26T11:19:20",
+ "generated_at": "2026-11-26T13:49:31",
  "baseline_head": "bc490c339f959b6f5262c90290853612329695e3",
  "read_only": true,
  "evidence_grade_definition": {
@@ -13,8 +13,29 @@
  "sources": {
   "csindex_oss": "https://oss-ch.csindex.com.cn/static/html/csindex/public/uploads/indices/detail/files/zh_CN/",
   "csindex_basic": "https://www.csindex.com.cn/csindex-home/indexInfo/index-basic-info/",
+  "csindex_perf": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode={code}&startDate={d}&endDate={d}",
   "cninfo": "巨潮资讯网（中国证监会指定信息披露网站）",
-  "cninfo_query": "http://www.cninfo.com.cn/new/hisAnnouncement/query"
+  "cninfo_query": "http://www.cninfo.com.cn/new/hisAnnouncement/query",
+  "official_samples_file": "reports/evidence/phase3B6_2_3_0/official_close_samples.json",
+  "official_samples_sha256": "3c48d83dca0620464e90298c6d8ce3d95884d686b7fd0bd4dd90454f8ea7c8a4",
+  "api_samples_file": "reports/evidence/phase3B6_2_3_0/api_identity_samples.json"
+ },
+ "verification_dimensions": {
+  "official_identity_verified": "官方指数代码/正式名称/发布机构已核验（含官方文件）",
+  "official_return_basis_verified": "官方文件明文确认收益口径",
+  "api_code_identity_verified": "数据接口返回代码与请求代码一致（仅身份，非数值验证）",
+  "api_name_identity_verified": "数据接口返回正式名称与官方全称一致（不能只比代码）",
+  "database_series_exists": "只读查询正式库 index_daily，确认实际历史记录存在",
+  "database_series_source_traceable": "库内是否具备数据源/批次标识/行级指纹/采集时间",
+  "database_series_numerically_verified": "逐日比对中证指数官网官方收盘值；取不到记 unknown，不记 false",
+  "historical_coverage_verified": "是否确认历史覆盖区间、缺失日期与连续性（本阶段未做）",
+  "point_in_time_verified": "是否确认历史数据在当时真实可取得（本阶段未做）"
+ },
+ "deprecated_fields": {
+  "series_matched": "已废弃 → api_code_identity_verified",
+  "data_series_matches_official": "已废弃 → 仅代表接口代码匹配，不代表数据库历史序列匹配；数值验证见 database_series_numerically_verified",
+  "series_matches_official": "已废弃 → series_matches_official_basis（需数值级验证）",
+  "data_series_matches_official_removed_at": "3B-6.2.3.0.1"
  },
  "indexes": [
   {
@@ -35,7 +56,7 @@
     "source_org": "中证指数有限公司",
     "url": "https://oss-ch.csindex.com.cn/static/html/csindex/public/uploads/indices/detail/files/zh_CN/000300_Index_Methodology_cn.pdf",
     "disclosed_date": "2023-09",
-    "obtained_at": "2026-11-26T11:17:15",
+    "obtained_at": "2026-11-26T13:47:08",
     "file": "reports/evidence/phase3B6_2_3_0/index_methodology/000300_Index_Methodology_cn.pdf",
     "bytes": 1184619,
     "sha256": "de6491e03e5d57ecf1aca104b1412543643a59e387a5343c9bd21ecbbdeba5b6",
@@ -57,13 +78,9 @@
     ],
     "basis_confirmed": true
    },
-   "return_basis_confirmed": true,
-   "series_probe": {
-    "request_code": "000300",
-    "returned_code": "000300",
-    "returned_full_name": "沪深300指数",
-    "returned_short_name": "沪深300",
-    "rows": 4,
+   "official_identity_verified": true,
+   "official_return_basis_verified": true,
+   "api_identity": {
     "columns": [
      "日期",
      "指数代码",
@@ -82,16 +99,172 @@
      "样本数量",
      "滚动市盈率"
     ],
+    "obtained": true,
+    "obtained_at": "2026-11-26T13:28:49",
+    "request_code": "000300",
+    "returned_code": "000300",
+    "returned_full_name": "沪深300指数",
+    "returned_short_name": "沪深300",
+    "rows": 4,
     "sample_close": [
      3386.35,
      3378.3,
      3347.05,
      3329.11
     ],
-    "series_matched": true
+    "source": "akshare.stock_zh_index_hist_csindex",
+    "from_cache": true
    },
-   "data_series_matches_official": true,
-   "note": "官方口径已确认，且数据接口返回代码与官方一致；但**历史连续覆盖与时点可用性未在本阶段确认**"
+   "api_code_identity_verified": true,
+   "api_name_identity_verified": true,
+   "database": {
+    "table": "index_daily",
+    "schema_columns_read": [
+     "index_code",
+     "trade_date",
+     "open",
+     "high",
+     "low",
+     "close",
+     "volume",
+     "amount",
+     "source",
+     "raw_basis",
+     "run_id",
+     "collected_at",
+     "row_fingerprint",
+     "quality_status",
+     "quality_note"
+    ],
+    "master_columns_read": [
+     "index_code",
+     "index_name",
+     "index_short_name",
+     "index_family",
+     "publisher",
+     "data_source",
+     "inception_date",
+     "inception_date_evidence",
+     "frequency",
+     "currency",
+     "return_basis",
+     "return_basis_evidence",
+     "data_status",
+     "layer_status",
+     "created_at",
+     "updated_at",
+     "data_version"
+    ],
+    "exists": true,
+    "rows": 5558,
+    "date_min": "2004-01-01",
+    "date_max": "2026-11-20",
+    "missing_trading_days": null,
+    "sources": [
+     "akshare.stock_zh_index_hist_csindex"
+    ],
+    "run_ids": [
+     261
+    ],
+    "collected_at_min": "2026-11-23T17:37:33",
+    "collected_at_max": "2026-11-23T17:37:33",
+    "quality_status_counts": {
+     "suspect": 1,
+     "valid": 5557
+    },
+    "suspect_rows": [
+     {
+      "trade_date": "2004-01-01",
+      "close": 1204.61,
+      "quality_note": "接口基线占位行：日期与第二行间隔异常或非交易日，不是真实行情"
+     }
+    ],
+    "row_fingerprint_present": true,
+    "source_traceable": true,
+    "source_traceable_reason": "具备数据源/批次标识/行级指纹/采集时间"
+   },
+   "database_series_exists": true,
+   "database_series_source_traceable": true,
+   "database_master_row": {
+    "exists": true,
+    "index_code": "000300",
+    "index_name": "沪深300指数",
+    "index_short_name": "沪深300",
+    "publisher": "中证指数有限公司",
+    "data_source": "akshare.stock_zh_index_hist_csindex",
+    "return_basis": "unknown",
+    "return_basis_evidence": "来源仅提供指数收盘点位，无全收益口径证据，保守标记 unknown",
+    "inception_date": null,
+    "inception_date_evidence": "来源未明确给出成立日，首行日期不得顶替",
+    "data_status": "active",
+    "layer_status": "ready",
+    "data_version": "index-v1"
+   },
+   "numerical_verification": {
+    "tolerance": 0.01,
+    "probe_dates": [
+     "20240102",
+     "20200102",
+     "20150105",
+     "20180102"
+    ],
+    "comparisons": [
+     {
+      "date": "2024-01-02",
+      "official_close": 3386.35,
+      "database_close": 3386.35,
+      "database_quality_status": "valid",
+      "abs_diff": 0.0,
+      "match": true,
+      "official_url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=000300&startDate=20240102&endDate=20240102",
+      "note": null
+     },
+     {
+      "date": "2020-01-02",
+      "official_close": 4152.24,
+      "database_close": 4152.24,
+      "database_quality_status": "valid",
+      "abs_diff": 0.0,
+      "match": true,
+      "official_url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=000300&startDate=20200102&endDate=20200102",
+      "note": null
+     },
+     {
+      "date": "2015-01-05",
+      "official_close": 3641.54,
+      "database_close": 3641.54,
+      "database_quality_status": "valid",
+      "abs_diff": 0.0,
+      "match": true,
+      "official_url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=000300&startDate=20150105&endDate=20150105",
+      "note": null
+     },
+     {
+      "date": "2018-01-02",
+      "official_close": 4087.4,
+      "database_close": 4087.4,
+      "database_quality_status": "valid",
+      "abs_diff": 0.0,
+      "match": true,
+      "official_url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=000300&startDate=20180102&endDate=20180102",
+      "note": null
+     }
+    ],
+    "official_obtained": 4,
+    "matched": 4,
+    "mismatch": 0,
+    "verified": true,
+    "verdict": "逐日比对 4 个不同年份的官方收盘值全部一致",
+    "samples_file": "reports/evidence/phase3B6_2_3_0/official_close_samples.json",
+    "samples_sha256": "3c48d83dca0620464e90298c6d8ce3d95884d686b7fd0bd4dd90454f8ea7c8a4",
+    "method": "逐日比对中证指数有限公司官网官方行情接口收盘值，容差 0.01；官方无数据日不计入通过；取不到官方数值记 unknown，不记 false"
+   },
+   "database_series_numerically_verified": true,
+   "historical_coverage_verified": false,
+   "historical_coverage_note": "本阶段未接入交易日历做缺失日核验，仅记录库内首末日期与行数",
+   "point_in_time_verified": false,
+   "point_in_time_note": "本阶段未做时点可用性（前视偏差）审计",
+   "series_matches_official_basis": true
   },
   {
    "index_code": "000905",
@@ -111,7 +284,7 @@
     "source_org": "中证指数有限公司",
     "url": "https://oss-ch.csindex.com.cn/static/html/csindex/public/uploads/indices/detail/files/zh_CN/000905_Index_Methodology_cn.pdf",
     "disclosed_date": "2022-05",
-    "obtained_at": "2026-11-26T11:17:18",
+    "obtained_at": "2026-11-26T13:47:10",
     "file": "reports/evidence/phase3B6_2_3_0/index_methodology/000905_Index_Methodology_cn.pdf",
     "bytes": 185201,
     "sha256": "6109ad8390fdad70ed807c799309f7d5cabc1cd949d45754704c7a8acf4d1933",
@@ -132,13 +305,9 @@
     ],
     "basis_confirmed": true
    },
-   "return_basis_confirmed": true,
-   "series_probe": {
-    "request_code": "000905",
-    "returned_code": "000905",
-    "returned_full_name": "中证小盘500指数",
-    "returned_short_name": "中证500",
-    "rows": 4,
+   "official_identity_verified": true,
+   "official_return_basis_verified": true,
+   "api_identity": {
     "columns": [
      "日期",
      "指数代码",
@@ -157,16 +326,172 @@
      "样本数量",
      "滚动市盈率"
     ],
+    "obtained": true,
+    "obtained_at": "2026-11-26T13:28:54",
+    "request_code": "000905",
+    "returned_code": "000905",
+    "returned_full_name": "中证小盘500指数",
+    "returned_short_name": "中证500",
+    "rows": 4,
     "sample_close": [
      5409.46,
      5401.4,
      5355.32,
      5281.87
     ],
-    "series_matched": true
+    "source": "akshare.stock_zh_index_hist_csindex",
+    "from_cache": true
    },
-   "data_series_matches_official": true,
-   "note": "官方口径已确认，且数据接口返回代码与官方一致；但**历史连续覆盖与时点可用性未在本阶段确认**"
+   "api_code_identity_verified": true,
+   "api_name_identity_verified": true,
+   "database": {
+    "table": "index_daily",
+    "schema_columns_read": [
+     "index_code",
+     "trade_date",
+     "open",
+     "high",
+     "low",
+     "close",
+     "volume",
+     "amount",
+     "source",
+     "raw_basis",
+     "run_id",
+     "collected_at",
+     "row_fingerprint",
+     "quality_status",
+     "quality_note"
+    ],
+    "master_columns_read": [
+     "index_code",
+     "index_name",
+     "index_short_name",
+     "index_family",
+     "publisher",
+     "data_source",
+     "inception_date",
+     "inception_date_evidence",
+     "frequency",
+     "currency",
+     "return_basis",
+     "return_basis_evidence",
+     "data_status",
+     "layer_status",
+     "created_at",
+     "updated_at",
+     "data_version"
+    ],
+    "exists": true,
+    "rows": 5317,
+    "date_min": "2004-01-01",
+    "date_max": "2026-11-20",
+    "missing_trading_days": null,
+    "sources": [
+     "akshare.stock_zh_index_hist_csindex"
+    ],
+    "run_ids": [
+     262
+    ],
+    "collected_at_min": "2026-11-23T17:37:46",
+    "collected_at_max": "2026-11-23T17:37:46",
+    "quality_status_counts": {
+     "suspect": 1,
+     "valid": 5316
+    },
+    "suspect_rows": [
+     {
+      "trade_date": "2004-01-01",
+      "close": 1000.0,
+      "quality_note": "接口基线占位行：日期与第二行间隔异常或非交易日，不是真实行情"
+     }
+    ],
+    "row_fingerprint_present": true,
+    "source_traceable": true,
+    "source_traceable_reason": "具备数据源/批次标识/行级指纹/采集时间"
+   },
+   "database_series_exists": true,
+   "database_series_source_traceable": true,
+   "database_master_row": {
+    "exists": true,
+    "index_code": "000905",
+    "index_name": "中证小盘500指数",
+    "index_short_name": "中证500",
+    "publisher": "中证指数有限公司",
+    "data_source": "akshare.stock_zh_index_hist_csindex",
+    "return_basis": "unknown",
+    "return_basis_evidence": "来源仅提供指数收盘点位，无全收益口径证据，保守标记 unknown",
+    "inception_date": null,
+    "inception_date_evidence": "来源未明确给出成立日，首行日期不得顶替",
+    "data_status": "active",
+    "layer_status": "ready",
+    "data_version": "index-v1"
+   },
+   "numerical_verification": {
+    "tolerance": 0.01,
+    "probe_dates": [
+     "20240102",
+     "20200102",
+     "20150105",
+     "20180102"
+    ],
+    "comparisons": [
+     {
+      "date": "2024-01-02",
+      "official_close": 5409.46,
+      "database_close": 5409.46,
+      "database_quality_status": "valid",
+      "abs_diff": 0.0,
+      "match": true,
+      "official_url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=000905&startDate=20240102&endDate=20240102",
+      "note": null
+     },
+     {
+      "date": "2020-01-02",
+      "official_close": 5366.14,
+      "database_close": 5366.14,
+      "database_quality_status": "valid",
+      "abs_diff": 0.0,
+      "match": true,
+      "official_url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=000905&startDate=20200102&endDate=20200102",
+      "note": null
+     },
+     {
+      "date": "2015-01-05",
+      "official_close": 5417.02,
+      "database_close": 5417.02,
+      "database_quality_status": "valid",
+      "abs_diff": 0.0,
+      "match": true,
+      "official_url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=000905&startDate=20150105&endDate=20150105",
+      "note": null
+     },
+     {
+      "date": "2018-01-02",
+      "official_close": 6332.23,
+      "database_close": 6332.23,
+      "database_quality_status": "valid",
+      "abs_diff": 0.0,
+      "match": true,
+      "official_url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=000905&startDate=20180102&endDate=20180102",
+      "note": null
+     }
+    ],
+    "official_obtained": 4,
+    "matched": 4,
+    "mismatch": 0,
+    "verified": true,
+    "verdict": "逐日比对 4 个不同年份的官方收盘值全部一致",
+    "samples_file": "reports/evidence/phase3B6_2_3_0/official_close_samples.json",
+    "samples_sha256": "3c48d83dca0620464e90298c6d8ce3d95884d686b7fd0bd4dd90454f8ea7c8a4",
+    "method": "逐日比对中证指数有限公司官网官方行情接口收盘值，容差 0.01；官方无数据日不计入通过；取不到官方数值记 unknown，不记 false"
+   },
+   "database_series_numerically_verified": true,
+   "historical_coverage_verified": false,
+   "historical_coverage_note": "本阶段未接入交易日历做缺失日核验，仅记录库内首末日期与行数",
+   "point_in_time_verified": false,
+   "point_in_time_note": "本阶段未做时点可用性（前视偏差）审计",
+   "series_matches_official_basis": true
   },
   {
    "index_code": "000906",
@@ -186,7 +511,7 @@
     "source_org": "中证指数有限公司",
     "url": "https://oss-ch.csindex.com.cn/static/html/csindex/public/uploads/indices/detail/files/zh_CN/000906_Index_Methodology_cn.pdf",
     "disclosed_date": "2022-05",
-    "obtained_at": "2026-11-26T11:17:18",
+    "obtained_at": "2026-11-26T13:47:11",
     "file": "reports/evidence/phase3B6_2_3_0/index_methodology/000906_Index_Methodology_cn.pdf",
     "bytes": 185201,
     "sha256": "6109ad8390fdad70ed807c799309f7d5cabc1cd949d45754704c7a8acf4d1933",
@@ -207,13 +532,9 @@
     ],
     "basis_confirmed": true
    },
-   "return_basis_confirmed": true,
-   "series_probe": {
-    "request_code": "000906",
-    "returned_code": "000906",
-    "returned_full_name": "中证800指数",
-    "returned_short_name": "中证800",
-    "rows": 4,
+   "official_identity_verified": true,
+   "official_return_basis_verified": true,
+   "api_identity": {
     "columns": [
      "日期",
      "指数代码",
@@ -232,16 +553,172 @@
      "样本数量",
      "滚动市盈率"
     ],
+    "obtained": true,
+    "obtained_at": "2026-11-26T13:29:01",
+    "request_code": "000906",
+    "returned_code": "000906",
+    "returned_full_name": "中证800指数",
+    "returned_short_name": "中证800",
+    "rows": 4,
     "sample_close": [
      3727.11,
      3719.14,
      3685.47,
      3657.37
     ],
-    "series_matched": true
+    "source": "akshare.stock_zh_index_hist_csindex",
+    "from_cache": true
    },
-   "data_series_matches_official": true,
-   "note": "官方口径已确认，且数据接口返回代码与官方一致；但**历史连续覆盖与时点可用性未在本阶段确认**"
+   "api_code_identity_verified": true,
+   "api_name_identity_verified": true,
+   "database": {
+    "table": "index_daily",
+    "schema_columns_read": [
+     "index_code",
+     "trade_date",
+     "open",
+     "high",
+     "low",
+     "close",
+     "volume",
+     "amount",
+     "source",
+     "raw_basis",
+     "run_id",
+     "collected_at",
+     "row_fingerprint",
+     "quality_status",
+     "quality_note"
+    ],
+    "master_columns_read": [
+     "index_code",
+     "index_name",
+     "index_short_name",
+     "index_family",
+     "publisher",
+     "data_source",
+     "inception_date",
+     "inception_date_evidence",
+     "frequency",
+     "currency",
+     "return_basis",
+     "return_basis_evidence",
+     "data_status",
+     "layer_status",
+     "created_at",
+     "updated_at",
+     "data_version"
+    ],
+    "exists": true,
+    "rows": 5317,
+    "date_min": "2004-01-01",
+    "date_max": "2026-11-20",
+    "missing_trading_days": null,
+    "sources": [
+     "akshare.stock_zh_index_hist_csindex"
+    ],
+    "run_ids": [
+     263
+    ],
+    "collected_at_min": "2026-11-23T17:37:55",
+    "collected_at_max": "2026-11-23T17:37:55",
+    "quality_status_counts": {
+     "suspect": 1,
+     "valid": 5316
+    },
+    "suspect_rows": [
+     {
+      "trade_date": "2004-01-01",
+      "close": 1000.0,
+      "quality_note": "接口基线占位行：日期与第二行间隔异常或非交易日，不是真实行情"
+     }
+    ],
+    "row_fingerprint_present": true,
+    "source_traceable": true,
+    "source_traceable_reason": "具备数据源/批次标识/行级指纹/采集时间"
+   },
+   "database_series_exists": true,
+   "database_series_source_traceable": true,
+   "database_master_row": {
+    "exists": true,
+    "index_code": "000906",
+    "index_name": "中证800指数",
+    "index_short_name": "中证800",
+    "publisher": "中证指数有限公司",
+    "data_source": "akshare.stock_zh_index_hist_csindex",
+    "return_basis": "unknown",
+    "return_basis_evidence": "来源仅提供指数收盘点位，无全收益口径证据，保守标记 unknown",
+    "inception_date": null,
+    "inception_date_evidence": "来源未明确给出成立日，首行日期不得顶替",
+    "data_status": "active",
+    "layer_status": "ready",
+    "data_version": "index-v1"
+   },
+   "numerical_verification": {
+    "tolerance": 0.01,
+    "probe_dates": [
+     "20240102",
+     "20200102",
+     "20150105",
+     "20180102"
+    ],
+    "comparisons": [
+     {
+      "date": "2024-01-02",
+      "official_close": 3727.11,
+      "database_close": 3727.11,
+      "database_quality_status": "valid",
+      "abs_diff": 0.0,
+      "match": true,
+      "official_url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=000906&startDate=20240102&endDate=20240102",
+      "note": null
+     },
+     {
+      "date": "2020-01-02",
+      "official_close": 4341.85,
+      "database_close": 4341.85,
+      "database_quality_status": "valid",
+      "abs_diff": 0.0,
+      "match": true,
+      "official_url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=000906&startDate=20200102&endDate=20200102",
+      "note": null
+     },
+     {
+      "date": "2015-01-05",
+      "official_close": 3944.36,
+      "database_close": 3944.36,
+      "database_quality_status": "valid",
+      "abs_diff": 0.0,
+      "match": true,
+      "official_url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=000906&startDate=20150105&endDate=20150105",
+      "note": null
+     },
+     {
+      "date": "2018-01-02",
+      "official_close": 4467.28,
+      "database_close": 4467.28,
+      "database_quality_status": "valid",
+      "abs_diff": 0.0,
+      "match": true,
+      "official_url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=000906&startDate=20180102&endDate=20180102",
+      "note": null
+     }
+    ],
+    "official_obtained": 4,
+    "matched": 4,
+    "mismatch": 0,
+    "verified": true,
+    "verdict": "逐日比对 4 个不同年份的官方收盘值全部一致",
+    "samples_file": "reports/evidence/phase3B6_2_3_0/official_close_samples.json",
+    "samples_sha256": "3c48d83dca0620464e90298c6d8ce3d95884d686b7fd0bd4dd90454f8ea7c8a4",
+    "method": "逐日比对中证指数有限公司官网官方行情接口收盘值，容差 0.01；官方无数据日不计入通过；取不到官方数值记 unknown，不记 false"
+   },
+   "database_series_numerically_verified": true,
+   "historical_coverage_verified": false,
+   "historical_coverage_note": "本阶段未接入交易日历做缺失日核验，仅记录库内首末日期与行数",
+   "point_in_time_verified": false,
+   "point_in_time_note": "本阶段未做时点可用性（前视偏差）审计",
+   "series_matches_official_basis": true
   },
   {
    "index_code": "000016",
@@ -261,7 +738,7 @@
     "source_org": "中证指数有限公司",
     "url": "https://oss-ch.csindex.com.cn/static/html/csindex/public/uploads/indices/detail/files/zh_CN/000016_Index_Methodology_cn.pdf",
     "disclosed_date": "2020-12",
-    "obtained_at": "2026-11-26T11:17:19",
+    "obtained_at": "2026-11-26T13:47:11",
     "file": "reports/evidence/phase3B6_2_3_0/index_methodology/000016_Index_Methodology_cn.pdf",
     "bytes": 138004,
     "sha256": "e8f1ce6045b7f91305fb28a1c898f61fceae8e2159ce665742d12fa4f8ceb5df",
@@ -282,13 +759,9 @@
     ],
     "basis_confirmed": true
    },
-   "return_basis_confirmed": true,
-   "series_probe": {
-    "request_code": "000016",
-    "returned_code": "000016",
-    "returned_full_name": "上证50指数",
-    "returned_short_name": "上证50",
-    "rows": 4,
+   "official_identity_verified": true,
+   "official_return_basis_verified": true,
+   "api_identity": {
     "columns": [
      "日期",
      "指数代码",
@@ -307,16 +780,172 @@
      "样本数量",
      "滚动市盈率"
     ],
+    "obtained": true,
+    "obtained_at": "2026-11-26T13:29:06",
+    "request_code": "000016",
+    "returned_code": "000016",
+    "returned_full_name": "上证50指数",
+    "returned_short_name": "上证50",
+    "rows": 4,
     "sample_close": [
      2292.23,
      2294.84,
      2279.04,
      2268.54
     ],
-    "series_matched": true
+    "source": "akshare.stock_zh_index_hist_csindex",
+    "from_cache": true
    },
-   "data_series_matches_official": true,
-   "note": "官方口径已确认，且数据接口返回代码与官方一致；但**历史连续覆盖与时点可用性未在本阶段确认**"
+   "api_code_identity_verified": true,
+   "api_name_identity_verified": true,
+   "database": {
+    "table": "index_daily",
+    "schema_columns_read": [
+     "index_code",
+     "trade_date",
+     "open",
+     "high",
+     "low",
+     "close",
+     "volume",
+     "amount",
+     "source",
+     "raw_basis",
+     "run_id",
+     "collected_at",
+     "row_fingerprint",
+     "quality_status",
+     "quality_note"
+    ],
+    "master_columns_read": [
+     "index_code",
+     "index_name",
+     "index_short_name",
+     "index_family",
+     "publisher",
+     "data_source",
+     "inception_date",
+     "inception_date_evidence",
+     "frequency",
+     "currency",
+     "return_basis",
+     "return_basis_evidence",
+     "data_status",
+     "layer_status",
+     "created_at",
+     "updated_at",
+     "data_version"
+    ],
+    "exists": true,
+    "rows": 5559,
+    "date_min": "2004-01-01",
+    "date_max": "2026-11-20",
+    "missing_trading_days": null,
+    "sources": [
+     "akshare.stock_zh_index_hist_csindex"
+    ],
+    "run_ids": [
+     264
+    ],
+    "collected_at_min": "2026-11-23T17:38:11",
+    "collected_at_max": "2026-11-23T17:38:11",
+    "quality_status_counts": {
+     "suspect": 1,
+     "valid": 5558
+    },
+    "suspect_rows": [
+     {
+      "trade_date": "2004-01-01",
+      "close": 1011.35,
+      "quality_note": "接口基线占位行：日期与第二行间隔异常或非交易日，不是真实行情"
+     }
+    ],
+    "row_fingerprint_present": true,
+    "source_traceable": true,
+    "source_traceable_reason": "具备数据源/批次标识/行级指纹/采集时间"
+   },
+   "database_series_exists": true,
+   "database_series_source_traceable": true,
+   "database_master_row": {
+    "exists": true,
+    "index_code": "000016",
+    "index_name": "上证50指数",
+    "index_short_name": "上证50",
+    "publisher": "中证指数有限公司",
+    "data_source": "akshare.stock_zh_index_hist_csindex",
+    "return_basis": "unknown",
+    "return_basis_evidence": "来源仅提供指数收盘点位，无全收益口径证据，保守标记 unknown",
+    "inception_date": null,
+    "inception_date_evidence": "来源未明确给出成立日，首行日期不得顶替",
+    "data_status": "active",
+    "layer_status": "ready",
+    "data_version": "index-v1"
+   },
+   "numerical_verification": {
+    "tolerance": 0.01,
+    "probe_dates": [
+     "20240102",
+     "20200102",
+     "20150105",
+     "20180102"
+    ],
+    "comparisons": [
+     {
+      "date": "2024-01-02",
+      "official_close": 2292.23,
+      "database_close": 2292.23,
+      "database_quality_status": "valid",
+      "abs_diff": 0.0,
+      "match": true,
+      "official_url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=000016&startDate=20240102&endDate=20240102",
+      "note": null
+     },
+     {
+      "date": "2020-01-02",
+      "official_close": 3090.83,
+      "database_close": 3090.83,
+      "database_quality_status": "valid",
+      "abs_diff": 0.0,
+      "match": true,
+      "official_url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=000016&startDate=20200102&endDate=20200102",
+      "note": null
+     },
+     {
+      "date": "2015-01-05",
+      "official_close": 2649.64,
+      "database_close": 2649.64,
+      "database_quality_status": "valid",
+      "abs_diff": 0.0,
+      "match": true,
+      "official_url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=000016&startDate=20150105&endDate=20150105",
+      "note": null
+     },
+     {
+      "date": "2018-01-02",
+      "official_close": 2908.73,
+      "database_close": 2908.73,
+      "database_quality_status": "valid",
+      "abs_diff": 0.0,
+      "match": true,
+      "official_url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=000016&startDate=20180102&endDate=20180102",
+      "note": null
+     }
+    ],
+    "official_obtained": 4,
+    "matched": 4,
+    "mismatch": 0,
+    "verified": true,
+    "verdict": "逐日比对 4 个不同年份的官方收盘值全部一致",
+    "samples_file": "reports/evidence/phase3B6_2_3_0/official_close_samples.json",
+    "samples_sha256": "3c48d83dca0620464e90298c6d8ce3d95884d686b7fd0bd4dd90454f8ea7c8a4",
+    "method": "逐日比对中证指数有限公司官网官方行情接口收盘值，容差 0.01；官方无数据日不计入通过；取不到官方数值记 unknown，不记 false"
+   },
+   "database_series_numerically_verified": true,
+   "historical_coverage_verified": false,
+   "historical_coverage_note": "本阶段未接入交易日历做缺失日核验，仅记录库内首末日期与行数",
+   "point_in_time_verified": false,
+   "point_in_time_note": "本阶段未做时点可用性（前视偏差）审计",
+   "series_matches_official_basis": true
   },
   {
    "index_code": "399997",
@@ -336,7 +965,7 @@
     "source_org": "中证指数有限公司",
     "url": "https://oss-ch.csindex.com.cn/static/html/csindex/public/uploads/indices/detail/files/zh_CN/20231208175434-399997_Index_Methodology_cn.pdf",
     "disclosed_date": "2023-12",
-    "obtained_at": "2026-11-26T11:17:20",
+    "obtained_at": "2026-11-26T13:47:12",
     "file": "reports/evidence/phase3B6_2_3_0/index_methodology/399997_Index_Methodology_cn.pdf",
     "bytes": 334506,
     "sha256": "62450948684c293063b2fac3307afe40e581d33f38c0d0708b9d1da1099a90ab",
@@ -362,13 +991,9 @@
     ],
     "basis_confirmed": true
    },
-   "return_basis_confirmed": true,
-   "series_probe": {
-    "request_code": "399997",
-    "returned_code": "399997",
-    "returned_full_name": "中证白酒指数",
-    "returned_short_name": "中证白酒",
-    "rows": 4,
+   "official_identity_verified": true,
+   "official_return_basis_verified": true,
+   "api_identity": {
     "columns": [
      "日期",
      "指数代码",
@@ -387,16 +1012,172 @@
      "样本数量",
      "滚动市盈率"
     ],
+    "obtained": true,
+    "obtained_at": "2026-11-26T13:29:11",
+    "request_code": "399997",
+    "returned_code": "399997",
+    "returned_full_name": "中证白酒指数",
+    "returned_short_name": "中证白酒",
+    "rows": 4,
     "sample_close": [
      12206.51,
      12147.94,
      11865.42,
      11761.14
     ],
-    "series_matched": true
+    "source": "akshare.stock_zh_index_hist_csindex",
+    "from_cache": true
    },
-   "data_series_matches_official": true,
-   "note": "官方口径已确认，且数据接口返回代码与官方一致；但**历史连续覆盖与时点可用性未在本阶段确认**"
+   "api_code_identity_verified": true,
+   "api_name_identity_verified": true,
+   "database": {
+    "table": "index_daily",
+    "schema_columns_read": [
+     "index_code",
+     "trade_date",
+     "open",
+     "high",
+     "low",
+     "close",
+     "volume",
+     "amount",
+     "source",
+     "raw_basis",
+     "run_id",
+     "collected_at",
+     "row_fingerprint",
+     "quality_status",
+     "quality_note"
+    ],
+    "master_columns_read": [
+     "index_code",
+     "index_name",
+     "index_short_name",
+     "index_family",
+     "publisher",
+     "data_source",
+     "inception_date",
+     "inception_date_evidence",
+     "frequency",
+     "currency",
+     "return_basis",
+     "return_basis_evidence",
+     "data_status",
+     "layer_status",
+     "created_at",
+     "updated_at",
+     "data_version"
+    ],
+    "exists": true,
+    "rows": 4345,
+    "date_min": "2004-01-01",
+    "date_max": "2026-11-20",
+    "missing_trading_days": null,
+    "sources": [
+     "akshare.stock_zh_index_hist_csindex"
+    ],
+    "run_ids": [
+     265
+    ],
+    "collected_at_min": "2026-11-23T17:38:24",
+    "collected_at_max": "2026-11-23T17:38:24",
+    "quality_status_counts": {
+     "suspect": 1,
+     "valid": 4344
+    },
+    "suspect_rows": [
+     {
+      "trade_date": "2004-01-01",
+      "close": 1028.64,
+      "quality_note": "接口基线占位行：日期与第二行间隔异常或非交易日，不是真实行情"
+     }
+    ],
+    "row_fingerprint_present": true,
+    "source_traceable": true,
+    "source_traceable_reason": "具备数据源/批次标识/行级指纹/采集时间"
+   },
+   "database_series_exists": true,
+   "database_series_source_traceable": true,
+   "database_master_row": {
+    "exists": true,
+    "index_code": "399997",
+    "index_name": "中证白酒指数",
+    "index_short_name": "中证白酒",
+    "publisher": "中证指数有限公司",
+    "data_source": "akshare.stock_zh_index_hist_csindex",
+    "return_basis": "unknown",
+    "return_basis_evidence": "来源仅提供指数收盘点位，无全收益口径证据，保守标记 unknown",
+    "inception_date": null,
+    "inception_date_evidence": "来源未明确给出成立日，首行日期不得顶替",
+    "data_status": "active",
+    "layer_status": "ready",
+    "data_version": "index-v1"
+   },
+   "numerical_verification": {
+    "tolerance": 0.01,
+    "probe_dates": [
+     "20240102",
+     "20200102",
+     "20150105",
+     "20180102"
+    ],
+    "comparisons": [
+     {
+      "date": "2024-01-02",
+      "official_close": 12206.51,
+      "database_close": 12206.51,
+      "database_quality_status": "valid",
+      "abs_diff": 0.0,
+      "match": true,
+      "official_url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=399997&startDate=20240102&endDate=20240102",
+      "note": null
+     },
+     {
+      "date": "2020-01-02",
+      "official_close": 8315.02,
+      "database_close": 8315.02,
+      "database_quality_status": "valid",
+      "abs_diff": 0.0,
+      "match": true,
+      "official_url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=399997&startDate=20200102&endDate=20200102",
+      "note": null
+     },
+     {
+      "date": "2015-01-05",
+      "official_close": 2676.53,
+      "database_close": 2676.53,
+      "database_quality_status": "valid",
+      "abs_diff": 0.0,
+      "match": true,
+      "official_url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=399997&startDate=20150105&endDate=20150105",
+      "note": null
+     },
+     {
+      "date": "2018-01-02",
+      "official_close": 6008.65,
+      "database_close": 6008.65,
+      "database_quality_status": "valid",
+      "abs_diff": 0.0,
+      "match": true,
+      "official_url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=399997&startDate=20180102&endDate=20180102",
+      "note": null
+     }
+    ],
+    "official_obtained": 4,
+    "matched": 4,
+    "mismatch": 0,
+    "verified": true,
+    "verdict": "逐日比对 4 个不同年份的官方收盘值全部一致",
+    "samples_file": "reports/evidence/phase3B6_2_3_0/official_close_samples.json",
+    "samples_sha256": "3c48d83dca0620464e90298c6d8ce3d95884d686b7fd0bd4dd90454f8ea7c8a4",
+    "method": "逐日比对中证指数有限公司官网官方行情接口收盘值，容差 0.01；官方无数据日不计入通过；取不到官方数值记 unknown，不记 false"
+   },
+   "database_series_numerically_verified": true,
+   "historical_coverage_verified": false,
+   "historical_coverage_note": "本阶段未接入交易日历做缺失日核验，仅记录库内首末日期与行数",
+   "point_in_time_verified": false,
+   "point_in_time_note": "本阶段未做时点可用性（前视偏差）审计",
+   "series_matches_official_basis": true
   },
   {
    "index_code": "H30184",
@@ -416,7 +1197,7 @@
     "source_org": "中证指数有限公司",
     "url": "https://oss-ch.csindex.com.cn/static/html/csindex/public/uploads/indices/detail/files/zh_CN/H30184_Index_Methodology_cn.pdf",
     "disclosed_date": "2024-11",
-    "obtained_at": "2026-11-26T11:17:21",
+    "obtained_at": "2026-11-26T13:47:13",
     "file": "reports/evidence/phase3B6_2_3_0/index_methodology/H30184_Index_Methodology_cn.pdf",
     "bytes": 457088,
     "sha256": "8b7de8a81c93e5f7d7b2f052484d90a465fdb67c9b322bee5a8f14e3bc0179e7",
@@ -437,13 +1218,9 @@
     ],
     "basis_confirmed": true
    },
-   "return_basis_confirmed": true,
-   "series_probe": {
-    "request_code": "H30184",
-    "returned_code": "H30184",
-    "returned_full_name": "中证全指半导体产品与设备指数",
-    "returned_short_name": "半导体",
-    "rows": 4,
+   "official_identity_verified": true,
+   "official_return_basis_verified": true,
+   "api_identity": {
     "columns": [
      "日期",
      "指数代码",
@@ -462,16 +1239,172 @@
      "样本数量",
      "滚动市盈率"
     ],
+    "obtained": true,
+    "obtained_at": "2026-11-26T13:29:16",
+    "request_code": "H30184",
+    "returned_code": "H30184",
+    "returned_full_name": "中证全指半导体产品与设备指数",
+    "returned_short_name": "半导体",
+    "rows": 4,
     "sample_close": [
      4912.91,
      4821.91,
      4752.8,
      4670.21
     ],
-    "series_matched": true
+    "source": "akshare.stock_zh_index_hist_csindex",
+    "from_cache": true
    },
-   "data_series_matches_official": true,
-   "note": "官方口径已确认，且数据接口返回代码与官方一致；但**历史连续覆盖与时点可用性未在本阶段确认**"
+   "api_code_identity_verified": true,
+   "api_name_identity_verified": true,
+   "database": {
+    "table": "index_daily",
+    "schema_columns_read": [
+     "index_code",
+     "trade_date",
+     "open",
+     "high",
+     "low",
+     "close",
+     "volume",
+     "amount",
+     "source",
+     "raw_basis",
+     "run_id",
+     "collected_at",
+     "row_fingerprint",
+     "quality_status",
+     "quality_note"
+    ],
+    "master_columns_read": [
+     "index_code",
+     "index_name",
+     "index_short_name",
+     "index_family",
+     "publisher",
+     "data_source",
+     "inception_date",
+     "inception_date_evidence",
+     "frequency",
+     "currency",
+     "return_basis",
+     "return_basis_evidence",
+     "data_status",
+     "layer_status",
+     "created_at",
+     "updated_at",
+     "data_version"
+    ],
+    "exists": true,
+    "rows": 5316,
+    "date_min": "2004-01-01",
+    "date_max": "2026-11-20",
+    "missing_trading_days": null,
+    "sources": [
+     "akshare.stock_zh_index_hist_csindex"
+    ],
+    "run_ids": [
+     266
+    ],
+    "collected_at_min": "2026-11-23T17:38:31",
+    "collected_at_max": "2026-11-23T17:38:31",
+    "quality_status_counts": {
+     "suspect": 1,
+     "valid": 5315
+    },
+    "suspect_rows": [
+     {
+      "trade_date": "2004-01-01",
+      "close": 994.47,
+      "quality_note": "接口基线占位行：日期与第二行间隔异常或非交易日，不是真实行情"
+     }
+    ],
+    "row_fingerprint_present": true,
+    "source_traceable": true,
+    "source_traceable_reason": "具备数据源/批次标识/行级指纹/采集时间"
+   },
+   "database_series_exists": true,
+   "database_series_source_traceable": true,
+   "database_master_row": {
+    "exists": true,
+    "index_code": "H30184",
+    "index_name": "中证全指半导体产品与设备指数",
+    "index_short_name": "半导体",
+    "publisher": "中证指数有限公司",
+    "data_source": "akshare.stock_zh_index_hist_csindex",
+    "return_basis": "unknown",
+    "return_basis_evidence": "来源仅提供指数收盘点位，无全收益口径证据，保守标记 unknown",
+    "inception_date": null,
+    "inception_date_evidence": "来源未明确给出成立日，首行日期不得顶替",
+    "data_status": "active",
+    "layer_status": "ready",
+    "data_version": "index-v1"
+   },
+   "numerical_verification": {
+    "tolerance": 0.01,
+    "probe_dates": [
+     "20240102",
+     "20200102",
+     "20150105",
+     "20180102"
+    ],
+    "comparisons": [
+     {
+      "date": "2024-01-02",
+      "official_close": 4912.91,
+      "database_close": 4912.91,
+      "database_quality_status": "valid",
+      "abs_diff": 0.0,
+      "match": true,
+      "official_url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=H30184&startDate=20240102&endDate=20240102",
+      "note": null
+     },
+     {
+      "date": "2020-01-02",
+      "official_close": 4670.56,
+      "database_close": 4670.56,
+      "database_quality_status": "valid",
+      "abs_diff": 0.0,
+      "match": true,
+      "official_url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=H30184&startDate=20200102&endDate=20200102",
+      "note": null
+     },
+     {
+      "date": "2015-01-05",
+      "official_close": 2273.23,
+      "database_close": 2273.23,
+      "database_quality_status": "valid",
+      "abs_diff": 0.0,
+      "match": true,
+      "official_url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=H30184&startDate=20150105&endDate=20150105",
+      "note": null
+     },
+     {
+      "date": "2018-01-02",
+      "official_close": 3958.32,
+      "database_close": 3958.32,
+      "database_quality_status": "valid",
+      "abs_diff": 0.0,
+      "match": true,
+      "official_url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=H30184&startDate=20180102&endDate=20180102",
+      "note": null
+     }
+    ],
+    "official_obtained": 4,
+    "matched": 4,
+    "mismatch": 0,
+    "verified": true,
+    "verdict": "逐日比对 4 个不同年份的官方收盘值全部一致",
+    "samples_file": "reports/evidence/phase3B6_2_3_0/official_close_samples.json",
+    "samples_sha256": "3c48d83dca0620464e90298c6d8ce3d95884d686b7fd0bd4dd90454f8ea7c8a4",
+    "method": "逐日比对中证指数有限公司官网官方行情接口收盘值，容差 0.01；官方无数据日不计入通过；取不到官方数值记 unknown，不记 false"
+   },
+   "database_series_numerically_verified": true,
+   "historical_coverage_verified": false,
+   "historical_coverage_note": "本阶段未接入交易日历做缺失日核验，仅记录库内首末日期与行数",
+   "point_in_time_verified": false,
+   "point_in_time_note": "本阶段未做时点可用性（前视偏差）审计",
+   "series_matches_official_basis": true
   },
   {
    "index_code": "000942",
@@ -491,7 +1424,7 @@
     "source_org": "中证指数有限公司",
     "url": "https://oss-ch.csindex.com.cn/static/html/csindex/public/uploads/indices/detail/files/zh_CN/000942_Index_Methodology_cn.pdf",
     "disclosed_date": "2022-05",
-    "obtained_at": "2026-11-26T11:17:24",
+    "obtained_at": "2026-11-26T13:47:13",
     "file": "reports/evidence/phase3B6_2_3_0/index_methodology/000942_Index_Methodology_cn.pdf",
     "bytes": 145567,
     "sha256": "e2893e60254074f9988a2f9e851f46ab3d0710b116eb078b337e138c317bf0ba",
@@ -512,13 +1445,9 @@
     ],
     "basis_confirmed": true
    },
-   "return_basis_confirmed": true,
-   "series_probe": {
-    "request_code": "000942",
-    "returned_code": "000942",
-    "returned_full_name": "中证内地消费主题指数",
-    "returned_short_name": "内地消费",
-    "rows": 4,
+   "official_identity_verified": true,
+   "official_return_basis_verified": true,
+   "api_identity": {
     "columns": [
      "日期",
      "指数代码",
@@ -537,16 +1466,172 @@
      "样本数量",
      "滚动市盈率"
     ],
+    "obtained": true,
+    "obtained_at": "2026-11-26T13:29:21",
+    "request_code": "000942",
+    "returned_code": "000942",
+    "returned_full_name": "中证内地消费主题指数",
+    "returned_short_name": "内地消费",
+    "rows": 4,
     "sample_close": [
      9814.16,
      9756.15,
      9654.64,
      9631.7
     ],
-    "series_matched": true
+    "source": "akshare.stock_zh_index_hist_csindex",
+    "from_cache": true
    },
-   "data_series_matches_official": true,
-   "note": "官方口径已确认，且数据接口返回代码与官方一致；但**历史连续覆盖与时点可用性未在本阶段确认**"
+   "api_code_identity_verified": true,
+   "api_name_identity_verified": true,
+   "database": {
+    "table": "index_daily",
+    "schema_columns_read": [
+     "index_code",
+     "trade_date",
+     "open",
+     "high",
+     "low",
+     "close",
+     "volume",
+     "amount",
+     "source",
+     "raw_basis",
+     "run_id",
+     "collected_at",
+     "row_fingerprint",
+     "quality_status",
+     "quality_note"
+    ],
+    "master_columns_read": [
+     "index_code",
+     "index_name",
+     "index_short_name",
+     "index_family",
+     "publisher",
+     "data_source",
+     "inception_date",
+     "inception_date_evidence",
+     "frequency",
+     "currency",
+     "return_basis",
+     "return_basis_evidence",
+     "data_status",
+     "layer_status",
+     "created_at",
+     "updated_at",
+     "data_version"
+    ],
+    "exists": true,
+    "rows": 5317,
+    "date_min": "2004-01-01",
+    "date_max": "2026-11-20",
+    "missing_trading_days": null,
+    "sources": [
+     "akshare.stock_zh_index_hist_csindex"
+    ],
+    "run_ids": [
+     267
+    ],
+    "collected_at_min": "2026-11-23T17:38:53",
+    "collected_at_max": "2026-11-23T17:38:53",
+    "quality_status_counts": {
+     "suspect": 1,
+     "valid": 5316
+    },
+    "suspect_rows": [
+     {
+      "trade_date": "2004-01-01",
+      "close": 1000.0,
+      "quality_note": "接口基线占位行：日期与第二行间隔异常或非交易日，不是真实行情"
+     }
+    ],
+    "row_fingerprint_present": true,
+    "source_traceable": true,
+    "source_traceable_reason": "具备数据源/批次标识/行级指纹/采集时间"
+   },
+   "database_series_exists": true,
+   "database_series_source_traceable": true,
+   "database_master_row": {
+    "exists": true,
+    "index_code": "000942",
+    "index_name": "中证内地消费主题指数",
+    "index_short_name": "内地消费",
+    "publisher": "中证指数有限公司",
+    "data_source": "akshare.stock_zh_index_hist_csindex",
+    "return_basis": "unknown",
+    "return_basis_evidence": "来源仅提供指数收盘点位，无全收益口径证据，保守标记 unknown",
+    "inception_date": null,
+    "inception_date_evidence": "来源未明确给出成立日，首行日期不得顶替",
+    "data_status": "active",
+    "layer_status": "ready",
+    "data_version": "index-v1"
+   },
+   "numerical_verification": {
+    "tolerance": 0.01,
+    "probe_dates": [
+     "20240102",
+     "20200102",
+     "20150105",
+     "20180102"
+    ],
+    "comparisons": [
+     {
+      "date": "2024-01-02",
+      "official_close": 9814.16,
+      "database_close": 9814.16,
+      "database_quality_status": "valid",
+      "abs_diff": 0.0,
+      "match": true,
+      "official_url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=000942&startDate=20240102&endDate=20240102",
+      "note": null
+     },
+     {
+      "date": "2020-01-02",
+      "official_close": 9864.77,
+      "database_close": 9864.77,
+      "database_quality_status": "valid",
+      "abs_diff": 0.0,
+      "match": true,
+      "official_url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=000942&startDate=20200102&endDate=20200102",
+      "note": null
+     },
+     {
+      "date": "2015-01-05",
+      "official_close": 5234.5,
+      "database_close": 5234.5,
+      "database_quality_status": "valid",
+      "abs_diff": 0.0,
+      "match": true,
+      "official_url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=000942&startDate=20150105&endDate=20150105",
+      "note": null
+     },
+     {
+      "date": "2018-01-02",
+      "official_close": 8641.14,
+      "database_close": 8641.14,
+      "database_quality_status": "valid",
+      "abs_diff": 0.0,
+      "match": true,
+      "official_url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=000942&startDate=20180102&endDate=20180102",
+      "note": null
+     }
+    ],
+    "official_obtained": 4,
+    "matched": 4,
+    "mismatch": 0,
+    "verified": true,
+    "verdict": "逐日比对 4 个不同年份的官方收盘值全部一致",
+    "samples_file": "reports/evidence/phase3B6_2_3_0/official_close_samples.json",
+    "samples_sha256": "3c48d83dca0620464e90298c6d8ce3d95884d686b7fd0bd4dd90454f8ea7c8a4",
+    "method": "逐日比对中证指数有限公司官网官方行情接口收盘值，容差 0.01；官方无数据日不计入通过；取不到官方数值记 unknown，不记 false"
+   },
+   "database_series_numerically_verified": true,
+   "historical_coverage_verified": false,
+   "historical_coverage_note": "本阶段未接入交易日历做缺失日核验，仅记录库内首末日期与行数",
+   "point_in_time_verified": false,
+   "point_in_time_note": "本阶段未做时点可用性（前视偏差）审计",
+   "series_matches_official_basis": true
   },
   {
    "index_code": "000012",
@@ -566,7 +1651,7 @@
     "source_org": "中证指数有限公司",
     "url": "https://oss-ch.csindex.com.cn/static/html/csindex/public/uploads/indices/detail/files/zh_CN/000012factsheet.pdf",
     "disclosed_date": "2002-12",
-    "obtained_at": "2026-11-26T11:17:29",
+    "obtained_at": "2026-11-26T13:47:14",
     "file": "reports/evidence/phase3B6_2_3_0/index_methodology/000012_factsheet.pdf",
     "bytes": 421962,
     "sha256": "21f24570c840ac91b807fd8c9b1edb3ad5a5fc9b5d3bb9ef75fe13caa2e42bea",
@@ -594,13 +1679,9 @@
     ],
     "basis_confirmed": true
    },
-   "return_basis_confirmed": true,
-   "series_probe": {
-    "request_code": "000012",
-    "returned_code": "000012",
-    "returned_full_name": "上证国债指数",
-    "returned_short_name": "国债指数",
-    "rows": 4,
+   "official_identity_verified": true,
+   "official_return_basis_verified": true,
+   "api_identity": {
     "columns": [
      "日期",
      "指数代码",
@@ -619,16 +1700,172 @@
      "样本数量",
      "滚动市盈率"
     ],
+    "obtained": true,
+    "obtained_at": "2026-11-26T13:40:11",
+    "request_code": "000012",
+    "returned_code": "000012",
+    "returned_full_name": "上证国债指数",
+    "returned_short_name": "国债指数",
+    "rows": 4,
     "sample_close": [
      206.07,
      206.02,
      206.18,
      206.32
     ],
-    "series_matched": true
+    "source": "akshare.stock_zh_index_hist_csindex",
+    "from_cache": true
    },
-   "data_series_matches_official": true,
-   "note": "官方口径已确认，且数据接口返回代码与官方一致；但**历史连续覆盖与时点可用性未在本阶段确认**"
+   "api_code_identity_verified": true,
+   "api_name_identity_verified": true,
+   "database": {
+    "table": "index_daily",
+    "schema_columns_read": [
+     "index_code",
+     "trade_date",
+     "open",
+     "high",
+     "low",
+     "close",
+     "volume",
+     "amount",
+     "source",
+     "raw_basis",
+     "run_id",
+     "collected_at",
+     "row_fingerprint",
+     "quality_status",
+     "quality_note"
+    ],
+    "master_columns_read": [
+     "index_code",
+     "index_name",
+     "index_short_name",
+     "index_family",
+     "publisher",
+     "data_source",
+     "inception_date",
+     "inception_date_evidence",
+     "frequency",
+     "currency",
+     "return_basis",
+     "return_basis_evidence",
+     "data_status",
+     "layer_status",
+     "created_at",
+     "updated_at",
+     "data_version"
+    ],
+    "exists": true,
+    "rows": 5558,
+    "date_min": "2004-01-01",
+    "date_max": "2026-11-20",
+    "missing_trading_days": null,
+    "sources": [
+     "akshare.stock_zh_index_hist_csindex"
+    ],
+    "run_ids": [
+     268
+    ],
+    "collected_at_min": "2026-11-23T17:39:01",
+    "collected_at_max": "2026-11-23T17:39:01",
+    "quality_status_counts": {
+     "suspect": 1,
+     "valid": 5557
+    },
+    "suspect_rows": [
+     {
+      "trade_date": "2004-01-01",
+      "close": 99.22,
+      "quality_note": "接口基线占位行：日期与第二行间隔异常或非交易日，不是真实行情"
+     }
+    ],
+    "row_fingerprint_present": true,
+    "source_traceable": true,
+    "source_traceable_reason": "具备数据源/批次标识/行级指纹/采集时间"
+   },
+   "database_series_exists": true,
+   "database_series_source_traceable": true,
+   "database_master_row": {
+    "exists": true,
+    "index_code": "000012",
+    "index_name": "上证国债指数",
+    "index_short_name": "国债指数",
+    "publisher": "中证指数有限公司",
+    "data_source": "akshare.stock_zh_index_hist_csindex",
+    "return_basis": "unknown",
+    "return_basis_evidence": "来源仅提供指数收盘点位，无全收益口径证据，保守标记 unknown",
+    "inception_date": null,
+    "inception_date_evidence": "来源未明确给出成立日，首行日期不得顶替",
+    "data_status": "active",
+    "layer_status": "ready",
+    "data_version": "index-v1"
+   },
+   "numerical_verification": {
+    "tolerance": 0.01,
+    "probe_dates": [
+     "20240102",
+     "20200102",
+     "20150105",
+     "20180102"
+    ],
+    "comparisons": [
+     {
+      "date": "2024-01-02",
+      "official_close": 206.07,
+      "database_close": 206.07,
+      "database_quality_status": "valid",
+      "abs_diff": 0.0,
+      "match": true,
+      "official_url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=000012&startDate=20240102&endDate=20240102",
+      "note": null
+     },
+     {
+      "date": "2020-01-02",
+      "official_close": 177.33,
+      "database_close": 177.33,
+      "database_quality_status": "valid",
+      "abs_diff": 0.0,
+      "match": true,
+      "official_url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=000012&startDate=20200102&endDate=20200102",
+      "note": null
+     },
+     {
+      "date": "2015-01-05",
+      "official_close": 145.8,
+      "database_close": 145.8,
+      "database_quality_status": "valid",
+      "abs_diff": 0.0,
+      "match": true,
+      "official_url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=000012&startDate=20150105&endDate=20150105",
+      "note": null
+     },
+     {
+      "date": "2018-01-02",
+      "official_close": 160.97,
+      "database_close": 160.97,
+      "database_quality_status": "valid",
+      "abs_diff": 0.0,
+      "match": true,
+      "official_url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=000012&startDate=20180102&endDate=20180102",
+      "note": null
+     }
+    ],
+    "official_obtained": 4,
+    "matched": 4,
+    "mismatch": 0,
+    "verified": true,
+    "verdict": "逐日比对 4 个不同年份的官方收盘值全部一致",
+    "samples_file": "reports/evidence/phase3B6_2_3_0/official_close_samples.json",
+    "samples_sha256": "3c48d83dca0620464e90298c6d8ce3d95884d686b7fd0bd4dd90454f8ea7c8a4",
+    "method": "逐日比对中证指数有限公司官网官方行情接口收盘值，容差 0.01；官方无数据日不计入通过；取不到官方数值记 unknown，不记 false"
+   },
+   "database_series_numerically_verified": true,
+   "historical_coverage_verified": false,
+   "historical_coverage_note": "本阶段未接入交易日历做缺失日核验，仅记录库内首末日期与行数",
+   "point_in_time_verified": false,
+   "point_in_time_note": "本阶段未做时点可用性（前视偏差）审计",
+   "series_matches_official_basis": true
   },
   {
    "index_code": "000922",
@@ -648,7 +1885,7 @@
     "source_org": "中证指数有限公司",
     "url": "https://oss-ch.csindex.com.cn/static/html/csindex/public/uploads/indices/detail/files/zh_CN/000922_Index_Methodology_cn.pdf",
     "disclosed_date": "2022-10",
-    "obtained_at": "2026-11-26T11:17:33",
+    "obtained_at": "2026-11-26T13:47:16",
     "file": "reports/evidence/phase3B6_2_3_0/index_methodology/000922_Index_Methodology_cn.pdf",
     "bytes": 1137267,
     "sha256": "6b8053f02ca87a0e32f79075fbe1ca107b5b952c4ca5bd4afb5b8ff4666f4991",
@@ -670,13 +1907,9 @@
     ],
     "basis_confirmed": true
    },
-   "return_basis_confirmed": true,
-   "series_probe": {
-    "request_code": "000922",
-    "returned_code": "000922",
-    "returned_full_name": "中证红利指数",
-    "returned_short_name": "中证红利",
-    "rows": 4,
+   "official_identity_verified": true,
+   "official_return_basis_verified": true,
+   "api_identity": {
     "columns": [
      "日期",
      "指数代码",
@@ -695,16 +1928,172 @@
      "样本数量",
      "滚动市盈率"
     ],
+    "obtained": true,
+    "obtained_at": "2026-11-26T13:40:14",
+    "request_code": "000922",
+    "returned_code": "000922",
+    "returned_full_name": "中证红利指数",
+    "returned_short_name": "中证红利",
+    "rows": 4,
     "sample_close": [
      5020.99,
      5074.18,
      5096.16,
      5099.25
     ],
-    "series_matched": true
+    "source": "akshare.stock_zh_index_hist_csindex",
+    "from_cache": true
    },
-   "data_series_matches_official": true,
-   "note": "官方口径已确认，且数据接口返回代码与官方一致；但**历史连续覆盖与时点可用性未在本阶段确认**"
+   "api_code_identity_verified": true,
+   "api_name_identity_verified": true,
+   "database": {
+    "table": "index_daily",
+    "schema_columns_read": [
+     "index_code",
+     "trade_date",
+     "open",
+     "high",
+     "low",
+     "close",
+     "volume",
+     "amount",
+     "source",
+     "raw_basis",
+     "run_id",
+     "collected_at",
+     "row_fingerprint",
+     "quality_status",
+     "quality_note"
+    ],
+    "master_columns_read": [
+     "index_code",
+     "index_name",
+     "index_short_name",
+     "index_family",
+     "publisher",
+     "data_source",
+     "inception_date",
+     "inception_date_evidence",
+     "frequency",
+     "currency",
+     "return_basis",
+     "return_basis_evidence",
+     "data_status",
+     "layer_status",
+     "created_at",
+     "updated_at",
+     "data_version"
+    ],
+    "exists": true,
+    "rows": 5317,
+    "date_min": "2004-01-01",
+    "date_max": "2026-11-20",
+    "missing_trading_days": null,
+    "sources": [
+     "akshare.stock_zh_index_hist_csindex"
+    ],
+    "run_ids": [
+     269
+    ],
+    "collected_at_min": "2026-11-23T17:39:13",
+    "collected_at_max": "2026-11-23T17:39:13",
+    "quality_status_counts": {
+     "suspect": 1,
+     "valid": 5316
+    },
+    "suspect_rows": [
+     {
+      "trade_date": "2004-01-01",
+      "close": 1000.0,
+      "quality_note": "接口基线占位行：日期与第二行间隔异常或非交易日，不是真实行情"
+     }
+    ],
+    "row_fingerprint_present": true,
+    "source_traceable": true,
+    "source_traceable_reason": "具备数据源/批次标识/行级指纹/采集时间"
+   },
+   "database_series_exists": true,
+   "database_series_source_traceable": true,
+   "database_master_row": {
+    "exists": true,
+    "index_code": "000922",
+    "index_name": "中证红利指数",
+    "index_short_name": "中证红利",
+    "publisher": "中证指数有限公司",
+    "data_source": "akshare.stock_zh_index_hist_csindex",
+    "return_basis": "unknown",
+    "return_basis_evidence": "来源仅提供指数收盘点位，无全收益口径证据，保守标记 unknown",
+    "inception_date": null,
+    "inception_date_evidence": "来源未明确给出成立日，首行日期不得顶替",
+    "data_status": "active",
+    "layer_status": "ready",
+    "data_version": "index-v1"
+   },
+   "numerical_verification": {
+    "tolerance": 0.01,
+    "probe_dates": [
+     "20240102",
+     "20200102",
+     "20150105",
+     "20180102"
+    ],
+    "comparisons": [
+     {
+      "date": "2024-01-02",
+      "official_close": 5020.99,
+      "database_close": 5020.99,
+      "database_quality_status": "valid",
+      "abs_diff": 0.0,
+      "match": true,
+      "official_url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=000922&startDate=20240102&endDate=20240102",
+      "note": null
+     },
+     {
+      "date": "2020-01-02",
+      "official_close": 4503.09,
+      "database_close": 4503.09,
+      "database_quality_status": "valid",
+      "abs_diff": 0.0,
+      "match": true,
+      "official_url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=000922&startDate=20200102&endDate=20200102",
+      "note": null
+     },
+     {
+      "date": "2015-01-05",
+      "official_close": 3582.31,
+      "database_close": 3582.31,
+      "database_quality_status": "valid",
+      "abs_diff": 0.0,
+      "match": true,
+      "official_url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=000922&startDate=20150105&endDate=20150105",
+      "note": null
+     },
+     {
+      "date": "2018-01-02",
+      "official_close": 4836.08,
+      "database_close": 4836.08,
+      "database_quality_status": "valid",
+      "abs_diff": 0.0,
+      "match": true,
+      "official_url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=000922&startDate=20180102&endDate=20180102",
+      "note": null
+     }
+    ],
+    "official_obtained": 4,
+    "matched": 4,
+    "mismatch": 0,
+    "verified": true,
+    "verdict": "逐日比对 4 个不同年份的官方收盘值全部一致",
+    "samples_file": "reports/evidence/phase3B6_2_3_0/official_close_samples.json",
+    "samples_sha256": "3c48d83dca0620464e90298c6d8ce3d95884d686b7fd0bd4dd90454f8ea7c8a4",
+    "method": "逐日比对中证指数有限公司官网官方行情接口收盘值，容差 0.01；官方无数据日不计入通过；取不到官方数值记 unknown，不记 false"
+   },
+   "database_series_numerically_verified": true,
+   "historical_coverage_verified": false,
+   "historical_coverage_note": "本阶段未接入交易日历做缺失日核验，仅记录库内首末日期与行数",
+   "point_in_time_verified": false,
+   "point_in_time_note": "本阶段未做时点可用性（前视偏差）审计",
+   "series_matches_official_basis": true
   },
   {
    "index_code": "930930",
@@ -724,7 +2113,7 @@
     "source_org": "中证指数有限公司",
     "url": "https://oss-ch.csindex.com.cn/static/html/csindex/public/uploads/indices/detail/files/zh_CN/930930factsheet.pdf",
     "disclosed_date": "2026-10",
-    "obtained_at": "2026-11-26T11:17:34",
+    "obtained_at": "2026-11-26T13:47:17",
     "file": "reports/evidence/phase3B6_2_3_0/index_methodology/930930_factsheet.pdf",
     "bytes": 446156,
     "sha256": "0bd7e8937145086a21537ab674b009812291156228f7f93efd2b7c8d2a827f7f",
@@ -750,13 +2139,9 @@
     "evidence": [],
     "basis_confirmed": false
    },
-   "return_basis_confirmed": false,
-   "series_probe": {
-    "request_code": "930930",
-    "returned_code": "930930",
-    "returned_full_name": "中证港股通综合指数",
-    "returned_short_name": "港股综合",
-    "rows": 4,
+   "official_identity_verified": true,
+   "official_return_basis_verified": false,
+   "api_identity": {
     "columns": [
      "日期",
      "指数代码",
@@ -775,16 +2160,172 @@
      "样本数量",
      "滚动市盈率"
     ],
+    "obtained": true,
+    "obtained_at": "2026-11-26T13:40:17",
+    "request_code": "930930",
+    "returned_code": "930930",
+    "returned_full_name": "中证港股通综合指数",
+    "returned_short_name": "港股综合",
+    "rows": 4,
     "sample_close": [
      2399.31,
      2383.89,
      2379.26,
      2363.75
     ],
-    "series_matched": true
+    "source": "akshare.stock_zh_index_hist_csindex",
+    "from_cache": true
    },
-   "data_series_matches_official": true,
-   "note": "口径或序列未确认，保持 unknown"
+   "api_code_identity_verified": true,
+   "api_name_identity_verified": true,
+   "database": {
+    "table": "index_daily",
+    "schema_columns_read": [
+     "index_code",
+     "trade_date",
+     "open",
+     "high",
+     "low",
+     "close",
+     "volume",
+     "amount",
+     "source",
+     "raw_basis",
+     "run_id",
+     "collected_at",
+     "row_fingerprint",
+     "quality_status",
+     "quality_note"
+    ],
+    "master_columns_read": [
+     "index_code",
+     "index_name",
+     "index_short_name",
+     "index_family",
+     "publisher",
+     "data_source",
+     "inception_date",
+     "inception_date_evidence",
+     "frequency",
+     "currency",
+     "return_basis",
+     "return_basis_evidence",
+     "data_status",
+     "layer_status",
+     "created_at",
+     "updated_at",
+     "data_version"
+    ],
+    "exists": true,
+    "rows": 2999,
+    "date_min": "2004-01-01",
+    "date_max": "2026-11-20",
+    "missing_trading_days": null,
+    "sources": [
+     "akshare.stock_zh_index_hist_csindex"
+    ],
+    "run_ids": [
+     270
+    ],
+    "collected_at_min": "2026-11-23T17:39:27",
+    "collected_at_max": "2026-11-23T17:39:27",
+    "quality_status_counts": {
+     "suspect": 1,
+     "valid": 2998
+    },
+    "suspect_rows": [
+     {
+      "trade_date": "2004-01-01",
+      "close": 3000.0,
+      "quality_note": "接口基线占位行：日期与第二行间隔异常或非交易日，不是真实行情"
+     }
+    ],
+    "row_fingerprint_present": true,
+    "source_traceable": true,
+    "source_traceable_reason": "具备数据源/批次标识/行级指纹/采集时间"
+   },
+   "database_series_exists": true,
+   "database_series_source_traceable": true,
+   "database_master_row": {
+    "exists": true,
+    "index_code": "930930",
+    "index_name": "中证港股通综合指数",
+    "index_short_name": "港股综合",
+    "publisher": "中证指数有限公司",
+    "data_source": "akshare.stock_zh_index_hist_csindex",
+    "return_basis": "unknown",
+    "return_basis_evidence": "来源仅提供指数收盘点位，无全收益口径证据，保守标记 unknown",
+    "inception_date": null,
+    "inception_date_evidence": "来源未明确给出成立日，首行日期不得顶替",
+    "data_status": "active",
+    "layer_status": "ready",
+    "data_version": "index-v1"
+   },
+   "numerical_verification": {
+    "tolerance": 0.01,
+    "probe_dates": [
+     "20240102",
+     "20200102",
+     "20150105",
+     "20180102"
+    ],
+    "comparisons": [
+     {
+      "date": "2024-01-02",
+      "official_close": 2399.31,
+      "database_close": 2399.31,
+      "database_quality_status": "valid",
+      "abs_diff": 0.0,
+      "match": true,
+      "official_url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=930930&startDate=20240102&endDate=20240102",
+      "note": null
+     },
+     {
+      "date": "2020-01-02",
+      "official_close": 3548.37,
+      "database_close": 3548.37,
+      "database_quality_status": "valid",
+      "abs_diff": 0.0,
+      "match": true,
+      "official_url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=930930&startDate=20200102&endDate=20200102",
+      "note": null
+     },
+     {
+      "date": "2015-01-05",
+      "official_close": 3001.78,
+      "database_close": 3001.78,
+      "database_quality_status": "valid",
+      "abs_diff": 0.0,
+      "match": true,
+      "official_url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=930930&startDate=20150105&endDate=20150105",
+      "note": null
+     },
+     {
+      "date": "2018-01-02",
+      "official_close": 3845.61,
+      "database_close": 3845.61,
+      "database_quality_status": "valid",
+      "abs_diff": 0.0,
+      "match": true,
+      "official_url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=930930&startDate=20180102&endDate=20180102",
+      "note": null
+     }
+    ],
+    "official_obtained": 4,
+    "matched": 4,
+    "mismatch": 0,
+    "verified": true,
+    "verdict": "逐日比对 4 个不同年份的官方收盘值全部一致",
+    "samples_file": "reports/evidence/phase3B6_2_3_0/official_close_samples.json",
+    "samples_sha256": "3c48d83dca0620464e90298c6d8ce3d95884d686b7fd0bd4dd90454f8ea7c8a4",
+    "method": "逐日比对中证指数有限公司官网官方行情接口收盘值，容差 0.01；官方无数据日不计入通过；取不到官方数值记 unknown，不记 false"
+   },
+   "database_series_numerically_verified": true,
+   "historical_coverage_verified": false,
+   "historical_coverage_note": "本阶段未接入交易日历做缺失日核验，仅记录库内首末日期与行数",
+   "point_in_time_verified": false,
+   "point_in_time_note": "本阶段未做时点可用性（前视偏差）审计",
+   "series_matches_official_basis": false
   }
  ]
 }

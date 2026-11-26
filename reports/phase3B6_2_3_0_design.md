@@ -63,13 +63,49 @@
 | 中证红利 = `price` | 股息率加权只改变**加权方式**，不改变「除息自然回落」的价格口径属性 |
 | 930930 = `unknown` | 官方单张仅列出「全收益指数 / 净收益指数」衍生代码，**未明文说明主序列口径** |
 
-### 3.4 双条件门槛
+### 3.4 九维验证状态（3B-6.2.3.0.1 修正）
+
+**原设计的「双条件门槛」把接口代码匹配当成了序列验证，属语义过度表达。**
+现拆成九个**独立**状态，逐项判定，不得互相替代：
+
+| # | 状态 | 含义 | 判定依据 |
+| ---: | --- | --- | --- |
+| 1 | `official_identity_verified` | 官方身份核验 | 代码 + 正式名称 + 发布机构 + 官方文件齐全 |
+| 2 | `official_return_basis_verified` | 官方口径核验 | 编制方案**明文**确认口径 |
+| 3 | `api_code_identity_verified` | API 代码身份 | 接口返回代码 == 请求代码（**仅身份**） |
+| 4 | `api_name_identity_verified` | API 名称身份 | 接口返回全称 == 官方全称（**不能只比代码**） |
+| 5 | `database_series_exists` | 库内序列存在 | 只读查 `index_daily` 实际记录 |
+| 6 | `database_series_source_traceable` | 数据源可追溯 | source + run_id + row_fingerprint + collected_at |
+| 7 | `database_series_numerically_verified` | **数值级官方验证** | 逐日比对中证官网官方收盘值 |
+| 8 | `historical_coverage_verified` | 历史连续覆盖 | 交易日历缺失日核验（**本阶段未做**） |
+| 9 | `point_in_time_verified` | 时点可用性 | 前视偏差审计（**本阶段未做**） |
+
+**复合结论**（同一指数逐条判断，不得用两个独立计数都 >0 判定）：
 
 ```
-return_basis_confirmed = 官方口径已确认 AND 数据序列代码与官方一致
+series_matches_official_basis =
+    official_return_basis_verified is True
+    AND database_series_numerically_verified is True
 ```
 
-两者**缺一不可**。只满足其一 → 保持 `unknown`。
+### 3.4.1 数值级验证的三态
+
+| 情形 | 结果 |
+| --- | --- |
+| 取得 ≥2 个不同年份官方数值且全部一致 | `True` |
+| 取得官方数值但存在不一致 | `False` |
+| **取不到官方数值**（限流/无数据） | **`None`（unknown）** |
+
+**「取不到」与「不一致」必须区分**，不得把无证据记为反证据。
+
+### 3.4.2 字段废弃声明
+
+| 旧字段 | 问题 | 处置 |
+| --- | --- | --- |
+| `series_matched` | 只表示接口代码相等 | → `api_code_identity_verified` |
+| `data_series_matches_official` | 被当成数值结论 | **废弃** → `database_series_numerically_verified` |
+| `series_matches_official` | 过度表达 | **废弃** → `series_matches_official_basis` |
+| `series_probe` | 名称含糊 | → `api_identity` |
 
 ### 3.5 000012 的多序列区分（任务特别要求）
 
@@ -141,18 +177,24 @@ return_basis_confirmed = 官方口径已确认 AND 数据序列代码与官方�
 
 ---
 
-## 6. 四个独立判断（不得互相替代）
+## 6. 九维验证结果（不得互相替代）
 
-| # | 判断 | 本阶段 |
+| # | 验证维度 | 本阶段结果 |
 | ---: | --- | --- |
-| 1 | 官方口径已确认 | 9/10 |
-| 2 | 历史数据序列已匹配官方 | 10/10（代码级匹配） |
-| 3 | 时点可用性已确认 | **未做** |
-| 4 | 历史连续覆盖已确认 | **未做** |
+| 1 | 官方指数身份确认 | **10 / 10** |
+| 2 | 官方收益口径确认 | **9 / 10** |
+| 3 | API 代码身份匹配 | **10 / 10** |
+| 4 | API 正式名称匹配 | **10 / 10** |
+| 5 | 数据库历史序列存在 | **10 / 10** |
+| 6 | 数据源可追溯 | **10 / 10** |
+| 7 | **历史数值级官方验证** | **10 / 10**（40/40 样本一致） |
+| 8 | 历史连续覆盖确认 | **0 / 10**（未做） |
+| 9 | 时点可用性确认 | **0 / 10**（未做） |
 
-**即使官方编制方案确认，也不代表历史行情已符合回测条件。**
+**复合结论 `series_matches_official_basis`**：**9 / 10**（`930930` 口径未确认）。
 
----
+**即使官方口径确认、数值级验证通过，也不代表历史行情已符合回测条件** ——
+覆盖与时点可用性仍是空白。
 
 ## 7. 安全边界
 

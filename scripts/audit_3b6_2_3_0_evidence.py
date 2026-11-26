@@ -35,7 +35,8 @@ EVID = ROOT / "reports" / "evidence" / "phase3B6_2_3_0"
 REPORTS = ROOT / "reports"
 METH_DIR = EVID / "index_methodology"
 CONTRACT_DIR = EVID / "fund_contracts"
-UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"
+UA = ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+      "(KHTML, like Gecko) Chrome/120.0 Safari/537.36")
 
 # 中证指数官方 OSS（编制方案/指数单张正式托管域名）
 CSI_OSS = ("https://oss-ch.csindex.com.cn/static/html/csindex/public/"
@@ -254,55 +255,424 @@ def judge_basis(text: str, doc_type: str | None) -> dict:
             "basis_confirmed": basis != "unknown"}
 
 
-def probe_series(code: str) -> dict:
-    """实测数据接口返回的指数全称，确认对应哪个指数版本。"""
-    try:
-        import akshare as ak
-        df = ak.stock_zh_index_hist_csindex(
-            symbol=code, start_date="20240102", end_date="20240105")
-        return {
-            "request_code": code,
-            "returned_code": str(df["指数代码"].iloc[0]),
-            "returned_full_name": str(df["指数中文全称"].iloc[0]),
-            "returned_short_name": str(df["指数中文简称"].iloc[0]),
-            "rows": len(df),
-            "columns": df.columns.tolist(),
-            "sample_close": [round(float(x), 4) for x in df["收盘"].tolist()],
-            "series_matched": str(df["指数代码"].iloc[0]) == code,
-        }
-    except Exception as exc:
-        return {"request_code": code, "series_matched": False,
-                "error": f"{type(exc).__name__}: {exc}"}
+API_SAMPLE_FILE = EVID / "api_identity_samples.json"
+
+
+def _load_api_samples() -> dict:
+    if API_SAMPLE_FILE.exists():
+        try:
+            return json.loads(API_SAMPLE_FILE.read_text(encoding="utf-8"))
+        except Exception:
+            return {}
+    return {}
+
+
+def _save_api_samples(data: dict) -> None:
+    EVID.mkdir(parents=True, exist_ok=True)
+    payload = json.dumps(data, ensure_ascii=False, indent=1, sort_keys=True)
+    content = payload + "\n"
+    API_SAMPLE_FILE.write_text(content, encoding="utf-8")
+    (EVID / "api_identity_samples.sha256").write_text(
+        hashlib.sha256(content.encode("utf-8")).hexdigest() + "\n",
+        encoding="utf-8")
+
+
+def probe_series(code: str, retries: int = 3) -> dict:
+    """实测数据接口返回的指数代码与正式名称。
+
+    **只用于身份核对（代码 + 名称），不得作为数据库历史序列的验证。**
+    接口取不到时返回 ``obtained=False``（对应 unknown），
+    **不得记为「不匹配」**——无证据与反证据必须区分。
+    """
+    import time
+    cache = _load_api_samples()
+    if cache.get(code, {}).get("returned_code"):
+        return {**cache[code], "from_cache": True}
+
+    last = None
+    for attempt in range(retries + 1):
+        if attempt:
+            time.sleep(2.0 * attempt)
+        try:
+            import akshare as ak
+            df = ak.stock_zh_index_hist_csindex(
+                symbol=code, start_date="20240102", end_date="20240105")
+            rec = {
+                "request_code": code,
+                "obtained": True,
+                "returned_code": str(df["指数代码"].iloc[0]),
+                "returned_full_name": str(df["指数中文全称"].iloc[0]),
+                "returned_short_name": str(df["指数中文简称"].iloc[0]),
+                "rows": len(df),
+                "columns": df.columns.tolist(),
+                "sample_close": [round(float(x), 4)
+                                 for x in df["收盘"].tolist()],
+                "obtained_at": datetime.now().isoformat(timespec="seconds"),
+                "source": "akshare.stock_zh_index_hist_csindex",
+            }
+            cache[code] = rec
+            _save_api_samples(cache)
+            return rec
+        except Exception as exc:
+            last = exc
+    return {"request_code": code, "obtained": False,
+            "error": f"接口未取得（{type(last).__name__}）"}
+
+
+# ---------------------------------------------------------------- 数据库只读审计
+def _db_connect():
+    """正式数据库只读连接（不写、不改 Schema）。"""
+    import sqlite3
+    from app.config import settings
+    p = str(settings.database_path).replace("\\", "/")
+    conn = sqlite3.connect(f"file:{p}?mode=ro", uri=True)
+    conn.execute("pragma temp_store = memory")
+    return conn
+
+
+def audit_db_series(code: str, conn) -> dict:
+    """只读查询正式数据库中该指数的**实际**历史行情记录。
+
+    先读真实 Schema，不猜测表名/字段名。
+    """
+    cols = [r[1] for r in conn.execute("pragma table_info(index_daily)")]
+    master_cols = [r[1] for r in conn.execute("pragma table_info(index_master)")]
+    out: dict = {
+        "table": "index_daily",
+        "schema_columns_read": cols,
+        "master_columns_read": master_cols,
+        "exists": False,
+        "rows": 0,
+        "date_min": None,
+        "date_max": None,
+        "missing_trading_days": None,
+        "sources": [],
+        "run_ids": [],
+        "collected_at_min": None,
+        "collected_at_max": None,
+        "quality_status_counts": {},
+        "suspect_rows": [],
+        "row_fingerprint_present": False,
+        "source_traceable": False,
+        "source_traceable_reason": None,
+    }
+    row = conn.execute(
+        "select count(*), min(trade_date), max(trade_date), "
+        "min(collected_at), max(collected_at) "
+        "from index_daily where index_code=?", (code,)).fetchone()
+    if not row or not row[0]:
+        out["source_traceable_reason"] = "正式库 index_daily 无该指数任何记录"
+        return out
+    out.update({
+        "exists": True,
+        "rows": row[0],
+        "date_min": row[1],
+        "date_max": row[2],
+        "collected_at_min": row[3],
+        "collected_at_max": row[4],
+    })
+    out["sources"] = sorted({
+        r[0] for r in conn.execute(
+            "select distinct source from index_daily where index_code=?",
+            (code,))})
+    out["run_ids"] = sorted({
+        r[0] for r in conn.execute(
+            "select distinct run_id from index_daily where index_code=? "
+            "and run_id is not null", (code,))})
+    out["quality_status_counts"] = {
+        r[0]: r[1] for r in conn.execute(
+            "select quality_status, count(*) from index_daily "
+            "where index_code=? group by quality_status", (code,))}
+    out["suspect_rows"] = [
+        {"trade_date": r[0], "close": r[1], "quality_note": r[2]}
+        for r in conn.execute(
+            "select trade_date, close, quality_note from index_daily "
+            "where index_code=? and quality_status<>'valid' "
+            "order by trade_date", (code,))]
+    fp = conn.execute(
+        "select count(*) from index_daily where index_code=? "
+        "and row_fingerprint is not null and row_fingerprint<>''",
+        (code,)).fetchone()
+    out["row_fingerprint_present"] = bool(fp and fp[0] == out["rows"])
+
+    # 可追溯性：必须同时有数据源、序列标识、采集记录
+    missing = []
+    if not out["sources"]:
+        missing.append("无 source 字段值")
+    if not out["run_ids"]:
+        missing.append("无 run_id 采集批次标识")
+    if not out["row_fingerprint_present"]:
+        missing.append("无 row_fingerprint 行级指纹")
+    if not out["collected_at_min"]:
+        missing.append("无 collected_at 采集时间")
+    out["source_traceable"] = not missing
+    out["source_traceable_reason"] = (
+        "具备数据源/批次标识/行级指纹/采集时间" if not missing
+        else "；".join(missing))
+    return out
+
+
+def audit_master_row(code: str, conn) -> dict:
+    """只读查询 index_master 中该指数的现有登记与证据字段。"""
+    cols = ["index_code", "index_name", "index_short_name", "publisher",
+            "data_source", "return_basis", "return_basis_evidence",
+            "inception_date", "inception_date_evidence",
+            "data_status", "layer_status", "data_version"]
+    row = conn.execute(
+        f"select {','.join(cols)} from index_master where index_code=?",
+        (code,)).fetchone()
+    if not row:
+        return {"exists": False}
+    return {"exists": True, **dict(zip(cols, row))}
+
+
+# ---------------------------------------------------------------- 官方数值校验
+OFFICIAL_PERF = ("https://www.csindex.com.cn/csindex-home/perf/"
+                 "index-perf?indexCode={code}&startDate={d}&endDate={d}")
+
+# 多个不同年份的抽样日（必须真实交易日；取不到则记为未命中，不得改用别的值）
+PROBE_DATES = ["20240102", "20200102", "20150105", "20180102"]
+
+
+_OFFICIAL_LAST_CALL = [0.0]
+OFFICIAL_SAMPLE_FILE = EVID / "official_close_samples.json"
+
+
+def _load_official_samples() -> dict:
+    if OFFICIAL_SAMPLE_FILE.exists():
+        try:
+            return json.loads(OFFICIAL_SAMPLE_FILE.read_text(encoding="utf-8"))
+        except Exception:
+            return {}
+    return {}
+
+
+def _save_official_samples(data: dict) -> None:
+    """固化已取得的官方数值样本（含来源 URL、获取时间、SHA256）。"""
+    EVID.mkdir(parents=True, exist_ok=True)
+    payload = json.dumps(data, ensure_ascii=False, indent=1, sort_keys=True)
+    content = payload + "\n"
+    OFFICIAL_SAMPLE_FILE.write_text(content, encoding="utf-8")
+    digest = hashlib.sha256(content.encode("utf-8")).hexdigest()
+    (EVID / "official_close_samples.sha256").write_text(
+        digest + "\n", encoding="utf-8")
+
+
+def _official_sample_sha256() -> str | None:
+    f = EVID / "official_close_samples.sha256"
+    return f.read_text(encoding="utf-8").strip() if f.exists() else None
+
+
+def official_close(code: str, yyyymmdd: str,
+                   retries: int = 3, gap: float = 1.2) -> dict:
+    """从中证指数官网官方行情接口取该日官方收盘值。
+
+    官网对密集请求返回 403；此处限速 + 退避重试，
+    **仍取不到时如实记录为未取得，不得改用第三方数据顶替。**
+    """
+    import time
+    u = OFFICIAL_PERF.format(code=code, d=yyyymmdd)
+
+    # 优先读已固化的官方样本（同一 URL 且已取得数值）
+    cache = _load_official_samples()
+    key = f"{code}|{yyyymmdd}"
+    hit = cache.get(key)
+    if hit and hit.get("close") is not None:
+        return {**hit, "from_cache": True}
+
+    last = None
+    for attempt in range(retries + 1):
+        wait = gap * (attempt + 1) - (time.time() - _OFFICIAL_LAST_CALL[0])
+        if wait > 0:
+            time.sleep(wait)
+        _OFFICIAL_LAST_CALL[0] = time.time()
+        try:
+            raw = _get(u, timeout=30, referer="https://www.csindex.com.cn/",
+                       retries=0)
+            d = json.loads(raw.decode("utf-8"))
+            rows = d.get("data") or []
+            if not rows:
+                return {"date": yyyymmdd, "close": None,
+                        "reason": "官方接口该日无数据（可能非交易日）"}
+            r = rows[0]
+            rec = {"date": yyyymmdd, "close": r.get("close"),
+                   "official_code": r.get("indexCode"),
+                   "official_name": r.get("indexNameCnAll"),
+                   "url": u,
+                   "obtained_at": datetime.now().isoformat(timespec="seconds"),
+                   "source": "中证指数有限公司官网行情接口"}
+            if rec["close"] is not None:
+                cache = _load_official_samples()
+                cache[key] = rec
+                _save_official_samples(cache)
+            return rec
+        except Exception as exc:
+            last = exc
+    return {"date": yyyymmdd, "close": None,
+            "reason": f"官方接口未取得（{type(last).__name__}）", "url": u}
+
+
+def numerical_verify(code: str, conn, tolerance: float = 0.01) -> dict:
+    """数值级验证：数据库收盘值 vs 中证指数官网官方收盘值。
+
+    **只有真实取得官方数值并逐日比对成功才算通过。**
+    官方取不到数据的日期记为未命中，不计入通过，也不替换为其他值。
+    """
+    comparisons = []
+    matched = 0
+    for d in PROBE_DATES:
+        iso = f"{d[:4]}-{d[4:6]}-{d[6:]}"
+        off = official_close(code, d)
+        row = conn.execute(
+            "select close, quality_status from index_daily "
+            "where index_code=? and trade_date=?", (code, iso)).fetchone()
+        db_close = row[0] if row else None
+        db_quality = row[1] if row else None
+        ok = (off.get("close") is not None and db_close is not None
+              and abs(float(off["close"]) - float(db_close)) <= tolerance)
+        if ok:
+            matched += 1
+        comparisons.append({
+            "date": iso,
+            "official_close": off.get("close"),
+            "database_close": db_close,
+            "database_quality_status": db_quality,
+            "abs_diff": (round(abs(float(off["close"]) - float(db_close)), 6)
+                         if ok or (off.get("close") is not None
+                                   and db_close is not None) else None),
+            "match": ok,
+            "official_url": off.get("url"),
+            "note": off.get("reason"),
+        })
+    official_obtained = sum(1 for c in comparisons
+                            if c["official_close"] is not None)
+    mismatch = sum(1 for c in comparisons
+                   if c["official_close"] is not None
+                   and c["database_close"] is not None
+                   and not c["match"])
+    # 三态：取不到官方数值 → None（unknown），不是 False
+    if official_obtained == 0:
+        verified = None
+        verdict = ("**未取得任何官方数值样本**：接口限流或该日无数据，"
+                   "按 unknown 记录，不得判定为已验证或不一致")
+    elif mismatch > 0:
+        verified = False
+        verdict = f"**官方数值与数据库不一致**（{mismatch} 处），判定为未通过"
+    elif matched >= 2:
+        verified = True
+        verdict = f"逐日比对 {matched} 个不同年份的官方收盘值全部一致"
+    else:
+        verified = None
+        verdict = (f"仅取得 {official_obtained} 个官方样本，"
+                   "不足 2 个不同年份，不足以判定通过")
+    return {
+        "tolerance": tolerance,
+        "probe_dates": PROBE_DATES,
+        "comparisons": comparisons,
+        "official_obtained": official_obtained,
+        "matched": matched,
+        "mismatch": mismatch,
+        "verified": verified,
+        "verdict": verdict,
+        "samples_file": "reports/evidence/phase3B6_2_3_0/"
+                        "official_close_samples.json",
+        "samples_sha256": _official_sample_sha256(),
+        "method": ("逐日比对中证指数有限公司官网官方行情接口收盘值，"
+                   "容差 0.01；官方无数据日不计入通过；"
+                   "取不到官方数值记 unknown，不记 false"),
+    }
+
+
+def verify_index(code: str, conn) -> dict:
+    """九个独立验证维度，逐项判定，不得互相替代。"""
+    basic = fetch_index_basic(code)
+    doc = fetch_methodology(code)
+    text = ""
+    if doc.get("file"):
+        try:
+            text = _pdf_text(ROOT / doc["file"])
+        except Exception:
+            text = ""
+    judged = judge_basis(text, doc.get("document_type"))
+    api = probe_series(code)
+    db = audit_db_series(code, conn)
+    master = audit_master_row(code, conn)
+    num = numerical_verify(code, conn)
+
+    official_name = basic.get("index_full_name")
+    official_code = code
+
+    # 1. 官方身份核验：代码 + 正式名称 + 发布机构三者齐全
+    official_identity_verified = bool(
+        basic.get("obtained") and official_name
+        and basic.get("publisher")
+        and (doc.get("file") is not None))
+
+    # 2. 官方收益口径核验
+    official_return_basis_verified = bool(judged["basis_confirmed"])
+
+    # 3. API 代码身份（取不到 → None/unknown，不是 False）
+    if not api.get("obtained"):
+        api_code_identity_verified = None
+        api_name_identity_verified = None
+    else:
+        api_code_identity_verified = bool(api.get("returned_code") == code)
+        # 4. API 正式名称：必须与官方全称一致，不能只比代码
+        api_name_identity_verified = bool(
+            official_name and api.get("returned_full_name") == official_name)
+
+    # 5. 数据库序列存在
+    database_series_exists = bool(db["exists"])
+
+    # 6. 数据源可追溯
+    database_series_source_traceable = bool(db["source_traceable"])
+
+    # 7. 数值级官方验证（三态：True / False / None=unknown）
+    database_series_numerically_verified = num["verified"]
+
+    # 8. 历史覆盖：本阶段未做交易日历连续性核验
+    historical_coverage_verified = False
+    coverage_note = ("本阶段未接入交易日历做缺失日核验，"
+                     "仅记录库内首末日期与行数")
+
+    # 9. 时点可用性：未做
+    point_in_time_verified = False
+
+    return {
+        "index_code": code,
+        "official": basic,
+        "document": doc,
+        "return_basis_judgement": judged,
+        "official_identity_verified": official_identity_verified,
+        "official_return_basis_verified": official_return_basis_verified,
+        "api_identity": api,
+        "api_code_identity_verified": api_code_identity_verified,
+        "api_name_identity_verified": api_name_identity_verified,
+        "database": db,
+        "database_series_exists": database_series_exists,
+        "database_series_source_traceable":
+            database_series_source_traceable,
+        "database_master_row": master,
+        "numerical_verification": num,
+        "database_series_numerically_verified":
+            database_series_numerically_verified,
+        "historical_coverage_verified": historical_coverage_verified,
+        "historical_coverage_note": coverage_note,
+        "point_in_time_verified": point_in_time_verified,
+        "point_in_time_note": "本阶段未做时点可用性（前视偏差）审计",
+        # 同一指数逐条判断：口径确认 + 数值级验证同时为真才通过
+        "series_matches_official_basis": bool(
+            official_return_basis_verified
+            and database_series_numerically_verified is True),
+    }
 
 
 def audit_indexes() -> dict:
-    records = []
-    for code in INDEX_CODES:
-        basic = fetch_index_basic(code)
-        doc = fetch_methodology(code)
-        text = ""
-        if doc.get("file"):
-            try:
-                text = _pdf_text(ROOT / doc["file"])
-            except Exception:
-                text = ""
-        judged = judge_basis(text, doc.get("document_type"))
-        series = probe_series(code)
-        records.append({
-            "index_code": code,
-            "official": basic,
-            "document": doc,
-            "return_basis_judgement": judged,
-            # **必须同时满足**：官方口径已确认 + 数据序列代码与官方一致
-            "return_basis_confirmed": bool(
-                judged["basis_confirmed"] and series.get("series_matched")),
-            "series_probe": series,
-            "data_series_matches_official": series.get("series_matched", False),
-            "note": ("官方口径已确认，且数据接口返回代码与官方一致；"
-                     "但**历史连续覆盖与时点可用性未在本阶段确认**"
-                     if judged["basis_confirmed"] and series.get("series_matched")
-                     else "口径或序列未确认，保持 unknown"),
-        })
+    conn = _db_connect()
+    try:
+        records = [verify_index(code, conn) for code in INDEX_CODES]
+    finally:
+        conn.close()
     return {"indexes": records}
 
 
@@ -689,8 +1059,15 @@ def summarize(idx: dict, fund: dict) -> dict:
     def cnt(seq, pred):
         return sum(1 for r in seq if pred(r))
 
+    def cnt_true(pred):
+        return sum(1 for r in irecs if pred(r) is True)
+
+    def cnt_unknown(pred):
+        return sum(1 for r in irecs if pred(r) is None)
+
     idx_summary = {
         "total_indexes": len(irecs),
+        # ---- 官方证据 ----
         "official_document_obtained": cnt(
             irecs, lambda r: r["document"].get("file") is not None),
         "methodology_obtained": cnt(
@@ -699,16 +1076,50 @@ def summarize(idx: dict, fund: dict) -> dict:
         "factsheet_only": cnt(
             irecs, lambda r: (r["document"].get("document_type") or "")
             .startswith("指数单张")),
-        "return_basis_confirmed": cnt(
-            irecs, lambda r: r["return_basis_confirmed"]),
-        "return_basis_still_unknown": cnt(
-            irecs, lambda r: not r["return_basis_confirmed"]),
-        "series_matches_official": cnt(
-            irecs, lambda r: r["data_series_matches_official"]),
+        # ---- 九个独立验证维度（逐条明细自动汇总）----
+        "official_identity_verified": cnt_true(
+            lambda r: r["official_identity_verified"]),
+        "official_return_basis_verified": cnt_true(
+            lambda r: r["official_return_basis_verified"]),
+        "api_code_identity_verified": cnt_true(
+            lambda r: r["api_code_identity_verified"]),
+        "api_name_identity_verified": cnt_true(
+            lambda r: r["api_name_identity_verified"]),
+        "database_series_exists": cnt_true(
+            lambda r: r["database_series_exists"]),
+        "database_series_source_traceable": cnt_true(
+            lambda r: r["database_series_source_traceable"]),
+        "database_series_numerically_verified": cnt_true(
+            lambda r: r["database_series_numerically_verified"]),
+        "database_series_numerically_unknown": cnt_unknown(
+            lambda r: r["database_series_numerically_verified"]),
+        "database_series_numerically_mismatch": sum(
+            1 for r in irecs
+            if r["database_series_numerically_verified"] is False),
+        "historical_coverage_verified": cnt_true(
+            lambda r: r["historical_coverage_verified"]),
+        "point_in_time_verified": cnt_true(
+            lambda r: r["point_in_time_verified"]),
+        # ---- 同一指数逐条判断的复合结论 ----
+        "series_matches_official_basis": cnt_true(
+            lambda r: r["series_matches_official_basis"]),
+        # ---- 兼容字段（语义已明确，见 deprecated_fields）----
+        "return_basis_confirmed": cnt_true(
+            lambda r: r["official_return_basis_verified"]),
+        "return_basis_still_unknown": sum(
+            1 for r in irecs if not r["official_return_basis_verified"]),
         "grade_counts": _counter(r["document"].get("evidence_grade")
                                   for r in irecs),
         "basis_counts": _counter(
             r["return_basis_judgement"]["return_basis"] for r in irecs),
+    }
+    idx_summary["deprecated_fields"] = {
+        "series_matched": "已废弃 → api_code_identity_verified",
+        "data_series_matches_official":
+            "已废弃 → 不得作为数值验证结论；"
+            "数值验证见 database_series_numerically_verified",
+        "series_matches_official":
+            "已废弃 → series_matches_official_basis（需数值级验证）",
     }
 
     fund_summary = {
@@ -729,17 +1140,28 @@ def summarize(idx: dict, fund: dict) -> dict:
         "grade_counts": _counter(r["evidence_grade"] for r in frecs),
     }
 
+    # 门禁：同一指数必须同时满足全部条件，**不得用两个独立计数都 >0 判定**
     gate = {
         "at_least_one_index_basis_l1": idx_summary[
-            "return_basis_confirmed"] > 0,
+            "official_return_basis_verified"] > 0,
         "at_least_one_fund_l1_contract": fund_summary[
             "l1_contract_obtained"] > 0,
+        # 逐指数判断：口径确认 + 数值级官方验证为 True
         "series_matches_official_basis": (
-            idx_summary["return_basis_confirmed"] > 0
-            and idx_summary["series_matches_official"] > 0),
+            idx_summary["series_matches_official_basis"] > 0),
+        "all_indexes_numerically_verified": (
+            idx_summary["database_series_numerically_verified"]
+            == idx_summary["total_indexes"]),
+        "all_indexes_coverage_verified": (
+            idx_summary["historical_coverage_verified"]
+            == idx_summary["total_indexes"]),
+        "all_indexes_point_in_time_verified": (
+            idx_summary["point_in_time_verified"]
+            == idx_summary["total_indexes"]),
         "ready_for_3b6_2_3_1_series_build": False,
-        "note": ("即使官方口径确认，历史连续覆盖与时点可用性仍未确认，"
-                 "不得直接进入指数收益序列建设"),
+        "note": ("历史连续覆盖与时点可用性仍未确认，"
+                 "不得直接进入指数收益序列建设；"
+                 "数值级验证通过也不代表可直接回测"),
     }
 
     return {
@@ -752,8 +1174,13 @@ def summarize(idx: dict, fund: dict) -> dict:
             "fund_count_matches_detail": (
                 fund_summary["total_funds"] == len(frecs)),
             "index_partition_ok": (
-                idx_summary["return_basis_confirmed"]
+                idx_summary["official_return_basis_verified"]
                 + idx_summary["return_basis_still_unknown"]
+                == idx_summary["total_indexes"]),
+            "numerical_partition_ok": (
+                idx_summary["database_series_numerically_verified"]
+                + idx_summary["database_series_numerically_unknown"]
+                + idx_summary["database_series_numerically_mismatch"]
                 == idx_summary["total_indexes"]),
             "fund_partition_ok": (
                 fund_summary["l1_contract_obtained"]
@@ -773,13 +1200,21 @@ def _counter(seq) -> dict:
 
 def main() -> None:
     EVID.mkdir(parents=True, exist_ok=True)
-    print("=== 第一部分：10 个指数官方口径核验 ===")
+    print("=== 第一部分：10 个指数九维验证 ===")
     idx = audit_indexes()
     for r in idx["indexes"]:
-        doc = r["document"]
         j = r["return_basis_judgement"]
-        print(f"  {r['index_code']:8s} {doc.get('document_type') or '未取得':22s} "
-              f"basis={j['return_basis']:10s} confirmed={r['return_basis_confirmed']}")
+        num = r["numerical_verification"]
+        print(f"  {r['index_code']:8s} basis={j['return_basis']:10s} "
+              f"id={r['official_identity_verified']!s:5s} "
+              f"basis_ok={r['official_return_basis_verified']!s:5s} "
+              f"api={r['api_code_identity_verified']!s:5s} "
+              f"db={r['database_series_exists']!s:5s} "
+              f"trace={r['database_series_source_traceable']!s:5s} "
+              f"num={r['database_series_numerically_verified']!s:5s} "
+              f"({num['matched']}/{num['official_obtained']}) "
+              f"cov={r['historical_coverage_verified']!s:5s} "
+              f"pit={r['point_in_time_verified']!s:5s}")
 
     print("\n=== 第二部分：78 只基金 L1 合同原件 ===")
     fund = audit_funds()
@@ -805,8 +1240,44 @@ def main() -> None:
         "sources": {
             "csindex_oss": CSI_OSS,
             "csindex_basic": CSI_BASIC,
+            "csindex_perf": OFFICIAL_PERF,
             "cninfo": "巨潮资讯网（中国证监会指定信息披露网站）",
             "cninfo_query": CNINFO_QUERY,
+            "official_samples_file": (
+                "reports/evidence/phase3B6_2_3_0/"
+                "official_close_samples.json"),
+            "official_samples_sha256": _official_sample_sha256(),
+            "api_samples_file": (
+                "reports/evidence/phase3B6_2_3_0/api_identity_samples.json"),
+        },
+        "verification_dimensions": {
+            "official_identity_verified":
+                "官方指数代码/正式名称/发布机构已核验（含官方文件）",
+            "official_return_basis_verified":
+                "官方文件明文确认收益口径",
+            "api_code_identity_verified":
+                "数据接口返回代码与请求代码一致（仅身份，非数值验证）",
+            "api_name_identity_verified":
+                "数据接口返回正式名称与官方全称一致（不能只比代码）",
+            "database_series_exists":
+                "只读查询正式库 index_daily，确认实际历史记录存在",
+            "database_series_source_traceable":
+                "库内是否具备数据源/批次标识/行级指纹/采集时间",
+            "database_series_numerically_verified":
+                "逐日比对中证指数官网官方收盘值；取不到记 unknown，不记 false",
+            "historical_coverage_verified":
+                "是否确认历史覆盖区间、缺失日期与连续性（本阶段未做）",
+            "point_in_time_verified":
+                "是否确认历史数据在当时真实可取得（本阶段未做）",
+        },
+        "deprecated_fields": {
+            "series_matched": "已废弃 → api_code_identity_verified",
+            "data_series_matches_official":
+                "已废弃 → 仅代表接口代码匹配，不代表数据库历史序列匹配；"
+                "数值验证见 database_series_numerically_verified",
+            "series_matches_official":
+                "已废弃 → series_matches_official_basis（需数值级验证）",
+            "data_series_matches_official_removed_at": "3B-6.2.3.0.1",
         },
         "indexes": idx["indexes"],
     }

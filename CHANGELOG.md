@@ -1,5 +1,135 @@
 # 变更日志
 
+## 2026-11-26 — 阶段3B-6.2.3.0.1 指数历史序列匹配证据纠偏与审计逻辑修复
+
+**只修复审计逻辑、字段语义、报告与测试。不建设指数收益序列，不修改数据库。**
+
+**一、问题**
+
+`probe_series()` 只调用 AKShare 查询 2024-01-02~05 的数据，用
+`series_matched = returned_code == request_code` 判断，
+**没有检查正式数据库已保存的历史序列，也没有做数值级官方交叉验证**。
+
+导致以下字段语义过度表达：
+
+| 旧字段 | 语义问题 |
+| --- | --- |
+| `series_matched` | 只表示接口代码相等，被当成「序列匹配」 |
+| `data_series_matches_official` | 被当成「数据库序列与官方匹配」的数值结论 |
+| `series_matches_official` | 同上，过度表达 |
+| `series_matches_official_basis`（门禁） | 用「两个独立计数都 >0」判定通过 |
+
+**二、拆分为九个独立验证状态**
+
+| # | 状态 | 判定依据 |
+| ---: | --- | --- |
+| 1 | `official_identity_verified` | 代码 + 正式名称 + 发布机构 + 官方文件 |
+| 2 | `official_return_basis_verified` | 编制方案**明文**确认口径 |
+| 3 | `api_code_identity_verified` | 接口返回代码 == 请求代码（仅身份） |
+| 4 | `api_name_identity_verified` | 接口返回全称 == 官方全称（不能只比代码） |
+| 5 | `database_series_exists` | 只读查 `index_daily` 实际记录 |
+| 6 | `database_series_source_traceable` | source + run_id + row_fingerprint + collected_at |
+| 7 | `database_series_numerically_verified` | 逐日比对中证官网官方收盘值 |
+| 8 | `historical_coverage_verified` | 交易日历缺失日核验（本阶段未做） |
+| 9 | `point_in_time_verified` | 前视偏差审计（本阶段未做） |
+
+**三、字段处置**
+
+| 旧字段 | 处置 |
+| --- | --- |
+| `series_matched` | → `api_code_identity_verified` |
+| `data_series_matches_official` | **废弃** → `database_series_numerically_verified` |
+| `series_matches_official` | **废弃** → `series_matches_official_basis` |
+| `series_probe` | → `api_identity` |
+
+旧字段已从逐指数明细中**移除**，仅在汇总 `deprecated_fields` 保留迁移说明。
+
+**四、复合结论与门禁修正**
+
+```python
+# 旧（错误）：两个独立计数都 >0 就通过
+series_matches_official_basis = (
+    return_basis_confirmed > 0 and series_matches_official > 0)
+
+# 新：同一指数逐条判断，且必须数值级验证为 True
+series_matches_official_basis = bool(
+    official_return_basis_verified is True
+    and database_series_numerically_verified is True)
+```
+
+门禁新增三项全量校验：`all_indexes_numerically_verified`、
+`all_indexes_coverage_verified`、`all_indexes_point_in_time_verified`。
+
+**五、正式数据库只读审计（先读真实 Schema）**
+
+| 项 | 结果 |
+| --- | --- |
+| 表名（读 Schema 确认） | `index_daily` |
+| 总行数 | **50,603** |
+| 日期范围 | `2004-01-01` ~ `2026-11-20` |
+| `source` | 全部 `akshare.stock_zh_index_hist_csindex` |
+| `run_id` / `row_fingerprint` / `collected_at` | 全部有值，可追溯 |
+| `suspect` 记录 | 每指数 1 条 `2004-01-01` 占位行（非真实行情，未清除） |
+
+**六、数值级官方验证（本轮新增，真正落地）**
+
+| 项 | 内容 |
+| --- | --- |
+| 官方来源 | 中证指数官网行情接口 `csindex-home/perf/index-perf` |
+| 抽样日 | `2024-01-02` / `2020-01-02` / `2015-01-05` / `2018-01-02` |
+| 容差 | 绝对差 ≤ 0.01 |
+| 判定 | ≥2 个不同年份命中才通过 |
+| 三态 | 取不到 → `None`(unknown)；取到但不一致 → `False` |
+| 样本固化 | `official_close_samples.json` + `.sha256`（含 URL、获取时间） |
+
+**实测：10 个指数 × 4 个年份 = 40 个样本全部一致，误差 0.00。**
+
+**七、九维验证结果**
+
+| 维度 | 结果 |
+| --- | ---: |
+| 官方指数身份确认 | **10 / 10** |
+| 官方收益口径确认 | **9 / 10** |
+| API 代码身份匹配 | **10 / 10** |
+| API 正式名称匹配 | **10 / 10** |
+| 数据库历史序列存在 | **10 / 10** |
+| 数据源可追溯 | **10 / 10** |
+| **历史数值级官方验证** | **10 / 10** |
+| 历史连续覆盖确认 | **0 / 10** |
+| 时点可用性确认 | **0 / 10** |
+| **复合 `series_matches_official_basis`** | **9 / 10** |
+
+**`930930` 数值验证通过（4/4）但口径未确认 → 复合结论仍为不通过**，
+证明两个维度确实独立。
+
+**八、测试**
+
+- 修正 4 项既有测试（旧字段引用、口径确认条件、汇总一致性、000012 序列字段）。
+- 新增 17 项边界测试，覆盖任务要求的 12 条，含：
+  `test_api_code_match_not_equal_db_match`、`test_api_name_mismatch_fails`、
+  `test_no_db_series_cannot_pass`、`test_untraceable_source_cannot_verify`、
+  `test_official_doc_alone_cannot_verify_numbers`、
+  `test_numerical_verification_uses_real_official_data`、
+  `test_000012_h00012_n00012_distinct`、`test_all_summaries_auto_computed`、
+  `test_series_matches_basis_requires_full_evidence`、
+  `test_gate_uses_same_index_conjunction`、`test_coverage_and_pit_not_derived`、
+  `test_gates_not_opened_by_rename`、`test_reports_have_no_deprecated_field_claims`、
+  `test_database_audit_reads_real_schema`、`test_suspect_rows_recorded`、
+  `test_index_master_return_basis_untouched`、
+  `test_no_overclaim_wording_in_reports`。
+- 专项 35 → **53**；全量 2492 → **2510**。
+
+**九、边界未变**
+
+不修改正式数据库、不修改 Schema、**不修改 `index_master.return_basis`**、
+不写入正式指数行情表、不写入基金数据、不修改基金合同审计结果、
+不修改收益公式、不开始序列建设、不开始回测、不开始正式排名。
+
+门禁：`ready_for_research_analysis=true`、`ready_for_backtest=false`、
+`ready_for_formal_ranking=false`、`ready_for_3b6_2_3_1_series_build=false`。
+
+---
+
 ## 2026-11-26 — 阶段3B-6.2.3.0 官方指数收益口径核验与基金合同原件获取审计
 
 **只做官方证据获取、来源核验与覆盖率审计。不接入基准行情，不进入回测，不修改数据库。**

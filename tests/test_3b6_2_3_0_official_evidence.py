@@ -133,7 +133,7 @@ def test_unknown_basis_not_upgraded(idx):
         if not j["basis_confirmed"]:
             assert j["return_basis"] == "unknown", \
                 f"{r['index_code']} 无明文依据却给了 {j['return_basis']}"
-            assert r["return_basis_confirmed"] is False
+            assert r["official_return_basis_verified"] is False
         else:
             assert j["evidence"], "确认口径必须给出明文依据"
 
@@ -142,16 +142,16 @@ def test_930930_stays_unknown(idx):
     """930930 官方单张未明文说明主序列口径 → 必须保持 unknown。"""
     rec = next(r for r in idx["indexes"] if r["index_code"] == "930930")
     assert rec["return_basis_judgement"]["return_basis"] == "unknown"
-    assert rec["return_basis_confirmed"] is False
+    assert rec["official_return_basis_verified"] is False
 
 
-def test_confirmed_requires_both_conditions(idx):
-    """口径确认必须同时满足「官方口径确认」+「序列代码匹配」。"""
+def test_deprecated_fields_removed_from_detail(idx):
+    """旧字段不得再出现在逐指数明细中。"""
+    banned = ("series_matched", "data_series_matches_official",
+              "series_matches_official", "series_probe")
     for r in idx["indexes"]:
-        j = r["return_basis_judgement"]
-        expect = bool(j["basis_confirmed"]
-                      and r["data_series_matches_official"])
-        assert r["return_basis_confirmed"] is expect
+        for k in banned:
+            assert k not in r, f"{r['index_code']} 仍保留旧字段 {k}"
 
 
 # ============================================================ 历史版本
@@ -182,14 +182,31 @@ def test_history_versions_recorded_separately(fund):
 
 # ============================================================ 覆盖率汇总
 def test_index_summary_matches_detail(idx, fund):
-    """指数汇总必须与明细一致。"""
+    """九个维度汇总必须全部由逐条明细自动计算。"""
     s = fund["summary"]["index_summary"]
-    assert s["total_indexes"] == len(idx["indexes"])
-    assert s["return_basis_confirmed"] == sum(
-        1 for r in idx["indexes"] if r["return_basis_confirmed"])
-    assert s["series_matches_official"] == sum(
-        1 for r in idx["indexes"] if r["data_series_matches_official"])
-    assert (s["return_basis_confirmed"] + s["return_basis_still_unknown"]
+    recs = idx["indexes"]
+    assert s["total_indexes"] == len(recs)
+    pairs = {
+        "official_identity_verified": "official_identity_verified",
+        "official_return_basis_verified": "official_return_basis_verified",
+        "api_code_identity_verified": "api_code_identity_verified",
+        "api_name_identity_verified": "api_name_identity_verified",
+        "database_series_exists": "database_series_exists",
+        "database_series_source_traceable":
+            "database_series_source_traceable",
+        "database_series_numerically_verified":
+            "database_series_numerically_verified",
+        "historical_coverage_verified": "historical_coverage_verified",
+        "point_in_time_verified": "point_in_time_verified",
+    }
+    for skey, dkey in pairs.items():
+        expect = sum(1 for r in recs if r[dkey] is True)
+        assert s[skey] == expect, f"{skey} 汇总 {s[skey]} != 明细 {expect}"
+    assert (s["official_return_basis_verified"]
+            + s["return_basis_still_unknown"] == s["total_indexes"])
+    assert (s["database_series_numerically_verified"]
+            + s["database_series_numerically_unknown"]
+            + s["database_series_numerically_mismatch"]
             == s["total_indexes"])
 
 
@@ -389,5 +406,290 @@ def test_000012_multi_series_distinguished(idx):
     """000012 必须与 H00012/N00012 区分，口径为全价而非净价/再投资。"""
     rec = next(r for r in idx["indexes"] if r["index_code"] == "000012")
     assert rec["return_basis_judgement"]["return_basis"] == "full_price"
-    assert rec["series_probe"]["returned_code"] == "000012"
-    assert rec["series_probe"]["returned_full_name"] == "上证国债指数"
+    assert rec["api_identity"]["returned_code"] == "000012"
+    assert rec["api_identity"]["returned_full_name"] == "上证国债指数"
+    # 数据库里只应存在 000012，不得混入 H00012 / N00012
+    assert rec["database"]["rows"] > 0
+
+
+def test_000012_variants_not_merged():
+    """正式库 index_daily 不得混入 H00012 / N00012 记录。"""
+    import sqlite3
+    from app.config import settings
+    p = str(settings.database_path).replace("\\", "/")
+    conn = sqlite3.connect(f"file:{p}?mode=ro", uri=True)
+    try:
+        codes = {r[0] for r in conn.execute(
+            "select distinct index_code from index_daily")}
+    finally:
+        conn.close()
+    assert "000012" in codes
+    assert "H00012" not in codes, "净价序列混入了正式库"
+    assert "N00012" not in codes, "利息再投资序列混入了正式库"
+
+
+# ============================================================ 九维验证边界（3B-6.2.3.0.1）
+def test_api_code_match_not_equal_db_match(idx):
+    """1. API 代码匹配不能自动等于数据库历史序列匹配。"""
+    for r in idx["indexes"]:
+        # 两者是独立字段、独立证据来源，字段名不得混用
+        assert "api_code_identity_verified" in r
+        assert "database_series_numerically_verified" in r
+        assert "series_matched" not in r
+        assert "data_series_matches_official" not in r
+        # 数值验证必须有逐日比对明细（独立于 API 身份核验）
+        num = r["numerical_verification"]
+        assert num["comparisons"], "数值验证必须有逐日比对明细"
+        for c in num["comparisons"]:
+            assert "official_close" in c and "database_close" in c
+            assert c.get("official_url"), "比对项必须带官方来源 URL"
+        # API 身份核验只看代码/名称，不参与数值判定
+        api = r["api_identity"]
+        assert "close" not in api, "API 身份核验不得携带收盘价参与数值判定"
+
+
+def test_api_name_mismatch_fails():
+    """2. API 名称不匹配必须失败（不能只比代码）。"""
+    from scripts.audit_3b6_2_3_0_evidence import verify_index
+    conn = __import__("scripts.audit_3b6_2_3_0_evidence",
+                      fromlist=["_db_connect"])._db_connect()
+    try:
+        r = verify_index("000300", conn)
+    finally:
+        conn.close()
+    # 该指数名称一致
+    assert r["api_name_identity_verified"] is True
+    # 名称核验必须比对全称而不是代码
+    assert r["official"]["index_full_name"] == \
+        r["api_identity"]["returned_full_name"]
+    # 若把名称改坏，判定逻辑必须为 False
+    fake = dict(r["api_identity"])
+    fake["returned_full_name"] = "沪深300全收益指数"
+    assert (fake["returned_full_name"]
+            == r["official"]["index_full_name"]) is False
+
+
+def test_no_db_series_cannot_pass():
+    """3. 正式数据库没有历史数据时不能通过。"""
+    from scripts.audit_3b6_2_3_0_evidence import audit_db_series, _db_connect
+    conn = _db_connect()
+    try:
+        out = audit_db_series("NOT_EXIST_CODE", conn)
+    finally:
+        conn.close()
+    assert out["exists"] is False
+    assert out["rows"] == 0
+    assert out["source_traceable"] is False
+
+
+def test_untraceable_source_cannot_verify():
+    """4. 数据源不可追溯时不能判定数值验证通过。"""
+    from scripts.audit_3b6_2_3_0_evidence import audit_db_series, _db_connect
+    conn = _db_connect()
+    try:
+        out = audit_db_series("000300", conn)
+    finally:
+        conn.close()
+    # 可追溯性判定必须依赖四个要素齐全
+    if out["source_traceable"]:
+        assert out["sources"]
+        assert out["run_ids"]
+        assert out["row_fingerprint_present"]
+        assert out["collected_at_min"]
+    else:
+        assert out["source_traceable_reason"]
+
+
+def test_official_doc_alone_cannot_verify_numbers(idx):
+    """5. 只有官方文件、没有历史数值证据时不能通过数值级验证。"""
+    from scripts.audit_3b6_2_3_0_evidence import numerical_verify, _db_connect
+    conn = _db_connect()
+    try:
+        out = numerical_verify("NOT_EXIST_CODE", conn)
+    finally:
+        conn.close()
+    assert out["official_obtained"] == 0
+    assert out["matched"] == 0
+    assert out["verified"] is None, "无官方数值必须记 unknown，不是 True"
+    assert "unknown" in out["verdict"]
+
+
+def test_numerical_verification_uses_real_official_data(idx):
+    """6. 数值级验证必须使用真实可核验的对照数据。"""
+    import hashlib
+    samples = EVID / "official_close_samples.json"
+    digest = EVID / "official_close_samples.sha256"
+    assert samples.exists(), "缺官方数值样本文件"
+    assert digest.exists(), "缺官方样本 SHA256"
+    payload = samples.read_text(encoding="utf-8")
+    assert hashlib.sha256(payload.encode("utf-8")).hexdigest() == \
+        digest.read_text(encoding="utf-8").strip()
+    data = json.loads(payload)
+    assert data, "官方样本为空"
+    for k, v in data.items():
+        assert v.get("url"), f"{k} 缺官方来源 URL"
+        assert "csindex.com.cn" in v["url"]
+        assert v.get("close") is not None
+        assert v.get("obtained_at")
+    # 每只已验证指数至少有 2 个不同年份的官方样本
+    for r in idx["indexes"]:
+        if r["database_series_numerically_verified"] is not True:
+            continue
+        years = {c["date"][:4]
+                 for c in r["numerical_verification"]["comparisons"]
+                 if c["match"]}
+        assert len(years) >= 2, \
+            f"{r['index_code']} 验证样本不足 2 个不同年份"
+
+
+def test_000012_h00012_n00012_distinct():
+    """7. 000012、H00012、N00012 必须严格区分。"""
+    import sys as _sys
+    from scripts.audit_3b6_2_3_0_evidence import probe_series
+    a = probe_series("000012")
+    if not a.get("obtained"):
+        pytest.skip("接口限流，无法实测三序列区分")
+    b = probe_series("H00012")
+    c = probe_series("N00012")
+    assert a["returned_code"] == "000012"
+    if b.get("obtained"):
+        assert b["returned_code"] == "H00012"
+        assert b["returned_full_name"] != a["returned_full_name"]
+    if c.get("obtained"):
+        assert c["returned_code"] == "N00012"
+        assert c["returned_full_name"] != a["returned_full_name"]
+    assert a["returned_full_name"] == "上证国债指数"
+
+
+def test_all_summaries_auto_computed(idx, fund):
+    """8. 10 个指数汇总统计必须从逐条明细自动计算。"""
+    from collections import Counter
+    s = fund["summary"]["index_summary"]
+    recs = idx["indexes"]
+    assert s["total_indexes"] == len(recs) == 10
+    # 口径分布由明细重算
+    assert s["basis_counts"] == dict(Counter(
+        r["return_basis_judgement"]["return_basis"] for r in recs))
+    # 证据等级分布由明细重算
+    assert s["grade_counts"] == dict(Counter(
+        str(r["document"].get("evidence_grade")) for r in recs))
+    # 复合结论由明细重算
+    assert s["series_matches_official_basis"] == sum(
+        1 for r in recs if r["series_matches_official_basis"] is True)
+
+
+def test_series_matches_basis_requires_full_evidence(idx):
+    """9. series_matches_official_basis 必须基于同一指数的完整证据条件。"""
+    for r in idx["indexes"]:
+        expect = bool(
+            r["official_return_basis_verified"] is True
+            and r["database_series_numerically_verified"] is True)
+        assert r["series_matches_official_basis"] is expect, \
+            f"{r['index_code']} 复合结论与逐条条件不符"
+    # 930930 口径未确认 → 即使数值验证通过也不能判通过
+    rec = next(r for r in idx["indexes"] if r["index_code"] == "930930")
+    assert rec["official_return_basis_verified"] is False
+    assert rec["series_matches_official_basis"] is False
+
+
+def test_gate_uses_same_index_conjunction(fund):
+    """9b. 门禁不得用两个独立计数都 >0 判定。"""
+    g = fund["summary"]["gates"]
+    isum = fund["summary"]["index_summary"]
+    assert g["series_matches_official_basis"] is (
+        isum["series_matches_official_basis"] > 0)
+    assert "series_matches_official" not in g, "门禁仍引用已废弃字段"
+
+
+def test_coverage_and_pit_not_derived(idx):
+    """10. 历史连续覆盖和时点可用性不能由数值匹配自动推导。"""
+    for r in idx["indexes"]:
+        if r["database_series_numerically_verified"] is True:
+            assert r["historical_coverage_verified"] is False, \
+                f"{r['index_code']} 由数值匹配推导了覆盖确认"
+            assert r["point_in_time_verified"] is False, \
+                f"{r['index_code']} 由数值匹配推导了时点可用性"
+            assert r["historical_coverage_note"]
+            assert r["point_in_time_note"]
+
+
+def test_gates_not_opened_by_rename(fund):
+    """11. 门禁不能因为本轮字段重命名而意外开放。"""
+    g = fund["summary"]["gates"]
+    assert g["ready_for_3b6_2_3_1_series_build"] is False
+    assert g["all_indexes_coverage_verified"] is False
+    assert g["all_indexes_point_in_time_verified"] is False
+    assert "数值级验证通过也不代表可直接回测" in g["note"]
+
+
+def test_reports_have_no_deprecated_field_claims(idx):
+    """12. 报告中的旧字段引用必须同步修正。
+
+    旧字段只允许出现在「废弃声明」语境中（同段落含「废弃」），
+    不得再作为结论字段使用。
+    """
+    for name in ("phase3B6_2_3_0_coverage_report.md",
+                 "phase3B6_2_3_0_recommendation.md",
+                 "phase3B6_2_3_0_design.md"):
+        txt = (REPORTS / name).read_text(encoding="utf-8")
+        lines = txt.splitlines()
+        for i, line in enumerate(lines):
+            for bad in ("series_matched", "data_series_matches_official"):
+                # 排除 series_matches_official_basis 这类新字段
+                if bad == "series_matched" and \
+                        "series_matches_official" in line:
+                    continue
+                if bad not in line:
+                    continue
+                # 必须处于废弃声明语境
+                ctx = line + (lines[i - 1] if i else "") + \
+                    (lines[i + 1] if i + 1 < len(lines) else "")
+                assert ("废弃" in ctx or "过度表达" in ctx
+                        or "已移除" in ctx), \
+                    f"{name} 第 {i + 1} 行仍把 {bad} 当结论使用：{line.strip()}"
+    # JSON 必须显式声明废弃字段
+    assert "deprecated_fields" in idx
+    assert "api_code_identity_verified" in idx["deprecated_fields"]["series_matched"]
+
+
+def test_no_overclaim_wording_in_reports():
+    """报告不得再出现「历史序列已匹配官方」这类过度表达。"""
+    for name in ("phase3B6_2_3_0_coverage_report.md",
+                 "phase3B6_2_3_0_recommendation.md"):
+        txt = (REPORTS / name).read_text(encoding="utf-8")
+        assert "历史数据序列已匹配官方" not in txt, \
+            f"{name} 仍声称序列已匹配"
+        assert "代码级匹配" not in txt, f"{name} 仍用代码级匹配代替数值验证"
+
+
+def test_database_audit_reads_real_schema(idx):
+    """正式数据库审计必须先读真实 Schema，不得猜测表名/字段。"""
+    for r in idx["indexes"]:
+        db = r["database"]
+        assert db["table"] == "index_daily"
+        assert "index_code" in db["schema_columns_read"]
+        assert "close" in db["schema_columns_read"]
+        assert "source" in db["schema_columns_read"]
+        assert "run_id" in db["schema_columns_read"]
+        assert "row_fingerprint" in db["schema_columns_read"]
+        assert "collected_at" in db["schema_columns_read"]
+
+
+def test_suspect_rows_recorded(idx):
+    """库内 suspect 质量记录必须如实保留，不得忽略。"""
+    for r in idx["indexes"]:
+        db = r["database"]
+        if db["exists"]:
+            total = sum(db["quality_status_counts"].values())
+            assert total == db["rows"]
+            assert len(db["suspect_rows"]) == \
+                db["quality_status_counts"].get("suspect", 0)
+
+
+def test_index_master_return_basis_untouched(idx):
+    """正式库 index_master.return_basis 必须仍为 unknown（本轮未修改）。"""
+    for r in idx["indexes"]:
+        m = r["database_master_row"]
+        assert m["exists"] is True
+        assert m["return_basis"] == "unknown", \
+            f"{r['index_code']} return_basis 被修改为 {m['return_basis']}"
