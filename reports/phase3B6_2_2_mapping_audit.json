@@ -1,7 +1,7 @@
 {
  "phase": "3B-6.2.2",
  "task": "场外公募基金与基准映射规则实现",
- "generated_at": "2026-11-26T08:47:19",
+ "generated_at": "2026-11-26T09:18:16",
  "baseline_head": "e9fcd3cd197c7f58d3267d3a20825caa6e320548",
  "mapping_rule_version": "3B-6.2.2-v1",
  "read_only": true,
@@ -23,35 +23,53 @@
  "confidence_levels": {
   "A": {
    "label": "高",
-   "definition": "官方合同和基准数据证据完整，映射关系明确",
+   "definition": "L1 官方合同证据、映射关系明确、收益口径确认、全部必要成分可计算",
    "requires": [
     "L1 官方合同文件",
-    "全部成分可计算",
-    "收益口径已确认"
+    "映射关系在合同中明确写出",
+    "收益口径已确认（非 unknown）",
+    "全部必要成分可计算"
    ],
+   "non_critical_gaps_allowed": false,
    "can_bypass_usability": false
   },
   "B": {
    "label": "中高",
-   "definition": "主要映射关系有可靠证据，但存在非关键缺口",
+   "definition": "映射关系有可靠的 L1/L2 证据，存在非关键缺口，但不影响基准身份及主要映射关系",
    "requires": [
-    "成分已识别",
-    "至少一个可用序列"
+    "L1 或 L2 映射证据",
+    "基准身份（用哪个指数）明确"
    ],
+   "non_critical_gaps_allowed": true,
+   "non_critical_gap_examples": [
+    "收益口径未确认（不影响「是哪只指数」，只影响能否算）",
+    "非必要成分缺失"
+   ],
+   "critical_gap_note": "**仅凭 L3 第三方平台文本，不能评为 B 级**",
    "can_bypass_usability": false
   },
   "C": {
    "label": "中低",
-   "definition": "有合理候选关系，但存在关键证据缺失",
+   "definition": "存在合理候选映射，但关键证据缺失，包括仅有 L3 第三方资料、收益口径未确认、必要成分不完整等",
    "requires": [
-    "成分已识别"
+    "有可识别的候选指数"
+   ],
+   "critical_gaps": [
+    "仅有 L3 第三方资料（映射关系未获官方证据确认）",
+    "收益口径未确认",
+    "必要成分不完整"
    ],
    "can_bypass_usability": false
   },
   "D": {
    "label": "低",
-   "definition": "数据不足、类别不明或映射依据不可靠",
+   "definition": "分类或映射依据严重不足，无法建立可靠候选关系",
    "requires": [],
+   "triggers": [
+    "分类字段不足且已降级（classification_confidence=low）",
+    "无任何已映射的候选指数",
+    "货币基金无万份收益/七日年化数据"
+   ],
    "can_bypass_usability": false
   }
  },
@@ -367,9 +385,8 @@
   ],
   "required_categories_missing": [],
   "confidence_distribution": {
-   "C": 41,
-   "D": 78,
-   "B": 1
+   "C": 42,
+   "D": 78
   },
   "confidence_note": "**置信度不能替代基准可用性判定**：即使置信度为 A，只要收益口径、历史权重或必要成分不满足条件，也不能判为可回测",
   "contract": {
@@ -473,9 +490,8 @@
    "substitute_available": 0,
    "allowed_to_next_stage": 0,
    "confidence_distribution": {
-    "C": 9,
-    "D": 15,
-    "B": 1
+    "C": 10,
+    "D": 15
    },
    "no_usable": 25
   },
@@ -1394,7 +1410,10 @@
    "max_kind": "none",
    "confidence": "C",
    "confidence_notes": [
-    "有指数映射，但存在不可计算成分；收益口径未确认"
+    "仅有 L3 第三方资料，**无法证明合同里写的确实是该指数**",
+    "未取得基金合同/招募说明书原始文件",
+    "收益口径未确认（关键证据缺失）",
+    "必要成分不完整"
    ],
    "confidence_is_not_usability": true,
    "benchmarks": {
@@ -1523,7 +1542,10 @@
    "max_kind": "none",
    "confidence": "C",
    "confidence_notes": [
-    "有指数映射，但存在不可计算成分；收益口径未确认"
+    "仅有 L3 第三方资料，**无法证明合同里写的确实是该指数**",
+    "未取得基金合同/招募说明书原始文件",
+    "收益口径未确认（关键证据缺失）",
+    "必要成分不完整"
    ],
    "confidence_is_not_usability": true,
    "benchmarks": {
@@ -1654,7 +1676,10 @@
    "max_kind": "none",
    "confidence": "C",
    "confidence_notes": [
-    "有指数映射，但存在不可计算成分；收益口径未确认"
+    "仅有 L3 第三方资料，**无法证明合同里写的确实是该指数**",
+    "未取得基金合同/招募说明书原始文件",
+    "收益口径未确认（关键证据缺失）",
+    "必要成分不完整"
    ],
    "confidence_is_not_usability": true,
    "benchmarks": {
@@ -1785,7 +1810,10 @@
    "max_kind": "none",
    "confidence": "C",
    "confidence_notes": [
-    "有指数映射，但存在不可计算成分；收益口径未确认"
+    "仅有 L3 第三方资料，**无法证明合同里写的确实是该指数**",
+    "未取得基金合同/招募说明书原始文件",
+    "收益口径未确认（关键证据缺失）",
+    "必要成分不完整"
    ],
    "confidence_is_not_usability": true,
    "benchmarks": {
@@ -1915,7 +1943,10 @@
    "max_kind": "none",
    "confidence": "C",
    "confidence_notes": [
-    "有指数映射，但存在不可计算成分；收益口径未确认"
+    "仅有 L3 第三方资料，**无法证明合同里写的确实是该指数**",
+    "未取得基金合同/招募说明书原始文件",
+    "收益口径未确认（关键证据缺失）",
+    "必要成分不完整"
    ],
    "confidence_is_not_usability": true,
    "benchmarks": {
@@ -2045,7 +2076,10 @@
    "max_kind": "none",
    "confidence": "C",
    "confidence_notes": [
-    "有指数映射，但存在不可计算成分；收益口径未确认"
+    "仅有 L3 第三方资料，**无法证明合同里写的确实是该指数**",
+    "未取得基金合同/招募说明书原始文件",
+    "收益口径未确认（关键证据缺失）",
+    "必要成分不完整"
    ],
    "confidence_is_not_usability": true,
    "benchmarks": {
@@ -2187,7 +2221,10 @@
    "max_kind": "none",
    "confidence": "C",
    "confidence_notes": [
-    "有指数映射，但存在不可计算成分；收益口径未确认"
+    "仅有 L3 第三方资料，**无法证明合同里写的确实是该指数**",
+    "未取得基金合同/招募说明书原始文件",
+    "收益口径未确认（关键证据缺失）",
+    "必要成分不完整"
    ],
    "confidence_is_not_usability": true,
    "benchmarks": {
@@ -2318,7 +2355,7 @@
    "max_kind": "none",
    "confidence": "D",
    "confidence_notes": [
-    "无已映射的可用指数"
+    "无已映射的候选指数，无法建立映射关系"
    ],
    "confidence_is_not_usability": true,
    "benchmarks": {
@@ -2517,7 +2554,7 @@
    "max_kind": "none",
    "confidence": "D",
    "confidence_notes": [
-    "分类字段不足，已降级分类"
+    "分类字段不足，已降级分类，无法建立可靠映射关系"
    ],
    "confidence_is_not_usability": true,
    "benchmarks": {
@@ -2611,7 +2648,7 @@
    "max_kind": "none",
    "confidence": "D",
    "confidence_notes": [
-    "分类字段不足，已降级分类"
+    "分类字段不足，已降级分类，无法建立可靠映射关系"
    ],
    "confidence_is_not_usability": true,
    "benchmarks": {
@@ -2705,7 +2742,7 @@
    "max_kind": "none",
    "confidence": "D",
    "confidence_notes": [
-    "分类字段不足，已降级分类"
+    "分类字段不足，已降级分类，无法建立可靠映射关系"
    ],
    "confidence_is_not_usability": true,
    "benchmarks": {
@@ -2798,7 +2835,7 @@
    "max_kind": "none",
    "confidence": "D",
    "confidence_notes": [
-    "分类字段不足，已降级分类"
+    "分类字段不足，已降级分类，无法建立可靠映射关系"
    ],
    "confidence_is_not_usability": true,
    "benchmarks": {
@@ -2892,7 +2929,7 @@
    "max_kind": "none",
    "confidence": "D",
    "confidence_notes": [
-    "分类字段不足，已降级分类"
+    "分类字段不足，已降级分类，无法建立可靠映射关系"
    ],
    "confidence_is_not_usability": true,
    "benchmarks": {
@@ -2985,7 +3022,7 @@
    "max_kind": "none",
    "confidence": "D",
    "confidence_notes": [
-    "分类字段不足，已降级分类"
+    "分类字段不足，已降级分类，无法建立可靠映射关系"
    ],
    "confidence_is_not_usability": true,
    "benchmarks": {
@@ -3078,7 +3115,7 @@
    "max_kind": "none",
    "confidence": "D",
    "confidence_notes": [
-    "分类字段不足，已降级分类"
+    "分类字段不足，已降级分类，无法建立可靠映射关系"
    ],
    "confidence_is_not_usability": true,
    "benchmarks": {
@@ -3172,7 +3209,7 @@
    "max_kind": "none",
    "confidence": "D",
    "confidence_notes": [
-    "分类字段不足，已降级分类"
+    "分类字段不足，已降级分类，无法建立可靠映射关系"
    ],
    "confidence_is_not_usability": true,
    "benchmarks": {
@@ -3267,7 +3304,7 @@
    "max_kind": "none",
    "confidence": "D",
    "confidence_notes": [
-    "分类字段不足，已降级分类"
+    "分类字段不足，已降级分类，无法建立可靠映射关系"
    ],
    "confidence_is_not_usability": true,
    "benchmarks": {
@@ -3361,7 +3398,7 @@
    "max_kind": "none",
    "confidence": "D",
    "confidence_notes": [
-    "分类字段不足，已降级分类"
+    "分类字段不足，已降级分类，无法建立可靠映射关系"
    ],
    "confidence_is_not_usability": true,
    "benchmarks": {
@@ -3455,7 +3492,7 @@
    "max_kind": "none",
    "confidence": "D",
    "confidence_notes": [
-    "分类字段不足，已降级分类"
+    "分类字段不足，已降级分类，无法建立可靠映射关系"
    ],
    "confidence_is_not_usability": true,
    "benchmarks": {
@@ -3549,7 +3586,7 @@
    "max_kind": "none",
    "confidence": "D",
    "confidence_notes": [
-    "分类字段不足，已降级分类"
+    "分类字段不足，已降级分类，无法建立可靠映射关系"
    ],
    "confidence_is_not_usability": true,
    "benchmarks": {
@@ -3642,7 +3679,7 @@
    "max_kind": "none",
    "confidence": "D",
    "confidence_notes": [
-    "分类字段不足，已降级分类"
+    "分类字段不足，已降级分类，无法建立可靠映射关系"
    ],
    "confidence_is_not_usability": true,
    "benchmarks": {
@@ -3736,7 +3773,7 @@
    "max_kind": "none",
    "confidence": "D",
    "confidence_notes": [
-    "分类字段不足，已降级分类"
+    "分类字段不足，已降级分类，无法建立可靠映射关系"
    ],
    "confidence_is_not_usability": true,
    "benchmarks": {
@@ -3830,7 +3867,7 @@
    "max_kind": "none",
    "confidence": "D",
    "confidence_notes": [
-    "分类字段不足，已降级分类"
+    "分类字段不足，已降级分类，无法建立可靠映射关系"
    ],
    "confidence_is_not_usability": true,
    "benchmarks": {
@@ -3924,7 +3961,7 @@
    "max_kind": "none",
    "confidence": "D",
    "confidence_notes": [
-    "分类字段不足，已降级分类"
+    "分类字段不足，已降级分类，无法建立可靠映射关系"
    ],
    "confidence_is_not_usability": true,
    "benchmarks": {
@@ -4018,7 +4055,7 @@
    "max_kind": "none",
    "confidence": "D",
    "confidence_notes": [
-    "分类字段不足，已降级分类"
+    "分类字段不足，已降级分类，无法建立可靠映射关系"
    ],
    "confidence_is_not_usability": true,
    "benchmarks": {
@@ -4112,7 +4149,7 @@
    "max_kind": "none",
    "confidence": "D",
    "confidence_notes": [
-    "分类字段不足，已降级分类"
+    "分类字段不足，已降级分类，无法建立可靠映射关系"
    ],
    "confidence_is_not_usability": true,
    "benchmarks": {
@@ -4205,7 +4242,7 @@
    "max_kind": "none",
    "confidence": "D",
    "confidence_notes": [
-    "分类字段不足，已降级分类"
+    "分类字段不足，已降级分类，无法建立可靠映射关系"
    ],
    "confidence_is_not_usability": true,
    "benchmarks": {
@@ -4300,7 +4337,7 @@
    "max_kind": "none",
    "confidence": "D",
    "confidence_notes": [
-    "分类字段不足，已降级分类"
+    "分类字段不足，已降级分类，无法建立可靠映射关系"
    ],
    "confidence_is_not_usability": true,
    "benchmarks": {
@@ -4393,7 +4430,7 @@
    "max_kind": "none",
    "confidence": "D",
    "confidence_notes": [
-    "分类字段不足，已降级分类"
+    "分类字段不足，已降级分类，无法建立可靠映射关系"
    ],
    "confidence_is_not_usability": true,
    "benchmarks": {
@@ -4487,7 +4524,7 @@
    "max_kind": "none",
    "confidence": "D",
    "confidence_notes": [
-    "分类字段不足，已降级分类"
+    "分类字段不足，已降级分类，无法建立可靠映射关系"
    ],
    "confidence_is_not_usability": true,
    "benchmarks": {
@@ -4580,7 +4617,7 @@
    "max_kind": "none",
    "confidence": "D",
    "confidence_notes": [
-    "分类字段不足，已降级分类"
+    "分类字段不足，已降级分类，无法建立可靠映射关系"
    ],
    "confidence_is_not_usability": true,
    "benchmarks": {
@@ -4674,7 +4711,7 @@
    "max_kind": "none",
    "confidence": "D",
    "confidence_notes": [
-    "分类字段不足，已降级分类"
+    "分类字段不足，已降级分类，无法建立可靠映射关系"
    ],
    "confidence_is_not_usability": true,
    "benchmarks": {
@@ -4768,7 +4805,7 @@
    "max_kind": "none",
    "confidence": "D",
    "confidence_notes": [
-    "分类字段不足，已降级分类"
+    "分类字段不足，已降级分类，无法建立可靠映射关系"
    ],
    "confidence_is_not_usability": true,
    "benchmarks": {
@@ -4861,7 +4898,7 @@
    "max_kind": "none",
    "confidence": "D",
    "confidence_notes": [
-    "分类字段不足，已降级分类"
+    "分类字段不足，已降级分类，无法建立可靠映射关系"
    ],
    "confidence_is_not_usability": true,
    "benchmarks": {
@@ -4954,7 +4991,7 @@
    "max_kind": "none",
    "confidence": "D",
    "confidence_notes": [
-    "分类字段不足，已降级分类"
+    "分类字段不足，已降级分类，无法建立可靠映射关系"
    ],
    "confidence_is_not_usability": true,
    "benchmarks": {
@@ -5047,7 +5084,7 @@
    "max_kind": "none",
    "confidence": "D",
    "confidence_notes": [
-    "分类字段不足，已降级分类"
+    "分类字段不足，已降级分类，无法建立可靠映射关系"
    ],
    "confidence_is_not_usability": true,
    "benchmarks": {
@@ -5140,7 +5177,7 @@
    "max_kind": "none",
    "confidence": "D",
    "confidence_notes": [
-    "分类字段不足，已降级分类"
+    "分类字段不足，已降级分类，无法建立可靠映射关系"
    ],
    "confidence_is_not_usability": true,
    "benchmarks": {
@@ -5233,7 +5270,7 @@
    "max_kind": "none",
    "confidence": "D",
    "confidence_notes": [
-    "分类字段不足，已降级分类"
+    "分类字段不足，已降级分类，无法建立可靠映射关系"
    ],
    "confidence_is_not_usability": true,
    "benchmarks": {
@@ -5326,7 +5363,7 @@
    "max_kind": "none",
    "confidence": "D",
    "confidence_notes": [
-    "分类字段不足，已降级分类"
+    "分类字段不足，已降级分类，无法建立可靠映射关系"
    ],
    "confidence_is_not_usability": true,
    "benchmarks": {
@@ -5419,7 +5456,7 @@
    "max_kind": "none",
    "confidence": "D",
    "confidence_notes": [
-    "分类字段不足，已降级分类"
+    "分类字段不足，已降级分类，无法建立可靠映射关系"
    ],
    "confidence_is_not_usability": true,
    "benchmarks": {
@@ -5512,7 +5549,7 @@
    "max_kind": "none",
    "confidence": "D",
    "confidence_notes": [
-    "分类字段不足，已降级分类"
+    "分类字段不足，已降级分类，无法建立可靠映射关系"
    ],
    "confidence_is_not_usability": true,
    "benchmarks": {
@@ -5605,7 +5642,7 @@
    "max_kind": "none",
    "confidence": "D",
    "confidence_notes": [
-    "分类字段不足，已降级分类"
+    "分类字段不足，已降级分类，无法建立可靠映射关系"
    ],
    "confidence_is_not_usability": true,
    "benchmarks": {
@@ -5699,7 +5736,7 @@
    "max_kind": "none",
    "confidence": "D",
    "confidence_notes": [
-    "分类字段不足，已降级分类"
+    "分类字段不足，已降级分类，无法建立可靠映射关系"
    ],
    "confidence_is_not_usability": true,
    "benchmarks": {
@@ -5793,7 +5830,7 @@
    "max_kind": "none",
    "confidence": "D",
    "confidence_notes": [
-    "分类字段不足，已降级分类"
+    "分类字段不足，已降级分类，无法建立可靠映射关系"
    ],
    "confidence_is_not_usability": true,
    "benchmarks": {
@@ -5886,7 +5923,7 @@
    "max_kind": "none",
    "confidence": "D",
    "confidence_notes": [
-    "分类字段不足，已降级分类"
+    "分类字段不足，已降级分类，无法建立可靠映射关系"
    ],
    "confidence_is_not_usability": true,
    "benchmarks": {
@@ -5980,7 +6017,7 @@
    "max_kind": "none",
    "confidence": "D",
    "confidence_notes": [
-    "分类字段不足，已降级分类"
+    "分类字段不足，已降级分类，无法建立可靠映射关系"
    ],
    "confidence_is_not_usability": true,
    "benchmarks": {
@@ -6073,7 +6110,7 @@
    "max_kind": "none",
    "confidence": "D",
    "confidence_notes": [
-    "分类字段不足，已降级分类"
+    "分类字段不足，已降级分类，无法建立可靠映射关系"
    ],
    "confidence_is_not_usability": true,
    "benchmarks": {
@@ -6166,7 +6203,7 @@
    "max_kind": "none",
    "confidence": "D",
    "confidence_notes": [
-    "分类字段不足，已降级分类"
+    "分类字段不足，已降级分类，无法建立可靠映射关系"
    ],
    "confidence_is_not_usability": true,
    "benchmarks": {
@@ -6259,7 +6296,7 @@
    "max_kind": "none",
    "confidence": "D",
    "confidence_notes": [
-    "分类字段不足，已降级分类"
+    "分类字段不足，已降级分类，无法建立可靠映射关系"
    ],
    "confidence_is_not_usability": true,
    "benchmarks": {
@@ -6352,7 +6389,10 @@
    "max_kind": "none",
    "confidence": "C",
    "confidence_notes": [
-    "有指数映射，但存在不可计算成分；收益口径未确认"
+    "仅有 L3 第三方资料，**无法证明合同里写的确实是该指数**",
+    "未取得基金合同/招募说明书原始文件",
+    "收益口径未确认（关键证据缺失）",
+    "必要成分不完整"
    ],
    "confidence_is_not_usability": true,
    "benchmarks": {
@@ -6483,7 +6523,10 @@
    "max_kind": "none",
    "confidence": "C",
    "confidence_notes": [
-    "有指数映射，但存在不可计算成分；收益口径未确认"
+    "仅有 L3 第三方资料，**无法证明合同里写的确实是该指数**",
+    "未取得基金合同/招募说明书原始文件",
+    "收益口径未确认（关键证据缺失）",
+    "必要成分不完整"
    ],
    "confidence_is_not_usability": true,
    "benchmarks": {
@@ -6635,7 +6678,10 @@
    "max_kind": "none",
    "confidence": "C",
    "confidence_notes": [
-    "有指数映射，但存在不可计算成分；收益口径未确认"
+    "仅有 L3 第三方资料，**无法证明合同里写的确实是该指数**",
+    "未取得基金合同/招募说明书原始文件",
+    "收益口径未确认（关键证据缺失）",
+    "必要成分不完整"
    ],
    "confidence_is_not_usability": true,
    "benchmarks": {
@@ -6789,7 +6835,10 @@
    "max_kind": "none",
    "confidence": "C",
    "confidence_notes": [
-    "有指数映射，但存在不可计算成分；收益口径未确认"
+    "仅有 L3 第三方资料，**无法证明合同里写的确实是该指数**",
+    "未取得基金合同/招募说明书原始文件",
+    "收益口径未确认（关键证据缺失）",
+    "必要成分不完整"
    ],
    "confidence_is_not_usability": true,
    "benchmarks": {
@@ -6919,7 +6968,10 @@
    "max_kind": "none",
    "confidence": "C",
    "confidence_notes": [
-    "有指数映射，但存在不可计算成分；收益口径未确认"
+    "仅有 L3 第三方资料，**无法证明合同里写的确实是该指数**",
+    "未取得基金合同/招募说明书原始文件",
+    "收益口径未确认（关键证据缺失）",
+    "必要成分不完整"
    ],
    "confidence_is_not_usability": true,
    "benchmarks": {
@@ -7049,7 +7101,10 @@
    "max_kind": "none",
    "confidence": "C",
    "confidence_notes": [
-    "有指数映射，但存在不可计算成分；收益口径未确认"
+    "仅有 L3 第三方资料，**无法证明合同里写的确实是该指数**",
+    "未取得基金合同/招募说明书原始文件",
+    "收益口径未确认（关键证据缺失）",
+    "必要成分不完整"
    ],
    "confidence_is_not_usability": true,
    "benchmarks": {
@@ -7179,7 +7234,10 @@
    "max_kind": "none",
    "confidence": "C",
    "confidence_notes": [
-    "有指数映射，但存在不可计算成分；收益口径未确认"
+    "仅有 L3 第三方资料，**无法证明合同里写的确实是该指数**",
+    "未取得基金合同/招募说明书原始文件",
+    "收益口径未确认（关键证据缺失）",
+    "必要成分不完整"
    ],
    "confidence_is_not_usability": true,
    "benchmarks": {
@@ -7323,7 +7381,7 @@
    "max_kind": "none",
    "confidence": "D",
    "confidence_notes": [
-    "无已映射的可用指数"
+    "无已映射的候选指数，无法建立映射关系"
    ],
    "confidence_is_not_usability": true,
    "benchmarks": {
@@ -7535,7 +7593,10 @@
    "max_kind": "none",
    "confidence": "C",
    "confidence_notes": [
-    "有指数映射，但存在不可计算成分；收益口径未确认"
+    "仅有 L3 第三方资料，**无法证明合同里写的确实是该指数**",
+    "未取得基金合同/招募说明书原始文件",
+    "收益口径未确认（关键证据缺失）",
+    "必要成分不完整"
    ],
    "confidence_is_not_usability": true,
    "benchmarks": {
@@ -7665,7 +7726,10 @@
    "max_kind": "none",
    "confidence": "C",
    "confidence_notes": [
-    "有指数映射，但存在不可计算成分；收益口径未确认"
+    "仅有 L3 第三方资料，**无法证明合同里写的确实是该指数**",
+    "未取得基金合同/招募说明书原始文件",
+    "收益口径未确认（关键证据缺失）",
+    "必要成分不完整"
    ],
    "confidence_is_not_usability": true,
    "benchmarks": {
@@ -7794,7 +7858,7 @@
    "max_kind": "none",
    "confidence": "D",
    "confidence_notes": [
-    "无已映射的可用指数"
+    "无已映射的候选指数，无法建立映射关系"
    ],
    "confidence_is_not_usability": true,
    "benchmarks": {
@@ -7925,7 +7989,7 @@
    "max_kind": "none",
    "confidence": "D",
    "confidence_notes": [
-    "无已映射的可用指数"
+    "无已映射的候选指数，无法建立映射关系"
    ],
    "confidence_is_not_usability": true,
    "benchmarks": {
@@ -8057,7 +8121,10 @@
    "max_kind": "none",
    "confidence": "C",
    "confidence_notes": [
-    "有指数映射，但存在不可计算成分；收益口径未确认"
+    "仅有 L3 第三方资料，**无法证明合同里写的确实是该指数**",
+    "未取得基金合同/招募说明书原始文件",
+    "收益口径未确认（关键证据缺失）",
+    "必要成分不完整"
    ],
    "confidence_is_not_usability": true,
    "benchmarks": {
@@ -8187,7 +8254,10 @@
    "max_kind": "none",
    "confidence": "C",
    "confidence_notes": [
-    "有指数映射，但存在不可计算成分；收益口径未确认"
+    "仅有 L3 第三方资料，**无法证明合同里写的确实是该指数**",
+    "未取得基金合同/招募说明书原始文件",
+    "收益口径未确认（关键证据缺失）",
+    "必要成分不完整"
    ],
    "confidence_is_not_usability": true,
    "benchmarks": {
@@ -8317,7 +8387,10 @@
    "max_kind": "none",
    "confidence": "C",
    "confidence_notes": [
-    "有指数映射，但存在不可计算成分；收益口径未确认"
+    "仅有 L3 第三方资料，**无法证明合同里写的确实是该指数**",
+    "未取得基金合同/招募说明书原始文件",
+    "收益口径未确认（关键证据缺失）",
+    "必要成分不完整"
    ],
    "confidence_is_not_usability": true,
    "benchmarks": {
@@ -8446,7 +8519,10 @@
    "max_kind": "none",
    "confidence": "C",
    "confidence_notes": [
-    "有指数映射，但存在不可计算成分；收益口径未确认"
+    "仅有 L3 第三方资料，**无法证明合同里写的确实是该指数**",
+    "未取得基金合同/招募说明书原始文件",
+    "收益口径未确认（关键证据缺失）",
+    "必要成分不完整"
    ],
    "confidence_is_not_usability": true,
    "benchmarks": {
@@ -8576,7 +8652,10 @@
    "max_kind": "none",
    "confidence": "C",
    "confidence_notes": [
-    "有指数映射，但存在不可计算成分；收益口径未确认"
+    "仅有 L3 第三方资料，**无法证明合同里写的确实是该指数**",
+    "未取得基金合同/招募说明书原始文件",
+    "收益口径未确认（关键证据缺失）",
+    "必要成分不完整"
    ],
    "confidence_is_not_usability": true,
    "benchmarks": {
@@ -8718,7 +8797,7 @@
    "max_kind": "none",
    "confidence": "D",
    "confidence_notes": [
-    "无已映射的可用指数"
+    "无已映射的候选指数，无法建立映射关系"
    ],
    "confidence_is_not_usability": true,
    "benchmarks": {
@@ -8850,7 +8929,7 @@
    "max_kind": "none",
    "confidence": "D",
    "confidence_notes": [
-    "无已映射的可用指数"
+    "无已映射的候选指数，无法建立映射关系"
    ],
    "confidence_is_not_usability": true,
    "benchmarks": {
@@ -9007,7 +9086,10 @@
    "max_kind": "none",
    "confidence": "C",
    "confidence_notes": [
-    "有指数映射，但存在不可计算成分；收益口径未确认"
+    "仅有 L3 第三方资料，**无法证明合同里写的确实是该指数**",
+    "未取得基金合同/招募说明书原始文件",
+    "收益口径未确认（关键证据缺失）",
+    "必要成分不完整"
    ],
    "confidence_is_not_usability": true,
    "benchmarks": {
@@ -9136,7 +9218,7 @@
    "max_kind": "none",
    "confidence": "D",
    "confidence_notes": [
-    "无已映射的可用指数"
+    "无已映射的候选指数，无法建立映射关系"
    ],
    "confidence_is_not_usability": true,
    "benchmarks": {
@@ -9252,7 +9334,10 @@
    "max_kind": "none",
    "confidence": "C",
    "confidence_notes": [
-    "有指数映射，但存在不可计算成分；收益口径未确认"
+    "仅有 L3 第三方资料，**无法证明合同里写的确实是该指数**",
+    "未取得基金合同/招募说明书原始文件",
+    "收益口径未确认（关键证据缺失）",
+    "必要成分不完整"
    ],
    "confidence_is_not_usability": true,
    "benchmarks": {
@@ -9395,7 +9480,10 @@
    "max_kind": "none",
    "confidence": "C",
    "confidence_notes": [
-    "有指数映射，但存在不可计算成分；收益口径未确认"
+    "仅有 L3 第三方资料，**无法证明合同里写的确实是该指数**",
+    "未取得基金合同/招募说明书原始文件",
+    "收益口径未确认（关键证据缺失）",
+    "必要成分不完整"
    ],
    "confidence_is_not_usability": true,
    "benchmarks": {
@@ -9524,7 +9612,7 @@
    "max_kind": "none",
    "confidence": "D",
    "confidence_notes": [
-    "无已映射的可用指数"
+    "无已映射的候选指数，无法建立映射关系"
    ],
    "confidence_is_not_usability": true,
    "benchmarks": {
@@ -9640,7 +9728,7 @@
    "max_kind": "none",
    "confidence": "D",
    "confidence_notes": [
-    "无已映射的可用指数"
+    "无已映射的候选指数，无法建立映射关系"
    ],
    "confidence_is_not_usability": true,
    "benchmarks": {
@@ -9756,7 +9844,7 @@
    "max_kind": "none",
    "confidence": "D",
    "confidence_notes": [
-    "无已映射的可用指数"
+    "无已映射的候选指数，无法建立映射关系"
    ],
    "confidence_is_not_usability": true,
    "benchmarks": {
@@ -9886,7 +9974,7 @@
    "max_kind": "none",
    "confidence": "D",
    "confidence_notes": [
-    "无已映射的可用指数"
+    "无已映射的候选指数，无法建立映射关系"
    ],
    "confidence_is_not_usability": true,
    "benchmarks": {
@@ -10004,7 +10092,7 @@
    "max_kind": "none",
    "confidence": "D",
    "confidence_notes": [
-    "无已映射的可用指数"
+    "无已映射的候选指数，无法建立映射关系"
    ],
    "confidence_is_not_usability": true,
    "benchmarks": {
@@ -10121,7 +10209,7 @@
    "max_kind": "none",
    "confidence": "D",
    "confidence_notes": [
-    "无已映射的可用指数"
+    "无已映射的候选指数，无法建立映射关系"
    ],
    "confidence_is_not_usability": true,
    "benchmarks": {
@@ -10227,7 +10315,10 @@
    "max_kind": "none",
    "confidence": "C",
    "confidence_notes": [
-    "有指数映射，但存在不可计算成分；收益口径未确认"
+    "仅有 L3 第三方资料，**无法证明合同里写的确实是该指数**",
+    "未取得基金合同/招募说明书原始文件",
+    "收益口径未确认（关键证据缺失）",
+    "必要成分不完整"
    ],
    "confidence_is_not_usability": true,
    "benchmarks": {
@@ -10357,7 +10448,10 @@
    "max_kind": "none",
    "confidence": "C",
    "confidence_notes": [
-    "有指数映射，但存在不可计算成分；收益口径未确认"
+    "仅有 L3 第三方资料，**无法证明合同里写的确实是该指数**",
+    "未取得基金合同/招募说明书原始文件",
+    "收益口径未确认（关键证据缺失）",
+    "必要成分不完整"
    ],
    "confidence_is_not_usability": true,
    "benchmarks": {
@@ -10487,7 +10581,10 @@
    "max_kind": "none",
    "confidence": "C",
    "confidence_notes": [
-    "有指数映射，但存在不可计算成分；收益口径未确认"
+    "仅有 L3 第三方资料，**无法证明合同里写的确实是该指数**",
+    "未取得基金合同/招募说明书原始文件",
+    "收益口径未确认（关键证据缺失）",
+    "必要成分不完整"
    ],
    "confidence_is_not_usability": true,
    "benchmarks": {
@@ -11147,7 +11244,10 @@
    "max_kind": "none",
    "confidence": "C",
    "confidence_notes": [
-    "有指数映射，但存在不可计算成分；收益口径未确认"
+    "仅有 L3 第三方资料，**无法证明合同里写的确实是该指数**",
+    "未取得基金合同/招募说明书原始文件",
+    "收益口径未确认（关键证据缺失）",
+    "必要成分不完整"
    ],
    "confidence_is_not_usability": true,
    "benchmarks": {
@@ -11277,7 +11377,10 @@
    "max_kind": "none",
    "confidence": "C",
    "confidence_notes": [
-    "有指数映射，但存在不可计算成分；收益口径未确认"
+    "仅有 L3 第三方资料，**无法证明合同里写的确实是该指数**",
+    "未取得基金合同/招募说明书原始文件",
+    "收益口径未确认（关键证据缺失）",
+    "必要成分不完整"
    ],
    "confidence_is_not_usability": true,
    "benchmarks": {
@@ -11407,7 +11510,10 @@
    "max_kind": "none",
    "confidence": "C",
    "confidence_notes": [
-    "有指数映射，但存在不可计算成分；收益口径未确认"
+    "仅有 L3 第三方资料，**无法证明合同里写的确实是该指数**",
+    "未取得基金合同/招募说明书原始文件",
+    "收益口径未确认（关键证据缺失）",
+    "必要成分不完整"
    ],
    "confidence_is_not_usability": true,
    "benchmarks": {
@@ -11537,7 +11643,10 @@
    "max_kind": "none",
    "confidence": "C",
    "confidence_notes": [
-    "有指数映射，但存在不可计算成分；收益口径未确认"
+    "仅有 L3 第三方资料，**无法证明合同里写的确实是该指数**",
+    "未取得基金合同/招募说明书原始文件",
+    "收益口径未确认（关键证据缺失）",
+    "必要成分不完整"
    ],
    "confidence_is_not_usability": true,
    "benchmarks": {
@@ -11666,7 +11775,10 @@
    "max_kind": "none",
    "confidence": "C",
    "confidence_notes": [
-    "有指数映射，但存在不可计算成分；收益口径未确认"
+    "仅有 L3 第三方资料，**无法证明合同里写的确实是该指数**",
+    "未取得基金合同/招募说明书原始文件",
+    "收益口径未确认（关键证据缺失）",
+    "必要成分不完整"
    ],
    "confidence_is_not_usability": true,
    "benchmarks": {
@@ -11796,7 +11908,10 @@
    "max_kind": "none",
    "confidence": "C",
    "confidence_notes": [
-    "有指数映射，但存在不可计算成分；收益口径未确认"
+    "仅有 L3 第三方资料，**无法证明合同里写的确实是该指数**",
+    "未取得基金合同/招募说明书原始文件",
+    "收益口径未确认（关键证据缺失）",
+    "必要成分不完整"
    ],
    "confidence_is_not_usability": true,
    "benchmarks": {
@@ -11926,7 +12041,10 @@
    "max_kind": "none",
    "confidence": "C",
    "confidence_notes": [
-    "有指数映射，但存在不可计算成分；收益口径未确认"
+    "仅有 L3 第三方资料，**无法证明合同里写的确实是该指数**",
+    "未取得基金合同/招募说明书原始文件",
+    "收益口径未确认（关键证据缺失）",
+    "必要成分不完整"
    ],
    "confidence_is_not_usability": true,
    "benchmarks": {
@@ -12056,7 +12174,10 @@
    "max_kind": "none",
    "confidence": "C",
    "confidence_notes": [
-    "有指数映射，但存在不可计算成分；收益口径未确认"
+    "仅有 L3 第三方资料，**无法证明合同里写的确实是该指数**",
+    "未取得基金合同/招募说明书原始文件",
+    "收益口径未确认（关键证据缺失）",
+    "必要成分不完整"
    ],
    "confidence_is_not_usability": true,
    "benchmarks": {
@@ -12186,7 +12307,7 @@
    "max_kind": "none",
    "confidence": "D",
    "confidence_notes": [
-    "无已映射的可用指数"
+    "无已映射的候选指数，无法建立映射关系"
    ],
    "confidence_is_not_usability": true,
    "benchmarks": {
@@ -12292,7 +12413,10 @@
    "max_kind": "none",
    "confidence": "C",
    "confidence_notes": [
-    "有指数映射，但存在不可计算成分；收益口径未确认"
+    "仅有 L3 第三方资料，**无法证明合同里写的确实是该指数**",
+    "未取得基金合同/招募说明书原始文件",
+    "收益口径未确认（关键证据缺失）",
+    "必要成分不完整"
    ],
    "confidence_is_not_usability": true,
    "benchmarks": {
@@ -12422,7 +12546,10 @@
    "max_kind": "none",
    "confidence": "C",
    "confidence_notes": [
-    "有指数映射，但存在不可计算成分；收益口径未确认"
+    "仅有 L3 第三方资料，**无法证明合同里写的确实是该指数**",
+    "未取得基金合同/招募说明书原始文件",
+    "收益口径未确认（关键证据缺失）",
+    "必要成分不完整"
    ],
    "confidence_is_not_usability": true,
    "benchmarks": {
@@ -12551,7 +12678,10 @@
    "max_kind": "none",
    "confidence": "C",
    "confidence_notes": [
-    "有指数映射，但存在不可计算成分；收益口径未确认"
+    "仅有 L3 第三方资料，**无法证明合同里写的确实是该指数**",
+    "未取得基金合同/招募说明书原始文件",
+    "收益口径未确认（关键证据缺失）",
+    "必要成分不完整"
    ],
    "confidence_is_not_usability": true,
    "benchmarks": {
@@ -12681,7 +12811,7 @@
    "max_kind": "none",
    "confidence": "D",
    "confidence_notes": [
-    "无已映射的可用指数"
+    "无已映射的候选指数，无法建立映射关系"
    ],
    "confidence_is_not_usability": true,
    "benchmarks": {
@@ -12799,7 +12929,7 @@
    "max_kind": "none",
    "confidence": "D",
    "confidence_notes": [
-    "无已映射的可用指数"
+    "无已映射的候选指数，无法建立映射关系"
    ],
    "confidence_is_not_usability": true,
    "benchmarks": {
@@ -12904,7 +13034,10 @@
    "max_kind": "none",
    "confidence": "C",
    "confidence_notes": [
-    "有指数映射，但存在不可计算成分；收益口径未确认"
+    "仅有 L3 第三方资料，**无法证明合同里写的确实是该指数**",
+    "未取得基金合同/招募说明书原始文件",
+    "收益口径未确认（关键证据缺失）",
+    "必要成分不完整"
    ],
    "confidence_is_not_usability": true,
    "benchmarks": {
@@ -13034,7 +13167,10 @@
    "max_kind": "none",
    "confidence": "C",
    "confidence_notes": [
-    "有指数映射，但存在不可计算成分；收益口径未确认"
+    "仅有 L3 第三方资料，**无法证明合同里写的确实是该指数**",
+    "未取得基金合同/招募说明书原始文件",
+    "收益口径未确认（关键证据缺失）",
+    "必要成分不完整"
    ],
    "confidence_is_not_usability": true,
    "benchmarks": {
@@ -13164,7 +13300,7 @@
    "max_kind": "none",
    "confidence": "D",
    "confidence_notes": [
-    "无已映射的可用指数"
+    "无已映射的候选指数，无法建立映射关系"
    ],
    "confidence_is_not_usability": true,
    "benchmarks": {
@@ -13296,7 +13432,7 @@
    "max_kind": "none",
    "confidence": "D",
    "confidence_notes": [
-    "无已映射的可用指数"
+    "无已映射的候选指数，无法建立映射关系"
    ],
    "confidence_is_not_usability": true,
    "benchmarks": {
@@ -13428,7 +13564,7 @@
    "max_kind": "none",
    "confidence": "D",
    "confidence_notes": [
-    "无已映射的可用指数"
+    "无已映射的候选指数，无法建立映射关系"
    ],
    "confidence_is_not_usability": true,
    "benchmarks": {
@@ -13560,7 +13696,7 @@
    "max_kind": "none",
    "confidence": "D",
    "confidence_notes": [
-    "无已映射的可用指数"
+    "无已映射的候选指数，无法建立映射关系"
    ],
    "confidence_is_not_usability": true,
    "benchmarks": {
@@ -13690,9 +13826,11 @@
    "mapping_rule_version": "3B-6.2.2-v1",
    "category_rule_id": "R-INDEX",
    "max_kind": "none",
-   "confidence": "B",
+   "confidence": "C",
    "confidence_notes": [
-    "主要成分已映射，但缺 L1 官方合同文件"
+    "仅有 L3 第三方资料，**无法证明合同里写的确实是该指数**",
+    "未取得基金合同/招募说明书原始文件",
+    "收益口径未确认（关键证据缺失）"
    ],
    "confidence_is_not_usability": true,
    "benchmarks": {
@@ -13808,7 +13946,10 @@
    "max_kind": "none",
    "confidence": "C",
    "confidence_notes": [
-    "有指数映射，但存在不可计算成分；收益口径未确认"
+    "仅有 L3 第三方资料，**无法证明合同里写的确实是该指数**",
+    "未取得基金合同/招募说明书原始文件",
+    "收益口径未确认（关键证据缺失）",
+    "必要成分不完整"
    ],
    "confidence_is_not_usability": true,
    "benchmarks": {
@@ -13938,7 +14079,7 @@
    "max_kind": "none",
    "confidence": "D",
    "confidence_notes": [
-    "无已映射的可用指数"
+    "无已映射的候选指数，无法建立映射关系"
    ],
    "confidence_is_not_usability": true,
    "benchmarks": {
@@ -14070,7 +14211,7 @@
    "max_kind": "none",
    "confidence": "D",
    "confidence_notes": [
-    "无已映射的可用指数"
+    "无已映射的候选指数，无法建立映射关系"
    ],
    "confidence_is_not_usability": true,
    "benchmarks": {
@@ -14202,7 +14343,7 @@
    "max_kind": "none",
    "confidence": "D",
    "confidence_notes": [
-    "无已映射的可用指数"
+    "无已映射的候选指数，无法建立映射关系"
    ],
    "confidence_is_not_usability": true,
    "benchmarks": {
@@ -14334,7 +14475,7 @@
    "max_kind": "none",
    "confidence": "D",
    "confidence_notes": [
-    "无已映射的可用指数"
+    "无已映射的候选指数，无法建立映射关系"
    ],
    "confidence_is_not_usability": true,
    "benchmarks": {
@@ -14466,7 +14607,7 @@
    "max_kind": "none",
    "confidence": "D",
    "confidence_notes": [
-    "无已映射的可用指数"
+    "无已映射的候选指数，无法建立映射关系"
    ],
    "confidence_is_not_usability": true,
    "benchmarks": {
@@ -14598,7 +14739,7 @@
    "max_kind": "none",
    "confidence": "D",
    "confidence_notes": [
-    "无已映射的可用指数"
+    "无已映射的候选指数，无法建立映射关系"
    ],
    "confidence_is_not_usability": true,
    "benchmarks": {
@@ -14730,7 +14871,7 @@
    "max_kind": "none",
    "confidence": "D",
    "confidence_notes": [
-    "无已映射的可用指数"
+    "无已映射的候选指数，无法建立映射关系"
    ],
    "confidence_is_not_usability": true,
    "benchmarks": {
@@ -14862,7 +15003,7 @@
    "max_kind": "none",
    "confidence": "D",
    "confidence_notes": [
-    "无已映射的可用指数"
+    "无已映射的候选指数，无法建立映射关系"
    ],
    "confidence_is_not_usability": true,
    "benchmarks": {
@@ -14994,7 +15135,7 @@
    "max_kind": "none",
    "confidence": "D",
    "confidence_notes": [
-    "无已映射的可用指数"
+    "无已映射的候选指数，无法建立映射关系"
    ],
    "confidence_is_not_usability": true,
    "benchmarks": {
@@ -15126,7 +15267,7 @@
    "max_kind": "none",
    "confidence": "D",
    "confidence_notes": [
-    "无已映射的可用指数"
+    "无已映射的候选指数，无法建立映射关系"
    ],
    "confidence_is_not_usability": true,
    "benchmarks": {

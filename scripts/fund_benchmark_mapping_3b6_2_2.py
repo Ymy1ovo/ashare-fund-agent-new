@@ -39,26 +39,60 @@ MAPPING_RULE_VERSION = "3B-6.2.2-v1"
 CONFIDENCE_LEVELS = {
     "A": {
         "label": "高",
-        "definition": "官方合同和基准数据证据完整，映射关系明确",
-        "requires": ["L1 官方合同文件", "全部成分可计算", "收益口径已确认"],
+        "definition": (
+            "L1 官方合同证据、映射关系明确、收益口径确认、"
+            "全部必要成分可计算"),
+        "requires": [
+            "L1 官方合同文件",
+            "映射关系在合同中明确写出",
+            "收益口径已确认（非 unknown）",
+            "全部必要成分可计算",
+        ],
+        "non_critical_gaps_allowed": False,
         "can_bypass_usability": False,
     },
     "B": {
         "label": "中高",
-        "definition": "主要映射关系有可靠证据，但存在非关键缺口",
-        "requires": ["成分已识别", "至少一个可用序列"],
+        "definition": (
+            "映射关系有可靠的 L1/L2 证据，存在非关键缺口，"
+            "但不影响基准身份及主要映射关系"),
+        "requires": [
+            "L1 或 L2 映射证据",
+            "基准身份（用哪个指数）明确",
+        ],
+        "non_critical_gaps_allowed": True,
+        "non_critical_gap_examples": [
+            "收益口径未确认（不影响「是哪只指数」，只影响能否算）",
+            "非必要成分缺失",
+        ],
+        "critical_gap_note": (
+            "**仅凭 L3 第三方平台文本，不能评为 B 级**"),
         "can_bypass_usability": False,
     },
     "C": {
         "label": "中低",
-        "definition": "有合理候选关系，但存在关键证据缺失",
-        "requires": ["成分已识别"],
+        "definition": (
+            "存在合理候选映射，但关键证据缺失，"
+            "包括仅有 L3 第三方资料、收益口径未确认、必要成分不完整等"),
+        "requires": [
+            "有可识别的候选指数",
+        ],
+        "critical_gaps": [
+            "仅有 L3 第三方资料（映射关系未获官方证据确认）",
+            "收益口径未确认",
+            "必要成分不完整",
+        ],
         "can_bypass_usability": False,
     },
     "D": {
         "label": "低",
-        "definition": "数据不足、类别不明或映射依据不可靠",
+        "definition": "分类或映射依据严重不足，无法建立可靠候选关系",
         "requires": [],
+        "triggers": [
+            "分类字段不足且已降级（classification_confidence=low）",
+            "无任何已映射的候选指数",
+            "货币基金无万份收益/七日年化数据",
+        ],
         "can_bypass_usability": False,
     },
 }
@@ -206,40 +240,74 @@ COMPOSITE_RULES = {
 def compute_confidence(
     *,
     classification_confidence: str,
-    has_official_contract: bool,
+    mapping_evidence_grade: str = "L3",
+    has_official_contract: bool = False,
     has_index_observation: bool,
     has_verified_basis: bool,
     all_components_computable: bool,
     category: str,
 ) -> tuple[str, list[str]]:
-    """按证据完整度计算映射置信度（A/B/C/D）。
+    """按**映射证据强度**计算置信度（A/B/C/D）。
 
-    **置信度只描述「映射关系本身的证据强度」，不代表可用性。**
+    **置信度只评价「映射关系本身的证据强度」，不代表基准可用性。**
+
+    关键边界：
+
+    - **仅有 L3 第三方平台文本 → 最高只能 C**，
+      因为无法证明「合同里写的确实是这只指数」。
+    - L1/L2 证据下，收益口径 ``unknown`` 或成分不完整属**非关键缺口**
+      （不影响「是哪只指数」这一身份判断），可评 B，但基准仍不可用。
+    - 无论哪一级，``can_bypass_usability`` 恒为 ``False``。
+
+    :param mapping_evidence_grade: 映射关系的证据等级 L1/L2/L3/L4
     """
     notes: list[str] = []
 
+    # ---- D：分类依据严重不足 ----
     if classification_confidence == "low":
-        notes.append("分类字段不足，已降级分类")
+        notes.append("分类字段不足，已降级分类，无法建立可靠映射关系")
         return "D", notes
 
-    if has_official_contract and has_verified_basis and all_components_computable:
+    # ---- D：无任何候选映射 ----
+    if not has_index_observation:
+        if category == "money_market":
+            notes.append("货币基金需独立口径，当前无万份收益/七日年化数据")
+        else:
+            notes.append("无已映射的候选指数，无法建立映射关系")
+        return "D", notes
+
+    reliable = mapping_evidence_grade in ("L1", "L2")
+
+    # ---- A：L1 + 官方合同 + 口径确认 + 全成分可算 ----
+    if (mapping_evidence_grade == "L1" and has_official_contract
+            and has_verified_basis and all_components_computable):
         return "A", notes
 
-    if has_index_observation and all_components_computable:
-        notes.append("主要成分已映射，但缺 L1 官方合同文件")
+    # ---- B：L1/L2 证据 + 仅有非关键缺口 ----
+    if reliable:
+        notes.append(
+            f"映射关系有 {mapping_evidence_grade} 证据支持，基准身份明确")
+        if not has_official_contract:
+            notes.append("未持有官方合同原始文件")
+        if not has_verified_basis:
+            notes.append(
+                "收益口径未确认（**非关键缺口**：不影响是哪只指数，"
+                "但基准**不可用**）")
+        if not all_components_computable:
+            notes.append("存在不可计算成分（**非关键缺口**，不予补齐）")
         return "B", notes
 
-    if has_index_observation:
-        notes.append("有指数映射，但存在不可计算成分"
-                      + ("；收益口径未确认" if not has_verified_basis else ""))
-        return "C", notes
-
-    if category in ("money_market",):
-        notes.append("货币基金需独立口径，当前无万份收益/七日年化数据")
-        return "D", notes
-
-    notes.append("无已映射的可用指数")
-    return "D", notes
+    # ---- C：仅有 L3 及以下资料，或关键证据缺失 ----
+    notes.append(
+        f"仅有 {mapping_evidence_grade} 第三方资料，"
+        "**无法证明合同里写的确实是该指数**")
+    if not has_official_contract:
+        notes.append("未取得基金合同/招募说明书原始文件")
+    if not has_verified_basis:
+        notes.append("收益口径未确认（关键证据缺失）")
+    if not all_components_computable:
+        notes.append("必要成分不完整")
+    return "C", notes
 
 
 # ------------------------------------------------------------------ 主映射函数
@@ -299,6 +367,7 @@ def map_fund_benchmark(
 
     confidence, conf_notes = compute_confidence(
         classification_confidence=cls["classification_confidence"],
+        mapping_evidence_grade=contract_evidence_grade,
         has_official_contract=has_official_contract_file,
         has_index_observation=usability["has_index_observation"],
         has_verified_basis=usability["has_verified_return_basis"],

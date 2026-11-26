@@ -233,35 +233,109 @@ def test_promotion_allowed_for_unlisted():
 
 # ============================================================ 置信度计算
 def test_confidence_A_requires_all_three():
+    """A 级：L1 + 官方合同 + 口径确认 + 全成分可算，四项缺一不可。"""
     c, _ = compute_confidence(
-        classification_confidence="high", has_official_contract=True,
-        has_index_observation=True, has_verified_basis=True,
-        all_components_computable=True, category="index_plain")
+        classification_confidence="high", mapping_evidence_grade="L1",
+        has_official_contract=True, has_index_observation=True,
+        has_verified_basis=True, all_components_computable=True,
+        category="index_plain")
     assert c == "A"
 
 
-def test_confidence_B_without_official():
+def test_confidence_A_needs_all_four():
+    """A 级四项条件任一缺失都不得为 A。"""
+    base = dict(classification_confidence="high", mapping_evidence_grade="L1",
+                has_official_contract=True, has_index_observation=True,
+                has_verified_basis=True, all_components_computable=True,
+                category="index_plain")
+    assert compute_confidence(**base)[0] == "A"
+    for key in ("has_official_contract", "has_verified_basis",
+                "all_components_computable"):
+        kw = dict(base)
+        kw[key] = False
+        assert compute_confidence(**kw)[0] != "A", f"{key}=False 仍评为 A"
+
+
+def test_mapping_identity_requires_l1_or_l2():
+    """映射关系身份必须有 L1/L2 证据，L3 不足以确认「是哪只指数」。"""
+    assert CONFIDENCE_LEVELS["A"]["requires"].count("L1 官方合同文件") == 1
+    assert "L1/L2" in CONFIDENCE_LEVELS["B"]["definition"]
+    assert "L3" in CONFIDENCE_LEVELS["B"]["critical_gap_note"]
+    assert "仅凭 L3 第三方平台文本，不能评为 B 级" in \
+        CONFIDENCE_LEVELS["B"]["critical_gap_note"].replace("**", "")
+
+
+def test_confidence_B_with_l2_evidence():
+    """B 级：L1/L2 证据 + 非关键缺口（口径未确认/成分不全）。"""
     c, notes = compute_confidence(
-        classification_confidence="high", has_official_contract=False,
-        has_index_observation=True, has_verified_basis=False,
-        all_components_computable=True, category="index_plain")
+        classification_confidence="high", mapping_evidence_grade="L2",
+        has_official_contract=False, has_index_observation=True,
+        has_verified_basis=False, all_components_computable=False,
+        category="index_plain")
     assert c == "B"
-    assert any("L1" in n for n in notes)
+    assert any("非关键缺口" in n for n in notes)
+    assert any("不可用" in n for n in notes)
+
+
+def test_confidence_B_without_official_but_l1():
+    """L1 证据但缺官方合同文件、口径未确认 → B（非关键缺口）。"""
+    c, notes = compute_confidence(
+        classification_confidence="high", mapping_evidence_grade="L1",
+        has_official_contract=False, has_index_observation=True,
+        has_verified_basis=False, all_components_computable=True,
+        category="index_plain")
+    assert c == "B"
+    assert any("未持有官方合同原始文件" in n for n in notes)
+
+
+def test_l3_never_becomes_B():
+    """**L3 + 有点位 + 全成分可算，不得自动评 B。**"""
+    c, notes = compute_confidence(
+        classification_confidence="high", mapping_evidence_grade="L3",
+        has_official_contract=False, has_index_observation=True,
+        has_verified_basis=False, all_components_computable=True,
+        category="index_plain")
+    assert c == "C", "仅有 L3 资料不得评 B"
+    assert any("无法证明合同里写的确实是该指数" in n for n in notes)
+
+
+def test_l3_with_all_good_but_no_l1_still_C():
+    """即使成分全可算、口径已确认，只有 L3 证据最高也只能 C。"""
+    c, _ = compute_confidence(
+        classification_confidence="high", mapping_evidence_grade="L3",
+        has_official_contract=True, has_index_observation=True,
+        has_verified_basis=True, all_components_computable=True,
+        category="index_plain")
+    assert c == "C"
 
 
 def test_confidence_C_with_uncomputable():
     c, notes = compute_confidence(
-        classification_confidence="high", has_official_contract=False,
-        has_index_observation=True, has_verified_basis=False,
-        all_components_computable=False, category="index_plain")
+        classification_confidence="high", mapping_evidence_grade="L3",
+        has_official_contract=False, has_index_observation=True,
+        has_verified_basis=False, all_components_computable=False,
+        category="index_plain")
     assert c == "C"
+    assert any("必要成分不完整" in n for n in notes)
+
+
+def test_unknown_basis_alone_not_D():
+    """仅收益口径 unknown，但映射身份有 L1 证据 → B，不是 D。"""
+    c, _ = compute_confidence(
+        classification_confidence="high", mapping_evidence_grade="L1",
+        has_official_contract=True, has_index_observation=True,
+        has_verified_basis=False, all_components_computable=True,
+        category="index_plain")
+    assert c == "B", "口径 unknown 不得直接判 D"
+    assert c != "D"
 
 
 def test_confidence_D_when_low_classification():
     c, notes = compute_confidence(
-        classification_confidence="low", has_official_contract=True,
-        has_index_observation=True, has_verified_basis=True,
-        all_components_computable=True, category="index_plain")
+        classification_confidence="low", mapping_evidence_grade="L1",
+        has_official_contract=True, has_index_observation=True,
+        has_verified_basis=True, all_components_computable=True,
+        category="index_plain")
     assert c == "D"
     assert any("分类字段不足" in n for n in notes)
 
@@ -776,3 +850,97 @@ def test_docs_per_category_counts_match(audit):
     txt = _docs_text()
     for cat, pc in audit["per_category"].items():
         assert str(pc["fund_count"]) in txt
+
+
+# ============================================================ 3B-6.2.2.1 评级边界
+def test_all_120_confidence_matches_detail(audit):
+    """120 只评级分布必须与实际明细一致。"""
+    from collections import Counter
+    recalc = Counter(r["confidence"] for r in audit["funds"])
+    assert audit["summary"]["confidence_distribution"] == dict(recalc)
+    assert sum(recalc.values()) == 120
+
+
+def test_004746_rated_C(audit):
+    """004746 仅有 L3 资料，必须评 C 而非 B。"""
+    rec = next((r for r in audit["funds"] if r["fund_code"] == "004746"), None)
+    assert rec is not None
+    assert rec["confidence"] == "C", f"004746 评级 {rec['confidence']} 偏高"
+    notes = " ".join(rec["confidence_notes"])
+    assert "L3" in notes
+    assert "无法证明合同里写的确实是该指数" in notes
+
+
+def test_no_fund_rated_above_evidence(audit):
+    """凡证据等级为 L3 的，不得评 A 或 B。"""
+    for r in audit["funds"]:
+        grade = r["benchmarks"]["contract"]["evidence_grade"]
+        if grade == "L3":
+            assert r["confidence"] in ("C", "D"), \
+                f"{r['fund_code']} 证据 {grade} 却评 {r['confidence']}"
+
+
+def test_confidence_A_never_bypasses_usability(audit):
+    """A 级也不能绕过可用性——本轮 A 级为 0。"""
+    assert audit["summary"]["confidence_distribution"].get("A", 0) == 0
+    for r in audit["funds"]:
+        if r["confidence"] == "A":
+            assert r["benchmarks"]["contract"]["available"] is True
+
+
+def test_confidence_levels_definitions_consistent(audit):
+    """JSON 中的四级定义必须与模块一致。"""
+    j = audit["confidence_levels"]
+    assert j == CONFIDENCE_LEVELS
+    for k in ("A", "B", "C", "D"):
+        assert j[k]["can_bypass_usability"] is False
+    assert "L1/L2" in j["B"]["definition"]
+    assert "L3" in j["C"]["definition"]
+
+
+def test_rules_json_confidence_consistent():
+    d = json.loads(RULES.read_text(encoding="utf-8"))
+    assert d["confidence_levels"] == CONFIDENCE_LEVELS
+    assert "仅凭 L3 第三方平台文本，不能评为 B 级" in \
+        d["confidence_levels"]["B"]["critical_gap_note"].replace("**", "")
+
+
+def test_counts_unchanged_after_fix(audit):
+    """评级修正不得改变七类数量与三类基准数量。"""
+    s = audit["summary"]
+    assert s["total_funds_by_fund_id"] == 120
+    assert s["total_share_classes"] == 149
+    assert s["contract"]["available"] == 0
+    assert s["research"]["candidate"] == 42
+    assert s["research"]["available"] == 0
+    assert s["substitute"]["candidate"] == 42
+    assert s["substitute"]["available"] == 0
+    assert s["allowed_to_next_stage"] == 0
+    from collections import Counter
+    recalc = Counter(r["category"] for r in audit["funds"])
+    assert s["category_counts"] == dict(recalc)
+    assert sum(recalc.values()) == 120
+
+
+def test_composites_unchanged(audit):
+    cs = audit["composites_summary"]
+    assert cs["total"] == 15
+    assert cs["total_components"] == 34
+    assert cs["all_not_reproducible"] is True
+
+
+def test_docs_confidence_fix_documented():
+    """报告必须记录本次评级修正。"""
+    txt = _docs_text().replace("**", "")
+    assert "004746" in txt
+    assert "仅有 L3" in txt or "L3 第三方" in txt
+    assert "B 级 0 只" in txt or "B 级为 0" in txt or "B | 0" in txt
+
+
+def test_docs_no_confidence_B_claim(audit):
+    """报告不得再声称有 B 级基金。"""
+    txt = _docs_text()
+    n_b = audit["summary"]["confidence_distribution"].get("B", 0)
+    assert n_b == 0
+    assert "B 级 1 只" not in txt
+    assert "**B** | 中高 | **1**" not in txt

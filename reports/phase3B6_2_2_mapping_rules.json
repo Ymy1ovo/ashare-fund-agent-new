@@ -1,7 +1,7 @@
 {
  "phase": "3B-6.2.2",
  "mapping_rule_version": "3B-6.2.2-v1",
- "generated_at": "2026-11-26T08:47:19",
+ "generated_at": "2026-11-26T09:18:16",
  "benchmark_kinds": {
   "contract": "合同业绩比较基准（需 L1）",
   "research": "研究评价基准（需收益口径确认 + 选择规则）",
@@ -24,35 +24,53 @@
  "confidence_levels": {
   "A": {
    "label": "高",
-   "definition": "官方合同和基准数据证据完整，映射关系明确",
+   "definition": "L1 官方合同证据、映射关系明确、收益口径确认、全部必要成分可计算",
    "requires": [
     "L1 官方合同文件",
-    "全部成分可计算",
-    "收益口径已确认"
+    "映射关系在合同中明确写出",
+    "收益口径已确认（非 unknown）",
+    "全部必要成分可计算"
    ],
+   "non_critical_gaps_allowed": false,
    "can_bypass_usability": false
   },
   "B": {
    "label": "中高",
-   "definition": "主要映射关系有可靠证据，但存在非关键缺口",
+   "definition": "映射关系有可靠的 L1/L2 证据，存在非关键缺口，但不影响基准身份及主要映射关系",
    "requires": [
-    "成分已识别",
-    "至少一个可用序列"
+    "L1 或 L2 映射证据",
+    "基准身份（用哪个指数）明确"
    ],
+   "non_critical_gaps_allowed": true,
+   "non_critical_gap_examples": [
+    "收益口径未确认（不影响「是哪只指数」，只影响能否算）",
+    "非必要成分缺失"
+   ],
+   "critical_gap_note": "**仅凭 L3 第三方平台文本，不能评为 B 级**",
    "can_bypass_usability": false
   },
   "C": {
    "label": "中低",
-   "definition": "有合理候选关系，但存在关键证据缺失",
+   "definition": "存在合理候选映射，但关键证据缺失，包括仅有 L3 第三方资料、收益口径未确认、必要成分不完整等",
    "requires": [
-    "成分已识别"
+    "有可识别的候选指数"
+   ],
+   "critical_gaps": [
+    "仅有 L3 第三方资料（映射关系未获官方证据确认）",
+    "收益口径未确认",
+    "必要成分不完整"
    ],
    "can_bypass_usability": false
   },
   "D": {
    "label": "低",
-   "definition": "数据不足、类别不明或映射依据不可靠",
+   "definition": "分类或映射依据严重不足，无法建立可靠候选关系",
    "requires": [],
+   "triggers": [
+    "分类字段不足且已降级（classification_confidence=low）",
+    "无任何已映射的候选指数",
+    "货币基金无万份收益/七日年化数据"
+   ],
    "can_bypass_usability": false
   }
  },

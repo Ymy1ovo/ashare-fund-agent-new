@@ -1,5 +1,117 @@
 # 变更日志
 
+## 2026-11-26 — 阶段3B-6.2.2.1 基金基准映射置信度评级边界修正
+
+**只修正置信度评级逻辑，不改三类基准可用性判定、不改统计口径、不改数据库。**
+
+**一、问题**
+
+`compute_confidence()` 原逻辑：
+
+```python
+if has_index_observation and all_components_computable:
+    return "B"
+```
+
+**没有要求映射关系本身具备足够可靠的证据**。`004746 易方达上证50指数`
+因此被评为 B 级，但它合同基准证据等级为 `L3`、无 L1 官方合同文件、
+指数 `return_basis` 为 `unknown`、研究基准不可用——**B 级明显偏高**。
+
+**二、修正后的四级边界**
+
+| 级别 | 定义 | 硬性条件 | 非关键缺口 |
+| --- | --- | --- | --- |
+| **A** | L1 官方合同证据、映射关系明确、收益口径确认、全部必要成分可计算 | 四项**全部满足** | 不允许 |
+| **B** | 映射关系有**可靠的 L1/L2 证据**，存在非关键缺口，但不影响基准身份及主要映射关系 | **必须有 L1 或 L2** | 允许 |
+| **C** | 存在合理候选映射，但关键证据缺失（**仅有 L3 第三方资料**、收益口径未确认、必要成分不完整） | 有可识别的候选指数 | — |
+| **D** | 分类或映射依据严重不足，无法建立可靠候选关系 | 无 | — |
+
+**三条关键边界**：
+
+| # | 规则 |
+| ---: | --- |
+| 1 | **仅有 L3 第三方平台文本，最高只能评 C** —— 无法证明「合同里写的确实是这只指数」 |
+| 2 | **收益口径 `unknown` 本身不直接判 D** —— 在 L1/L2 证据下它属非关键缺口（不影响身份判断），可评 B，但基准仍不可用 |
+| 3 | **不得为保留 B 级数量而放宽证据要求** |
+
+**新增参数** `mapping_evidence_grade`（L1/L2/L3/L4），由调用方传入实际证据等级。
+
+**三、评级变化**
+
+| 项 | 修正前 | 修正后 |
+| --- | ---: | ---: |
+| **A 级** | 0 | **0** |
+| **B 级** | 1 | **0** |
+| **C 级** | 41 | **42** |
+| **D 级** | 78 | **78** |
+| 合计 | 120 | **120** |
+
+**唯一变化：`004746` B → C。**
+
+| 基金 | 修正前 | 修正后 | 原因 |
+| --- | --- | --- | --- |
+| `004746 易方达上证50指数` | B | **C** | 仅有 L3 第三方资料，无法证明合同里写的确实是该指数 |
+
+**四、未受影响（必须保持不变）**
+
+| 项 | 值 | 是否变化 |
+| --- | ---: | --- |
+| 基金本体 | **120** | 否 |
+| 份额类别 | **149** | 否 |
+| 合同基准可用 | **0** | 否 |
+| 研究基准候选 / 可用 | **42 / 0** | 否 |
+| 替代基准候选 / 可用 | **42 / 0** | 否 |
+| 允许进入下一阶段 | **0** | 否 |
+| 复合基准总数 / 成分 | **15 / 34** | 否 |
+| 复合基准可复现 | **0** | 否 |
+
+**七类数量、三类基准数字、15 条复合基准结论均未改变。**
+
+**五、测试修正**
+
+修正 6 项既有测试（原测试用旧边界断言）：
+
+| 测试 | 修正内容 |
+| --- | --- |
+| `test_confidence_A_requires_all_three` | 新增 `mapping_evidence_grade="L1"` 参数 |
+| `test_confidence_B_without_official` | 改为 L1 证据场景，断言 B |
+| `test_confidence_C_with_uncomputable` | 明确 L3 场景 |
+| `test_confidence_D_when_low_classification` | 补 `mapping_evidence_grade` |
+| `test_confidence_A_still_not_usable` | 场景改用 L1 纯指数基准 |
+| `test_confidence_A_with_history_still_needs_all` | 同上 |
+
+**新增 10 项边界测试**：
+
+| # | 测试 | 断言 |
+| ---: | --- | --- |
+| 1 | `test_l3_never_becomes_B` | **L3 + 有点位 + 全成分可算，不得评 B** |
+| 2 | `test_l3_with_all_good_but_no_l1_still_C` | 只有 L3 最高只能 C |
+| 3 | `test_confidence_B_with_l2_evidence` | L1/L2 + 非关键缺口 → B |
+| 4 | `test_unknown_basis_alone_not_D` | 仅口径 unknown 不判 D |
+| 5 | `test_confidence_A_needs_all_four` | A 级四项缺一不可 |
+| 6 | `test_mapping_identity_requires_l1_or_l2` | 定义文本一致性 |
+| 7 | `test_all_120_confidence_matches_detail` | 120 只评级与明细一致 |
+| 8 | `test_004746_rated_C` | 004746 必须评 C |
+| 9 | `test_no_fund_rated_above_evidence` | L3 证据不得评 A/B |
+| 10 | `test_confidence_A_never_bypasses_usability` | A 级不绕过可用性 |
+
+全部直接调用 `compute_confidence()` 真实逻辑。
+
+**六、数据安全**
+
+| 项 | 值 |
+| --- | --- |
+| 数据库 SHA256 | `27e0b54d7a5675892b70fc5061ed38da8dc6b58119139c63a4039e08e0523061` |
+| 是否变化 | **否** |
+| `integrity_check` | **ok** |
+| 外键违规 | **0** |
+
+**测试**：专项 **100 passed**；全量 **2428 → 2444 passed / 0 failed / 0 skipped**。
+
+**门禁不变**：`ready_for_research_analysis=true`，
+`ready_for_backtest=false`，`ready_for_formal_ranking=false`。
+
+
 ## 2026-11-26 — 阶段3B-6.2.2 支付宝场外公募基金与基准映射规则实现
 
 **只做映射规则建设与只读审计。不接入基准收益序列，不开放回测。**
