@@ -9,7 +9,7 @@
 > 3. **`2018-06-18` 被标为 `market_closed_placeholder`** —— 无官方日历证据，
 >    应降为 `suspected_market_closed_placeholder`，连续性不得判 verified。
 >
-> **请以 `reports/phase3B6_2_3_1_0_2_fix_report.md` 为准。**
+> **请以 `reports/phase3B6_2_3_1_0_3_fix_report.md` 为准**（3B-6.2.3.1.0.3 为最终一致性版本）。
 >
 > 本报告保留作为历史记录，原文未删除。
 

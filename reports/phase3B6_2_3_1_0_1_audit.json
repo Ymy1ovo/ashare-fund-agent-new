@@ -148,7 +148,7 @@
     "extreme_moves": [],
     "data_quality_verified": true,
     "coverage_status": "verified",
-    "continuity_status": "verified",
+    "continuity_status": "has_unresolved_suspicion",
     "outside_calendar_detail": [
      {
       "date": "2018-06-18",
@@ -172,7 +172,8 @@
     "calendar_used": "A股交易日历（项目代理）",
     "calendar_available": true,
     "calendar_is_official": false,
-    "reason": "相对 A 股交易日历**代理**无缺失（非官方发布日历）"
+    "reason": "相对 A 股交易日历**代理**无缺失（非官方发布日历）",
+    "continuity_level_definition": "存在疑似休市占位行但无官方日历证据"
    },
    "mapping_evidence": {
     "price_index_code": "000300",
@@ -222,15 +223,18 @@
    },
    "next_stage_states": {
     "raw_data_layer_ingest_candidate": true,
-    "validated_series_candidate": true,
+    "validated_series_candidate": false,
     "formal_series_admitted": false,
     "rule": {
      "raw_data_layer_ingest_candidate": "官方身份 + 接口返回成功（质量异常不阻止隔离存储）",
      "validated_series_candidate": "身份 + 口径 + 接口 + 质量 + 覆盖verified + 连续verified",
      "formal_series_admitted": "validated + 映射 + 时点可用"
-    }
+    },
+    "proxy_qualified_series_candidate": false
    },
-   "conclusion": "H00300：可进入**原始数据隔离层**；可作为**已验证独立序列**；**不得**正式准入（时点可用性 unknown）"
+   "conclusion": "H00300：可进入**原始数据隔离层**；可作为**已验证独立序列**；**不得**正式准入（时点可用性 unknown）",
+   "_original_continuity_status": "verified",
+   "_corrected_by": "3B-6.2.3.1.0.3"
   },
   {
    "tr_candidate": "H00905",
@@ -314,7 +318,7 @@
     "extreme_moves": [],
     "data_quality_verified": true,
     "coverage_status": "verified",
-    "continuity_status": "verified",
+    "continuity_status": "has_unresolved_suspicion",
     "outside_calendar_detail": [
      {
       "date": "2018-06-18",
@@ -338,7 +342,8 @@
     "calendar_used": "A股交易日历（项目代理）",
     "calendar_available": true,
     "calendar_is_official": false,
-    "reason": "相对 A 股交易日历**代理**无缺失（非官方发布日历）"
+    "reason": "相对 A 股交易日历**代理**无缺失（非官方发布日历）",
+    "continuity_level_definition": "存在疑似休市占位行但无官方日历证据"
    },
    "mapping_evidence": {
     "price_index_code": "000905",
@@ -388,15 +393,18 @@
    },
    "next_stage_states": {
     "raw_data_layer_ingest_candidate": true,
-    "validated_series_candidate": true,
+    "validated_series_candidate": false,
     "formal_series_admitted": false,
     "rule": {
      "raw_data_layer_ingest_candidate": "官方身份 + 接口返回成功（质量异常不阻止隔离存储）",
      "validated_series_candidate": "身份 + 口径 + 接口 + 质量 + 覆盖verified + 连续verified",
      "formal_series_admitted": "validated + 映射 + 时点可用"
-    }
+    },
+    "proxy_qualified_series_candidate": false
    },
-   "conclusion": "H00905：可进入**原始数据隔离层**；可作为**已验证独立序列**；**不得**正式准入（时点可用性 unknown）"
+   "conclusion": "H00905：可进入**原始数据隔离层**；可作为**已验证独立序列**；**不得**正式准入（时点可用性 unknown）",
+   "_original_continuity_status": "verified",
+   "_corrected_by": "3B-6.2.3.1.0.3"
   },
   {
    "tr_candidate": "H00906",
@@ -480,7 +488,7 @@
     "extreme_moves": [],
     "data_quality_verified": true,
     "coverage_status": "verified",
-    "continuity_status": "verified",
+    "continuity_status": "has_unresolved_suspicion",
     "outside_calendar_detail": [
      {
       "date": "2018-06-18",
@@ -504,7 +512,8 @@
     "calendar_used": "A股交易日历（项目代理）",
     "calendar_available": true,
     "calendar_is_official": false,
-    "reason": "相对 A 股交易日历**代理**无缺失（非官方发布日历）"
+    "reason": "相对 A 股交易日历**代理**无缺失（非官方发布日历）",
+    "continuity_level_definition": "存在疑似休市占位行但无官方日历证据"
    },
    "mapping_evidence": {
     "price_index_code": "000906",
@@ -554,15 +563,18 @@
    },
    "next_stage_states": {
     "raw_data_layer_ingest_candidate": true,
-    "validated_series_candidate": true,
+    "validated_series_candidate": false,
     "formal_series_admitted": false,
     "rule": {
      "raw_data_layer_ingest_candidate": "官方身份 + 接口返回成功（质量异常不阻止隔离存储）",
      "validated_series_candidate": "身份 + 口径 + 接口 + 质量 + 覆盖verified + 连续verified",
      "formal_series_admitted": "validated + 映射 + 时点可用"
-    }
+    },
+    "proxy_qualified_series_candidate": false
    },
-   "conclusion": "H00906：可进入**原始数据隔离层**；可作为**已验证独立序列**；**不得**正式准入（时点可用性 unknown）"
+   "conclusion": "H00906：可进入**原始数据隔离层**；可作为**已验证独立序列**；**不得**正式准入（时点可用性 unknown）",
+   "_original_continuity_status": "verified",
+   "_corrected_by": "3B-6.2.3.1.0.3"
   },
   {
    "tr_candidate": "H00016",
@@ -646,7 +658,7 @@
     "extreme_moves": [],
     "data_quality_verified": true,
     "coverage_status": "verified",
-    "continuity_status": "verified",
+    "continuity_status": "has_unresolved_suspicion",
     "outside_calendar_detail": [
      {
       "date": "2018-06-18",
@@ -670,7 +682,8 @@
     "calendar_used": "A股交易日历（项目代理）",
     "calendar_available": true,
     "calendar_is_official": false,
-    "reason": "相对 A 股交易日历**代理**无缺失（非官方发布日历）"
+    "reason": "相对 A 股交易日历**代理**无缺失（非官方发布日历）",
+    "continuity_level_definition": "存在疑似休市占位行但无官方日历证据"
    },
    "mapping_evidence": {
     "price_index_code": "000016",
@@ -717,15 +730,18 @@
    },
    "next_stage_states": {
     "raw_data_layer_ingest_candidate": true,
-    "validated_series_candidate": true,
+    "validated_series_candidate": false,
     "formal_series_admitted": false,
     "rule": {
      "raw_data_layer_ingest_candidate": "官方身份 + 接口返回成功（质量异常不阻止隔离存储）",
      "validated_series_candidate": "身份 + 口径 + 接口 + 质量 + 覆盖verified + 连续verified",
      "formal_series_admitted": "validated + 映射 + 时点可用"
-    }
+    },
+    "proxy_qualified_series_candidate": false
    },
-   "conclusion": "H00016：可进入**原始数据隔离层**；可作为**已验证独立序列**；**不得**正式准入（时点可用性 unknown）"
+   "conclusion": "H00016：可进入**原始数据隔离层**；可作为**已验证独立序列**；**不得**正式准入（时点可用性 unknown）",
+   "_original_continuity_status": "verified",
+   "_corrected_by": "3B-6.2.3.1.0.3"
   },
   {
    "tr_candidate": "H20539",
@@ -809,7 +825,7 @@
     "extreme_moves": [],
     "data_quality_verified": true,
     "coverage_status": "verified",
-    "continuity_status": "verified",
+    "continuity_status": "has_unresolved_suspicion",
     "outside_calendar_detail": [
      {
       "date": "2018-06-18",
@@ -833,7 +849,8 @@
     "calendar_used": "A股交易日历（项目代理）",
     "calendar_available": true,
     "calendar_is_official": false,
-    "reason": "相对 A 股交易日历**代理**无缺失（非官方发布日历）"
+    "reason": "相对 A 股交易日历**代理**无缺失（非官方发布日历）",
+    "continuity_level_definition": "存在疑似休市占位行但无官方日历证据"
    },
    "mapping_evidence": {
     "price_index_code": "399997",
@@ -883,15 +900,18 @@
    },
    "next_stage_states": {
     "raw_data_layer_ingest_candidate": true,
-    "validated_series_candidate": true,
+    "validated_series_candidate": false,
     "formal_series_admitted": false,
     "rule": {
      "raw_data_layer_ingest_candidate": "官方身份 + 接口返回成功（质量异常不阻止隔离存储）",
      "validated_series_candidate": "身份 + 口径 + 接口 + 质量 + 覆盖verified + 连续verified",
      "formal_series_admitted": "validated + 映射 + 时点可用"
-    }
+    },
+    "proxy_qualified_series_candidate": false
    },
-   "conclusion": "H20539：可进入**原始数据隔离层**；可作为**已验证独立序列**；**不得**正式准入（时点可用性 unknown）"
+   "conclusion": "H20539：可进入**原始数据隔离层**；可作为**已验证独立序列**；**不得**正式准入（时点可用性 unknown）",
+   "_original_continuity_status": "verified",
+   "_corrected_by": "3B-6.2.3.1.0.3"
   },
   {
    "tr_candidate": "399997CNY02",
@@ -975,7 +995,7 @@
     "extreme_moves": [],
     "data_quality_verified": true,
     "coverage_status": "verified",
-    "continuity_status": "verified",
+    "continuity_status": "verified_against_proxy_calendar",
     "outside_calendar_detail": [],
     "outside_calendar_unexplained": 0,
     "missing_trading_days": 0,
@@ -986,7 +1006,8 @@
     "calendar_used": "A股交易日历（项目代理）",
     "calendar_available": true,
     "calendar_is_official": false,
-    "reason": "相对 A 股交易日历**代理**无缺失（非官方发布日历）"
+    "reason": "相对 A 股交易日历**代理**无缺失（非官方发布日历）",
+    "continuity_level_definition": "相对**项目 A 股交易日历代理**验证连续；**不是官方发布日历**"
    },
    "mapping_evidence": {
     "price_index_code": "399997",
@@ -1036,15 +1057,18 @@
    },
    "next_stage_states": {
     "raw_data_layer_ingest_candidate": true,
-    "validated_series_candidate": true,
+    "validated_series_candidate": false,
     "formal_series_admitted": false,
     "rule": {
      "raw_data_layer_ingest_candidate": "官方身份 + 接口返回成功（质量异常不阻止隔离存储）",
      "validated_series_candidate": "身份 + 口径 + 接口 + 质量 + 覆盖verified + 连续verified",
      "formal_series_admitted": "validated + 映射 + 时点可用"
-    }
+    },
+    "proxy_qualified_series_candidate": true
    },
-   "conclusion": "399997CNY02：可进入**原始数据隔离层**；可作为**已验证独立序列**；**不得**正式准入（时点可用性 unknown）"
+   "conclusion": "399997CNY02：可进入**原始数据隔离层**；可作为**已验证独立序列**；**不得**正式准入（时点可用性 unknown）",
+   "_original_continuity_status": "verified",
+   "_corrected_by": "3B-6.2.3.1.0.3"
   },
   {
    "tr_candidate": "H20184",
@@ -1130,7 +1154,7 @@
     "extreme_moves": [],
     "data_quality_verified": false,
     "coverage_status": "verified",
-    "continuity_status": "verified",
+    "continuity_status": "has_unresolved_suspicion",
     "outside_calendar_detail": [
      {
       "date": "2018-06-18",
@@ -1154,7 +1178,8 @@
     "calendar_used": "A股交易日历（项目代理）",
     "calendar_available": true,
     "calendar_is_official": false,
-    "reason": "相对 A 股交易日历**代理**无缺失（非官方发布日历）"
+    "reason": "相对 A 股交易日历**代理**无缺失（非官方发布日历）",
+    "continuity_level_definition": "存在疑似休市占位行但无官方日历证据"
    },
    "mapping_evidence": {
     "price_index_code": "H30184",
@@ -1210,9 +1235,12 @@
      "raw_data_layer_ingest_candidate": "官方身份 + 接口返回成功（质量异常不阻止隔离存储）",
      "validated_series_candidate": "身份 + 口径 + 接口 + 质量 + 覆盖verified + 连续verified",
      "formal_series_admitted": "validated + 映射 + 时点可用"
-    }
+    },
+    "proxy_qualified_series_candidate": false
    },
-   "conclusion": "H20184：可进入**原始数据隔离层**；**不可**作为已验证序列（数据质量）；**不得**正式准入（时点可用性 unknown）"
+   "conclusion": "H20184：可进入**原始数据隔离层**；**不可**作为已验证序列（数据质量）；**不得**正式准入（时点可用性 unknown）",
+   "_original_continuity_status": "verified",
+   "_corrected_by": "3B-6.2.3.1.0.3"
   },
   {
    "tr_candidate": "H00942",
@@ -1296,7 +1324,7 @@
     "extreme_moves": [],
     "data_quality_verified": true,
     "coverage_status": "verified",
-    "continuity_status": "verified",
+    "continuity_status": "has_unresolved_suspicion",
     "outside_calendar_detail": [
      {
       "date": "2018-06-18",
@@ -1320,7 +1348,8 @@
     "calendar_used": "A股交易日历（项目代理）",
     "calendar_available": true,
     "calendar_is_official": false,
-    "reason": "相对 A 股交易日历**代理**无缺失（非官方发布日历）"
+    "reason": "相对 A 股交易日历**代理**无缺失（非官方发布日历）",
+    "continuity_level_definition": "存在疑似休市占位行但无官方日历证据"
    },
    "mapping_evidence": {
     "price_index_code": "000942",
@@ -1370,15 +1399,18 @@
    },
    "next_stage_states": {
     "raw_data_layer_ingest_candidate": true,
-    "validated_series_candidate": true,
+    "validated_series_candidate": false,
     "formal_series_admitted": false,
     "rule": {
      "raw_data_layer_ingest_candidate": "官方身份 + 接口返回成功（质量异常不阻止隔离存储）",
      "validated_series_candidate": "身份 + 口径 + 接口 + 质量 + 覆盖verified + 连续verified",
      "formal_series_admitted": "validated + 映射 + 时点可用"
-    }
+    },
+    "proxy_qualified_series_candidate": false
    },
-   "conclusion": "H00942：可进入**原始数据隔离层**；可作为**已验证独立序列**；**不得**正式准入（时点可用性 unknown）"
+   "conclusion": "H00942：可进入**原始数据隔离层**；可作为**已验证独立序列**；**不得**正式准入（时点可用性 unknown）",
+   "_original_continuity_status": "verified",
+   "_corrected_by": "3B-6.2.3.1.0.3"
   },
   {
    "tr_candidate": "H00922",
@@ -1462,7 +1494,7 @@
     "extreme_moves": [],
     "data_quality_verified": true,
     "coverage_status": "verified",
-    "continuity_status": "verified",
+    "continuity_status": "has_unresolved_suspicion",
     "outside_calendar_detail": [
      {
       "date": "2018-06-18",
@@ -1486,7 +1518,8 @@
     "calendar_used": "A股交易日历（项目代理）",
     "calendar_available": true,
     "calendar_is_official": false,
-    "reason": "相对 A 股交易日历**代理**无缺失（非官方发布日历）"
+    "reason": "相对 A 股交易日历**代理**无缺失（非官方发布日历）",
+    "continuity_level_definition": "存在疑似休市占位行但无官方日历证据"
    },
    "mapping_evidence": {
     "price_index_code": "000922",
@@ -1536,15 +1569,18 @@
    },
    "next_stage_states": {
     "raw_data_layer_ingest_candidate": true,
-    "validated_series_candidate": true,
+    "validated_series_candidate": false,
     "formal_series_admitted": false,
     "rule": {
      "raw_data_layer_ingest_candidate": "官方身份 + 接口返回成功（质量异常不阻止隔离存储）",
      "validated_series_candidate": "身份 + 口径 + 接口 + 质量 + 覆盖verified + 连续verified",
      "formal_series_admitted": "validated + 映射 + 时点可用"
-    }
+    },
+    "proxy_qualified_series_candidate": false
    },
-   "conclusion": "H00922：可进入**原始数据隔离层**；可作为**已验证独立序列**；**不得**正式准入（时点可用性 unknown）"
+   "conclusion": "H00922：可进入**原始数据隔离层**；可作为**已验证独立序列**；**不得**正式准入（时点可用性 unknown）",
+   "_original_continuity_status": "verified",
+   "_corrected_by": "3B-6.2.3.1.0.3"
   },
   {
    "tr_candidate": "H00012",
@@ -1633,7 +1669,8 @@
     "missing_trading_days": null,
     "dates_outside_calendar": null,
     "calendar_used": "债券市场交易日历",
-    "calendar_available": false
+    "calendar_available": false,
+    "continuity_level_definition": "适用市场日历未取得，无法核验"
    },
    "mapping_evidence": {
     "price_index_code": "000012",
@@ -1678,9 +1715,12 @@
      "raw_data_layer_ingest_candidate": "官方身份 + 接口返回成功（质量异常不阻止隔离存储）",
      "validated_series_candidate": "身份 + 口径 + 接口 + 质量 + 覆盖verified + 连续verified",
      "formal_series_admitted": "validated + 映射 + 时点可用"
-    }
+    },
+    "proxy_qualified_series_candidate": false
    },
-   "conclusion": "H00012：可进入**原始数据隔离层**；**不可**作为已验证序列（覆盖=unknown, 连续=unknown）；**不得**正式准入（时点可用性 unknown）"
+   "conclusion": "H00012：可进入**原始数据隔离层**；**不可**作为已验证序列（覆盖=unknown, 连续=unknown）；**不得**正式准入（时点可用性 unknown）",
+   "_original_continuity_status": "unknown",
+   "_corrected_by": "3B-6.2.3.1.0.3"
   },
   {
    "tr_candidate": "N00012",
@@ -1769,7 +1809,8 @@
     "missing_trading_days": null,
     "dates_outside_calendar": null,
     "calendar_used": "债券市场交易日历",
-    "calendar_available": false
+    "calendar_available": false,
+    "continuity_level_definition": "适用市场日历未取得，无法核验"
    },
    "mapping_evidence": {
     "price_index_code": "000012",
@@ -1814,9 +1855,12 @@
      "raw_data_layer_ingest_candidate": "官方身份 + 接口返回成功（质量异常不阻止隔离存储）",
      "validated_series_candidate": "身份 + 口径 + 接口 + 质量 + 覆盖verified + 连续verified",
      "formal_series_admitted": "validated + 映射 + 时点可用"
-    }
+    },
+    "proxy_qualified_series_candidate": false
    },
-   "conclusion": "N00012：可进入**原始数据隔离层**；**不可**作为已验证序列（覆盖=unknown, 连续=unknown）；**不得**正式准入（时点可用性 unknown）"
+   "conclusion": "N00012：可进入**原始数据隔离层**；**不可**作为已验证序列（覆盖=unknown, 连续=unknown）；**不得**正式准入（时点可用性 unknown）",
+   "_original_continuity_status": "unknown",
+   "_corrected_by": "3B-6.2.3.1.0.3"
   },
   {
    "tr_candidate": "H20930",
@@ -1905,7 +1949,8 @@
     "missing_trading_days": null,
     "dates_outside_calendar": null,
     "calendar_used": "港股交易日历",
-    "calendar_available": false
+    "calendar_available": false,
+    "continuity_level_definition": "适用市场日历未取得，无法核验"
    },
    "mapping_evidence": {
     "price_index_code": "930930",
@@ -1953,9 +1998,12 @@
      "raw_data_layer_ingest_candidate": "官方身份 + 接口返回成功（质量异常不阻止隔离存储）",
      "validated_series_candidate": "身份 + 口径 + 接口 + 质量 + 覆盖verified + 连续verified",
      "formal_series_admitted": "validated + 映射 + 时点可用"
-    }
+    },
+    "proxy_qualified_series_candidate": false
    },
-   "conclusion": "H20930：可进入**原始数据隔离层**；**不可**作为已验证序列（覆盖=unknown, 连续=unknown）；**不得**正式准入（时点可用性 unknown）"
+   "conclusion": "H20930：可进入**原始数据隔离层**；**不可**作为已验证序列（覆盖=unknown, 连续=unknown）；**不得**正式准入（时点可用性 unknown）",
+   "_original_continuity_status": "unknown",
+   "_corrected_by": "3B-6.2.3.1.0.3"
   }
  ],
  "summary": {
@@ -1972,13 +2020,17 @@
     "history_api_available": 9,
     "coverage_verified": 9,
     "coverage_unknown": 0,
-    "continuity_verified": 9,
+    "continuity_verified": 0,
     "continuity_unknown": 0,
     "data_quality_verified": 8,
     "point_in_time_available": 0,
     "raw_data_layer_ingest_candidate": 9,
-    "validated_series_candidate": 8,
-    "formal_series_admitted": 0
+    "validated_series_candidate": 0,
+    "formal_series_admitted": 0,
+    "continuity_verified_official_calendar": 0,
+    "continuity_verified_against_proxy_calendar": 1,
+    "continuity_has_unresolved_suspicion": 8,
+    "proxy_qualified_series_candidate": 1
    },
    "bond": {
     "candidate_count": 2,
@@ -2021,7 +2073,8 @@
   },
   "totals": {
    "raw_data_layer_ingest_candidate": 12,
-   "validated_series_candidate": 8,
+   "validated_series_candidate": 0,
+   "proxy_qualified_series_candidate": 1,
    "formal_series_admitted": 0
   },
   "gates": {
@@ -2044,5 +2097,38 @@
   "generated_at": "2026-11-27T14:41:29",
   "file_count": 0,
   "files": {}
- }
+ },
+ "_superseded_snapshot": {
+  "note": "本字段保留 3B-6.2.3.1.0.1 原始结论供审计追溯；summary/candidates 已按 3B-6.2.3.1.0.3 修正",
+  "original_summary_totals": {
+   "raw_data_layer_ingest_candidate": 12,
+   "validated_series_candidate": 8,
+   "formal_series_admitted": 0
+  },
+  "original_stock_group": {
+   "candidate_count": 9,
+   "market": "沪深A股",
+   "calendar_used": "A股交易日历（项目代理）",
+   "calendar_available": true,
+   "official_identity_verified": 9,
+   "mapping_verified": 9,
+   "return_basis_verified": 9,
+   "history_api_available": 9,
+   "coverage_verified": 9,
+   "coverage_unknown": 0,
+   "continuity_verified": 0,
+   "continuity_unknown": 0,
+   "data_quality_verified": 8,
+   "point_in_time_available": 0,
+   "raw_data_layer_ingest_candidate": 9,
+   "validated_series_candidate": 0,
+   "formal_series_admitted": 0,
+   "continuity_verified_official_calendar": 0,
+   "continuity_verified_against_proxy_calendar": 1,
+   "continuity_has_unresolved_suspicion": 8,
+   "proxy_qualified_series_candidate": 1
+  }
+ },
+ "_corrected_by": "3B-6.2.3.1.0.3",
+ "_correction_note": "已按 3B-6.2.3.1.0.3 修正：8 只股票候选连续性由 verified 改为 has_unresolved_suspicion；validated_series_candidate 由 8 改为 0；新增 proxy_qualified_series_candidate=1（399997CNY02）。原始值见 _superseded_snapshot。"
 }

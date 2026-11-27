@@ -1,0 +1,492 @@
+{
+ "phase": "3B-6.2.3.1.0.3",
+ "generated_at": "2026-11-27T16:20:50",
+ "no_new_download": true,
+ "note": "本轮不下载新数据；登记未修改的原始官方证据与本轮产物。被本轮修正的审计 JSON（010/020）不在此登记",
+ "referenced_total": 80,
+ "referenced_exists": 80,
+ "missing_count": 0,
+ "missing_files": [],
+ "files": {
+  "reports/evidence/phase3B6_2_3_1_0/basic_000012.json": {
+   "purpose": "3B-6.2.3.1.0 原始证据",
+   "exists": true,
+   "bytes": 1055,
+   "sha256": "4390b7dc8015f4ed85dfeeafde53b7a7b4565ce95064deb5028216343f0fe39b"
+  },
+  "reports/evidence/phase3B6_2_3_1_0/basic_000016.json": {
+   "purpose": "3B-6.2.3.1.0 原始证据",
+   "exists": true,
+   "bytes": 1181,
+   "sha256": "44bd88a3dc069ab09206ceca301a362db8ab2dab3529d2cd498369081e22b88b"
+  },
+  "reports/evidence/phase3B6_2_3_1_0/basic_000300.json": {
+   "purpose": "3B-6.2.3.1.0 原始证据",
+   "exists": true,
+   "bytes": 1088,
+   "sha256": "89cbd0812e258757ccca68285181d280b22881f1e95e4fb524ddea64bd159fb6"
+  },
+  "reports/evidence/phase3B6_2_3_1_0/basic_000905.json": {
+   "purpose": "3B-6.2.3.1.0 原始证据",
+   "exists": true,
+   "bytes": 990,
+   "sha256": "29bbc5ab7081e7c50efbac91062224810b908ead05448316b96e6441c77a2efb"
+  },
+  "reports/evidence/phase3B6_2_3_1_0/basic_000906.json": {
+   "purpose": "3B-6.2.3.1.0 原始证据",
+   "exists": true,
+   "bytes": 975,
+   "sha256": "1e49eff6bdccda98fa090db0b8987178bd4e799dfbcc842e2f695289ebb9ffd5"
+  },
+  "reports/evidence/phase3B6_2_3_1_0/basic_000922.json": {
+   "purpose": "3B-6.2.3.1.0 原始证据",
+   "exists": true,
+   "bytes": 1180,
+   "sha256": "437049bcdc8f4317a6566e79d6b9806939612977c5e9fbd30030cb0673fa7090"
+  },
+  "reports/evidence/phase3B6_2_3_1_0/basic_000942.json": {
+   "purpose": "3B-6.2.3.1.0 原始证据",
+   "exists": true,
+   "bytes": 1223,
+   "sha256": "da5688dc762f816518e59fac067a6a99ec997864e9c96f40e6b30d9f1ed14c25"
+  },
+  "reports/evidence/phase3B6_2_3_1_0/basic_399997.json": {
+   "purpose": "3B-6.2.3.1.0 原始证据",
+   "exists": true,
+   "bytes": 1062,
+   "sha256": "4107d6e3ed60008fe515b4b96324d506827b08729b3a0037cbffa2f0a37bbb5a"
+  },
+  "reports/evidence/phase3B6_2_3_1_0/basic_399997CNY02.json": {
+   "purpose": "3B-6.2.3.1.0 原始证据",
+   "exists": true,
+   "bytes": 812,
+   "sha256": "900d51e827626ec68aef7ff06b839c6f57eb5982e0049b5c527adf03092a1b5a"
+  },
+  "reports/evidence/phase3B6_2_3_1_0/basic_930930.json": {
+   "purpose": "3B-6.2.3.1.0 原始证据",
+   "exists": true,
+   "bytes": 1233,
+   "sha256": "03b676d21f126b75faaaad284435cf771325b888d132e612914801ab20fdb749"
+  },
+  "reports/evidence/phase3B6_2_3_1_0/basic_H00012.json": {
+   "purpose": "3B-6.2.3.1.0 原始证据",
+   "exists": true,
+   "bytes": 824,
+   "sha256": "7db12d476e572bf6e89219f31fe8b79d4aded423f1cbe4c7940f782fa74f769a"
+  },
+  "reports/evidence/phase3B6_2_3_1_0/basic_H00016.json": {
+   "purpose": "3B-6.2.3.1.0 原始证据",
+   "exists": true,
+   "bytes": 793,
+   "sha256": "e2052cd2fab60c0f5362b47b273aea0bed566bcb6dde5c8b6f298f2d73572914"
+  },
+  "reports/evidence/phase3B6_2_3_1_0/basic_H00300.json": {
+   "purpose": "3B-6.2.3.1.0 原始证据",
+   "exists": true,
+   "bytes": 779,
+   "sha256": "4a2c782da6c6465f7896c164e384135669c4a98c1f80ad0e8b4e11d4878099b7"
+  },
+  "reports/evidence/phase3B6_2_3_1_0/basic_H00905.json": {
+   "purpose": "3B-6.2.3.1.0 原始证据",
+   "exists": true,
+   "bytes": 812,
+   "sha256": "b1ac3733e668f0bb3c88f70f79ba66f0862703ce0fcad0438451220295a27395"
+  },
+  "reports/evidence/phase3B6_2_3_1_0/basic_H00906.json": {
+   "purpose": "3B-6.2.3.1.0 原始证据",
+   "exists": true,
+   "bytes": 797,
+   "sha256": "9d61703e8d54941ef27c5805bece09c5665623462d69893d8d30a5038c834b3d"
+  },
+  "reports/evidence/phase3B6_2_3_1_0/basic_H00922.json": {
+   "purpose": "3B-6.2.3.1.0 原始证据",
+   "exists": true,
+   "bytes": 804,
+   "sha256": "9698705a87b45a1a5aa6e50cd7f3dc9517f5e302e79b59aa7755bb0303dbe25e"
+  },
+  "reports/evidence/phase3B6_2_3_1_0/basic_H00942.json": {
+   "purpose": "3B-6.2.3.1.0 原始证据",
+   "exists": true,
+   "bytes": 837,
+   "sha256": "7498475b391917e6eb53377958a716f89b3f2380138a8213fdb7ae112fde3f47"
+  },
+  "reports/evidence/phase3B6_2_3_1_0/basic_H20184.json": {
+   "purpose": "3B-6.2.3.1.0 原始证据",
+   "exists": true,
+   "bytes": 891,
+   "sha256": "dc3f32265597505e22374f63e2ca889958e70efde052ea7f7bfdff1d5a1331cc"
+  },
+  "reports/evidence/phase3B6_2_3_1_0/basic_H20539.json": {
+   "purpose": "3B-6.2.3.1.0 原始证据",
+   "exists": true,
+   "bytes": 810,
+   "sha256": "18907a63f4b6ab209e517727a19948b14649e1c378c309d77a1e214a6d985bb5"
+  },
+  "reports/evidence/phase3B6_2_3_1_0/basic_H20930.json": {
+   "purpose": "3B-6.2.3.1.0 原始证据",
+   "exists": true,
+   "bytes": 836,
+   "sha256": "faffba0d41b7dbb450edd6f72137e63950a907136739b3e76c138744517a28a0"
+  },
+  "reports/evidence/phase3B6_2_3_1_0/basic_H30184.json": {
+   "purpose": "3B-6.2.3.1.0 原始证据",
+   "exists": true,
+   "bytes": 1460,
+   "sha256": "69c1bc656ff884f0187ed261b085eef794cd2d3285f4700adb0e5d7f9a8e0f9b"
+  },
+  "reports/evidence/phase3B6_2_3_1_0/basic_N00012.json": {
+   "purpose": "3B-6.2.3.1.0 原始证据",
+   "exists": true,
+   "bytes": 850,
+   "sha256": "12625ae7ce88ceba8dc5cdb6d5308083d25ecbc19313a553e4d4b2fc601a325d"
+  },
+  "reports/evidence/phase3B6_2_3_1_0/hist_000012_20040101_20261127.json": {
+   "purpose": "3B-6.2.3.1.0 原始证据",
+   "exists": true,
+   "bytes": 1963145,
+   "sha256": "9ce641b75375e500c1b560657baeb7bf0799e698e3287449987640ec2290b116"
+  },
+  "reports/evidence/phase3B6_2_3_1_0/hist_000016_20040101_20261127.json": {
+   "purpose": "3B-6.2.3.1.0 原始证据",
+   "exists": true,
+   "bytes": 1823322,
+   "sha256": "f6580e14502cf9e34a9a9657c9dfd664b5ce1eaf34cabf4ab737a9c7bd4b9e45"
+  },
+  "reports/evidence/phase3B6_2_3_1_0/hist_000300_20040101_20261127.json": {
+   "purpose": "3B-6.2.3.1.0 原始证据",
+   "exists": true,
+   "bytes": 1859052,
+   "sha256": "0fa59be4faf85775a230582710cfebd597ed19b8a500b0877cd31157f52963f1"
+  },
+  "reports/evidence/phase3B6_2_3_1_0/hist_000905_20040101_20261127.json": {
+   "purpose": "3B-6.2.3.1.0 原始证据",
+   "exists": true,
+   "bytes": 1859847,
+   "sha256": "f858b7df4e25bb97b86916272aa717de25ce7b2a34d874d70e2e24cdfde6b82b"
+  },
+  "reports/evidence/phase3B6_2_3_1_0/hist_000906_20040101_20261127.json": {
+   "purpose": "3B-6.2.3.1.0 原始证据",
+   "exists": true,
+   "bytes": 1785955,
+   "sha256": "01b7e169bcd8cab117dbd30a86e8443224436556c14b0a073e54f1412c174a5f"
+  },
+  "reports/evidence/phase3B6_2_3_1_0/hist_000922_20040101_20261127.json": {
+   "purpose": "3B-6.2.3.1.0 原始证据",
+   "exists": true,
+   "bytes": 1858342,
+   "sha256": "09e8c7ac1087dc93c9936ec508017a79ea737ab63085ac169a46acedb9222b50"
+  },
+  "reports/evidence/phase3B6_2_3_1_0/hist_000942_20040101_20261127.json": {
+   "purpose": "3B-6.2.3.1.0 原始证据",
+   "exists": true,
+   "bytes": 2000098,
+   "sha256": "5cde2565301e96445e558f59e1b549e6b00fb840295c4379d700e6bf64866f1a"
+  },
+  "reports/evidence/phase3B6_2_3_1_0/hist_399997_20040101_20261127.json": {
+   "purpose": "3B-6.2.3.1.0 原始证据",
+   "exists": true,
+   "bytes": 1503148,
+   "sha256": "21a2fb2b4096e1bc4487f6f650c5bba92504b4eab0c943688347879685ef140d"
+  },
+  "reports/evidence/phase3B6_2_3_1_0/hist_399997CNY02_20040101_20261127.json": {
+   "purpose": "3B-6.2.3.1.0 原始证据",
+   "exists": true,
+   "bytes": 1653318,
+   "sha256": "c7d1323cbb21d5f7973de65f97ab2b1fc398ee095786b31c3c3cabf16559f319"
+  },
+  "reports/evidence/phase3B6_2_3_1_0/hist_930930_20040101_20261127.json": {
+   "purpose": "3B-6.2.3.1.0 原始证据",
+   "exists": true,
+   "bytes": 1138705,
+   "sha256": "54cf880c62f999f2af7ed6c848ab94b587dfec8ee52a7707190e1ffa75fc8468"
+  },
+  "reports/evidence/phase3B6_2_3_1_0/hist_H00012_20040101_20261127.json": {
+   "purpose": "3B-6.2.3.1.0 原始证据",
+   "exists": true,
+   "bytes": 1285757,
+   "sha256": "cc23ff824f58067ae5a5aaec2d3e63b52eac6d9c075ed321945f68efe106b92a"
+  },
+  "reports/evidence/phase3B6_2_3_1_0/hist_H00016_20040101_20261127.json": {
+   "purpose": "3B-6.2.3.1.0 原始证据",
+   "exists": true,
+   "bytes": 1912959,
+   "sha256": "625ba341082a844819f3eb5c1408a069b420d6b325bba145229b0bb6a1c5f898"
+  },
+  "reports/evidence/phase3B6_2_3_1_0/hist_H00300_20040101_20261127.json": {
+   "purpose": "3B-6.2.3.1.0 原始证据",
+   "exists": true,
+   "bytes": 1868404,
+   "sha256": "f545659bc59e97a84b596dbe93eea2d4aa3871c5ba11d1a0c6bdaae4983d15ef"
+  },
+  "reports/evidence/phase3B6_2_3_1_0/hist_H00905_20040101_20261127.json": {
+   "purpose": "3B-6.2.3.1.0 原始证据",
+   "exists": true,
+   "bytes": 1959475,
+   "sha256": "4a60d94d8e29bca27b8fcbb719989fa62d358416660724f5ce3c6ad076e8ebb3"
+  },
+  "reports/evidence/phase3B6_2_3_1_0/hist_H00906_20040101_20261127.json": {
+   "purpose": "3B-6.2.3.1.0 原始证据",
+   "exists": true,
+   "bytes": 1885540,
+   "sha256": "c7049c15e7be9f9497049be2b748182126b0a0c2ae397b715241c7c3e4b04b57"
+  },
+  "reports/evidence/phase3B6_2_3_1_0/hist_H00922_20040101_20261127.json": {
+   "purpose": "3B-6.2.3.1.0 原始证据",
+   "exists": true,
+   "bytes": 1941092,
+   "sha256": "374baf3e0a60380d4131cb1f684dd15ca422f2e377bca67f6a2c7801f607bbba"
+  },
+  "reports/evidence/phase3B6_2_3_1_0/hist_H00942_20040101_20261127.json": {
+   "purpose": "3B-6.2.3.1.0 原始证据",
+   "exists": true,
+   "bytes": 2078941,
+   "sha256": "ea0497aa06442ec527c697b7d90c852533c212173cf92fa6e25ddee661c9ebe0"
+  },
+  "reports/evidence/phase3B6_2_3_1_0/hist_H20184_20040101_20261127.json": {
+   "purpose": "3B-6.2.3.1.0 原始证据",
+   "exists": true,
+   "bytes": 2382392,
+   "sha256": "52ce7738e06362b6cfc841153dd3b53cd0a95b016a969b23329cd18914b9e84d"
+  },
+  "reports/evidence/phase3B6_2_3_1_0/hist_H20539_20040101_20261127.json": {
+   "purpose": "3B-6.2.3.1.0 原始证据",
+   "exists": true,
+   "bytes": 1615193,
+   "sha256": "9235ba8d6754f27535480e252ad060c129ca6e0fa49540e1bf1f26f431bc6e66"
+  },
+  "reports/evidence/phase3B6_2_3_1_0/hist_H20930_20040101_20261127.json": {
+   "purpose": "3B-6.2.3.1.0 原始证据",
+   "exists": true,
+   "bytes": 1210831,
+   "sha256": "188c05599881baafeb151d9108b30a4e4b2d2ae9f0220da27f51e7703bd82bcf"
+  },
+  "reports/evidence/phase3B6_2_3_1_0/hist_H30184_20040101_20261127.json": {
+   "purpose": "3B-6.2.3.1.0 原始证据",
+   "exists": true,
+   "bytes": 2238681,
+   "sha256": "67057bebb23074450a22467b6fbc2104d92dc30f8f35d4b3ee194da0375110db"
+  },
+  "reports/evidence/phase3B6_2_3_1_0/hist_N00012_20040101_20261127.json": {
+   "purpose": "3B-6.2.3.1.0 原始证据",
+   "exists": true,
+   "bytes": 1368377,
+   "sha256": "d4b0aaf3885df93946f1597e50a43dcee0507fa1c7bce33148ab7bd61015badb"
+  },
+  "reports/evidence/phase3B6_2_3_0_4/baseline_after.json": {
+   "purpose": "3B-6.2.3.0.4 对照证据",
+   "exists": true,
+   "bytes": 8758,
+   "sha256": "3c9cc53e1a633ce784066c5bee81e5b01b2cb3f94c8ddf0dc845fe1acadc3d74"
+  },
+  "reports/evidence/phase3B6_2_3_0_4/baseline_before.json": {
+   "purpose": "3B-6.2.3.0.4 对照证据",
+   "exists": true,
+   "bytes": 9011,
+   "sha256": "765af9787e54afdcc4c2e8ed4eb90cb0ab7576c0d47ce7fbdff92512243af6ca"
+  },
+  "reports/evidence/phase3B6_2_3_0_4/csindex_basic_000012.json": {
+   "purpose": "3B-6.2.3.0.4 对照证据",
+   "exists": true,
+   "bytes": 1055,
+   "sha256": "4390b7dc8015f4ed85dfeeafde53b7a7b4565ce95064deb5028216343f0fe39b"
+  },
+  "reports/evidence/phase3B6_2_3_0_4/csindex_basic_000016.json": {
+   "purpose": "3B-6.2.3.0.4 对照证据",
+   "exists": true,
+   "bytes": 1181,
+   "sha256": "44bd88a3dc069ab09206ceca301a362db8ab2dab3529d2cd498369081e22b88b"
+  },
+  "reports/evidence/phase3B6_2_3_0_4/csindex_basic_000300.json": {
+   "purpose": "3B-6.2.3.0.4 对照证据",
+   "exists": true,
+   "bytes": 1088,
+   "sha256": "89cbd0812e258757ccca68285181d280b22881f1e95e4fb524ddea64bd159fb6"
+  },
+  "reports/evidence/phase3B6_2_3_0_4/csindex_basic_000905.json": {
+   "purpose": "3B-6.2.3.0.4 对照证据",
+   "exists": true,
+   "bytes": 990,
+   "sha256": "29bbc5ab7081e7c50efbac91062224810b908ead05448316b96e6441c77a2efb"
+  },
+  "reports/evidence/phase3B6_2_3_0_4/csindex_basic_000906.json": {
+   "purpose": "3B-6.2.3.0.4 对照证据",
+   "exists": true,
+   "bytes": 975,
+   "sha256": "1e49eff6bdccda98fa090db0b8987178bd4e799dfbcc842e2f695289ebb9ffd5"
+  },
+  "reports/evidence/phase3B6_2_3_0_4/csindex_basic_000922.json": {
+   "purpose": "3B-6.2.3.0.4 对照证据",
+   "exists": true,
+   "bytes": 1180,
+   "sha256": "437049bcdc8f4317a6566e79d6b9806939612977c5e9fbd30030cb0673fa7090"
+  },
+  "reports/evidence/phase3B6_2_3_0_4/csindex_basic_000942.json": {
+   "purpose": "3B-6.2.3.0.4 对照证据",
+   "exists": true,
+   "bytes": 1223,
+   "sha256": "da5688dc762f816518e59fac067a6a99ec997864e9c96f40e6b30d9f1ed14c25"
+  },
+  "reports/evidence/phase3B6_2_3_0_4/csindex_basic_399997.json": {
+   "purpose": "3B-6.2.3.0.4 对照证据",
+   "exists": true,
+   "bytes": 1062,
+   "sha256": "4107d6e3ed60008fe515b4b96324d506827b08729b3a0037cbffa2f0a37bbb5a"
+  },
+  "reports/evidence/phase3B6_2_3_0_4/csindex_basic_930930.json": {
+   "purpose": "3B-6.2.3.0.4 对照证据",
+   "exists": true,
+   "bytes": 1233,
+   "sha256": "03b676d21f126b75faaaad284435cf771325b888d132e612914801ab20fdb749"
+  },
+  "reports/evidence/phase3B6_2_3_0_4/csindex_basic_H30184.json": {
+   "purpose": "3B-6.2.3.0.4 对照证据",
+   "exists": true,
+   "bytes": 1460,
+   "sha256": "69c1bc656ff884f0187ed261b085eef794cd2d3285f4700adb0e5d7f9a8e0f9b"
+  },
+  "reports/evidence/phase3B6_2_3_0_4/csindex_ctrl_000012_from20040102.json": {
+   "purpose": "3B-6.2.3.0.4 对照证据",
+   "exists": true,
+   "bytes": 1961712,
+   "sha256": "024fb0741adecba8fafd11fbe4874213ef51d3700e730c364ca1012e22980241"
+  },
+  "reports/evidence/phase3B6_2_3_0_4/csindex_ctrl_000016_from20040102.json": {
+   "purpose": "3B-6.2.3.0.4 对照证据",
+   "exists": true,
+   "bytes": 1822008,
+   "sha256": "9d6bfeae9cbce2d19aa2c70818bb418e5c13005c8901bd6c7e33c56862b192ba"
+  },
+  "reports/evidence/phase3B6_2_3_0_4/csindex_ctrl_000300_from20040102.json": {
+   "purpose": "3B-6.2.3.0.4 对照证据",
+   "exists": true,
+   "bytes": 1857719,
+   "sha256": "5f20f2354a1a281d6f63eb22a3f4a93c29d93ce71c4e29c7e2d8773cbbbdf6c7"
+  },
+  "reports/evidence/phase3B6_2_3_0_4/csindex_ctrl_000905_from20040102.json": {
+   "purpose": "3B-6.2.3.0.4 对照证据",
+   "exists": true,
+   "bytes": 1858785,
+   "sha256": "ec16abc97a8a686d067a581ca6710eb9240df3560dc7bc18ba8baf4523ec8bca"
+  },
+  "reports/evidence/phase3B6_2_3_0_4/csindex_ctrl_000906_from20040102.json": {
+   "purpose": "3B-6.2.3.0.4 对照证据",
+   "exists": true,
+   "bytes": 1784944,
+   "sha256": "722d85985f4582a1ac2d695bf30c5e72b0f45e0cdf9333f225163a351d19c69b"
+  },
+  "reports/evidence/phase3B6_2_3_0_4/csindex_ctrl_000922_from20040102.json": {
+   "purpose": "3B-6.2.3.0.4 对照证据",
+   "exists": true,
+   "bytes": 1857291,
+   "sha256": "8f6f37642a94ea9b1436d62f8cbbaf89e0c188c3160286a4475a63c44651e5c0"
+  },
+  "reports/evidence/phase3B6_2_3_0_4/csindex_ctrl_000942_from20040102.json": {
+   "purpose": "3B-6.2.3.0.4 对照证据",
+   "exists": true,
+   "bytes": 1998965,
+   "sha256": "ff7030c44cda5fe5800765310144e2fda950cd6f71b3e76c1e7ad68efb1bfa9a"
+  },
+  "reports/evidence/phase3B6_2_3_0_4/csindex_ctrl_399997_from20040102.json": {
+   "purpose": "3B-6.2.3.0.4 对照证据",
+   "exists": true,
+   "bytes": 1502108,
+   "sha256": "66c3f2691393c5b25476f740fe43d7ccdaf75a4e0ba6eb10e942180d1bc46d49"
+  },
+  "reports/evidence/phase3B6_2_3_0_4/csindex_ctrl_930930_from20040102.json": {
+   "purpose": "3B-6.2.3.0.4 对照证据",
+   "exists": true,
+   "bytes": 1137550,
+   "sha256": "31b752886b66cd3a2e98f8551c4ae98c8b9a16df579b903beadae0be8f407486"
+  },
+  "reports/evidence/phase3B6_2_3_0_4/csindex_ctrl_H30184_from20040102.json": {
+   "purpose": "3B-6.2.3.0.4 对照证据",
+   "exists": true,
+   "bytes": 2237397,
+   "sha256": "c0bc14a031df3f35c23cef4818f88071b4e73b7e23b5f791bb3f4a652a19b034"
+  },
+  "reports/evidence/phase3B6_2_3_0_4/csindex_hist_000012_from20040101.json": {
+   "purpose": "3B-6.2.3.0.4 对照证据",
+   "exists": true,
+   "bytes": 1962061,
+   "sha256": "9b93c64af70beffbe9994b4816c0f17e8d744a1586a54c93ce2460af60a33f7f"
+  },
+  "reports/evidence/phase3B6_2_3_0_4/csindex_hist_000016_from20040101.json": {
+   "purpose": "3B-6.2.3.0.4 对照证据",
+   "exists": true,
+   "bytes": 1822331,
+   "sha256": "623196e3160c3f0e4e35a76c74663fde25760cf2611cd2c9a5a9b70a87f3349e"
+  },
+  "reports/evidence/phase3B6_2_3_0_4/csindex_hist_000300_from20040101.json": {
+   "purpose": "3B-6.2.3.0.4 对照证据",
+   "exists": true,
+   "bytes": 1858043,
+   "sha256": "1dda4b85fff46bc0587ce57edc5de8520251e8cce7fb891f65daee490d183c07"
+  },
+  "reports/evidence/phase3B6_2_3_0_4/csindex_hist_000905_from20040101.json": {
+   "purpose": "3B-6.2.3.0.4 对照证据",
+   "exists": true,
+   "bytes": 1858785,
+   "sha256": "6438b39074f4bb1997d625dc0d5425a8f5e4f13c23c5dd76b488a8b9ff20f655"
+  },
+  "reports/evidence/phase3B6_2_3_0_4/csindex_hist_000906_from20040101.json": {
+   "purpose": "3B-6.2.3.0.4 对照证据",
+   "exists": true,
+   "bytes": 1784944,
+   "sha256": "68ff1da2d6687a452851be391c3305fb1263f26719a043fd00b2947374111711"
+  },
+  "reports/evidence/phase3B6_2_3_0_4/csindex_hist_000922_from20040101.json": {
+   "purpose": "3B-6.2.3.0.4 对照证据",
+   "exists": true,
+   "bytes": 1857291,
+   "sha256": "eb96474bb6cac16c825c21ab9541d1eb73e5d65c5d9b6b0f9ae838c3d91c7adb"
+  },
+  "reports/evidence/phase3B6_2_3_0_4/csindex_hist_000942_from20040101.json": {
+   "purpose": "3B-6.2.3.0.4 对照证据",
+   "exists": true,
+   "bytes": 1998965,
+   "sha256": "8fdc47fc69f7dfca70ae69919f2c808b9f0649a30d431a086f4c2b75ffdc617d"
+  },
+  "reports/evidence/phase3B6_2_3_0_4/csindex_hist_399997_from20040101.json": {
+   "purpose": "3B-6.2.3.0.4 对照证据",
+   "exists": true,
+   "bytes": 1502108,
+   "sha256": "e0f85d49813e3d27dabdfe596e92ff9cce63d45b30dcad035d5e0bf5f894ff22"
+  },
+  "reports/evidence/phase3B6_2_3_0_4/csindex_hist_930930_from20040101.json": {
+   "purpose": "3B-6.2.3.0.4 对照证据",
+   "exists": true,
+   "bytes": 1137550,
+   "sha256": "f70e816664b4f9af3c4d1f50f5a0b4c68b77dd6f2f02d1c97bf871fa3368ad11"
+  },
+  "reports/evidence/phase3B6_2_3_0_4/csindex_hist_H30184_from20040101.json": {
+   "purpose": "3B-6.2.3.0.4 对照证据",
+   "exists": true,
+   "bytes": 2237397,
+   "sha256": "72c4fcca210dc8031817cad2543e18fbd30e8e1123e65e52a9a412c91ae51a95"
+  },
+  "reports/evidence/phase3B6_2_3_0_4/requests_manifest.json": {
+   "purpose": "3B-6.2.3.0.4 对照证据",
+   "exists": true,
+   "bytes": 5783,
+   "sha256": "30ca04c150dd925ad8bd86bdd551ea31a6002b56a65d9502685eecb52eb81109"
+  },
+  "reports/phase3B6_2_3_1_0_3_audit.json": {
+   "purpose": "本轮产物",
+   "exists": true,
+   "bytes": 73392,
+   "sha256": "6732a6ab91d59680e34de7142456070f4a1b5ea0736c521c61c64ad1b5ecfd91"
+  },
+  "reports/phase3B6_2_3_1_0_3_fix_report.md": {
+   "purpose": "本轮产物",
+   "exists": true,
+   "bytes": 6432,
+   "sha256": "9f1d8616a9b5c58f7e3f1f0cb908d9ecbd467e30f4a990b418f2998e9dc52421"
+  },
+  "reports/phase3B6_2_3_1_0_3_test_report.md": {
+   "purpose": "本轮产物",
+   "exists": true,
+   "bytes": 4578,
+   "sha256": "3492c6a179b91b035566c0d25db326893db6d0a17ce30d422f3db21eb8ceb890"
+  }
+ }
+}

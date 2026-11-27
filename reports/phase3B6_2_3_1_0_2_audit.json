@@ -140,8 +140,12 @@
     "reason": "相对 A 股交易日历**代理**无缺失（非官方发布日历）",
     "coverage_anchor": "second_row_unconfirmed",
     "coverage_anchor_note": "覆盖核验起点为第二行，但**第二行未被确认为真实历史起点**；覆盖率结论仅表示「自该行起相对日历无缺失」，不代表真实历史起点已确认",
-    "continuity_note": "存在 1 个疑似休市占位行，**无官方日历证据，不得判为 verified**"
-   }
+    "continuity_note": "存在 1 个疑似休市占位行，**无官方日历证据，不得判为 verified**",
+    "continuity_status_original": "has_unresolved_suspicion",
+    "continuity_level": "has_unresolved_suspicion",
+    "continuity_level_definition": "存在疑似休市占位行但无官方日历证据"
+   },
+   "_aligned_by": "3B-6.2.3.1.0.3"
   },
   {
    "tr_candidate": "H00905",
@@ -248,8 +252,12 @@
     "reason": "相对 A 股交易日历**代理**无缺失（非官方发布日历）",
     "coverage_anchor": "second_row_unconfirmed",
     "coverage_anchor_note": "覆盖核验起点为第二行，但**第二行未被确认为真实历史起点**；覆盖率结论仅表示「自该行起相对日历无缺失」，不代表真实历史起点已确认",
-    "continuity_note": "存在 1 个疑似休市占位行，**无官方日历证据，不得判为 verified**"
-   }
+    "continuity_note": "存在 1 个疑似休市占位行，**无官方日历证据，不得判为 verified**",
+    "continuity_status_original": "has_unresolved_suspicion",
+    "continuity_level": "has_unresolved_suspicion",
+    "continuity_level_definition": "存在疑似休市占位行但无官方日历证据"
+   },
+   "_aligned_by": "3B-6.2.3.1.0.3"
   },
   {
    "tr_candidate": "H00906",
@@ -356,8 +364,12 @@
     "reason": "相对 A 股交易日历**代理**无缺失（非官方发布日历）",
     "coverage_anchor": "second_row_unconfirmed",
     "coverage_anchor_note": "覆盖核验起点为第二行，但**第二行未被确认为真实历史起点**；覆盖率结论仅表示「自该行起相对日历无缺失」，不代表真实历史起点已确认",
-    "continuity_note": "存在 1 个疑似休市占位行，**无官方日历证据，不得判为 verified**"
-   }
+    "continuity_note": "存在 1 个疑似休市占位行，**无官方日历证据，不得判为 verified**",
+    "continuity_status_original": "has_unresolved_suspicion",
+    "continuity_level": "has_unresolved_suspicion",
+    "continuity_level_definition": "存在疑似休市占位行但无官方日历证据"
+   },
+   "_aligned_by": "3B-6.2.3.1.0.3"
   },
   {
    "tr_candidate": "H00016",
@@ -464,8 +476,12 @@
     "reason": "相对 A 股交易日历**代理**无缺失（非官方发布日历）",
     "coverage_anchor": "second_row_unconfirmed",
     "coverage_anchor_note": "覆盖核验起点为第二行，但**第二行未被确认为真实历史起点**；覆盖率结论仅表示「自该行起相对日历无缺失」，不代表真实历史起点已确认",
-    "continuity_note": "存在 1 个疑似休市占位行，**无官方日历证据，不得判为 verified**"
-   }
+    "continuity_note": "存在 1 个疑似休市占位行，**无官方日历证据，不得判为 verified**",
+    "continuity_status_original": "has_unresolved_suspicion",
+    "continuity_level": "has_unresolved_suspicion",
+    "continuity_level_definition": "存在疑似休市占位行但无官方日历证据"
+   },
+   "_aligned_by": "3B-6.2.3.1.0.3"
   },
   {
    "tr_candidate": "H20539",
@@ -572,8 +588,12 @@
     "reason": "相对 A 股交易日历**代理**无缺失（非官方发布日历）",
     "coverage_anchor": "second_row_unconfirmed",
     "coverage_anchor_note": "覆盖核验起点为第二行，但**第二行未被确认为真实历史起点**；覆盖率结论仅表示「自该行起相对日历无缺失」，不代表真实历史起点已确认",
-    "continuity_note": "存在 1 个疑似休市占位行，**无官方日历证据，不得判为 verified**"
-   }
+    "continuity_note": "存在 1 个疑似休市占位行，**无官方日历证据，不得判为 verified**",
+    "continuity_status_original": "has_unresolved_suspicion",
+    "continuity_level": "has_unresolved_suspicion",
+    "continuity_level_definition": "存在疑似休市占位行但无官方日历证据"
+   },
+   "_aligned_by": "3B-6.2.3.1.0.3"
   },
   {
    "tr_candidate": "399997CNY02",
@@ -664,8 +684,12 @@
     "reason": "相对 A 股交易日历**代理**无缺失（非官方发布日历）",
     "coverage_anchor": "second_row_unconfirmed",
     "coverage_anchor_note": "覆盖核验起点为第二行，但**第二行未被确认为真实历史起点**；覆盖率结论仅表示「自该行起相对日历无缺失」，不代表真实历史起点已确认",
-    "continuity_note": "无日历外日期"
-   }
+    "continuity_note": "无日历外日期",
+    "continuity_status_original": "verified",
+    "continuity_level": "verified_against_proxy_calendar",
+    "continuity_level_definition": "相对**项目 A 股交易日历代理**验证连续；**不是官方发布日历**"
+   },
+   "_aligned_by": "3B-6.2.3.1.0.3"
   },
   {
    "tr_candidate": "H20184",
@@ -774,8 +798,12 @@
     "reason": "相对 A 股交易日历**代理**无缺失（非官方发布日历）",
     "coverage_anchor": "second_row_unconfirmed",
     "coverage_anchor_note": "覆盖核验起点为第二行，但**第二行未被确认为真实历史起点**；覆盖率结论仅表示「自该行起相对日历无缺失」，不代表真实历史起点已确认",
-    "continuity_note": "存在 1 个疑似休市占位行，**无官方日历证据，不得判为 verified**"
-   }
+    "continuity_note": "存在 1 个疑似休市占位行，**无官方日历证据，不得判为 verified**",
+    "continuity_status_original": "has_unresolved_suspicion",
+    "continuity_level": "has_unresolved_suspicion",
+    "continuity_level_definition": "存在疑似休市占位行但无官方日历证据"
+   },
+   "_aligned_by": "3B-6.2.3.1.0.3"
   },
   {
    "tr_candidate": "H00942",
@@ -882,8 +910,12 @@
     "reason": "相对 A 股交易日历**代理**无缺失（非官方发布日历）",
     "coverage_anchor": "second_row_unconfirmed",
     "coverage_anchor_note": "覆盖核验起点为第二行，但**第二行未被确认为真实历史起点**；覆盖率结论仅表示「自该行起相对日历无缺失」，不代表真实历史起点已确认",
-    "continuity_note": "存在 1 个疑似休市占位行，**无官方日历证据，不得判为 verified**"
-   }
+    "continuity_note": "存在 1 个疑似休市占位行，**无官方日历证据，不得判为 verified**",
+    "continuity_status_original": "has_unresolved_suspicion",
+    "continuity_level": "has_unresolved_suspicion",
+    "continuity_level_definition": "存在疑似休市占位行但无官方日历证据"
+   },
+   "_aligned_by": "3B-6.2.3.1.0.3"
   },
   {
    "tr_candidate": "H00922",
@@ -990,8 +1022,12 @@
     "reason": "相对 A 股交易日历**代理**无缺失（非官方发布日历）",
     "coverage_anchor": "second_row_unconfirmed",
     "coverage_anchor_note": "覆盖核验起点为第二行，但**第二行未被确认为真实历史起点**；覆盖率结论仅表示「自该行起相对日历无缺失」，不代表真实历史起点已确认",
-    "continuity_note": "存在 1 个疑似休市占位行，**无官方日历证据，不得判为 verified**"
-   }
+    "continuity_note": "存在 1 个疑似休市占位行，**无官方日历证据，不得判为 verified**",
+    "continuity_status_original": "has_unresolved_suspicion",
+    "continuity_level": "has_unresolved_suspicion",
+    "continuity_level_definition": "存在疑似休市占位行但无官方日历证据"
+   },
+   "_aligned_by": "3B-6.2.3.1.0.3"
   },
   {
    "tr_candidate": "H00012",
@@ -1077,8 +1113,12 @@
     "coverage_anchor": "second_row_unconfirmed",
     "coverage_anchor_note": "覆盖核验起点为第二行，但**第二行未被确认为真实历史起点**；覆盖率结论仅表示「自该行起相对日历无缺失」，不代表真实历史起点已确认",
     "continuity_note": "适用日历未取得",
-    "outside_calendar_detail": []
-   }
+    "outside_calendar_detail": [],
+    "continuity_status_original": "unknown",
+    "continuity_level": "unknown",
+    "continuity_level_definition": "适用市场日历未取得，无法核验"
+   },
+   "_aligned_by": "3B-6.2.3.1.0.3"
   },
   {
    "tr_candidate": "N00012",
@@ -1164,8 +1204,12 @@
     "coverage_anchor": "second_row_unconfirmed",
     "coverage_anchor_note": "覆盖核验起点为第二行，但**第二行未被确认为真实历史起点**；覆盖率结论仅表示「自该行起相对日历无缺失」，不代表真实历史起点已确认",
     "continuity_note": "适用日历未取得",
-    "outside_calendar_detail": []
-   }
+    "outside_calendar_detail": [],
+    "continuity_status_original": "unknown",
+    "continuity_level": "unknown",
+    "continuity_level_definition": "适用市场日历未取得，无法核验"
+   },
+   "_aligned_by": "3B-6.2.3.1.0.3"
   },
   {
    "tr_candidate": "H20930",
@@ -1251,8 +1295,12 @@
     "coverage_anchor": "second_row_unconfirmed",
     "coverage_anchor_note": "覆盖核验起点为第二行，但**第二行未被确认为真实历史起点**；覆盖率结论仅表示「自该行起相对日历无缺失」，不代表真实历史起点已确认",
     "continuity_note": "适用日历未取得",
-    "outside_calendar_detail": []
-   }
+    "outside_calendar_detail": [],
+    "continuity_status_original": "unknown",
+    "continuity_level": "unknown",
+    "continuity_level_definition": "适用市场日历未取得，无法核验"
+   },
+   "_aligned_by": "3B-6.2.3.1.0.3"
   }
  ],
  "summary": {
@@ -1270,7 +1318,11 @@
     "real_history_start_unknown": 9,
     "continuity_verified": 1,
     "continuity_has_unresolved_suspicion": 8,
-    "continuity_unknown": 0
+    "continuity_unknown": 0,
+    "continuity_level_verified_official_calendar": 0,
+    "continuity_level_verified_against_proxy_calendar": 1,
+    "continuity_level_has_unresolved_suspicion": 8,
+    "continuity_level_unknown": 0
    },
    "bond": {
     "candidate_count": 2,
@@ -1307,7 +1359,14 @@
    "synthetic_unknown": 0,
    "tr_candidate_control_available": 0,
    "price_index_control_available": 12,
-   "real_history_start_unknown": 12
+   "real_history_start_unknown": 12,
+   "continuity_levels": {
+    "verified_official_calendar": 0,
+    "verified_against_proxy_calendar": 1,
+    "has_unresolved_suspicion": 8,
+    "has_issues": 0,
+    "unknown": 3
+   }
   },
   "gates": {
    "ready_for_research_analysis": true,
@@ -1345,5 +1404,28 @@
   "manifest_verified_count": 54,
   "no_original_manifest_count": 0,
   "manifest_file": "reports/evidence/phase3B6_2_3_1_0_2/manifest.json"
- }
+ },
+ "_superseded_snapshot": {
+  "note": "保留 3B-6.2.3.1.0.2 原始四态连续性状态；新增 continuity_level（五态）字段以与 3.0.3 对齐",
+  "original_stock_group": {
+   "candidate_count": 9,
+   "market": "沪深A股",
+   "calendar_available": true,
+   "synthetic_confirmed": 0,
+   "synthetic_strong_inference": 9,
+   "synthetic_unknown": 0,
+   "tr_candidate_control_available": 0,
+   "price_index_control_available": 9,
+   "real_history_start_unknown": 9,
+   "continuity_verified": 1,
+   "continuity_has_unresolved_suspicion": 8,
+   "continuity_unknown": 0,
+   "continuity_level_verified_official_calendar": 0,
+   "continuity_level_verified_against_proxy_calendar": 1,
+   "continuity_level_has_unresolved_suspicion": 8,
+   "continuity_level_unknown": 0
+  }
+ },
+ "_aligned_by": "3B-6.2.3.1.0.3",
+ "_alignment_note": "已按 3B-6.2.3.1.0.3 增加五态 continuity_level 字段；原四态 continuity_status 保留在 continuity_status_original 与 _superseded_snapshot 中。`verified` 在代理日历下对应 `verified_against_proxy_calendar`，**不是官方日历验证**。"
 }

@@ -1,5 +1,135 @@
 # 变更日志
 
+## 2026-11-27 — 阶段3B-6.2.3.1.0.3 连续性证据等级与准入统计最终一致性修正
+
+**只读修正。不重新下载数据，不修改数据库，不开始正式序列建设。**
+
+**基线与提交**
+
+| 项 | 值 |
+| --- | --- |
+| 任务基线 HEAD | `03f72f061ce16bd1f8d21c8847d7dca3a2052194` |
+
+**一、核心冲突**
+
+| 项 | 3B-6.2.3.1.0.1 | 3B-6.2.3.1.0.2 | **本轮最终** |
+| --- | ---: | ---: | ---: |
+| 股票 `continuity_verified` | **9** | 1 | **0（官方）/ 1（代理）** |
+| `has_unresolved_suspicion` | — | 8 | **8** |
+| `validated_series_candidate` | **8** | 未定义 | **0** |
+| `proxy_qualified_series_candidate` | 未定义 | 未定义 | **1** |
+| `formal_series_admitted` | 0 | 0 | **0** |
+
+**以 3B-6.2.3.1.0.2 的逐候选证据为准**，010 的 `continuity_verified=9` 已作废。
+
+**二、五态连续性证据等级**
+
+| 等级 | 定义 | 允许 validated | 数量 |
+| --- | --- | --- | ---: |
+| `verified_official_calendar` | 相对**官方指数发布日历**验证 | **是** | **0** |
+| `verified_against_proxy_calendar` | 相对**项目 A 股日历代理**验证；**非官方** | 否 | **1** |
+| `has_unresolved_suspicion` | 存在疑似休市占位但无官方日历证据 | 否 | **8** |
+| `has_issues` | 存在无法解释的日历外日期 | 否 | **0** |
+| `unknown` | 适用市场日历未取得 | 否 | **3** |
+
+**关键约束：只有 `verified_official_calendar` 允许 `validated_series_candidate`。**
+本轮**没有任何官方交易日历**，故 `verified_official_calendar = 0`。
+
+**三、四个独立状态**
+
+| 状态 | 判定规则 | 本轮 |
+| --- | --- | ---: |
+| `raw_data_layer_ingest_candidate` | 官方身份 + 历史接口可用 | **12 / 12** |
+| `validated_series_candidate` | 身份+口径+映射+质量+覆盖+**连续性达官方等级**+真实起点已知 | **0 / 12** |
+| **`proxy_qualified_series_candidate`** | 同上，连续性只需达**代理**等级 | **1 / 12** |
+| `formal_series_admitted` | validated + 时点可用 | **0 / 12** |
+
+**`proxy_qualified_series_candidate` 为独立统计字段，不冒充官方验证。**
+
+**四、逐候选最终状态**
+
+| 候选 | 分组 | 连续性等级 | 原始层 | 已验证 | 代理验证 | 正式准入 |
+| --- | --- | --- | --- | --- | --- | --- |
+| `H00300` `H00905` `H00906` `H00016` `H20539` `H00942` `H00922` | stock | `has_unresolved_suspicion` | ✅ | ❌ | ❌ | ❌ |
+| `H20184` | stock | `has_unresolved_suspicion` | ✅ | ❌ | ❌ | ❌ |
+| **`399997CNY02`** | stock | **`verified_against_proxy_calendar`** | ✅ | ❌ | **✅** | ❌ |
+| `H00012` `N00012` | bond | `unknown` | ✅ | ❌ | ❌ | ❌ |
+| `H20930` | hk | `unknown` | ✅ | ❌ | ❌ | ❌ |
+| **合计** | — | — | **12** | **0** | **1** | **0** |
+
+**五、为什么 `validated` 是 0 而不是 1**
+
+`399997CNY02` 虽在代理日历下覆盖与连续性通过，但：
+
+| 阻断项 | 原因 |
+| --- | --- |
+| 连续性等级 | `verified_against_proxy_calendar`，**非官方日历** |
+| 真实历史起点 | `unknown`（无候选自身对照证据） |
+| 时点可用性 | `unknown` |
+
+**六、三方 JSON 已完全一致**
+
+| 文件 | 连续性字段 | 状态 |
+| --- | --- | --- |
+| `phase3B6_2_3_1_0_1_audit.json` | `continuity_status`（五态） | **已同步** |
+| `phase3B6_2_3_1_0_2_audit.json` | `continuity_level`（五态） | **已对齐** |
+| `phase3B6_2_3_1_0_3_audit.json` | `continuity_level`（五态） | **基准** |
+
+**12 / 12 候选在三份 JSON 中完全一致。**
+
+**七、原始记录保留**
+
+| 文件 | 保留内容 |
+| --- | --- |
+| 010 JSON | `_superseded_snapshot` + 每候选 `_original_continuity_status` |
+| 020 JSON | `_superseded_snapshot` + 每候选 `continuity_status_original` |
+| 010 报告 | 修正横幅 + 「以 3.0.3 为准」 |
+| 020 报告 | 修正横幅 + 「以 3.0.3 为准」 |
+
+**旧报告未删除，均保留修订记录。**
+
+**八、冲突解决明细**
+
+8 只股票候选：010 `verified` → 020/030 `has_unresolved_suspicion`（实质冲突已解决）。
+
+`399997CNY02`：四态 `verified` → 五态 `verified_against_proxy_calendar`（命名细化）。
+
+**九、新增模块**
+
+- `scripts/audit_3b6_2_3_1_0_3_consistency.py`：一致性修正脚本（**不重新下载**）。
+  关键函数：`map_continuity_level()`（四态→五态）、`compute_admission()`
+  （四状态计算）、`summarize()`。
+- `tests/test_3b6_2_3_1_0_3_consistency.py`：**32 项**专项测试。
+
+**十、测试**
+
+| 项目 | 结果 |
+| --- | --- |
+| 专项测试 | **32 passed / 0 failed / 0 skipped** |
+| 全量测试 | 2783 → **2815**（**+32**） |
+
+**十一、数据库与证据不变性**
+
+| 项 | 值 |
+| --- | --- |
+| 数据库 SHA256 | `1671e4037cd265a2dead8b78d43614189a782385ca450ac6c2de3c4ff36ee873`（未变） |
+| `index_daily` 总行数 | 50,603（未变） |
+| 全收益代码在库内 | **全部 0** |
+| `integrity_check` | ok |
+| `foreign_key_check` | 0 |
+| 原始官方证据（basic_/hist_/csindex_） | SHA256 全部一致 |
+| 是否重新下载 | **否** |
+
+**十二、边界**
+
+未修改正式数据库、未修改 Schema、未写入全收益行情、未修改已有行情、
+未删除 suspect 记录、未修改基金净值、未开放回测或正式排名。
+
+门禁：`ready_for_research_analysis=true`、`ready_for_backtest=false`、
+`ready_for_formal_ranking=false`、`ready_for_3b6_2_3_1_series_build=false`。
+
+---
+
 ## 2026-11-27 — 阶段3B-6.2.3.1.0.2 全收益候选合成行证据溯源与休市日分类保守化
 
 **只读审计修正。不重新下载数据，不修改数据库，不开始正式序列建设。**
