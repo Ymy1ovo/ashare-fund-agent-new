@@ -1,0 +1,122 @@
+{
+ "csindex_basic_000012.json": {
+  "url": "https://www.csindex.com.cn/csindex-home/indexInfo/index-basic-info/000012",
+  "kind": "official_basic_info"
+ },
+ "csindex_hist_000012_from20040101.json": {
+  "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=000012&startDate=20040101&endDate=20261123",
+  "kind": "official_history_from_20040101"
+ },
+ "csindex_ctrl_000012_from20040102.json": {
+  "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=000012&startDate=20040102&endDate=20261123",
+  "kind": "official_control_from_20040102"
+ },
+ "csindex_basic_000016.json": {
+  "url": "https://www.csindex.com.cn/csindex-home/indexInfo/index-basic-info/000016",
+  "kind": "official_basic_info"
+ },
+ "csindex_hist_000016_from20040101.json": {
+  "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=000016&startDate=20040101&endDate=20261123",
+  "kind": "official_history_from_20040101"
+ },
+ "csindex_ctrl_000016_from20040102.json": {
+  "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=000016&startDate=20040102&endDate=20261123",
+  "kind": "official_control_from_20040102"
+ },
+ "csindex_basic_000300.json": {
+  "url": "https://www.csindex.com.cn/csindex-home/indexInfo/index-basic-info/000300",
+  "kind": "official_basic_info"
+ },
+ "csindex_hist_000300_from20040101.json": {
+  "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=000300&startDate=20040101&endDate=20261123",
+  "kind": "official_history_from_20040101"
+ },
+ "csindex_ctrl_000300_from20040102.json": {
+  "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=000300&startDate=20040102&endDate=20261123",
+  "kind": "official_control_from_20040102"
+ },
+ "csindex_basic_000905.json": {
+  "url": "https://www.csindex.com.cn/csindex-home/indexInfo/index-basic-info/000905",
+  "kind": "official_basic_info"
+ },
+ "csindex_hist_000905_from20040101.json": {
+  "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=000905&startDate=20040101&endDate=20261123",
+  "kind": "official_history_from_20040101"
+ },
+ "csindex_ctrl_000905_from20040102.json": {
+  "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=000905&startDate=20040102&endDate=20261123",
+  "kind": "official_control_from_20040102"
+ },
+ "csindex_basic_000906.json": {
+  "url": "https://www.csindex.com.cn/csindex-home/indexInfo/index-basic-info/000906",
+  "kind": "official_basic_info"
+ },
+ "csindex_hist_000906_from20040101.json": {
+  "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=000906&startDate=20040101&endDate=20261123",
+  "kind": "official_history_from_20040101"
+ },
+ "csindex_ctrl_000906_from20040102.json": {
+  "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=000906&startDate=20040102&endDate=20261123",
+  "kind": "official_control_from_20040102"
+ },
+ "csindex_basic_000922.json": {
+  "url": "https://www.csindex.com.cn/csindex-home/indexInfo/index-basic-info/000922",
+  "kind": "official_basic_info"
+ },
+ "csindex_hist_000922_from20040101.json": {
+  "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=000922&startDate=20040101&endDate=20261123",
+  "kind": "official_history_from_20040101"
+ },
+ "csindex_ctrl_000922_from20040102.json": {
+  "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=000922&startDate=20040102&endDate=20261123",
+  "kind": "official_control_from_20040102"
+ },
+ "csindex_basic_000942.json": {
+  "url": "https://www.csindex.com.cn/csindex-home/indexInfo/index-basic-info/000942",
+  "kind": "official_basic_info"
+ },
+ "csindex_hist_000942_from20040101.json": {
+  "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=000942&startDate=20040101&endDate=20261123",
+  "kind": "official_history_from_20040101"
+ },
+ "csindex_ctrl_000942_from20040102.json": {
+  "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=000942&startDate=20040102&endDate=20261123",
+  "kind": "official_control_from_20040102"
+ },
+ "csindex_basic_399997.json": {
+  "url": "https://www.csindex.com.cn/csindex-home/indexInfo/index-basic-info/399997",
+  "kind": "official_basic_info"
+ },
+ "csindex_hist_399997_from20040101.json": {
+  "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=399997&startDate=20040101&endDate=20261123",
+  "kind": "official_history_from_20040101"
+ },
+ "csindex_ctrl_399997_from20040102.json": {
+  "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=399997&startDate=20040102&endDate=20261123",
+  "kind": "official_control_from_20040102"
+ },
+ "csindex_basic_930930.json": {
+  "url": "https://www.csindex.com.cn/csindex-home/indexInfo/index-basic-info/930930",
+  "kind": "official_basic_info"
+ },
+ "csindex_hist_930930_from20040101.json": {
+  "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=930930&startDate=20040101&endDate=20261123",
+  "kind": "official_history_from_20040101"
+ },
+ "csindex_ctrl_930930_from20040102.json": {
+  "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=930930&startDate=20040102&endDate=20261123",
+  "kind": "official_control_from_20040102"
+ },
+ "csindex_basic_H30184.json": {
+  "url": "https://www.csindex.com.cn/csindex-home/indexInfo/index-basic-info/H30184",
+  "kind": "official_basic_info"
+ },
+ "csindex_hist_H30184_from20040101.json": {
+  "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=H30184&startDate=20040101&endDate=20261123",
+  "kind": "official_history_from_20040101"
+ },
+ "csindex_ctrl_H30184_from20040102.json": {
+  "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=H30184&startDate=20040102&endDate=20261123",
+  "kind": "official_control_from_20040102"
+ }
+}

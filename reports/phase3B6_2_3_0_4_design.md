@@ -53,7 +53,8 @@
 | 官方基日 `basicDate` | 同上 |
 | 官方基点 `basicIndex` | 同上 |
 | 官方发布日 `publishDate` | 同上 |
-| 官方最早可查历史 | `csindex-home/perf/index-perf` 全量返回首行 |
+| **API 响应首日** | `csindex-home/perf/index-perf` 全量返回首行 |
+| **真实最早历史行情日期** | 需独立证据；无则 `unknown` |
 | `2004-01-01` 是否为有效交易日 | 项目 `trade_calendar`（**A股代理，非官方日历**） |
 
 ### 2.4 内部生成逻辑排查
@@ -87,7 +88,8 @@
 | `source_origin` | 官方接口 / 项目内部生成 / 第三方 / unknown |
 | `official_base_date` | 官方基日及证据 |
 | `official_publish_date` | 官方发布日期及证据 |
-| `earliest_official_history` | 官方最早可查询历史日期 |
+| `earliest_response_date` | 本次接口响应的**第一条**日期（非真实历史起点） |
+| `actual_earliest_historical_quote_date` | 真实最早历史行情日期；无独立证据时为 `unknown` |
 | `is_valid_trading_day` | 2004-01-01 是否有效交易日 |
 | `base_value_confusion` | 是否混淆基点值与行情 |
 | `placeholder_evidence` | 是否有证据证明人为占位 |

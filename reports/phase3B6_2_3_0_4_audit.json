@@ -1,11 +1,18 @@
 {
  "phase": "3B-6.2.3.0.4",
- "generated_at": "2026-11-27T10:20:35",
+ "generated_at": "2026-11-27T13:29:06",
  "read_only": true,
  "target_date": "2004-01-01",
  "target_count": 10,
+ "date_semantics": {
+  "official_basic_date": "指数官方基本信息中的基日（basicDate）",
+  "official_publish_date": "指数正式发布的日期（publishDate）",
+  "earliest_response_date": "本次官方接口响应的第一条日期；随请求起始日变化，**不是**真实最早历史行情日期",
+  "actual_earliest_historical_quote_date": "真实最早历史行情日期；无独立证据时为 unknown",
+  "warning": "**四者不可混为一谈**：基日 ≠ 发布日期 ≠ 响应首日 ≠ 真实最早行情日期"
+ },
  "baseline": {
-  "captured_at": "2026-11-27T10:05:24",
+  "captured_at": "2026-11-27T13:28:47",
   "database_path": "D:\\ymy\\jj-agent\\data\\fund_agent.db",
   "database_sha256": "1671e4037cd265a2dead8b78d43614189a782385ca450ac6c2de3c4ff36ee873",
   "database_bytes": 334036992,
@@ -452,9 +459,11 @@
    "1011.35",
    "99.22"
   ],
+  "scope": "app/ 与 scripts/ 下的 *.py / *.sql（**排除 tests/ 与扫描器自身**）",
   "per_value": {
    "2004-01-01": {
-    "production_code_hits": 24,
+    "production_code_hits": 8,
+    "test_code_hits": 21,
     "hits": [
      "app/fund/index_ingest.py:271:    # 基线占位行：来源首行常为 2004-01-01 且与第二行数值相同，",
      "app/fund/index_layer.py:326:    中证官网接口常在首行返回 2004-01-01 基线值，",
@@ -463,13 +472,12 @@
      "app/fund/research/index_verify.py:188:    | 000905 | 2004-01-01 | 2004-12-31 | 365 | **基线** |",
      "app/fund/research/index_verify.py:189:    | 399997 | 2004-01-01 | 2009-01-05 | 1831 | **基线** |",
      "app/fund/research/index_verify.py:190:    | 930930 | 2004-01-01 | 2014-11-14 | 3970 | **基线** |",
-     "scripts/audit_3b6_2_3_0_2_continuity.py:901:                \"2004-01-01 占位行单独统计，不计入有效行情，\"",
-     "tests/test_3b6_0_1_1_index_verify.py:205:    r = detect_baseline_row([\"2004-01-01\", \"2009-01-05\"])",
-     "tests/test_3b6_0_1_1_index_verify.py:212:    r = detect_baseline_row([\"2004-01-01\", \"2004-01-02\"],"
+     "scripts/audit_3b6_2_3_0_2_continuity.py:901:                \"2004-01-01 占位行单独统计，不计入有效行情，\""
     ]
    },
    "20040101": {
     "production_code_hits": 9,
+    "test_code_hits": 18,
     "hits": [
      "app/fund/index_ingest.py:51:DEFAULT_START = \"20040101\"",
      "app/fund/research/index_verify.py:78:def fetch_csindex_history(code: str, *, start_date: str = \"20040101\",",
@@ -483,45 +491,38 @@
     ]
    },
    "1000.0": {
-    "production_code_hits": 41,
-    "hits": [
-     "tests/test_3b6_0_1_1_index_verify.py:29:    closes = closes or [1000.0 + i for i in range(n)]",
-     "tests/test_3b6_0_2_1_raw_quality_and_basis.py:53:    closes = closes or [1000.0 + i for i in range(n)]",
-     "tests/test_3b6_0_2_1_raw_quality_and_basis.py:88:            (code, d, 1000.0, \"test\", \"2020-01-01T00:00:00\", \"fp_\" + d))",
-     "tests/test_3b6_0_2_2_effective_observations.py:53:def _seed(conn, code, basis, n_rows, quality=\"valid\", close=1000.0):",
-     "tests/test_3b6_0_2_2_effective_observations.py:115:            (\"000300\", d, 1000.0, \"test\", \"t\", f\"fp2_{d}\", \"suspect\"))",
-     "tests/test_3b6_0_2_3_finite_positive_close.py:108:    _insert(conn, \"T001\", 1000.0, \"2020-01-02\")",
-     "tests/test_3b6_0_2_3_finite_positive_close.py:120:    _insert(conn, \"T002\", 1000.0, \"2020-01-02\")",
-     "tests/test_3b6_0_2_3_finite_positive_close.py:129:    _insert(conn, \"T003\", 1000.0, \"2020-01-02\")",
-     "tests/test_3b6_0_2_3_finite_positive_close.py:142:    _insert(conn, \"T004\", 1000.0, \"2020-01-02\")",
-     "tests/test_3b6_0_2_3_finite_positive_close.py:158:        _insert(conn, \"T005\", 1000.0 + i, d)"
-    ]
+    "production_code_hits": 0,
+    "test_code_hits": 41,
+    "hits": []
    },
    "3000.0": {
-    "production_code_hits": 2,
-    "hits": [
-     "tests/test_validation_fix_3.py:82:    first = incremental_commission(3000.0, 0.0, costs, fill_gross=3000.0)",
-     "tests/test_validation_fix_3.py:95:    first = incremental_commission(3000.0, 0.0, costs, fill_gross=3000.0,"
-    ]
+    "production_code_hits": 0,
+    "test_code_hits": 2,
+    "hits": []
    },
    "994.47": {
     "production_code_hits": 0,
+    "test_code_hits": 1,
     "hits": []
    },
    "1204.61": {
     "production_code_hits": 0,
+    "test_code_hits": 1,
     "hits": []
    },
    "1028.64": {
     "production_code_hits": 0,
+    "test_code_hits": 1,
     "hits": []
    },
    "1011.35": {
     "production_code_hits": 0,
+    "test_code_hits": 1,
     "hits": []
    },
    "99.22": {
     "production_code_hits": 0,
+    "test_code_hits": 1,
     "hits": []
    }
   }
@@ -548,6 +549,504 @@
    }
   ]
  },
+ "evidence_files": {
+  "expected_total": 30,
+  "found_total": 30,
+  "sha256_match_manifest": 30,
+  "manifest_file": "reports/evidence/phase3B6_2_3_0_4/manifest.json",
+  "files": [
+   {
+    "index_code": "000012",
+    "kind": "basic",
+    "file": "csindex_basic_000012.json",
+    "exists": true,
+    "sha256": "4390b7dc8015f4ed85dfeeafde53b7a7b4565ce95064deb5028216343f0fe39b",
+    "bytes": 1055,
+    "relative_path": "reports/evidence/phase3B6_2_3_0_4/csindex_basic_000012.json",
+    "manifest_sha256": "4390b7dc8015f4ed85dfeeafde53b7a7b4565ce95064deb5028216343f0fe39b",
+    "manifest_match": true
+   },
+   {
+    "index_code": "000012",
+    "kind": "hist_from_20040101",
+    "file": "csindex_hist_000012_from20040101.json",
+    "exists": true,
+    "sha256": "9b93c64af70beffbe9994b4816c0f17e8d744a1586a54c93ce2460af60a33f7f",
+    "bytes": 1962061,
+    "relative_path": "reports/evidence/phase3B6_2_3_0_4/csindex_hist_000012_from20040101.json",
+    "manifest_sha256": "9b93c64af70beffbe9994b4816c0f17e8d744a1586a54c93ce2460af60a33f7f",
+    "manifest_match": true
+   },
+   {
+    "index_code": "000012",
+    "kind": "ctrl_from_20040102",
+    "file": "csindex_ctrl_000012_from20040102.json",
+    "exists": true,
+    "sha256": "024fb0741adecba8fafd11fbe4874213ef51d3700e730c364ca1012e22980241",
+    "bytes": 1961712,
+    "relative_path": "reports/evidence/phase3B6_2_3_0_4/csindex_ctrl_000012_from20040102.json",
+    "manifest_sha256": "024fb0741adecba8fafd11fbe4874213ef51d3700e730c364ca1012e22980241",
+    "manifest_match": true
+   },
+   {
+    "index_code": "000016",
+    "kind": "basic",
+    "file": "csindex_basic_000016.json",
+    "exists": true,
+    "sha256": "44bd88a3dc069ab09206ceca301a362db8ab2dab3529d2cd498369081e22b88b",
+    "bytes": 1181,
+    "relative_path": "reports/evidence/phase3B6_2_3_0_4/csindex_basic_000016.json",
+    "manifest_sha256": "44bd88a3dc069ab09206ceca301a362db8ab2dab3529d2cd498369081e22b88b",
+    "manifest_match": true
+   },
+   {
+    "index_code": "000016",
+    "kind": "hist_from_20040101",
+    "file": "csindex_hist_000016_from20040101.json",
+    "exists": true,
+    "sha256": "623196e3160c3f0e4e35a76c74663fde25760cf2611cd2c9a5a9b70a87f3349e",
+    "bytes": 1822331,
+    "relative_path": "reports/evidence/phase3B6_2_3_0_4/csindex_hist_000016_from20040101.json",
+    "manifest_sha256": "623196e3160c3f0e4e35a76c74663fde25760cf2611cd2c9a5a9b70a87f3349e",
+    "manifest_match": true
+   },
+   {
+    "index_code": "000016",
+    "kind": "ctrl_from_20040102",
+    "file": "csindex_ctrl_000016_from20040102.json",
+    "exists": true,
+    "sha256": "9d6bfeae9cbce2d19aa2c70818bb418e5c13005c8901bd6c7e33c56862b192ba",
+    "bytes": 1822008,
+    "relative_path": "reports/evidence/phase3B6_2_3_0_4/csindex_ctrl_000016_from20040102.json",
+    "manifest_sha256": "9d6bfeae9cbce2d19aa2c70818bb418e5c13005c8901bd6c7e33c56862b192ba",
+    "manifest_match": true
+   },
+   {
+    "index_code": "000300",
+    "kind": "basic",
+    "file": "csindex_basic_000300.json",
+    "exists": true,
+    "sha256": "89cbd0812e258757ccca68285181d280b22881f1e95e4fb524ddea64bd159fb6",
+    "bytes": 1088,
+    "relative_path": "reports/evidence/phase3B6_2_3_0_4/csindex_basic_000300.json",
+    "manifest_sha256": "89cbd0812e258757ccca68285181d280b22881f1e95e4fb524ddea64bd159fb6",
+    "manifest_match": true
+   },
+   {
+    "index_code": "000300",
+    "kind": "hist_from_20040101",
+    "file": "csindex_hist_000300_from20040101.json",
+    "exists": true,
+    "sha256": "1dda4b85fff46bc0587ce57edc5de8520251e8cce7fb891f65daee490d183c07",
+    "bytes": 1858043,
+    "relative_path": "reports/evidence/phase3B6_2_3_0_4/csindex_hist_000300_from20040101.json",
+    "manifest_sha256": "1dda4b85fff46bc0587ce57edc5de8520251e8cce7fb891f65daee490d183c07",
+    "manifest_match": true
+   },
+   {
+    "index_code": "000300",
+    "kind": "ctrl_from_20040102",
+    "file": "csindex_ctrl_000300_from20040102.json",
+    "exists": true,
+    "sha256": "5f20f2354a1a281d6f63eb22a3f4a93c29d93ce71c4e29c7e2d8773cbbbdf6c7",
+    "bytes": 1857719,
+    "relative_path": "reports/evidence/phase3B6_2_3_0_4/csindex_ctrl_000300_from20040102.json",
+    "manifest_sha256": "5f20f2354a1a281d6f63eb22a3f4a93c29d93ce71c4e29c7e2d8773cbbbdf6c7",
+    "manifest_match": true
+   },
+   {
+    "index_code": "000905",
+    "kind": "basic",
+    "file": "csindex_basic_000905.json",
+    "exists": true,
+    "sha256": "29bbc5ab7081e7c50efbac91062224810b908ead05448316b96e6441c77a2efb",
+    "bytes": 990,
+    "relative_path": "reports/evidence/phase3B6_2_3_0_4/csindex_basic_000905.json",
+    "manifest_sha256": "29bbc5ab7081e7c50efbac91062224810b908ead05448316b96e6441c77a2efb",
+    "manifest_match": true
+   },
+   {
+    "index_code": "000905",
+    "kind": "hist_from_20040101",
+    "file": "csindex_hist_000905_from20040101.json",
+    "exists": true,
+    "sha256": "6438b39074f4bb1997d625dc0d5425a8f5e4f13c23c5dd76b488a8b9ff20f655",
+    "bytes": 1858785,
+    "relative_path": "reports/evidence/phase3B6_2_3_0_4/csindex_hist_000905_from20040101.json",
+    "manifest_sha256": "6438b39074f4bb1997d625dc0d5425a8f5e4f13c23c5dd76b488a8b9ff20f655",
+    "manifest_match": true
+   },
+   {
+    "index_code": "000905",
+    "kind": "ctrl_from_20040102",
+    "file": "csindex_ctrl_000905_from20040102.json",
+    "exists": true,
+    "sha256": "ec16abc97a8a686d067a581ca6710eb9240df3560dc7bc18ba8baf4523ec8bca",
+    "bytes": 1858785,
+    "relative_path": "reports/evidence/phase3B6_2_3_0_4/csindex_ctrl_000905_from20040102.json",
+    "manifest_sha256": "ec16abc97a8a686d067a581ca6710eb9240df3560dc7bc18ba8baf4523ec8bca",
+    "manifest_match": true
+   },
+   {
+    "index_code": "000906",
+    "kind": "basic",
+    "file": "csindex_basic_000906.json",
+    "exists": true,
+    "sha256": "1e49eff6bdccda98fa090db0b8987178bd4e799dfbcc842e2f695289ebb9ffd5",
+    "bytes": 975,
+    "relative_path": "reports/evidence/phase3B6_2_3_0_4/csindex_basic_000906.json",
+    "manifest_sha256": "1e49eff6bdccda98fa090db0b8987178bd4e799dfbcc842e2f695289ebb9ffd5",
+    "manifest_match": true
+   },
+   {
+    "index_code": "000906",
+    "kind": "hist_from_20040101",
+    "file": "csindex_hist_000906_from20040101.json",
+    "exists": true,
+    "sha256": "68ff1da2d6687a452851be391c3305fb1263f26719a043fd00b2947374111711",
+    "bytes": 1784944,
+    "relative_path": "reports/evidence/phase3B6_2_3_0_4/csindex_hist_000906_from20040101.json",
+    "manifest_sha256": "68ff1da2d6687a452851be391c3305fb1263f26719a043fd00b2947374111711",
+    "manifest_match": true
+   },
+   {
+    "index_code": "000906",
+    "kind": "ctrl_from_20040102",
+    "file": "csindex_ctrl_000906_from20040102.json",
+    "exists": true,
+    "sha256": "722d85985f4582a1ac2d695bf30c5e72b0f45e0cdf9333f225163a351d19c69b",
+    "bytes": 1784944,
+    "relative_path": "reports/evidence/phase3B6_2_3_0_4/csindex_ctrl_000906_from20040102.json",
+    "manifest_sha256": "722d85985f4582a1ac2d695bf30c5e72b0f45e0cdf9333f225163a351d19c69b",
+    "manifest_match": true
+   },
+   {
+    "index_code": "000922",
+    "kind": "basic",
+    "file": "csindex_basic_000922.json",
+    "exists": true,
+    "sha256": "437049bcdc8f4317a6566e79d6b9806939612977c5e9fbd30030cb0673fa7090",
+    "bytes": 1180,
+    "relative_path": "reports/evidence/phase3B6_2_3_0_4/csindex_basic_000922.json",
+    "manifest_sha256": "437049bcdc8f4317a6566e79d6b9806939612977c5e9fbd30030cb0673fa7090",
+    "manifest_match": true
+   },
+   {
+    "index_code": "000922",
+    "kind": "hist_from_20040101",
+    "file": "csindex_hist_000922_from20040101.json",
+    "exists": true,
+    "sha256": "eb96474bb6cac16c825c21ab9541d1eb73e5d65c5d9b6b0f9ae838c3d91c7adb",
+    "bytes": 1857291,
+    "relative_path": "reports/evidence/phase3B6_2_3_0_4/csindex_hist_000922_from20040101.json",
+    "manifest_sha256": "eb96474bb6cac16c825c21ab9541d1eb73e5d65c5d9b6b0f9ae838c3d91c7adb",
+    "manifest_match": true
+   },
+   {
+    "index_code": "000922",
+    "kind": "ctrl_from_20040102",
+    "file": "csindex_ctrl_000922_from20040102.json",
+    "exists": true,
+    "sha256": "8f6f37642a94ea9b1436d62f8cbbaf89e0c188c3160286a4475a63c44651e5c0",
+    "bytes": 1857291,
+    "relative_path": "reports/evidence/phase3B6_2_3_0_4/csindex_ctrl_000922_from20040102.json",
+    "manifest_sha256": "8f6f37642a94ea9b1436d62f8cbbaf89e0c188c3160286a4475a63c44651e5c0",
+    "manifest_match": true
+   },
+   {
+    "index_code": "000942",
+    "kind": "basic",
+    "file": "csindex_basic_000942.json",
+    "exists": true,
+    "sha256": "da5688dc762f816518e59fac067a6a99ec997864e9c96f40e6b30d9f1ed14c25",
+    "bytes": 1223,
+    "relative_path": "reports/evidence/phase3B6_2_3_0_4/csindex_basic_000942.json",
+    "manifest_sha256": "da5688dc762f816518e59fac067a6a99ec997864e9c96f40e6b30d9f1ed14c25",
+    "manifest_match": true
+   },
+   {
+    "index_code": "000942",
+    "kind": "hist_from_20040101",
+    "file": "csindex_hist_000942_from20040101.json",
+    "exists": true,
+    "sha256": "8fdc47fc69f7dfca70ae69919f2c808b9f0649a30d431a086f4c2b75ffdc617d",
+    "bytes": 1998965,
+    "relative_path": "reports/evidence/phase3B6_2_3_0_4/csindex_hist_000942_from20040101.json",
+    "manifest_sha256": "8fdc47fc69f7dfca70ae69919f2c808b9f0649a30d431a086f4c2b75ffdc617d",
+    "manifest_match": true
+   },
+   {
+    "index_code": "000942",
+    "kind": "ctrl_from_20040102",
+    "file": "csindex_ctrl_000942_from20040102.json",
+    "exists": true,
+    "sha256": "ff7030c44cda5fe5800765310144e2fda950cd6f71b3e76c1e7ad68efb1bfa9a",
+    "bytes": 1998965,
+    "relative_path": "reports/evidence/phase3B6_2_3_0_4/csindex_ctrl_000942_from20040102.json",
+    "manifest_sha256": "ff7030c44cda5fe5800765310144e2fda950cd6f71b3e76c1e7ad68efb1bfa9a",
+    "manifest_match": true
+   },
+   {
+    "index_code": "399997",
+    "kind": "basic",
+    "file": "csindex_basic_399997.json",
+    "exists": true,
+    "sha256": "4107d6e3ed60008fe515b4b96324d506827b08729b3a0037cbffa2f0a37bbb5a",
+    "bytes": 1062,
+    "relative_path": "reports/evidence/phase3B6_2_3_0_4/csindex_basic_399997.json",
+    "manifest_sha256": "4107d6e3ed60008fe515b4b96324d506827b08729b3a0037cbffa2f0a37bbb5a",
+    "manifest_match": true
+   },
+   {
+    "index_code": "399997",
+    "kind": "hist_from_20040101",
+    "file": "csindex_hist_399997_from20040101.json",
+    "exists": true,
+    "sha256": "e0f85d49813e3d27dabdfe596e92ff9cce63d45b30dcad035d5e0bf5f894ff22",
+    "bytes": 1502108,
+    "relative_path": "reports/evidence/phase3B6_2_3_0_4/csindex_hist_399997_from20040101.json",
+    "manifest_sha256": "e0f85d49813e3d27dabdfe596e92ff9cce63d45b30dcad035d5e0bf5f894ff22",
+    "manifest_match": true
+   },
+   {
+    "index_code": "399997",
+    "kind": "ctrl_from_20040102",
+    "file": "csindex_ctrl_399997_from20040102.json",
+    "exists": true,
+    "sha256": "66c3f2691393c5b25476f740fe43d7ccdaf75a4e0ba6eb10e942180d1bc46d49",
+    "bytes": 1502108,
+    "relative_path": "reports/evidence/phase3B6_2_3_0_4/csindex_ctrl_399997_from20040102.json",
+    "manifest_sha256": "66c3f2691393c5b25476f740fe43d7ccdaf75a4e0ba6eb10e942180d1bc46d49",
+    "manifest_match": true
+   },
+   {
+    "index_code": "930930",
+    "kind": "basic",
+    "file": "csindex_basic_930930.json",
+    "exists": true,
+    "sha256": "03b676d21f126b75faaaad284435cf771325b888d132e612914801ab20fdb749",
+    "bytes": 1233,
+    "relative_path": "reports/evidence/phase3B6_2_3_0_4/csindex_basic_930930.json",
+    "manifest_sha256": "03b676d21f126b75faaaad284435cf771325b888d132e612914801ab20fdb749",
+    "manifest_match": true
+   },
+   {
+    "index_code": "930930",
+    "kind": "hist_from_20040101",
+    "file": "csindex_hist_930930_from20040101.json",
+    "exists": true,
+    "sha256": "f70e816664b4f9af3c4d1f50f5a0b4c68b77dd6f2f02d1c97bf871fa3368ad11",
+    "bytes": 1137550,
+    "relative_path": "reports/evidence/phase3B6_2_3_0_4/csindex_hist_930930_from20040101.json",
+    "manifest_sha256": "f70e816664b4f9af3c4d1f50f5a0b4c68b77dd6f2f02d1c97bf871fa3368ad11",
+    "manifest_match": true
+   },
+   {
+    "index_code": "930930",
+    "kind": "ctrl_from_20040102",
+    "file": "csindex_ctrl_930930_from20040102.json",
+    "exists": true,
+    "sha256": "31b752886b66cd3a2e98f8551c4ae98c8b9a16df579b903beadae0be8f407486",
+    "bytes": 1137550,
+    "relative_path": "reports/evidence/phase3B6_2_3_0_4/csindex_ctrl_930930_from20040102.json",
+    "manifest_sha256": "31b752886b66cd3a2e98f8551c4ae98c8b9a16df579b903beadae0be8f407486",
+    "manifest_match": true
+   },
+   {
+    "index_code": "H30184",
+    "kind": "basic",
+    "file": "csindex_basic_H30184.json",
+    "exists": true,
+    "sha256": "69c1bc656ff884f0187ed261b085eef794cd2d3285f4700adb0e5d7f9a8e0f9b",
+    "bytes": 1460,
+    "relative_path": "reports/evidence/phase3B6_2_3_0_4/csindex_basic_H30184.json",
+    "manifest_sha256": "69c1bc656ff884f0187ed261b085eef794cd2d3285f4700adb0e5d7f9a8e0f9b",
+    "manifest_match": true
+   },
+   {
+    "index_code": "H30184",
+    "kind": "hist_from_20040101",
+    "file": "csindex_hist_H30184_from20040101.json",
+    "exists": true,
+    "sha256": "72c4fcca210dc8031817cad2543e18fbd30e8e1123e65e52a9a412c91ae51a95",
+    "bytes": 2237397,
+    "relative_path": "reports/evidence/phase3B6_2_3_0_4/csindex_hist_H30184_from20040101.json",
+    "manifest_sha256": "72c4fcca210dc8031817cad2543e18fbd30e8e1123e65e52a9a412c91ae51a95",
+    "manifest_match": true
+   },
+   {
+    "index_code": "H30184",
+    "kind": "ctrl_from_20040102",
+    "file": "csindex_ctrl_H30184_from20040102.json",
+    "exists": true,
+    "sha256": "c0bc14a031df3f35c23cef4818f88071b4e73b7e23b5f791bb3f4a652a19b034",
+    "bytes": 2237397,
+    "relative_path": "reports/evidence/phase3B6_2_3_0_4/csindex_ctrl_H30184_from20040102.json",
+    "manifest_sha256": "c0bc14a031df3f35c23cef4818f88071b4e73b7e23b5f791bb3f4a652a19b034",
+    "manifest_match": true
+   }
+  ]
+ },
+ "url_verification": {
+  "rule": "20040101 请求的 startDate 必须为 20040101；对照请求的 startDate 必须为 20040102；历史响应含 20040101、对照响应不含",
+  "per_index": [
+   {
+    "index_code": "000012",
+    "hist_url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=000012&startDate=20040101&endDate=20261123",
+    "hist_url_start_param": "20040101",
+    "ctrl_url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=000012&startDate=20040102&endDate=20261123",
+    "ctrl_url_start_param": "20040102",
+    "hist_response_row_count": 5559,
+    "ctrl_response_row_count": 5558,
+    "hist_first_date": "20040101",
+    "ctrl_first_date": "20040102",
+    "hist_contains_20040101": true,
+    "ctrl_contains_20040101": false,
+    "hist_sha256": "9b93c64af70beffbe9994b4816c0f17e8d744a1586a54c93ce2460af60a33f7f",
+    "ctrl_sha256": "024fb0741adecba8fafd11fbe4874213ef51d3700e730c364ca1012e22980241"
+   },
+   {
+    "index_code": "000016",
+    "hist_url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=000016&startDate=20040101&endDate=20261123",
+    "hist_url_start_param": "20040101",
+    "ctrl_url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=000016&startDate=20040102&endDate=20261123",
+    "ctrl_url_start_param": "20040102",
+    "hist_response_row_count": 5560,
+    "ctrl_response_row_count": 5559,
+    "hist_first_date": "20040101",
+    "ctrl_first_date": "20040102",
+    "hist_contains_20040101": true,
+    "ctrl_contains_20040101": false,
+    "hist_sha256": "623196e3160c3f0e4e35a76c74663fde25760cf2611cd2c9a5a9b70a87f3349e",
+    "ctrl_sha256": "9d6bfeae9cbce2d19aa2c70818bb418e5c13005c8901bd6c7e33c56862b192ba"
+   },
+   {
+    "index_code": "000300",
+    "hist_url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=000300&startDate=20040101&endDate=20261123",
+    "hist_url_start_param": "20040101",
+    "ctrl_url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=000300&startDate=20040102&endDate=20261123",
+    "ctrl_url_start_param": "20040102",
+    "hist_response_row_count": 5559,
+    "ctrl_response_row_count": 5558,
+    "hist_first_date": "20040101",
+    "ctrl_first_date": "20040102",
+    "hist_contains_20040101": true,
+    "ctrl_contains_20040101": false,
+    "hist_sha256": "1dda4b85fff46bc0587ce57edc5de8520251e8cce7fb891f65daee490d183c07",
+    "ctrl_sha256": "5f20f2354a1a281d6f63eb22a3f4a93c29d93ce71c4e29c7e2d8773cbbbdf6c7"
+   },
+   {
+    "index_code": "000905",
+    "hist_url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=000905&startDate=20040101&endDate=20261123",
+    "hist_url_start_param": "20040101",
+    "ctrl_url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=000905&startDate=20040102&endDate=20261123",
+    "ctrl_url_start_param": "20040102",
+    "hist_response_row_count": 5318,
+    "ctrl_response_row_count": 5318,
+    "hist_first_date": "20040101",
+    "ctrl_first_date": "20040102",
+    "hist_contains_20040101": true,
+    "ctrl_contains_20040101": false,
+    "hist_sha256": "6438b39074f4bb1997d625dc0d5425a8f5e4f13c23c5dd76b488a8b9ff20f655",
+    "ctrl_sha256": "ec16abc97a8a686d067a581ca6710eb9240df3560dc7bc18ba8baf4523ec8bca"
+   },
+   {
+    "index_code": "000906",
+    "hist_url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=000906&startDate=20040101&endDate=20261123",
+    "hist_url_start_param": "20040101",
+    "ctrl_url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=000906&startDate=20040102&endDate=20261123",
+    "ctrl_url_start_param": "20040102",
+    "hist_response_row_count": 5318,
+    "ctrl_response_row_count": 5318,
+    "hist_first_date": "20040101",
+    "ctrl_first_date": "20040102",
+    "hist_contains_20040101": true,
+    "ctrl_contains_20040101": false,
+    "hist_sha256": "68ff1da2d6687a452851be391c3305fb1263f26719a043fd00b2947374111711",
+    "ctrl_sha256": "722d85985f4582a1ac2d695bf30c5e72b0f45e0cdf9333f225163a351d19c69b"
+   },
+   {
+    "index_code": "000922",
+    "hist_url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=000922&startDate=20040101&endDate=20261123",
+    "hist_url_start_param": "20040101",
+    "ctrl_url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=000922&startDate=20040102&endDate=20261123",
+    "ctrl_url_start_param": "20040102",
+    "hist_response_row_count": 5318,
+    "ctrl_response_row_count": 5318,
+    "hist_first_date": "20040101",
+    "ctrl_first_date": "20040102",
+    "hist_contains_20040101": true,
+    "ctrl_contains_20040101": false,
+    "hist_sha256": "eb96474bb6cac16c825c21ab9541d1eb73e5d65c5d9b6b0f9ae838c3d91c7adb",
+    "ctrl_sha256": "8f6f37642a94ea9b1436d62f8cbbaf89e0c188c3160286a4475a63c44651e5c0"
+   },
+   {
+    "index_code": "000942",
+    "hist_url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=000942&startDate=20040101&endDate=20261123",
+    "hist_url_start_param": "20040101",
+    "ctrl_url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=000942&startDate=20040102&endDate=20261123",
+    "ctrl_url_start_param": "20040102",
+    "hist_response_row_count": 5318,
+    "ctrl_response_row_count": 5318,
+    "hist_first_date": "20040101",
+    "ctrl_first_date": "20040102",
+    "hist_contains_20040101": true,
+    "ctrl_contains_20040101": false,
+    "hist_sha256": "8fdc47fc69f7dfca70ae69919f2c808b9f0649a30d431a086f4c2b75ffdc617d",
+    "ctrl_sha256": "ff7030c44cda5fe5800765310144e2fda950cd6f71b3e76c1e7ad68efb1bfa9a"
+   },
+   {
+    "index_code": "399997",
+    "hist_url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=399997&startDate=20040101&endDate=20261123",
+    "hist_url_start_param": "20040101",
+    "ctrl_url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=399997&startDate=20040102&endDate=20261123",
+    "ctrl_url_start_param": "20040102",
+    "hist_response_row_count": 4346,
+    "ctrl_response_row_count": 4346,
+    "hist_first_date": "20040101",
+    "ctrl_first_date": "20040102",
+    "hist_contains_20040101": true,
+    "ctrl_contains_20040101": false,
+    "hist_sha256": "e0f85d49813e3d27dabdfe596e92ff9cce63d45b30dcad035d5e0bf5f894ff22",
+    "ctrl_sha256": "66c3f2691393c5b25476f740fe43d7ccdaf75a4e0ba6eb10e942180d1bc46d49"
+   },
+   {
+    "index_code": "930930",
+    "hist_url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=930930&startDate=20040101&endDate=20261123",
+    "hist_url_start_param": "20040101",
+    "ctrl_url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=930930&startDate=20040102&endDate=20261123",
+    "ctrl_url_start_param": "20040102",
+    "hist_response_row_count": 3000,
+    "ctrl_response_row_count": 3000,
+    "hist_first_date": "20040101",
+    "ctrl_first_date": "20040102",
+    "hist_contains_20040101": true,
+    "ctrl_contains_20040101": false,
+    "hist_sha256": "f70e816664b4f9af3c4d1f50f5a0b4c68b77dd6f2f02d1c97bf871fa3368ad11",
+    "ctrl_sha256": "31b752886b66cd3a2e98f8551c4ae98c8b9a16df579b903beadae0be8f407486"
+   },
+   {
+    "index_code": "H30184",
+    "hist_url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=H30184&startDate=20040101&endDate=20261123",
+    "hist_url_start_param": "20040101",
+    "ctrl_url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=H30184&startDate=20040102&endDate=20261123",
+    "ctrl_url_start_param": "20040102",
+    "hist_response_row_count": 5317,
+    "ctrl_response_row_count": 5317,
+    "hist_first_date": "20040101",
+    "ctrl_first_date": "20040102",
+    "hist_contains_20040101": true,
+    "ctrl_contains_20040101": false,
+    "hist_sha256": "72c4fcca210dc8031817cad2543e18fbd30e8e1123e65e52a9a412c91ae51a95",
+    "ctrl_sha256": "c0bc14a031df3f35c23cef4818f88071b4e73b7e23b5f791bb3f4a652a19b034"
+   }
+  ],
+  "hist_urls_correct": 10,
+  "ctrl_urls_correct": 10,
+  "hist_contains_20040101_count": 10,
+  "ctrl_contains_20040101_count": 0,
+  "first_date_consistent_count": 10
+ },
  "records": [
   {
    "index_code": "000012",
@@ -555,7 +1054,10 @@
    "official_basic_date": "2002-12-31",
    "official_publish_date": "2003-01-02",
    "official_basic_index": 100.0,
-   "earliest_official_history": "20040101",
+   "earliest_response_date": "20040101",
+   "earliest_response_date_semantics": "本次官方接口响应的第一条日期；**不等于**指数真实最早历史行情日期，也不等于官方基日或发布日期",
+   "actual_earliest_historical_quote_date": "unknown",
+   "actual_earliest_historical_quote_date_evidence": "unknown：未取得可独立证明真实最早历史行情日期的官方证据；接口响应首日随请求起始日变化（见对照实验），因此不能作为真实历史起点",
    "has_2004_01_01_in_official_response": true,
    "synthetic_when_requested_from_20040101": true,
    "disappears_when_requested_from_20040102": true,
@@ -786,7 +1288,7 @@
     }
    ],
    "evidence_grade": "L1",
-   "final_conclusion": "该行由官方接口对**请求起始日**的合成行为产生：从 20040101 起请求时首行为 2004-01-01，改从 20040102 起请求后该日消失；官方原始响应可复核（SHA256 9b93c64af70beffb…）。**不是项目内部生成的占位数据**，但也不是该指数在 2004-01-01 的真实交易日行情。",
+   "final_conclusion": "该行由官方接口对**请求起始日**的合成行为产生：从 20040101 起请求时响应首行为 2004-01-01，改从 20040102 起请求后该日消失；官方原始响应可复核（SHA256 9b93c64af70beffb…）。**不是项目内部生成的占位数据**，但也不是该指数在 2004-01-01 的真实交易日行情。该指数真实最早历史行情日期仍为 unknown。",
    "recommended_action": "保留（已标 suspect，不建议删除：可追溯官方合成行为）",
    "is_valid_trading_day": "no",
    "historical_availability": "unknown",
@@ -812,18 +1314,14 @@
    },
    "official_basic": {
     "index_code": "000012",
-    "url": "https://www.csindex.com.cn/csindex-home/indexInfo/index-basic-info/000012",
     "obtained": true,
-    "file": "reports/evidence/phase3B6_2_3_0_4/csindex_basic_000012.json",
-    "bytes": 1055,
     "sha256": "4390b7dc8015f4ed85dfeeafde53b7a7b4565ce95064deb5028216343f0fe39b",
-    "obtained_at": "2026-11-27T10:05:32",
+    "file": "reports/evidence/phase3B6_2_3_0_4/csindex_basic_000012.json",
+    "url": "https://www.csindex.com.cn/csindex-home/indexInfo/index-basic-info/000012",
     "official_full_name": "上证国债指数",
     "basic_date": "2002-12-31",
     "basic_index": 100.0,
-    "publish_date": "2003-01-02",
-    "publish_channel": "卫星",
-    "index_type": "bond"
+    "publish_date": "2003-01-02"
    }
   },
   {
@@ -832,7 +1330,10 @@
    "official_basic_date": "2003-12-31",
    "official_publish_date": "2004-01-02",
    "official_basic_index": 1000.0,
-   "earliest_official_history": "20040101",
+   "earliest_response_date": "20040101",
+   "earliest_response_date_semantics": "本次官方接口响应的第一条日期；**不等于**指数真实最早历史行情日期，也不等于官方基日或发布日期",
+   "actual_earliest_historical_quote_date": "unknown",
+   "actual_earliest_historical_quote_date_evidence": "unknown：未取得可独立证明真实最早历史行情日期的官方证据；接口响应首日随请求起始日变化（见对照实验），因此不能作为真实历史起点",
    "has_2004_01_01_in_official_response": true,
    "synthetic_when_requested_from_20040101": true,
    "disappears_when_requested_from_20040102": true,
@@ -1063,7 +1564,7 @@
     }
    ],
    "evidence_grade": "L1",
-   "final_conclusion": "该行由官方接口对**请求起始日**的合成行为产生：从 20040101 起请求时首行为 2004-01-01，改从 20040102 起请求后该日消失；官方原始响应可复核（SHA256 623196e3160c3f0e…）。**不是项目内部生成的占位数据**，但也不是该指数在 2004-01-01 的真实交易日行情。",
+   "final_conclusion": "该行由官方接口对**请求起始日**的合成行为产生：从 20040101 起请求时响应首行为 2004-01-01，改从 20040102 起请求后该日消失；官方原始响应可复核（SHA256 623196e3160c3f0e…）。**不是项目内部生成的占位数据**，但也不是该指数在 2004-01-01 的真实交易日行情。该指数真实最早历史行情日期仍为 unknown。",
    "recommended_action": "保留（已标 suspect，不建议删除：可追溯官方合成行为）",
    "is_valid_trading_day": "no",
    "historical_availability": "unknown",
@@ -1089,18 +1590,14 @@
    },
    "official_basic": {
     "index_code": "000016",
-    "url": "https://www.csindex.com.cn/csindex-home/indexInfo/index-basic-info/000016",
     "obtained": true,
-    "file": "reports/evidence/phase3B6_2_3_0_4/csindex_basic_000016.json",
-    "bytes": 1181,
     "sha256": "44bd88a3dc069ab09206ceca301a362db8ab2dab3529d2cd498369081e22b88b",
-    "obtained_at": "2026-11-27T10:06:31",
+    "file": "reports/evidence/phase3B6_2_3_0_4/csindex_basic_000016.json",
+    "url": "https://www.csindex.com.cn/csindex-home/indexInfo/index-basic-info/000016",
     "official_full_name": "上证50指数",
     "basic_date": "2003-12-31",
     "basic_index": 1000.0,
-    "publish_date": "2004-01-02",
-    "publish_channel": "卫星",
-    "index_type": "stock"
+    "publish_date": "2004-01-02"
    }
   },
   {
@@ -1109,7 +1606,10 @@
    "official_basic_date": "2004-12-31",
    "official_publish_date": "2005-04-08",
    "official_basic_index": 1000.0,
-   "earliest_official_history": "20040101",
+   "earliest_response_date": "20040101",
+   "earliest_response_date_semantics": "本次官方接口响应的第一条日期；**不等于**指数真实最早历史行情日期，也不等于官方基日或发布日期",
+   "actual_earliest_historical_quote_date": "unknown",
+   "actual_earliest_historical_quote_date_evidence": "unknown：未取得可独立证明真实最早历史行情日期的官方证据；接口响应首日随请求起始日变化（见对照实验），因此不能作为真实历史起点",
    "has_2004_01_01_in_official_response": true,
    "synthetic_when_requested_from_20040101": true,
    "disappears_when_requested_from_20040102": true,
@@ -1340,7 +1840,7 @@
     }
    ],
    "evidence_grade": "L1",
-   "final_conclusion": "该行由官方接口对**请求起始日**的合成行为产生：从 20040101 起请求时首行为 2004-01-01，改从 20040102 起请求后该日消失；官方原始响应可复核（SHA256 1dda4b85fff46bc0…）。**不是项目内部生成的占位数据**，但也不是该指数在 2004-01-01 的真实交易日行情。",
+   "final_conclusion": "该行由官方接口对**请求起始日**的合成行为产生：从 20040101 起请求时响应首行为 2004-01-01，改从 20040102 起请求后该日消失；官方原始响应可复核（SHA256 1dda4b85fff46bc0…）。**不是项目内部生成的占位数据**，但也不是该指数在 2004-01-01 的真实交易日行情。该指数真实最早历史行情日期仍为 unknown。",
    "recommended_action": "保留（已标 suspect，不建议删除：可追溯官方合成行为）",
    "is_valid_trading_day": "no",
    "historical_availability": "unknown",
@@ -1366,18 +1866,14 @@
    },
    "official_basic": {
     "index_code": "000300",
-    "url": "https://www.csindex.com.cn/csindex-home/indexInfo/index-basic-info/000300",
     "obtained": true,
-    "file": "reports/evidence/phase3B6_2_3_0_4/csindex_basic_000300.json",
-    "bytes": 1088,
     "sha256": "89cbd0812e258757ccca68285181d280b22881f1e95e4fb524ddea64bd159fb6",
-    "obtained_at": "2026-11-27T10:07:05",
+    "file": "reports/evidence/phase3B6_2_3_0_4/csindex_basic_000300.json",
+    "url": "https://www.csindex.com.cn/csindex-home/indexInfo/index-basic-info/000300",
     "official_full_name": "沪深300指数",
     "basic_date": "2004-12-31",
     "basic_index": 1000.0,
-    "publish_date": "2005-04-08",
-    "publish_channel": "卫星",
-    "index_type": "stock"
+    "publish_date": "2005-04-08"
    }
   },
   {
@@ -1386,7 +1882,10 @@
    "official_basic_date": "2004-12-31",
    "official_publish_date": "2007-01-15",
    "official_basic_index": 1000.0,
-   "earliest_official_history": "20040101",
+   "earliest_response_date": "20040101",
+   "earliest_response_date_semantics": "本次官方接口响应的第一条日期；**不等于**指数真实最早历史行情日期，也不等于官方基日或发布日期",
+   "actual_earliest_historical_quote_date": "unknown",
+   "actual_earliest_historical_quote_date_evidence": "unknown：未取得可独立证明真实最早历史行情日期的官方证据；接口响应首日随请求起始日变化（见对照实验），因此不能作为真实历史起点",
    "has_2004_01_01_in_official_response": true,
    "synthetic_when_requested_from_20040101": true,
    "disappears_when_requested_from_20040102": true,
@@ -1617,7 +2116,7 @@
     }
    ],
    "evidence_grade": "L1",
-   "final_conclusion": "该行由官方接口对**请求起始日**的合成行为产生：从 20040101 起请求时首行为 2004-01-01，改从 20040102 起请求后该日消失；官方原始响应可复核（SHA256 6438b39074f4bb19…）。**不是项目内部生成的占位数据**，但也不是该指数在 2004-01-01 的真实交易日行情。",
+   "final_conclusion": "该行由官方接口对**请求起始日**的合成行为产生：从 20040101 起请求时响应首行为 2004-01-01，改从 20040102 起请求后该日消失；官方原始响应可复核（SHA256 6438b39074f4bb19…）。**不是项目内部生成的占位数据**，但也不是该指数在 2004-01-01 的真实交易日行情。该指数真实最早历史行情日期仍为 unknown。",
    "recommended_action": "保留（已标 suspect，不建议删除：可追溯官方合成行为）",
    "is_valid_trading_day": "no",
    "historical_availability": "unknown",
@@ -1643,18 +2142,14 @@
    },
    "official_basic": {
     "index_code": "000905",
-    "url": "https://www.csindex.com.cn/csindex-home/indexInfo/index-basic-info/000905",
     "obtained": true,
-    "file": "reports/evidence/phase3B6_2_3_0_4/csindex_basic_000905.json",
-    "bytes": 990,
     "sha256": "29bbc5ab7081e7c50efbac91062224810b908ead05448316b96e6441c77a2efb",
-    "obtained_at": "2026-11-27T10:11:10",
+    "file": "reports/evidence/phase3B6_2_3_0_4/csindex_basic_000905.json",
+    "url": "https://www.csindex.com.cn/csindex-home/indexInfo/index-basic-info/000905",
     "official_full_name": "中证小盘500指数",
     "basic_date": "2004-12-31",
     "basic_index": 1000.0,
-    "publish_date": "2007-01-15",
-    "publish_channel": "卫星",
-    "index_type": "stock"
+    "publish_date": "2007-01-15"
    }
   },
   {
@@ -1663,7 +2158,10 @@
    "official_basic_date": "2004-12-31",
    "official_publish_date": "2007-01-15",
    "official_basic_index": 1000.0,
-   "earliest_official_history": "20040101",
+   "earliest_response_date": "20040101",
+   "earliest_response_date_semantics": "本次官方接口响应的第一条日期；**不等于**指数真实最早历史行情日期，也不等于官方基日或发布日期",
+   "actual_earliest_historical_quote_date": "unknown",
+   "actual_earliest_historical_quote_date_evidence": "unknown：未取得可独立证明真实最早历史行情日期的官方证据；接口响应首日随请求起始日变化（见对照实验），因此不能作为真实历史起点",
    "has_2004_01_01_in_official_response": true,
    "synthetic_when_requested_from_20040101": true,
    "disappears_when_requested_from_20040102": true,
@@ -1894,7 +2392,7 @@
     }
    ],
    "evidence_grade": "L1",
-   "final_conclusion": "该行由官方接口对**请求起始日**的合成行为产生：从 20040101 起请求时首行为 2004-01-01，改从 20040102 起请求后该日消失；官方原始响应可复核（SHA256 68ff1da2d6687a45…）。**不是项目内部生成的占位数据**，但也不是该指数在 2004-01-01 的真实交易日行情。",
+   "final_conclusion": "该行由官方接口对**请求起始日**的合成行为产生：从 20040101 起请求时响应首行为 2004-01-01，改从 20040102 起请求后该日消失；官方原始响应可复核（SHA256 68ff1da2d6687a45…）。**不是项目内部生成的占位数据**，但也不是该指数在 2004-01-01 的真实交易日行情。该指数真实最早历史行情日期仍为 unknown。",
    "recommended_action": "保留（已标 suspect，不建议删除：可追溯官方合成行为）",
    "is_valid_trading_day": "no",
    "historical_availability": "unknown",
@@ -1920,18 +2418,14 @@
    },
    "official_basic": {
     "index_code": "000906",
-    "url": "https://www.csindex.com.cn/csindex-home/indexInfo/index-basic-info/000906",
     "obtained": true,
-    "file": "reports/evidence/phase3B6_2_3_0_4/csindex_basic_000906.json",
-    "bytes": 975,
     "sha256": "1e49eff6bdccda98fa090db0b8987178bd4e799dfbcc842e2f695289ebb9ffd5",
-    "obtained_at": "2026-11-27T10:12:51",
+    "file": "reports/evidence/phase3B6_2_3_0_4/csindex_basic_000906.json",
+    "url": "https://www.csindex.com.cn/csindex-home/indexInfo/index-basic-info/000906",
     "official_full_name": "中证800指数",
     "basic_date": "2004-12-31",
     "basic_index": 1000.0,
-    "publish_date": "2007-01-15",
-    "publish_channel": "卫星",
-    "index_type": "stock"
+    "publish_date": "2007-01-15"
    }
   },
   {
@@ -1940,7 +2434,10 @@
    "official_basic_date": "2004-12-31",
    "official_publish_date": "2008-05-26",
    "official_basic_index": 1000.0,
-   "earliest_official_history": "20040101",
+   "earliest_response_date": "20040101",
+   "earliest_response_date_semantics": "本次官方接口响应的第一条日期；**不等于**指数真实最早历史行情日期，也不等于官方基日或发布日期",
+   "actual_earliest_historical_quote_date": "unknown",
+   "actual_earliest_historical_quote_date_evidence": "unknown：未取得可独立证明真实最早历史行情日期的官方证据；接口响应首日随请求起始日变化（见对照实验），因此不能作为真实历史起点",
    "has_2004_01_01_in_official_response": true,
    "synthetic_when_requested_from_20040101": true,
    "disappears_when_requested_from_20040102": true,
@@ -2171,7 +2668,7 @@
     }
    ],
    "evidence_grade": "L1",
-   "final_conclusion": "该行由官方接口对**请求起始日**的合成行为产生：从 20040101 起请求时首行为 2004-01-01，改从 20040102 起请求后该日消失；官方原始响应可复核（SHA256 eb96474bb6cac16c…）。**不是项目内部生成的占位数据**，但也不是该指数在 2004-01-01 的真实交易日行情。",
+   "final_conclusion": "该行由官方接口对**请求起始日**的合成行为产生：从 20040101 起请求时响应首行为 2004-01-01，改从 20040102 起请求后该日消失；官方原始响应可复核（SHA256 eb96474bb6cac16c…）。**不是项目内部生成的占位数据**，但也不是该指数在 2004-01-01 的真实交易日行情。该指数真实最早历史行情日期仍为 unknown。",
    "recommended_action": "保留（已标 suspect，不建议删除：可追溯官方合成行为）",
    "is_valid_trading_day": "no",
    "historical_availability": "unknown",
@@ -2197,18 +2694,14 @@
    },
    "official_basic": {
     "index_code": "000922",
-    "url": "https://www.csindex.com.cn/csindex-home/indexInfo/index-basic-info/000922",
     "obtained": true,
-    "file": "reports/evidence/phase3B6_2_3_0_4/csindex_basic_000922.json",
-    "bytes": 1180,
     "sha256": "437049bcdc8f4317a6566e79d6b9806939612977c5e9fbd30030cb0673fa7090",
-    "obtained_at": "2026-11-27T10:14:09",
+    "file": "reports/evidence/phase3B6_2_3_0_4/csindex_basic_000922.json",
+    "url": "https://www.csindex.com.cn/csindex-home/indexInfo/index-basic-info/000922",
     "official_full_name": "中证红利指数",
     "basic_date": "2004-12-31",
     "basic_index": 1000.0,
-    "publish_date": "2008-05-26",
-    "publish_channel": "指数通",
-    "index_type": "stock"
+    "publish_date": "2008-05-26"
    }
   },
   {
@@ -2217,7 +2710,10 @@
    "official_basic_date": "2004-12-31",
    "official_publish_date": "2009-10-28",
    "official_basic_index": 1000.0,
-   "earliest_official_history": "20040101",
+   "earliest_response_date": "20040101",
+   "earliest_response_date_semantics": "本次官方接口响应的第一条日期；**不等于**指数真实最早历史行情日期，也不等于官方基日或发布日期",
+   "actual_earliest_historical_quote_date": "unknown",
+   "actual_earliest_historical_quote_date_evidence": "unknown：未取得可独立证明真实最早历史行情日期的官方证据；接口响应首日随请求起始日变化（见对照实验），因此不能作为真实历史起点",
    "has_2004_01_01_in_official_response": true,
    "synthetic_when_requested_from_20040101": true,
    "disappears_when_requested_from_20040102": true,
@@ -2448,7 +2944,7 @@
     }
    ],
    "evidence_grade": "L1",
-   "final_conclusion": "该行由官方接口对**请求起始日**的合成行为产生：从 20040101 起请求时首行为 2004-01-01，改从 20040102 起请求后该日消失；官方原始响应可复核（SHA256 8fdc47fc69f7dfca…）。**不是项目内部生成的占位数据**，但也不是该指数在 2004-01-01 的真实交易日行情。",
+   "final_conclusion": "该行由官方接口对**请求起始日**的合成行为产生：从 20040101 起请求时响应首行为 2004-01-01，改从 20040102 起请求后该日消失；官方原始响应可复核（SHA256 8fdc47fc69f7dfca…）。**不是项目内部生成的占位数据**，但也不是该指数在 2004-01-01 的真实交易日行情。该指数真实最早历史行情日期仍为 unknown。",
    "recommended_action": "保留（已标 suspect，不建议删除：可追溯官方合成行为）",
    "is_valid_trading_day": "no",
    "historical_availability": "unknown",
@@ -2474,18 +2970,14 @@
    },
    "official_basic": {
     "index_code": "000942",
-    "url": "https://www.csindex.com.cn/csindex-home/indexInfo/index-basic-info/000942",
     "obtained": true,
-    "file": "reports/evidence/phase3B6_2_3_0_4/csindex_basic_000942.json",
-    "bytes": 1223,
     "sha256": "da5688dc762f816518e59fac067a6a99ec997864e9c96f40e6b30d9f1ed14c25",
-    "obtained_at": "2026-11-27T10:15:55",
+    "file": "reports/evidence/phase3B6_2_3_0_4/csindex_basic_000942.json",
+    "url": "https://www.csindex.com.cn/csindex-home/indexInfo/index-basic-info/000942",
     "official_full_name": "中证内地消费主题指数",
     "basic_date": "2004-12-31",
     "basic_index": 1000.0,
-    "publish_date": "2009-10-28",
-    "publish_channel": "指数通",
-    "index_type": "stock"
+    "publish_date": "2009-10-28"
    }
   },
   {
@@ -2494,7 +2986,10 @@
    "official_basic_date": "2008-12-31",
    "official_publish_date": "2015-01-21",
    "official_basic_index": 1000.0,
-   "earliest_official_history": "20040101",
+   "earliest_response_date": "20040101",
+   "earliest_response_date_semantics": "本次官方接口响应的第一条日期；**不等于**指数真实最早历史行情日期，也不等于官方基日或发布日期",
+   "actual_earliest_historical_quote_date": "unknown",
+   "actual_earliest_historical_quote_date_evidence": "unknown：未取得可独立证明真实最早历史行情日期的官方证据；接口响应首日随请求起始日变化（见对照实验），因此不能作为真实历史起点",
    "has_2004_01_01_in_official_response": true,
    "synthetic_when_requested_from_20040101": true,
    "disappears_when_requested_from_20040102": true,
@@ -2725,7 +3220,7 @@
     }
    ],
    "evidence_grade": "L1",
-   "final_conclusion": "该行由官方接口对**请求起始日**的合成行为产生：从 20040101 起请求时首行为 2004-01-01，改从 20040102 起请求后该日消失；官方原始响应可复核（SHA256 e0f85d49813e3d27…）。**不是项目内部生成的占位数据**，但也不是该指数在 2004-01-01 的真实交易日行情。",
+   "final_conclusion": "该行由官方接口对**请求起始日**的合成行为产生：从 20040101 起请求时响应首行为 2004-01-01，改从 20040102 起请求后该日消失；官方原始响应可复核（SHA256 e0f85d49813e3d27…）。**不是项目内部生成的占位数据**，但也不是该指数在 2004-01-01 的真实交易日行情。该指数真实最早历史行情日期仍为 unknown。",
    "recommended_action": "保留（已标 suspect，不建议删除：可追溯官方合成行为）",
    "is_valid_trading_day": "no",
    "historical_availability": "unknown",
@@ -2751,18 +3246,14 @@
    },
    "official_basic": {
     "index_code": "399997",
-    "url": "https://www.csindex.com.cn/csindex-home/indexInfo/index-basic-info/399997",
     "obtained": true,
-    "file": "reports/evidence/phase3B6_2_3_0_4/csindex_basic_399997.json",
-    "bytes": 1062,
     "sha256": "4107d6e3ed60008fe515b4b96324d506827b08729b3a0037cbffa2f0a37bbb5a",
-    "obtained_at": "2026-11-27T10:16:50",
+    "file": "reports/evidence/phase3B6_2_3_0_4/csindex_basic_399997.json",
+    "url": "https://www.csindex.com.cn/csindex-home/indexInfo/index-basic-info/399997",
     "official_full_name": "中证白酒指数",
     "basic_date": "2008-12-31",
     "basic_index": 1000.0,
-    "publish_date": "2015-01-21",
-    "publish_channel": "卫星",
-    "index_type": "stock"
+    "publish_date": "2015-01-21"
    }
   },
   {
@@ -2771,7 +3262,10 @@
    "official_basic_date": "2014-11-14",
    "official_publish_date": "2017-01-16",
    "official_basic_index": 3000.0,
-   "earliest_official_history": "20040101",
+   "earliest_response_date": "20040101",
+   "earliest_response_date_semantics": "本次官方接口响应的第一条日期；**不等于**指数真实最早历史行情日期，也不等于官方基日或发布日期",
+   "actual_earliest_historical_quote_date": "unknown",
+   "actual_earliest_historical_quote_date_evidence": "unknown：未取得可独立证明真实最早历史行情日期的官方证据；接口响应首日随请求起始日变化（见对照实验），因此不能作为真实历史起点",
    "has_2004_01_01_in_official_response": true,
    "synthetic_when_requested_from_20040101": true,
    "disappears_when_requested_from_20040102": true,
@@ -3002,7 +3496,7 @@
     }
    ],
    "evidence_grade": "L1",
-   "final_conclusion": "该行由官方接口对**请求起始日**的合成行为产生：从 20040101 起请求时首行为 2004-01-01，改从 20040102 起请求后该日消失；官方原始响应可复核（SHA256 f70e816664b4f9af…）。**不是项目内部生成的占位数据**，但也不是该指数在 2004-01-01 的真实交易日行情。",
+   "final_conclusion": "该行由官方接口对**请求起始日**的合成行为产生：从 20040101 起请求时响应首行为 2004-01-01，改从 20040102 起请求后该日消失；官方原始响应可复核（SHA256 f70e816664b4f9af…）。**不是项目内部生成的占位数据**，但也不是该指数在 2004-01-01 的真实交易日行情。该指数真实最早历史行情日期仍为 unknown。",
    "recommended_action": "保留（已标 suspect，不建议删除：可追溯官方合成行为）",
    "is_valid_trading_day": "no",
    "historical_availability": "unknown",
@@ -3028,18 +3522,14 @@
    },
    "official_basic": {
     "index_code": "930930",
-    "url": "https://www.csindex.com.cn/csindex-home/indexInfo/index-basic-info/930930",
     "obtained": true,
-    "file": "reports/evidence/phase3B6_2_3_0_4/csindex_basic_930930.json",
-    "bytes": 1233,
     "sha256": "03b676d21f126b75faaaad284435cf771325b888d132e612914801ab20fdb749",
-    "obtained_at": "2026-11-27T10:17:48",
+    "file": "reports/evidence/phase3B6_2_3_0_4/csindex_basic_930930.json",
+    "url": "https://www.csindex.com.cn/csindex-home/indexInfo/index-basic-info/930930",
     "official_full_name": "中证港股通综合指数",
     "basic_date": "2014-11-14",
     "basic_index": 3000.0,
-    "publish_date": "2017-01-16",
-    "publish_channel": "指数通",
-    "index_type": "stock"
+    "publish_date": "2017-01-16"
    }
   },
   {
@@ -3048,7 +3538,10 @@
    "official_basic_date": "2004-12-31",
    "official_publish_date": "2013-07-15",
    "official_basic_index": 1000.0,
-   "earliest_official_history": "20040101",
+   "earliest_response_date": "20040101",
+   "earliest_response_date_semantics": "本次官方接口响应的第一条日期；**不等于**指数真实最早历史行情日期，也不等于官方基日或发布日期",
+   "actual_earliest_historical_quote_date": "unknown",
+   "actual_earliest_historical_quote_date_evidence": "unknown：未取得可独立证明真实最早历史行情日期的官方证据；接口响应首日随请求起始日变化（见对照实验），因此不能作为真实历史起点",
    "has_2004_01_01_in_official_response": true,
    "synthetic_when_requested_from_20040101": true,
    "disappears_when_requested_from_20040102": true,
@@ -3279,7 +3772,7 @@
     }
    ],
    "evidence_grade": "L1",
-   "final_conclusion": "该行由官方接口对**请求起始日**的合成行为产生：从 20040101 起请求时首行为 2004-01-01，改从 20040102 起请求后该日消失；官方原始响应可复核（SHA256 72c4fcca210dc803…）。**不是项目内部生成的占位数据**，但也不是该指数在 2004-01-01 的真实交易日行情。",
+   "final_conclusion": "该行由官方接口对**请求起始日**的合成行为产生：从 20040101 起请求时响应首行为 2004-01-01，改从 20040102 起请求后该日消失；官方原始响应可复核（SHA256 72c4fcca210dc803…）。**不是项目内部生成的占位数据**，但也不是该指数在 2004-01-01 的真实交易日行情。该指数真实最早历史行情日期仍为 unknown。",
    "recommended_action": "保留（已标 suspect，不建议删除：可追溯官方合成行为）",
    "is_valid_trading_day": "no",
    "historical_availability": "unknown",
@@ -3305,18 +3798,14 @@
    },
    "official_basic": {
     "index_code": "H30184",
-    "url": "https://www.csindex.com.cn/csindex-home/indexInfo/index-basic-info/H30184",
     "obtained": true,
-    "file": "reports/evidence/phase3B6_2_3_0_4/csindex_basic_H30184.json",
-    "bytes": 1460,
     "sha256": "69c1bc656ff884f0187ed261b085eef794cd2d3285f4700adb0e5d7f9a8e0f9b",
-    "obtained_at": "2026-11-27T10:18:18",
+    "file": "reports/evidence/phase3B6_2_3_0_4/csindex_basic_H30184.json",
+    "url": "https://www.csindex.com.cn/csindex-home/indexInfo/index-basic-info/H30184",
     "official_full_name": "中证全指半导体产品与设备指数",
     "basic_date": "2004-12-31",
     "basic_index": 1000.0,
-    "publish_date": "2013-07-15",
-    "publish_channel": "指数通",
-    "index_type": "stock"
+    "publish_date": "2013-07-15"
    }
   }
  ],
@@ -3334,6 +3823,10 @@
    "L1": 10
   },
   "historical_availability_unknown": 10,
+  "actual_earliest_quote_date_unknown": 10,
+  "evidence_files_found": 30,
+  "evidence_files_expected": 30,
+  "evidence_sha256_match_manifest": 30,
   "gates": {
    "ready_for_research_analysis": true,
    "ready_for_backtest": false,
@@ -3347,7 +3840,14 @@
    "all_suspect": true,
    "every_record_has_conclusion": true,
    "every_record_has_grade": true,
-   "every_record_has_action": true
+   "every_record_has_action": true,
+   "no_earliest_official_history_field": true,
+   "every_record_has_earliest_response_date": true,
+   "every_record_earliest_quote_unknown": true,
+   "evidence_30_files_found": true,
+   "evidence_sha256_all_match": true,
+   "hist_urls_all_20040101": true,
+   "ctrl_urls_all_20040102": true
   }
  }
 }

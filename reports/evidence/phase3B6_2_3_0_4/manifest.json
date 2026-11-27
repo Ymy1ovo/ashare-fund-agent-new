@@ -1,15 +1,15 @@
 {
  "phase": "3B-6.2.3.0.4",
  "purpose": "10条2004-01-01占位记录来源溯源官方证据",
- "file_count": 32,
+ "file_count": 33,
  "files": {
   "baseline_after.json": {
    "bytes": 8758,
    "sha256": "3c9cc53e1a633ce784066c5bee81e5b01b2cb3f94c8ddf0dc845fe1acadc3d74"
   },
   "baseline_before.json": {
-   "bytes": 8758,
-   "sha256": "d8229a932c6c2d51efe1240e454498170d843367911c76e276a633788dd1e7f5"
+   "bytes": 9011,
+   "sha256": "c6c555dff4e9f5f23961cf2ad5ee1a5c903fdefe03b22c40c5159f8f2c3d2a17"
   },
   "csindex_basic_000012.json": {
    "bytes": 1055,
@@ -130,6 +130,10 @@
   "csindex_hist_H30184_from20040101.json": {
    "bytes": 2237397,
    "sha256": "72c4fcca210dc8031817cad2543e18fbd30e8e1123e65e52a9a412c91ae51a95"
+  },
+  "requests_manifest.json": {
+   "bytes": 5783,
+   "sha256": "30ca04c150dd925ad8bd86bdd551ea31a6002b56a65d9502685eecb52eb81109"
   }
  }
 }

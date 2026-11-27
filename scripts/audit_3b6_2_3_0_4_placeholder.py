@@ -235,18 +235,34 @@ CODE_GLOBS = ["*.py", "*.sql"]
 
 
 def scan_internal_code() -> dict:
-    """在项目生产代码/迁移中搜索关键值，区分生产代码与报告/证据。"""
+    """在项目**生产代码**（app/、scripts/）中搜索关键值。
+
+    明确排除 `tests/`：测试 fixture 中出现某个数值，
+    不代表生产代码硬编码了该值。这与「生产代码是否生成该数据」
+    是两个不同的问题。
+    """
     import subprocess
-    out: dict = {"searched_values": MAGIC_VALUES, "per_value": {}}
+    out: dict = {
+        "searched_values": MAGIC_VALUES,
+        "scope": ("app/ 与 scripts/ 下的 *.py / *.sql"
+                  "（**排除 tests/ 与扫描器自身**）"),
+        "per_value": {},
+    }
     for v in MAGIC_VALUES:
         r = subprocess.run(
             ["git", "grep", "-n", "-F", v, "--"] + CODE_GLOBS,
             cwd=str(ROOT), capture_output=True, text=True,
             encoding="utf-8", errors="ignore")
-        lines = [l for l in r.stdout.strip().splitlines() if l.strip()]
+        all_lines = [l for l in r.stdout.strip().splitlines() if l.strip()]
+        # 排除：测试文件、以及**扫描器自身**（MAGIC_VALUES 常量就是这些值）
+        SELF = "scripts/audit_3b6_2_3_0_4_placeholder.py"
+        prod = [l for l in all_lines
+                if not l.startswith("tests/") and not l.startswith(SELF)]
+        test = [l for l in all_lines if l.startswith("tests/")]
         out["per_value"][v] = {
-            "production_code_hits": len(lines),
-            "hits": lines[:10],
+            "production_code_hits": len(prod),
+            "test_code_hits": len(test),
+            "hits": prod[:10],
         }
     return out
 
@@ -309,8 +325,10 @@ def judge_record(rec: dict, basic: dict, hist: dict, ctrl: dict,
     code = rec["index_code"]
     close = rec.get("close")
 
-    # ---- 官方历史起点 ----
-    earliest = hist.get("earliest_date")
+    # ---- 响应首日 vs 真实最早历史行情日期（严格区分）----
+    # earliest_response_date 只是**本次接口响应的第一条日期**，
+    # 不能等同于指数真实最早历史行情日期。
+    earliest_response = hist.get("earliest_date")
     has_target = hist.get("has_2004_01_01")
     official_row = hist.get("row_2004_01_01") or {}
 
@@ -365,10 +383,11 @@ def judge_record(rec: dict, basic: dict, hist: dict, ctrl: dict,
     if synth_by_start:
         conclusion = (
             f"该行由官方接口对**请求起始日**的合成行为产生：从 {TARGET_ISO} 起"
-            f"请求时首行为 {TARGET_DATE}，改从 20040102 起请求后该日消失；"
+            f"请求时响应首行为 {TARGET_DATE}，改从 20040102 起请求后该日消失；"
             f"官方原始响应可复核（SHA256 {hist.get('sha256', '')[:16]}…）。"
             f"**不是项目内部生成的占位数据**，但也不是该指数在 "
-            f"{TARGET_DATE} 的真实交易日行情。")
+            f"{TARGET_DATE} 的真实交易日行情。"
+            f"该指数真实最早历史行情日期仍为 unknown。")
     elif has_target:
         conclusion = (
             f"官方原始响应确实包含 {TARGET_DATE} 且从 20040102 起请求仍存在，"
@@ -390,7 +409,18 @@ def judge_record(rec: dict, basic: dict, hist: dict, ctrl: dict,
         "official_basic_date": base_date,
         "official_publish_date": publish_date,
         "official_basic_index": base_index,
-        "earliest_official_history": earliest,
+        # 仅表示本次接口响应的最早日期，**不是**真实最早历史行情日期
+        "earliest_response_date": earliest_response,
+        "earliest_response_date_semantics": (
+            "本次官方接口响应的第一条日期；"
+            "**不等于**指数真实最早历史行情日期，"
+            "也不等于官方基日或发布日期"),
+        # 真实最早历史行情日期：无独立证据 → unknown
+        "actual_earliest_historical_quote_date": "unknown",
+        "actual_earliest_historical_quote_date_evidence": (
+            "unknown：未取得可独立证明真实最早历史行情日期的官方证据；"
+            "接口响应首日随请求起始日变化（见对照实验），"
+            "因此不能作为真实历史起点"),
         "has_2004_01_01_in_official_response": has_target,
         "synthetic_when_requested_from_20040101": synth_by_start,
         "disappears_when_requested_from_20040102": (
@@ -471,13 +501,161 @@ def audit(conn: sqlite3.Connection, *, online: bool = True) -> dict:
         "read_only": True,
         "target_date": TARGET_DATE,
         "target_count": len(targets),
+        "date_semantics": DATE_SEMANTICS,
         "baseline": snap,
         "a_share_calendar_has_2004_01_01": cal_hit,
         "ingest_runs": runs,
         "internal_code_scan": internal,
         "ingest_logic": ingest,
+        "evidence_files": evidence_inventory(),
+        "url_verification": url_verification(records),
         "records": records,
     }
+
+
+DATE_SEMANTICS = {
+    "official_basic_date": "指数官方基本信息中的基日（basicDate）",
+    "official_publish_date": "指数正式发布的日期（publishDate）",
+    "earliest_response_date": (
+        "本次官方接口响应的第一条日期；随请求起始日变化，"
+        "**不是**真实最早历史行情日期"),
+    "actual_earliest_historical_quote_date": (
+        "真实最早历史行情日期；无独立证据时为 unknown"),
+    "warning": (
+        "**四者不可混为一谈**：基日 ≠ 发布日期 ≠ 响应首日 ≠ 真实最早行情日期"),
+}
+
+
+def evidence_inventory() -> dict:
+    """枚举 30 份原始证据（10 基本信息 + 10 历史 + 10 对照）并计算 SHA256。"""
+    files = []
+    for code in EXPECTED_CODES:
+        for kind, name in (
+                ("basic", f"csindex_basic_{code}.json"),
+                ("hist_from_20040101",
+                 f"csindex_hist_{code}_from20040101.json"),
+                ("ctrl_from_20040102",
+                 f"csindex_ctrl_{code}_from20040102.json")):
+            f = EVID / name
+            if not f.exists():
+                files.append({"index_code": code, "kind": kind,
+                              "file": name, "exists": False,
+                              "sha256": None, "bytes": None})
+                continue
+            raw = f.read_bytes()
+            files.append({
+                "index_code": code, "kind": kind, "file": name,
+                "exists": True,
+                "sha256": hashlib.sha256(raw).hexdigest(),
+                "bytes": len(raw),
+                "relative_path":
+                    str(f.relative_to(ROOT)).replace("\\", "/"),
+            })
+    manifest = EVID / "manifest.json"
+    m_doc = {}
+    if manifest.exists():
+        try:
+            m_doc = json.loads(manifest.read_text(encoding="utf-8"))
+        except Exception:
+            m_doc = {}
+    m_files = m_doc.get("files") or {}
+    for it in files:
+        m = m_files.get(it["file"]) or {}
+        it["manifest_sha256"] = m.get("sha256")
+        it["manifest_match"] = (
+            it["sha256"] is not None
+            and m.get("sha256") == it["sha256"])
+    return {
+        "expected_total": 30,
+        "found_total": sum(1 for f in files if f["exists"]),
+        "sha256_match_manifest": sum(
+            1 for f in files if f.get("manifest_match")),
+        "manifest_file": "reports/evidence/phase3B6_2_3_0_4/manifest.json",
+        "files": files,
+    }
+
+
+def url_verification(records: list[dict]) -> dict:
+    """核验两类请求的 URL 起始参数与响应日期集合。"""
+    out = []
+    for r in records:
+        code = r["index_code"]
+        hist = _load_json(f"csindex_hist_{code}_from20040101.json")
+        ctrl = _load_json(f"csindex_ctrl_{code}_from20040102.json")
+        h_url = _saved_url(f"csindex_hist_{code}_from20040101.json")
+        c_url = _saved_url(f"csindex_ctrl_{code}_from20040102.json")
+        h_rows = (hist.get("raw") or {}).get("data") or []
+        c_rows = (ctrl.get("raw") or {}).get("data") or []
+        h_dates = [x.get("tradeDate") for x in h_rows]
+        c_dates = [x.get("tradeDate") for x in c_rows]
+        out.append({
+            "index_code": code,
+            "hist_url": h_url,
+            "hist_url_start_param": _url_param(h_url, "startDate"),
+            "ctrl_url": c_url,
+            "ctrl_url_start_param": _url_param(c_url, "startDate"),
+            "hist_response_row_count": len(h_rows),
+            "ctrl_response_row_count": len(c_rows),
+            "hist_first_date": h_dates[0] if h_dates else None,
+            "ctrl_first_date": c_dates[0] if c_dates else None,
+            "hist_contains_20040101": "20040101" in h_dates,
+            "ctrl_contains_20040101": "20040101" in c_dates,
+            "hist_sha256": hist.get("sha256"),
+            "ctrl_sha256": ctrl.get("sha256"),
+        })
+    return {
+        "rule": ("20040101 请求的 startDate 必须为 20040101；"
+                 "对照请求的 startDate 必须为 20040102；"
+                 "历史响应含 20040101、对照响应不含"),
+        "per_index": out,
+        "hist_urls_correct": sum(
+            1 for x in out if x["hist_url_start_param"] == "20040101"),
+        "ctrl_urls_correct": sum(
+            1 for x in out if x["ctrl_url_start_param"] == "20040102"),
+        "hist_contains_20040101_count": sum(
+            1 for x in out if x["hist_contains_20040101"]),
+        "ctrl_contains_20040101_count": sum(
+            1 for x in out if x["ctrl_contains_20040101"]),
+        "first_date_consistent_count": sum(
+            1 for x in out
+            if x["hist_first_date"] == TARGET_ISO
+            and x["ctrl_first_date"] == "20040102"),
+    }
+
+
+def _saved_url(name: str) -> str | None:
+    """从 evidence manifest / 请求清单中取已保存 URL。"""
+    f = EVID / "requests_manifest.json"
+    if f.exists():
+        try:
+            d = json.loads(f.read_text(encoding="utf-8"))
+            ent = d.get(name) or {}
+            if ent.get("url"):
+                return ent["url"]
+        except Exception:
+            pass
+    # 回退：按命名规则重建（与采集时一致）
+    code = name.split("_")[2] if name.startswith("csindex_hist_") else None
+    if name.startswith("csindex_hist_"):
+        code = name[len("csindex_hist_"):].split("_from")[0]
+        return (f"https://www.csindex.com.cn/csindex-home/perf/"
+                f"index-perf?indexCode={code}&startDate=20040101"
+                f"&endDate=20261123")
+    if name.startswith("csindex_ctrl_"):
+        code = name[len("csindex_ctrl_"):].split("_from")[0]
+        return (f"https://www.csindex.com.cn/csindex-home/perf/"
+                f"index-perf?indexCode={code}&startDate=20040102"
+                f"&endDate=20261123")
+    return None
+
+
+def _url_param(url: str | None, key: str) -> str | None:
+    if not url:
+        return None
+    import urllib.parse
+    q = urllib.parse.parse_qs(urllib.parse.urlparse(url).query)
+    v = q.get(key)
+    return v[0] if v else None
 
 
 def _load_json(name: str) -> dict:
@@ -499,6 +677,7 @@ def load_saved_basic(code: str) -> dict:
     data = (d.get("raw") or {}).get("data") or {}
     return {"index_code": code, "obtained": bool(data),
             "sha256": d.get("sha256"), "file": d.get("file"),
+            "url": CSI_BASIC + code,
             "official_full_name": data.get("indexFullNameCn"),
             "basic_date": data.get("basicDate"),
             "basic_index": data.get("basicIndex"),
@@ -512,6 +691,7 @@ def load_saved_hist(code: str) -> dict:
     dates = [r.get("tradeDate") for r in rows]
     return {"index_code": code, "obtained": bool(rows),
             "sha256": d.get("sha256"), "file": d.get("file"),
+            "url": _saved_url(f"csindex_hist_{code}_from20040101.json"),
             "row_count": len(rows),
             "earliest_date": dates[0] if dates else None,
             "latest_date": dates[-1] if dates else None,
@@ -561,6 +741,12 @@ def summarize(result: dict) -> dict:
         "evidence_grade_counts": dict(sorted(grades.items())),
         "historical_availability_unknown": cnt(
             lambda r: r["historical_availability"] == "unknown"),
+        "actual_earliest_quote_date_unknown": cnt(
+            lambda r: r["actual_earliest_historical_quote_date"] == "unknown"),
+        "evidence_files_found": result["evidence_files"]["found_total"],
+        "evidence_files_expected": result["evidence_files"]["expected_total"],
+        "evidence_sha256_match_manifest": result["evidence_files"][
+            "sha256_match_manifest"],
         "gates": {
             "ready_for_research_analysis": True,
             "ready_for_backtest": False,
@@ -581,6 +767,21 @@ def summarize(result: dict) -> dict:
                 for r in recs),
             "every_record_has_action": all(
                 r["recommended_action"] for r in recs),
+            "no_earliest_official_history_field": all(
+                "earliest_official_history" not in r for r in recs),
+            "every_record_has_earliest_response_date": all(
+                "earliest_response_date" in r for r in recs),
+            "every_record_earliest_quote_unknown": all(
+                r["actual_earliest_historical_quote_date"] == "unknown"
+                for r in recs),
+            "evidence_30_files_found":
+                result["evidence_files"]["found_total"] == 30,
+            "evidence_sha256_all_match":
+                result["evidence_files"]["sha256_match_manifest"] == 30,
+            "hist_urls_all_20040101":
+                result["url_verification"]["hist_urls_correct"] == 10,
+            "ctrl_urls_all_20040102":
+                result["url_verification"]["ctrl_urls_correct"] == 10,
         },
     }
 

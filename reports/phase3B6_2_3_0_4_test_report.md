@@ -8,7 +8,7 @@
 
 ## 1. 专项测试文件
 
-`tests/test_3b6_2_3_0_4_placeholder.py` — **37 项**
+`tests/test_3b6_2_3_0_4_placeholder.py` — **62 项**
 
 ---
 
@@ -133,8 +133,8 @@
 
 | 项目 | 结果 |
 | --- | --- |
-| 专项测试 | **37 passed / 0 failed / 0 skipped** |
-| 全量测试 | 2594 → **2631**（+37） |
+| 专项测试 | **62 passed / 0 failed / 0 skipped** |
+| 全量测试 | 2594 → **2656**（+62） |
 
 ---
 
@@ -202,3 +202,99 @@ historical_availability_unknown: 10
 | `ready_for_formal_ranking` | **false** |
 | `ready_for_3b6_2_3_1_series_build` | **false** |
 
+---
+
+## 8. 3B-6.2.3.0.4.1 追加：字段语义纠偏与证据 SHA256 补强（+25 项）
+
+### 8.1 修正的问题
+
+| # | 问题 | 修正 |
+| ---: | --- | --- |
+| 1 | `earliest_official_history` 把 API 响应首日说成「官方最早历史日期」 | 改名为 `earliest_response_date`，并新增 `actual_earliest_historical_quote_date = unknown` |
+| 2 | `test_evidence_sha256_verifiable` 只覆盖 10 份基本信息文件 | 改为覆盖 **30 份**（10 基本 + 10 历史 + 10 对照），真实计算二进制哈希 |
+| 3 | 报告第 3 节把 10 个指数的 `2004-01-01` 统一写成「官方最早历史」 | 重写为「四类日期严格区分」 |
+
+### 8.2 新增测试（25 项）
+
+**字段语义（5 项）**
+
+| 测试 | 断言 |
+| --- | --- |
+| `test_no_earliest_official_history_field` | 旧字段已从所有记录移除 |
+| `test_earliest_response_date_matches_real_json` | 逐条与真实 JSON 首行日期比对 |
+| `test_actual_earliest_quote_date_unknown` | 10/10 为 `unknown` 且有依据说明 |
+| `test_four_date_concepts_distinguished` | 四类日期字段均存在且不互相替代 |
+| `test_date_semantics_declared` | 审计 JSON 显式声明四类语义 |
+
+**报告措辞（1 项）**
+
+| 测试 | 断言 |
+| --- | --- |
+| `test_report_not_claiming_20040101_as_real_history` | 报告中「官方最早历史」已消失，`**unknown**` 出现 ≥10 次 |
+
+**30 份证据 SHA256（5 项）**
+
+| 测试 | 断言 |
+| --- | --- |
+| `test_30_evidence_files_exist` | 30 份文件全部存在且非空 |
+| `test_30_evidence_sha256_matches_manifest` | 真实计算二进制 SHA256 与 manifest 逐一比对 |
+| `test_30_evidence_sha256_matches_audit_json` | 与审计 JSON 记录逐一比对（含字节数） |
+| `test_evidence_sha256_cross_check_three_sources` | 文件实际哈希 == manifest == 审计 JSON 三方一致 |
+| `test_no_sha256_string_length_only_check` | 测试代码本身必须含真实哈希计算 |
+
+**URL 与日期集合（4 项）**
+
+| 测试 | 断言 |
+| --- | --- |
+| `test_hist_url_start_param_is_20040101` | 10/10 历史请求 `startDate=20040101` |
+| `test_ctrl_url_start_param_is_20040102` | 10/10 对照请求 `startDate=20040102` |
+| `test_hist_contains_20040101_ctrl_does_not` | 历史响应含 10/10，对照响应含 0/10 |
+| `test_first_date_consistent_with_parsed` | 记录的首日/行数与实际 JSON 解析一致 |
+
+**原结论不变（2 项）**
+
+| 测试 | 断言 |
+| --- | --- |
+| `test_original_conclusions_unchanged` | 10 条目标、10 合成行、5 基点混淆、L1=10 等全部不变 |
+| `test_synthetic_mechanism_not_claimed_as_official_announcement` | 报告明确说明是技术判断，非官方公告 |
+
+**数据库与门禁（8 项）**
+
+| 测试 | 断言 |
+| --- | --- |
+| `test_db_sha256_unchanged_again` | SHA256 仍为 `1671e403…e873` |
+| `test_integrity_ok_again` | `ok` |
+| `test_fk_zero_again` | 0 |
+| `test_targets_still_10_suspect` | 10 条仍全部 suspect |
+| `test_suspect_total_11` | suspect 总数仍 11 |
+| `test_h30184_still_suspect_zero` | `2013-06-28` 仍 `(0.0, 'suspect')` |
+| `test_gates_unchanged_again` | 四项门禁不变 |
+| `test_self_check_includes_new_assertions` | 新增 7 项自校验全部 True |
+
+### 8.3 修正过程中发现并修复的两个自身缺陷
+
+| # | 缺陷 | 修复 |
+| ---: | --- | --- |
+| 1 | 离线模式下 `official_basic` 缺 `url` 字段，导致 L1 来源校验失败 | `load_saved_basic()` 补 `url = CSI_BASIC + code` |
+| 2 | 代码扫描把 `tests/` 与**扫描器自身**的 `MAGIC_VALUES` 常量算作「生产代码硬编码」 | 扫描范围排除 `tests/` 与扫描器自身，并分别统计 `production_code_hits` / `test_code_hits` |
+
+> 第 2 项是真实的逻辑缺陷：扫描器的目标清单本身就是这些数值，
+> 若不排除自身会产生「自己检测到自己」的假阳性。
+
+### 8.4 30 份证据 SHA256 验证结果
+
+| 类别 | 文件数 | 存在 | SHA256 匹配 manifest | 匹配审计 JSON |
+| --- | ---: | ---: | ---: | ---: |
+| `csindex_basic_<code>.json` | 10 | 10 | 10 | 10 |
+| `csindex_hist_<code>_from20040101.json` | 10 | 10 | 10 | 10 |
+| `csindex_ctrl_<code>_from20040102.json` | 10 | 10 | 10 | 10 |
+| **合计** | **30** | **30** | **30** | **30** |
+
+### 8.5 门禁
+
+| 门禁 | 值 |
+| --- | --- |
+| `ready_for_research_analysis` | **true** |
+| `ready_for_backtest` | **false** |
+| `ready_for_formal_ranking` | **false** |
+| `ready_for_3b6_2_3_1_series_build` | **false** |

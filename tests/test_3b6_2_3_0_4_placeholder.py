@@ -379,3 +379,274 @@ def test_no_vacuous_assertion():
     txt = Path(__file__).read_text(encoding="utf-8")
     assert ("or " + "True") not in txt
     assert ("assert " + "True") not in txt
+
+
+# ============================================================ 3B-6.2.3.0.4.1 字段语义修正
+def test_no_earliest_official_history_field(audit_doc):
+    """1. 不再使用 earliest_official_history 表达 API 响应首日。"""
+    for r in audit_doc["records"]:
+        assert "earliest_official_history" not in r, \
+            f"{r['index_code']} 仍保留旧字段"
+
+
+def test_earliest_response_date_matches_real_json(audit_doc):
+    """2. earliest_response_date 必须与真实 JSON 解析出的最早日期一致。"""
+    for r in audit_doc["records"]:
+        code = r["index_code"]
+        f = EVID / f"csindex_hist_{code}_from20040101.json"
+        assert f.exists(), f"缺历史响应 {code}"
+        rows = json.loads(f.read_text(encoding="utf-8")).get("data") or []
+        assert rows, f"{code} 历史响应为空"
+        real_first = rows[0].get("tradeDate")
+        assert r["earliest_response_date"] == real_first, \
+            f"{code} 记录 {r['earliest_response_date']} != 真实 {real_first}"
+
+
+def test_actual_earliest_quote_date_unknown(audit_doc):
+    """3. actual_earliest_historical_quote_date 在无独立证据时必须为 unknown。"""
+    for r in audit_doc["records"]:
+        assert r["actual_earliest_historical_quote_date"] == "unknown", \
+            f"{r['index_code']} 无证据却给了具体日期"
+        assert r["actual_earliest_historical_quote_date_evidence"]
+        assert "unknown" in r["actual_earliest_historical_quote_date_evidence"]
+
+
+def test_four_date_concepts_distinguished(audit_doc):
+    """基日 / 发布日 / 响应首日 / 真实最早行情日期 四者必须分开。"""
+    for r in audit_doc["records"]:
+        assert r["official_basic_date"]
+        assert r["official_publish_date"]
+        assert r["earliest_response_date"]
+        assert r["actual_earliest_historical_quote_date"] == "unknown"
+        # 响应首日不得被当成真实最早行情日期
+        assert r["earliest_response_date"] != \
+            r["actual_earliest_historical_quote_date"]
+
+
+def test_date_semantics_declared(audit_doc):
+    """审计 JSON 必须显式声明四类日期语义。"""
+    ds = audit_doc["date_semantics"]
+    for k in ("official_basic_date", "official_publish_date",
+              "earliest_response_date",
+              "actual_earliest_historical_quote_date"):
+        assert k in ds, f"缺语义声明 {k}"
+    assert "不可混为一谈" in ds["warning"]
+
+
+def test_report_not_claiming_20040101_as_real_history():
+    """4. 报告不得把 2004-01-01 描述为真实最早历史行情。"""
+    txt = (REPORTS / "phase3B6_2_3_0_4_audit_report.md").read_text(
+        encoding="utf-8")
+    assert "官方最早历史一律为" not in txt
+    assert "官方最早历史" not in txt
+    assert "API 响应首日" in txt or "API响应首日" in txt
+    assert "真实最早历史行情日期" in txt
+    # unknown 必须出现 10 次（每条记录一次）
+    assert txt.count("**unknown**") >= 10
+
+
+# ============================================================ 30 份证据 SHA256
+def _evidence_files() -> list[Path]:
+    out = []
+    for code in EXPECTED_CODES:
+        for name in (f"csindex_basic_{code}.json",
+                     f"csindex_hist_{code}_from20040101.json",
+                     f"csindex_ctrl_{code}_from20040102.json"):
+            out.append(EVID / name)
+    return out
+
+
+def test_30_evidence_files_exist():
+    """5. 30 份原始证据文件全部存在。"""
+    files = _evidence_files()
+    assert len(files) == 30
+    missing = [f.name for f in files if not f.exists()]
+    assert not missing, f"缺失文件：{missing}"
+    for f in files:
+        assert f.stat().st_size > 0
+
+
+def test_30_evidence_sha256_matches_manifest():
+    """6. 30 份文件 SHA256 与 manifest 一致（真实二进制哈希）。"""
+    manifest = EVID / "manifest.json"
+    assert manifest.exists(), "缺 manifest.json"
+    m = json.loads(manifest.read_text(encoding="utf-8"))
+    m_files = m.get("files") or {}
+    checked = 0
+    for f in _evidence_files():
+        assert f.name in m_files, f"manifest 缺 {f.name}"
+        actual = hashlib.sha256(f.read_bytes()).hexdigest()
+        assert actual == m_files[f.name]["sha256"], \
+            f"{f.name} SHA256 与 manifest 不符"
+        assert len(actual) == 64
+        checked += 1
+    assert checked == 30
+
+
+def test_30_evidence_sha256_matches_audit_json(audit_doc):
+    """7. 30 份文件 SHA256 与审计 JSON 对应记录一致。"""
+    ev = audit_doc["evidence_files"]
+    assert ev["expected_total"] == 30
+    assert ev["found_total"] == 30
+    assert ev["sha256_match_manifest"] == 30
+    by_name = {f["file"]: f for f in ev["files"]}
+    checked = 0
+    for f in _evidence_files():
+        rec = by_name.get(f.name)
+        assert rec is not None, f"审计 JSON 缺 {f.name}"
+        assert rec["exists"] is True
+        actual = hashlib.sha256(f.read_bytes()).hexdigest()
+        assert rec["sha256"] == actual, f"{f.name} 审计记录 SHA256 不符"
+        assert rec["bytes"] == f.stat().st_size
+        checked += 1
+    assert checked == 30
+
+
+def test_evidence_sha256_cross_check_three_sources(audit_doc):
+    """三方交叉核对：文件实际哈希 == manifest == 审计 JSON。"""
+    m = json.loads((EVID / "manifest.json").read_text(encoding="utf-8"))
+    m_files = m.get("files") or {}
+    audit_by = {f["file"]: f for f in audit_doc["evidence_files"]["files"]}
+    for f in _evidence_files():
+        actual = hashlib.sha256(f.read_bytes()).hexdigest()
+        assert actual == m_files[f.name]["sha256"]
+        assert actual == audit_by[f.name]["sha256"]
+
+
+def test_no_sha256_string_length_only_check():
+    """不得只检查 SHA256 字符串长度——必须真算。"""
+    src = Path(__file__).read_text(encoding="utf-8")
+    # 本文件必须出现真实哈希计算
+    assert "hashlib.sha256(" in src
+    assert ".read_bytes()" in src
+
+
+# ============================================================ URL 参数核验
+def test_hist_url_start_param_is_20040101(audit_doc):
+    """8. 20040101 请求的实际 URL 起始参数正确。"""
+    uv = audit_doc["url_verification"]
+    assert uv["hist_urls_correct"] == 10
+    for x in uv["per_index"]:
+        assert x["hist_url_start_param"] == "20040101", \
+            f"{x['index_code']} 历史请求 startDate 错误"
+        assert "indexCode=" + x["index_code"] in x["hist_url"]
+
+
+def test_ctrl_url_start_param_is_20040102(audit_doc):
+    """8b. 20040102 对照请求的实际 URL 起始参数正确。"""
+    uv = audit_doc["url_verification"]
+    assert uv["ctrl_urls_correct"] == 10
+    for x in uv["per_index"]:
+        assert x["ctrl_url_start_param"] == "20040102", \
+            f"{x['index_code']} 对照请求 startDate 错误"
+
+
+def test_hist_contains_20040101_ctrl_does_not(audit_doc):
+    """真实响应日期集合与审计结论一致。"""
+    uv = audit_doc["url_verification"]
+    assert uv["hist_contains_20040101_count"] == 10
+    assert uv["ctrl_contains_20040101_count"] == 0
+
+
+def test_first_date_consistent_with_parsed(audit_doc):
+    """响应首日必须与实际解析结果一致（对照 JSON 复核）。"""
+    uv = audit_doc["url_verification"]
+    assert uv["first_date_consistent_count"] == 10
+    for x in uv["per_index"]:
+        code = x["index_code"]
+        h = json.loads((EVID / f"csindex_hist_{code}_from20040101.json")
+                       .read_text(encoding="utf-8"))
+        c = json.loads((EVID / f"csindex_ctrl_{code}_from20040102.json")
+                       .read_text(encoding="utf-8"))
+        h_rows = h.get("data") or []
+        c_rows = c.get("data") or []
+        assert h_rows[0]["tradeDate"] == x["hist_first_date"]
+        assert c_rows[0]["tradeDate"] == x["ctrl_first_date"]
+        assert x["hist_response_row_count"] == len(h_rows)
+        assert x["ctrl_response_row_count"] == len(c_rows)
+
+
+# ============================================================ 原结论不变
+def test_original_conclusions_unchanged(audit_doc):
+    """10. 原有 10 条记录逐条结论保持不变。"""
+    s = audit_doc["summary"]
+    assert s["target_count"] == 10
+    assert s["synthetic_start_row_count"] == 10
+    assert s["disappears_from_20040102_count"] == 10
+    assert s["db_matches_official_close"] == 10
+    assert s["row_equals_second_row"] == 10
+    assert s["base_value_confusion"] == 5
+    assert s["all_still_suspect"] == 10
+    assert s["evidence_grade_counts"] == {"L1": 10}
+    assert s["historical_availability_unknown"] == 10
+
+
+def test_synthetic_mechanism_not_claimed_as_official_announcement(audit_doc):
+    """合成机制是技术判断，不得声称官方发布过解释。"""
+    txt = (REPORTS / "phase3B6_2_3_0_4_audit_report.md").read_text(
+        encoding="utf-8")
+    assert "技术判断" in txt
+    assert "不能声称中证官方发布过" in txt
+
+
+# ============================================================ 数据库不变性
+def test_db_sha256_unchanged_again():
+    """11. 数据库 SHA256 保持不变。"""
+    assert file_sha256() == BASELINE_DB_SHA256
+
+
+def test_integrity_ok_again(conn):
+    """12. integrity_check 正常。"""
+    assert conn.execute("pragma integrity_check").fetchone()[0] == "ok"
+
+
+def test_fk_zero_again(conn):
+    """13. foreign_key_check 为 0。"""
+    assert len(conn.execute("pragma foreign_key_check").fetchall()) == 0
+
+
+def test_targets_still_10_suspect(conn):
+    """10 条目标记录仍全部 suspect。"""
+    n = conn.execute(
+        "select count(*) from index_daily where trade_date='2004-01-01' "
+        "and quality_status='suspect'").fetchone()[0]
+    assert n == 10
+    total = conn.execute(
+        "select count(*) from index_daily where trade_date='2004-01-01'"
+    ).fetchone()[0]
+    assert total == 10
+
+
+def test_suspect_total_11(conn):
+    assert conn.execute(
+        "select count(*) from index_daily where quality_status<>'valid'"
+    ).fetchone()[0] == 11
+
+
+def test_h30184_still_suspect_zero(conn):
+    row = conn.execute(
+        "select close, quality_status from index_daily "
+        "where index_code='H30184' and trade_date='2013-06-28'").fetchone()
+    assert row == (0.0, "suspect")
+
+
+def test_gates_unchanged_again(audit_doc):
+    """14. 四项门禁保持不变。"""
+    g = audit_doc["summary"]["gates"]
+    assert g["ready_for_research_analysis"] is True
+    assert g["ready_for_backtest"] is False
+    assert g["ready_for_formal_ranking"] is False
+    assert g["ready_for_3b6_2_3_1_series_build"] is False
+
+
+def test_self_check_includes_new_assertions(audit_doc):
+    """自校验必须包含本轮新增的字段语义与证据校验。"""
+    sc = audit_doc["summary"]["_self_check"]
+    for k in ("no_earliest_official_history_field",
+              "every_record_has_earliest_response_date",
+              "every_record_earliest_quote_unknown",
+              "evidence_30_files_found",
+              "evidence_sha256_all_match",
+              "hist_urls_all_20040101",
+              "ctrl_urls_all_20040102"):
+        assert sc.get(k) is True, f"自校验缺 {k} 或未通过"
