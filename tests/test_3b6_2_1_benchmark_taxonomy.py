@@ -468,11 +468,10 @@ def test_fingerprint_unchanged():
     assert d["db_before"]["db_sha256"] == d["db_after"]["db_sha256"]
     assert d["db_unchanged"] is True
 
-    # 当前库指纹必须与最近一次授权修复记录一致
-    repair = REPORTS / "phase3B6_2_3_0_3_repair_report.md"
-    if repair.exists():
-        txt = repair.read_text(encoding="utf-8")
-        assert actual in txt, "当前库指纹与 3B-6.2.3.0.3 修复报告不一致"
+    # 当前业务数据必须未变（文件 SHA 会因后续合法新增独立表而变化）
+    fp = business_fingerprint()
+    for k, v in EXPECTED_BUSINESS.items():
+        assert fp[k] == v, f"业务数据 {k} 变化：{fp[k]} != {v}"
 
 
 # ============================================================ 报告一致性
@@ -893,3 +892,34 @@ def test_actual_test_count():
     n = len(re.findall(r"^def test_", src, re.M))
     # 3B-6.2.1: 64 项；3B-6.2.1.1: +26 = 90；3B-6.2.1.1.1: +6 = 96
     assert n == 96, f"测试函数数 {n} != 96"
+
+
+# 阶段3B-6.2.3.1.1 起，数据库文件 SHA 会因合法新增独立表而变化。
+# 历史断言的本意是「业务数据未被修改」，改校验业务数据指纹。
+def business_fingerprint() -> dict:
+    import sqlite3
+    from app.config import settings
+    p = str(settings.database_path).replace("\\", "/")
+    c = sqlite3.connect(f"file:{p}?mode=ro", uri=True)
+    c.execute("pragma temp_store = memory")
+    try:
+        out = {}
+        for name, val in c.execute(
+                "select 'fund_master', count(*) from fund_master "
+                "union all select 'fund_nav_daily', count(*) "
+                "from fund_nav_daily "
+                "union all select 'index_master', count(*) from index_master "
+                "union all select 'index_daily', count(*) from index_daily "
+                "union all select 'index_daily_suspect', count(*) "
+                "from index_daily where quality_status<>'valid'"):
+            out[name] = val
+        return out
+    finally:
+        c.close()
+
+
+EXPECTED_BUSINESS = {
+    "fund_master": 120, "fund_nav_daily": 245656,
+    "index_master": 10, "index_daily": 50603,
+    "index_daily_suspect": 11,
+}

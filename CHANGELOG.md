@@ -1,5 +1,151 @@
 # 变更日志
 
+## 2026-11-27 — 阶段3B-6.2.3.1.1 全收益指数独立原始数据层建设
+
+**只建原始归档与隔离存储。不建设正式全收益序列，不开放回测。**
+
+**基线与提交**
+
+| 项 | 值 |
+| --- | --- |
+| 任务基线 HEAD | `3aae887da4a82ba77481c0efdb2f32c11feef618` |
+
+**一、新建独立数据层（6 张表，全部 `tr_` 前缀）**
+
+| 表 | 用途 | 行数 |
+| --- | --- | ---: |
+| `tr_candidate_master` | 候选注册表 | 12 |
+| `tr_evidence_files` | 原始证据与 SHA256 | 34 |
+| `tr_ingest_runs` | 导入批次审计 | 1 |
+| `tr_index_daily_raw` | 原始历史行情（逐行） | **55,942** |
+| `tr_candidate_quality` | 质量与连续性快照 | 12 |
+| `tr_price_index_mapping` | 候选与价格指数映射 | 12 |
+
+**迁移文件**：`migrations/phase3b6_2_3_1_1_total_return_layer.sql`
+**回滚文件**：`migrations/phase3b6_2_3_1_1_total_return_layer_down.sql`
+
+**二、与 `index_daily` 完全隔离**
+
+| 检查 | 结果 |
+| --- | --- |
+| 表名白名单 | 6/6 全为 `tr_` 前缀 |
+| 12 个全收益代码在 `index_daily` | **全部 0 行** |
+| `index_daily` 行数（前 → 后） | **50,603 → 50,603** |
+| `index_daily` 内容指纹 | **完全一致** |
+| 正式回测引擎可读 | **否** |
+
+**导入批次自证**：`tr_ingest_runs` 记录 `index_daily_before/after` 与
+`fingerprint_before/after`，两者完全一致。
+
+**三、原始数据原样保留，不清洗**
+
+| 异常类型 | 行数 | 标记 | 原始值 |
+| --- | ---: | --- | --- |
+| `20040101` 疑似合成行 | **12** | `suspected_synthetic` | **保留**（1000.0 / 100.0 / 1011.35 / 994.47 / 3000.0） |
+| `2018-06-18` 疑似休市 | **8** | `suspected_market_closed_placeholder` | **保留** |
+| `H20184` `2013-06-28` 零值 | **1** | `invalid_value` | **`0.0` 原样保留** |
+
+**质量状态分布**：
+
+| 状态 | 行数 |
+| --- | ---: |
+| `normal_unverified` | 55,921 |
+| `suspected_synthetic` | 12 |
+| `suspected_market_closed_placeholder` | 8 |
+| `invalid_value` | 1 |
+| **`verified`** | **0** |
+
+**没有任何一行被标记为 `verified`。**
+
+**四、候选分层管理**
+
+| 分组 | 数量 | 日历 | 可用 |
+| --- | ---: | --- | --- |
+| `stock` | 9 | A股交易日历（项目代理） | 是 |
+| `bond` | 2 | 债券市场日历 | **否** |
+| `hk` | 1 | 港股日历 | **否** |
+
+**收益口径严格区分**：`gross_total_return` / `net_total_return` /
+`bond_clean_price` / `bond_interest_reinvestment` / `unknown`。
+
+**映射证据等级**：全部标为 `technical_inference`，
+`official_mapping_document_found = 0`（**非官方映射确认**）。
+
+**五、幂等与事务**
+
+| 机制 | 实现 |
+| --- | --- |
+| 行级幂等 | 主键 `(tr_code, trade_date)` + `insert or ignore` |
+| 批次幂等 | `batch_key` 唯一，重复执行复用同一 `run_id` |
+| 快照幂等 | 同一 `(tr_code, run_id)` 先删后插 |
+| 映射幂等 | 同一 `tr_code` 先删后插 |
+| 事务原子性 | `get_connection()` 上下文，异常自动回滚 |
+| 重标记 | `relabel_existing_rows()` 只改质量标记，**不动原始数值** |
+
+**重复执行结果**：插入 0 / 跳过 55,942，行数不变。
+
+**六、证据可追溯**
+
+| 项 | 结果 |
+| --- | --- |
+| 证据文件 | **34** |
+| SHA256 真实复核 | **34 / 34 通过** |
+| 行情行缺证据引用 | **0** |
+| 行引用 SHA256 与证据表一致 | **✅** |
+
+**七、准入状态未升级**
+
+| 状态 | 值 |
+| --- | ---: |
+| `raw_data_layer_ingest_candidate` | **12** |
+| `validated_series_candidate` | **0** |
+| `proxy_qualified_series_candidate` | **0** |
+| `formal_series_admitted` | **0** |
+
+**连续性分布与审计 JSON 完全一致**：官方 0 / 代理 1 / 疑似 8 / 有问题 0 / 未知 3。
+
+**八、新增模块**
+
+- `migrations/phase3b6_2_3_1_1_total_return_layer.sql`（建表）
+- `migrations/phase3b6_2_3_1_1_total_return_layer_down.sql`（回滚）
+- `app/fund/tr_layer.py`（Repository 与数据访问）
+- `scripts/build_3b6_2_3_1_1_tr_layer.py`（导入脚本）
+- `scripts/report_3b6_2_3_1_1.py`（审计报告生成）
+- `tests/test_3b6_2_3_1_1_tr_layer.py`：**36 项**专项测试
+
+**九、测试**
+
+| 项目 | 结果 |
+| --- | --- |
+| 专项测试 | **36 passed / 0 failed / 0 skipped** |
+| 全量测试 | 2843 → **2879**（**+36**） |
+
+**十、数据库安全核验**
+
+| 项 | 值 |
+| --- | --- |
+| 备份 | `data/backups/fund_agent_before_3b6_2_3_1_1.db` |
+| 实施前 SHA256 | `1671e4037cd265a2dead8b78d43614189a782385ca450ac6c2de3c4ff36ee873` |
+| 实施后 SHA256 | `1c6327d9b7fb1b504fac55684fa62dc0984da13d51256747dfbb5fe6b54d2e62` |
+| 变化原因 | **新增 6 张 `tr_*` 表**（预期） |
+| `index_daily` | 50,603 行，**内容指纹未变** |
+| `index_master` | 10（未变） |
+| `fund_master` | 120（未变） |
+| `fund_nav_daily` | 245,656（未变） |
+| `integrity_check` | **ok** |
+| `foreign_key_check` | **0** |
+
+**十一、边界**
+
+未修改 `index_daily`、未修改 `index_master`、未修改任何基金表、
+未修改 Schema 中已有表、未写入正式全收益序列、未开放回测或正式排名、
+未重新下载任何数据。
+
+门禁：`ready_for_research_analysis=true`、`ready_for_backtest=false`、
+`ready_for_formal_ranking=false`、`ready_for_3b6_2_3_1_series_build=false`。
+
+---
+
 ## 2026-11-27 — 阶段3B-6.2.3.1.0.3.1 代理验证准入缺失真实历史起点条件修复
 
 **只读修正。不重新下载数据，不修改数据库，不开始正式序列建设。**

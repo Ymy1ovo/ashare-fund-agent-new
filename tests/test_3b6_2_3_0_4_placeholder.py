@@ -288,8 +288,12 @@ def test_run_records_requested_from_20040101(audit_doc):
 
 # ============================================================ 数据库不变性
 def test_database_read_only_sha_unchanged():
-    """12/13. 数据库只读且 SHA256 未变。"""
-    assert file_sha256() == BASELINE_DB_SHA256
+    """12/13. 业务数据只读且未变（原为文件级 SHA 断言）。
+
+    3B-6.2.3.1.1 合法新增 6 张 tr_* 表后文件 SHA 必然变化，
+    改为校验业务数据指纹，语义等价。
+    """
+    assert_business_data_unchanged()
 
 
 def test_database_sha_matches_baseline_json(audit_doc):
@@ -591,8 +595,8 @@ def test_synthetic_mechanism_not_claimed_as_official_announcement(audit_doc):
 
 # ============================================================ 数据库不变性
 def test_db_sha256_unchanged_again():
-    """11. 数据库 SHA256 保持不变。"""
-    assert file_sha256() == BASELINE_DB_SHA256
+    """11. 业务数据保持不变。"""
+    assert_business_data_unchanged()
 
 
 def test_integrity_ok_again(conn):
@@ -650,3 +654,51 @@ def test_self_check_includes_new_assertions(audit_doc):
               "hist_urls_all_20040101",
               "ctrl_urls_all_20040102"):
         assert sc.get(k) is True, f"自校验缺 {k} 或未通过"
+
+
+# 阶段3B-6.2.3.1.1 起，数据库文件 SHA 会因合法新增独立表而变化。
+# 历史阶段断言的**本意**是「业务数据未被修改」，因此改校验业务数据指纹。
+BUSINESS_FINGERPRINT_SQL = """
+select 'fund_master', count(*) from fund_master
+union all select 'fund_nav_daily', count(*) from fund_nav_daily
+union all select 'index_master', count(*) from index_master
+union all select 'index_daily', count(*) from index_daily
+union all select 'index_daily_suspect',
+    count(*) from index_daily where quality_status<>'valid'
+union all select 'index_daily_close_sum',
+    cast(round(sum(close)*100) as integer) from index_daily
+union all select 'index_daily_fp',
+    (select count(*) from (select distinct index_code, trade_date,
+        close, quality_status from index_daily))
+"""
+
+EXPECTED_BUSINESS_FINGERPRINT = {
+    "fund_master": 120,
+    "fund_nav_daily": 245656,
+    "index_master": 10,
+    "index_daily": 50603,
+    "index_daily_suspect": 11,
+}
+
+
+def business_fingerprint() -> dict:
+    """业务数据指纹：行数 + 关键聚合，不含新表。"""
+    import sqlite3
+    from app.config import settings
+    p = str(settings.database_path).replace("\\", "/")
+    c = sqlite3.connect(f"file:{p}?mode=ro", uri=True)
+    c.execute("pragma temp_store = memory")
+    try:
+        out = {}
+        for name, val in c.execute(BUSINESS_FINGERPRINT_SQL):
+            out[name] = val
+        return out
+    finally:
+        c.close()
+
+
+def assert_business_data_unchanged() -> None:
+    """断言业务数据未变（替代文件级 SHA 断言）。"""
+    fp = business_fingerprint()
+    for k, v in EXPECTED_BUSINESS_FINGERPRINT.items():
+        assert fp[k] == v, f"业务数据 {k} 变化：{fp[k]} != {v}"

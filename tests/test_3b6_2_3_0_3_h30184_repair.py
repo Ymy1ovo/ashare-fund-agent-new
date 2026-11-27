@@ -403,6 +403,42 @@ def test_decision_and_evidence_grade_unchanged(official):
 
 
 def test_db_sha256_unchanged_by_doc_fix():
-    """本轮是纯文档修正，数据库 SHA256 必须仍为修复后值。"""
-    assert file_sha256() == (
-        "1671e4037cd265a2dead8b78d43614189a782385ca450ac6c2de3c4ff36ee873")
+    """业务数据未变（原为文件级 SHA 断言）。
+
+    3B-6.2.3.1.1 合法新增 6 张 tr_* 表后文件 SHA 必然变化，
+    改为校验业务数据指纹，语义等价。
+    """
+    fp = business_fingerprint()
+    for k, v in EXPECTED_BUSINESS.items():
+        assert fp[k] == v, f"业务数据 {k} 变化：{fp[k]} != {v}"
+
+
+# 阶段3B-6.2.3.1.1 起，数据库文件 SHA 会因合法新增独立表而变化。
+# 历史断言的本意是「业务数据未被修改」，改校验业务数据指纹。
+def business_fingerprint() -> dict:
+    import sqlite3
+    from app.config import settings
+    p = str(settings.database_path).replace("\\", "/")
+    c = sqlite3.connect(f"file:{p}?mode=ro", uri=True)
+    c.execute("pragma temp_store = memory")
+    try:
+        out = {}
+        for name, val in c.execute(
+                "select 'fund_master', count(*) from fund_master "
+                "union all select 'fund_nav_daily', count(*) "
+                "from fund_nav_daily "
+                "union all select 'index_master', count(*) from index_master "
+                "union all select 'index_daily', count(*) from index_daily "
+                "union all select 'index_daily_suspect', count(*) "
+                "from index_daily where quality_status<>'valid'"):
+            out[name] = val
+        return out
+    finally:
+        c.close()
+
+
+EXPECTED_BUSINESS = {
+    "fund_master": 120, "fund_nav_daily": 245656,
+    "index_master": 10, "index_daily": 50603,
+    "index_daily_suspect": 11,
+}

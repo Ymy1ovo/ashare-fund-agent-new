@@ -1,0 +1,207 @@
+{
+ "phase": "3B-6.2.3.1.1",
+ "task": "全收益指数独立原始数据层建设",
+ "generated_at": "2026-11-27T18:08:58",
+ "baseline_head": "3aae887da4a82ba77481c0efdb2f32c11feef618",
+ "read_only_on_index_daily": true,
+ "no_redownload": true,
+ "table_counts": {
+  "tr_candidate_master": 12,
+  "tr_evidence_files": 34,
+  "tr_ingest_runs": 1,
+  "tr_index_daily_raw": 55942,
+  "tr_candidate_quality": 12,
+  "tr_price_index_mapping": 12
+ },
+ "ingest_run": {
+  "run_id": 1,
+  "batch_key": "3B-6.2.3.1.1-tr-raw-layer-v1",
+  "started_at": "2026-11-27T17:17:04",
+  "finished_at": "2026-11-27T17:17:07",
+  "status": "success",
+  "candidate_count": 12,
+  "rows_inserted": 0,
+  "rows_skipped": 55942,
+  "evidence_count": 36,
+  "index_daily_before": 50603,
+  "index_daily_after": 50603,
+  "index_daily_fingerprint_before": "dbbd07c1339e99f27b0aeadb43eb56848776dbbad97f3fb7b9748bbd2f1e61f6",
+  "index_daily_fingerprint_after": "dbbd07c1339e99f27b0aeadb43eb56848776dbbad97f3fb7b9748bbd2f1e61f6",
+  "error_message": null,
+  "note": null
+ },
+ "isolation": {
+  "tr_tables": [
+   "tr_candidate_master",
+   "tr_candidate_quality",
+   "tr_evidence_files",
+   "tr_index_daily_raw",
+   "tr_ingest_runs",
+   "tr_price_index_mapping"
+  ],
+  "tr_table_count": 6,
+  "bad_names": [],
+  "leaked_into_index_daily": [],
+  "isolated": true
+ },
+ "index_daily": {
+  "row_count": 50603,
+  "fingerprint": "dbbd07c1339e99f27b0aeadb43eb56848776dbbad97f3fb7b9748bbd2f1e61f6",
+  "expected_rows": 50603,
+  "unchanged": true
+ },
+ "integrity_check": "ok",
+ "foreign_key_check": 0,
+ "quality_distribution": {
+  "invalid_value": 1,
+  "normal_unverified": 55921,
+  "suspected_market_closed_placeholder": 8,
+  "suspected_synthetic": 12
+ },
+ "per_candidate": [
+  {
+   "tr_code": "399997CNY02",
+   "rows": 4349,
+   "synth": 1,
+   "closed": 0,
+   "invalid": 0
+  },
+  {
+   "tr_code": "H00012",
+   "rows": 3376,
+   "synth": 1,
+   "closed": 0,
+   "invalid": 0
+  },
+  {
+   "tr_code": "H00016",
+   "rows": 5563,
+   "synth": 1,
+   "closed": 1,
+   "invalid": 0
+  },
+  {
+   "tr_code": "H00300",
+   "rows": 5321,
+   "synth": 1,
+   "closed": 1,
+   "invalid": 0
+  },
+  {
+   "tr_code": "H00905",
+   "rows": 5321,
+   "synth": 1,
+   "closed": 1,
+   "invalid": 0
+  },
+  {
+   "tr_code": "H00906",
+   "rows": 5321,
+   "synth": 1,
+   "closed": 1,
+   "invalid": 0
+  },
+  {
+   "tr_code": "H00922",
+   "rows": 5321,
+   "synth": 1,
+   "closed": 1,
+   "invalid": 0
+  },
+  {
+   "tr_code": "H00942",
+   "rows": 5321,
+   "synth": 1,
+   "closed": 1,
+   "invalid": 0
+  },
+  {
+   "tr_code": "H20184",
+   "rows": 5320,
+   "synth": 1,
+   "closed": 1,
+   "invalid": 1
+  },
+  {
+   "tr_code": "H20539",
+   "rows": 4350,
+   "synth": 1,
+   "closed": 1,
+   "invalid": 0
+  },
+  {
+   "tr_code": "H20930",
+   "rows": 3003,
+   "synth": 1,
+   "closed": 0,
+   "invalid": 0
+  },
+  {
+   "tr_code": "N00012",
+   "rows": 3376,
+   "synth": 1,
+   "closed": 0,
+   "invalid": 0
+  }
+ ],
+ "evidence": {
+  "total": 34,
+  "sha256_verified": 34,
+  "failed": [],
+  "all_verified": true
+ },
+ "continuity_consistency": {
+  "verified_official_calendar": {
+   "db": 0,
+   "audit": 0,
+   "match": true
+  },
+  "verified_against_proxy_calendar": {
+   "db": 1,
+   "audit": 1,
+   "match": true
+  },
+  "has_unresolved_suspicion": {
+   "db": 8,
+   "audit": 8,
+   "match": true
+  },
+  "has_issues": {
+   "db": 0,
+   "audit": 0,
+   "match": true
+  },
+  "unknown": {
+   "db": 3,
+   "audit": 3,
+   "match": true
+  }
+ },
+ "admission_totals": {
+  "raw_data_layer_ingest_candidate": 12,
+  "validated_series_candidate": 0,
+  "proxy_qualified_series_candidate": 0,
+  "formal_series_admitted": 0
+ },
+ "database": {
+  "path": "D:\\ymy\\jj-agent\\data\\fund_agent.db",
+  "sha256": "1c6327d9b7fb1b504fac55684fa62dc0984da13d51256747dfbb5fe6b54d2e62",
+  "bytes": 371400704
+ },
+ "gates": {
+  "ready_for_research_analysis": true,
+  "ready_for_backtest": false,
+  "ready_for_formal_ranking": false,
+  "ready_for_3b6_2_3_1_series_build": false
+ },
+ "_self_check": {
+  "twelve_candidates": true,
+  "index_daily_unchanged": true,
+  "isolated": true,
+  "all_evidence_sha256_ok": true,
+  "no_validated": true,
+  "no_formal_admitted": true,
+  "continuity_matches_audit": true,
+  "no_verified_row_state": true
+ }
+}
