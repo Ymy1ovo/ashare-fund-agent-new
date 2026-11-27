@@ -1,0 +1,253 @@
+{
+ "captured_at": "2026-11-27T10:05:18",
+ "database_path": "D:\\ymy\\jj-agent\\data\\fund_agent.db",
+ "database_sha256": "1671e4037cd265a2dead8b78d43614189a782385ca450ac6c2de3c4ff36ee873",
+ "database_bytes": 334036992,
+ "index_daily_total": 50603,
+ "integrity_check": "ok",
+ "foreign_key_check": 0,
+ "target_date": "2004-01-01",
+ "target_count": 10,
+ "target_records": [
+  {
+   "index_code": "000012",
+   "trade_date": "2004-01-01",
+   "open": null,
+   "high": null,
+   "low": null,
+   "close": 99.22,
+   "volume": null,
+   "amount": null,
+   "source": "akshare.stock_zh_index_hist_csindex",
+   "raw_basis": "raw",
+   "run_id": 268,
+   "collected_at": "2026-11-23T17:39:01",
+   "row_fingerprint": "2e5279052eea71e94b4adbc0d2302c6e5f5bf00520e4881b3bc0f70d178a0102",
+   "quality_status": "suspect",
+   "quality_note": "接口基线占位行：日期与第二行间隔异常或非交易日，不是真实行情",
+   "row_content_sha256": "f685629b0758e1eb90338ad03ec58c5d14f3577c91e2c60ff3b8b230b1470a1a"
+  },
+  {
+   "index_code": "000016",
+   "trade_date": "2004-01-01",
+   "open": 997.0,
+   "high": 1021.57,
+   "low": 993.89,
+   "close": 1011.35,
+   "volume": null,
+   "amount": null,
+   "source": "akshare.stock_zh_index_hist_csindex",
+   "raw_basis": "raw",
+   "run_id": 264,
+   "collected_at": "2026-11-23T17:38:11",
+   "row_fingerprint": "71a94f717fa7284b540cfb3dcba192f16c913f8c656bd9809a1b890c96579832",
+   "quality_status": "suspect",
+   "quality_note": "接口基线占位行：日期与第二行间隔异常或非交易日，不是真实行情",
+   "row_content_sha256": "3a8c63de344fa65eeb51cfef217a5f1a2d5ad707179281ba5c02c1b14ae3408e"
+  },
+  {
+   "index_code": "000300",
+   "trade_date": "2004-01-01",
+   "open": null,
+   "high": null,
+   "low": null,
+   "close": 1204.61,
+   "volume": null,
+   "amount": null,
+   "source": "akshare.stock_zh_index_hist_csindex",
+   "raw_basis": "raw",
+   "run_id": 261,
+   "collected_at": "2026-11-23T17:37:33",
+   "row_fingerprint": "9ab56ce0f6a6456fb3253a9dae28015515bd35c5707c4b4e122d9e7375a2c863",
+   "quality_status": "suspect",
+   "quality_note": "接口基线占位行：日期与第二行间隔异常或非交易日，不是真实行情",
+   "row_content_sha256": "bf19ea497fe6f09e6420a402856f6ee30c7c0f16b7e462ea72a27c6017b7a193"
+  },
+  {
+   "index_code": "000905",
+   "trade_date": "2004-01-01",
+   "open": null,
+   "high": null,
+   "low": null,
+   "close": 1000.0,
+   "volume": null,
+   "amount": null,
+   "source": "akshare.stock_zh_index_hist_csindex",
+   "raw_basis": "raw",
+   "run_id": 262,
+   "collected_at": "2026-11-23T17:37:46",
+   "row_fingerprint": "94bbe8a1ff669d2a618fe01126184d20952d345addfccc9c7eb3dc8b40528f19",
+   "quality_status": "suspect",
+   "quality_note": "接口基线占位行：日期与第二行间隔异常或非交易日，不是真实行情",
+   "row_content_sha256": "ccbd3c24985730825e1ced2c8c398fba688694f8c3821c21f14e8c05ed636b43"
+  },
+  {
+   "index_code": "000906",
+   "trade_date": "2004-01-01",
+   "open": null,
+   "high": null,
+   "low": null,
+   "close": 1000.0,
+   "volume": null,
+   "amount": null,
+   "source": "akshare.stock_zh_index_hist_csindex",
+   "raw_basis": "raw",
+   "run_id": 263,
+   "collected_at": "2026-11-23T17:37:55",
+   "row_fingerprint": "24feb3b1bfc785485447bd8978598eed3eeec1119a2a718ed54075c366eec376",
+   "quality_status": "suspect",
+   "quality_note": "接口基线占位行：日期与第二行间隔异常或非交易日，不是真实行情",
+   "row_content_sha256": "762c550f6872904b5b1f8ac9e93cf85fb8ff7b4e54835921fefb6c0d78ba9a2c"
+  },
+  {
+   "index_code": "000922",
+   "trade_date": "2004-01-01",
+   "open": null,
+   "high": null,
+   "low": null,
+   "close": 1000.0,
+   "volume": null,
+   "amount": null,
+   "source": "akshare.stock_zh_index_hist_csindex",
+   "raw_basis": "raw",
+   "run_id": 269,
+   "collected_at": "2026-11-23T17:39:13",
+   "row_fingerprint": "b501bbc1e6e1e093d18d3cfdace57bbbb3f692bfe194d0176e23e6cfa343fcde",
+   "quality_status": "suspect",
+   "quality_note": "接口基线占位行：日期与第二行间隔异常或非交易日，不是真实行情",
+   "row_content_sha256": "8d3a4a370c78f619dd6b394dbae19d14bd0f1baa36c653b05a8aba3c3937a681"
+  },
+  {
+   "index_code": "000942",
+   "trade_date": "2004-01-01",
+   "open": null,
+   "high": null,
+   "low": null,
+   "close": 1000.0,
+   "volume": null,
+   "amount": null,
+   "source": "akshare.stock_zh_index_hist_csindex",
+   "raw_basis": "raw",
+   "run_id": 267,
+   "collected_at": "2026-11-23T17:38:53",
+   "row_fingerprint": "c2f3eb73f3c41a2317cf6c1d33cfd9af6ffe9253bac626227b1e96b25291cd77",
+   "quality_status": "suspect",
+   "quality_note": "接口基线占位行：日期与第二行间隔异常或非交易日，不是真实行情",
+   "row_content_sha256": "c393ba5cc5d59c45afff6c5a45e9cd3b11771076c86c032aeba8f7c03788e3d7"
+  },
+  {
+   "index_code": "399997",
+   "trade_date": "2004-01-01",
+   "open": 1016.34,
+   "high": 1028.64,
+   "low": 1010.87,
+   "close": 1028.64,
+   "volume": null,
+   "amount": null,
+   "source": "akshare.stock_zh_index_hist_csindex",
+   "raw_basis": "raw",
+   "run_id": 265,
+   "collected_at": "2026-11-23T17:38:24",
+   "row_fingerprint": "fef72a23b2385da6666bfc4c312145355bc6847c8b62fe95a2405631d3fcd209",
+   "quality_status": "suspect",
+   "quality_note": "接口基线占位行：日期与第二行间隔异常或非交易日，不是真实行情",
+   "row_content_sha256": "3549d3a5f27c284db8c14fa5b01a32c86bfac9e798cf63c1d2307bfa4e004d7a"
+  },
+  {
+   "index_code": "930930",
+   "trade_date": "2004-01-01",
+   "open": null,
+   "high": null,
+   "low": null,
+   "close": 3000.0,
+   "volume": null,
+   "amount": null,
+   "source": "akshare.stock_zh_index_hist_csindex",
+   "raw_basis": "raw",
+   "run_id": 270,
+   "collected_at": "2026-11-23T17:39:27",
+   "row_fingerprint": "423d6e98219a2ee5ceab06dc38abe32d281599bad47275de20b59b5fc564cd56",
+   "quality_status": "suspect",
+   "quality_note": "接口基线占位行：日期与第二行间隔异常或非交易日，不是真实行情",
+   "row_content_sha256": "895f6acb3cea4400f54b6b2d74ad0d34357a4267e4b7fd950058e18fbfafd66e"
+  },
+  {
+   "index_code": "H30184",
+   "trade_date": "2004-01-01",
+   "open": 995.44,
+   "high": 997.92,
+   "low": 978.61,
+   "close": 994.47,
+   "volume": null,
+   "amount": null,
+   "source": "akshare.stock_zh_index_hist_csindex",
+   "raw_basis": "raw",
+   "run_id": 266,
+   "collected_at": "2026-11-23T17:38:31",
+   "row_fingerprint": "6b07937d957fa7fe63f93c6740a02f89fc218ed335a68ea8888c04b271ca5a82",
+   "quality_status": "suspect",
+   "quality_note": "接口基线占位行：日期与第二行间隔异常或非交易日，不是真实行情",
+   "row_content_sha256": "d8984bb97ce81b7c1e46eed6202480fe01551705333365231d7c76c348319c05"
+  }
+ ],
+ "other_index_fingerprints": {
+  "000012": {
+   "rows": 5558,
+   "fingerprint": "4b395035989a298ad01dcb4a7c833b61a9891b09346b2f9d389ff11be10a1218"
+  },
+  "000016": {
+   "rows": 5559,
+   "fingerprint": "182ac85ab20f6bcc5fe8f732c8d1f584ba8605fbc6c29ff33fdb133fcaddfce5"
+  },
+  "000300": {
+   "rows": 5558,
+   "fingerprint": "aaed243ab58d1e10496fc3132c9f6838b889f95b039a4bd2458d688fb584c0d6"
+  },
+  "000905": {
+   "rows": 5317,
+   "fingerprint": "e816e052b1b43a0fd1110b5d2ec58a9519f8c278bcd4ed5c6806cc91ebd99878"
+  },
+  "000906": {
+   "rows": 5317,
+   "fingerprint": "4b930c3963131ae8f27d22852900d01f6607907f84bf9db22a91bd47f6abf5e7"
+  },
+  "000922": {
+   "rows": 5317,
+   "fingerprint": "618e7df46abbbc39688b46d02e651f201074d4a53d126afc261b19c334771e9d"
+  },
+  "000942": {
+   "rows": 5317,
+   "fingerprint": "59f5e404123d65da3ed6ce83e5306d83825e9390b0965f398c48d9b4b80da8c6"
+  },
+  "399997": {
+   "rows": 4345,
+   "fingerprint": "e987cb6b820ebb987c67abe0277fb91a5731a562755aa90240a5c76ea5e7f33c"
+  },
+  "930930": {
+   "rows": 2999,
+   "fingerprint": "b15a2b0073b37a39bf83686d892cf042339f4e5b18460369f51bcb7ea53729ad"
+  },
+  "H30184": {
+   "rows": 5316,
+   "fingerprint": "f38216777390bc15ca84cd6b9d994ac8e7caaa683311df9e04ffd4ef51c11b3f"
+  }
+ },
+ "suspect_total": 11,
+ "h30184_20130628": {
+  "index_code": "H30184",
+  "trade_date": "2013-06-28",
+  "open": null,
+  "high": null,
+  "low": null,
+  "close": 0.0,
+  "volume": null,
+  "amount": null,
+  "source": "akshare.stock_zh_index_hist_csindex",
+  "raw_basis": "raw",
+  "run_id": 266,
+  "collected_at": "2026-11-23T17:38:31",
+  "row_fingerprint": "0084f7d807800fc23855387e55d7ea24131619d8ad2c1d9bb78c30a4ab23e702",
+  "quality_status": "suspect",
+  "quality_note": "**官方无法确认真实收盘点位**：中证指数官网接口对该日返回 close=0.0 且 OHLC 全为 null，单一日期查询返回空数组；原值 close=0.0、原质量状态 valid 予以保留，本条不再参与有效行情与收益计算（3B-6.2.3.0.3）"
+ }
+}
