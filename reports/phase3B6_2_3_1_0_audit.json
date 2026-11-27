@@ -1,0 +1,3892 @@
+{
+ "phase": "3B-6.2.3.1.0",
+ "task": "官方全收益指数历史序列可行性审计",
+ "generated_at": "2026-11-27T14:11:27",
+ "baseline_head": "3ca4d733c753898e5778767a3a89a521ae7ef58d",
+ "read_only": true,
+ "groups": {
+  "stock_total_return": "8 个收益口径已确认的股票价格指数的全收益候选",
+  "bond_derivative": "债券指数衍生序列（独立统计）",
+  "hk_derivative": "港股指数衍生序列（主口径 unknown，独立统计）"
+ },
+ "group_separation_rule": "**不得把股票指数、债券指数、港股指数混为一个统计集合**",
+ "dimension_definitions": {
+  "official_identity_verified": "官方代码/全称/基日/发布日齐全",
+  "mapping_to_price_index_verified": "基日一致 + 全收益/价格比值恒>1 且随时间上升",
+  "return_basis_verified": "官方名称明确含全收益/净收益",
+  "history_api_available": "官方接口返回 >100 行完整历史",
+  "history_coverage_verified": "相对 A 股日历代理无缺失交易日",
+  "data_quality_verified": "无重复/倒序/非法日期/非数值/NaN/Inf/非正值/空值",
+  "continuity_verified": "覆盖通过且无日历外日期",
+  "point_in_time_available": "能证明历史交易日当时已公开（本轮均 unknown）",
+  "formal_series_admitted": "以上八项全部通过"
+ },
+ "dimension_independence_note": "**九维不得互相替代**：官方身份通过 ≠ 映射通过 ≠ 接口通过 ≠ 质量通过 ≠ 连续性通过 ≠ 时点可用 ≠ 正式准入",
+ "calendar_source": "项目 trade_calendar（A股交易日**代理**，**不是**指数官方发布日历）",
+ "db_before": {
+  "database_path": "D:\\ymy\\jj-agent\\data\\fund_agent.db",
+  "database_sha256": "1671e4037cd265a2dead8b78d43614189a782385ca450ac6c2de3c4ff36ee873",
+  "index_daily_total": 50603,
+  "integrity_check": "ok",
+  "foreign_key_check": 0
+ },
+ "db_after": {
+  "database_path": "D:\\ymy\\jj-agent\\data\\fund_agent.db",
+  "database_sha256": "1671e4037cd265a2dead8b78d43614189a782385ca450ac6c2de3c4ff36ee873",
+  "index_daily_total": 50603,
+  "integrity_check": "ok",
+  "foreign_key_check": 0
+ },
+ "db_unchanged": true,
+ "candidates": [
+  {
+   "tr_candidate": "H00300",
+   "price_index": "000300",
+   "tr_basic": {
+    "index_code": "H00300",
+    "url": "https://www.csindex.com.cn/csindex-home/indexInfo/index-basic-info/H00300",
+    "obtained": true,
+    "file": "reports/evidence/phase3B6_2_3_1_0/basic_H00300.json",
+    "bytes": 779,
+    "sha256": "4a2c782da6c6465f7896c164e384135669c4a98c1f80ad0e8b4e11d4878099b7",
+    "obtained_at": "2026-11-27T14:07:14",
+    "official_full_name": "沪深300全收益指数",
+    "official_short_name": "300收益",
+    "basic_date": "2004-12-31",
+    "basic_index": 1000.0,
+    "publish_date": "2005-04-08",
+    "index_type": "stock",
+    "currency": "人民币",
+    "publisher": "中证指数有限公司"
+   },
+   "price_basic": {
+    "index_code": "000300",
+    "url": "https://www.csindex.com.cn/csindex-home/indexInfo/index-basic-info/000300",
+    "obtained": true,
+    "file": "reports/evidence/phase3B6_2_3_1_0/basic_000300.json",
+    "bytes": 1088,
+    "sha256": "89cbd0812e258757ccca68285181d280b22881f1e95e4fb524ddea64bd159fb6",
+    "obtained_at": "2026-11-27T14:06:38",
+    "official_full_name": "沪深300指数",
+    "official_short_name": "沪深300",
+    "basic_date": "2004-12-31",
+    "basic_index": 1000.0,
+    "publish_date": "2005-04-08",
+    "index_type": "stock",
+    "currency": "人民币",
+    "publisher": "中证指数有限公司"
+   },
+   "tr_history_meta": {
+    "index_code": "H00300",
+    "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=H00300&startDate=20040101&endDate=20261127",
+    "obtained": true,
+    "file": "reports/evidence/phase3B6_2_3_1_0/hist_H00300_20040101_20261127.json",
+    "bytes": 1868404,
+    "sha256": "f545659bc59e97a84b596dbe93eea2d4aa3871c5ba11d1a0c6bdaae4983d15ef",
+    "obtained_at": "2026-11-27T14:07:13",
+    "row_count": 5321
+   },
+   "price_history_meta": {
+    "index_code": "000300",
+    "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=000300&startDate=20040101&endDate=20261127",
+    "obtained": true,
+    "file": "reports/evidence/phase3B6_2_3_1_0/hist_000300_20040101_20261127.json",
+    "bytes": 1859052,
+    "sha256": "0fa59be4faf85775a230582710cfebd597ed19b8a500b0877cd31157f52963f1",
+    "obtained_at": "2026-11-27T14:06:38",
+    "row_count": 5562
+   },
+   "quality": {
+    "real_history_start": "20041231",
+    "synthetic_first_row": "20040101",
+    "calendar_window_days": 5319,
+    "first_date": "20040101",
+    "last_date": "20261126",
+    "row_count": 5321,
+    "distinct_dates": 5321,
+    "duplicate_dates": 0,
+    "descending_dates": 0,
+    "illegal_dates": [],
+    "null_close": 0,
+    "non_numeric_close": 0,
+    "nan_or_inf_close": 0,
+    "non_positive_close": 0,
+    "non_positive_sample": [],
+    "extreme_moves": [],
+    "extreme_move_count": 0,
+    "missing_trading_days": 0,
+    "missing_sample": [],
+    "dates_outside_calendar": 1,
+    "dates_outside_calendar_sample": [
+     "2018-06-18"
+    ],
+    "calendar_source": "项目 trade_calendar（A股交易日**代理**，非官方指数发布日历）"
+   },
+   "mapping": {
+    "price_index": "000300",
+    "tr_candidate": "H00300",
+    "checks": [
+     {
+      "check": "候选名称含「全收益/净收益」",
+      "passed": true,
+      "value": "沪深300全收益指数",
+      "strength": "弱（名称相似不足以判定映射）"
+     },
+     {
+      "check": "基日一致",
+      "passed": null,
+      "strength": "中",
+      "value": null
+     },
+     {
+      "check": "全收益/价格比值恒 >= 1（基日当天必然 =1）",
+      "passed": true,
+      "value": {
+       "ratio_first": 1.0,
+       "ratio_last": 1.5062619374190818,
+       "sample_count": 5319,
+       "ratio_equals_one_count": 175
+      },
+      "strength": "中（符合分红再投资特征，但不能证明口径）"
+     },
+     {
+      "check": "比值随时间上升（再投资累积）",
+      "passed": true,
+      "value": {
+       "ratio_first": 1.0,
+       "ratio_last": 1.5062619374190818
+      },
+      "strength": "中"
+     }
+    ],
+    "ratio_first": 1.0,
+    "ratio_last": 1.5062619374190818,
+    "ratio_sample_count": 5319,
+    "all_ratios_at_least_one": true,
+    "ratio_increasing": true,
+    "ratio_equals_one_dates": [
+     "20041231",
+     "20050104",
+     "20050105",
+     "20050106",
+     "20050107",
+     "20050110",
+     "20050111",
+     "20050112",
+     "20050113",
+     "20050114"
+    ],
+    "ratio_equals_one_count": 175,
+    "note": "比值恒 >= 1 且随时间上升，符合「分红再投资累积」特征；但这是**技术判断**，不能替代官方口径文件。**早期比值恰为 1 说明该段未体现分红再投资**，需在正式使用时注意"
+   },
+   "cross_year_samples": [
+    {
+     "date": "20040101",
+     "price_close": 1204.61,
+     "tr_close": 1000.0,
+     "ratio": 0.830144
+    },
+    {
+     "date": "20050104",
+     "price_close": 982.79,
+     "tr_close": 982.79,
+     "ratio": 1.0
+    },
+    {
+     "date": "20060104",
+     "price_close": 941.43,
+     "tr_close": 941.43,
+     "ratio": 1.0
+    },
+    {
+     "date": "20070104",
+     "price_close": 2067.09,
+     "tr_close": 2106.44,
+     "ratio": 1.019036
+    },
+    {
+     "date": "20080102",
+     "price_close": 5385.1,
+     "tr_close": 5523.94,
+     "ratio": 1.025782
+    },
+    {
+     "date": "20090105",
+     "price_close": 1882.96,
+     "tr_close": 1950.97,
+     "ratio": 1.036119
+    },
+    {
+     "date": "20100104",
+     "price_close": 3535.23,
+     "tr_close": 3697.67,
+     "ratio": 1.045949
+    },
+    {
+     "date": "20110104",
+     "price_close": 3189.68,
+     "tr_close": 3371.87,
+     "ratio": 1.057119
+    },
+    {
+     "date": "20120104",
+     "price_close": 2298.75,
+     "tr_close": 2461.32,
+     "ratio": 1.070721
+    },
+    {
+     "date": "20130104",
+     "price_close": 2524.41,
+     "tr_close": 2759.37,
+     "ratio": 1.093075
+    },
+    {
+     "date": "20140102",
+     "price_close": 2321.98,
+     "tr_close": 2601.73,
+     "ratio": 1.120479
+    },
+    {
+     "date": "20150105",
+     "price_close": 3641.54,
+     "tr_close": 4192.99,
+     "ratio": 1.151433
+    },
+    {
+     "date": "20160104",
+     "price_close": 3469.07,
+     "tr_close": 4056.17,
+     "ratio": 1.169238
+    },
+    {
+     "date": "20170103",
+     "price_close": 3342.23,
+     "tr_close": 3996.97,
+     "ratio": 1.195899
+    },
+    {
+     "date": "20180102",
+     "price_close": 4087.4,
+     "tr_close": 4987.52,
+     "ratio": 1.220218
+    },
+    {
+     "date": "20190102",
+     "price_close": 2969.54,
+     "tr_close": 3704.62,
+     "ratio": 1.24754
+    },
+    {
+     "date": "20200102",
+     "price_close": 4152.24,
+     "tr_close": 5298.75,
+     "ratio": 1.276118
+    },
+    {
+     "date": "20210104",
+     "price_close": 5267.72,
+     "tr_close": 6863.92,
+     "ratio": 1.303015
+    },
+    {
+     "date": "20220104",
+     "price_close": 4917.77,
+     "tr_close": 6521.61,
+     "ratio": 1.326132
+    },
+    {
+     "date": "20230103",
+     "price_close": 3887.9,
+     "tr_close": 5274.03,
+     "ratio": 1.356524
+    },
+    {
+     "date": "20240102",
+     "price_close": 3386.35,
+     "tr_close": 4709.92,
+     "ratio": 1.390854
+    },
+    {
+     "date": "20250102",
+     "price_close": 3820.4,
+     "tr_close": 5478.38,
+     "ratio": 1.433981
+    },
+    {
+     "date": "20260105",
+     "price_close": 4717.75,
+     "tr_close": 6956.12,
+     "ratio": 1.474457
+    }
+   ],
+   "return_basis": "gross_total_return",
+   "dimensions": {
+    "official_identity_verified": true,
+    "mapping_to_price_index_verified": true,
+    "return_basis_verified": true,
+    "history_api_available": true,
+    "history_coverage_verified": true,
+    "data_quality_verified": true,
+    "continuity_verified": false,
+    "point_in_time_available": false,
+    "formal_series_admitted": false
+   },
+   "dimensions_passed": 6,
+   "dimensions_total": 9,
+   "evidence_grade": "L1",
+   "blocking_dimensions": [
+    "continuity_verified",
+    "point_in_time_available",
+    "formal_series_admitted"
+   ],
+   "point_in_time": {
+    "index_snapshot_tables": [],
+    "index_daily_multi_version_rows": 0,
+    "collected_at_distinct_dates": [
+     "2026-11-23"
+    ],
+    "has_historical_snapshot": false,
+    "has_revision_records": false,
+    "can_prove_published_at_the_time": false,
+    "historical_point_in_time_availability": "unknown",
+    "reason": "无历史快照表、无修订记录、每 (index_code,trade_date) 仅 1 行；当前采集时间与当前下载数据**不能证明**历史交易日当时已公开；无法排除事后回溯计算",
+    "note": "该结论适用于本轮全部候选序列（含股票/债券/港股），不因序列类型不同而改变"
+   },
+   "conclusion": "H00300：未通过维度 ['continuity_verified', 'point_in_time_available', 'formal_series_admitted']；其中历史覆盖 0 个交易日缺失，日历外日期 1 条",
+   "group": "stock_total_return"
+  },
+  {
+   "tr_candidate": "H00905",
+   "price_index": "000905",
+   "tr_basic": {
+    "index_code": "H00905",
+    "url": "https://www.csindex.com.cn/csindex-home/indexInfo/index-basic-info/H00905",
+    "obtained": true,
+    "file": "reports/evidence/phase3B6_2_3_1_0/basic_H00905.json",
+    "bytes": 812,
+    "sha256": "b1ac3733e668f0bb3c88f70f79ba66f0862703ce0fcad0438451220295a27395",
+    "obtained_at": "2026-11-27T14:09:22",
+    "official_full_name": "中证小盘500全收益指数",
+    "official_short_name": "500收益",
+    "basic_date": "2004-12-31",
+    "basic_index": 1000.0,
+    "publish_date": "2007-01-15",
+    "index_type": "stock",
+    "currency": "人民币",
+    "publisher": "中证指数有限公司"
+   },
+   "price_basic": {
+    "index_code": "000905",
+    "url": "https://www.csindex.com.cn/csindex-home/indexInfo/index-basic-info/000905",
+    "obtained": true,
+    "file": "reports/evidence/phase3B6_2_3_1_0/basic_000905.json",
+    "bytes": 990,
+    "sha256": "29bbc5ab7081e7c50efbac91062224810b908ead05448316b96e6441c77a2efb",
+    "obtained_at": "2026-11-27T14:08:30",
+    "official_full_name": "中证小盘500指数",
+    "official_short_name": "中证500",
+    "basic_date": "2004-12-31",
+    "basic_index": 1000.0,
+    "publish_date": "2007-01-15",
+    "index_type": "stock",
+    "currency": "人民币",
+    "publisher": "中证指数有限公司"
+   },
+   "tr_history_meta": {
+    "index_code": "H00905",
+    "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=H00905&startDate=20040101&endDate=20261127",
+    "obtained": true,
+    "file": "reports/evidence/phase3B6_2_3_1_0/hist_H00905_20040101_20261127.json",
+    "bytes": 1959475,
+    "sha256": "4a60d94d8e29bca27b8fcbb719989fa62d358416660724f5ce3c6ad076e8ebb3",
+    "obtained_at": "2026-11-27T14:09:22",
+    "row_count": 5321
+   },
+   "price_history_meta": {
+    "index_code": "000905",
+    "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=000905&startDate=20040101&endDate=20261127",
+    "obtained": true,
+    "file": "reports/evidence/phase3B6_2_3_1_0/hist_000905_20040101_20261127.json",
+    "bytes": 1859847,
+    "sha256": "f858b7df4e25bb97b86916272aa717de25ce7b2a34d874d70e2e24cdfde6b82b",
+    "obtained_at": "2026-11-27T14:08:29",
+    "row_count": 5321
+   },
+   "quality": {
+    "real_history_start": "20041231",
+    "synthetic_first_row": "20040101",
+    "calendar_window_days": 5319,
+    "first_date": "20040101",
+    "last_date": "20261126",
+    "row_count": 5321,
+    "distinct_dates": 5321,
+    "duplicate_dates": 0,
+    "descending_dates": 0,
+    "illegal_dates": [],
+    "null_close": 0,
+    "non_numeric_close": 0,
+    "nan_or_inf_close": 0,
+    "non_positive_close": 0,
+    "non_positive_sample": [],
+    "extreme_moves": [],
+    "extreme_move_count": 0,
+    "missing_trading_days": 0,
+    "missing_sample": [],
+    "dates_outside_calendar": 1,
+    "dates_outside_calendar_sample": [
+     "2018-06-18"
+    ],
+    "calendar_source": "项目 trade_calendar（A股交易日**代理**，非官方指数发布日历）"
+   },
+   "mapping": {
+    "price_index": "000905",
+    "tr_candidate": "H00905",
+    "checks": [
+     {
+      "check": "候选名称含「全收益/净收益」",
+      "passed": true,
+      "value": "中证小盘500全收益指数",
+      "strength": "弱（名称相似不足以判定映射）"
+     },
+     {
+      "check": "基日一致",
+      "passed": null,
+      "strength": "中",
+      "value": null
+     },
+     {
+      "check": "全收益/价格比值恒 >= 1（基日当天必然 =1）",
+      "passed": true,
+      "value": {
+       "ratio_first": 1.0,
+       "ratio_last": 1.2561765137276706,
+       "sample_count": 5320,
+       "ratio_equals_one_count": 48
+      },
+      "strength": "中（符合分红再投资特征，但不能证明口径）"
+     },
+     {
+      "check": "比值随时间上升（再投资累积）",
+      "passed": true,
+      "value": {
+       "ratio_first": 1.0,
+       "ratio_last": 1.2561765137276706
+      },
+      "strength": "中"
+     }
+    ],
+    "ratio_first": 1.0,
+    "ratio_last": 1.2561765137276706,
+    "ratio_sample_count": 5320,
+    "all_ratios_at_least_one": true,
+    "ratio_increasing": true,
+    "ratio_equals_one_dates": [
+     "20041231",
+     "20050104",
+     "20050105",
+     "20050106",
+     "20050107",
+     "20050110",
+     "20050111",
+     "20050112",
+     "20050113",
+     "20050114"
+    ],
+    "ratio_equals_one_count": 48,
+    "note": "比值恒 >= 1 且随时间上升，符合「分红再投资累积」特征；但这是**技术判断**，不能替代官方口径文件。**早期比值恰为 1 说明该段未体现分红再投资**，需在正式使用时注意"
+   },
+   "cross_year_samples": [
+    {
+     "date": "20040101",
+     "price_close": 1000.0,
+     "tr_close": 1000.0,
+     "ratio": 1.0
+    },
+    {
+     "date": "20050104",
+     "price_close": 986.93,
+     "tr_close": 986.93,
+     "ratio": 1.0
+    },
+    {
+     "date": "20060104",
+     "price_close": 871.73,
+     "tr_close": 882.76,
+     "ratio": 1.012653
+    },
+    {
+     "date": "20070104",
+     "price_close": 1723.69,
+     "tr_close": 1761.4,
+     "ratio": 1.021877
+    },
+    {
+     "date": "20080102",
+     "price_close": 5123.93,
+     "tr_close": 5255.99,
+     "ratio": 1.025773
+    },
+    {
+     "date": "20090105",
+     "price_close": 2020.24,
+     "tr_close": 2082.6,
+     "ratio": 1.030868
+    },
+    {
+     "date": "20100104",
+     "price_close": 4510.53,
+     "tr_close": 4673.08,
+     "ratio": 1.036038
+    },
+    {
+     "date": "20110104",
+     "price_close": 5011.5,
+     "tr_close": 5213.22,
+     "ratio": 1.040251
+    },
+    {
+     "date": "20120104",
+     "price_close": 3192.23,
+     "tr_close": 3337.77,
+     "ratio": 1.045592
+    },
+    {
+     "date": "20130104",
+     "price_close": 3258.25,
+     "tr_close": 3437.54,
+     "ratio": 1.055026
+    },
+    {
+     "date": "20140102",
+     "price_close": 3847.88,
+     "tr_close": 4100.33,
+     "ratio": 1.065608
+    },
+    {
+     "date": "20150105",
+     "price_close": 5417.02,
+     "tr_close": 5832.4,
+     "ratio": 1.076681
+    },
+    {
+     "date": "20160104",
+     "price_close": 6983.4,
+     "tr_close": 7557.26,
+     "ratio": 1.082175
+    },
+    {
+     "date": "20170103",
+     "price_close": 6320.76,
+     "tr_close": 6890.18,
+     "ratio": 1.090087
+    },
+    {
+     "date": "20180102",
+     "price_close": 6332.23,
+     "tr_close": 6959.15,
+     "ratio": 1.099005
+    },
+    {
+     "date": "20190102",
+     "price_close": 4131.96,
+     "tr_close": 4594.34,
+     "ratio": 1.111903
+    },
+    {
+     "date": "20200102",
+     "price_close": 5366.14,
+     "tr_close": 6049.61,
+     "ratio": 1.127367
+    },
+    {
+     "date": "20210104",
+     "price_close": 6482.79,
+     "tr_close": 7392.18,
+     "ratio": 1.140278
+    },
+    {
+     "date": "20220104",
+     "price_close": 7354.46,
+     "tr_close": 8506.54,
+     "ratio": 1.156651
+    },
+    {
+     "date": "20230103",
+     "price_close": 5955.9,
+     "tr_close": 7010.57,
+     "ratio": 1.17708
+    },
+    {
+     "date": "20240102",
+     "price_close": 5409.46,
+     "tr_close": 6471.93,
+     "ratio": 1.19641
+    },
+    {
+     "date": "20250102",
+     "price_close": 5545.82,
+     "tr_close": 6774.77,
+     "ratio": 1.221599
+    },
+    {
+     "date": "20260105",
+     "price_close": 7651.2,
+     "tr_close": 9495.41,
+     "ratio": 1.241035
+    }
+   ],
+   "return_basis": "gross_total_return",
+   "dimensions": {
+    "official_identity_verified": true,
+    "mapping_to_price_index_verified": true,
+    "return_basis_verified": true,
+    "history_api_available": true,
+    "history_coverage_verified": true,
+    "data_quality_verified": true,
+    "continuity_verified": false,
+    "point_in_time_available": false,
+    "formal_series_admitted": false
+   },
+   "dimensions_passed": 6,
+   "dimensions_total": 9,
+   "evidence_grade": "L1",
+   "blocking_dimensions": [
+    "continuity_verified",
+    "point_in_time_available",
+    "formal_series_admitted"
+   ],
+   "point_in_time": {
+    "index_snapshot_tables": [],
+    "index_daily_multi_version_rows": 0,
+    "collected_at_distinct_dates": [
+     "2026-11-23"
+    ],
+    "has_historical_snapshot": false,
+    "has_revision_records": false,
+    "can_prove_published_at_the_time": false,
+    "historical_point_in_time_availability": "unknown",
+    "reason": "无历史快照表、无修订记录、每 (index_code,trade_date) 仅 1 行；当前采集时间与当前下载数据**不能证明**历史交易日当时已公开；无法排除事后回溯计算",
+    "note": "该结论适用于本轮全部候选序列（含股票/债券/港股），不因序列类型不同而改变"
+   },
+   "conclusion": "H00905：未通过维度 ['continuity_verified', 'point_in_time_available', 'formal_series_admitted']；其中历史覆盖 0 个交易日缺失，日历外日期 1 条",
+   "group": "stock_total_return"
+  },
+  {
+   "tr_candidate": "H00906",
+   "price_index": "000906",
+   "tr_basic": {
+    "index_code": "H00906",
+    "url": "https://www.csindex.com.cn/csindex-home/indexInfo/index-basic-info/H00906",
+    "obtained": true,
+    "file": "reports/evidence/phase3B6_2_3_1_0/basic_H00906.json",
+    "bytes": 797,
+    "sha256": "9d61703e8d54941ef27c5805bece09c5665623462d69893d8d30a5038c834b3d",
+    "obtained_at": "2026-11-27T14:09:42",
+    "official_full_name": "中证800全收益指数",
+    "official_short_name": "800收益",
+    "basic_date": "2004-12-31",
+    "basic_index": 1000.0,
+    "publish_date": "2007-01-15",
+    "index_type": "stock",
+    "currency": "人民币",
+    "publisher": "中证指数有限公司"
+   },
+   "price_basic": {
+    "index_code": "000906",
+    "url": "https://www.csindex.com.cn/csindex-home/indexInfo/index-basic-info/000906",
+    "obtained": true,
+    "file": "reports/evidence/phase3B6_2_3_1_0/basic_000906.json",
+    "bytes": 975,
+    "sha256": "1e49eff6bdccda98fa090db0b8987178bd4e799dfbcc842e2f695289ebb9ffd5",
+    "obtained_at": "2026-11-27T14:09:31",
+    "official_full_name": "中证800指数",
+    "official_short_name": "中证800",
+    "basic_date": "2004-12-31",
+    "basic_index": 1000.0,
+    "publish_date": "2007-01-15",
+    "index_type": "stock",
+    "currency": "人民币",
+    "publisher": "中证指数有限公司"
+   },
+   "tr_history_meta": {
+    "index_code": "H00906",
+    "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=H00906&startDate=20040101&endDate=20261127",
+    "obtained": true,
+    "file": "reports/evidence/phase3B6_2_3_1_0/hist_H00906_20040101_20261127.json",
+    "bytes": 1885540,
+    "sha256": "c7049c15e7be9f9497049be2b748182126b0a0c2ae397b715241c7c3e4b04b57",
+    "obtained_at": "2026-11-27T14:09:42",
+    "row_count": 5321
+   },
+   "price_history_meta": {
+    "index_code": "000906",
+    "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=000906&startDate=20040101&endDate=20261127",
+    "obtained": true,
+    "file": "reports/evidence/phase3B6_2_3_1_0/hist_000906_20040101_20261127.json",
+    "bytes": 1785955,
+    "sha256": "01b7e169bcd8cab117dbd30a86e8443224436556c14b0a073e54f1412c174a5f",
+    "obtained_at": "2026-11-27T14:09:31",
+    "row_count": 5321
+   },
+   "quality": {
+    "real_history_start": "20041231",
+    "synthetic_first_row": "20040101",
+    "calendar_window_days": 5319,
+    "first_date": "20040101",
+    "last_date": "20261126",
+    "row_count": 5321,
+    "distinct_dates": 5321,
+    "duplicate_dates": 0,
+    "descending_dates": 0,
+    "illegal_dates": [],
+    "null_close": 0,
+    "non_numeric_close": 0,
+    "nan_or_inf_close": 0,
+    "non_positive_close": 0,
+    "non_positive_sample": [],
+    "extreme_moves": [],
+    "extreme_move_count": 0,
+    "missing_trading_days": 0,
+    "missing_sample": [],
+    "dates_outside_calendar": 1,
+    "dates_outside_calendar_sample": [
+     "2018-06-18"
+    ],
+    "calendar_source": "项目 trade_calendar（A股交易日**代理**，非官方指数发布日历）"
+   },
+   "mapping": {
+    "price_index": "000906",
+    "tr_candidate": "H00906",
+    "checks": [
+     {
+      "check": "候选名称含「全收益/净收益」",
+      "passed": true,
+      "value": "中证800全收益指数",
+      "strength": "弱（名称相似不足以判定映射）"
+     },
+     {
+      "check": "基日一致",
+      "passed": null,
+      "strength": "中",
+      "value": null
+     },
+     {
+      "check": "全收益/价格比值恒 >= 1（基日当天必然 =1）",
+      "passed": true,
+      "value": {
+       "ratio_first": 1.0,
+       "ratio_last": 1.4592365091074162,
+       "sample_count": 5320,
+       "ratio_equals_one_count": 48
+      },
+      "strength": "中（符合分红再投资特征，但不能证明口径）"
+     },
+     {
+      "check": "比值随时间上升（再投资累积）",
+      "passed": true,
+      "value": {
+       "ratio_first": 1.0,
+       "ratio_last": 1.4592365091074162
+      },
+      "strength": "中"
+     }
+    ],
+    "ratio_first": 1.0,
+    "ratio_last": 1.4592365091074162,
+    "ratio_sample_count": 5320,
+    "all_ratios_at_least_one": true,
+    "ratio_increasing": true,
+    "ratio_equals_one_dates": [
+     "20041231",
+     "20050104",
+     "20050105",
+     "20050106",
+     "20050107",
+     "20050110",
+     "20050111",
+     "20050112",
+     "20050113",
+     "20050114"
+    ],
+    "ratio_equals_one_count": 48,
+    "note": "比值恒 >= 1 且随时间上升，符合「分红再投资累积」特征；但这是**技术判断**，不能替代官方口径文件。**早期比值恰为 1 说明该段未体现分红再投资**，需在正式使用时注意"
+   },
+   "cross_year_samples": [
+    {
+     "date": "20040101",
+     "price_close": 1000.0,
+     "tr_close": 1000.0,
+     "ratio": 1.0
+    },
+    {
+     "date": "20050104",
+     "price_close": 983.9,
+     "tr_close": 983.9,
+     "ratio": 1.0
+    },
+    {
+     "date": "20060104",
+     "price_close": 914.75,
+     "tr_close": 932.18,
+     "ratio": 1.019054
+    },
+    {
+     "date": "20070104",
+     "price_close": 1967.62,
+     "tr_close": 2038.42,
+     "ratio": 1.035983
+    },
+    {
+     "date": "20080102",
+     "price_close": 5278.92,
+     "tr_close": 5501.33,
+     "ratio": 1.042132
+    },
+    {
+     "date": "20090105",
+     "price_close": 1892.05,
+     "tr_close": 1989.44,
+     "ratio": 1.051473
+    },
+    {
+     "date": "20100104",
+     "price_close": 3687.94,
+     "tr_close": 3910.88,
+     "ratio": 1.060451
+    },
+    {
+     "date": "20110104",
+     "price_close": 3507.01,
+     "tr_close": 3752.33,
+     "ratio": 1.069951
+    },
+    {
+     "date": "20120104",
+     "price_close": 2448.86,
+     "tr_close": 2648.6,
+     "ratio": 1.081564
+    },
+    {
+     "date": "20130104",
+     "price_close": 2643.83,
+     "tr_close": 2910.81,
+     "ratio": 1.100982
+    },
+    {
+     "date": "20140102",
+     "price_close": 2586.02,
+     "tr_close": 2907.69,
+     "ratio": 1.124388
+    },
+    {
+     "date": "20150105",
+     "price_close": 3944.36,
+     "tr_close": 4536.15,
+     "ratio": 1.150034
+    },
+    {
+     "date": "20160104",
+     "price_close": 4084.6,
+     "tr_close": 4755.82,
+     "ratio": 1.164329
+    },
+    {
+     "date": "20170103",
+     "price_close": 3862.95,
+     "tr_close": 4579.08,
+     "ratio": 1.185384
+    },
+    {
+     "date": "20180102",
+     "price_close": 4467.28,
+     "tr_close": 5385.06,
+     "ratio": 1.205445
+    },
+    {
+     "date": "20190102",
+     "price_close": 3160.12,
+     "tr_close": 3884.51,
+     "ratio": 1.229229
+    },
+    {
+     "date": "20200102",
+     "price_close": 4341.85,
+     "tr_close": 5448.06,
+     "ratio": 1.254778
+    },
+    {
+     "date": "20210104",
+     "price_close": 5448.99,
+     "tr_close": 6965.01,
+     "ratio": 1.27822
+    },
+    {
+     "date": "20220104",
+     "price_close": 5321.8,
+     "tr_close": 6917.67,
+     "ratio": 1.299874
+    },
+    {
+     "date": "20230103",
+     "price_close": 4232.51,
+     "tr_close": 5620.52,
+     "ratio": 1.32794
+    },
+    {
+     "date": "20240102",
+     "price_close": 3727.11,
+     "tr_close": 5062.96,
+     "ratio": 1.358414
+    },
+    {
+     "date": "20250102",
+     "price_close": 4100.89,
+     "tr_close": 5729.65,
+     "ratio": 1.397172
+    },
+    {
+     "date": "20260105",
+     "price_close": 5214.24,
+     "tr_close": 7467.2,
+     "ratio": 1.432078
+    }
+   ],
+   "return_basis": "gross_total_return",
+   "dimensions": {
+    "official_identity_verified": true,
+    "mapping_to_price_index_verified": true,
+    "return_basis_verified": true,
+    "history_api_available": true,
+    "history_coverage_verified": true,
+    "data_quality_verified": true,
+    "continuity_verified": false,
+    "point_in_time_available": false,
+    "formal_series_admitted": false
+   },
+   "dimensions_passed": 6,
+   "dimensions_total": 9,
+   "evidence_grade": "L1",
+   "blocking_dimensions": [
+    "continuity_verified",
+    "point_in_time_available",
+    "formal_series_admitted"
+   ],
+   "point_in_time": {
+    "index_snapshot_tables": [],
+    "index_daily_multi_version_rows": 0,
+    "collected_at_distinct_dates": [
+     "2026-11-23"
+    ],
+    "has_historical_snapshot": false,
+    "has_revision_records": false,
+    "can_prove_published_at_the_time": false,
+    "historical_point_in_time_availability": "unknown",
+    "reason": "无历史快照表、无修订记录、每 (index_code,trade_date) 仅 1 行；当前采集时间与当前下载数据**不能证明**历史交易日当时已公开；无法排除事后回溯计算",
+    "note": "该结论适用于本轮全部候选序列（含股票/债券/港股），不因序列类型不同而改变"
+   },
+   "conclusion": "H00906：未通过维度 ['continuity_verified', 'point_in_time_available', 'formal_series_admitted']；其中历史覆盖 0 个交易日缺失，日历外日期 1 条",
+   "group": "stock_total_return"
+  },
+  {
+   "tr_candidate": "H00016",
+   "price_index": "000016",
+   "tr_basic": {
+    "index_code": "H00016",
+    "url": "https://www.csindex.com.cn/csindex-home/indexInfo/index-basic-info/H00016",
+    "obtained": true,
+    "file": "reports/evidence/phase3B6_2_3_1_0/basic_H00016.json",
+    "bytes": 793,
+    "sha256": "e2052cd2fab60c0f5362b47b273aea0bed566bcb6dde5c8b6f298f2d73572914",
+    "obtained_at": "2026-11-27T14:09:50",
+    "official_full_name": "上证50全收益指数",
+    "official_short_name": "50收益",
+    "basic_date": "2003-12-31",
+    "basic_index": 1000.0,
+    "publish_date": "2004-01-02",
+    "index_type": "stock",
+    "currency": "人民币",
+    "publisher": "中证指数有限公司"
+   },
+   "price_basic": {
+    "index_code": "000016",
+    "url": "https://www.csindex.com.cn/csindex-home/indexInfo/index-basic-info/000016",
+    "obtained": true,
+    "file": "reports/evidence/phase3B6_2_3_1_0/basic_000016.json",
+    "bytes": 1181,
+    "sha256": "44bd88a3dc069ab09206ceca301a362db8ab2dab3529d2cd498369081e22b88b",
+    "obtained_at": "2026-11-27T14:09:48",
+    "official_full_name": "上证50指数",
+    "official_short_name": "上证50",
+    "basic_date": "2003-12-31",
+    "basic_index": 1000.0,
+    "publish_date": "2004-01-02",
+    "index_type": "stock",
+    "currency": "人民币",
+    "publisher": "中证指数有限公司"
+   },
+   "tr_history_meta": {
+    "index_code": "H00016",
+    "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=H00016&startDate=20040101&endDate=20261127",
+    "obtained": true,
+    "file": "reports/evidence/phase3B6_2_3_1_0/hist_H00016_20040101_20261127.json",
+    "bytes": 1912959,
+    "sha256": "625ba341082a844819f3eb5c1408a069b420d6b325bba145229b0bb6a1c5f898",
+    "obtained_at": "2026-11-27T14:09:50",
+    "row_count": 5563
+   },
+   "price_history_meta": {
+    "index_code": "000016",
+    "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=000016&startDate=20040101&endDate=20261127",
+    "obtained": true,
+    "file": "reports/evidence/phase3B6_2_3_1_0/hist_000016_20040101_20261127.json",
+    "bytes": 1823322,
+    "sha256": "f6580e14502cf9e34a9a9657c9dfd664b5ce1eaf34cabf4ab737a9c7bd4b9e45",
+    "obtained_at": "2026-11-27T14:09:47",
+    "row_count": 5563
+   },
+   "quality": {
+    "real_history_start": "20040101",
+    "synthetic_first_row": null,
+    "calendar_window_days": 5561,
+    "first_date": "20040101",
+    "last_date": "20261126",
+    "row_count": 5563,
+    "distinct_dates": 5563,
+    "duplicate_dates": 0,
+    "descending_dates": 0,
+    "illegal_dates": [],
+    "null_close": 0,
+    "non_numeric_close": 0,
+    "nan_or_inf_close": 0,
+    "non_positive_close": 0,
+    "non_positive_sample": [],
+    "extreme_moves": [],
+    "extreme_move_count": 0,
+    "missing_trading_days": 0,
+    "missing_sample": [],
+    "dates_outside_calendar": 2,
+    "dates_outside_calendar_sample": [
+     "2004-01-01",
+     "2018-06-18"
+    ],
+    "calendar_source": "项目 trade_calendar（A股交易日**代理**，非官方指数发布日历）"
+   },
+   "mapping": {
+    "price_index": "000016",
+    "tr_candidate": "H00016",
+    "checks": [
+     {
+      "check": "候选名称含「全收益/净收益」",
+      "passed": true,
+      "value": "上证50全收益指数",
+      "strength": "弱（名称相似不足以判定映射）"
+     },
+     {
+      "check": "基日一致",
+      "passed": null,
+      "strength": "中",
+      "value": null
+     },
+     {
+      "check": "全收益/价格比值恒 >= 1（基日当天必然 =1）",
+      "passed": true,
+      "value": {
+       "ratio_first": 1.0,
+       "ratio_last": 1.7439708611291675,
+       "sample_count": 5563,
+       "ratio_equals_one_count": 8
+      },
+      "strength": "中（符合分红再投资特征，但不能证明口径）"
+     },
+     {
+      "check": "比值随时间上升（再投资累积）",
+      "passed": true,
+      "value": {
+       "ratio_first": 1.0,
+       "ratio_last": 1.7439708611291675
+      },
+      "strength": "中"
+     }
+    ],
+    "ratio_first": 1.0,
+    "ratio_last": 1.7439708611291675,
+    "ratio_sample_count": 5563,
+    "all_ratios_at_least_one": true,
+    "ratio_increasing": true,
+    "ratio_equals_one_dates": [
+     "20040101",
+     "20040102",
+     "20040105",
+     "20040106",
+     "20040107",
+     "20040108",
+     "20040109",
+     "20040112"
+    ],
+    "ratio_equals_one_count": 8,
+    "note": "比值恒 >= 1 且随时间上升，符合「分红再投资累积」特征；但这是**技术判断**，不能替代官方口径文件。**早期比值恰为 1 说明该段未体现分红再投资**，需在正式使用时注意"
+   },
+   "cross_year_samples": [
+    {
+     "date": "20040101",
+     "price_close": 1011.35,
+     "tr_close": 1011.35,
+     "ratio": 1.0
+    },
+    {
+     "date": "20050104",
+     "price_close": 827.07,
+     "tr_close": 835.13,
+     "ratio": 1.009745
+    },
+    {
+     "date": "20060104",
+     "price_close": 812.6,
+     "tr_close": 840.28,
+     "ratio": 1.034063
+    },
+    {
+     "date": "20070104",
+     "price_close": 1836.14,
+     "tr_close": 1944.8,
+     "ratio": 1.059178
+    },
+    {
+     "date": "20080102",
+     "price_close": 4219.69,
+     "tr_close": 4504.54,
+     "ratio": 1.067505
+    },
+    {
+     "date": "20090105",
+     "price_close": 1436.89,
+     "tr_close": 1553.48,
+     "ratio": 1.081141
+    },
+    {
+     "date": "20100104",
+     "price_close": 2514.65,
+     "tr_close": 2751.38,
+     "ratio": 1.09414
+    },
+    {
+     "date": "20110104",
+     "price_close": 2015.11,
+     "tr_close": 2234.83,
+     "ratio": 1.109036
+    },
+    {
+     "date": "20120104",
+     "price_close": 1595.12,
+     "tr_close": 1799.59,
+     "ratio": 1.128185
+    },
+    {
+     "date": "20130104",
+     "price_close": 1870.5,
+     "tr_close": 2170.12,
+     "ratio": 1.160182
+    },
+    {
+     "date": "20140102",
+     "price_close": 1561.1,
+     "tr_close": 1872.69,
+     "ratio": 1.199596
+    },
+    {
+     "date": "20150105",
+     "price_close": 2649.64,
+     "tr_close": 3291.05,
+     "ratio": 1.242074
+    },
+    {
+     "date": "20160104",
+     "price_close": 2270.46,
+     "tr_close": 2881.04,
+     "ratio": 1.268923
+    },
+    {
+     "date": "20170103",
+     "price_close": 2307.89,
+     "tr_close": 3015.75,
+     "ratio": 1.306713
+    },
+    {
+     "date": "20180102",
+     "price_close": 2908.73,
+     "tr_close": 3899.46,
+     "ratio": 1.340606
+    },
+    {
+     "date": "20190102",
+     "price_close": 2262.79,
+     "tr_close": 3122.58,
+     "ratio": 1.379969
+    },
+    {
+     "date": "20200102",
+     "price_close": 3090.83,
+     "tr_close": 4384.5,
+     "ratio": 1.418551
+    },
+    {
+     "date": "20210104",
+     "price_close": 3643.36,
+     "tr_close": 5304.24,
+     "ratio": 1.455865
+    },
+    {
+     "date": "20220104",
+     "price_close": 3264.07,
+     "tr_close": 4851.58,
+     "ratio": 1.486359
+    },
+    {
+     "date": "20230103",
+     "price_close": 2641.42,
+     "tr_close": 4048.02,
+     "ratio": 1.532517
+    },
+    {
+     "date": "20240102",
+     "price_close": 2292.23,
+     "tr_close": 3634.97,
+     "ratio": 1.585779
+    },
+    {
+     "date": "20250102",
+     "price_close": 2610.34,
+     "tr_close": 4289.74,
+     "ratio": 1.643364
+    },
+    {
+     "date": "20260105",
+     "price_close": 3099.75,
+     "tr_close": 5269.85,
+     "ratio": 1.700089
+    }
+   ],
+   "return_basis": "gross_total_return",
+   "dimensions": {
+    "official_identity_verified": true,
+    "mapping_to_price_index_verified": true,
+    "return_basis_verified": true,
+    "history_api_available": true,
+    "history_coverage_verified": true,
+    "data_quality_verified": true,
+    "continuity_verified": false,
+    "point_in_time_available": false,
+    "formal_series_admitted": false
+   },
+   "dimensions_passed": 6,
+   "dimensions_total": 9,
+   "evidence_grade": "L1",
+   "blocking_dimensions": [
+    "continuity_verified",
+    "point_in_time_available",
+    "formal_series_admitted"
+   ],
+   "point_in_time": {
+    "index_snapshot_tables": [],
+    "index_daily_multi_version_rows": 0,
+    "collected_at_distinct_dates": [
+     "2026-11-23"
+    ],
+    "has_historical_snapshot": false,
+    "has_revision_records": false,
+    "can_prove_published_at_the_time": false,
+    "historical_point_in_time_availability": "unknown",
+    "reason": "无历史快照表、无修订记录、每 (index_code,trade_date) 仅 1 行；当前采集时间与当前下载数据**不能证明**历史交易日当时已公开；无法排除事后回溯计算",
+    "note": "该结论适用于本轮全部候选序列（含股票/债券/港股），不因序列类型不同而改变"
+   },
+   "conclusion": "H00016：未通过维度 ['continuity_verified', 'point_in_time_available', 'formal_series_admitted']；其中历史覆盖 0 个交易日缺失，日历外日期 2 条",
+   "group": "stock_total_return"
+  },
+  {
+   "tr_candidate": "H20539",
+   "price_index": "399997",
+   "tr_basic": {
+    "index_code": "H20539",
+    "url": "https://www.csindex.com.cn/csindex-home/indexInfo/index-basic-info/H20539",
+    "obtained": true,
+    "file": "reports/evidence/phase3B6_2_3_1_0/basic_H20539.json",
+    "bytes": 810,
+    "sha256": "18907a63f4b6ab209e517727a19948b14649e1c378c309d77a1e214a6d985bb5",
+    "obtained_at": "2026-11-27T14:10:12",
+    "official_full_name": "中证白酒全收益指数",
+    "official_short_name": "中证白酒全收益",
+    "basic_date": "2008-12-31",
+    "basic_index": 1000.0,
+    "publish_date": "2015-01-21",
+    "index_type": "stock",
+    "currency": "人民币",
+    "publisher": "中证指数有限公司"
+   },
+   "price_basic": {
+    "index_code": "399997",
+    "url": "https://www.csindex.com.cn/csindex-home/indexInfo/index-basic-info/399997",
+    "obtained": true,
+    "file": "reports/evidence/phase3B6_2_3_1_0/basic_399997.json",
+    "bytes": 1062,
+    "sha256": "4107d6e3ed60008fe515b4b96324d506827b08729b3a0037cbffa2f0a37bbb5a",
+    "obtained_at": "2026-11-27T14:10:04",
+    "official_full_name": "中证白酒指数",
+    "official_short_name": "中证白酒",
+    "basic_date": "2008-12-31",
+    "basic_index": 1000.0,
+    "publish_date": "2015-01-21",
+    "index_type": "stock",
+    "currency": "人民币",
+    "publisher": "中证指数有限公司"
+   },
+   "tr_history_meta": {
+    "index_code": "H20539",
+    "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=H20539&startDate=20040101&endDate=20261127",
+    "obtained": true,
+    "file": "reports/evidence/phase3B6_2_3_1_0/hist_H20539_20040101_20261127.json",
+    "bytes": 1615193,
+    "sha256": "9235ba8d6754f27535480e252ad060c129ca6e0fa49540e1bf1f26f431bc6e66",
+    "obtained_at": "2026-11-27T14:10:11",
+    "row_count": 4350
+   },
+   "price_history_meta": {
+    "index_code": "399997",
+    "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=399997&startDate=20040101&endDate=20261127",
+    "obtained": true,
+    "file": "reports/evidence/phase3B6_2_3_1_0/hist_399997_20040101_20261127.json",
+    "bytes": 1503148,
+    "sha256": "21a2fb2b4096e1bc4487f6f650c5bba92504b4eab0c943688347879685ef140d",
+    "obtained_at": "2026-11-27T14:10:04",
+    "row_count": 4349
+   },
+   "quality": {
+    "real_history_start": "20081231",
+    "synthetic_first_row": "20040101",
+    "calendar_window_days": 4348,
+    "first_date": "20040101",
+    "last_date": "20261126",
+    "row_count": 4350,
+    "distinct_dates": 4350,
+    "duplicate_dates": 0,
+    "descending_dates": 0,
+    "illegal_dates": [],
+    "null_close": 0,
+    "non_numeric_close": 0,
+    "nan_or_inf_close": 0,
+    "non_positive_close": 0,
+    "non_positive_sample": [],
+    "extreme_moves": [],
+    "extreme_move_count": 0,
+    "missing_trading_days": 0,
+    "missing_sample": [],
+    "dates_outside_calendar": 1,
+    "dates_outside_calendar_sample": [
+     "2018-06-18"
+    ],
+    "calendar_source": "项目 trade_calendar（A股交易日**代理**，非官方指数发布日历）"
+   },
+   "mapping": {
+    "price_index": "399997",
+    "tr_candidate": "H20539",
+    "checks": [
+     {
+      "check": "候选名称含「全收益/净收益」",
+      "passed": true,
+      "value": "中证白酒全收益指数",
+      "strength": "弱（名称相似不足以判定映射）"
+     },
+     {
+      "check": "基日一致",
+      "passed": null,
+      "strength": "中",
+      "value": null
+     },
+     {
+      "check": "全收益/价格比值恒 >= 1（基日当天必然 =1）",
+      "passed": true,
+      "value": {
+       "ratio_first": 1.0,
+       "ratio_last": 1.4331916109683076,
+       "sample_count": 4348,
+       "ratio_equals_one_count": 78
+      },
+      "strength": "中（符合分红再投资特征，但不能证明口径）"
+     },
+     {
+      "check": "比值随时间上升（再投资累积）",
+      "passed": true,
+      "value": {
+       "ratio_first": 1.0,
+       "ratio_last": 1.4331916109683076
+      },
+      "strength": "中"
+     }
+    ],
+    "ratio_first": 1.0,
+    "ratio_last": 1.4331916109683076,
+    "ratio_sample_count": 4348,
+    "all_ratios_at_least_one": true,
+    "ratio_increasing": true,
+    "ratio_equals_one_dates": [
+     "20090105",
+     "20090106",
+     "20090107",
+     "20090108",
+     "20090109",
+     "20090112",
+     "20090113",
+     "20090114",
+     "20090115",
+     "20090116"
+    ],
+    "ratio_equals_one_count": 78,
+    "note": "比值恒 >= 1 且随时间上升，符合「分红再投资累积」特征；但这是**技术判断**，不能替代官方口径文件。**早期比值恰为 1 说明该段未体现分红再投资**，需在正式使用时注意"
+   },
+   "cross_year_samples": [
+    {
+     "date": "20040101",
+     "price_close": 1028.64,
+     "tr_close": 1000.0,
+     "ratio": 0.972157
+    },
+    {
+     "date": "20090105",
+     "price_close": 1028.64,
+     "tr_close": 1028.64,
+     "ratio": 1.0
+    },
+    {
+     "date": "20100104",
+     "price_close": 2488.45,
+     "tr_close": 2521.95,
+     "ratio": 1.013462
+    },
+    {
+     "date": "20110104",
+     "price_close": 3128.3,
+     "tr_close": 3210.27,
+     "ratio": 1.026203
+    },
+    {
+     "date": "20120104",
+     "price_close": 2888.43,
+     "tr_close": 2985.92,
+     "ratio": 1.033752
+    },
+    {
+     "date": "20130104",
+     "price_close": 3222.54,
+     "tr_close": 3373.67,
+     "ratio": 1.046898
+    },
+    {
+     "date": "20140102",
+     "price_close": 1749.77,
+     "tr_close": 1898.57,
+     "ratio": 1.08504
+    },
+    {
+     "date": "20150105",
+     "price_close": 2676.53,
+     "tr_close": 2992.34,
+     "ratio": 1.117992
+    },
+    {
+     "date": "20160104",
+     "price_close": 2748.67,
+     "tr_close": 3120.55,
+     "ratio": 1.135295
+    },
+    {
+     "date": "20170103",
+     "price_close": 3390.65,
+     "tr_close": 3917.54,
+     "ratio": 1.155395
+    },
+    {
+     "date": "20180102",
+     "price_close": 6008.65,
+     "tr_close": 7054.65,
+     "ratio": 1.174082
+    },
+    {
+     "date": "20190102",
+     "price_close": 4302.67,
+     "tr_close": 5125.55,
+     "ratio": 1.191249
+    },
+    {
+     "date": "20200102",
+     "price_close": 8315.02,
+     "tr_close": 10081.11,
+     "ratio": 1.212398
+    },
+    {
+     "date": "20210104",
+     "price_close": 19120.21,
+     "tr_close": 23512.35,
+     "ratio": 1.229712
+    },
+    {
+     "date": "20220104",
+     "price_close": 17748.87,
+     "tr_close": 22009.37,
+     "ratio": 1.240043
+    },
+    {
+     "date": "20230103",
+     "price_close": 15328.03,
+     "tr_close": 19273.78,
+     "ratio": 1.257421
+    },
+    {
+     "date": "20240102",
+     "price_close": 12206.51,
+     "tr_close": 15644.68,
+     "ratio": 1.281667
+    },
+    {
+     "date": "20250102",
+     "price_close": 10152.74,
+     "tr_close": 13434.56,
+     "ratio": 1.323245
+    },
+    {
+     "date": "20260105",
+     "price_close": 8938.42,
+     "tr_close": 12339.87,
+     "ratio": 1.380543
+    }
+   ],
+   "return_basis": "gross_total_return",
+   "dimensions": {
+    "official_identity_verified": true,
+    "mapping_to_price_index_verified": true,
+    "return_basis_verified": true,
+    "history_api_available": true,
+    "history_coverage_verified": true,
+    "data_quality_verified": true,
+    "continuity_verified": false,
+    "point_in_time_available": false,
+    "formal_series_admitted": false
+   },
+   "dimensions_passed": 6,
+   "dimensions_total": 9,
+   "evidence_grade": "L1",
+   "blocking_dimensions": [
+    "continuity_verified",
+    "point_in_time_available",
+    "formal_series_admitted"
+   ],
+   "point_in_time": {
+    "index_snapshot_tables": [],
+    "index_daily_multi_version_rows": 0,
+    "collected_at_distinct_dates": [
+     "2026-11-23"
+    ],
+    "has_historical_snapshot": false,
+    "has_revision_records": false,
+    "can_prove_published_at_the_time": false,
+    "historical_point_in_time_availability": "unknown",
+    "reason": "无历史快照表、无修订记录、每 (index_code,trade_date) 仅 1 行；当前采集时间与当前下载数据**不能证明**历史交易日当时已公开；无法排除事后回溯计算",
+    "note": "该结论适用于本轮全部候选序列（含股票/债券/港股），不因序列类型不同而改变"
+   },
+   "conclusion": "H20539：未通过维度 ['continuity_verified', 'point_in_time_available', 'formal_series_admitted']；其中历史覆盖 0 个交易日缺失，日历外日期 1 条",
+   "group": "stock_total_return"
+  },
+  {
+   "tr_candidate": "399997CNY02",
+   "price_index": "399997",
+   "tr_basic": {
+    "index_code": "399997CNY02",
+    "url": "https://www.csindex.com.cn/csindex-home/indexInfo/index-basic-info/399997CNY02",
+    "obtained": true,
+    "file": "reports/evidence/phase3B6_2_3_1_0/basic_399997CNY02.json",
+    "bytes": 812,
+    "sha256": "900d51e827626ec68aef7ff06b839c6f57eb5982e0049b5c527adf03092a1b5a",
+    "obtained_at": "2026-11-27T14:10:21",
+    "official_full_name": "中证白酒净收益指数",
+    "official_short_name": "中证白酒净收益",
+    "basic_date": "2008-12-31",
+    "basic_index": 1000.0,
+    "publish_date": "2015-01-21",
+    "index_type": "stock",
+    "currency": "人民币",
+    "publisher": "中证指数有限公司"
+   },
+   "price_basic": {
+    "index_code": "399997",
+    "url": "https://www.csindex.com.cn/csindex-home/indexInfo/index-basic-info/399997",
+    "obtained": true,
+    "file": "reports/evidence/phase3B6_2_3_1_0/basic_399997.json",
+    "bytes": 1062,
+    "sha256": "4107d6e3ed60008fe515b4b96324d506827b08729b3a0037cbffa2f0a37bbb5a",
+    "obtained_at": "2026-11-27T14:10:04",
+    "official_full_name": "中证白酒指数",
+    "official_short_name": "中证白酒",
+    "basic_date": "2008-12-31",
+    "basic_index": 1000.0,
+    "publish_date": "2015-01-21",
+    "index_type": "stock",
+    "currency": "人民币",
+    "publisher": "中证指数有限公司"
+   },
+   "tr_history_meta": {
+    "index_code": "399997CNY02",
+    "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=399997CNY02&startDate=20040101&endDate=20261127",
+    "obtained": true,
+    "file": "reports/evidence/phase3B6_2_3_1_0/hist_399997CNY02_20040101_20261127.json",
+    "bytes": 1653318,
+    "sha256": "c7d1323cbb21d5f7973de65f97ab2b1fc398ee095786b31c3c3cabf16559f319",
+    "obtained_at": "2026-11-27T14:10:20",
+    "row_count": 4349
+   },
+   "price_history_meta": {
+    "index_code": "399997",
+    "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=399997&startDate=20040101&endDate=20261127",
+    "obtained": true,
+    "file": "reports/evidence/phase3B6_2_3_1_0/hist_399997_20040101_20261127.json",
+    "bytes": 1503148,
+    "sha256": "21a2fb2b4096e1bc4487f6f650c5bba92504b4eab0c943688347879685ef140d",
+    "obtained_at": "2026-11-27T14:10:04",
+    "row_count": 4349
+   },
+   "quality": {
+    "real_history_start": "20081231",
+    "synthetic_first_row": "20040101",
+    "calendar_window_days": 4348,
+    "first_date": "20040101",
+    "last_date": "20261126",
+    "row_count": 4349,
+    "distinct_dates": 4349,
+    "duplicate_dates": 0,
+    "descending_dates": 0,
+    "illegal_dates": [],
+    "null_close": 0,
+    "non_numeric_close": 0,
+    "nan_or_inf_close": 0,
+    "non_positive_close": 0,
+    "non_positive_sample": [],
+    "extreme_moves": [],
+    "extreme_move_count": 0,
+    "missing_trading_days": 0,
+    "missing_sample": [],
+    "dates_outside_calendar": 0,
+    "dates_outside_calendar_sample": [],
+    "calendar_source": "项目 trade_calendar（A股交易日**代理**，非官方指数发布日历）"
+   },
+   "mapping": {
+    "price_index": "399997",
+    "tr_candidate": "399997CNY02",
+    "checks": [
+     {
+      "check": "候选名称含「全收益/净收益」",
+      "passed": true,
+      "value": "中证白酒净收益指数",
+      "strength": "弱（名称相似不足以判定映射）"
+     },
+     {
+      "check": "基日一致",
+      "passed": null,
+      "strength": "中",
+      "value": null
+     },
+     {
+      "check": "全收益/价格比值恒 >= 1（基日当天必然 =1）",
+      "passed": true,
+      "value": {
+       "ratio_first": 1.0,
+       "ratio_last": 1.3817307356135584,
+       "sample_count": 4347,
+       "ratio_equals_one_count": 82
+      },
+      "strength": "中（符合分红再投资特征，但不能证明口径）"
+     },
+     {
+      "check": "比值随时间上升（再投资累积）",
+      "passed": true,
+      "value": {
+       "ratio_first": 1.0,
+       "ratio_last": 1.3817307356135584
+      },
+      "strength": "中"
+     }
+    ],
+    "ratio_first": 1.0,
+    "ratio_last": 1.3817307356135584,
+    "ratio_sample_count": 4347,
+    "all_ratios_at_least_one": true,
+    "ratio_increasing": true,
+    "ratio_equals_one_dates": [
+     "20090105",
+     "20090106",
+     "20090107",
+     "20090108",
+     "20090109",
+     "20090112",
+     "20090113",
+     "20090114",
+     "20090115",
+     "20090116"
+    ],
+    "ratio_equals_one_count": 82,
+    "note": "比值恒 >= 1 且随时间上升，符合「分红再投资累积」特征；但这是**技术判断**，不能替代官方口径文件。**早期比值恰为 1 说明该段未体现分红再投资**，需在正式使用时注意"
+   },
+   "cross_year_samples": [
+    {
+     "date": "20040101",
+     "price_close": 1028.64,
+     "tr_close": 1000.0,
+     "ratio": 0.972157
+    },
+    {
+     "date": "20090105",
+     "price_close": 1028.64,
+     "tr_close": 1028.64,
+     "ratio": 1.0
+    },
+    {
+     "date": "20100104",
+     "price_close": 2488.45,
+     "tr_close": 2518.56,
+     "ratio": 1.0121
+    },
+    {
+     "date": "20110104",
+     "price_close": 3128.3,
+     "tr_close": 3201.8,
+     "ratio": 1.023495
+    },
+    {
+     "date": "20120104",
+     "price_close": 2888.43,
+     "tr_close": 2975.7,
+     "ratio": 1.030214
+    },
+    {
+     "date": "20130104",
+     "price_close": 3222.54,
+     "tr_close": 3357.45,
+     "ratio": 1.041864
+    },
+    {
+     "date": "20140102",
+     "price_close": 1749.77,
+     "tr_close": 1882.72,
+     "ratio": 1.075981
+    },
+    {
+     "date": "20150105",
+     "price_close": 2676.53,
+     "tr_close": 2958.22,
+     "ratio": 1.105244
+    },
+    {
+     "date": "20160104",
+     "price_close": 2748.67,
+     "tr_close": 3080.18,
+     "ratio": 1.120607
+    },
+    {
+     "date": "20170103",
+     "price_close": 3390.65,
+     "tr_close": 3860.11,
+     "ratio": 1.138457
+    },
+    {
+     "date": "20180102",
+     "price_close": 6008.65,
+     "tr_close": 6939.72,
+     "ratio": 1.154955
+    },
+    {
+     "date": "20190102",
+     "price_close": 4302.67,
+     "tr_close": 5034.52,
+     "ratio": 1.170092
+    },
+    {
+     "date": "20200102",
+     "price_close": 8315.02,
+     "tr_close": 9884.36,
+     "ratio": 1.188736
+    },
+    {
+     "date": "20210104",
+     "price_close": 19120.21,
+     "tr_close": 23020.44,
+     "ratio": 1.203985
+    },
+    {
+     "date": "20220104",
+     "price_close": 17748.87,
+     "tr_close": 21530.47,
+     "ratio": 1.213061
+    },
+    {
+     "date": "20230103",
+     "price_close": 15328.03,
+     "tr_close": 18828.14,
+     "ratio": 1.228347
+    },
+    {
+     "date": "20240102",
+     "price_close": 12206.51,
+     "tr_close": 15253.58,
+     "ratio": 1.249627
+    },
+    {
+     "date": "20250102",
+     "price_close": 10152.74,
+     "tr_close": 13056.66,
+     "ratio": 1.286023
+    },
+    {
+     "date": "20260105",
+     "price_close": 8938.42,
+     "tr_close": 11941.65,
+     "ratio": 1.335991
+    }
+   ],
+   "return_basis": "net_total_return",
+   "dimensions": {
+    "official_identity_verified": true,
+    "mapping_to_price_index_verified": true,
+    "return_basis_verified": true,
+    "history_api_available": true,
+    "history_coverage_verified": true,
+    "data_quality_verified": true,
+    "continuity_verified": true,
+    "point_in_time_available": false,
+    "formal_series_admitted": false
+   },
+   "dimensions_passed": 7,
+   "dimensions_total": 9,
+   "evidence_grade": "L1",
+   "blocking_dimensions": [
+    "point_in_time_available",
+    "formal_series_admitted"
+   ],
+   "point_in_time": {
+    "index_snapshot_tables": [],
+    "index_daily_multi_version_rows": 0,
+    "collected_at_distinct_dates": [
+     "2026-11-23"
+    ],
+    "has_historical_snapshot": false,
+    "has_revision_records": false,
+    "can_prove_published_at_the_time": false,
+    "historical_point_in_time_availability": "unknown",
+    "reason": "无历史快照表、无修订记录、每 (index_code,trade_date) 仅 1 行；当前采集时间与当前下载数据**不能证明**历史交易日当时已公开；无法排除事后回溯计算",
+    "note": "该结论适用于本轮全部候选序列（含股票/债券/港股），不因序列类型不同而改变"
+   },
+   "conclusion": "399997CNY02：官方身份/映射/口径/接口/覆盖/质量/连续性**全部通过**，仅**历史时点可用性**为 unknown，因此不能准入正式基准序列；可进入下一阶段**独立数据层建设**（非正式序列）",
+   "group": "stock_total_return"
+  },
+  {
+   "tr_candidate": "H20184",
+   "price_index": "H30184",
+   "tr_basic": {
+    "index_code": "H20184",
+    "url": "https://www.csindex.com.cn/csindex-home/indexInfo/index-basic-info/H20184",
+    "obtained": true,
+    "file": "reports/evidence/phase3B6_2_3_1_0/basic_H20184.json",
+    "bytes": 891,
+    "sha256": "dc3f32265597505e22374f63e2ca889958e70efde052ea7f7bfdff1d5a1331cc",
+    "obtained_at": "2026-11-27T14:10:50",
+    "official_full_name": "中证全指半导体产品与设备全收益指数",
+    "official_short_name": "半导体全收益",
+    "basic_date": "2004-12-31",
+    "basic_index": 1000.0,
+    "publish_date": "2013-07-15",
+    "index_type": "stock",
+    "currency": "人民币",
+    "publisher": "中证指数有限公司"
+   },
+   "price_basic": {
+    "index_code": "H30184",
+    "url": "https://www.csindex.com.cn/csindex-home/indexInfo/index-basic-info/H30184",
+    "obtained": true,
+    "file": "reports/evidence/phase3B6_2_3_1_0/basic_H30184.json",
+    "bytes": 1460,
+    "sha256": "69c1bc656ff884f0187ed261b085eef794cd2d3285f4700adb0e5d7f9a8e0f9b",
+    "obtained_at": "2026-11-27T14:10:26",
+    "official_full_name": "中证全指半导体产品与设备指数",
+    "official_short_name": "半导体",
+    "basic_date": "2004-12-31",
+    "basic_index": 1000.0,
+    "publish_date": "2013-07-15",
+    "index_type": "stock",
+    "currency": "人民币",
+    "publisher": "中证指数有限公司"
+   },
+   "tr_history_meta": {
+    "index_code": "H20184",
+    "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=H20184&startDate=20040101&endDate=20261127",
+    "obtained": true,
+    "file": "reports/evidence/phase3B6_2_3_1_0/hist_H20184_20040101_20261127.json",
+    "bytes": 2382392,
+    "sha256": "52ce7738e06362b6cfc841153dd3b53cd0a95b016a969b23329cd18914b9e84d",
+    "obtained_at": "2026-11-27T14:10:50",
+    "row_count": 5320
+   },
+   "price_history_meta": {
+    "index_code": "H30184",
+    "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=H30184&startDate=20040101&endDate=20261127",
+    "obtained": true,
+    "file": "reports/evidence/phase3B6_2_3_1_0/hist_H30184_20040101_20261127.json",
+    "bytes": 2238681,
+    "sha256": "67057bebb23074450a22467b6fbc2104d92dc30f8f35d4b3ee194da0375110db",
+    "obtained_at": "2026-11-27T14:10:25",
+    "row_count": 5320
+   },
+   "quality": {
+    "real_history_start": "20050104",
+    "synthetic_first_row": "20040101",
+    "calendar_window_days": 5318,
+    "first_date": "20040101",
+    "last_date": "20261126",
+    "row_count": 5320,
+    "distinct_dates": 5320,
+    "duplicate_dates": 0,
+    "descending_dates": 0,
+    "illegal_dates": [],
+    "null_close": 0,
+    "non_numeric_close": 0,
+    "nan_or_inf_close": 0,
+    "non_positive_close": 1,
+    "non_positive_sample": [
+     "20130628"
+    ],
+    "extreme_moves": [],
+    "extreme_move_count": 0,
+    "missing_trading_days": 0,
+    "missing_sample": [],
+    "dates_outside_calendar": 1,
+    "dates_outside_calendar_sample": [
+     "2018-06-18"
+    ],
+    "calendar_source": "项目 trade_calendar（A股交易日**代理**，非官方指数发布日历）"
+   },
+   "mapping": {
+    "price_index": "H30184",
+    "tr_candidate": "H20184",
+    "checks": [
+     {
+      "check": "候选名称含「全收益/净收益」",
+      "passed": true,
+      "value": "中证全指半导体产品与设备全收益指数",
+      "strength": "弱（名称相似不足以判定映射）"
+     },
+     {
+      "check": "基日一致",
+      "passed": null,
+      "strength": "中",
+      "value": null
+     },
+     {
+      "check": "全收益/价格比值恒 >= 1（基日当天必然 =1）",
+      "passed": true,
+      "value": {
+       "ratio_first": 1.0,
+       "ratio_last": 1.0877919584972304,
+       "sample_count": 5318,
+       "ratio_equals_one_count": 95
+      },
+      "strength": "中（符合分红再投资特征，但不能证明口径）"
+     },
+     {
+      "check": "比值随时间上升（再投资累积）",
+      "passed": true,
+      "value": {
+       "ratio_first": 1.0,
+       "ratio_last": 1.0877919584972304
+      },
+      "strength": "中"
+     }
+    ],
+    "ratio_first": 1.0,
+    "ratio_last": 1.0877919584972304,
+    "ratio_sample_count": 5318,
+    "all_ratios_at_least_one": true,
+    "ratio_increasing": true,
+    "ratio_equals_one_dates": [
+     "20050104",
+     "20050105",
+     "20050106",
+     "20050107",
+     "20050110",
+     "20050111",
+     "20050112",
+     "20050113",
+     "20050114",
+     "20050117"
+    ],
+    "ratio_equals_one_count": 95,
+    "note": "比值恒 >= 1 且随时间上升，符合「分红再投资累积」特征；但这是**技术判断**，不能替代官方口径文件。**早期比值恰为 1 说明该段未体现分红再投资**，需在正式使用时注意"
+   },
+   "cross_year_samples": [
+    {
+     "date": "20040101",
+     "price_close": 994.47,
+     "tr_close": 994.47,
+     "ratio": 1.0
+    },
+    {
+     "date": "20050104",
+     "price_close": 994.47,
+     "tr_close": 994.47,
+     "ratio": 1.0
+    },
+    {
+     "date": "20060104",
+     "price_close": 857.28,
+     "tr_close": 869.18,
+     "ratio": 1.013881
+    },
+    {
+     "date": "20070104",
+     "price_close": 1586.09,
+     "tr_close": 1622.13,
+     "ratio": 1.022723
+    },
+    {
+     "date": "20080102",
+     "price_close": 2943.31,
+     "tr_close": 3022.39,
+     "ratio": 1.026868
+    },
+    {
+     "date": "20090105",
+     "price_close": 923.86,
+     "tr_close": 953.88,
+     "ratio": 1.032494
+    },
+    {
+     "date": "20100104",
+     "price_close": 2081.55,
+     "tr_close": 2151.87,
+     "ratio": 1.033783
+    },
+    {
+     "date": "20110104",
+     "price_close": 3213.68,
+     "tr_close": 3332.43,
+     "ratio": 1.036951
+    },
+    {
+     "date": "20120104",
+     "price_close": 1607.23,
+     "tr_close": 1669.55,
+     "ratio": 1.038775
+    },
+    {
+     "date": "20130104",
+     "price_close": 1277.91,
+     "tr_close": 1335.31,
+     "ratio": 1.044917
+    },
+    {
+     "date": "20140102",
+     "price_close": 1843.08,
+     "tr_close": 1937.49,
+     "ratio": 1.051224
+    },
+    {
+     "date": "20150105",
+     "price_close": 2273.23,
+     "tr_close": 2394.83,
+     "ratio": 1.053492
+    },
+    {
+     "date": "20160104",
+     "price_close": 3478.16,
+     "tr_close": 3668.81,
+     "ratio": 1.054813
+    },
+    {
+     "date": "20170103",
+     "price_close": 3109.55,
+     "tr_close": 3290.42,
+     "ratio": 1.058166
+    },
+    {
+     "date": "20180102",
+     "price_close": 3958.32,
+     "tr_close": 4198.23,
+     "ratio": 1.060609
+    },
+    {
+     "date": "20190102",
+     "price_close": 2162.89,
+     "tr_close": 2301.61,
+     "ratio": 1.064136
+    },
+    {
+     "date": "20200102",
+     "price_close": 4670.56,
+     "tr_close": 4992.12,
+     "ratio": 1.068848
+    },
+    {
+     "date": "20210104",
+     "price_close": 6650.74,
+     "tr_close": 7123.62,
+     "ratio": 1.071102
+    },
+    {
+     "date": "20220104",
+     "price_close": 7999.09,
+     "tr_close": 8586.53,
+     "ratio": 1.073438
+    },
+    {
+     "date": "20230103",
+     "price_close": 5191.55,
+     "tr_close": 5590.9,
+     "ratio": 1.076923
+    },
+    {
+     "date": "20240102",
+     "price_close": 4912.91,
+     "tr_close": 5305.09,
+     "ratio": 1.079826
+    },
+    {
+     "date": "20250102",
+     "price_close": 6025.72,
+     "tr_close": 6527.06,
+     "ratio": 1.0832
+    },
+    {
+     "date": "20260105",
+     "price_close": 9610.65,
+     "tr_close": 10436.0,
+     "ratio": 1.085879
+    }
+   ],
+   "return_basis": "gross_total_return",
+   "dimensions": {
+    "official_identity_verified": true,
+    "mapping_to_price_index_verified": true,
+    "return_basis_verified": true,
+    "history_api_available": true,
+    "history_coverage_verified": true,
+    "data_quality_verified": false,
+    "continuity_verified": false,
+    "point_in_time_available": false,
+    "formal_series_admitted": false
+   },
+   "dimensions_passed": 5,
+   "dimensions_total": 9,
+   "evidence_grade": "L1",
+   "blocking_dimensions": [
+    "data_quality_verified",
+    "continuity_verified",
+    "point_in_time_available",
+    "formal_series_admitted"
+   ],
+   "point_in_time": {
+    "index_snapshot_tables": [],
+    "index_daily_multi_version_rows": 0,
+    "collected_at_distinct_dates": [
+     "2026-11-23"
+    ],
+    "has_historical_snapshot": false,
+    "has_revision_records": false,
+    "can_prove_published_at_the_time": false,
+    "historical_point_in_time_availability": "unknown",
+    "reason": "无历史快照表、无修订记录、每 (index_code,trade_date) 仅 1 行；当前采集时间与当前下载数据**不能证明**历史交易日当时已公开；无法排除事后回溯计算",
+    "note": "该结论适用于本轮全部候选序列（含股票/债券/港股），不因序列类型不同而改变"
+   },
+   "conclusion": "H20184：未通过维度 ['data_quality_verified', 'continuity_verified', 'point_in_time_available', 'formal_series_admitted']；其中历史覆盖 0 个交易日缺失，日历外日期 1 条",
+   "group": "stock_total_return"
+  },
+  {
+   "tr_candidate": "H00942",
+   "price_index": "000942",
+   "tr_basic": {
+    "index_code": "H00942",
+    "url": "https://www.csindex.com.cn/csindex-home/indexInfo/index-basic-info/H00942",
+    "obtained": true,
+    "file": "reports/evidence/phase3B6_2_3_1_0/basic_H00942.json",
+    "bytes": 837,
+    "sha256": "7498475b391917e6eb53377958a716f89b3f2380138a8213fdb7ae112fde3f47",
+    "obtained_at": "2026-11-27T14:11:09",
+    "official_full_name": "中证内地消费主题全收益指数",
+    "official_short_name": "内地消收",
+    "basic_date": "2004-12-31",
+    "basic_index": 1000.0,
+    "publish_date": "2009-10-28",
+    "index_type": "stock",
+    "currency": "人民币",
+    "publisher": "中证指数有限公司"
+   },
+   "price_basic": {
+    "index_code": "000942",
+    "url": "https://www.csindex.com.cn/csindex-home/indexInfo/index-basic-info/000942",
+    "obtained": true,
+    "file": "reports/evidence/phase3B6_2_3_1_0/basic_000942.json",
+    "bytes": 1223,
+    "sha256": "da5688dc762f816518e59fac067a6a99ec997864e9c96f40e6b30d9f1ed14c25",
+    "obtained_at": "2026-11-27T14:11:04",
+    "official_full_name": "中证内地消费主题指数",
+    "official_short_name": "内地消费",
+    "basic_date": "2004-12-31",
+    "basic_index": 1000.0,
+    "publish_date": "2009-10-28",
+    "index_type": "stock",
+    "currency": "人民币",
+    "publisher": "中证指数有限公司"
+   },
+   "tr_history_meta": {
+    "index_code": "H00942",
+    "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=H00942&startDate=20040101&endDate=20261127",
+    "obtained": true,
+    "file": "reports/evidence/phase3B6_2_3_1_0/hist_H00942_20040101_20261127.json",
+    "bytes": 2078941,
+    "sha256": "ea0497aa06442ec527c697b7d90c852533c212173cf92fa6e25ddee661c9ebe0",
+    "obtained_at": "2026-11-27T14:11:09",
+    "row_count": 5321
+   },
+   "price_history_meta": {
+    "index_code": "000942",
+    "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=000942&startDate=20040101&endDate=20261127",
+    "obtained": true,
+    "file": "reports/evidence/phase3B6_2_3_1_0/hist_000942_20040101_20261127.json",
+    "bytes": 2000098,
+    "sha256": "5cde2565301e96445e558f59e1b549e6b00fb840295c4379d700e6bf64866f1a",
+    "obtained_at": "2026-11-27T14:11:04",
+    "row_count": 5321
+   },
+   "quality": {
+    "real_history_start": "20041231",
+    "synthetic_first_row": "20040101",
+    "calendar_window_days": 5319,
+    "first_date": "20040101",
+    "last_date": "20261126",
+    "row_count": 5321,
+    "distinct_dates": 5321,
+    "duplicate_dates": 0,
+    "descending_dates": 0,
+    "illegal_dates": [],
+    "null_close": 0,
+    "non_numeric_close": 0,
+    "nan_or_inf_close": 0,
+    "non_positive_close": 0,
+    "non_positive_sample": [],
+    "extreme_moves": [],
+    "extreme_move_count": 0,
+    "missing_trading_days": 0,
+    "missing_sample": [],
+    "dates_outside_calendar": 1,
+    "dates_outside_calendar_sample": [
+     "2018-06-18"
+    ],
+    "calendar_source": "项目 trade_calendar（A股交易日**代理**，非官方指数发布日历）"
+   },
+   "mapping": {
+    "price_index": "000942",
+    "tr_candidate": "H00942",
+    "checks": [
+     {
+      "check": "候选名称含「全收益/净收益」",
+      "passed": true,
+      "value": "中证内地消费主题全收益指数",
+      "strength": "弱（名称相似不足以判定映射）"
+     },
+     {
+      "check": "基日一致",
+      "passed": null,
+      "strength": "中",
+      "value": null
+     },
+     {
+      "check": "全收益/价格比值恒 >= 1（基日当天必然 =1）",
+      "passed": true,
+      "value": {
+       "ratio_first": 1.0,
+       "ratio_last": 1.5264905034481322,
+       "sample_count": 5320,
+       "ratio_equals_one_count": 59
+      },
+      "strength": "中（符合分红再投资特征，但不能证明口径）"
+     },
+     {
+      "check": "比值随时间上升（再投资累积）",
+      "passed": true,
+      "value": {
+       "ratio_first": 1.0,
+       "ratio_last": 1.5264905034481322
+      },
+      "strength": "中"
+     }
+    ],
+    "ratio_first": 1.0,
+    "ratio_last": 1.5264905034481322,
+    "ratio_sample_count": 5320,
+    "all_ratios_at_least_one": true,
+    "ratio_increasing": true,
+    "ratio_equals_one_dates": [
+     "20041231",
+     "20050104",
+     "20050105",
+     "20050106",
+     "20050107",
+     "20050110",
+     "20050111",
+     "20050112",
+     "20050113",
+     "20050114"
+    ],
+    "ratio_equals_one_count": 59,
+    "note": "比值恒 >= 1 且随时间上升，符合「分红再投资累积」特征；但这是**技术判断**，不能替代官方口径文件。**早期比值恰为 1 说明该段未体现分红再投资**，需在正式使用时注意"
+   },
+   "cross_year_samples": [
+    {
+     "date": "20040101",
+     "price_close": 1000.0,
+     "tr_close": 1000.0,
+     "ratio": 1.0
+    },
+    {
+     "date": "20050104",
+     "price_close": 986.11,
+     "tr_close": 986.11,
+     "ratio": 1.0
+    },
+    {
+     "date": "20060104",
+     "price_close": 957.72,
+     "tr_close": 972.75,
+     "ratio": 1.015694
+    },
+    {
+     "date": "20070104",
+     "price_close": 2316.34,
+     "tr_close": 2386.13,
+     "ratio": 1.030129
+    },
+    {
+     "date": "20080102",
+     "price_close": 6080.8,
+     "tr_close": 6292.56,
+     "ratio": 1.034824
+    },
+    {
+     "date": "20090105",
+     "price_close": 2367.16,
+     "tr_close": 2464.77,
+     "ratio": 1.041235
+    },
+    {
+     "date": "20100104",
+     "price_close": 4888.17,
+     "tr_close": 5125.4,
+     "ratio": 1.048531
+    },
+    {
+     "date": "20110104",
+     "price_close": 4907.84,
+     "tr_close": 5190.45,
+     "ratio": 1.057583
+    },
+    {
+     "date": "20120104",
+     "price_close": 3838.54,
+     "tr_close": 4100.89,
+     "ratio": 1.068346
+    },
+    {
+     "date": "20130104",
+     "price_close": 3953.2,
+     "tr_close": 4298.19,
+     "ratio": 1.087269
+    },
+    {
+     "date": "20140102",
+     "price_close": 4240.41,
+     "tr_close": 4727.01,
+     "ratio": 1.114753
+    },
+    {
+     "date": "20150105",
+     "price_close": 5234.5,
+     "tr_close": 6004.22,
+     "ratio": 1.147047
+    },
+    {
+     "date": "20160104",
+     "price_close": 5606.64,
+     "tr_close": 6550.38,
+     "ratio": 1.168325
+    },
+    {
+     "date": "20170103",
+     "price_close": 5768.61,
+     "tr_close": 6931.77,
+     "ratio": 1.201636
+    },
+    {
+     "date": "20180102",
+     "price_close": 8641.14,
+     "tr_close": 10654.51,
+     "ratio": 1.232998
+    },
+    {
+     "date": "20190102",
+     "price_close": 6194.92,
+     "tr_close": 7784.75,
+     "ratio": 1.256634
+    },
+    {
+     "date": "20200102",
+     "price_close": 9864.77,
+     "tr_close": 12665.44,
+     "ratio": 1.283906
+    },
+    {
+     "date": "20210104",
+     "price_close": 16510.57,
+     "tr_close": 21597.2,
+     "ratio": 1.308083
+    },
+    {
+     "date": "20220104",
+     "price_close": 14157.13,
+     "tr_close": 18790.83,
+     "ratio": 1.327305
+    },
+    {
+     "date": "20230103",
+     "price_close": 11614.86,
+     "tr_close": 15714.23,
+     "ratio": 1.352942
+    },
+    {
+     "date": "20240102",
+     "price_close": 9814.16,
+     "tr_close": 13585.15,
+     "ratio": 1.38424
+    },
+    {
+     "date": "20250102",
+     "price_close": 10285.7,
+     "tr_close": 14691.1,
+     "ratio": 1.428303
+    },
+    {
+     "date": "20260105",
+     "price_close": 10339.78,
+     "tr_close": 15312.88,
+     "ratio": 1.480968
+    }
+   ],
+   "return_basis": "gross_total_return",
+   "dimensions": {
+    "official_identity_verified": true,
+    "mapping_to_price_index_verified": true,
+    "return_basis_verified": true,
+    "history_api_available": true,
+    "history_coverage_verified": true,
+    "data_quality_verified": true,
+    "continuity_verified": false,
+    "point_in_time_available": false,
+    "formal_series_admitted": false
+   },
+   "dimensions_passed": 6,
+   "dimensions_total": 9,
+   "evidence_grade": "L1",
+   "blocking_dimensions": [
+    "continuity_verified",
+    "point_in_time_available",
+    "formal_series_admitted"
+   ],
+   "point_in_time": {
+    "index_snapshot_tables": [],
+    "index_daily_multi_version_rows": 0,
+    "collected_at_distinct_dates": [
+     "2026-11-23"
+    ],
+    "has_historical_snapshot": false,
+    "has_revision_records": false,
+    "can_prove_published_at_the_time": false,
+    "historical_point_in_time_availability": "unknown",
+    "reason": "无历史快照表、无修订记录、每 (index_code,trade_date) 仅 1 行；当前采集时间与当前下载数据**不能证明**历史交易日当时已公开；无法排除事后回溯计算",
+    "note": "该结论适用于本轮全部候选序列（含股票/债券/港股），不因序列类型不同而改变"
+   },
+   "conclusion": "H00942：未通过维度 ['continuity_verified', 'point_in_time_available', 'formal_series_admitted']；其中历史覆盖 0 个交易日缺失，日历外日期 1 条",
+   "group": "stock_total_return"
+  },
+  {
+   "tr_candidate": "H00922",
+   "price_index": "000922",
+   "tr_basic": {
+    "index_code": "H00922",
+    "url": "https://www.csindex.com.cn/csindex-home/indexInfo/index-basic-info/H00922",
+    "obtained": true,
+    "file": "reports/evidence/phase3B6_2_3_1_0/basic_H00922.json",
+    "bytes": 804,
+    "sha256": "9698705a87b45a1a5aa6e50cd7f3dc9517f5e302e79b59aa7755bb0303dbe25e",
+    "obtained_at": "2026-11-27T14:11:14",
+    "official_full_name": "中证红利全收益指数",
+    "official_short_name": "中红收益",
+    "basic_date": "2004-12-31",
+    "basic_index": 1000.0,
+    "publish_date": "2008-05-26",
+    "index_type": "stock",
+    "currency": "人民币",
+    "publisher": "中证指数有限公司"
+   },
+   "price_basic": {
+    "index_code": "000922",
+    "url": "https://www.csindex.com.cn/csindex-home/indexInfo/index-basic-info/000922",
+    "obtained": true,
+    "file": "reports/evidence/phase3B6_2_3_1_0/basic_000922.json",
+    "bytes": 1180,
+    "sha256": "437049bcdc8f4317a6566e79d6b9806939612977c5e9fbd30030cb0673fa7090",
+    "obtained_at": "2026-11-27T14:11:11",
+    "official_full_name": "中证红利指数",
+    "official_short_name": "中证红利",
+    "basic_date": "2004-12-31",
+    "basic_index": 1000.0,
+    "publish_date": "2008-05-26",
+    "index_type": "stock",
+    "currency": "人民币",
+    "publisher": "中证指数有限公司"
+   },
+   "tr_history_meta": {
+    "index_code": "H00922",
+    "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=H00922&startDate=20040101&endDate=20261127",
+    "obtained": true,
+    "file": "reports/evidence/phase3B6_2_3_1_0/hist_H00922_20040101_20261127.json",
+    "bytes": 1941092,
+    "sha256": "374baf3e0a60380d4131cb1f684dd15ca422f2e377bca67f6a2c7801f607bbba",
+    "obtained_at": "2026-11-27T14:11:14",
+    "row_count": 5321
+   },
+   "price_history_meta": {
+    "index_code": "000922",
+    "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=000922&startDate=20040101&endDate=20261127",
+    "obtained": true,
+    "file": "reports/evidence/phase3B6_2_3_1_0/hist_000922_20040101_20261127.json",
+    "bytes": 1858342,
+    "sha256": "09e8c7ac1087dc93c9936ec508017a79ea737ab63085ac169a46acedb9222b50",
+    "obtained_at": "2026-11-27T14:11:11",
+    "row_count": 5321
+   },
+   "quality": {
+    "real_history_start": "20041231",
+    "synthetic_first_row": "20040101",
+    "calendar_window_days": 5319,
+    "first_date": "20040101",
+    "last_date": "20261126",
+    "row_count": 5321,
+    "distinct_dates": 5321,
+    "duplicate_dates": 0,
+    "descending_dates": 0,
+    "illegal_dates": [],
+    "null_close": 0,
+    "non_numeric_close": 0,
+    "nan_or_inf_close": 0,
+    "non_positive_close": 0,
+    "non_positive_sample": [],
+    "extreme_moves": [],
+    "extreme_move_count": 0,
+    "missing_trading_days": 0,
+    "missing_sample": [],
+    "dates_outside_calendar": 1,
+    "dates_outside_calendar_sample": [
+     "2018-06-18"
+    ],
+    "calendar_source": "项目 trade_calendar（A股交易日**代理**，非官方指数发布日历）"
+   },
+   "mapping": {
+    "price_index": "000922",
+    "tr_candidate": "H00922",
+    "checks": [
+     {
+      "check": "候选名称含「全收益/净收益」",
+      "passed": true,
+      "value": "中证红利全收益指数",
+      "strength": "弱（名称相似不足以判定映射）"
+     },
+     {
+      "check": "基日一致",
+      "passed": null,
+      "strength": "中",
+      "value": null
+     },
+     {
+      "check": "全收益/价格比值恒 >= 1（基日当天必然 =1）",
+      "passed": true,
+      "value": {
+       "ratio_first": 1.0,
+       "ratio_last": 2.181597219054223,
+       "sample_count": 5320,
+       "ratio_equals_one_count": 60
+      },
+      "strength": "中（符合分红再投资特征，但不能证明口径）"
+     },
+     {
+      "check": "比值随时间上升（再投资累积）",
+      "passed": true,
+      "value": {
+       "ratio_first": 1.0,
+       "ratio_last": 2.181597219054223
+      },
+      "strength": "中"
+     }
+    ],
+    "ratio_first": 1.0,
+    "ratio_last": 2.181597219054223,
+    "ratio_sample_count": 5320,
+    "all_ratios_at_least_one": true,
+    "ratio_increasing": true,
+    "ratio_equals_one_dates": [
+     "20041231",
+     "20050104",
+     "20050105",
+     "20050106",
+     "20050107",
+     "20050110",
+     "20050111",
+     "20050112",
+     "20050113",
+     "20050114"
+    ],
+    "ratio_equals_one_count": 60,
+    "note": "比值恒 >= 1 且随时间上升，符合「分红再投资累积」特征；但这是**技术判断**，不能替代官方口径文件。**早期比值恰为 1 说明该段未体现分红再投资**，需在正式使用时注意"
+   },
+   "cross_year_samples": [
+    {
+     "date": "20040101",
+     "price_close": 1000.0,
+     "tr_close": 1000.0,
+     "ratio": 1.0
+    },
+    {
+     "date": "20050104",
+     "price_close": 981.56,
+     "tr_close": 981.56,
+     "ratio": 1.0
+    },
+    {
+     "date": "20060104",
+     "price_close": 900.52,
+     "tr_close": 934.21,
+     "ratio": 1.037412
+    },
+    {
+     "date": "20070104",
+     "price_close": 1815.7,
+     "tr_close": 1950.6,
+     "ratio": 1.074296
+    },
+    {
+     "date": "20080102",
+     "price_close": 5163.14,
+     "tr_close": 5625.74,
+     "ratio": 1.089597
+    },
+    {
+     "date": "20090105",
+     "price_close": 1776.05,
+     "tr_close": 1972.18,
+     "ratio": 1.11043
+    },
+    {
+     "date": "20100104",
+     "price_close": 3532.21,
+     "tr_close": 3982.17,
+     "ratio": 1.127388
+    },
+    {
+     "date": "20110104",
+     "price_close": 3146.59,
+     "tr_close": 3621.57,
+     "ratio": 1.150951
+    },
+    {
+     "date": "20120104",
+     "price_close": 2321.96,
+     "tr_close": 2735.67,
+     "ratio": 1.178173
+    },
+    {
+     "date": "20130104",
+     "price_close": 2533.88,
+     "tr_close": 3076.42,
+     "ratio": 1.214114
+    },
+    {
+     "date": "20140102",
+     "price_close": 2270.2,
+     "tr_close": 2860.94,
+     "ratio": 1.260215
+    },
+    {
+     "date": "20150105",
+     "price_close": 3582.31,
+     "tr_close": 4690.37,
+     "ratio": 1.309314
+    },
+    {
+     "date": "20160104",
+     "price_close": 4065.48,
+     "tr_close": 5449.98,
+     "ratio": 1.34055
+    },
+    {
+     "date": "20170103",
+     "price_close": 4081.8,
+     "tr_close": 5669.76,
+     "ratio": 1.389034
+    },
+    {
+     "date": "20180102",
+     "price_close": 4836.08,
+     "tr_close": 6932.76,
+     "ratio": 1.433549
+    },
+    {
+     "date": "20190102",
+     "price_close": 3779.25,
+     "tr_close": 5624.67,
+     "ratio": 1.488303
+    },
+    {
+     "date": "20200102",
+     "price_close": 4503.09,
+     "tr_close": 6999.68,
+     "ratio": 1.554417
+    },
+    {
+     "date": "20210104",
+     "price_close": 4611.31,
+     "tr_close": 7493.02,
+     "ratio": 1.624922
+    },
+    {
+     "date": "20220104",
+     "price_close": 5272.76,
+     "tr_close": 8932.42,
+     "ratio": 1.694069
+    },
+    {
+     "date": "20230103",
+     "price_close": 4957.78,
+     "tr_close": 8850.5,
+     "ratio": 1.785174
+    },
+    {
+     "date": "20240102",
+     "price_close": 5020.99,
+     "tr_close": 9447.69,
+     "ratio": 1.881639
+    },
+    {
+     "date": "20250102",
+     "price_close": 5470.19,
+     "tr_close": 10883.67,
+     "ratio": 1.989633
+    },
+    {
+     "date": "20260105",
+     "price_close": 5525.12,
+     "tr_close": 11567.21,
+     "ratio": 2.093567
+    }
+   ],
+   "return_basis": "gross_total_return",
+   "dimensions": {
+    "official_identity_verified": true,
+    "mapping_to_price_index_verified": true,
+    "return_basis_verified": true,
+    "history_api_available": true,
+    "history_coverage_verified": true,
+    "data_quality_verified": true,
+    "continuity_verified": false,
+    "point_in_time_available": false,
+    "formal_series_admitted": false
+   },
+   "dimensions_passed": 6,
+   "dimensions_total": 9,
+   "evidence_grade": "L1",
+   "blocking_dimensions": [
+    "continuity_verified",
+    "point_in_time_available",
+    "formal_series_admitted"
+   ],
+   "point_in_time": {
+    "index_snapshot_tables": [],
+    "index_daily_multi_version_rows": 0,
+    "collected_at_distinct_dates": [
+     "2026-11-23"
+    ],
+    "has_historical_snapshot": false,
+    "has_revision_records": false,
+    "can_prove_published_at_the_time": false,
+    "historical_point_in_time_availability": "unknown",
+    "reason": "无历史快照表、无修订记录、每 (index_code,trade_date) 仅 1 行；当前采集时间与当前下载数据**不能证明**历史交易日当时已公开；无法排除事后回溯计算",
+    "note": "该结论适用于本轮全部候选序列（含股票/债券/港股），不因序列类型不同而改变"
+   },
+   "conclusion": "H00922：未通过维度 ['continuity_verified', 'point_in_time_available', 'formal_series_admitted']；其中历史覆盖 0 个交易日缺失，日历外日期 1 条",
+   "group": "stock_total_return"
+  },
+  {
+   "tr_candidate": "H00012",
+   "price_index": "000012",
+   "tr_basic": {
+    "index_code": "H00012",
+    "url": "https://www.csindex.com.cn/csindex-home/indexInfo/index-basic-info/H00012",
+    "obtained": true,
+    "file": "reports/evidence/phase3B6_2_3_1_0/basic_H00012.json",
+    "bytes": 824,
+    "sha256": "7db12d476e572bf6e89219f31fe8b79d4aded423f1cbe4c7940f782fa74f769a",
+    "obtained_at": "2026-11-27T14:11:17",
+    "official_full_name": "上证国债指数(净价)",
+    "official_short_name": "国债指数(净)",
+    "basic_date": "2012-12-31",
+    "basic_index": 100.0,
+    "publish_date": "2018-01-02",
+    "index_type": "bond",
+    "currency": "人民币",
+    "publisher": "中证指数有限公司"
+   },
+   "price_basic": {
+    "index_code": "000012",
+    "url": "https://www.csindex.com.cn/csindex-home/indexInfo/index-basic-info/000012",
+    "obtained": true,
+    "file": "reports/evidence/phase3B6_2_3_1_0/basic_000012.json",
+    "bytes": 1055,
+    "sha256": "4390b7dc8015f4ed85dfeeafde53b7a7b4565ce95064deb5028216343f0fe39b",
+    "obtained_at": "2026-11-27T14:11:16",
+    "official_full_name": "上证国债指数",
+    "official_short_name": "国债指数",
+    "basic_date": "2002-12-31",
+    "basic_index": 100.0,
+    "publish_date": "2003-01-02",
+    "index_type": "bond",
+    "currency": "人民币",
+    "publisher": "中证指数有限公司"
+   },
+   "tr_history_meta": {
+    "index_code": "H00012",
+    "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=H00012&startDate=20040101&endDate=20261127",
+    "obtained": true,
+    "file": "reports/evidence/phase3B6_2_3_1_0/hist_H00012_20040101_20261127.json",
+    "bytes": 1285757,
+    "sha256": "cc23ff824f58067ae5a5aaec2d3e63b52eac6d9c075ed321945f68efe106b92a",
+    "obtained_at": "2026-11-27T14:11:17",
+    "row_count": 3376
+   },
+   "price_history_meta": {
+    "index_code": "000012",
+    "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=000012&startDate=20040101&endDate=20261127",
+    "obtained": true,
+    "file": "reports/evidence/phase3B6_2_3_1_0/hist_000012_20040101_20261127.json",
+    "bytes": 1963145,
+    "sha256": "9ce641b75375e500c1b560657baeb7bf0799e698e3287449987640ec2290b116",
+    "obtained_at": "2026-11-27T14:11:16",
+    "row_count": 5562
+   },
+   "quality": {
+    "real_history_start": "20121231",
+    "synthetic_first_row": "20040101",
+    "calendar_window_days": 3375,
+    "first_date": "20040101",
+    "last_date": "20261126",
+    "row_count": 3376,
+    "distinct_dates": 3376,
+    "duplicate_dates": 0,
+    "descending_dates": 0,
+    "illegal_dates": [],
+    "null_close": 0,
+    "non_numeric_close": 0,
+    "nan_or_inf_close": 0,
+    "non_positive_close": 0,
+    "non_positive_sample": [],
+    "extreme_moves": [],
+    "extreme_move_count": 0,
+    "missing_trading_days": 0,
+    "missing_sample": [],
+    "dates_outside_calendar": 0,
+    "dates_outside_calendar_sample": [],
+    "calendar_source": "项目 trade_calendar（A股交易日**代理**，非官方指数发布日历）"
+   },
+   "mapping": {
+    "price_index": "000012",
+    "tr_candidate": "H00012",
+    "checks": [
+     {
+      "check": "候选名称含「全收益/净收益」",
+      "passed": false,
+      "value": "上证国债指数(净价)",
+      "strength": "弱（名称相似不足以判定映射）"
+     },
+     {
+      "check": "基日一致",
+      "passed": null,
+      "strength": "中",
+      "value": null
+     },
+     {
+      "check": "全收益/价格比值恒 >= 1（基日当天必然 =1）",
+      "passed": false,
+      "value": {
+       "ratio_first": 0.7364312541424258,
+       "ratio_last": 0.4726755953662633,
+       "sample_count": 3375,
+       "ratio_equals_one_count": 0
+      },
+      "strength": "中（符合分红再投资特征，但不能证明口径）"
+     },
+     {
+      "check": "比值随时间上升（再投资累积）",
+      "passed": false,
+      "value": {
+       "ratio_first": 0.7364312541424258,
+       "ratio_last": 0.4726755953662633
+      },
+      "strength": "中"
+     }
+    ],
+    "ratio_first": 0.7364312541424258,
+    "ratio_last": 0.4726755953662633,
+    "ratio_sample_count": 3375,
+    "all_ratios_at_least_one": false,
+    "ratio_increasing": false,
+    "ratio_equals_one_dates": [],
+    "ratio_equals_one_count": 0,
+    "note": "比值恒 >= 1 且随时间上升，符合「分红再投资累积」特征；但这是**技术判断**，不能替代官方口径文件。**早期比值恰为 1 说明该段未体现分红再投资**，需在正式使用时注意"
+   },
+   "cross_year_samples": [
+    {
+     "date": "20040101",
+     "price_close": 99.22,
+     "tr_close": 100.0,
+     "ratio": 1.007861
+    },
+    {
+     "date": "20121231",
+     "price_close": 135.79,
+     "tr_close": 100.0,
+     "ratio": 0.736431
+    },
+    {
+     "date": "20130104",
+     "price_close": 135.84,
+     "tr_close": 100.0,
+     "ratio": 0.73616
+    },
+    {
+     "date": "20140102",
+     "price_close": 139.62,
+     "tr_close": 99.26,
+     "ratio": 0.71093
+    },
+    {
+     "date": "20150105",
+     "price_close": 145.8,
+     "tr_close": 99.92,
+     "ratio": 0.685322
+    },
+    {
+     "date": "20160104",
+     "price_close": 154.66,
+     "tr_close": 102.26,
+     "ratio": 0.661192
+    },
+    {
+     "date": "20170103",
+     "price_close": 159.71,
+     "tr_close": 102.01,
+     "ratio": 0.63872
+    },
+    {
+     "date": "20180102",
+     "price_close": 160.97,
+     "tr_close": 99.31,
+     "ratio": 0.616947
+    },
+    {
+     "date": "20190102",
+     "price_close": 170.01,
+     "tr_close": 101.3,
+     "ratio": 0.595847
+    },
+    {
+     "date": "20200102",
+     "price_close": 177.33,
+     "tr_close": 102.08,
+     "ratio": 0.57565
+    },
+    {
+     "date": "20210104",
+     "price_close": 183.85,
+     "tr_close": 102.41,
+     "ratio": 0.55703
+    },
+    {
+     "date": "20220104",
+     "price_close": 191.66,
+     "tr_close": 103.4,
+     "ratio": 0.539497
+    },
+    {
+     "date": "20230103",
+     "price_close": 198.6,
+     "tr_close": 103.88,
+     "ratio": 0.523061
+    },
+    {
+     "date": "20240102",
+     "price_close": 206.07,
+     "tr_close": 104.65,
+     "ratio": 0.507837
+    },
+    {
+     "date": "20250102",
+     "price_close": 223.13,
+     "tr_close": 110.3,
+     "ratio": 0.494331
+    },
+    {
+     "date": "20260105",
+     "price_close": 224.7,
+     "tr_close": 108.37,
+     "ratio": 0.482287
+    }
+   ],
+   "return_basis": "unknown",
+   "dimensions": {
+    "official_identity_verified": true,
+    "mapping_to_price_index_verified": false,
+    "return_basis_verified": false,
+    "history_api_available": true,
+    "history_coverage_verified": true,
+    "data_quality_verified": true,
+    "continuity_verified": true,
+    "point_in_time_available": false,
+    "formal_series_admitted": false
+   },
+   "dimensions_passed": 5,
+   "dimensions_total": 9,
+   "evidence_grade": "L2",
+   "blocking_dimensions": [
+    "mapping_to_price_index_verified",
+    "return_basis_verified",
+    "point_in_time_available",
+    "formal_series_admitted"
+   ],
+   "point_in_time": {
+    "index_snapshot_tables": [],
+    "index_daily_multi_version_rows": 0,
+    "collected_at_distinct_dates": [
+     "2026-11-23"
+    ],
+    "has_historical_snapshot": false,
+    "has_revision_records": false,
+    "can_prove_published_at_the_time": false,
+    "historical_point_in_time_availability": "unknown",
+    "reason": "无历史快照表、无修订记录、每 (index_code,trade_date) 仅 1 行；当前采集时间与当前下载数据**不能证明**历史交易日当时已公开；无法排除事后回溯计算",
+    "note": "该结论适用于本轮全部候选序列（含股票/债券/港股），不因序列类型不同而改变"
+   },
+   "conclusion": "H00012：未通过维度 ['mapping_to_price_index_verified', 'return_basis_verified', 'point_in_time_available', 'formal_series_admitted']；其中历史覆盖 0 个交易日缺失，日历外日期 0 条",
+   "group": "bond_derivative"
+  },
+  {
+   "tr_candidate": "N00012",
+   "price_index": "000012",
+   "tr_basic": {
+    "index_code": "N00012",
+    "url": "https://www.csindex.com.cn/csindex-home/indexInfo/index-basic-info/N00012",
+    "obtained": true,
+    "file": "reports/evidence/phase3B6_2_3_1_0/basic_N00012.json",
+    "bytes": 850,
+    "sha256": "12625ae7ce88ceba8dc5cdb6d5308083d25ecbc19313a553e4d4b2fc601a325d",
+    "obtained_at": "2026-11-27T14:11:18",
+    "official_full_name": "上证国债指数(利息及再投资)",
+    "official_short_name": "国债指数(利)",
+    "basic_date": "2012-12-31",
+    "basic_index": 100.0,
+    "publish_date": "2018-01-02",
+    "index_type": "bond",
+    "currency": "人民币",
+    "publisher": "中证指数有限公司"
+   },
+   "price_basic": {
+    "index_code": "000012",
+    "url": "https://www.csindex.com.cn/csindex-home/indexInfo/index-basic-info/000012",
+    "obtained": true,
+    "file": "reports/evidence/phase3B6_2_3_1_0/basic_000012.json",
+    "bytes": 1055,
+    "sha256": "4390b7dc8015f4ed85dfeeafde53b7a7b4565ce95064deb5028216343f0fe39b",
+    "obtained_at": "2026-11-27T14:11:16",
+    "official_full_name": "上证国债指数",
+    "official_short_name": "国债指数",
+    "basic_date": "2002-12-31",
+    "basic_index": 100.0,
+    "publish_date": "2003-01-02",
+    "index_type": "bond",
+    "currency": "人民币",
+    "publisher": "中证指数有限公司"
+   },
+   "tr_history_meta": {
+    "index_code": "N00012",
+    "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=N00012&startDate=20040101&endDate=20261127",
+    "obtained": true,
+    "file": "reports/evidence/phase3B6_2_3_1_0/hist_N00012_20040101_20261127.json",
+    "bytes": 1368377,
+    "sha256": "d4b0aaf3885df93946f1597e50a43dcee0507fa1c7bce33148ab7bd61015badb",
+    "obtained_at": "2026-11-27T14:11:18",
+    "row_count": 3376
+   },
+   "price_history_meta": {
+    "index_code": "000012",
+    "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=000012&startDate=20040101&endDate=20261127",
+    "obtained": true,
+    "file": "reports/evidence/phase3B6_2_3_1_0/hist_000012_20040101_20261127.json",
+    "bytes": 1963145,
+    "sha256": "9ce641b75375e500c1b560657baeb7bf0799e698e3287449987640ec2290b116",
+    "obtained_at": "2026-11-27T14:11:16",
+    "row_count": 5562
+   },
+   "quality": {
+    "real_history_start": "20121231",
+    "synthetic_first_row": "20040101",
+    "calendar_window_days": 3375,
+    "first_date": "20040101",
+    "last_date": "20261126",
+    "row_count": 3376,
+    "distinct_dates": 3376,
+    "duplicate_dates": 0,
+    "descending_dates": 0,
+    "illegal_dates": [],
+    "null_close": 0,
+    "non_numeric_close": 0,
+    "nan_or_inf_close": 0,
+    "non_positive_close": 0,
+    "non_positive_sample": [],
+    "extreme_moves": [],
+    "extreme_move_count": 0,
+    "missing_trading_days": 0,
+    "missing_sample": [],
+    "dates_outside_calendar": 0,
+    "dates_outside_calendar_sample": [],
+    "calendar_source": "项目 trade_calendar（A股交易日**代理**，非官方指数发布日历）"
+   },
+   "mapping": {
+    "price_index": "000012",
+    "tr_candidate": "N00012",
+    "checks": [
+     {
+      "check": "候选名称含「全收益/净收益」",
+      "passed": false,
+      "value": "上证国债指数(利息及再投资)",
+      "strength": "弱（名称相似不足以判定映射）"
+     },
+     {
+      "check": "基日一致",
+      "passed": null,
+      "strength": "中",
+      "value": null
+     },
+     {
+      "check": "全收益/价格比值恒 >= 1（基日当天必然 =1）",
+      "passed": false,
+      "value": {
+       "ratio_first": 0.7364312541424258,
+       "ratio_last": 0.6767150424185004,
+       "sample_count": 3375,
+       "ratio_equals_one_count": 0
+      },
+      "strength": "中（符合分红再投资特征，但不能证明口径）"
+     },
+     {
+      "check": "比值随时间上升（再投资累积）",
+      "passed": false,
+      "value": {
+       "ratio_first": 0.7364312541424258,
+       "ratio_last": 0.6767150424185004
+      },
+      "strength": "中"
+     }
+    ],
+    "ratio_first": 0.7364312541424258,
+    "ratio_last": 0.6767150424185004,
+    "ratio_sample_count": 3375,
+    "all_ratios_at_least_one": false,
+    "ratio_increasing": false,
+    "ratio_equals_one_dates": [],
+    "ratio_equals_one_count": 0,
+    "note": "比值恒 >= 1 且随时间上升，符合「分红再投资累积」特征；但这是**技术判断**，不能替代官方口径文件。**早期比值恰为 1 说明该段未体现分红再投资**，需在正式使用时注意"
+   },
+   "cross_year_samples": [
+    {
+     "date": "20040101",
+     "price_close": 99.22,
+     "tr_close": 100.0,
+     "ratio": 1.007861
+    },
+    {
+     "date": "20121231",
+     "price_close": 135.79,
+     "tr_close": 100.0,
+     "ratio": 0.736431
+    },
+    {
+     "date": "20130104",
+     "price_close": 135.84,
+     "tr_close": 100.04,
+     "ratio": 0.736455
+    },
+    {
+     "date": "20140102",
+     "price_close": 139.62,
+     "tr_close": 103.59,
+     "ratio": 0.741942
+    },
+    {
+     "date": "20150105",
+     "price_close": 145.8,
+     "tr_close": 107.44,
+     "ratio": 0.7369
+    },
+    {
+     "date": "20160104",
+     "price_close": 154.66,
+     "tr_close": 111.46,
+     "ratio": 0.720678
+    },
+    {
+     "date": "20170103",
+     "price_close": 159.71,
+     "tr_close": 115.48,
+     "ratio": 0.723061
+    },
+    {
+     "date": "20180102",
+     "price_close": 160.97,
+     "tr_close": 119.52,
+     "ratio": 0.742499
+    },
+    {
+     "date": "20190102",
+     "price_close": 170.01,
+     "tr_close": 123.78,
+     "ratio": 0.728075
+    },
+    {
+     "date": "20200102",
+     "price_close": 177.33,
+     "tr_close": 128.18,
+     "ratio": 0.722833
+    },
+    {
+     "date": "20210104",
+     "price_close": 183.85,
+     "tr_close": 132.57,
+     "ratio": 0.721077
+    },
+    {
+     "date": "20220104",
+     "price_close": 191.66,
+     "tr_close": 136.96,
+     "ratio": 0.714599
+    },
+    {
+     "date": "20230103",
+     "price_close": 198.6,
+     "tr_close": 141.36,
+     "ratio": 0.711782
+    },
+    {
+     "date": "20240102",
+     "price_close": 206.07,
+     "tr_close": 145.71,
+     "ratio": 0.70709
+    },
+    {
+     "date": "20250102",
+     "price_close": 223.13,
+     "tr_close": 149.94,
+     "ratio": 0.671985
+    },
+    {
+     "date": "20260105",
+     "price_close": 224.7,
+     "tr_close": 153.87,
+     "ratio": 0.68478
+    }
+   ],
+   "return_basis": "unknown",
+   "dimensions": {
+    "official_identity_verified": true,
+    "mapping_to_price_index_verified": false,
+    "return_basis_verified": false,
+    "history_api_available": true,
+    "history_coverage_verified": true,
+    "data_quality_verified": true,
+    "continuity_verified": true,
+    "point_in_time_available": false,
+    "formal_series_admitted": false
+   },
+   "dimensions_passed": 5,
+   "dimensions_total": 9,
+   "evidence_grade": "L2",
+   "blocking_dimensions": [
+    "mapping_to_price_index_verified",
+    "return_basis_verified",
+    "point_in_time_available",
+    "formal_series_admitted"
+   ],
+   "point_in_time": {
+    "index_snapshot_tables": [],
+    "index_daily_multi_version_rows": 0,
+    "collected_at_distinct_dates": [
+     "2026-11-23"
+    ],
+    "has_historical_snapshot": false,
+    "has_revision_records": false,
+    "can_prove_published_at_the_time": false,
+    "historical_point_in_time_availability": "unknown",
+    "reason": "无历史快照表、无修订记录、每 (index_code,trade_date) 仅 1 行；当前采集时间与当前下载数据**不能证明**历史交易日当时已公开；无法排除事后回溯计算",
+    "note": "该结论适用于本轮全部候选序列（含股票/债券/港股），不因序列类型不同而改变"
+   },
+   "conclusion": "N00012：未通过维度 ['mapping_to_price_index_verified', 'return_basis_verified', 'point_in_time_available', 'formal_series_admitted']；其中历史覆盖 0 个交易日缺失，日历外日期 0 条",
+   "group": "bond_derivative"
+  },
+  {
+   "tr_candidate": "H20930",
+   "price_index": "930930",
+   "tr_basic": {
+    "index_code": "H20930",
+    "url": "https://www.csindex.com.cn/csindex-home/indexInfo/index-basic-info/H20930",
+    "obtained": true,
+    "file": "reports/evidence/phase3B6_2_3_1_0/basic_H20930.json",
+    "bytes": 836,
+    "sha256": "faffba0d41b7dbb450edd6f72137e63950a907136739b3e76c138744517a28a0",
+    "obtained_at": "2026-11-27T14:11:22",
+    "official_full_name": "中证港股通综合全收益指数",
+    "official_short_name": "港股综合(全)",
+    "basic_date": "2014-11-14",
+    "basic_index": 3000.0,
+    "publish_date": "2017-01-16",
+    "index_type": "stock",
+    "currency": "港元",
+    "publisher": "中证指数有限公司"
+   },
+   "price_basic": {
+    "index_code": "930930",
+    "url": "https://www.csindex.com.cn/csindex-home/indexInfo/index-basic-info/930930",
+    "obtained": true,
+    "file": "reports/evidence/phase3B6_2_3_1_0/basic_930930.json",
+    "bytes": 1233,
+    "sha256": "03b676d21f126b75faaaad284435cf771325b888d132e612914801ab20fdb749",
+    "obtained_at": "2026-11-27T14:11:20",
+    "official_full_name": "中证港股通综合指数",
+    "official_short_name": "港股综合",
+    "basic_date": "2014-11-14",
+    "basic_index": 3000.0,
+    "publish_date": "2017-01-16",
+    "index_type": "stock",
+    "currency": "港元",
+    "publisher": "中证指数有限公司"
+   },
+   "tr_history_meta": {
+    "index_code": "H20930",
+    "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=H20930&startDate=20040101&endDate=20261127",
+    "obtained": true,
+    "file": "reports/evidence/phase3B6_2_3_1_0/hist_H20930_20040101_20261127.json",
+    "bytes": 1210831,
+    "sha256": "188c05599881baafeb151d9108b30a4e4b2d2ae9f0220da27f51e7703bd82bcf",
+    "obtained_at": "2026-11-27T14:11:22",
+    "row_count": 3003
+   },
+   "price_history_meta": {
+    "index_code": "930930",
+    "url": "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=930930&startDate=20040101&endDate=20261127",
+    "obtained": true,
+    "file": "reports/evidence/phase3B6_2_3_1_0/hist_930930_20040101_20261127.json",
+    "bytes": 1138705,
+    "sha256": "54cf880c62f999f2af7ed6c848ab94b587dfec8ee52a7707190e1ffa75fc8468",
+    "obtained_at": "2026-11-27T14:11:19",
+    "row_count": 3003
+   },
+   "quality": {
+    "real_history_start": "20141114",
+    "synthetic_first_row": "20040101",
+    "calendar_window_days": 2925,
+    "first_date": "20040101",
+    "last_date": "20261126",
+    "row_count": 3003,
+    "distinct_dates": 3003,
+    "duplicate_dates": 0,
+    "descending_dates": 0,
+    "illegal_dates": [],
+    "null_close": 0,
+    "non_numeric_close": 0,
+    "nan_or_inf_close": 0,
+    "non_positive_close": 0,
+    "non_positive_sample": [],
+    "extreme_moves": [],
+    "extreme_move_count": 0,
+    "missing_trading_days": 62,
+    "missing_sample": [
+     "2017-04-14",
+     "2017-04-17",
+     "2017-05-03",
+     "2017-12-25",
+     "2017-12-26",
+     "2018-03-30",
+     "2018-04-02",
+     "2018-05-22",
+     "2018-07-02",
+     "2018-09-25"
+    ],
+    "dates_outside_calendar": 139,
+    "dates_outside_calendar_sample": [
+     "2015-01-01",
+     "2015-01-02",
+     "2015-02-18",
+     "2015-02-19",
+     "2015-02-20",
+     "2015-02-23",
+     "2015-02-24",
+     "2015-04-06",
+     "2015-05-01",
+     "2015-06-22"
+    ],
+    "calendar_source": "项目 trade_calendar（A股交易日**代理**，非官方指数发布日历）"
+   },
+   "mapping": {
+    "price_index": "930930",
+    "tr_candidate": "H20930",
+    "checks": [
+     {
+      "check": "候选名称含「全收益/净收益」",
+      "passed": true,
+      "value": "中证港股通综合全收益指数",
+      "strength": "弱（名称相似不足以判定映射）"
+     },
+     {
+      "check": "基日一致",
+      "passed": null,
+      "strength": "中",
+      "value": null
+     },
+     {
+      "check": "全收益/价格比值恒 >= 1（基日当天必然 =1）",
+      "passed": true,
+      "value": {
+       "ratio_first": 1.0,
+       "ratio_last": 1.5157177957639143,
+       "sample_count": 3002,
+       "ratio_equals_one_count": 2
+      },
+      "strength": "中（符合分红再投资特征，但不能证明口径）"
+     },
+     {
+      "check": "比值随时间上升（再投资累积）",
+      "passed": true,
+      "value": {
+       "ratio_first": 1.0,
+       "ratio_last": 1.5157177957639143
+      },
+      "strength": "中"
+     }
+    ],
+    "ratio_first": 1.0,
+    "ratio_last": 1.5157177957639143,
+    "ratio_sample_count": 3002,
+    "all_ratios_at_least_one": true,
+    "ratio_increasing": true,
+    "ratio_equals_one_dates": [
+     "20141114",
+     "20141117"
+    ],
+    "ratio_equals_one_count": 2,
+    "note": "比值恒 >= 1 且随时间上升，符合「分红再投资累积」特征；但这是**技术判断**，不能替代官方口径文件。**早期比值恰为 1 说明该段未体现分红再投资**，需在正式使用时注意"
+   },
+   "cross_year_samples": [
+    {
+     "date": "20040101",
+     "price_close": 3000.0,
+     "tr_close": 3000.0,
+     "ratio": 1.0
+    },
+    {
+     "date": "20141114",
+     "price_close": 3000.0,
+     "tr_close": 3000.0,
+     "ratio": 1.0
+    },
+    {
+     "date": "20150101",
+     "price_close": 2974.95,
+     "tr_close": 2978.25,
+     "ratio": 1.001109
+    },
+    {
+     "date": "20160101",
+     "price_close": 2760.33,
+     "tr_close": 2851.67,
+     "ratio": 1.03309
+    },
+    {
+     "date": "20170103",
+     "price_close": 2753.74,
+     "tr_close": 2952.27,
+     "ratio": 1.072095
+    },
+    {
+     "date": "20180102",
+     "price_close": 3845.61,
+     "tr_close": 4262.65,
+     "ratio": 1.108446
+    },
+    {
+     "date": "20190102",
+     "price_close": 3072.99,
+     "tr_close": 3519.5,
+     "ratio": 1.145301
+    },
+    {
+     "date": "20200102",
+     "price_close": 3548.37,
+     "tr_close": 4205.0,
+     "ratio": 1.185051
+    },
+    {
+     "date": "20210104",
+     "price_close": 3974.36,
+     "tr_close": 4849.49,
+     "ratio": 1.220194
+    },
+    {
+     "date": "20220103",
+     "price_close": 3451.53,
+     "tr_close": 4326.07,
+     "ratio": 1.253377
+    },
+    {
+     "date": "20230103",
+     "price_close": 2895.34,
+     "tr_close": 3774.96,
+     "ratio": 1.303805
+    },
+    {
+     "date": "20240102",
+     "price_close": 2399.31,
+     "tr_close": 3266.65,
+     "ratio": 1.361496
+    },
+    {
+     "date": "20250102",
+     "price_close": 2729.63,
+     "tr_close": 3896.4,
+     "ratio": 1.427446
+    },
+    {
+     "date": "20260102",
+     "price_close": 3782.96,
+     "tr_close": 5573.17,
+     "ratio": 1.47323
+    }
+   ],
+   "return_basis": "gross_total_return",
+   "dimensions": {
+    "official_identity_verified": true,
+    "mapping_to_price_index_verified": true,
+    "return_basis_verified": true,
+    "history_api_available": true,
+    "history_coverage_verified": false,
+    "data_quality_verified": true,
+    "continuity_verified": false,
+    "point_in_time_available": false,
+    "formal_series_admitted": false
+   },
+   "dimensions_passed": 5,
+   "dimensions_total": 9,
+   "evidence_grade": "L1",
+   "blocking_dimensions": [
+    "history_coverage_verified",
+    "continuity_verified",
+    "point_in_time_available",
+    "formal_series_admitted"
+   ],
+   "point_in_time": {
+    "index_snapshot_tables": [],
+    "index_daily_multi_version_rows": 0,
+    "collected_at_distinct_dates": [
+     "2026-11-23"
+    ],
+    "has_historical_snapshot": false,
+    "has_revision_records": false,
+    "can_prove_published_at_the_time": false,
+    "historical_point_in_time_availability": "unknown",
+    "reason": "无历史快照表、无修订记录、每 (index_code,trade_date) 仅 1 行；当前采集时间与当前下载数据**不能证明**历史交易日当时已公开；无法排除事后回溯计算",
+    "note": "该结论适用于本轮全部候选序列（含股票/债券/港股），不因序列类型不同而改变"
+   },
+   "conclusion": "H20930：未通过维度 ['history_coverage_verified', 'continuity_verified', 'point_in_time_available', 'formal_series_admitted']；其中历史覆盖 62 个交易日缺失，日历外日期 139 条",
+   "group": "hk_derivative"
+  }
+ ],
+ "summary": {
+  "total_candidates": 12,
+  "stock_total_return": {
+   "candidate_count": 9,
+   "official_identity_verified": 9,
+   "mapping_to_price_index_verified": 9,
+   "return_basis_verified": 9,
+   "history_api_available": 9,
+   "history_coverage_verified": 9,
+   "data_quality_verified": 8,
+   "continuity_verified": 1,
+   "point_in_time_available": 0,
+   "formal_series_admitted": 0,
+   "evidence_grade_counts": {
+    "L1": 9
+   }
+  },
+  "bond_derivative": {
+   "candidate_count": 2,
+   "official_identity_verified": 2,
+   "mapping_to_price_index_verified": 0,
+   "return_basis_verified": 0,
+   "history_api_available": 2,
+   "history_coverage_verified": 2,
+   "data_quality_verified": 2,
+   "continuity_verified": 2,
+   "point_in_time_available": 0,
+   "formal_series_admitted": 0,
+   "evidence_grade_counts": {
+    "L2": 2
+   }
+  },
+  "hk_derivative": {
+   "candidate_count": 1,
+   "official_identity_verified": 1,
+   "mapping_to_price_index_verified": 1,
+   "return_basis_verified": 1,
+   "history_api_available": 1,
+   "history_coverage_verified": 0,
+   "data_quality_verified": 1,
+   "continuity_verified": 0,
+   "point_in_time_available": 0,
+   "formal_series_admitted": 0,
+   "evidence_grade_counts": {
+    "L1": 1
+   }
+  },
+  "stock_price_indexes_covered": 8,
+  "stock_price_indexes_expected": 8,
+  "evidence_grade_counts": {
+   "L1": 10,
+   "L2": 2
+  },
+  "admitted_count": 0,
+  "admissible_for_next_stage_data_layer": 11,
+  "gates": {
+   "ready_for_research_analysis": true,
+   "ready_for_backtest": false,
+   "ready_for_formal_ranking": false,
+   "ready_for_3b6_2_3_1_series_build": false,
+   "note": "本轮只做可行性审计；不因审计完成而开放任何门禁"
+  },
+  "_self_check": {
+   "groups_disjoint": true,
+   "all_eight_price_indexes_have_candidate": true,
+   "every_candidate_has_conclusion": true,
+   "every_candidate_has_grade": true,
+   "no_candidate_admitted": true,
+   "point_in_time_all_unknown": true
+  }
+ },
+ "evidence_manifest": {
+  "phase": "3B-6.2.3.1.0",
+  "purpose": "官方全收益指数历史序列可行性审计原始证据",
+  "generated_at": "2026-11-27T14:11:27",
+  "file_count": 44,
+  "files": {
+   "basic_000012.json": {
+    "bytes": 1055,
+    "sha256": "4390b7dc8015f4ed85dfeeafde53b7a7b4565ce95064deb5028216343f0fe39b"
+   },
+   "basic_000016.json": {
+    "bytes": 1181,
+    "sha256": "44bd88a3dc069ab09206ceca301a362db8ab2dab3529d2cd498369081e22b88b"
+   },
+   "basic_000300.json": {
+    "bytes": 1088,
+    "sha256": "89cbd0812e258757ccca68285181d280b22881f1e95e4fb524ddea64bd159fb6"
+   },
+   "basic_000905.json": {
+    "bytes": 990,
+    "sha256": "29bbc5ab7081e7c50efbac91062224810b908ead05448316b96e6441c77a2efb"
+   },
+   "basic_000906.json": {
+    "bytes": 975,
+    "sha256": "1e49eff6bdccda98fa090db0b8987178bd4e799dfbcc842e2f695289ebb9ffd5"
+   },
+   "basic_000922.json": {
+    "bytes": 1180,
+    "sha256": "437049bcdc8f4317a6566e79d6b9806939612977c5e9fbd30030cb0673fa7090"
+   },
+   "basic_000942.json": {
+    "bytes": 1223,
+    "sha256": "da5688dc762f816518e59fac067a6a99ec997864e9c96f40e6b30d9f1ed14c25"
+   },
+   "basic_399997.json": {
+    "bytes": 1062,
+    "sha256": "4107d6e3ed60008fe515b4b96324d506827b08729b3a0037cbffa2f0a37bbb5a"
+   },
+   "basic_399997CNY02.json": {
+    "bytes": 812,
+    "sha256": "900d51e827626ec68aef7ff06b839c6f57eb5982e0049b5c527adf03092a1b5a"
+   },
+   "basic_930930.json": {
+    "bytes": 1233,
+    "sha256": "03b676d21f126b75faaaad284435cf771325b888d132e612914801ab20fdb749"
+   },
+   "basic_H00012.json": {
+    "bytes": 824,
+    "sha256": "7db12d476e572bf6e89219f31fe8b79d4aded423f1cbe4c7940f782fa74f769a"
+   },
+   "basic_H00016.json": {
+    "bytes": 793,
+    "sha256": "e2052cd2fab60c0f5362b47b273aea0bed566bcb6dde5c8b6f298f2d73572914"
+   },
+   "basic_H00300.json": {
+    "bytes": 779,
+    "sha256": "4a2c782da6c6465f7896c164e384135669c4a98c1f80ad0e8b4e11d4878099b7"
+   },
+   "basic_H00905.json": {
+    "bytes": 812,
+    "sha256": "b1ac3733e668f0bb3c88f70f79ba66f0862703ce0fcad0438451220295a27395"
+   },
+   "basic_H00906.json": {
+    "bytes": 797,
+    "sha256": "9d61703e8d54941ef27c5805bece09c5665623462d69893d8d30a5038c834b3d"
+   },
+   "basic_H00922.json": {
+    "bytes": 804,
+    "sha256": "9698705a87b45a1a5aa6e50cd7f3dc9517f5e302e79b59aa7755bb0303dbe25e"
+   },
+   "basic_H00942.json": {
+    "bytes": 837,
+    "sha256": "7498475b391917e6eb53377958a716f89b3f2380138a8213fdb7ae112fde3f47"
+   },
+   "basic_H20184.json": {
+    "bytes": 891,
+    "sha256": "dc3f32265597505e22374f63e2ca889958e70efde052ea7f7bfdff1d5a1331cc"
+   },
+   "basic_H20539.json": {
+    "bytes": 810,
+    "sha256": "18907a63f4b6ab209e517727a19948b14649e1c378c309d77a1e214a6d985bb5"
+   },
+   "basic_H20930.json": {
+    "bytes": 836,
+    "sha256": "faffba0d41b7dbb450edd6f72137e63950a907136739b3e76c138744517a28a0"
+   },
+   "basic_H30184.json": {
+    "bytes": 1460,
+    "sha256": "69c1bc656ff884f0187ed261b085eef794cd2d3285f4700adb0e5d7f9a8e0f9b"
+   },
+   "basic_N00012.json": {
+    "bytes": 850,
+    "sha256": "12625ae7ce88ceba8dc5cdb6d5308083d25ecbc19313a553e4d4b2fc601a325d"
+   },
+   "hist_000012_20040101_20261127.json": {
+    "bytes": 1963145,
+    "sha256": "9ce641b75375e500c1b560657baeb7bf0799e698e3287449987640ec2290b116"
+   },
+   "hist_000016_20040101_20261127.json": {
+    "bytes": 1823322,
+    "sha256": "f6580e14502cf9e34a9a9657c9dfd664b5ce1eaf34cabf4ab737a9c7bd4b9e45"
+   },
+   "hist_000300_20040101_20261127.json": {
+    "bytes": 1859052,
+    "sha256": "0fa59be4faf85775a230582710cfebd597ed19b8a500b0877cd31157f52963f1"
+   },
+   "hist_000905_20040101_20261127.json": {
+    "bytes": 1859847,
+    "sha256": "f858b7df4e25bb97b86916272aa717de25ce7b2a34d874d70e2e24cdfde6b82b"
+   },
+   "hist_000906_20040101_20261127.json": {
+    "bytes": 1785955,
+    "sha256": "01b7e169bcd8cab117dbd30a86e8443224436556c14b0a073e54f1412c174a5f"
+   },
+   "hist_000922_20040101_20261127.json": {
+    "bytes": 1858342,
+    "sha256": "09e8c7ac1087dc93c9936ec508017a79ea737ab63085ac169a46acedb9222b50"
+   },
+   "hist_000942_20040101_20261127.json": {
+    "bytes": 2000098,
+    "sha256": "5cde2565301e96445e558f59e1b549e6b00fb840295c4379d700e6bf64866f1a"
+   },
+   "hist_399997_20040101_20261127.json": {
+    "bytes": 1503148,
+    "sha256": "21a2fb2b4096e1bc4487f6f650c5bba92504b4eab0c943688347879685ef140d"
+   },
+   "hist_399997CNY02_20040101_20261127.json": {
+    "bytes": 1653318,
+    "sha256": "c7d1323cbb21d5f7973de65f97ab2b1fc398ee095786b31c3c3cabf16559f319"
+   },
+   "hist_930930_20040101_20261127.json": {
+    "bytes": 1138705,
+    "sha256": "54cf880c62f999f2af7ed6c848ab94b587dfec8ee52a7707190e1ffa75fc8468"
+   },
+   "hist_H00012_20040101_20261127.json": {
+    "bytes": 1285757,
+    "sha256": "cc23ff824f58067ae5a5aaec2d3e63b52eac6d9c075ed321945f68efe106b92a"
+   },
+   "hist_H00016_20040101_20261127.json": {
+    "bytes": 1912959,
+    "sha256": "625ba341082a844819f3eb5c1408a069b420d6b325bba145229b0bb6a1c5f898"
+   },
+   "hist_H00300_20040101_20261127.json": {
+    "bytes": 1868404,
+    "sha256": "f545659bc59e97a84b596dbe93eea2d4aa3871c5ba11d1a0c6bdaae4983d15ef"
+   },
+   "hist_H00905_20040101_20261127.json": {
+    "bytes": 1959475,
+    "sha256": "4a60d94d8e29bca27b8fcbb719989fa62d358416660724f5ce3c6ad076e8ebb3"
+   },
+   "hist_H00906_20040101_20261127.json": {
+    "bytes": 1885540,
+    "sha256": "c7049c15e7be9f9497049be2b748182126b0a0c2ae397b715241c7c3e4b04b57"
+   },
+   "hist_H00922_20040101_20261127.json": {
+    "bytes": 1941092,
+    "sha256": "374baf3e0a60380d4131cb1f684dd15ca422f2e377bca67f6a2c7801f607bbba"
+   },
+   "hist_H00942_20040101_20261127.json": {
+    "bytes": 2078941,
+    "sha256": "ea0497aa06442ec527c697b7d90c852533c212173cf92fa6e25ddee661c9ebe0"
+   },
+   "hist_H20184_20040101_20261127.json": {
+    "bytes": 2382392,
+    "sha256": "52ce7738e06362b6cfc841153dd3b53cd0a95b016a969b23329cd18914b9e84d"
+   },
+   "hist_H20539_20040101_20261127.json": {
+    "bytes": 1615193,
+    "sha256": "9235ba8d6754f27535480e252ad060c129ca6e0fa49540e1bf1f26f431bc6e66"
+   },
+   "hist_H20930_20040101_20261127.json": {
+    "bytes": 1210831,
+    "sha256": "188c05599881baafeb151d9108b30a4e4b2d2ae9f0220da27f51e7703bd82bcf"
+   },
+   "hist_H30184_20040101_20261127.json": {
+    "bytes": 2238681,
+    "sha256": "67057bebb23074450a22467b6fbc2104d92dc30f8f35d4b3ee194da0375110db"
+   },
+   "hist_N00012_20040101_20261127.json": {
+    "bytes": 1368377,
+    "sha256": "d4b0aaf3885df93946f1597e50a43dcee0507fa1c7bce33148ab7bd61015badb"
+   }
+  }
+ }
+}

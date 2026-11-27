@@ -1,0 +1,184 @@
+{
+ "phase": "3B-6.2.3.1.0",
+ "purpose": "官方全收益指数历史序列可行性审计原始证据",
+ "generated_at": "2026-11-27T14:29:49",
+ "file_count": 44,
+ "files": {
+  "basic_000012.json": {
+   "bytes": 1055,
+   "sha256": "4390b7dc8015f4ed85dfeeafde53b7a7b4565ce95064deb5028216343f0fe39b"
+  },
+  "basic_000016.json": {
+   "bytes": 1181,
+   "sha256": "44bd88a3dc069ab09206ceca301a362db8ab2dab3529d2cd498369081e22b88b"
+  },
+  "basic_000300.json": {
+   "bytes": 1088,
+   "sha256": "89cbd0812e258757ccca68285181d280b22881f1e95e4fb524ddea64bd159fb6"
+  },
+  "basic_000905.json": {
+   "bytes": 990,
+   "sha256": "29bbc5ab7081e7c50efbac91062224810b908ead05448316b96e6441c77a2efb"
+  },
+  "basic_000906.json": {
+   "bytes": 975,
+   "sha256": "1e49eff6bdccda98fa090db0b8987178bd4e799dfbcc842e2f695289ebb9ffd5"
+  },
+  "basic_000922.json": {
+   "bytes": 1180,
+   "sha256": "437049bcdc8f4317a6566e79d6b9806939612977c5e9fbd30030cb0673fa7090"
+  },
+  "basic_000942.json": {
+   "bytes": 1223,
+   "sha256": "da5688dc762f816518e59fac067a6a99ec997864e9c96f40e6b30d9f1ed14c25"
+  },
+  "basic_399997.json": {
+   "bytes": 1062,
+   "sha256": "4107d6e3ed60008fe515b4b96324d506827b08729b3a0037cbffa2f0a37bbb5a"
+  },
+  "basic_399997CNY02.json": {
+   "bytes": 812,
+   "sha256": "900d51e827626ec68aef7ff06b839c6f57eb5982e0049b5c527adf03092a1b5a"
+  },
+  "basic_930930.json": {
+   "bytes": 1233,
+   "sha256": "03b676d21f126b75faaaad284435cf771325b888d132e612914801ab20fdb749"
+  },
+  "basic_H00012.json": {
+   "bytes": 824,
+   "sha256": "7db12d476e572bf6e89219f31fe8b79d4aded423f1cbe4c7940f782fa74f769a"
+  },
+  "basic_H00016.json": {
+   "bytes": 793,
+   "sha256": "e2052cd2fab60c0f5362b47b273aea0bed566bcb6dde5c8b6f298f2d73572914"
+  },
+  "basic_H00300.json": {
+   "bytes": 779,
+   "sha256": "4a2c782da6c6465f7896c164e384135669c4a98c1f80ad0e8b4e11d4878099b7"
+  },
+  "basic_H00905.json": {
+   "bytes": 812,
+   "sha256": "b1ac3733e668f0bb3c88f70f79ba66f0862703ce0fcad0438451220295a27395"
+  },
+  "basic_H00906.json": {
+   "bytes": 797,
+   "sha256": "9d61703e8d54941ef27c5805bece09c5665623462d69893d8d30a5038c834b3d"
+  },
+  "basic_H00922.json": {
+   "bytes": 804,
+   "sha256": "9698705a87b45a1a5aa6e50cd7f3dc9517f5e302e79b59aa7755bb0303dbe25e"
+  },
+  "basic_H00942.json": {
+   "bytes": 837,
+   "sha256": "7498475b391917e6eb53377958a716f89b3f2380138a8213fdb7ae112fde3f47"
+  },
+  "basic_H20184.json": {
+   "bytes": 891,
+   "sha256": "dc3f32265597505e22374f63e2ca889958e70efde052ea7f7bfdff1d5a1331cc"
+  },
+  "basic_H20539.json": {
+   "bytes": 810,
+   "sha256": "18907a63f4b6ab209e517727a19948b14649e1c378c309d77a1e214a6d985bb5"
+  },
+  "basic_H20930.json": {
+   "bytes": 836,
+   "sha256": "faffba0d41b7dbb450edd6f72137e63950a907136739b3e76c138744517a28a0"
+  },
+  "basic_H30184.json": {
+   "bytes": 1460,
+   "sha256": "69c1bc656ff884f0187ed261b085eef794cd2d3285f4700adb0e5d7f9a8e0f9b"
+  },
+  "basic_N00012.json": {
+   "bytes": 850,
+   "sha256": "12625ae7ce88ceba8dc5cdb6d5308083d25ecbc19313a553e4d4b2fc601a325d"
+  },
+  "hist_000012_20040101_20261127.json": {
+   "bytes": 1963145,
+   "sha256": "9ce641b75375e500c1b560657baeb7bf0799e698e3287449987640ec2290b116"
+  },
+  "hist_000016_20040101_20261127.json": {
+   "bytes": 1823322,
+   "sha256": "f6580e14502cf9e34a9a9657c9dfd664b5ce1eaf34cabf4ab737a9c7bd4b9e45"
+  },
+  "hist_000300_20040101_20261127.json": {
+   "bytes": 1859052,
+   "sha256": "0fa59be4faf85775a230582710cfebd597ed19b8a500b0877cd31157f52963f1"
+  },
+  "hist_000905_20040101_20261127.json": {
+   "bytes": 1859847,
+   "sha256": "f858b7df4e25bb97b86916272aa717de25ce7b2a34d874d70e2e24cdfde6b82b"
+  },
+  "hist_000906_20040101_20261127.json": {
+   "bytes": 1785955,
+   "sha256": "01b7e169bcd8cab117dbd30a86e8443224436556c14b0a073e54f1412c174a5f"
+  },
+  "hist_000922_20040101_20261127.json": {
+   "bytes": 1858342,
+   "sha256": "09e8c7ac1087dc93c9936ec508017a79ea737ab63085ac169a46acedb9222b50"
+  },
+  "hist_000942_20040101_20261127.json": {
+   "bytes": 2000098,
+   "sha256": "5cde2565301e96445e558f59e1b549e6b00fb840295c4379d700e6bf64866f1a"
+  },
+  "hist_399997_20040101_20261127.json": {
+   "bytes": 1503148,
+   "sha256": "21a2fb2b4096e1bc4487f6f650c5bba92504b4eab0c943688347879685ef140d"
+  },
+  "hist_399997CNY02_20040101_20261127.json": {
+   "bytes": 1653318,
+   "sha256": "c7d1323cbb21d5f7973de65f97ab2b1fc398ee095786b31c3c3cabf16559f319"
+  },
+  "hist_930930_20040101_20261127.json": {
+   "bytes": 1138705,
+   "sha256": "54cf880c62f999f2af7ed6c848ab94b587dfec8ee52a7707190e1ffa75fc8468"
+  },
+  "hist_H00012_20040101_20261127.json": {
+   "bytes": 1285757,
+   "sha256": "cc23ff824f58067ae5a5aaec2d3e63b52eac6d9c075ed321945f68efe106b92a"
+  },
+  "hist_H00016_20040101_20261127.json": {
+   "bytes": 1912959,
+   "sha256": "625ba341082a844819f3eb5c1408a069b420d6b325bba145229b0bb6a1c5f898"
+  },
+  "hist_H00300_20040101_20261127.json": {
+   "bytes": 1868404,
+   "sha256": "f545659bc59e97a84b596dbe93eea2d4aa3871c5ba11d1a0c6bdaae4983d15ef"
+  },
+  "hist_H00905_20040101_20261127.json": {
+   "bytes": 1959475,
+   "sha256": "4a60d94d8e29bca27b8fcbb719989fa62d358416660724f5ce3c6ad076e8ebb3"
+  },
+  "hist_H00906_20040101_20261127.json": {
+   "bytes": 1885540,
+   "sha256": "c7049c15e7be9f9497049be2b748182126b0a0c2ae397b715241c7c3e4b04b57"
+  },
+  "hist_H00922_20040101_20261127.json": {
+   "bytes": 1941092,
+   "sha256": "374baf3e0a60380d4131cb1f684dd15ca422f2e377bca67f6a2c7801f607bbba"
+  },
+  "hist_H00942_20040101_20261127.json": {
+   "bytes": 2078941,
+   "sha256": "ea0497aa06442ec527c697b7d90c852533c212173cf92fa6e25ddee661c9ebe0"
+  },
+  "hist_H20184_20040101_20261127.json": {
+   "bytes": 2382392,
+   "sha256": "52ce7738e06362b6cfc841153dd3b53cd0a95b016a969b23329cd18914b9e84d"
+  },
+  "hist_H20539_20040101_20261127.json": {
+   "bytes": 1615193,
+   "sha256": "9235ba8d6754f27535480e252ad060c129ca6e0fa49540e1bf1f26f431bc6e66"
+  },
+  "hist_H20930_20040101_20261127.json": {
+   "bytes": 1210831,
+   "sha256": "188c05599881baafeb151d9108b30a4e4b2d2ae9f0220da27f51e7703bd82bcf"
+  },
+  "hist_H30184_20040101_20261127.json": {
+   "bytes": 2238681,
+   "sha256": "67057bebb23074450a22467b6fbc2104d92dc30f8f35d4b3ee194da0375110db"
+  },
+  "hist_N00012_20040101_20261127.json": {
+   "bytes": 1368377,
+   "sha256": "d4b0aaf3885df93946f1597e50a43dcee0507fa1c7bce33148ab7bd61015badb"
+  }
+ }
+}
