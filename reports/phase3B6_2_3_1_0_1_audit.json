@@ -234,7 +234,8 @@
    },
    "conclusion": "H00300：可进入**原始数据隔离层**；可作为**已验证独立序列**；**不得**正式准入（时点可用性 unknown）",
    "_original_continuity_status": "verified",
-   "_corrected_by": "3B-6.2.3.1.0.3"
+   "_corrected_by": "3B-6.2.3.1.0.3",
+   "_corrected_by_2": "3B-6.2.3.1.0.3.1"
   },
   {
    "tr_candidate": "H00905",
@@ -404,7 +405,8 @@
    },
    "conclusion": "H00905：可进入**原始数据隔离层**；可作为**已验证独立序列**；**不得**正式准入（时点可用性 unknown）",
    "_original_continuity_status": "verified",
-   "_corrected_by": "3B-6.2.3.1.0.3"
+   "_corrected_by": "3B-6.2.3.1.0.3",
+   "_corrected_by_2": "3B-6.2.3.1.0.3.1"
   },
   {
    "tr_candidate": "H00906",
@@ -574,7 +576,8 @@
    },
    "conclusion": "H00906：可进入**原始数据隔离层**；可作为**已验证独立序列**；**不得**正式准入（时点可用性 unknown）",
    "_original_continuity_status": "verified",
-   "_corrected_by": "3B-6.2.3.1.0.3"
+   "_corrected_by": "3B-6.2.3.1.0.3",
+   "_corrected_by_2": "3B-6.2.3.1.0.3.1"
   },
   {
    "tr_candidate": "H00016",
@@ -741,7 +744,8 @@
    },
    "conclusion": "H00016：可进入**原始数据隔离层**；可作为**已验证独立序列**；**不得**正式准入（时点可用性 unknown）",
    "_original_continuity_status": "verified",
-   "_corrected_by": "3B-6.2.3.1.0.3"
+   "_corrected_by": "3B-6.2.3.1.0.3",
+   "_corrected_by_2": "3B-6.2.3.1.0.3.1"
   },
   {
    "tr_candidate": "H20539",
@@ -911,7 +915,8 @@
    },
    "conclusion": "H20539：可进入**原始数据隔离层**；可作为**已验证独立序列**；**不得**正式准入（时点可用性 unknown）",
    "_original_continuity_status": "verified",
-   "_corrected_by": "3B-6.2.3.1.0.3"
+   "_corrected_by": "3B-6.2.3.1.0.3",
+   "_corrected_by_2": "3B-6.2.3.1.0.3.1"
   },
   {
    "tr_candidate": "399997CNY02",
@@ -1064,11 +1069,12 @@
      "validated_series_candidate": "身份 + 口径 + 接口 + 质量 + 覆盖verified + 连续verified",
      "formal_series_admitted": "validated + 映射 + 时点可用"
     },
-    "proxy_qualified_series_candidate": true
+    "proxy_qualified_series_candidate": false
    },
    "conclusion": "399997CNY02：可进入**原始数据隔离层**；可作为**已验证独立序列**；**不得**正式准入（时点可用性 unknown）",
    "_original_continuity_status": "verified",
-   "_corrected_by": "3B-6.2.3.1.0.3"
+   "_corrected_by": "3B-6.2.3.1.0.3",
+   "_corrected_by_2": "3B-6.2.3.1.0.3.1"
   },
   {
    "tr_candidate": "H20184",
@@ -1240,7 +1246,8 @@
    },
    "conclusion": "H20184：可进入**原始数据隔离层**；**不可**作为已验证序列（数据质量）；**不得**正式准入（时点可用性 unknown）",
    "_original_continuity_status": "verified",
-   "_corrected_by": "3B-6.2.3.1.0.3"
+   "_corrected_by": "3B-6.2.3.1.0.3",
+   "_corrected_by_2": "3B-6.2.3.1.0.3.1"
   },
   {
    "tr_candidate": "H00942",
@@ -1410,7 +1417,8 @@
    },
    "conclusion": "H00942：可进入**原始数据隔离层**；可作为**已验证独立序列**；**不得**正式准入（时点可用性 unknown）",
    "_original_continuity_status": "verified",
-   "_corrected_by": "3B-6.2.3.1.0.3"
+   "_corrected_by": "3B-6.2.3.1.0.3",
+   "_corrected_by_2": "3B-6.2.3.1.0.3.1"
   },
   {
    "tr_candidate": "H00922",
@@ -1580,7 +1588,8 @@
    },
    "conclusion": "H00922：可进入**原始数据隔离层**；可作为**已验证独立序列**；**不得**正式准入（时点可用性 unknown）",
    "_original_continuity_status": "verified",
-   "_corrected_by": "3B-6.2.3.1.0.3"
+   "_corrected_by": "3B-6.2.3.1.0.3",
+   "_corrected_by_2": "3B-6.2.3.1.0.3.1"
   },
   {
    "tr_candidate": "H00012",
@@ -1720,7 +1729,8 @@
    },
    "conclusion": "H00012：可进入**原始数据隔离层**；**不可**作为已验证序列（覆盖=unknown, 连续=unknown）；**不得**正式准入（时点可用性 unknown）",
    "_original_continuity_status": "unknown",
-   "_corrected_by": "3B-6.2.3.1.0.3"
+   "_corrected_by": "3B-6.2.3.1.0.3",
+   "_corrected_by_2": "3B-6.2.3.1.0.3.1"
   },
   {
    "tr_candidate": "N00012",
@@ -1860,7 +1870,8 @@
    },
    "conclusion": "N00012：可进入**原始数据隔离层**；**不可**作为已验证序列（覆盖=unknown, 连续=unknown）；**不得**正式准入（时点可用性 unknown）",
    "_original_continuity_status": "unknown",
-   "_corrected_by": "3B-6.2.3.1.0.3"
+   "_corrected_by": "3B-6.2.3.1.0.3",
+   "_corrected_by_2": "3B-6.2.3.1.0.3.1"
   },
   {
    "tr_candidate": "H20930",
@@ -2003,7 +2014,8 @@
    },
    "conclusion": "H20930：可进入**原始数据隔离层**；**不可**作为已验证序列（覆盖=unknown, 连续=unknown）；**不得**正式准入（时点可用性 unknown）",
    "_original_continuity_status": "unknown",
-   "_corrected_by": "3B-6.2.3.1.0.3"
+   "_corrected_by": "3B-6.2.3.1.0.3",
+   "_corrected_by_2": "3B-6.2.3.1.0.3.1"
   }
  ],
  "summary": {
@@ -2030,7 +2042,7 @@
     "continuity_verified_official_calendar": 0,
     "continuity_verified_against_proxy_calendar": 1,
     "continuity_has_unresolved_suspicion": 8,
-    "proxy_qualified_series_candidate": 1
+    "proxy_qualified_series_candidate": 0
    },
    "bond": {
     "candidate_count": 2,
@@ -2074,7 +2086,7 @@
   "totals": {
    "raw_data_layer_ingest_candidate": 12,
    "validated_series_candidate": 0,
-   "proxy_qualified_series_candidate": 1,
+   "proxy_qualified_series_candidate": 0,
    "formal_series_admitted": 0
   },
   "gates": {
@@ -2127,8 +2139,11 @@
    "continuity_verified_against_proxy_calendar": 1,
    "continuity_has_unresolved_suspicion": 8,
    "proxy_qualified_series_candidate": 1
-  }
+  },
+  "proxy_qualified_before_3_0_3_1": 1
  },
  "_corrected_by": "3B-6.2.3.1.0.3",
- "_correction_note": "已按 3B-6.2.3.1.0.3 修正：8 只股票候选连续性由 verified 改为 has_unresolved_suspicion；validated_series_candidate 由 8 改为 0；新增 proxy_qualified_series_candidate=1（399997CNY02）。原始值见 _superseded_snapshot。"
+ "_correction_note": "已按 3B-6.2.3.1.0.3 修正：8 只股票候选连续性由 verified 改为 has_unresolved_suspicion；validated_series_candidate 由 8 改为 0；新增 proxy_qualified_series_candidate=1（399997CNY02）。原始值见 _superseded_snapshot。",
+ "_corrected_by_2": "3B-6.2.3.1.0.3.1",
+ "_correction_note_2": "proxy_qualified_series_candidate 由 1 改为 0：代理验证准入补上「真实历史起点已知」条件。399997CNY02 保留 verified_against_proxy_calendar 等级，但 real_history_start=unknown 故不再满足代理验证。"
 }

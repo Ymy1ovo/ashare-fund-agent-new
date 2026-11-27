@@ -1,7 +1,7 @@
 {
  "phase": "3B-6.2.3.1.0.3",
  "task": "连续性证据等级与下一阶段准入统计最终一致性修正",
- "generated_at": "2026-11-27T15:54:45",
+ "generated_at": "2026-11-27T16:26:36",
  "baseline_head": "03f72f061ce16bd1f8d21c8847d7dca3a2052194",
  "read_only": true,
  "no_redownload": true,
@@ -65,7 +65,7 @@
    "calendar_is_official": false,
    "continuity_level": "has_unresolved_suspicion",
    "continuity_raw_020": "has_unresolved_suspicion",
-   "continuity_raw_010": "verified",
+   "continuity_raw_010": "has_unresolved_suspicion",
    "quality_020": {
     "first_date": "20040101",
     "last_date": "20261126",
@@ -116,7 +116,10 @@
     "reason": "相对 A 股交易日历**代理**无缺失（非官方发布日历）",
     "coverage_anchor": "second_row_unconfirmed",
     "coverage_anchor_note": "覆盖核验起点为第二行，但**第二行未被确认为真实历史起点**；覆盖率结论仅表示「自该行起相对日历无缺失」，不代表真实历史起点已确认",
-    "continuity_note": "存在 1 个疑似休市占位行，**无官方日历证据，不得判为 verified**"
+    "continuity_note": "存在 1 个疑似休市占位行，**无官方日历证据，不得判为 verified**",
+    "continuity_status_original": "has_unresolved_suspicion",
+    "continuity_level": "has_unresolved_suspicion",
+    "continuity_level_definition": "存在疑似休市占位行但无官方日历证据"
    },
    "synthetic_020": {
     "status": "strong_inference",
@@ -192,6 +195,10 @@
      "真实历史起点未知",
      "时点可用性"
     ],
+    "proxy_blockers": [
+     "连续性=has_unresolved_suspicion",
+     "真实历史起点未知"
+    ],
     "evidence_snapshot": {
      "official_identity_verified": true,
      "return_basis_verified": true,
@@ -204,9 +211,11 @@
      "real_history_start": "unknown",
      "synthetic_status": "strong_inference"
     },
-    "note": "可进原始隔离层；不得作为已验证序列；连续性存在未解决疑点；不得正式准入"
+    "note": "可进原始隔离层；不得作为已验证序列；连续性存在未解决疑点；不得正式准入",
+    "proxy_qualified_original": false
    },
-   "conflict_with_010": true
+   "conflict_with_010": false,
+   "_corrected_by": "3B-6.2.3.1.0.3.1"
   },
   {
    "tr_candidate": "H00905",
@@ -217,7 +226,7 @@
    "calendar_is_official": false,
    "continuity_level": "has_unresolved_suspicion",
    "continuity_raw_020": "has_unresolved_suspicion",
-   "continuity_raw_010": "verified",
+   "continuity_raw_010": "has_unresolved_suspicion",
    "quality_020": {
     "first_date": "20040101",
     "last_date": "20261126",
@@ -268,7 +277,10 @@
     "reason": "相对 A 股交易日历**代理**无缺失（非官方发布日历）",
     "coverage_anchor": "second_row_unconfirmed",
     "coverage_anchor_note": "覆盖核验起点为第二行，但**第二行未被确认为真实历史起点**；覆盖率结论仅表示「自该行起相对日历无缺失」，不代表真实历史起点已确认",
-    "continuity_note": "存在 1 个疑似休市占位行，**无官方日历证据，不得判为 verified**"
+    "continuity_note": "存在 1 个疑似休市占位行，**无官方日历证据，不得判为 verified**",
+    "continuity_status_original": "has_unresolved_suspicion",
+    "continuity_level": "has_unresolved_suspicion",
+    "continuity_level_definition": "存在疑似休市占位行但无官方日历证据"
    },
    "synthetic_020": {
     "status": "strong_inference",
@@ -344,6 +356,10 @@
      "真实历史起点未知",
      "时点可用性"
     ],
+    "proxy_blockers": [
+     "连续性=has_unresolved_suspicion",
+     "真实历史起点未知"
+    ],
     "evidence_snapshot": {
      "official_identity_verified": true,
      "return_basis_verified": true,
@@ -356,9 +372,11 @@
      "real_history_start": "unknown",
      "synthetic_status": "strong_inference"
     },
-    "note": "可进原始隔离层；不得作为已验证序列；连续性存在未解决疑点；不得正式准入"
+    "note": "可进原始隔离层；不得作为已验证序列；连续性存在未解决疑点；不得正式准入",
+    "proxy_qualified_original": false
    },
-   "conflict_with_010": true
+   "conflict_with_010": false,
+   "_corrected_by": "3B-6.2.3.1.0.3.1"
   },
   {
    "tr_candidate": "H00906",
@@ -369,7 +387,7 @@
    "calendar_is_official": false,
    "continuity_level": "has_unresolved_suspicion",
    "continuity_raw_020": "has_unresolved_suspicion",
-   "continuity_raw_010": "verified",
+   "continuity_raw_010": "has_unresolved_suspicion",
    "quality_020": {
     "first_date": "20040101",
     "last_date": "20261126",
@@ -420,7 +438,10 @@
     "reason": "相对 A 股交易日历**代理**无缺失（非官方发布日历）",
     "coverage_anchor": "second_row_unconfirmed",
     "coverage_anchor_note": "覆盖核验起点为第二行，但**第二行未被确认为真实历史起点**；覆盖率结论仅表示「自该行起相对日历无缺失」，不代表真实历史起点已确认",
-    "continuity_note": "存在 1 个疑似休市占位行，**无官方日历证据，不得判为 verified**"
+    "continuity_note": "存在 1 个疑似休市占位行，**无官方日历证据，不得判为 verified**",
+    "continuity_status_original": "has_unresolved_suspicion",
+    "continuity_level": "has_unresolved_suspicion",
+    "continuity_level_definition": "存在疑似休市占位行但无官方日历证据"
    },
    "synthetic_020": {
     "status": "strong_inference",
@@ -496,6 +517,10 @@
      "真实历史起点未知",
      "时点可用性"
     ],
+    "proxy_blockers": [
+     "连续性=has_unresolved_suspicion",
+     "真实历史起点未知"
+    ],
     "evidence_snapshot": {
      "official_identity_verified": true,
      "return_basis_verified": true,
@@ -508,9 +533,11 @@
      "real_history_start": "unknown",
      "synthetic_status": "strong_inference"
     },
-    "note": "可进原始隔离层；不得作为已验证序列；连续性存在未解决疑点；不得正式准入"
+    "note": "可进原始隔离层；不得作为已验证序列；连续性存在未解决疑点；不得正式准入",
+    "proxy_qualified_original": false
    },
-   "conflict_with_010": true
+   "conflict_with_010": false,
+   "_corrected_by": "3B-6.2.3.1.0.3.1"
   },
   {
    "tr_candidate": "H00016",
@@ -521,7 +548,7 @@
    "calendar_is_official": false,
    "continuity_level": "has_unresolved_suspicion",
    "continuity_raw_020": "has_unresolved_suspicion",
-   "continuity_raw_010": "verified",
+   "continuity_raw_010": "has_unresolved_suspicion",
    "quality_020": {
     "first_date": "20040101",
     "last_date": "20261126",
@@ -572,7 +599,10 @@
     "reason": "相对 A 股交易日历**代理**无缺失（非官方发布日历）",
     "coverage_anchor": "second_row_unconfirmed",
     "coverage_anchor_note": "覆盖核验起点为第二行，但**第二行未被确认为真实历史起点**；覆盖率结论仅表示「自该行起相对日历无缺失」，不代表真实历史起点已确认",
-    "continuity_note": "存在 1 个疑似休市占位行，**无官方日历证据，不得判为 verified**"
+    "continuity_note": "存在 1 个疑似休市占位行，**无官方日历证据，不得判为 verified**",
+    "continuity_status_original": "has_unresolved_suspicion",
+    "continuity_level": "has_unresolved_suspicion",
+    "continuity_level_definition": "存在疑似休市占位行但无官方日历证据"
    },
    "synthetic_020": {
     "status": "strong_inference",
@@ -648,6 +678,10 @@
      "真实历史起点未知",
      "时点可用性"
     ],
+    "proxy_blockers": [
+     "连续性=has_unresolved_suspicion",
+     "真实历史起点未知"
+    ],
     "evidence_snapshot": {
      "official_identity_verified": true,
      "return_basis_verified": true,
@@ -660,9 +694,11 @@
      "real_history_start": "unknown",
      "synthetic_status": "strong_inference"
     },
-    "note": "可进原始隔离层；不得作为已验证序列；连续性存在未解决疑点；不得正式准入"
+    "note": "可进原始隔离层；不得作为已验证序列；连续性存在未解决疑点；不得正式准入",
+    "proxy_qualified_original": false
    },
-   "conflict_with_010": true
+   "conflict_with_010": false,
+   "_corrected_by": "3B-6.2.3.1.0.3.1"
   },
   {
    "tr_candidate": "H20539",
@@ -673,7 +709,7 @@
    "calendar_is_official": false,
    "continuity_level": "has_unresolved_suspicion",
    "continuity_raw_020": "has_unresolved_suspicion",
-   "continuity_raw_010": "verified",
+   "continuity_raw_010": "has_unresolved_suspicion",
    "quality_020": {
     "first_date": "20040101",
     "last_date": "20261126",
@@ -724,7 +760,10 @@
     "reason": "相对 A 股交易日历**代理**无缺失（非官方发布日历）",
     "coverage_anchor": "second_row_unconfirmed",
     "coverage_anchor_note": "覆盖核验起点为第二行，但**第二行未被确认为真实历史起点**；覆盖率结论仅表示「自该行起相对日历无缺失」，不代表真实历史起点已确认",
-    "continuity_note": "存在 1 个疑似休市占位行，**无官方日历证据，不得判为 verified**"
+    "continuity_note": "存在 1 个疑似休市占位行，**无官方日历证据，不得判为 verified**",
+    "continuity_status_original": "has_unresolved_suspicion",
+    "continuity_level": "has_unresolved_suspicion",
+    "continuity_level_definition": "存在疑似休市占位行但无官方日历证据"
    },
    "synthetic_020": {
     "status": "strong_inference",
@@ -800,6 +839,10 @@
      "真实历史起点未知",
      "时点可用性"
     ],
+    "proxy_blockers": [
+     "连续性=has_unresolved_suspicion",
+     "真实历史起点未知"
+    ],
     "evidence_snapshot": {
      "official_identity_verified": true,
      "return_basis_verified": true,
@@ -812,9 +855,11 @@
      "real_history_start": "unknown",
      "synthetic_status": "strong_inference"
     },
-    "note": "可进原始隔离层；不得作为已验证序列；连续性存在未解决疑点；不得正式准入"
+    "note": "可进原始隔离层；不得作为已验证序列；连续性存在未解决疑点；不得正式准入",
+    "proxy_qualified_original": false
    },
-   "conflict_with_010": true
+   "conflict_with_010": false,
+   "_corrected_by": "3B-6.2.3.1.0.3.1"
   },
   {
    "tr_candidate": "399997CNY02",
@@ -825,7 +870,7 @@
    "calendar_is_official": false,
    "continuity_level": "verified_against_proxy_calendar",
    "continuity_raw_020": "verified",
-   "continuity_raw_010": "verified",
+   "continuity_raw_010": "verified_against_proxy_calendar",
    "quality_020": {
     "first_date": "20040101",
     "last_date": "20261126",
@@ -860,7 +905,10 @@
     "reason": "相对 A 股交易日历**代理**无缺失（非官方发布日历）",
     "coverage_anchor": "second_row_unconfirmed",
     "coverage_anchor_note": "覆盖核验起点为第二行，但**第二行未被确认为真实历史起点**；覆盖率结论仅表示「自该行起相对日历无缺失」，不代表真实历史起点已确认",
-    "continuity_note": "无日历外日期"
+    "continuity_note": "无日历外日期",
+    "continuity_status_original": "verified",
+    "continuity_level": "verified_against_proxy_calendar",
+    "continuity_level_definition": "相对**项目 A 股交易日历代理**验证连续；**不是官方发布日历**"
    },
    "synthetic_020": {
     "status": "strong_inference",
@@ -929,12 +977,15 @@
     "continuity_level_definition": "相对**项目 A 股交易日历代理**验证连续；**不是官方发布日历**",
     "raw_data_layer_ingest_candidate": true,
     "validated_series_candidate": false,
-    "proxy_qualified_series_candidate": true,
+    "proxy_qualified_series_candidate": false,
     "formal_series_admitted": false,
     "blockers": [
      "连续性=verified_against_proxy_calendar",
      "真实历史起点未知",
      "时点可用性"
+    ],
+    "proxy_blockers": [
+     "真实历史起点未知"
     ],
     "evidence_snapshot": {
      "official_identity_verified": true,
@@ -948,9 +999,11 @@
      "real_history_start": "unknown",
      "synthetic_status": "strong_inference"
     },
-    "note": "可进原始隔离层；**仅代理日历验证**，不得称官方验证；不得正式准入"
+    "note": "可进原始隔离层；连续性已达代理等级，但**代理验证候选仍未通过**；不得正式准入",
+    "proxy_qualified_original": false
    },
-   "conflict_with_010": false
+   "conflict_with_010": true,
+   "_corrected_by": "3B-6.2.3.1.0.3.1"
   },
   {
    "tr_candidate": "H20184",
@@ -961,7 +1014,7 @@
    "calendar_is_official": false,
    "continuity_level": "has_unresolved_suspicion",
    "continuity_raw_020": "has_unresolved_suspicion",
-   "continuity_raw_010": "verified",
+   "continuity_raw_010": "has_unresolved_suspicion",
    "quality_020": {
     "first_date": "20040101",
     "last_date": "20261126",
@@ -1014,7 +1067,10 @@
     "reason": "相对 A 股交易日历**代理**无缺失（非官方发布日历）",
     "coverage_anchor": "second_row_unconfirmed",
     "coverage_anchor_note": "覆盖核验起点为第二行，但**第二行未被确认为真实历史起点**；覆盖率结论仅表示「自该行起相对日历无缺失」，不代表真实历史起点已确认",
-    "continuity_note": "存在 1 个疑似休市占位行，**无官方日历证据，不得判为 verified**"
+    "continuity_note": "存在 1 个疑似休市占位行，**无官方日历证据，不得判为 verified**",
+    "continuity_status_original": "has_unresolved_suspicion",
+    "continuity_level": "has_unresolved_suspicion",
+    "continuity_level_definition": "存在疑似休市占位行但无官方日历证据"
    },
    "synthetic_020": {
     "status": "strong_inference",
@@ -1091,6 +1147,11 @@
      "真实历史起点未知",
      "时点可用性"
     ],
+    "proxy_blockers": [
+     "数据质量",
+     "连续性=has_unresolved_suspicion",
+     "真实历史起点未知"
+    ],
     "evidence_snapshot": {
      "official_identity_verified": true,
      "return_basis_verified": true,
@@ -1103,9 +1164,11 @@
      "real_history_start": "unknown",
      "synthetic_status": "strong_inference"
     },
-    "note": "可进原始隔离层；不得作为已验证序列；数据质量未通过；连续性存在未解决疑点；不得正式准入"
+    "note": "可进原始隔离层；不得作为已验证序列；数据质量未通过；连续性存在未解决疑点；不得正式准入",
+    "proxy_qualified_original": false
    },
-   "conflict_with_010": true
+   "conflict_with_010": false,
+   "_corrected_by": "3B-6.2.3.1.0.3.1"
   },
   {
    "tr_candidate": "H00942",
@@ -1116,7 +1179,7 @@
    "calendar_is_official": false,
    "continuity_level": "has_unresolved_suspicion",
    "continuity_raw_020": "has_unresolved_suspicion",
-   "continuity_raw_010": "verified",
+   "continuity_raw_010": "has_unresolved_suspicion",
    "quality_020": {
     "first_date": "20040101",
     "last_date": "20261126",
@@ -1167,7 +1230,10 @@
     "reason": "相对 A 股交易日历**代理**无缺失（非官方发布日历）",
     "coverage_anchor": "second_row_unconfirmed",
     "coverage_anchor_note": "覆盖核验起点为第二行，但**第二行未被确认为真实历史起点**；覆盖率结论仅表示「自该行起相对日历无缺失」，不代表真实历史起点已确认",
-    "continuity_note": "存在 1 个疑似休市占位行，**无官方日历证据，不得判为 verified**"
+    "continuity_note": "存在 1 个疑似休市占位行，**无官方日历证据，不得判为 verified**",
+    "continuity_status_original": "has_unresolved_suspicion",
+    "continuity_level": "has_unresolved_suspicion",
+    "continuity_level_definition": "存在疑似休市占位行但无官方日历证据"
    },
    "synthetic_020": {
     "status": "strong_inference",
@@ -1243,6 +1309,10 @@
      "真实历史起点未知",
      "时点可用性"
     ],
+    "proxy_blockers": [
+     "连续性=has_unresolved_suspicion",
+     "真实历史起点未知"
+    ],
     "evidence_snapshot": {
      "official_identity_verified": true,
      "return_basis_verified": true,
@@ -1255,9 +1325,11 @@
      "real_history_start": "unknown",
      "synthetic_status": "strong_inference"
     },
-    "note": "可进原始隔离层；不得作为已验证序列；连续性存在未解决疑点；不得正式准入"
+    "note": "可进原始隔离层；不得作为已验证序列；连续性存在未解决疑点；不得正式准入",
+    "proxy_qualified_original": false
    },
-   "conflict_with_010": true
+   "conflict_with_010": false,
+   "_corrected_by": "3B-6.2.3.1.0.3.1"
   },
   {
    "tr_candidate": "H00922",
@@ -1268,7 +1340,7 @@
    "calendar_is_official": false,
    "continuity_level": "has_unresolved_suspicion",
    "continuity_raw_020": "has_unresolved_suspicion",
-   "continuity_raw_010": "verified",
+   "continuity_raw_010": "has_unresolved_suspicion",
    "quality_020": {
     "first_date": "20040101",
     "last_date": "20261126",
@@ -1319,7 +1391,10 @@
     "reason": "相对 A 股交易日历**代理**无缺失（非官方发布日历）",
     "coverage_anchor": "second_row_unconfirmed",
     "coverage_anchor_note": "覆盖核验起点为第二行，但**第二行未被确认为真实历史起点**；覆盖率结论仅表示「自该行起相对日历无缺失」，不代表真实历史起点已确认",
-    "continuity_note": "存在 1 个疑似休市占位行，**无官方日历证据，不得判为 verified**"
+    "continuity_note": "存在 1 个疑似休市占位行，**无官方日历证据，不得判为 verified**",
+    "continuity_status_original": "has_unresolved_suspicion",
+    "continuity_level": "has_unresolved_suspicion",
+    "continuity_level_definition": "存在疑似休市占位行但无官方日历证据"
    },
    "synthetic_020": {
     "status": "strong_inference",
@@ -1395,6 +1470,10 @@
      "真实历史起点未知",
      "时点可用性"
     ],
+    "proxy_blockers": [
+     "连续性=has_unresolved_suspicion",
+     "真实历史起点未知"
+    ],
     "evidence_snapshot": {
      "official_identity_verified": true,
      "return_basis_verified": true,
@@ -1407,9 +1486,11 @@
      "real_history_start": "unknown",
      "synthetic_status": "strong_inference"
     },
-    "note": "可进原始隔离层；不得作为已验证序列；连续性存在未解决疑点；不得正式准入"
+    "note": "可进原始隔离层；不得作为已验证序列；连续性存在未解决疑点；不得正式准入",
+    "proxy_qualified_original": false
    },
-   "conflict_with_010": true
+   "conflict_with_010": false,
+   "_corrected_by": "3B-6.2.3.1.0.3.1"
   },
   {
    "tr_candidate": "H00012",
@@ -1450,7 +1531,10 @@
     "coverage_anchor": "second_row_unconfirmed",
     "coverage_anchor_note": "覆盖核验起点为第二行，但**第二行未被确认为真实历史起点**；覆盖率结论仅表示「自该行起相对日历无缺失」，不代表真实历史起点已确认",
     "continuity_note": "适用日历未取得",
-    "outside_calendar_detail": []
+    "outside_calendar_detail": [],
+    "continuity_status_original": "unknown",
+    "continuity_level": "unknown",
+    "continuity_level_definition": "适用市场日历未取得，无法核验"
    },
    "synthetic_020": {
     "status": "strong_inference",
@@ -1529,6 +1613,13 @@
      "真实历史起点未知",
      "时点可用性"
     ],
+    "proxy_blockers": [
+     "收益口径",
+     "映射证据",
+     "覆盖=unknown",
+     "连续性=unknown",
+     "真实历史起点未知"
+    ],
     "evidence_snapshot": {
      "official_identity_verified": true,
      "return_basis_verified": false,
@@ -1541,9 +1632,11 @@
      "real_history_start": "unknown",
      "synthetic_status": "strong_inference"
     },
-    "note": "可进原始隔离层；不得作为已验证序列；不得正式准入"
+    "note": "可进原始隔离层；不得作为已验证序列；不得正式准入",
+    "proxy_qualified_original": false
    },
-   "conflict_with_010": false
+   "conflict_with_010": false,
+   "_corrected_by": "3B-6.2.3.1.0.3.1"
   },
   {
    "tr_candidate": "N00012",
@@ -1584,7 +1677,10 @@
     "coverage_anchor": "second_row_unconfirmed",
     "coverage_anchor_note": "覆盖核验起点为第二行，但**第二行未被确认为真实历史起点**；覆盖率结论仅表示「自该行起相对日历无缺失」，不代表真实历史起点已确认",
     "continuity_note": "适用日历未取得",
-    "outside_calendar_detail": []
+    "outside_calendar_detail": [],
+    "continuity_status_original": "unknown",
+    "continuity_level": "unknown",
+    "continuity_level_definition": "适用市场日历未取得，无法核验"
    },
    "synthetic_020": {
     "status": "strong_inference",
@@ -1663,6 +1759,13 @@
      "真实历史起点未知",
      "时点可用性"
     ],
+    "proxy_blockers": [
+     "收益口径",
+     "映射证据",
+     "覆盖=unknown",
+     "连续性=unknown",
+     "真实历史起点未知"
+    ],
     "evidence_snapshot": {
      "official_identity_verified": true,
      "return_basis_verified": false,
@@ -1675,9 +1778,11 @@
      "real_history_start": "unknown",
      "synthetic_status": "strong_inference"
     },
-    "note": "可进原始隔离层；不得作为已验证序列；不得正式准入"
+    "note": "可进原始隔离层；不得作为已验证序列；不得正式准入",
+    "proxy_qualified_original": false
    },
-   "conflict_with_010": false
+   "conflict_with_010": false,
+   "_corrected_by": "3B-6.2.3.1.0.3.1"
   },
   {
    "tr_candidate": "H20930",
@@ -1718,7 +1823,10 @@
     "coverage_anchor": "second_row_unconfirmed",
     "coverage_anchor_note": "覆盖核验起点为第二行，但**第二行未被确认为真实历史起点**；覆盖率结论仅表示「自该行起相对日历无缺失」，不代表真实历史起点已确认",
     "continuity_note": "适用日历未取得",
-    "outside_calendar_detail": []
+    "outside_calendar_detail": [],
+    "continuity_status_original": "unknown",
+    "continuity_level": "unknown",
+    "continuity_level_definition": "适用市场日历未取得，无法核验"
    },
    "synthetic_020": {
     "status": "strong_inference",
@@ -1795,6 +1903,11 @@
      "真实历史起点未知",
      "时点可用性"
     ],
+    "proxy_blockers": [
+     "覆盖=unknown",
+     "连续性=unknown",
+     "真实历史起点未知"
+    ],
     "evidence_snapshot": {
      "official_identity_verified": true,
      "return_basis_verified": true,
@@ -1807,9 +1920,11 @@
      "real_history_start": "unknown",
      "synthetic_status": "strong_inference"
     },
-    "note": "可进原始隔离层；不得作为已验证序列；不得正式准入"
+    "note": "可进原始隔离层；不得作为已验证序列；不得正式准入",
+    "proxy_qualified_original": false
    },
-   "conflict_with_010": false
+   "conflict_with_010": false,
+   "_corrected_by": "3B-6.2.3.1.0.3.1"
   }
  ],
  "summary": {
@@ -1827,7 +1942,7 @@
     "continuity_unknown": 0,
     "raw_data_layer_ingest_candidate": 9,
     "validated_series_candidate": 0,
-    "proxy_qualified_series_candidate": 1,
+    "proxy_qualified_series_candidate": 0,
     "formal_series_admitted": 0
    },
    "bond": {
@@ -1869,10 +1984,10 @@
    "continuity_unknown": 3,
    "raw_data_layer_ingest_candidate": 12,
    "validated_series_candidate": 0,
-   "proxy_qualified_series_candidate": 1,
+   "proxy_qualified_series_candidate": 0,
    "formal_series_admitted": 0
   },
-  "conflicts_resolved": 8,
+  "conflicts_resolved": 1,
   "continuity_levels": {
    "verified_official_calendar": {
     "rank": 5,
@@ -1914,7 +2029,8 @@
    "h20184_quality_failed": true,
    "bond_hk_unknown": true,
    "no_formal_admitted": true,
-   "ingest_all_12": true
+   "ingest_all_12": true,
+   "no_proxy_qualified": true
   }
  },
  "evidence_manifest": {
@@ -1922,5 +2038,21 @@
   "referenced_exists": 56,
   "missing_count": 0,
   "missing_files": []
- }
+ },
+ "_superseded_snapshot": {
+  "note": "保留 3B-6.2.3.1.0.3 原始 proxy_qualified 判定；该判定缺少真实历史起点条件，已被 3.0.3.1 修正",
+  "original_totals": {
+   "continuity_verified_official_calendar": 0,
+   "continuity_verified_against_proxy_calendar": 1,
+   "continuity_has_unresolved_suspicion": 8,
+   "continuity_has_issues": 0,
+   "continuity_unknown": 3,
+   "raw_data_layer_ingest_candidate": 12,
+   "validated_series_candidate": 0,
+   "proxy_qualified_series_candidate": 0,
+   "formal_series_admitted": 0
+  }
+ },
+ "_corrected_by": "3B-6.2.3.1.0.3.1",
+ "_correction_note": "proxy_qualified_series_candidate 由 1 改为 0：代理验证准入补上「真实历史起点已知」条件。399997CNY02 保留 verified_against_proxy_calendar 等级，但因 real_history_start=unknown 不再满足代理验证。原始判定见 _superseded_snapshot 与每候选 proxy_qualified_original。"
 }

@@ -1,5 +1,121 @@
 # 变更日志
 
+## 2026-11-27 — 阶段3B-6.2.3.1.0.3.1 代理验证准入缺失真实历史起点条件修复
+
+**只读修正。不重新下载数据，不修改数据库，不开始正式序列建设。**
+
+**基线与提交**
+
+| 项 | 值 |
+| --- | --- |
+| 任务基线 HEAD | `586cd83b5a86728c10556079ac69fde4c66b3007` |
+
+**一、问题**
+
+`compute_admission()` 两个准入条件判据**不对称**：
+
+| 准入状态 | 修正前 | 问题 |
+| --- | --- | --- |
+| `validated_series_candidate` | 身份+口径+映射+质量+覆盖+**官方日历连续**+**真实起点已知** | 正确 |
+| `proxy_qualified_series_candidate` | 身份+口径+映射+质量+覆盖+代理日历连续 | **缺少「真实起点已知」** |
+
+报告明确规定：代理验证候选与已验证候选使用**相同**的身份/口径/映射/质量/覆盖/
+**历史起点**条件，仅把连续性等级要求放宽为代理日历验证。
+
+**二、修正**
+
+```python
+proxy_qualified = bool(
+    identity and basis and mapping and quality and coverage
+    and cont_level in ("verified_official_calendar",
+                       "verified_against_proxy_calendar")
+    and real_start_known)      # ← 新增
+```
+
+同时新增 `proxy_blockers` 字段，独立记录代理验证的阻断原因。
+
+**三、结果**
+
+| 状态 | 修正前 | **修正后** |
+| --- | ---: | ---: |
+| `raw_data_layer_ingest_candidate` | 12 | **12** |
+| `validated_series_candidate` | 0 | **0** |
+| **`proxy_qualified_series_candidate`** | **1** | **0** |
+| `formal_series_admitted` | 0 | **0** |
+
+**连续性五态未变**：官方 0 / 代理 1 / 疑似 8 / 有问题 0 / 未知 3。
+
+**连续性证据等级保持不变，只是准入判定更严格。**
+
+**四、`399997CNY02` 完整状态**
+
+| 项 | 值 |
+| --- | --- |
+| `continuity_level` | **`verified_against_proxy_calendar`（保留）** |
+| 覆盖状态 | `verified`（保留，相对 A 股代理日历） |
+| 连续性原始状态 | `verified`（保留） |
+| `calendar_is_official` | `false` |
+| `raw_data_layer_ingest_candidate` | **true** |
+| `validated_series_candidate` | **false** |
+| **`proxy_qualified_series_candidate`** | **false（本轮修正）** |
+| `formal_series_admitted` | **false** |
+
+**阻断原因**：
+
+| 字段 | 内容 |
+| --- | --- |
+| `blockers` | `["连续性=verified_against_proxy_calendar", "真实历史起点未知", "时点可用性"]` |
+| **`proxy_blockers`** | **`["真实历史起点未知"]`** |
+
+**代理日历审计结果完整保留，未删除、未改写。**
+
+**五、为什么真实起点是关键条件**
+
+`399997CNY02` 的 `real_history_start` 为 `unknown`：
+
+| 事实 | 说明 |
+| --- | --- |
+| 首行 `20040101` | 请求起始日合成行（`strong_inference`） |
+| 候选自身对照证据 | **无**（12/12 候选均无） |
+| 第二行 `20081231` | **未被确认为真实历史起点** |
+
+**如果不知道序列从哪天开始是真实的，就无法判定「覆盖」和「连续性」是否有意义。**
+代理日历下的「无缺失」可能只是因为起点取错了。
+
+**六、新增模块**
+
+- `tests/test_3b6_2_3_1_0_3_1_proxy_start.py`：**28 项**专项测试。
+- `scripts/audit_3b6_2_3_1_0_3_consistency.py`：修正 `compute_admission()`。
+
+**七、测试**
+
+| 项目 | 结果 |
+| --- | --- |
+| 专项测试 | **28 passed / 0 failed / 0 skipped** |
+| 全量测试 | 2815 → **2843**（**+28**） |
+
+**八、数据库与证据不变性**
+
+| 项 | 值 |
+| --- | --- |
+| 数据库 SHA256 | `1671e4037cd265a2dead8b78d43614189a782385ca450ac6c2de3c4ff36ee873`（未变） |
+| `index_daily` 总行数 | 50,603（未变） |
+| 全收益代码在库内 | **全部 0** |
+| `integrity_check` | ok |
+| `foreign_key_check` | 0 |
+| 官方原始证据（basic_/hist_/csindex_） | SHA256 全部一致 |
+| 是否重新下载 | **否** |
+
+**九、边界**
+
+未修改正式数据库、未修改 Schema、未写入全收益行情、未修改原始指数行情、
+未修改基金净值、未修改正式映射、未开放回测或正式排名。
+
+门禁：`ready_for_research_analysis=true`、`ready_for_backtest=false`、
+`ready_for_formal_ranking=false`、`ready_for_3b6_2_3_1_series_build=false`。
+
+---
+
 ## 2026-11-27 — 阶段3B-6.2.3.1.0.3 连续性证据等级与准入统计最终一致性修正
 
 **只读修正。不重新下载数据，不修改数据库，不开始正式序列建设。**

@@ -1,10 +1,10 @@
 {
  "phase": "3B-6.2.3.1.0.3",
- "generated_at": "2026-11-27T16:20:50",
+ "generated_at": "2026-11-27T16:46:09",
  "no_new_download": true,
- "note": "本轮不下载新数据；登记未修改的原始官方证据与本轮产物。被本轮修正的审计 JSON（010/020）不在此登记",
- "referenced_total": 80,
- "referenced_exists": 80,
+ "note": "只登记**未修改的原始官方证据**（basic_/hist_/csindex_ 前缀）；本轮产物与被修正的审计 JSON 不在此登记",
+ "referenced_total": 74,
+ "referenced_exists": 74,
  "missing_count": 0,
  "missing_files": [],
  "files": {
@@ -272,18 +272,6 @@
    "bytes": 1368377,
    "sha256": "d4b0aaf3885df93946f1597e50a43dcee0507fa1c7bce33148ab7bd61015badb"
   },
-  "reports/evidence/phase3B6_2_3_0_4/baseline_after.json": {
-   "purpose": "3B-6.2.3.0.4 对照证据",
-   "exists": true,
-   "bytes": 8758,
-   "sha256": "3c9cc53e1a633ce784066c5bee81e5b01b2cb3f94c8ddf0dc845fe1acadc3d74"
-  },
-  "reports/evidence/phase3B6_2_3_0_4/baseline_before.json": {
-   "purpose": "3B-6.2.3.0.4 对照证据",
-   "exists": true,
-   "bytes": 9011,
-   "sha256": "765af9787e54afdcc4c2e8ed4eb90cb0ab7576c0d47ce7fbdff92512243af6ca"
-  },
   "reports/evidence/phase3B6_2_3_0_4/csindex_basic_000012.json": {
    "purpose": "3B-6.2.3.0.4 对照证据",
    "exists": true,
@@ -463,30 +451,6 @@
    "exists": true,
    "bytes": 2237397,
    "sha256": "72c4fcca210dc8031817cad2543e18fbd30e8e1123e65e52a9a412c91ae51a95"
-  },
-  "reports/evidence/phase3B6_2_3_0_4/requests_manifest.json": {
-   "purpose": "3B-6.2.3.0.4 对照证据",
-   "exists": true,
-   "bytes": 5783,
-   "sha256": "30ca04c150dd925ad8bd86bdd551ea31a6002b56a65d9502685eecb52eb81109"
-  },
-  "reports/phase3B6_2_3_1_0_3_audit.json": {
-   "purpose": "本轮产物",
-   "exists": true,
-   "bytes": 73392,
-   "sha256": "6732a6ab91d59680e34de7142456070f4a1b5ea0736c521c61c64ad1b5ecfd91"
-  },
-  "reports/phase3B6_2_3_1_0_3_fix_report.md": {
-   "purpose": "本轮产物",
-   "exists": true,
-   "bytes": 6432,
-   "sha256": "9f1d8616a9b5c58f7e3f1f0cb908d9ecbd467e30f4a990b418f2998e9dc52421"
-  },
-  "reports/phase3B6_2_3_1_0_3_test_report.md": {
-   "purpose": "本轮产物",
-   "exists": true,
-   "bytes": 4578,
-   "sha256": "3492c6a179b91b035566c0d25db326893db6d0a17ce30d422f3db21eb8ceb890"
   }
  }
 }

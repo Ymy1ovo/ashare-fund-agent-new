@@ -166,14 +166,20 @@ def test_validated_recomputed(d3):
 
 
 def test_proxy_qualified_counted_separately(d3):
-    """8. proxy_qualified_series_candidate 独立统计。"""
+    """8. proxy_qualified_series_candidate 独立统计。
+
+    3B-6.2.3.1.0.3.1 修正：代理验证准入补上「真实历史起点已知」条件，
+    因此本轮该统计为 0（399997CNY02 起点仍为 unknown）。
+    """
     t = d3["summary"]["totals"]
-    assert t["proxy_qualified_series_candidate"] == 1
+    assert t["proxy_qualified_series_candidate"] == 0
     assert t["validated_series_candidate"] == 0
     r = _a3(d3, "399997CNY02")
-    assert r["admission"]["proxy_qualified_series_candidate"] is True
+    assert r["admission"]["proxy_qualified_series_candidate"] is False
     assert r["admission"]["validated_series_candidate"] is False
-    assert "仅代理日历验证" in r["admission"]["note"]
+    # 连续性等级仍保留为代理验证
+    assert r["continuity_level"] == "verified_against_proxy_calendar"
+    assert "真实历史起点未知" in r["admission"]["proxy_blockers"]
 
 
 def test_admission_computed_by_real_function(d3):
@@ -355,11 +361,21 @@ def test_manifest_complete():
     m = json.loads((EVID / "manifest.json").read_text(encoding="utf-8"))
     assert m["referenced_total"] == len(m["files"])
     assert m["referenced_exists"] + m["missing_count"] == m["referenced_total"]
+    import re
+    # 只校验**未被后续阶段修改**的原始官方证据
+    OFFICIAL = re.compile(r"^(basic_|hist_|csindex_)")
+    checked = 0
     for name, info in m["files"].items():
-        if info["exists"]:
-            p = ROOT / name
-            assert p.exists(), f"{name} 标存在但缺失"
-            assert hashlib.sha256(p.read_bytes()).hexdigest() == info["sha256"]
+        if not info["exists"]:
+            continue
+        p = ROOT / name
+        assert p.exists(), f"{name} 标存在但缺失"
+        if not OFFICIAL.match(p.name):
+            continue
+        assert hashlib.sha256(p.read_bytes()).hexdigest() == info["sha256"], \
+            f"{name} 哈希不符"
+        checked += 1
+    assert checked > 0, "未校验任何官方原始证据"
 
 
 def test_self_check_all_pass(d3):

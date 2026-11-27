@@ -120,11 +120,15 @@ def compute_admission(cand: dict) -> dict:
     validated = bool(identity and basis and mapping and quality and coverage
                      and cont_ok_for_validated and real_start_known)
 
-    # B'. 代理验证候选：允许代理日历下覆盖+连续，但不含官方等级要求
+    # B'. 代理验证候选
+    # 与 validated 使用**相同**的身份/口径/映射/质量/覆盖/真实起点条件，
+    # 仅把连续性等级要求放宽为「官方或代理日历验证」。
+    # **不得因连续性代理通过就忽略真实历史起点未知。**
     proxy_qualified = bool(
         identity and basis and mapping and quality and coverage
         and cont_level in ("verified_official_calendar",
-                           "verified_against_proxy_calendar"))
+                           "verified_against_proxy_calendar")
+        and real_start_known)
 
     # C. 正式准入：validated + 时点可用
     admitted = bool(validated and pit)
@@ -147,6 +151,24 @@ def compute_admission(cand: dict) -> dict:
     if not pit:
         blockers.append("时点可用性")
 
+    # 代理验证专属阻断（与 validated 共用同一套条件，仅连续性门槛放宽）
+    proxy_blockers = []
+    if not identity:
+        proxy_blockers.append("官方身份")
+    if not basis:
+        proxy_blockers.append("收益口径")
+    if not mapping:
+        proxy_blockers.append("映射证据")
+    if not quality:
+        proxy_blockers.append("数据质量")
+    if not coverage:
+        proxy_blockers.append(f"覆盖={q.get('coverage_status')}")
+    if cont_level not in ("verified_official_calendar",
+                          "verified_against_proxy_calendar"):
+        proxy_blockers.append(f"连续性={cont_level}")
+    if not real_start_known:
+        proxy_blockers.append("真实历史起点未知")
+
     return {
         "tr_candidate": cand["tr_candidate"],
         "price_index": cand["price_index"],
@@ -162,6 +184,7 @@ def compute_admission(cand: dict) -> dict:
         "proxy_qualified_series_candidate": proxy_qualified,
         "formal_series_admitted": admitted,
         "blockers": blockers,
+        "proxy_blockers": proxy_blockers,
         "evidence_snapshot": {
             "official_identity_verified": identity,
             "return_basis_verified": basis,
@@ -190,6 +213,9 @@ def _admission_note(identity, api, validated, proxy_q, admitted,
         parts.append("可作为已验证序列")
     elif proxy_q:
         parts.append("**仅代理日历验证**，不得称官方验证")
+    elif cont_level in ("verified_official_calendar",
+                        "verified_against_proxy_calendar"):
+        parts.append("连续性已达代理等级，但**代理验证候选仍未通过**")
     else:
         parts.append("不得作为已验证序列")
     if not quality:
