@@ -1,6 +1,17 @@
 # 阶段3B-6.2.3.1.0.1 修正报告：全收益审计边界纠偏与准入统计一致性
 
-> **只读审计修正。不重新下载数据，不修改数据库，不开始正式序列建设。**
+> ⚠️ **本报告的部分表述已被 3B-6.2.3.1.0.2 修正**。原报告存在三处不准确：
+>
+> 1. **合成行状态全部标为 `confirmed=True`** —— 实际无任何全收益候选自身的对照证据，
+>    应降级为 `strong_inference`；
+> 2. **`real_history_start` 给出了具体日期** —— 无候选自身对照证据，
+>    应全部为 `unknown`；
+> 3. **`2018-06-18` 被标为 `market_closed_placeholder`** —— 无官方日历证据，
+>    应降为 `suspected_market_closed_placeholder`，连续性不得判 verified。
+>
+> **请以 `reports/phase3B6_2_3_1_0_2_fix_report.md` 为准。**
+>
+> 本报告保留作为历史记录，原文未删除。
 
 **基线 HEAD**：`3a85bd6dc12dbd73ad497d5af62337dc8e2245a2`
 
