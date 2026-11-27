@@ -292,3 +292,117 @@ def test_no_vacuous_assertion():
     txt = Path(__file__).read_text(encoding="utf-8")
     assert ("or " + "True") not in txt
     assert ("assert " + "True") not in txt
+
+
+# ============================================================ 证据来源一致性（3B-6.2.3.0.3.1）
+def _evidence_json(name: str) -> tuple[dict, str]:
+    """读取真实证据文件，返回 (解析结果, SHA256)。"""
+    f = EVID / name
+    assert f.exists(), f"缺证据文件 {name}"
+    raw = f.read_bytes()
+    return json.loads(raw.decode("utf-8")), hashlib.sha256(raw).hexdigest()
+
+
+def test_range_evidence_row_count_is_7():
+    """区间查询实际行数必须为 7（读真实文件，不读报告）。"""
+    d, _ = _evidence_json("range_20130624_20130703.json")
+    rows = d.get("data") or []
+    assert len(rows) == 7
+
+
+def test_range_evidence_last_date_is_0702():
+    """区间查询最后日期必须是 2013-07-02，不是 2013-07-03。"""
+    d, _ = _evidence_json("range_20130624_20130703.json")
+    dates = [r["tradeDate"] for r in d["data"]]
+    assert dates[0] == "20130624"
+    assert dates[-1] == "20130702"
+    assert "20130703" not in dates, "7 行区间响应不应包含 2013-07-03"
+
+
+def test_0703_only_in_wide_evidence():
+    """2013-07-03 数据只存在于宽区间证据中。"""
+    rng, _ = _evidence_json("range_20130624_20130703.json")
+    wide, _ = _evidence_json("h30184_wide.json")
+    rng_dates = {r["tradeDate"] for r in rng["data"]}
+    wide_dates = {r["tradeDate"] for r in wide["data"]}
+    assert "20130703" not in rng_dates
+    assert "20130703" in wide_dates
+    row = next(r for r in wide["data"] if r["tradeDate"] == "20130703")
+    assert row["close"] == 1569.54
+
+
+def test_wide_evidence_row_count_is_41():
+    """宽区间证据必须为 41 行。"""
+    d, _ = _evidence_json("h30184_wide.json")
+    assert len(d.get("data") or []) == 41
+
+
+def test_report_does_not_attribute_0703_to_range():
+    """报告不得把 2013-07-03 的**数据**归入 7 行区间响应。
+
+    注意区分：
+    - URL 里的 ``endDate=20130703`` 是**请求参数**，合法；
+    - 逐日表格里 ``2013-07-03`` 那一行的**来源列**必须是宽区间证据。
+    """
+    txt = (REPORTS / "phase3B6_2_3_0_3_repair_report.md").read_text(
+        encoding="utf-8")
+    lines = txt.splitlines()
+    # 只检查「逐日数据表格」中日期单元格恰为 2013-07-03 的行，
+    # 避免把 URL 的 endDate 参数、证据文件名 range_...20130703.json 误判
+    checked = 0
+    for i, line in enumerate(lines):
+        if not line.startswith("|"):
+            continue
+        cells = [c.strip() for c in line.strip("|").split("|")]
+        if not cells:
+            continue
+        if cells[0] not in ("`2013-07-03`", "2013-07-03"):
+            continue
+        checked += 1
+        # 该行的来源列必须是宽区间证据
+        assert "h30184_wide" in line, \
+            f"第 {i + 1} 行把 2013-07-03 的数据归入区间响应：{line.strip()}"
+        assert "range_20130624_20130703" not in line, \
+            f"第 {i + 1} 行把 2013-07-03 的数据归入区间响应：{line.strip()}"
+    assert checked >= 1, "逐日表格中未找到 2013-07-03 行"
+
+
+def test_report_states_range_is_7_rows():
+    """报告必须明确写出区间查询为 7 行。"""
+    txt = (REPORTS / "phase3B6_2_3_0_3_repair_report.md").read_text(
+        encoding="utf-8")
+    assert "7 行" in txt
+    assert "2013-07-02" in txt
+    assert "h30184_wide.json" in txt
+
+
+def test_report_marks_source_per_row():
+    """逐日表格必须标注来源文件列。"""
+    txt = (REPORTS / "phase3B6_2_3_0_3_repair_report.md").read_text(
+        encoding="utf-8")
+    assert "来源文件" in txt
+
+
+def test_evidence_sha256_unchanged(official):
+    """原始证据 SHA256 不得改变。"""
+    _, rng_sha = _evidence_json("range_20130624_20130703.json")
+    _, wide_sha = _evidence_json("h30184_wide.json")
+    _, single_sha = _evidence_json("single_20130628.json")
+    assert rng_sha == official["range_sha256"]
+    assert rng_sha == ("ccbbb38316fab0f9c24a56d79a7c15af7559e114399253da4"
+                       "b5cbbb660b609e5")
+    assert single_sha == official["single_date_sha256"]
+    assert wide_sha == ("858ecda87ee336bb0568f9bfeb9ba895f54c01eecc44b28a46"
+                        "e934d1614d7e26")
+
+
+def test_decision_and_evidence_grade_unchanged(official):
+    """不得改变证据等级与情况 B 决策。"""
+    assert official["evidence_grade"] == "L1"
+    assert DECISION == "B"
+
+
+def test_db_sha256_unchanged_by_doc_fix():
+    """本轮是纯文档修正，数据库 SHA256 必须仍为修复后值。"""
+    assert file_sha256() == (
+        "1671e4037cd265a2dead8b78d43614189a782385ca450ac6c2de3c4ff36ee873")
