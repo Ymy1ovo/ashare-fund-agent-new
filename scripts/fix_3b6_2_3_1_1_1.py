@@ -23,7 +23,7 @@ from app.fund import tr_layer  # noqa: E402
 
 REPORTS = ROOT / "reports"
 EVID_TR = REPORTS / "evidence" / "phase3B6_2_3_1_0"
-EVID = REPORTS / "evidence" / "phase3B6_2_3_1_1_1_1"
+EVID = REPORTS / "evidence" / "phase3B6_2_3_1_1_1_2"
 
 
 def file_sha256(p: Path) -> str:
@@ -138,10 +138,11 @@ def main() -> None:
     total_extra = anomalies["extra_in_db"]
 
     result = {
-        "phase": "3B-6.2.3.1.1.1.1",
-        "task": "原始JSON存储逐行核验闭环与迁移脚本规范化",
+        "phase": "3B-6.2.3.1.1.1.2",
+        "task": "迁移部分状态幂等性与审计基线元数据修正",
         "generated_at": datetime.now().isoformat(timespec="seconds"),
-        "baseline_head": "9cf46ab084e7ecc6e51e60572c770e698b83ad7c",
+        "baseline_head": "cdbdbf0284c8cf9f356fa4d298fd29f03169a014",
+        "final_head_note": ("本轮最终 HEAD 见 fix_report；baseline_head 为本轮任务起点，两者不得混淆"),
         "fixes": {
             "1_evidence_count": {
                 "before": 36,
@@ -242,7 +243,7 @@ def main() -> None:
             "real_start_all_unknown": real_start == {"unknown"},
         },
     }
-    (REPORTS / "phase3B6_2_3_1_1_1_1_audit.json").write_text(
+    (REPORTS / "phase3B6_2_3_1_1_1_2_audit.json").write_text(
         json.dumps(result, ensure_ascii=False, indent=1) + "\n",
         encoding="utf-8")
 
@@ -256,7 +257,7 @@ def main() -> None:
                 "sha256": file_sha256(f),
                 "kind": e["evidence_kind"],
             }
-    man = {"phase": "3B-6.2.3.1.1.1.1",
+    man = {"phase": "3B-6.2.3.1.1.1.2",
            "generated_at": datetime.now().isoformat(timespec="seconds"),
            "note": "本轮不下载新数据；登记导入所引用的原始官方证据",
            "file_count": len(files), "files": files}

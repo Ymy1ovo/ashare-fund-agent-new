@@ -1,5 +1,137 @@
 # 变更日志
 
+## 2026-11-28 — 阶段3B-6.2.3.1.1.1.2 迁移部分状态幂等性与审计基线元数据修正
+
+**只修两个边界问题。不重新下载，不重建数据层，不改任何行情数据。**
+
+**基线与提交**
+
+| 项 | 值 |
+| --- | --- |
+| 本轮任务基线 HEAD | `cdbdbf0284c8cf9f356fa4d298fd29f03169a014` |
+| 本轮最终 HEAD | 见提交记录（**与基线不同，不得混淆**） |
+
+**一、问题 1：UP 迁移不支持部分列已存在**
+
+**缺陷**：原 `migrate_raw_record_columns()` 虽先检查缺失列，
+但执行时**仍执行完整 UP SQL 文件**。
+
+失败场景：
+
+| 场景 | 原行为 |
+| --- | --- |
+| 两列都在 | ✅ 跳过 |
+| 两列都不在 | ✅ 成功 |
+| **仅 `raw_record_json` 存在** | ❌ 第一条 `ADD COLUMN raw_record_json` 报重复列 |
+
+**修正：逐列执行**
+
+```python
+for col in ("raw_record_json", "raw_record_sha256"):
+    if col in _raw_record_columns(conn):
+        continue                        # 已存在 → 跳过
+    stmts = _statements_for_column(UP_SQL, col, "ADD")
+    for stmt in stmts:
+        conn.execute(stmt)              # 只执行该列的 DDL
+```
+
+**DDL 仍来自 SQL 文件**——`_statements_for_column()` 从文件筛选
+`add column <col>` 语句，**没有改回 Python 硬编码**。
+
+DOWN 同样逐列，只删实际存在的列。
+
+**二、八种部分状态验证**
+
+用**真实构造只有一列存在的数据库**测试：
+
+| # | 初始状态 | 操作 | 结果 |
+| ---: | --- | --- | --- |
+| 1 | 两列都不存在 | UP | 新增两列 ✅ |
+| 2 | 两列都存在 | UP | `added=[]`，`executed=False` ✅ |
+| 3 | **仅 `raw_record_json`** | UP | 只新增 `raw_record_sha256` ✅ |
+| 4 | **仅 `raw_record_sha256`** | UP | 只新增 `raw_record_json` ✅ |
+| 5 | 两列都存在 | DOWN | 删除两列 ✅ |
+| 6 | **仅 `raw_record_json`** | DOWN | 只删该列 ✅ |
+| 7 | **仅 `raw_record_sha256`** | DOWN | 只删该列 ✅ |
+| 8 | 两列都不存在 | DOWN | `dropped=[]`，`executed=False` ✅ |
+
+**全部场景均不删表、不丢数据、不动其他字段**（4×2 参数化测试）。
+
+**三、问题 2：审计基线元数据不一致**
+
+**缺陷**：`scripts/fix_3b6_2_3_1_1_1.py` 中 `baseline_head` 写的是
+`9cf46ab084e7ecc6e51e60572c770e698b83ad7c`（3B-6.2.3.1.1 的基线），
+但本轮实际基线是 `cdbdbf0284c8cf9f356fa4d298fd29f03169a014`。
+
+**修正**：
+
+| 文件 | 修正 |
+| --- | --- |
+| `scripts/fix_3b6_2_3_1_1_1.py` | `baseline_head` → `cdbdbf0...` |
+| `reports/phase3B6_2_3_1_1_1_1_fix_report.md` | 标注「本轮任务基线 HEAD」 |
+| `reports/phase3B6_2_3_1_1_1_1_test_report.md` | 同上 |
+| 审计 JSON | 重生成，新增 `final_head_note` |
+
+**基线与最终 HEAD 严格分开**：
+
+```json
+{
+  "baseline_head": "cdbdbf0284c8cf9f356fa4d298fd29f03169a014",
+  "final_head_note": "本轮最终 HEAD 见 fix_report；baseline_head 为本轮任务起点，两者不得混淆"
+}
+```
+
+**四、数据保护核验**
+
+| 项 | 结果 |
+| --- | --- |
+| `tr_index_daily_raw` 行数 | **55,942**（不变） |
+| `raw_record_json` / SHA 数据 | **不变** |
+| `index_daily` 行数 | **50,603** |
+| `index_daily` 内容指纹 | **`dbbd07c1339e99f27b0aeadb43eb56848776dbbad97f3fb7b9748bbd2f1e61f6`** |
+| 证据文件 SHA256 | **34 / 34 通过** |
+| `integrity_check` | **ok** |
+| `foreign_key_check` | **0** |
+
+**五、准入与门禁**
+
+| 状态 | 值 |
+| --- | ---: |
+| `raw_data_layer_ingest_candidate` | **12** |
+| `validated_series_candidate` | **0** |
+| `proxy_qualified_series_candidate` | **0** |
+| `formal_series_admitted` | **0** |
+
+门禁：`ready_for_research_analysis=true`、`ready_for_backtest=false`、
+`ready_for_formal_ranking=false`、`ready_for_3b6_2_3_1_series_build=false`。
+
+**六、本轮未重跑 55,942 条回填**
+
+未重新回填 `raw_record_json`、未重新计算 `row_fingerprint`、未重新下载数据。
+审计脚本仍执行核验（只读），但数据本身未被改写。
+
+**七、修改文件**
+
+- `app/fund/tr_layer.py`：`migrate_raw_record_columns()` 与
+  `rollback_raw_record_columns()` 改为**逐列执行**；新增
+  `_statements_for_column()`
+- `scripts/fix_3b6_2_3_1_1_1.py`：修正 `baseline_head`，输出到新阶段文件名
+- `tests/test_3b6_2_3_1_1_1_2_migration.py`：**34 项**专项测试
+
+**八、测试**
+
+| 项目 | 结果 |
+| --- | --- |
+| 专项测试（本轮） | **34 passed / 0 failed / 0 skipped** |
+| 全量测试 | 2939 → **2973**（**+34**） |
+
+**九、边界**
+
+未修改 `index_daily`、未修改任何行情数值、未删除异常记录、
+未重新下载数据、未开放回测或正式排名。
+
+---
+
 ## 2026-11-28 — 阶段3B-6.2.3.1.1.1.1 原始JSON存储逐行核验闭环与迁移脚本规范化
 
 **只修核验逻辑与迁移规范。不重建数据层，不重新下载，不改任何行情数值。**

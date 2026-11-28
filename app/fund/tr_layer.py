@@ -508,50 +508,75 @@ def _raw_record_columns(conn: sqlite3.Connection) -> set[str]:
         "pragma table_info(tr_index_daily_raw)")}
 
 
+def _statements_for_column(sql_path: Path, column: str,
+                           action: str) -> list[str]:
+    """从真实 SQL 文件中挑出**针对某一列**的语句。
+
+    DDL 仍然以 SQL 文件为唯一来源，这里只做筛选，不硬编码 DDL。
+    ``action`` 为 ``ADD`` 或 ``DROP``。
+    """
+    out = []
+    needle = f"{action.lower()} column {column.lower()}"
+    for stmt in _split_sql(sql_path.read_text(encoding="utf-8")):
+        if needle in stmt.lower():
+            out.append(stmt)
+    return out
+
+
 def migrate_raw_record_columns(conn: sqlite3.Connection) -> dict:
     """幂等新增 raw_record_json / raw_record_sha256 两列。
 
+    **逐列执行**：只对**尚不存在**的列执行对应 DDL。
+
+    - 两列都已存在 → 不执行任何 DDL
+    - 只有一列存在 → 只新增缺的那一列
+    - 两列都不存在 → 新增两列
+
     实际 DDL 来自 ``migrations/phase3b6_2_3_1_1_1_raw_record.sql``。
-    先检查列是否已存在；两列都已存在时**不执行** SQL（保证幂等）。
     """
     before = _raw_record_columns(conn)
-    missing = [c for c in ("raw_record_json", "raw_record_sha256")
-               if c not in before]
-    if not missing:
-        return {"added": [], "columns": sorted(before), "executed": False}
-    sql = RAW_RECORD_MIGRATION_UP.read_text(encoding="utf-8")
-    for stmt in _split_sql(sql):
-        conn.execute(stmt)
+    added: list[str] = []
+    for col in ("raw_record_json", "raw_record_sha256"):
+        if col in _raw_record_columns(conn):
+            continue
+        stmts = _statements_for_column(
+            RAW_RECORD_MIGRATION_UP, col, "ADD")
+        if not stmts:
+            raise RuntimeError(f"UP SQL 中找不到新增 {col} 的语句")
+        for stmt in stmts:
+            conn.execute(stmt)
+        added.append(col)
     after = _raw_record_columns(conn)
-    return {"added": sorted(after - before), "columns": sorted(after),
-            "executed": True}
+    return {"added": sorted(added), "columns": sorted(after),
+            "executed": bool(added)}
 
 
 def rollback_raw_record_columns(conn: sqlite3.Connection) -> dict:
-    """幂等删除两列。实际 DDL 来自 DOWN SQL 文件。
+    """幂等删除两列。**逐列执行**：只删**实际存在**的列。
 
-    两列都不存在时**不执行** SQL（保证幂等）。
-    只删这两列，不动表和其他字段。
+    - 两列都不存在 → 不执行任何 DDL
+    - 只有一列存在 → 只删那一列
+    - 两列都存在 → 删除两列
+
+    实际 DDL 来自 ``migrations/phase3b6_2_3_1_1_1_raw_record_down.sql``。
+    **只删这两列，不删表、不动其他字段。**
     """
     before = _raw_record_columns(conn)
-    present = [c for c in ("raw_record_json", "raw_record_sha256")
-               if c in before]
-    if not present:
-        return {"dropped": [], "columns": sorted(before), "executed": False}
-    sql = RAW_RECORD_MIGRATION_DOWN.read_text(encoding="utf-8")
-    for stmt in _split_sql(sql):
-        # 只执行仍需要的语句（避免对已不存在的列执行 DROP）
-        low = stmt.lower()
-        if "drop column raw_record_sha256" in low:
-            if "raw_record_sha256" not in _raw_record_columns(conn):
-                continue
-        if "drop column raw_record_json" in low:
-            if "raw_record_json" not in _raw_record_columns(conn):
-                continue
-        conn.execute(stmt)
+    dropped: list[str] = []
+    # 先删 SHA 再删 JSON，与 DOWN 文件中的顺序一致
+    for col in ("raw_record_sha256", "raw_record_json"):
+        if col not in _raw_record_columns(conn):
+            continue
+        stmts = _statements_for_column(
+            RAW_RECORD_MIGRATION_DOWN, col, "DROP")
+        if not stmts:
+            raise RuntimeError(f"DOWN SQL 中找不到删除 {col} 的语句")
+        for stmt in stmts:
+            conn.execute(stmt)
+        dropped.append(col)
     after = _raw_record_columns(conn)
-    return {"dropped": sorted(before - after), "columns": sorted(after),
-            "executed": True}
+    return {"dropped": sorted(dropped), "columns": sorted(after),
+            "executed": bool(dropped)}
 
 
 def _split_sql(sql: str) -> list[str]:

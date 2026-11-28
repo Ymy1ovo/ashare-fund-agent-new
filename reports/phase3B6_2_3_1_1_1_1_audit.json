@@ -1,8 +1,8 @@
 {
  "phase": "3B-6.2.3.1.1.1.1",
  "task": "原始JSON存储逐行核验闭环与迁移脚本规范化",
- "generated_at": "2026-11-28T14:34:55",
- "baseline_head": "9cf46ab084e7ecc6e51e60572c770e698b83ad7c",
+ "generated_at": "2026-11-28T14:47:24",
+ "baseline_head": "cdbdbf0284c8cf9f356fa4d298fd29f03169a014",
  "fixes": {
   "1_evidence_count": {
    "before": 36,
