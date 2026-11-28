@@ -116,13 +116,22 @@ def index_daily_fingerprint(conn: sqlite3.Connection) -> dict:
     return {"row_count": len(rows), "fingerprint": h.hexdigest()}
 
 
+# 指纹覆盖的**全部**原始行情字段，顺序固定。
+FINGERPRINT_FIELDS = (
+    "tr_code", "trade_date", "open", "high", "low", "close",
+    "volume", "amount", "change", "change_pct",
+    "cons_number", "peg", "returned_code", "returned_name",
+)
+
+
 def row_fingerprint(rec: dict) -> str:
-    """单行内容指纹（含全部原始字段）。"""
-    keys = ("tr_code", "trade_date", "open", "high", "low", "close",
-            "volume", "amount", "change", "change_pct",
-            "returned_code", "returned_name")
+    """单行内容指纹：覆盖**所有保存的原始行情字段**，顺序固定。
+
+    序列化规则固定为 ``字段名=repr(值)`` 逐行拼接，
+    保证同一数据永远产生同一指纹，任一字段变化都会改变指纹。
+    """
     h = hashlib.sha256()
-    for k in keys:
+    for k in FINGERPRINT_FIELDS:
         h.update(f"{k}={rec.get(k)!r}\n".encode())
     return h.hexdigest()
 
@@ -461,3 +470,167 @@ def relabel_existing_rows(conn: sqlite3.Connection, tr_code: str,
                 (new, note, tr_code, d))
             n += 1
     return n
+
+
+# ---------------------------------------------------------------- 原始记录完整性
+# 规范化序列化的字段顺序（固定规则，保证可复现）
+RAW_RECORD_FIELDS = (
+    "tradeDate", "indexCode", "indexNameCnAll", "indexNameCn",
+    "indexNameEnAll", "indexNameEn",
+    "open", "high", "low", "close", "change", "changePct",
+    "tradingVol", "tradingValue", "consNumber", "peg",
+)
+
+RAW_RECORD_MIGRATION_UP = (ROOT / "migrations"
+                           / "phase3b6_2_3_1_1_1_raw_record.sql")
+
+
+def normalize_raw_record(rec: dict) -> str:
+    """把原始接口记录序列化为**规范化 JSON**（固定字段顺序、固定分隔符）。
+
+    只保留 ``RAW_RECORD_FIELDS`` 中的字段；缺失字段保留为 ``null``。
+    **不修改任何数值**，只是统一序列化方式。
+    """
+    ordered = {k: rec.get(k) for k in RAW_RECORD_FIELDS}
+    return json.dumps(ordered, ensure_ascii=False, sort_keys=False,
+                      separators=(",", ":"))
+
+
+def raw_record_sha256(rec: dict) -> str:
+    """规范化记录的 SHA256（**不等于**原始证据文件 SHA256）。"""
+    return hashlib.sha256(normalize_raw_record(rec).encode("utf-8")).hexdigest()
+
+
+def migrate_raw_record_columns(conn: sqlite3.Connection) -> dict:
+    """幂等新增 raw_record_json / raw_record_sha256 两列。"""
+    cols = {r[1] for r in conn.execute(
+        "pragma table_info(tr_index_daily_raw)")}
+    added = []
+    if "raw_record_json" not in cols:
+        conn.execute("alter table tr_index_daily_raw "
+                     "add column raw_record_json text")
+        added.append("raw_record_json")
+    if "raw_record_sha256" not in cols:
+        conn.execute("alter table tr_index_daily_raw "
+                     "add column raw_record_sha256 text")
+        added.append("raw_record_sha256")
+    return {"added": added, "columns": sorted(cols | set(added))}
+
+
+def rollback_raw_record_columns(conn: sqlite3.Connection) -> dict:
+    """回滚：删除两列（SQLite 3.35+）。"""
+    cols = {r[1] for r in conn.execute(
+        "pragma table_info(tr_index_daily_raw)")}
+    dropped = []
+    for c in ("raw_record_sha256", "raw_record_json"):
+        if c in cols:
+            conn.execute(f"alter table tr_index_daily_raw drop column {c}")
+            dropped.append(c)
+    return {"dropped": dropped}
+
+
+def backfill_raw_records(conn: sqlite3.Connection,
+                         hist_dir: Path) -> dict:
+    """从原始历史 JSON 回填 raw_record_json / raw_record_sha256。
+
+    **只写这两个字段，不动任何行情数值。**
+    返回逐候选的回填统计。
+    """
+    out = {}
+    codes = [r[0] for r in conn.execute(
+        "select tr_code from tr_candidate_master order by tr_code")]
+    for code in codes:
+        f = hist_dir / f"hist_{code}_20040101_20261127.json"
+        if not f.exists():
+            out[code] = {"error": "缺原始文件", "updated": 0}
+            continue
+        rows = json.loads(f.read_bytes().decode("utf-8")).get("data") or []
+        updated = 0
+        for rec in rows:
+            d = rec.get("tradeDate")
+            if not d:
+                continue
+            conn.execute(
+                "update tr_index_daily_raw set raw_record_json=?, "
+                "raw_record_sha256=? where tr_code=? and trade_date=?",
+                (normalize_raw_record(rec), raw_record_sha256(rec), code, d))
+            updated += 1
+        out[code] = {"updated": updated, "source_rows": len(rows)}
+    return out
+
+
+def verify_raw_records(conn: sqlite3.Connection,
+                       hist_dir: Path) -> dict:
+    """逐候选逐行核对：原始 JSON vs 数据库。
+
+    **不允许抽样**，逐条比对全部原始字段。
+    """
+    out = {}
+    codes = [r[0] for r in conn.execute(
+        "select tr_code from tr_candidate_master order by tr_code")]
+    for code in codes:
+        f = hist_dir / f"hist_{code}_20040101_20261127.json"
+        if not f.exists():
+            out[code] = {"error": "缺原始文件"}
+            continue
+        raw_rows = json.loads(f.read_bytes().decode("utf-8")).get("data") or []
+        raw_by_date = {r.get("tradeDate"): r for r in raw_rows
+                       if r.get("tradeDate")}
+        db_rows = {r[0]: r for r in conn.execute(
+            "select trade_date, open, high, low, close, volume, amount, "
+            "change, change_pct, cons_number, peg, returned_code, "
+            "returned_name, raw_record_sha256 "
+            "from tr_index_daily_raw where tr_code=?", (code,))}
+        matched = mismatched = missing = extra = 0
+        diffs = []
+        for d, rec in raw_by_date.items():
+            row = db_rows.get(d)
+            if row is None:
+                missing += 1
+                if len(diffs) < 20:
+                    diffs.append({"date": d, "issue": "DB 缺失"})
+                continue
+            # 逐字段比对
+            expect = {
+                "open": rec.get("open"), "high": rec.get("high"),
+                "low": rec.get("low"), "close": rec.get("close"),
+                "volume": rec.get("tradingVol"),
+                "amount": rec.get("tradingValue"),
+                "change": rec.get("change"),
+                "change_pct": rec.get("changePct"),
+                "cons_number": rec.get("consNumber"),
+                "peg": rec.get("peg"),
+                "returned_code": rec.get("indexCode"),
+                "returned_name": rec.get("indexNameCnAll"),
+            }
+            actual = {
+                "open": row[1], "high": row[2], "low": row[3],
+                "close": row[4], "volume": row[5], "amount": row[6],
+                "change": row[7], "change_pct": row[8],
+                "cons_number": row[9], "peg": row[10],
+                "returned_code": row[11], "returned_name": row[12],
+            }
+            bad = {k: {"raw": expect[k], "db": actual[k]}
+                   for k in expect if expect[k] != actual[k]}
+            # 规范化指纹比对
+            fp_expect = raw_record_sha256(rec)
+            if row[13] != fp_expect:
+                bad["raw_record_sha256"] = {"raw": fp_expect, "db": row[13]}
+            if bad:
+                mismatched += 1
+                if len(diffs) < 20:
+                    diffs.append({"date": d, "fields": bad})
+            else:
+                matched += 1
+        for d in db_rows:
+            if d not in raw_by_date:
+                extra += 1
+        out[code] = {
+            "raw_rows": len(raw_rows), "db_rows": len(db_rows),
+            "matched": matched, "mismatched": mismatched,
+            "missing_in_db": missing, "extra_in_db": extra,
+            "diffs": diffs,
+            "complete": (mismatched == 0 and missing == 0 and extra == 0
+                         and matched == len(raw_rows)),
+        }
+    return out

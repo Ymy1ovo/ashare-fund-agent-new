@@ -299,6 +299,10 @@ def main() -> None:
                 })
                 mapping_rows.append(code)
 
+        # 证据数按**数据库实际唯一文件数**统计，
+        # 不累加 upsert 调用次数（同一对照文件可能被多个候选引用）
+        evidence_count = conn.execute(
+            "select count(*) from tr_evidence_files").fetchone()[0]
         idx_after = tr_layer.index_daily_fingerprint(conn)
         tr_layer.finish_run(
             conn, run_id, status="success",

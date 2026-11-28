@@ -1,5 +1,165 @@
 # 变更日志
 
+## 2026-11-28 — 阶段3B-6.2.3.1.1.1 全收益指数原始归档完整性与审计计数修复
+
+**只修指纹、计数与完整性字段。不重建数据层，不重新下载，不改任何行情数值。**
+
+**基线与提交**
+
+| 项 | 值 |
+| --- | --- |
+| 任务基线 HEAD | `9cf46ab084e7ecc6e51e60572c770e698b83ad7c` |
+
+**一、问题 1：证据计数 36 vs 实际 34**
+
+**根因**：原导入脚本累加 `upsert` 调用次数，但 `399997` 有 2 个候选
+（`H20539`、`399997CNY02`）共用同一份对照文件，
+`upsert_evidence()` 按 `relative_path` 去重（实际留 1 行），
+**计数器却加了 2 次**。34 唯一 + 2 重复 = 36。
+
+**修复**：改为按数据库实际唯一文件数统计。
+
+```python
+evidence_count = conn.execute(
+    "select count(*) from tr_evidence_files").fetchone()[0]
+```
+
+**结果**：
+
+| 项 | 修复前 | 修复后 |
+| --- | ---: | ---: |
+| `tr_evidence_files` 行数 | 34 | **34** |
+| `tr_ingest_runs.evidence_count` | **36** | **34** |
+| manifest 文件数 | 34 | **34** |
+| 审计 JSON `unique_files` | 34 | **34** |
+
+**唯一证据构成**：`basic_info` 12 + `history` 12 + `control` 10 = **34**。
+
+**二、问题 2：row_fingerprint 漏字段**
+
+**修正前**：12 个字段，**缺 `cons_number` 与 `peg`**。
+
+**修正后**：14 个字段
+
+```python
+FINGERPRINT_FIELDS = (
+    "tr_code", "trade_date", "open", "high", "low", "close",
+    "volume", "amount", "change", "change_pct",
+    "cons_number", "peg",              # ← 新增
+    "returned_code", "returned_name",
+)
+```
+
+序列化规则固定为 `字段名=repr(值)` 逐行拼接，顺序固定。
+
+**全量重算 55,942 行，行情数值无任何变化。**
+
+**三、问题 3：逐行原始记录完整性**
+
+**新增两列**（独立迁移，可重复执行）：
+
+| 列 | 用途 |
+| --- | --- |
+| `raw_record_json` | 原始记录的**规范化** JSON（固定字段顺序） |
+| `raw_record_sha256` | 该规范化 JSON 的 SHA256 |
+
+**重要区分**：
+
+| 字段 | 含义 |
+| --- | --- |
+| `evidence_sha256` | **原始证据文件**的 SHA256（文件级） |
+| `raw_record_sha256` | **单条记录规范化 JSON** 的 SHA256（行级） |
+
+**两者不得互相替代**（有测试断言二者不相等）。
+
+**规范化规则**：16 个字段固定顺序 +
+`json.dumps(ensure_ascii=False, sort_keys=False, separators=(",", ":"))`。
+
+**逐候选核对结果（全量，非抽样）**：
+
+| 候选 | 原始行 | DB 行 | 匹配 | 不符 | 缺失 | 多余 |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| `399997CNY02` | 4,349 | 4,349 | **4,349** | 0 | 0 | 0 |
+| `H00012` | 3,376 | 3,376 | **3,376** | 0 | 0 | 0 |
+| `H00016` | 5,563 | 5,563 | **5,563** | 0 | 0 | 0 |
+| `H00300` | 5,321 | 5,321 | **5,321** | 0 | 0 | 0 |
+| `H00905` | 5,321 | 5,321 | **5,321** | 0 | 0 | 0 |
+| `H00906` | 5,321 | 5,321 | **5,321** | 0 | 0 | 0 |
+| `H00922` | 5,321 | 5,321 | **5,321** | 0 | 0 | 0 |
+| `H00942` | 5,321 | 5,321 | **5,321** | 0 | 0 | 0 |
+| `H20184` | 5,320 | 5,320 | **5,320** | 0 | 0 | 0 |
+| `H20539` | 4,350 | 4,350 | **4,350** | 0 | 0 | 0 |
+| `H20930` | 3,003 | 3,003 | **3,003** | 0 | 0 | 0 |
+| `N00012` | 3,376 | 3,376 | **3,376** | 0 | 0 | 0 |
+| **合计** | **55,942** | **55,942** | **55,942** | **0** | **0** | **0** |
+
+**逐条比对字段**：`open` / `high` / `low` / `close` / `tradingVol` /
+`tradingValue` / `change` / `changePct` / `consNumber` / `peg` /
+`indexCode` / `indexNameCnAll`，以及 `raw_record_sha256`。
+
+**四、数据安全核验**
+
+| 项 | 结果 |
+| --- | --- |
+| 记录数（前 → 后） | 55,942 → **55,942** |
+| `close` / `cons_number` / `peg` 全量快照 | **完全一致** |
+| 异常行（12 合成 + 8 休市 + 1 零值） | **全部保留，标记不变** |
+| `index_daily` 行数 | **50,603** |
+| `index_daily` 内容指纹 | **`dbbd07c1339e99f27b0aeadb43eb56848776dbbad97f3fb7b9748bbd2f1e61f6`** |
+| 与任务给定值 | **一致** |
+| 证据文件数 | **34**，SHA256 **34/34 通过** |
+| 连续性分布 | 官方 0 / 代理 1 / 疑似 8 / 未知 3 |
+| `real_history_start` | **全部 `unknown`** |
+| 行质量状态含 `verified` | **否** |
+
+**五、数据库**
+
+| 项 | 值 |
+| --- | --- |
+| 备份 | `data/backups/fund_agent_before_3b6_2_3_1_1_1.db` |
+| 实施前 SHA256 | `1c6327d9b7fb1b504fac55684fa62dc0984da13d51256747dfbb5fe6b54d2e62` |
+| 实施后 SHA256 | `4fbab661ce645f8f5d740168a11675ecf6456917c29aad18a9b3aca416ca684d` |
+| 变化原因 | 新增 2 列 + 重算 55,942 行指纹（预期） |
+| `integrity_check` | **ok** |
+| `foreign_key_check` | **0** |
+
+**六、准入状态未升级**
+
+| 状态 | 值 |
+| --- | ---: |
+| `raw_data_layer_ingest_candidate` | **12** |
+| `validated_series_candidate` | **0** |
+| `proxy_qualified_series_candidate` | **0** |
+| `formal_series_admitted` | **0** |
+
+**七、新增模块**
+
+- `migrations/phase3b6_2_3_1_1_1_raw_record.sql`（up）
+- `migrations/phase3b6_2_3_1_1_1_raw_record_down.sql`（down）
+- `app/fund/tr_layer.py`：新增 `FINGERPRINT_FIELDS`、`RAW_RECORD_FIELDS`、
+  `normalize_raw_record()`、`raw_record_sha256()`、
+  `migrate_raw_record_columns()`、`rollback_raw_record_columns()`、
+  `backfill_raw_records()`、`verify_raw_records()`
+- `scripts/fix_3b6_2_3_1_1_1.py`（修复脚本）
+- `tests/test_3b6_2_3_1_1_1_integrity.py`：**32 项**专项测试
+
+**八、测试**
+
+| 项目 | 结果 |
+| --- | --- |
+| 专项测试 | **32 passed / 0 failed / 0 skipped** |
+| 全量测试 | 2879 → **2911**（**+32**） |
+
+**九、边界**
+
+未修改 `index_daily`、未修改任何行情数值、未删除异常记录、
+未重新下载数据、未删除原始证据文件、未开放回测或正式排名。
+
+门禁：`ready_for_research_analysis=true`、`ready_for_backtest=false`、
+`ready_for_formal_ranking=false`、`ready_for_3b6_2_3_1_series_build=false`。
+
+---
+
 ## 2026-11-27 — 阶段3B-6.2.3.1.1 全收益指数独立原始数据层建设
 
 **只建原始归档与隔离存储。不建设正式全收益序列，不开放回测。**
