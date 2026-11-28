@@ -1,5 +1,161 @@
 # 变更日志
 
+## 2026-11-28 — 阶段3B-6.2.3.1.1.1.1 原始JSON存储逐行核验闭环与迁移脚本规范化
+
+**只修核验逻辑与迁移规范。不重建数据层，不重新下载，不改任何行情数值。**
+
+**基线与提交**
+
+| 项 | 值 |
+| --- | --- |
+| 任务基线 HEAD | `cdbdbf0284c8cf9f356fa4d298fd29f03169a014` |
+
+**一、问题 1：verify_raw_records() 未核验数据库实际保存的 JSON**
+
+**修正前的缺口**：从原始 JSON 读记录、比对行情字段、比对 SHA 列，
+但**没有读取数据库 `raw_record_json` 内容**。
+因此无法证明数据库实际保存的 JSON 与原始文件一致——
+理论上「SHA 列正确但 JSON 被篡改」不会被发现。
+
+**修正后：四层核验严格分开**
+
+| 层 | 内容 |
+| ---: | --- |
+| 1 | **行情字段**逐项比对（`open`/`close`/`cons_number`/`peg`/…） |
+| 2 | **数据库实际 `raw_record_json`** vs 原始 JSON 规范化结果（逐字符） |
+| 3 | `raw_record_sha256` 列 vs **原始规范化 SHA** |
+| 4 | `raw_record_sha256` 列 vs **数据库实际 JSON 自身的 SHA** |
+
+**八类异常分别统计**：
+
+| 异常 | 含义 |
+| --- | --- |
+| `field_mismatch` | 行情字段不一致 |
+| `raw_record_json_missing` | JSON 列为 NULL |
+| `raw_record_json_mismatch` | JSON 内容与原始规范化结果不同 |
+| `raw_record_sha256_missing` | SHA 列为 NULL |
+| `raw_record_sha256_mismatch` | SHA 列 ≠ 原始规范化 SHA |
+| `stored_json_sha_mismatch` | SHA 列 ≠ 数据库实际 JSON 的 SHA |
+| `missing_in_db` | 原始有、DB 无 |
+| `extra_in_db` | DB 有、原始无 |
+
+`complete = true` 要求八类全为 0 且匹配数等于原始行数。
+每种异常保留最多 **10 条**明细样本。
+
+**二、问题 2：迁移 SQL 文件只有注释**
+
+**修正前**：`phase3b6_2_3_1_1_1_raw_record.sql` 与 `_down.sql`
+只有说明性注释，实际 DDL 硬编码在 Python 函数里。
+
+**修正后：真实 SQL**
+
+UP：
+```sql
+ALTER TABLE tr_index_daily_raw ADD COLUMN raw_record_json TEXT;
+ALTER TABLE tr_index_daily_raw ADD COLUMN raw_record_sha256 TEXT;
+```
+
+DOWN：
+```sql
+ALTER TABLE tr_index_daily_raw DROP COLUMN raw_record_sha256;
+ALTER TABLE tr_index_daily_raw DROP COLUMN raw_record_json;
+```
+
+**Python 函数执行真实 SQL 并保持幂等**：
+已存在列时不执行 SQL；不存在列时不执行删除。
+DOWN 只删这两列，**不删表、不动其他字段**。
+
+**三、全量核验结果（55,942 条）**
+
+| 候选 | 原始 | DB | 匹配 | 八类异常 | 完整 |
+| --- | ---: | ---: | ---: | ---: | --- |
+| `399997CNY02` | 4,349 | 4,349 | **4,349** | 0 | ✅ |
+| `H00012` | 3,376 | 3,376 | **3,376** | 0 | ✅ |
+| `H00016` | 5,563 | 5,563 | **5,563** | 0 | ✅ |
+| `H00300` | 5,321 | 5,321 | **5,321** | 0 | ✅ |
+| `H00905` | 5,321 | 5,321 | **5,321** | 0 | ✅ |
+| `H00906` | 5,321 | 5,321 | **5,321** | 0 | ✅ |
+| `H00922` | 5,321 | 5,321 | **5,321** | 0 | ✅ |
+| `H00942` | 5,321 | 5,321 | **5,321** | 0 | ✅ |
+| `H20184` | 5,320 | 5,320 | **5,320** | 0 | ✅ |
+| `H20539` | 4,350 | 4,350 | **4,350** | 0 | ✅ |
+| `H20930` | 3,003 | 3,003 | **3,003** | 0 | ✅ |
+| `N00012` | 3,376 | 3,376 | **3,376** | 0 | ✅ |
+| **合计** | **55,942** | **55,942** | **55,942** | **0** | **12/12** |
+
+**四层核验汇总**：
+
+| 层 | 结果 |
+| --- | --- |
+| 原始记录总数 | **55,942** |
+| DB 记录总数 | **55,942** |
+| `raw_record_json` 逐行一致 | **55,942 / 55,942** |
+| `raw_record_sha256` 逐行一致 | **55,942 / 55,942** |
+| DB JSON 自身 SHA 一致 | **55,942 / 55,942** |
+| 行情字段不一致 | **0** |
+| DB 缺失记录 | **0** |
+| DB 多余记录 | **0** |
+
+**四层是不同层次的核验，不得合并成一个笼统的「完整性通过」。**
+
+**四、数据安全核验**
+
+| 项 | 结果 |
+| --- | --- |
+| `tr_index_daily_raw` 行数 | **55,942**（不变） |
+| 原始行情字段 | **不变** |
+| `row_fingerprint` 字段数 | **14** |
+| 证据文件 SHA256 | **34 / 34 通过** |
+| `tr_evidence_files` | **34** |
+| `tr_ingest_runs.evidence_count` | **34** |
+| `index_daily` 行数 | **50,603** |
+| `index_daily` 内容指纹 | **`dbbd07c1339e99f27b0aeadb43eb56848776dbbad97f3fb7b9748bbd2f1e61f6`** |
+| 12 条疑似合成行 | **保留** |
+| 8 条疑似休市占位 | **保留** |
+| `H20184` 零值异常 | **保留（`close=0.0`）** |
+| 连续性分布 | **0 / 1 / 8 / 3**（不变） |
+| `real_history_start` | **全 `unknown`** |
+| `integrity_check` | **ok** |
+| `foreign_key_check` | **0** |
+
+**五、准入与门禁**
+
+| 状态 | 值 |
+| --- | ---: |
+| `raw_data_layer_ingest_candidate` | **12** |
+| `validated_series_candidate` | **0** |
+| `proxy_qualified_series_candidate` | **0** |
+| `formal_series_admitted` | **0** |
+
+门禁：`ready_for_research_analysis=true`、`ready_for_backtest=false`、
+`ready_for_formal_ranking=false`、`ready_for_3b6_2_3_1_series_build=false`。
+
+**原始归档完整不等于序列已验证。**
+
+**六、修改文件**
+
+- `app/fund/tr_layer.py`：重写 `verify_raw_records()`（四层核验 +
+  八类异常统计 + 样本上限）；`migrate_raw_record_columns()` 与
+  `rollback_raw_record_columns()` 改为执行真实 SQL 文件；新增 `_split_sql()`
+- `migrations/phase3b6_2_3_1_1_1_raw_record.sql`：改为真实 `ALTER TABLE ADD COLUMN`
+- `migrations/phase3b6_2_3_1_1_1_raw_record_down.sql`：改为真实 `DROP COLUMN`
+- `scripts/fix_3b6_2_3_1_1_1.py`：输出四层核验统计
+- `tests/test_3b6_2_3_1_1_1_1_verify.py`：**28 项**专项测试
+
+**七、测试**
+
+| 项目 | 结果 |
+| --- | --- |
+| 专项测试 | **28 passed / 0 failed / 0 skipped** |
+| 全量测试 | 2911 → **2939**（**+28**） |
+
+**八、边界**
+
+未修改 `index_daily`、未修改任何行情数值、未删除异常记录、
+未重新下载数据、未删除原始证据文件、未开放回测或正式排名。
+
+---
+
 ## 2026-11-28 — 阶段3B-6.2.3.1.1.1 全收益指数原始归档完整性与审计计数修复
 
 **只修指纹、计数与完整性字段。不重建数据层，不重新下载，不改任何行情数值。**

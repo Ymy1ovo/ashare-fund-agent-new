@@ -483,6 +483,8 @@ RAW_RECORD_FIELDS = (
 
 RAW_RECORD_MIGRATION_UP = (ROOT / "migrations"
                            / "phase3b6_2_3_1_1_1_raw_record.sql")
+RAW_RECORD_MIGRATION_DOWN = (ROOT / "migrations"
+                             / "phase3b6_2_3_1_1_1_raw_record_down.sql")
 
 
 def normalize_raw_record(rec: dict) -> str:
@@ -501,32 +503,67 @@ def raw_record_sha256(rec: dict) -> str:
     return hashlib.sha256(normalize_raw_record(rec).encode("utf-8")).hexdigest()
 
 
-def migrate_raw_record_columns(conn: sqlite3.Connection) -> dict:
-    """幂等新增 raw_record_json / raw_record_sha256 两列。"""
-    cols = {r[1] for r in conn.execute(
+def _raw_record_columns(conn: sqlite3.Connection) -> set[str]:
+    return {r[1] for r in conn.execute(
         "pragma table_info(tr_index_daily_raw)")}
-    added = []
-    if "raw_record_json" not in cols:
-        conn.execute("alter table tr_index_daily_raw "
-                     "add column raw_record_json text")
-        added.append("raw_record_json")
-    if "raw_record_sha256" not in cols:
-        conn.execute("alter table tr_index_daily_raw "
-                     "add column raw_record_sha256 text")
-        added.append("raw_record_sha256")
-    return {"added": added, "columns": sorted(cols | set(added))}
+
+
+def migrate_raw_record_columns(conn: sqlite3.Connection) -> dict:
+    """幂等新增 raw_record_json / raw_record_sha256 两列。
+
+    实际 DDL 来自 ``migrations/phase3b6_2_3_1_1_1_raw_record.sql``。
+    先检查列是否已存在；两列都已存在时**不执行** SQL（保证幂等）。
+    """
+    before = _raw_record_columns(conn)
+    missing = [c for c in ("raw_record_json", "raw_record_sha256")
+               if c not in before]
+    if not missing:
+        return {"added": [], "columns": sorted(before), "executed": False}
+    sql = RAW_RECORD_MIGRATION_UP.read_text(encoding="utf-8")
+    for stmt in _split_sql(sql):
+        conn.execute(stmt)
+    after = _raw_record_columns(conn)
+    return {"added": sorted(after - before), "columns": sorted(after),
+            "executed": True}
 
 
 def rollback_raw_record_columns(conn: sqlite3.Connection) -> dict:
-    """回滚：删除两列（SQLite 3.35+）。"""
-    cols = {r[1] for r in conn.execute(
-        "pragma table_info(tr_index_daily_raw)")}
-    dropped = []
-    for c in ("raw_record_sha256", "raw_record_json"):
-        if c in cols:
-            conn.execute(f"alter table tr_index_daily_raw drop column {c}")
-            dropped.append(c)
-    return {"dropped": dropped}
+    """幂等删除两列。实际 DDL 来自 DOWN SQL 文件。
+
+    两列都不存在时**不执行** SQL（保证幂等）。
+    只删这两列，不动表和其他字段。
+    """
+    before = _raw_record_columns(conn)
+    present = [c for c in ("raw_record_json", "raw_record_sha256")
+               if c in before]
+    if not present:
+        return {"dropped": [], "columns": sorted(before), "executed": False}
+    sql = RAW_RECORD_MIGRATION_DOWN.read_text(encoding="utf-8")
+    for stmt in _split_sql(sql):
+        # 只执行仍需要的语句（避免对已不存在的列执行 DROP）
+        low = stmt.lower()
+        if "drop column raw_record_sha256" in low:
+            if "raw_record_sha256" not in _raw_record_columns(conn):
+                continue
+        if "drop column raw_record_json" in low:
+            if "raw_record_json" not in _raw_record_columns(conn):
+                continue
+        conn.execute(stmt)
+    after = _raw_record_columns(conn)
+    return {"dropped": sorted(before - after), "columns": sorted(after),
+            "executed": True}
+
+
+def _split_sql(sql: str) -> list[str]:
+    """把 SQL 文件拆成语句（去掉注释与空行）。"""
+    lines = []
+    for line in sql.splitlines():
+        s = line.strip()
+        if not s or s.startswith("--"):
+            continue
+        lines.append(line)
+    text = "\n".join(lines)
+    return [s.strip() for s in text.split(";") if s.strip()]
 
 
 def backfill_raw_records(conn: sqlite3.Connection,
@@ -563,7 +600,15 @@ def verify_raw_records(conn: sqlite3.Connection,
                        hist_dir: Path) -> dict:
     """逐候选逐行核对：原始 JSON vs 数据库。
 
-    **不允许抽样**，逐条比对全部原始字段。
+    **不允许抽样**，逐条比对全部原始字段，并**实际读取数据库保存的
+    ``raw_record_json`` 内容**进行比对（不只比 SHA 列）。
+
+    四层核验严格分开统计：
+
+    1. ``field_mismatch``：行情字段（close/cons_number/...）不一致
+    2. ``raw_record_json_mismatch``：数据库 JSON 内容与原始规范化结果不一致
+    3. ``raw_record_sha256_mismatch``：SHA 列与原始规范化 SHA 不一致
+    4. ``stored_json_sha_mismatch``：SHA 列与**数据库实际 JSON** 的 SHA 不一致
     """
     out = {}
     codes = [r[0] for r in conn.execute(
@@ -579,18 +624,39 @@ def verify_raw_records(conn: sqlite3.Connection,
         db_rows = {r[0]: r for r in conn.execute(
             "select trade_date, open, high, low, close, volume, amount, "
             "change, change_pct, cons_number, peg, returned_code, "
-            "returned_name, raw_record_sha256 "
+            "returned_name, raw_record_json, raw_record_sha256 "
             "from tr_index_daily_raw where tr_code=?", (code,))}
-        matched = mismatched = missing = extra = 0
-        diffs = []
+
+        counters = {
+            "matched": 0,
+            "field_mismatch": 0,
+            "raw_record_json_missing": 0,
+            "raw_record_json_mismatch": 0,
+            "raw_record_sha256_missing": 0,
+            "raw_record_sha256_mismatch": 0,
+            "stored_json_sha_mismatch": 0,
+            "missing_in_db": 0,
+            "extra_in_db": 0,
+        }
+        samples: dict[str, list] = {k: [] for k in counters
+                                    if k not in ("matched",)}
+
         for d, rec in raw_by_date.items():
             row = db_rows.get(d)
             if row is None:
-                missing += 1
-                if len(diffs) < 20:
-                    diffs.append({"date": d, "issue": "DB 缺失"})
+                counters["missing_in_db"] += 1
+                if len(samples["missing_in_db"]) < 10:
+                    samples["missing_in_db"].append(d)
                 continue
-            # 逐字段比对
+
+            expected_json = normalize_raw_record(rec)
+            expected_sha = raw_record_sha256(rec)
+            stored_json = row[13]
+            stored_sha = row[14]
+
+            problems = {}
+
+            # 1) 行情字段逐项比对
             expect = {
                 "open": rec.get("open"), "high": rec.get("high"),
                 "low": rec.get("low"), "close": rec.get("close"),
@@ -610,27 +676,60 @@ def verify_raw_records(conn: sqlite3.Connection,
                 "cons_number": row[9], "peg": row[10],
                 "returned_code": row[11], "returned_name": row[12],
             }
-            bad = {k: {"raw": expect[k], "db": actual[k]}
-                   for k in expect if expect[k] != actual[k]}
-            # 规范化指纹比对
-            fp_expect = raw_record_sha256(rec)
-            if row[13] != fp_expect:
-                bad["raw_record_sha256"] = {"raw": fp_expect, "db": row[13]}
-            if bad:
-                mismatched += 1
-                if len(diffs) < 20:
-                    diffs.append({"date": d, "fields": bad})
+            bad_fields = {k: {"raw": expect[k], "db": actual[k]}
+                          for k in expect if expect[k] != actual[k]}
+            if bad_fields:
+                counters["field_mismatch"] += 1
+                problems["field_mismatch"] = bad_fields
+
+            # 2) 数据库实际保存的 JSON 内容
+            if stored_json is None:
+                counters["raw_record_json_missing"] += 1
+                problems["raw_record_json_missing"] = True
+            elif stored_json != expected_json:
+                counters["raw_record_json_mismatch"] += 1
+                problems["raw_record_json_mismatch"] = {
+                    "expected": expected_json[:200],
+                    "stored": stored_json[:200]}
+
+            # 3) SHA 列 vs 原始规范化 SHA
+            if stored_sha is None:
+                counters["raw_record_sha256_missing"] += 1
+                problems["raw_record_sha256_missing"] = True
+            elif stored_sha != expected_sha:
+                counters["raw_record_sha256_mismatch"] += 1
+                problems["raw_record_sha256_mismatch"] = {
+                    "expected": expected_sha, "stored": stored_sha}
+
+            # 4) SHA 列 vs 数据库实际 JSON 的 SHA
+            if stored_json is not None and stored_sha is not None:
+                actual_json_sha = hashlib.sha256(
+                    stored_json.encode("utf-8")).hexdigest()
+                if stored_sha != actual_json_sha:
+                    counters["stored_json_sha_mismatch"] += 1
+                    problems["stored_json_sha_mismatch"] = {
+                        "stored_json_sha": actual_json_sha,
+                        "stored_sha_column": stored_sha}
+
+            if problems:
+                for k, v in problems.items():
+                    if len(samples[k]) < 10:
+                        samples[k].append({"date": d, "detail": v})
             else:
-                matched += 1
+                counters["matched"] += 1
+
         for d in db_rows:
             if d not in raw_by_date:
-                extra += 1
+                counters["extra_in_db"] += 1
+                if len(samples["extra_in_db"]) < 10:
+                    samples["extra_in_db"].append(d)
+
+        total_bad = sum(counters[k] for k in counters
+                        if k not in ("matched",))
         out[code] = {
             "raw_rows": len(raw_rows), "db_rows": len(db_rows),
-            "matched": matched, "mismatched": mismatched,
-            "missing_in_db": missing, "extra_in_db": extra,
-            "diffs": diffs,
-            "complete": (mismatched == 0 and missing == 0 and extra == 0
-                         and matched == len(raw_rows)),
+            **counters,
+            "samples": samples,
+            "complete": (total_bad == 0 and counters["matched"] == len(raw_rows)),
         }
     return out

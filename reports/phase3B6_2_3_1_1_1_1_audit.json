@@ -1,0 +1,513 @@
+{
+ "phase": "3B-6.2.3.1.1.1.1",
+ "task": "原始JSON存储逐行核验闭环与迁移脚本规范化",
+ "generated_at": "2026-11-28T14:34:55",
+ "baseline_head": "9cf46ab084e7ecc6e51e60572c770e698b83ad7c",
+ "fixes": {
+  "1_evidence_count": {
+   "before": 36,
+   "after": 34,
+   "cause": "原逻辑累加 upsert 调用次数；399997 有 2 个候选共用同一对照文件，被重复计数 2 次",
+   "rule": "按 tr_evidence_files 唯一文件数统计"
+  },
+  "2_row_fingerprint": {
+   "fields": [
+    "tr_code",
+    "trade_date",
+    "open",
+    "high",
+    "low",
+    "close",
+    "volume",
+    "amount",
+    "change",
+    "change_pct",
+    "cons_number",
+    "peg",
+    "returned_code",
+    "returned_name"
+   ],
+   "updated_rows": 55942,
+   "added_fields": [
+    "cons_number",
+    "peg"
+   ]
+  },
+  "3_raw_record_integrity": {
+   "migration": {
+    "added": [],
+    "columns": [
+     "amount",
+     "change",
+     "change_pct",
+     "close",
+     "cons_number",
+     "evidence_relative_path",
+     "evidence_sha256",
+     "high",
+     "ingested_at",
+     "low",
+     "open",
+     "peg",
+     "raw_record_json",
+     "raw_record_sha256",
+     "request_url",
+     "returned_code",
+     "returned_name",
+     "row_fingerprint",
+     "row_quality_note",
+     "row_quality_status",
+     "run_id",
+     "source_interface",
+     "tr_code",
+     "trade_date",
+     "volume"
+    ],
+    "executed": false
+   },
+   "backfill": {
+    "399997CNY02": {
+     "updated": 4349,
+     "source_rows": 4349
+    },
+    "H00012": {
+     "updated": 3376,
+     "source_rows": 3376
+    },
+    "H00016": {
+     "updated": 5563,
+     "source_rows": 5563
+    },
+    "H00300": {
+     "updated": 5321,
+     "source_rows": 5321
+    },
+    "H00905": {
+     "updated": 5321,
+     "source_rows": 5321
+    },
+    "H00906": {
+     "updated": 5321,
+     "source_rows": 5321
+    },
+    "H00922": {
+     "updated": 5321,
+     "source_rows": 5321
+    },
+    "H00942": {
+     "updated": 5321,
+     "source_rows": 5321
+    },
+    "H20184": {
+     "updated": 5320,
+     "source_rows": 5320
+    },
+    "H20539": {
+     "updated": 4350,
+     "source_rows": 4350
+    },
+    "H20930": {
+     "updated": 3003,
+     "source_rows": 3003
+    },
+    "N00012": {
+     "updated": 3376,
+     "source_rows": 3376
+    }
+   }
+  }
+ },
+ "verification": {
+  "399997CNY02": {
+   "raw_rows": 4349,
+   "db_rows": 4349,
+   "matched": 4349,
+   "field_mismatch": 0,
+   "raw_record_json_missing": 0,
+   "raw_record_json_mismatch": 0,
+   "raw_record_sha256_missing": 0,
+   "raw_record_sha256_mismatch": 0,
+   "stored_json_sha_mismatch": 0,
+   "missing_in_db": 0,
+   "extra_in_db": 0,
+   "samples": {
+    "field_mismatch": [],
+    "raw_record_json_missing": [],
+    "raw_record_json_mismatch": [],
+    "raw_record_sha256_missing": [],
+    "raw_record_sha256_mismatch": [],
+    "stored_json_sha_mismatch": [],
+    "missing_in_db": [],
+    "extra_in_db": []
+   },
+   "complete": true
+  },
+  "H00012": {
+   "raw_rows": 3376,
+   "db_rows": 3376,
+   "matched": 3376,
+   "field_mismatch": 0,
+   "raw_record_json_missing": 0,
+   "raw_record_json_mismatch": 0,
+   "raw_record_sha256_missing": 0,
+   "raw_record_sha256_mismatch": 0,
+   "stored_json_sha_mismatch": 0,
+   "missing_in_db": 0,
+   "extra_in_db": 0,
+   "samples": {
+    "field_mismatch": [],
+    "raw_record_json_missing": [],
+    "raw_record_json_mismatch": [],
+    "raw_record_sha256_missing": [],
+    "raw_record_sha256_mismatch": [],
+    "stored_json_sha_mismatch": [],
+    "missing_in_db": [],
+    "extra_in_db": []
+   },
+   "complete": true
+  },
+  "H00016": {
+   "raw_rows": 5563,
+   "db_rows": 5563,
+   "matched": 5563,
+   "field_mismatch": 0,
+   "raw_record_json_missing": 0,
+   "raw_record_json_mismatch": 0,
+   "raw_record_sha256_missing": 0,
+   "raw_record_sha256_mismatch": 0,
+   "stored_json_sha_mismatch": 0,
+   "missing_in_db": 0,
+   "extra_in_db": 0,
+   "samples": {
+    "field_mismatch": [],
+    "raw_record_json_missing": [],
+    "raw_record_json_mismatch": [],
+    "raw_record_sha256_missing": [],
+    "raw_record_sha256_mismatch": [],
+    "stored_json_sha_mismatch": [],
+    "missing_in_db": [],
+    "extra_in_db": []
+   },
+   "complete": true
+  },
+  "H00300": {
+   "raw_rows": 5321,
+   "db_rows": 5321,
+   "matched": 5321,
+   "field_mismatch": 0,
+   "raw_record_json_missing": 0,
+   "raw_record_json_mismatch": 0,
+   "raw_record_sha256_missing": 0,
+   "raw_record_sha256_mismatch": 0,
+   "stored_json_sha_mismatch": 0,
+   "missing_in_db": 0,
+   "extra_in_db": 0,
+   "samples": {
+    "field_mismatch": [],
+    "raw_record_json_missing": [],
+    "raw_record_json_mismatch": [],
+    "raw_record_sha256_missing": [],
+    "raw_record_sha256_mismatch": [],
+    "stored_json_sha_mismatch": [],
+    "missing_in_db": [],
+    "extra_in_db": []
+   },
+   "complete": true
+  },
+  "H00905": {
+   "raw_rows": 5321,
+   "db_rows": 5321,
+   "matched": 5321,
+   "field_mismatch": 0,
+   "raw_record_json_missing": 0,
+   "raw_record_json_mismatch": 0,
+   "raw_record_sha256_missing": 0,
+   "raw_record_sha256_mismatch": 0,
+   "stored_json_sha_mismatch": 0,
+   "missing_in_db": 0,
+   "extra_in_db": 0,
+   "samples": {
+    "field_mismatch": [],
+    "raw_record_json_missing": [],
+    "raw_record_json_mismatch": [],
+    "raw_record_sha256_missing": [],
+    "raw_record_sha256_mismatch": [],
+    "stored_json_sha_mismatch": [],
+    "missing_in_db": [],
+    "extra_in_db": []
+   },
+   "complete": true
+  },
+  "H00906": {
+   "raw_rows": 5321,
+   "db_rows": 5321,
+   "matched": 5321,
+   "field_mismatch": 0,
+   "raw_record_json_missing": 0,
+   "raw_record_json_mismatch": 0,
+   "raw_record_sha256_missing": 0,
+   "raw_record_sha256_mismatch": 0,
+   "stored_json_sha_mismatch": 0,
+   "missing_in_db": 0,
+   "extra_in_db": 0,
+   "samples": {
+    "field_mismatch": [],
+    "raw_record_json_missing": [],
+    "raw_record_json_mismatch": [],
+    "raw_record_sha256_missing": [],
+    "raw_record_sha256_mismatch": [],
+    "stored_json_sha_mismatch": [],
+    "missing_in_db": [],
+    "extra_in_db": []
+   },
+   "complete": true
+  },
+  "H00922": {
+   "raw_rows": 5321,
+   "db_rows": 5321,
+   "matched": 5321,
+   "field_mismatch": 0,
+   "raw_record_json_missing": 0,
+   "raw_record_json_mismatch": 0,
+   "raw_record_sha256_missing": 0,
+   "raw_record_sha256_mismatch": 0,
+   "stored_json_sha_mismatch": 0,
+   "missing_in_db": 0,
+   "extra_in_db": 0,
+   "samples": {
+    "field_mismatch": [],
+    "raw_record_json_missing": [],
+    "raw_record_json_mismatch": [],
+    "raw_record_sha256_missing": [],
+    "raw_record_sha256_mismatch": [],
+    "stored_json_sha_mismatch": [],
+    "missing_in_db": [],
+    "extra_in_db": []
+   },
+   "complete": true
+  },
+  "H00942": {
+   "raw_rows": 5321,
+   "db_rows": 5321,
+   "matched": 5321,
+   "field_mismatch": 0,
+   "raw_record_json_missing": 0,
+   "raw_record_json_mismatch": 0,
+   "raw_record_sha256_missing": 0,
+   "raw_record_sha256_mismatch": 0,
+   "stored_json_sha_mismatch": 0,
+   "missing_in_db": 0,
+   "extra_in_db": 0,
+   "samples": {
+    "field_mismatch": [],
+    "raw_record_json_missing": [],
+    "raw_record_json_mismatch": [],
+    "raw_record_sha256_missing": [],
+    "raw_record_sha256_mismatch": [],
+    "stored_json_sha_mismatch": [],
+    "missing_in_db": [],
+    "extra_in_db": []
+   },
+   "complete": true
+  },
+  "H20184": {
+   "raw_rows": 5320,
+   "db_rows": 5320,
+   "matched": 5320,
+   "field_mismatch": 0,
+   "raw_record_json_missing": 0,
+   "raw_record_json_mismatch": 0,
+   "raw_record_sha256_missing": 0,
+   "raw_record_sha256_mismatch": 0,
+   "stored_json_sha_mismatch": 0,
+   "missing_in_db": 0,
+   "extra_in_db": 0,
+   "samples": {
+    "field_mismatch": [],
+    "raw_record_json_missing": [],
+    "raw_record_json_mismatch": [],
+    "raw_record_sha256_missing": [],
+    "raw_record_sha256_mismatch": [],
+    "stored_json_sha_mismatch": [],
+    "missing_in_db": [],
+    "extra_in_db": []
+   },
+   "complete": true
+  },
+  "H20539": {
+   "raw_rows": 4350,
+   "db_rows": 4350,
+   "matched": 4350,
+   "field_mismatch": 0,
+   "raw_record_json_missing": 0,
+   "raw_record_json_mismatch": 0,
+   "raw_record_sha256_missing": 0,
+   "raw_record_sha256_mismatch": 0,
+   "stored_json_sha_mismatch": 0,
+   "missing_in_db": 0,
+   "extra_in_db": 0,
+   "samples": {
+    "field_mismatch": [],
+    "raw_record_json_missing": [],
+    "raw_record_json_mismatch": [],
+    "raw_record_sha256_missing": [],
+    "raw_record_sha256_mismatch": [],
+    "stored_json_sha_mismatch": [],
+    "missing_in_db": [],
+    "extra_in_db": []
+   },
+   "complete": true
+  },
+  "H20930": {
+   "raw_rows": 3003,
+   "db_rows": 3003,
+   "matched": 3003,
+   "field_mismatch": 0,
+   "raw_record_json_missing": 0,
+   "raw_record_json_mismatch": 0,
+   "raw_record_sha256_missing": 0,
+   "raw_record_sha256_mismatch": 0,
+   "stored_json_sha_mismatch": 0,
+   "missing_in_db": 0,
+   "extra_in_db": 0,
+   "samples": {
+    "field_mismatch": [],
+    "raw_record_json_missing": [],
+    "raw_record_json_mismatch": [],
+    "raw_record_sha256_missing": [],
+    "raw_record_sha256_mismatch": [],
+    "stored_json_sha_mismatch": [],
+    "missing_in_db": [],
+    "extra_in_db": []
+   },
+   "complete": true
+  },
+  "N00012": {
+   "raw_rows": 3376,
+   "db_rows": 3376,
+   "matched": 3376,
+   "field_mismatch": 0,
+   "raw_record_json_missing": 0,
+   "raw_record_json_mismatch": 0,
+   "raw_record_sha256_missing": 0,
+   "raw_record_sha256_mismatch": 0,
+   "stored_json_sha_mismatch": 0,
+   "missing_in_db": 0,
+   "extra_in_db": 0,
+   "samples": {
+    "field_mismatch": [],
+    "raw_record_json_missing": [],
+    "raw_record_json_mismatch": [],
+    "raw_record_sha256_missing": [],
+    "raw_record_sha256_mismatch": [],
+    "stored_json_sha_mismatch": [],
+    "missing_in_db": [],
+    "extra_in_db": []
+   },
+   "complete": true
+  }
+ },
+ "verification_totals": {
+  "raw_rows": 55942,
+  "db_rows": 55942,
+  "matched": 55942,
+  "anomalies": {
+   "field_mismatch": 0,
+   "raw_record_json_missing": 0,
+   "raw_record_json_mismatch": 0,
+   "raw_record_sha256_missing": 0,
+   "raw_record_sha256_mismatch": 0,
+   "stored_json_sha_mismatch": 0,
+   "missing_in_db": 0,
+   "extra_in_db": 0
+  },
+  "field_mismatch": 0,
+  "missing_in_db": 0,
+  "extra_in_db": 0,
+  "all_complete": true
+ },
+ "verification_layers": {
+  "note": "四层核验严格分开统计，不得合并成一个笼统的「完整性通过」",
+  "1_field_values": "行情字段逐项比对（open/close/cons_number/peg/...）",
+  "2_raw_json_content": "实际读取数据库 raw_record_json，与原始 JSON 规范化结果逐字符比对",
+  "3_sha_vs_expected": "raw_record_sha256 列 vs 原始规范化 SHA",
+  "4_sha_vs_stored_json": "raw_record_sha256 列 vs 数据库实际 JSON 自身的 SHA"
+ },
+ "evidence": {
+  "unique_files": 34,
+  "sha256_verified": 34,
+  "failed": [],
+  "all_verified": true,
+  "batch_evidence_count": 34,
+  "consistent": true
+ },
+ "data_unchanged": {
+  "rows_before": 55942,
+  "rows_after": 55942,
+  "rows_equal": true,
+  "values_identical": true,
+  "index_daily_rows": 50603,
+  "index_daily_fingerprint": "dbbd07c1339e99f27b0aeadb43eb56848776dbbad97f3fb7b9748bbd2f1e61f6",
+  "index_daily_unchanged": true
+ },
+ "quality_distribution": {
+  "invalid_value": 1,
+  "normal_unverified": 55921,
+  "suspected_market_closed_placeholder": 8,
+  "suspected_synthetic": 12
+ },
+ "continuity_distribution": {
+  "verified_against_proxy_calendar": 1,
+  "unknown": 3,
+  "has_unresolved_suspicion": 8
+ },
+ "real_history_start_values": [
+  "unknown"
+ ],
+ "admission_totals": {
+  "raw_data_layer_ingest_candidate": 12,
+  "validated_series_candidate": 0,
+  "proxy_qualified_series_candidate": 0,
+  "formal_series_admitted": 0
+ },
+ "integrity_check": "ok",
+ "foreign_key_check": 0,
+ "isolation": {
+  "tr_tables": [
+   "tr_candidate_master",
+   "tr_candidate_quality",
+   "tr_evidence_files",
+   "tr_index_daily_raw",
+   "tr_ingest_runs",
+   "tr_price_index_mapping"
+  ],
+  "tr_table_count": 6,
+  "bad_names": [],
+  "leaked_into_index_daily": [],
+  "isolated": true
+ },
+ "database": {
+  "path": "D:\\ymy\\jj-agent\\data\\fund_agent.db",
+  "sha256": "4fbab661ce645f8f5d740168a11675ecf6456917c29aad18a9b3aca416ca684d",
+  "bytes": 399134720
+ },
+ "gates": {
+  "ready_for_research_analysis": true,
+  "ready_for_backtest": false,
+  "ready_for_formal_ranking": false,
+  "ready_for_3b6_2_3_1_series_build": false
+ },
+ "_self_check": {
+  "evidence_count_consistent": true,
+  "fingerprint_covers_all_fields": true,
+  "all_records_verified": true,
+  "all_anomalies_zero": true,
+  "no_missing_no_extra": true,
+  "values_untouched": true,
+  "index_daily_unchanged": true,
+  "evidence_sha256_ok": true,
+  "no_validated": true,
+  "no_formal_admitted": true,
+  "real_start_all_unknown": true
+ }
+}

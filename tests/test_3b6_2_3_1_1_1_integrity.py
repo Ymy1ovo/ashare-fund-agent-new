@@ -173,12 +173,19 @@ def test_all_db_fingerprints_recomputed(conn):
 
 # ============================================================ 7-9. 逐行核对
 def test_all_candidates_verified(conn, audit):
-    """7. 12 个候选逐行原始记录核对。"""
+    """7. 12 个候选逐行原始记录核对。
+
+    3B-6.2.3.1.1.1.1 起审计 JSON 改为八类异常分别统计，
+    原 `mismatched` 字段已拆为 `field_mismatch` 等。
+    """
     v = audit["verification"]
     assert set(v) == EXPECTED_CODES
     for code, r in v.items():
-        assert r["complete"] is True, f"{code} 不完整：{r}"
-        assert r["mismatched"] == 0
+        assert r["complete"] is True, f"{code} 不完整：{r.get('samples')}"
+        assert r["field_mismatch"] == 0
+        assert r["raw_record_json_mismatch"] == 0
+        assert r["raw_record_sha256_mismatch"] == 0
+        assert r["stored_json_sha_mismatch"] == 0
         assert r["missing_in_db"] == 0
         assert r["extra_in_db"] == 0
         assert r["matched"] == r["raw_rows"] == r["db_rows"]
@@ -188,10 +195,12 @@ def test_total_rows_no_missing_no_extra(audit):
     """8. 55,942 条记录无遗漏、无多余。"""
     t = audit["verification_totals"]
     assert t["matched"] == EXPECTED_RAW_ROWS
-    assert t["mismatched"] == 0
     assert t["missing_in_db"] == 0
     assert t["extra_in_db"] == 0
     assert t["all_complete"] is True
+    # 八类异常全部为 0
+    for k, v in t["anomalies"].items():
+        assert v == 0, f"{k} 非 0：{v}"
 
 
 def test_field_values_match_raw_file(conn):

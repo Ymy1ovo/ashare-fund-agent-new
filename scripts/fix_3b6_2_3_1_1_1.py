@@ -23,7 +23,7 @@ from app.fund import tr_layer  # noqa: E402
 
 REPORTS = ROOT / "reports"
 EVID_TR = REPORTS / "evidence" / "phase3B6_2_3_1_0"
-EVID = REPORTS / "evidence" / "phase3B6_2_3_1_1_1"
+EVID = REPORTS / "evidence" / "phase3B6_2_3_1_1_1_1"
 
 
 def file_sha256(p: Path) -> str:
@@ -124,13 +124,22 @@ def main() -> None:
     db = ROOT / "data" / "fund_agent.db"
     all_complete = all(v.get("complete") for v in verify.values())
     total_matched = sum(v.get("matched", 0) for v in verify.values())
-    total_mismatched = sum(v.get("mismatched", 0) for v in verify.values())
-    total_missing = sum(v.get("missing_in_db", 0) for v in verify.values())
-    total_extra = sum(v.get("extra_in_db", 0) for v in verify.values())
+    # 八类异常分别汇总（**不得合并成一个笼统的「完整性」**）
+    ANOMALY_KEYS = (
+        "field_mismatch", "raw_record_json_missing",
+        "raw_record_json_mismatch", "raw_record_sha256_missing",
+        "raw_record_sha256_mismatch", "stored_json_sha_mismatch",
+        "missing_in_db", "extra_in_db",
+    )
+    anomalies = {k: sum(v.get(k, 0) for v in verify.values())
+                 for k in ANOMALY_KEYS}
+    total_mismatched = anomalies["field_mismatch"]
+    total_missing = anomalies["missing_in_db"]
+    total_extra = anomalies["extra_in_db"]
 
     result = {
-        "phase": "3B-6.2.3.1.1.1",
-        "task": "全收益原始归档完整性与审计计数修复",
+        "phase": "3B-6.2.3.1.1.1.1",
+        "task": "原始JSON存储逐行核验闭环与迁移脚本规范化",
         "generated_at": datetime.now().isoformat(timespec="seconds"),
         "baseline_head": "9cf46ab084e7ecc6e51e60572c770e698b83ad7c",
         "fixes": {
@@ -154,11 +163,24 @@ def main() -> None:
         },
         "verification": verify,
         "verification_totals": {
+            "raw_rows": sum(v.get("raw_rows", 0) for v in verify.values()),
+            "db_rows": sum(v.get("db_rows", 0) for v in verify.values()),
             "matched": total_matched,
-            "mismatched": total_mismatched,
-            "missing_in_db": total_missing,
-            "extra_in_db": total_extra,
+            "anomalies": anomalies,
+            "field_mismatch": anomalies["field_mismatch"],
+            "missing_in_db": anomalies["missing_in_db"],
+            "extra_in_db": anomalies["extra_in_db"],
             "all_complete": all_complete,
+        },
+        "verification_layers": {
+            "note": ("四层核验严格分开统计，"
+                     "不得合并成一个笼统的「完整性通过」"),
+            "1_field_values": "行情字段逐项比对（open/close/cons_number/peg/...）",
+            "2_raw_json_content": ("实际读取数据库 raw_record_json，"
+                                   "与原始 JSON 规范化结果逐字符比对"),
+            "3_sha_vs_expected": "raw_record_sha256 列 vs 原始规范化 SHA",
+            "4_sha_vs_stored_json": ("raw_record_sha256 列 vs "
+                                     "数据库实际 JSON 自身的 SHA"),
         },
         "evidence": {
             "unique_files": ev_unique,
@@ -207,6 +229,7 @@ def main() -> None:
             "fingerprint_covers_all_fields": len(
                 tr_layer.FINGERPRINT_FIELDS) == 14,
             "all_records_verified": all_complete,
+            "all_anomalies_zero": all(v == 0 for v in anomalies.values()),
             "no_missing_no_extra": (total_missing == 0 and total_extra == 0),
             "values_untouched": values_before == values_after,
             "index_daily_unchanged": (
@@ -219,7 +242,7 @@ def main() -> None:
             "real_start_all_unknown": real_start == {"unknown"},
         },
     }
-    (REPORTS / "phase3B6_2_3_1_1_1_audit.json").write_text(
+    (REPORTS / "phase3B6_2_3_1_1_1_1_audit.json").write_text(
         json.dumps(result, ensure_ascii=False, indent=1) + "\n",
         encoding="utf-8")
 
@@ -233,7 +256,7 @@ def main() -> None:
                 "sha256": file_sha256(f),
                 "kind": e["evidence_kind"],
             }
-    man = {"phase": "3B-6.2.3.1.1.1",
+    man = {"phase": "3B-6.2.3.1.1.1.1",
            "generated_at": datetime.now().isoformat(timespec="seconds"),
            "note": "本轮不下载新数据；登记导入所引用的原始官方证据",
            "file_count": len(files), "files": files}
@@ -243,8 +266,9 @@ def main() -> None:
     print(json.dumps(result["_self_check"], ensure_ascii=False, indent=1))
     print(f"\n证据唯一数: {ev_unique}（批次记录 {run['evidence_count']}）")
     print(f"指纹更新: {fp_updated} 行")
-    print(f"逐行核对: 匹配 {total_matched} / 不符 {total_mismatched} "
-          f"/ 缺失 {total_missing} / 多余 {total_extra}")
+    print(f"逐行核对: 匹配 {total_matched} / 总数 "
+          f"{sum(v.get('raw_rows', 0) for v in verify.values())}")
+    print(f"八类异常: {json.dumps(anomalies, ensure_ascii=False)}")
     print(f"数值未变: {values_before == values_after}")
     print(f"index_daily: {idx_after['row_count']} 行 "
           f"指纹 {idx_after['fingerprint'][:16]}...")

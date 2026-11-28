@@ -1,5 +1,5 @@
 -- ============================================================================
--- 阶段3B-6.2.3.1.1.1 原始记录逐行完整性字段
+-- 阶段3B-6.2.3.1.1.1 原始记录逐行完整性字段（UP）
 --
 -- 为 tr_index_daily_raw 增加：
 --   raw_record_json   原始 JSON 记录的**规范化**序列化（固定规则）
@@ -9,6 +9,12 @@
 -- 不等于原始证据文件的 SHA256（后者保存在 evidence_sha256）。
 -- 两者用途不同，不得互相替代。
 --
--- 不修改任何行情数值。可重复执行（SQLite 不支持 ADD COLUMN IF NOT EXISTS，
--- 因此由 tr_layer.migrate_raw_record_columns() 先检查列是否存在）。
+-- 不修改任何行情数值。
+-- SQLite 的 ALTER TABLE ADD COLUMN 不支持 IF NOT EXISTS，
+-- 因此由 tr_layer.migrate_raw_record_columns() 先检查列是否存在再执行本文件，
+-- 以保证幂等。
 -- ============================================================================
+
+ALTER TABLE tr_index_daily_raw ADD COLUMN raw_record_json TEXT;
+
+ALTER TABLE tr_index_daily_raw ADD COLUMN raw_record_sha256 TEXT;
