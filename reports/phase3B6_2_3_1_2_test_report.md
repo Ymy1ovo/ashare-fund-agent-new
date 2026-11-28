@@ -1,9 +1,10 @@
 # 阶段3B-6.2.3.1.2 测试报告
 
-> **真实操作数据库、真实调用审计函数、真实计算 SHA256。**
+> ⚠️ **本报告已被 3B-6.2.3.1.2.1 修正**。新增 52 项边界修复专项测试，
+> 并重新生成全部审计结果。请以本报告为准。
 
 **本轮任务基线 HEAD**：`6a76d2890ddd5ec21d97d90ed1ab4b07d3ea168a`
-**本轮最终 HEAD**：见提交记录（**与基线不同，不得混淆**）
+**修正后最终 HEAD**：见提交记录
 
 ---
 
@@ -82,8 +83,9 @@ for j, s in rows:
 
 | 项目 | 结果 |
 | --- | --- |
-| 专项测试 | **41 passed / 0 failed / 0 skipped** |
-| 全量测试 | 2973 → **3014**（**+41**） |
+| 专项测试（3B-6.2.3.1.2 原始） | **41 passed / 0 failed / 0 skipped** |
+| **专项测试（3B-6.2.3.1.2.1 新增）** | **52 passed / 0 failed / 0 skipped** |
+| 全量测试 | 3014 → **3066**（**+52**） |
 
 ---
 
@@ -162,3 +164,87 @@ H20930: 任务书=bond 实际=hk (中证港股通综合全收益指数)
 | `ready_for_formal_ranking` | **false** |
 | `ready_for_3b6_2_3_1_series_build` | **false** |
 
+
+---
+
+## 9. 3B-6.2.3.1.2.1 新增专项测试（52 项）
+
+文件：`tests/test_3b6_2_3_1_2_1_boundary.py`
+
+### 9.1 修复1：连续性判定（9 项）
+
+| 测试 | 断言 |
+| --- | --- |
+| `test_suspected_closed_blocks_proxy_verification` | 有疑似休市 → `has_unresolved_suspicion` |
+| `test_no_suspected_can_be_proxy_verified` | 无疑似且无缺失 → 代理验证 |
+| `test_missing_trading_days_gives_has_issues` | 有缺失 → `has_issues` |
+| `test_bond_hk_still_unknown` | 债券/港股仍 unknown |
+| `test_suspected_not_bypassing_continuity` | 疑似记录不能绕过阻断 |
+| `test_all_12_real_candidates_checked` | **检查全部 12 个真实候选** |
+| `test_continuity_distribution_matches_baseline` | 分布与原始五态一致 |
+| `test_closed_placeholder_records_preserved` | 8 条疑似休市保留 |
+| `test_no_official_calendar_upgrade` | 代理不得升级为官方 |
+
+### 9.2 修复2：判级优先级（11 项）
+
+| 测试 | 断言 |
+| --- | --- |
+| `test_h20184_real_data_graded_d` | **H20184 真实数据评为 D** |
+| `test_close_zero_graded_d` | close=0 → D |
+| `test_close_negative_graded_d` | close<0 → D |
+| `test_calendar_unknown_no_fatal_graded_c` | 日历 unknown 无致命 → C |
+| `test_proxy_calendar_and_quality_graded_b` | 代理日历+质量 → B |
+| `test_all_six_graded_a` | 六项全通 → A |
+| `test_d_not_intercepted_by_c` | **D 不被 C 截获** |
+| `test_identity_missing_graded_unknown` | 身份不足 → UNKNOWN |
+| `test_grade_distribution_from_real_data` | 从真实数据重算，不硬编码 |
+| `test_grading_file_consistent` | 两个 JSON 一致 |
+| `test_d_not_intercepted_by_c`（重复断言优先级规则） | — |
+
+### 9.3 修复3：无效前值（4 项）
+
+| 测试 | 断言 |
+| --- | --- |
+| `test_invalid_prev_close_blocks_return_calc` | 阻断计数 ≥1，**无虚假 extreme_jump** |
+| `test_invalid_prev_close_no_change_inconsistency` | 无虚假 change 不一致 |
+| `test_h20184_real_has_blocked_count` | 真实数据有阻断记录 |
+| `test_abnormal_value_still_preserved` | 原始 0.0 保留 |
+
+### 9.4 修复4：用途限制（4 项）
+
+| 测试 | 断言 |
+| --- | --- |
+| `test_usage_restrictions_present` | 显式筛选规则存在且自洽 |
+| `test_excluded_records_are_abnormal` | 排除的必须是异常行 |
+| `test_residual_continuity_gap_declared` | 缺口必须声明 |
+| `test_synthetic_rows_in_exclusion_list` | 12 条合成行在排除清单 |
+
+### 9.5 修复5：非交易日诊断（4 项 + 12 项逐项检查）
+
+| 测试 | 断言 |
+| --- | --- |
+| `test_non_trading_date_filled_for_stock` | **A 股实际填充** |
+| `test_non_trading_date_not_applicable_for_bond` | 债券不适用 |
+| `test_non_trading_date_not_applicable_for_hk` | 港股不适用 |
+| `test_non_trading_is_proxy_anomaly_not_official` | 只能标代理异常 |
+
+**12 项逐项真实函数测试**：非法日期、重复日期、close=0、
+high<low、OHLC 冲突、volume 负值、change 不一致、
+change_pct 不一致、异常跳变、连续重复价格等，
+**每项都用构造数据真实调用 `audit_row_quality()` 验证**。
+
+### 9.6 数据保护（9 项）
+
+覆盖：行数不变、`index_daily` 指纹不变、`raw_record` 不变、
+证据 SHA256 不变、完整性/外键、隔离、异常行保留、门禁、基线。
+
+---
+
+## 10. 实际执行 vs 静态检查
+
+| 类型 | 内容 |
+| --- | --- |
+| **实际执行** | 12 个候选真实审计（55,942 行）；52 项专项测试真实调用函数；数据库完整性检查；SHA256 真实计算 |
+| **静态检查** | 判级优先级规则定义；连续性判定规则表 |
+
+**所有结论均有实际执行支撑。**

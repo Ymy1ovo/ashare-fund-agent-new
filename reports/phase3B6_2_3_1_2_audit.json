@@ -1,8 +1,8 @@
 {
  "phase": "3B-6.2.3.1.2",
  "task": "全收益指数历史序列质量验证与可用性分级",
- "generated_at": "2026-11-28T16:38:46",
- "baseline_head": "6a76d2890ddd5ec21d97d90ed1ab4b07d3ea168a",
+ "generated_at": "2026-11-28T17:10:28",
+ "baseline_head": "aaa41cca487a90758ab17f24051fc2e93f52830c",
  "read_only": true,
  "no_redownload": true,
  "task_candidate_table_errors": {
@@ -137,7 +137,9 @@
     "dates_outside_calendar": 0,
     "outside_detail": [],
     "unexplained_count": 0,
-    "reason": "相对 A 股日历**代理**无缺失（非官方发布日历）",
+    "suspected_market_closed_count": 0,
+    "reason": "相对 A 股日历代理无缺失且无日历外异常（非官方日历）",
+    "continuity_rule": "缺失→has_issues；无法解释→has_unresolved_suspicion；疑似休市→has_unresolved_suspicion；全无→verified_against_proxy_calendar",
     "calendar_evidence": "项目 trade_calendar 表 8,797 天（1990-12-19 ~ 2026-12-31）；**非官方指数发布日历**",
     "proxy_not_official": true
    },
@@ -199,7 +201,18 @@
      "non_trading_date": {
       "count": 0,
       "sample": []
+     },
+     "blocked_by_invalid_previous_close": {
+      "count": 0,
+      "sample": []
      }
+    },
+    "calendar_diagnostic": {
+     "applicable": true,
+     "reason": "",
+     "count": 0,
+     "calendar": "A股交易日历（项目代理）",
+     "official": false
     },
     "fatal_issue_count": 0,
     "data_quality_status": "pass",
@@ -229,6 +242,27 @@
     "normal_unverified": 4348,
     "suspected_synthetic": 1
    },
+   "data_usage_restrictions": {
+    "must_exclude_before_return_calc": [
+     {
+      "trade_date": "20040101",
+      "row_quality_status": "suspected_synthetic",
+      "close": 1000.0
+     }
+    ],
+    "excluded_count": 1,
+    "usable_after_exclusion": 4348,
+    "quality_audit_only": [
+     {
+      "trade_date": "20040101",
+      "row_quality_status": "suspected_synthetic"
+     }
+    ],
+    "allow_descriptive_after_exclusion": true,
+    "residual_continuity_gap": false,
+    "residual_note": "排除异常行后相对代理日历无缺失，但**仍非官方日历验证**",
+    "rule": "任何收益计算必须显式按 row_quality_status 筛选，**不得默认使用全部 55,942 条原始记录**"
+   },
    "grading": {
     "dimensions": {
      "official_identity": "official",
@@ -239,6 +273,8 @@
      "point_in_time": "unknown"
     },
     "final_grade": "B",
+    "grade_reason": "身份、口径、质量通过，日历达代理验证等级",
+    "grade_priority_rule": "A → D → B → C → UNKNOWN",
     "grade_definition": "关键质量条件通过，存在明确有限缺口",
     "allowed_uses": [
      "描述性统计（收益分布、波动率、相关性）",
@@ -409,7 +445,16 @@
      "non_trading_date": {
       "count": 0,
       "sample": []
+     },
+     "blocked_by_invalid_previous_close": {
+      "count": 0,
+      "sample": []
      }
+    },
+    "calendar_diagnostic": {
+     "applicable": false,
+     "reason": "bond 市场日历 unknown，**不得借用 A 股日历做非交易日诊断**",
+     "count": 0
     },
     "fatal_issue_count": 0,
     "data_quality_status": "pass",
@@ -439,6 +484,27 @@
     "normal_unverified": 3375,
     "suspected_synthetic": 1
    },
+   "data_usage_restrictions": {
+    "must_exclude_before_return_calc": [
+     {
+      "trade_date": "20040101",
+      "row_quality_status": "suspected_synthetic",
+      "close": 100.0
+     }
+    ],
+    "excluded_count": 1,
+    "usable_after_exclusion": 3375,
+    "quality_audit_only": [
+     {
+      "trade_date": "20040101",
+      "row_quality_status": "suspected_synthetic"
+     }
+    ],
+    "allow_descriptive_after_exclusion": true,
+    "residual_continuity_gap": true,
+    "residual_note": "排除异常行后**仍存在连续性缺口**，不得描述为官方完整历史序列",
+    "rule": "任何收益计算必须显式按 row_quality_status 筛选，**不得默认使用全部 55,942 条原始记录**"
+   },
    "grading": {
     "dimensions": {
      "official_identity": "official",
@@ -449,6 +515,8 @@
      "point_in_time": "unknown"
     },
     "final_grade": "C",
+    "grade_reason": "身份与口径成立，但存在未解决限制（日历=unknown）",
+    "grade_priority_rule": "A → D → B → C → UNKNOWN",
     "grade_definition": "可用于有限描述性/代理研究，存在未解决关键限制",
     "allowed_uses": [
      "有限描述性研究",
@@ -510,7 +578,7 @@
     "calendar_used": "A股交易日历（项目代理）",
     "calendar_available": true,
     "calendar_is_official": false,
-    "continuity_status": "verified_against_proxy_calendar",
+    "continuity_status": "has_unresolved_suspicion",
     "coverage_status": "verified",
     "missing_trading_days": 0,
     "missing_sample": [],
@@ -530,7 +598,9 @@
      }
     ],
     "unexplained_count": 0,
-    "reason": "相对 A 股日历**代理**无缺失（非官方发布日历）",
+    "suspected_market_closed_count": 1,
+    "reason": "存在 1 条疑似休市占位记录，**无官方日历证据，不得判为代理验证通过**",
+    "continuity_rule": "缺失→has_issues；无法解释→has_unresolved_suspicion；疑似休市→has_unresolved_suspicion；全无→verified_against_proxy_calendar",
     "calendar_evidence": "项目 trade_calendar 表 8,797 天（1990-12-19 ~ 2026-12-31）；**非官方指数发布日历**",
     "proxy_not_official": true
    },
@@ -590,9 +660,25 @@
       "sample": []
      },
      "non_trading_date": {
+      "count": 1,
+      "sample": [
+       {
+        "date": "2018-06-18",
+        "note": "不在 A 股代理日历内；**代理异常，非官方休市认定**"
+       }
+      ]
+     },
+     "blocked_by_invalid_previous_close": {
       "count": 0,
       "sample": []
      }
+    },
+    "calendar_diagnostic": {
+     "applicable": true,
+     "reason": "",
+     "count": 1,
+     "calendar": "A股交易日历（项目代理）",
+     "official": false
     },
     "fatal_issue_count": 0,
     "data_quality_status": "pass",
@@ -623,21 +709,52 @@
     "suspected_market_closed_placeholder": 1,
     "suspected_synthetic": 1
    },
+   "data_usage_restrictions": {
+    "must_exclude_before_return_calc": [
+     {
+      "trade_date": "20040101",
+      "row_quality_status": "suspected_synthetic",
+      "close": 1011.35
+     },
+     {
+      "trade_date": "20180618",
+      "row_quality_status": "suspected_market_closed_placeholder",
+      "close": 3616.55
+     }
+    ],
+    "excluded_count": 2,
+    "usable_after_exclusion": 5561,
+    "quality_audit_only": [
+     {
+      "trade_date": "20040101",
+      "row_quality_status": "suspected_synthetic"
+     },
+     {
+      "trade_date": "20180618",
+      "row_quality_status": "suspected_market_closed_placeholder"
+     }
+    ],
+    "allow_descriptive_after_exclusion": true,
+    "residual_continuity_gap": true,
+    "residual_note": "排除异常行后**仍存在连续性缺口**，不得描述为官方完整历史序列",
+    "rule": "任何收益计算必须显式按 row_quality_status 筛选，**不得默认使用全部 55,942 条原始记录**"
+   },
    "grading": {
     "dimensions": {
      "official_identity": "official",
      "return_basis": "official",
      "historical_start": "unknown",
-     "calendar": "verified_against_proxy_calendar",
+     "calendar": "has_unresolved_suspicion",
      "data_quality": "pass",
      "point_in_time": "unknown"
     },
-    "final_grade": "B",
-    "grade_definition": "关键质量条件通过，存在明确有限缺口",
+    "final_grade": "C",
+    "grade_reason": "身份与口径成立，但存在未解决限制（日历=has_unresolved_suspicion）",
+    "grade_priority_rule": "A → D → B → C → UNKNOWN",
+    "grade_definition": "可用于有限描述性/代理研究，存在未解决关键限制",
     "allowed_uses": [
-     "描述性统计（收益分布、波动率、相关性）",
-     "基准结构分析（成分、权重研究）",
-     "代理收益序列的敏感性分析（须标注限制）"
+     "有限描述性研究",
+     "作为代理序列做探索性分析（须明确标注证据缺口）"
     ],
     "forbidden_uses": [
      "任何声称无未来数据偏差的回测",
@@ -648,7 +765,7 @@
     ],
     "blockers": [
      "真实历史起点 unknown",
-     "日历等级=verified_against_proxy_calendar",
+     "日历等级=has_unresolved_suspicion",
      "历史时点可用性 unknown"
     ]
    }
@@ -695,7 +812,7 @@
     "calendar_used": "A股交易日历（项目代理）",
     "calendar_available": true,
     "calendar_is_official": false,
-    "continuity_status": "verified_against_proxy_calendar",
+    "continuity_status": "has_unresolved_suspicion",
     "coverage_status": "verified",
     "missing_trading_days": 0,
     "missing_sample": [],
@@ -715,7 +832,9 @@
      }
     ],
     "unexplained_count": 0,
-    "reason": "相对 A 股日历**代理**无缺失（非官方发布日历）",
+    "suspected_market_closed_count": 1,
+    "reason": "存在 1 条疑似休市占位记录，**无官方日历证据，不得判为代理验证通过**",
+    "continuity_rule": "缺失→has_issues；无法解释→has_unresolved_suspicion；疑似休市→has_unresolved_suspicion；全无→verified_against_proxy_calendar",
     "calendar_evidence": "项目 trade_calendar 表 8,797 天（1990-12-19 ~ 2026-12-31）；**非官方指数发布日历**",
     "proxy_not_official": true
    },
@@ -775,9 +894,25 @@
       "sample": []
      },
      "non_trading_date": {
+      "count": 1,
+      "sample": [
+       {
+        "date": "2018-06-18",
+        "note": "不在 A 股代理日历内；**代理异常，非官方休市认定**"
+       }
+      ]
+     },
+     "blocked_by_invalid_previous_close": {
       "count": 0,
       "sample": []
      }
+    },
+    "calendar_diagnostic": {
+     "applicable": true,
+     "reason": "",
+     "count": 1,
+     "calendar": "A股交易日历（项目代理）",
+     "official": false
     },
     "fatal_issue_count": 0,
     "data_quality_status": "pass",
@@ -808,21 +943,52 @@
     "suspected_market_closed_placeholder": 1,
     "suspected_synthetic": 1
    },
+   "data_usage_restrictions": {
+    "must_exclude_before_return_calc": [
+     {
+      "trade_date": "20040101",
+      "row_quality_status": "suspected_synthetic",
+      "close": 1000.0
+     },
+     {
+      "trade_date": "20180618",
+      "row_quality_status": "suspected_market_closed_placeholder",
+      "close": 4614.35
+     }
+    ],
+    "excluded_count": 2,
+    "usable_after_exclusion": 5319,
+    "quality_audit_only": [
+     {
+      "trade_date": "20040101",
+      "row_quality_status": "suspected_synthetic"
+     },
+     {
+      "trade_date": "20180618",
+      "row_quality_status": "suspected_market_closed_placeholder"
+     }
+    ],
+    "allow_descriptive_after_exclusion": true,
+    "residual_continuity_gap": true,
+    "residual_note": "排除异常行后**仍存在连续性缺口**，不得描述为官方完整历史序列",
+    "rule": "任何收益计算必须显式按 row_quality_status 筛选，**不得默认使用全部 55,942 条原始记录**"
+   },
    "grading": {
     "dimensions": {
      "official_identity": "official",
      "return_basis": "official",
      "historical_start": "unknown",
-     "calendar": "verified_against_proxy_calendar",
+     "calendar": "has_unresolved_suspicion",
      "data_quality": "pass",
      "point_in_time": "unknown"
     },
-    "final_grade": "B",
-    "grade_definition": "关键质量条件通过，存在明确有限缺口",
+    "final_grade": "C",
+    "grade_reason": "身份与口径成立，但存在未解决限制（日历=has_unresolved_suspicion）",
+    "grade_priority_rule": "A → D → B → C → UNKNOWN",
+    "grade_definition": "可用于有限描述性/代理研究，存在未解决关键限制",
     "allowed_uses": [
-     "描述性统计（收益分布、波动率、相关性）",
-     "基准结构分析（成分、权重研究）",
-     "代理收益序列的敏感性分析（须标注限制）"
+     "有限描述性研究",
+     "作为代理序列做探索性分析（须明确标注证据缺口）"
     ],
     "forbidden_uses": [
      "任何声称无未来数据偏差的回测",
@@ -833,7 +999,7 @@
     ],
     "blockers": [
      "真实历史起点 unknown",
-     "日历等级=verified_against_proxy_calendar",
+     "日历等级=has_unresolved_suspicion",
      "历史时点可用性 unknown"
     ]
    }
@@ -880,7 +1046,7 @@
     "calendar_used": "A股交易日历（项目代理）",
     "calendar_available": true,
     "calendar_is_official": false,
-    "continuity_status": "verified_against_proxy_calendar",
+    "continuity_status": "has_unresolved_suspicion",
     "coverage_status": "verified",
     "missing_trading_days": 0,
     "missing_sample": [],
@@ -900,7 +1066,9 @@
      }
     ],
     "unexplained_count": 0,
-    "reason": "相对 A 股日历**代理**无缺失（非官方发布日历）",
+    "suspected_market_closed_count": 1,
+    "reason": "存在 1 条疑似休市占位记录，**无官方日历证据，不得判为代理验证通过**",
+    "continuity_rule": "缺失→has_issues；无法解释→has_unresolved_suspicion；疑似休市→has_unresolved_suspicion；全无→verified_against_proxy_calendar",
     "calendar_evidence": "项目 trade_calendar 表 8,797 天（1990-12-19 ~ 2026-12-31）；**非官方指数发布日历**",
     "proxy_not_official": true
    },
@@ -960,9 +1128,25 @@
       "sample": []
      },
      "non_trading_date": {
+      "count": 1,
+      "sample": [
+       {
+        "date": "2018-06-18",
+        "note": "不在 A 股代理日历内；**代理异常，非官方休市认定**"
+       }
+      ]
+     },
+     "blocked_by_invalid_previous_close": {
       "count": 0,
       "sample": []
      }
+    },
+    "calendar_diagnostic": {
+     "applicable": true,
+     "reason": "",
+     "count": 1,
+     "calendar": "A股交易日历（项目代理）",
+     "official": false
     },
     "fatal_issue_count": 0,
     "data_quality_status": "pass",
@@ -993,21 +1177,52 @@
     "suspected_market_closed_placeholder": 1,
     "suspected_synthetic": 1
    },
+   "data_usage_restrictions": {
+    "must_exclude_before_return_calc": [
+     {
+      "trade_date": "20040101",
+      "row_quality_status": "suspected_synthetic",
+      "close": 1000.0
+     },
+     {
+      "trade_date": "20180618",
+      "row_quality_status": "suspected_market_closed_placeholder",
+      "close": 6060.55
+     }
+    ],
+    "excluded_count": 2,
+    "usable_after_exclusion": 5319,
+    "quality_audit_only": [
+     {
+      "trade_date": "20040101",
+      "row_quality_status": "suspected_synthetic"
+     },
+     {
+      "trade_date": "20180618",
+      "row_quality_status": "suspected_market_closed_placeholder"
+     }
+    ],
+    "allow_descriptive_after_exclusion": true,
+    "residual_continuity_gap": true,
+    "residual_note": "排除异常行后**仍存在连续性缺口**，不得描述为官方完整历史序列",
+    "rule": "任何收益计算必须显式按 row_quality_status 筛选，**不得默认使用全部 55,942 条原始记录**"
+   },
    "grading": {
     "dimensions": {
      "official_identity": "official",
      "return_basis": "official",
      "historical_start": "unknown",
-     "calendar": "verified_against_proxy_calendar",
+     "calendar": "has_unresolved_suspicion",
      "data_quality": "pass",
      "point_in_time": "unknown"
     },
-    "final_grade": "B",
-    "grade_definition": "关键质量条件通过，存在明确有限缺口",
+    "final_grade": "C",
+    "grade_reason": "身份与口径成立，但存在未解决限制（日历=has_unresolved_suspicion）",
+    "grade_priority_rule": "A → D → B → C → UNKNOWN",
+    "grade_definition": "可用于有限描述性/代理研究，存在未解决关键限制",
     "allowed_uses": [
-     "描述性统计（收益分布、波动率、相关性）",
-     "基准结构分析（成分、权重研究）",
-     "代理收益序列的敏感性分析（须标注限制）"
+     "有限描述性研究",
+     "作为代理序列做探索性分析（须明确标注证据缺口）"
     ],
     "forbidden_uses": [
      "任何声称无未来数据偏差的回测",
@@ -1018,7 +1233,7 @@
     ],
     "blockers": [
      "真实历史起点 unknown",
-     "日历等级=verified_against_proxy_calendar",
+     "日历等级=has_unresolved_suspicion",
      "历史时点可用性 unknown"
     ]
    }
@@ -1065,7 +1280,7 @@
     "calendar_used": "A股交易日历（项目代理）",
     "calendar_available": true,
     "calendar_is_official": false,
-    "continuity_status": "verified_against_proxy_calendar",
+    "continuity_status": "has_unresolved_suspicion",
     "coverage_status": "verified",
     "missing_trading_days": 0,
     "missing_sample": [],
@@ -1085,7 +1300,9 @@
      }
     ],
     "unexplained_count": 0,
-    "reason": "相对 A 股日历**代理**无缺失（非官方发布日历）",
+    "suspected_market_closed_count": 1,
+    "reason": "存在 1 条疑似休市占位记录，**无官方日历证据，不得判为代理验证通过**",
+    "continuity_rule": "缺失→has_issues；无法解释→has_unresolved_suspicion；疑似休市→has_unresolved_suspicion；全无→verified_against_proxy_calendar",
     "calendar_evidence": "项目 trade_calendar 表 8,797 天（1990-12-19 ~ 2026-12-31）；**非官方指数发布日历**",
     "proxy_not_official": true
    },
@@ -1145,9 +1362,25 @@
       "sample": []
      },
      "non_trading_date": {
+      "count": 1,
+      "sample": [
+       {
+        "date": "2018-06-18",
+        "note": "不在 A 股代理日历内；**代理异常，非官方休市认定**"
+       }
+      ]
+     },
+     "blocked_by_invalid_previous_close": {
       "count": 0,
       "sample": []
      }
+    },
+    "calendar_diagnostic": {
+     "applicable": true,
+     "reason": "",
+     "count": 1,
+     "calendar": "A股交易日历（项目代理）",
+     "official": false
     },
     "fatal_issue_count": 0,
     "data_quality_status": "pass",
@@ -1178,21 +1411,52 @@
     "suspected_market_closed_placeholder": 1,
     "suspected_synthetic": 1
    },
+   "data_usage_restrictions": {
+    "must_exclude_before_return_calc": [
+     {
+      "trade_date": "20040101",
+      "row_quality_status": "suspected_synthetic",
+      "close": 1000.0
+     },
+     {
+      "trade_date": "20180618",
+      "row_quality_status": "suspected_market_closed_placeholder",
+      "close": 4906.05
+     }
+    ],
+    "excluded_count": 2,
+    "usable_after_exclusion": 5319,
+    "quality_audit_only": [
+     {
+      "trade_date": "20040101",
+      "row_quality_status": "suspected_synthetic"
+     },
+     {
+      "trade_date": "20180618",
+      "row_quality_status": "suspected_market_closed_placeholder"
+     }
+    ],
+    "allow_descriptive_after_exclusion": true,
+    "residual_continuity_gap": true,
+    "residual_note": "排除异常行后**仍存在连续性缺口**，不得描述为官方完整历史序列",
+    "rule": "任何收益计算必须显式按 row_quality_status 筛选，**不得默认使用全部 55,942 条原始记录**"
+   },
    "grading": {
     "dimensions": {
      "official_identity": "official",
      "return_basis": "official",
      "historical_start": "unknown",
-     "calendar": "verified_against_proxy_calendar",
+     "calendar": "has_unresolved_suspicion",
      "data_quality": "pass",
      "point_in_time": "unknown"
     },
-    "final_grade": "B",
-    "grade_definition": "关键质量条件通过，存在明确有限缺口",
+    "final_grade": "C",
+    "grade_reason": "身份与口径成立，但存在未解决限制（日历=has_unresolved_suspicion）",
+    "grade_priority_rule": "A → D → B → C → UNKNOWN",
+    "grade_definition": "可用于有限描述性/代理研究，存在未解决关键限制",
     "allowed_uses": [
-     "描述性统计（收益分布、波动率、相关性）",
-     "基准结构分析（成分、权重研究）",
-     "代理收益序列的敏感性分析（须标注限制）"
+     "有限描述性研究",
+     "作为代理序列做探索性分析（须明确标注证据缺口）"
     ],
     "forbidden_uses": [
      "任何声称无未来数据偏差的回测",
@@ -1203,7 +1467,7 @@
     ],
     "blockers": [
      "真实历史起点 unknown",
-     "日历等级=verified_against_proxy_calendar",
+     "日历等级=has_unresolved_suspicion",
      "历史时点可用性 unknown"
     ]
    }
@@ -1250,7 +1514,7 @@
     "calendar_used": "A股交易日历（项目代理）",
     "calendar_available": true,
     "calendar_is_official": false,
-    "continuity_status": "verified_against_proxy_calendar",
+    "continuity_status": "has_unresolved_suspicion",
     "coverage_status": "verified",
     "missing_trading_days": 0,
     "missing_sample": [],
@@ -1270,7 +1534,9 @@
      }
     ],
     "unexplained_count": 0,
-    "reason": "相对 A 股日历**代理**无缺失（非官方发布日历）",
+    "suspected_market_closed_count": 1,
+    "reason": "存在 1 条疑似休市占位记录，**无官方日历证据，不得判为代理验证通过**",
+    "continuity_rule": "缺失→has_issues；无法解释→has_unresolved_suspicion；疑似休市→has_unresolved_suspicion；全无→verified_against_proxy_calendar",
     "calendar_evidence": "项目 trade_calendar 表 8,797 天（1990-12-19 ~ 2026-12-31）；**非官方指数发布日历**",
     "proxy_not_official": true
    },
@@ -1330,9 +1596,25 @@
       "sample": []
      },
      "non_trading_date": {
+      "count": 1,
+      "sample": [
+       {
+        "date": "2018-06-18",
+        "note": "不在 A 股代理日历内；**代理异常，非官方休市认定**"
+       }
+      ]
+     },
+     "blocked_by_invalid_previous_close": {
       "count": 0,
       "sample": []
      }
+    },
+    "calendar_diagnostic": {
+     "applicable": true,
+     "reason": "",
+     "count": 1,
+     "calendar": "A股交易日历（项目代理）",
+     "official": false
     },
     "fatal_issue_count": 0,
     "data_quality_status": "pass",
@@ -1363,21 +1645,52 @@
     "suspected_market_closed_placeholder": 1,
     "suspected_synthetic": 1
    },
+   "data_usage_restrictions": {
+    "must_exclude_before_return_calc": [
+     {
+      "trade_date": "20040101",
+      "row_quality_status": "suspected_synthetic",
+      "close": 1000.0
+     },
+     {
+      "trade_date": "20180618",
+      "row_quality_status": "suspected_market_closed_placeholder",
+      "close": 6475.67
+     }
+    ],
+    "excluded_count": 2,
+    "usable_after_exclusion": 5319,
+    "quality_audit_only": [
+     {
+      "trade_date": "20040101",
+      "row_quality_status": "suspected_synthetic"
+     },
+     {
+      "trade_date": "20180618",
+      "row_quality_status": "suspected_market_closed_placeholder"
+     }
+    ],
+    "allow_descriptive_after_exclusion": true,
+    "residual_continuity_gap": true,
+    "residual_note": "排除异常行后**仍存在连续性缺口**，不得描述为官方完整历史序列",
+    "rule": "任何收益计算必须显式按 row_quality_status 筛选，**不得默认使用全部 55,942 条原始记录**"
+   },
    "grading": {
     "dimensions": {
      "official_identity": "official",
      "return_basis": "official",
      "historical_start": "unknown",
-     "calendar": "verified_against_proxy_calendar",
+     "calendar": "has_unresolved_suspicion",
      "data_quality": "pass",
      "point_in_time": "unknown"
     },
-    "final_grade": "B",
-    "grade_definition": "关键质量条件通过，存在明确有限缺口",
+    "final_grade": "C",
+    "grade_reason": "身份与口径成立，但存在未解决限制（日历=has_unresolved_suspicion）",
+    "grade_priority_rule": "A → D → B → C → UNKNOWN",
+    "grade_definition": "可用于有限描述性/代理研究，存在未解决关键限制",
     "allowed_uses": [
-     "描述性统计（收益分布、波动率、相关性）",
-     "基准结构分析（成分、权重研究）",
-     "代理收益序列的敏感性分析（须标注限制）"
+     "有限描述性研究",
+     "作为代理序列做探索性分析（须明确标注证据缺口）"
     ],
     "forbidden_uses": [
      "任何声称无未来数据偏差的回测",
@@ -1388,7 +1701,7 @@
     ],
     "blockers": [
      "真实历史起点 unknown",
-     "日历等级=verified_against_proxy_calendar",
+     "日历等级=has_unresolved_suspicion",
      "历史时点可用性 unknown"
     ]
    }
@@ -1435,7 +1748,7 @@
     "calendar_used": "A股交易日历（项目代理）",
     "calendar_available": true,
     "calendar_is_official": false,
-    "continuity_status": "verified_against_proxy_calendar",
+    "continuity_status": "has_unresolved_suspicion",
     "coverage_status": "verified",
     "missing_trading_days": 0,
     "missing_sample": [],
@@ -1455,7 +1768,9 @@
      }
     ],
     "unexplained_count": 0,
-    "reason": "相对 A 股日历**代理**无缺失（非官方发布日历）",
+    "suspected_market_closed_count": 1,
+    "reason": "存在 1 条疑似休市占位记录，**无官方日历证据，不得判为代理验证通过**",
+    "continuity_rule": "缺失→has_issues；无法解释→has_unresolved_suspicion；疑似休市→has_unresolved_suspicion；全无→verified_against_proxy_calendar",
     "calendar_evidence": "项目 trade_calendar 表 8,797 天（1990-12-19 ~ 2026-12-31）；**非官方指数发布日历**",
     "proxy_not_official": true
    },
@@ -1515,9 +1830,25 @@
       "sample": []
      },
      "non_trading_date": {
+      "count": 1,
+      "sample": [
+       {
+        "date": "2018-06-18",
+        "note": "不在 A 股代理日历内；**代理异常，非官方休市认定**"
+       }
+      ]
+     },
+     "blocked_by_invalid_previous_close": {
       "count": 0,
       "sample": []
      }
+    },
+    "calendar_diagnostic": {
+     "applicable": true,
+     "reason": "",
+     "count": 1,
+     "calendar": "A股交易日历（项目代理）",
+     "official": false
     },
     "fatal_issue_count": 0,
     "data_quality_status": "pass",
@@ -1548,21 +1879,52 @@
     "suspected_market_closed_placeholder": 1,
     "suspected_synthetic": 1
    },
+   "data_usage_restrictions": {
+    "must_exclude_before_return_calc": [
+     {
+      "trade_date": "20040101",
+      "row_quality_status": "suspected_synthetic",
+      "close": 1000.0
+     },
+     {
+      "trade_date": "20180618",
+      "row_quality_status": "suspected_market_closed_placeholder",
+      "close": 10721.51
+     }
+    ],
+    "excluded_count": 2,
+    "usable_after_exclusion": 5319,
+    "quality_audit_only": [
+     {
+      "trade_date": "20040101",
+      "row_quality_status": "suspected_synthetic"
+     },
+     {
+      "trade_date": "20180618",
+      "row_quality_status": "suspected_market_closed_placeholder"
+     }
+    ],
+    "allow_descriptive_after_exclusion": true,
+    "residual_continuity_gap": true,
+    "residual_note": "排除异常行后**仍存在连续性缺口**，不得描述为官方完整历史序列",
+    "rule": "任何收益计算必须显式按 row_quality_status 筛选，**不得默认使用全部 55,942 条原始记录**"
+   },
    "grading": {
     "dimensions": {
      "official_identity": "official",
      "return_basis": "official",
      "historical_start": "unknown",
-     "calendar": "verified_against_proxy_calendar",
+     "calendar": "has_unresolved_suspicion",
      "data_quality": "pass",
      "point_in_time": "unknown"
     },
-    "final_grade": "B",
-    "grade_definition": "关键质量条件通过，存在明确有限缺口",
+    "final_grade": "C",
+    "grade_reason": "身份与口径成立，但存在未解决限制（日历=has_unresolved_suspicion）",
+    "grade_priority_rule": "A → D → B → C → UNKNOWN",
+    "grade_definition": "可用于有限描述性/代理研究，存在未解决关键限制",
     "allowed_uses": [
-     "描述性统计（收益分布、波动率、相关性）",
-     "基准结构分析（成分、权重研究）",
-     "代理收益序列的敏感性分析（须标注限制）"
+     "有限描述性研究",
+     "作为代理序列做探索性分析（须明确标注证据缺口）"
     ],
     "forbidden_uses": [
      "任何声称无未来数据偏差的回测",
@@ -1573,7 +1935,7 @@
     ],
     "blockers": [
      "真实历史起点 unknown",
-     "日历等级=verified_against_proxy_calendar",
+     "日历等级=has_unresolved_suspicion",
      "历史时点可用性 unknown"
     ]
    }
@@ -1620,7 +1982,7 @@
     "calendar_used": "A股交易日历（项目代理）",
     "calendar_available": true,
     "calendar_is_official": false,
-    "continuity_status": "verified_against_proxy_calendar",
+    "continuity_status": "has_unresolved_suspicion",
     "coverage_status": "verified",
     "missing_trading_days": 0,
     "missing_sample": [],
@@ -1640,7 +2002,9 @@
      }
     ],
     "unexplained_count": 0,
-    "reason": "相对 A 股日历**代理**无缺失（非官方发布日历）",
+    "suspected_market_closed_count": 1,
+    "reason": "存在 1 条疑似休市占位记录，**无官方日历证据，不得判为代理验证通过**",
+    "continuity_rule": "缺失→has_issues；无法解释→has_unresolved_suspicion；疑似休市→has_unresolved_suspicion；全无→verified_against_proxy_calendar",
     "calendar_evidence": "项目 trade_calendar 表 8,797 天（1990-12-19 ~ 2026-12-31）；**非官方指数发布日历**",
     "proxy_not_official": true
    },
@@ -1689,7 +2053,7 @@
       "sample": []
      },
      "change_inconsistent": {
-      "count": 2,
+      "count": 1,
       "sample": [
        {
         "date": "20130628",
@@ -1697,13 +2061,6 @@
         "close": 0.0,
         "change_field": 0.0,
         "expected": -1547.19
-       },
-       {
-        "date": "20130701",
-        "prev": 0.0,
-        "close": 1579.13,
-        "change_field": 38.23,
-        "expected": 1579.13
        }
       ]
      },
@@ -1718,24 +2075,39 @@
       ]
      },
      "extreme_jump": {
-      "count": 1,
-      "sample": [
-       {
-        "date": "20130628",
-        "prev": 1547.19,
-        "close": 0.0,
-        "jump": 1.0
-       }
-      ]
+      "count": 0,
+      "sample": []
      },
      "repeated_price_run": {
       "count": 0,
       "sample": []
      },
      "non_trading_date": {
-      "count": 0,
-      "sample": []
+      "count": 1,
+      "sample": [
+       {
+        "date": "2018-06-18",
+        "note": "不在 A 股代理日历内；**代理异常，非官方休市认定**"
+       }
+      ]
+     },
+     "blocked_by_invalid_previous_close": {
+      "count": 1,
+      "sample": [
+       {
+        "date": "20130701",
+        "prev_close": 0.0,
+        "reason": "前一交易日收盘价无效（<=0 或缺失），不计算相邻收益"
+       }
+      ]
      }
+    },
+    "calendar_diagnostic": {
+     "applicable": true,
+     "reason": "",
+     "count": 1,
+     "calendar": "A股交易日历（项目代理）",
+     "official": false
     },
     "fatal_issue_count": 1,
     "data_quality_status": "has_fatal",
@@ -1767,20 +2139,60 @@
     "suspected_market_closed_placeholder": 1,
     "suspected_synthetic": 1
    },
+   "data_usage_restrictions": {
+    "must_exclude_before_return_calc": [
+     {
+      "trade_date": "20040101",
+      "row_quality_status": "suspected_synthetic",
+      "close": 994.47
+     },
+     {
+      "trade_date": "20130628",
+      "row_quality_status": "invalid_value",
+      "close": 0.0
+     },
+     {
+      "trade_date": "20180618",
+      "row_quality_status": "suspected_market_closed_placeholder",
+      "close": 3422.74
+     }
+    ],
+    "excluded_count": 3,
+    "usable_after_exclusion": 5317,
+    "quality_audit_only": [
+     {
+      "trade_date": "20040101",
+      "row_quality_status": "suspected_synthetic"
+     },
+     {
+      "trade_date": "20130628",
+      "row_quality_status": "invalid_value"
+     },
+     {
+      "trade_date": "20180618",
+      "row_quality_status": "suspected_market_closed_placeholder"
+     }
+    ],
+    "allow_descriptive_after_exclusion": true,
+    "residual_continuity_gap": true,
+    "residual_note": "排除异常行后**仍存在连续性缺口**，不得描述为官方完整历史序列",
+    "rule": "任何收益计算必须显式按 row_quality_status 筛选，**不得默认使用全部 55,942 条原始记录**"
+   },
    "grading": {
     "dimensions": {
      "official_identity": "official",
      "return_basis": "official",
      "historical_start": "unknown",
-     "calendar": "verified_against_proxy_calendar",
+     "calendar": "has_unresolved_suspicion",
      "data_quality": "has_fatal",
      "point_in_time": "unknown"
     },
-    "final_grade": "C",
-    "grade_definition": "可用于有限描述性/代理研究，存在未解决关键限制",
+    "final_grade": "D",
+    "grade_reason": "存在 1 处致命数据质量问题，不能作为可靠收益序列",
+    "grade_priority_rule": "A → D → B → C → UNKNOWN",
+    "grade_definition": "存在严重质量问题，不可作为可靠历史收益序列",
     "allowed_uses": [
-     "有限描述性研究",
-     "作为代理序列做探索性分析（须明确标注证据缺口）"
+     "仅供数据质量研究，不作为收益来源"
     ],
     "forbidden_uses": [
      "任何声称无未来数据偏差的回测",
@@ -1791,8 +2203,8 @@
     ],
     "blockers": [
      "真实历史起点 unknown",
-     "日历等级=verified_against_proxy_calendar",
-     "数据质量存在致命问题",
+     "日历等级=has_unresolved_suspicion",
+     "致命数据质量问题 1 处",
      "历史时点可用性 unknown"
     ]
    }
@@ -1839,7 +2251,7 @@
     "calendar_used": "A股交易日历（项目代理）",
     "calendar_available": true,
     "calendar_is_official": false,
-    "continuity_status": "verified_against_proxy_calendar",
+    "continuity_status": "has_unresolved_suspicion",
     "coverage_status": "verified",
     "missing_trading_days": 0,
     "missing_sample": [],
@@ -1859,7 +2271,9 @@
      }
     ],
     "unexplained_count": 0,
-    "reason": "相对 A 股日历**代理**无缺失（非官方发布日历）",
+    "suspected_market_closed_count": 1,
+    "reason": "存在 1 条疑似休市占位记录，**无官方日历证据，不得判为代理验证通过**",
+    "continuity_rule": "缺失→has_issues；无法解释→has_unresolved_suspicion；疑似休市→has_unresolved_suspicion；全无→verified_against_proxy_calendar",
     "calendar_evidence": "项目 trade_calendar 表 8,797 天（1990-12-19 ~ 2026-12-31）；**非官方指数发布日历**",
     "proxy_not_official": true
    },
@@ -1919,9 +2333,25 @@
       "sample": []
      },
      "non_trading_date": {
+      "count": 1,
+      "sample": [
+       {
+        "date": "2018-06-18",
+        "note": "不在 A 股代理日历内；**代理异常，非官方休市认定**"
+       }
+      ]
+     },
+     "blocked_by_invalid_previous_close": {
       "count": 0,
       "sample": []
      }
+    },
+    "calendar_diagnostic": {
+     "applicable": true,
+     "reason": "",
+     "count": 1,
+     "calendar": "A股交易日历（项目代理）",
+     "official": false
     },
     "fatal_issue_count": 0,
     "data_quality_status": "pass",
@@ -1952,21 +2382,52 @@
     "suspected_market_closed_placeholder": 1,
     "suspected_synthetic": 1
    },
+   "data_usage_restrictions": {
+    "must_exclude_before_return_calc": [
+     {
+      "trade_date": "20040101",
+      "row_quality_status": "suspected_synthetic",
+      "close": 1000.0
+     },
+     {
+      "trade_date": "20180618",
+      "row_quality_status": "suspected_market_closed_placeholder",
+      "close": 8059.48
+     }
+    ],
+    "excluded_count": 2,
+    "usable_after_exclusion": 4348,
+    "quality_audit_only": [
+     {
+      "trade_date": "20040101",
+      "row_quality_status": "suspected_synthetic"
+     },
+     {
+      "trade_date": "20180618",
+      "row_quality_status": "suspected_market_closed_placeholder"
+     }
+    ],
+    "allow_descriptive_after_exclusion": true,
+    "residual_continuity_gap": true,
+    "residual_note": "排除异常行后**仍存在连续性缺口**，不得描述为官方完整历史序列",
+    "rule": "任何收益计算必须显式按 row_quality_status 筛选，**不得默认使用全部 55,942 条原始记录**"
+   },
    "grading": {
     "dimensions": {
      "official_identity": "official",
      "return_basis": "official",
      "historical_start": "unknown",
-     "calendar": "verified_against_proxy_calendar",
+     "calendar": "has_unresolved_suspicion",
      "data_quality": "pass",
      "point_in_time": "unknown"
     },
-    "final_grade": "B",
-    "grade_definition": "关键质量条件通过，存在明确有限缺口",
+    "final_grade": "C",
+    "grade_reason": "身份与口径成立，但存在未解决限制（日历=has_unresolved_suspicion）",
+    "grade_priority_rule": "A → D → B → C → UNKNOWN",
+    "grade_definition": "可用于有限描述性/代理研究，存在未解决关键限制",
     "allowed_uses": [
-     "描述性统计（收益分布、波动率、相关性）",
-     "基准结构分析（成分、权重研究）",
-     "代理收益序列的敏感性分析（须标注限制）"
+     "有限描述性研究",
+     "作为代理序列做探索性分析（须明确标注证据缺口）"
     ],
     "forbidden_uses": [
      "任何声称无未来数据偏差的回测",
@@ -1977,7 +2438,7 @@
     ],
     "blockers": [
      "真实历史起点 unknown",
-     "日历等级=verified_against_proxy_calendar",
+     "日历等级=has_unresolved_suspicion",
      "历史时点可用性 unknown"
     ]
    }
@@ -2105,7 +2566,16 @@
      "non_trading_date": {
       "count": 0,
       "sample": []
+     },
+     "blocked_by_invalid_previous_close": {
+      "count": 0,
+      "sample": []
      }
+    },
+    "calendar_diagnostic": {
+     "applicable": false,
+     "reason": "hk 市场日历 unknown，**不得借用 A 股日历做非交易日诊断**",
+     "count": 0
     },
     "fatal_issue_count": 0,
     "data_quality_status": "pass",
@@ -2135,6 +2605,27 @@
     "normal_unverified": 3002,
     "suspected_synthetic": 1
    },
+   "data_usage_restrictions": {
+    "must_exclude_before_return_calc": [
+     {
+      "trade_date": "20040101",
+      "row_quality_status": "suspected_synthetic",
+      "close": 3000.0
+     }
+    ],
+    "excluded_count": 1,
+    "usable_after_exclusion": 3002,
+    "quality_audit_only": [
+     {
+      "trade_date": "20040101",
+      "row_quality_status": "suspected_synthetic"
+     }
+    ],
+    "allow_descriptive_after_exclusion": true,
+    "residual_continuity_gap": true,
+    "residual_note": "排除异常行后**仍存在连续性缺口**，不得描述为官方完整历史序列",
+    "rule": "任何收益计算必须显式按 row_quality_status 筛选，**不得默认使用全部 55,942 条原始记录**"
+   },
    "grading": {
     "dimensions": {
      "official_identity": "official",
@@ -2145,6 +2636,8 @@
      "point_in_time": "unknown"
     },
     "final_grade": "C",
+    "grade_reason": "身份与口径成立，但存在未解决限制（日历=unknown）",
+    "grade_priority_rule": "A → D → B → C → UNKNOWN",
     "grade_definition": "可用于有限描述性/代理研究，存在未解决关键限制",
     "allowed_uses": [
      "有限描述性研究",
@@ -2278,7 +2771,16 @@
      "non_trading_date": {
       "count": 0,
       "sample": []
+     },
+     "blocked_by_invalid_previous_close": {
+      "count": 0,
+      "sample": []
      }
+    },
+    "calendar_diagnostic": {
+     "applicable": false,
+     "reason": "bond 市场日历 unknown，**不得借用 A 股日历做非交易日诊断**",
+     "count": 0
     },
     "fatal_issue_count": 0,
     "data_quality_status": "pass",
@@ -2308,6 +2810,27 @@
     "normal_unverified": 3375,
     "suspected_synthetic": 1
    },
+   "data_usage_restrictions": {
+    "must_exclude_before_return_calc": [
+     {
+      "trade_date": "20040101",
+      "row_quality_status": "suspected_synthetic",
+      "close": 100.0
+     }
+    ],
+    "excluded_count": 1,
+    "usable_after_exclusion": 3375,
+    "quality_audit_only": [
+     {
+      "trade_date": "20040101",
+      "row_quality_status": "suspected_synthetic"
+     }
+    ],
+    "allow_descriptive_after_exclusion": true,
+    "residual_continuity_gap": true,
+    "residual_note": "排除异常行后**仍存在连续性缺口**，不得描述为官方完整历史序列",
+    "rule": "任何收益计算必须显式按 row_quality_status 筛选，**不得默认使用全部 55,942 条原始记录**"
+   },
    "grading": {
     "dimensions": {
      "official_identity": "official",
@@ -2318,6 +2841,8 @@
      "point_in_time": "unknown"
     },
     "final_grade": "C",
+    "grade_reason": "身份与口径成立，但存在未解决限制（日历=unknown）",
+    "grade_priority_rule": "A → D → B → C → UNKNOWN",
     "grade_definition": "可用于有限描述性/代理研究，存在未解决关键限制",
     "allowed_uses": [
      "有限描述性研究",
@@ -2341,13 +2866,16 @@
  "summary": {
   "total_candidates": 12,
   "grade_distribution": {
-   "B": 8,
-   "C": 4
+   "B": 1,
+   "C": 10,
+   "D": 1
   },
   "continuity_distribution": {
-   "verified_against_proxy_calendar": 9,
-   "unknown": 3
+   "verified_against_proxy_calendar": 1,
+   "unknown": 3,
+   "has_unresolved_suspicion": 8
   },
+  "continuity_rule_note": "疑似休市占位 → has_unresolved_suspicion（不得判代理验证通过）；缺失交易日 → has_issues；无日历 → unknown",
   "historical_start_confirmed": 0,
   "point_in_time_verified": 0,
   "calendar_official": 0,
@@ -2397,6 +2925,10 @@
   "index_daily_unchanged": true,
   "no_validated": true,
   "no_formal_admitted": true,
-  "synthetic_rows_preserved": true
+  "synthetic_rows_preserved": true,
+  "suspected_closed_not_verified": true,
+  "fatal_quality_graded_d": true,
+  "no_grade_a_unchanged": true,
+  "invalid_prev_close_blocked": true
  }
 }

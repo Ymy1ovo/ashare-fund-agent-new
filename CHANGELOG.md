@@ -1,5 +1,210 @@
 # 变更日志
 
+## 2026-11-28 — 阶段3B-6.2.3.1.2.1 质量分级与连续性判定边界修复
+
+**只读审计逻辑修复。不重新下载，不改任何原始行情。**
+
+**基线与提交**
+
+| 项 | 值 |
+| --- | --- |
+| 本轮任务基线 HEAD | `aaa41cca487a90758ab17f24051fc2e93f52830c` |
+| 本轮最终 HEAD | 见提交记录（**与基线不同，不得混淆**） |
+
+**一、修复1：疑似休市不得升级为代理连续性通过**
+
+**缺陷**：
+
+```python
+unexplained = [x for x in closed_detail
+               if x["classification"] != "suspected_market_closed"]  # ❌
+```
+
+疑似休市被排除在未解决异常之外，导致 8 个候选错判为
+`verified_against_proxy_calendar`。
+
+**修正后的连续性规则**：
+
+| 条件 | 判定 |
+| --- | --- |
+| 有缺失交易日 | `has_issues` |
+| 有无法解释的日历外日期 | `has_unresolved_suspicion` |
+| **有疑似休市占位** | **`has_unresolved_suspicion`** |
+| 三者皆无 | `verified_against_proxy_calendar` |
+| 无适用市场日历 | `unknown` |
+
+**修复前后连续性分布**：
+
+| 等级 | 修复前 | **修复后** |
+| --- | ---: | ---: |
+| `verified_official_calendar` | 0 | **0** |
+| `verified_against_proxy_calendar` | **9** | **1** |
+| `has_unresolved_suspicion` | **0** | **8** |
+| `has_issues` | 0 | **0** |
+| `unknown` | 3 | **3** |
+
+**与上一阶段原始五态分布完全一致，8 个未解决疑点全部回归。**
+
+**二、修复2：致命质量问题优先判 D**
+
+**缺陷**：`grade_candidate()` 先判 C 再判 D，
+`H20184` 有 `fatal_issue_count=1` 仍评为 C。
+
+**修正后判级优先级**：
+
+```
+A → D → B → C → UNKNOWN
+```
+
+| 优先级 | 等级 | 条件 |
+| ---: | --- | --- |
+| 1 | **A** | 六项关键证据全部满足 |
+| 2 | **D** | **存在致命数据质量问题** |
+| 3 | UNKNOWN | 身份或口径证据不足 |
+| 4 | **B** | 身份+口径+质量通过，日历至少代理验证 |
+| 5 | **C** | 身份+口径成立，但存在未解决限制 |
+
+**修复前后分级分布**：
+
+| 等级 | 修复前 | **修复后** |
+| --- | ---: | ---: |
+| A | 0 | **0** |
+| B | **8** | **1** |
+| C | **4** | **10** |
+| D | **0** | **1** |
+| UNKNOWN | 0 | **0** |
+
+**`H20184` 最终等级：D**
+
+| 项 | 值 |
+| --- | --- |
+| 异常日期 | `2013-06-28` |
+| `close` | **`0.0`**（原样保留） |
+| `fatal_issue_count` | **1** |
+| `data_quality_status` | **`has_fatal`** |
+| 理由 | 存在致命数据质量问题，不能作为可靠收益序列 |
+
+**三、修复3：无效前值不制造连带收益异常**
+
+**缺陷**：`H20184` 的 `close=0.0` 被继续用作下一日 `prev_close`，
+制造虚假的 `change_inconsistent` / `change_pct_inconsistent` / `extreme_jump`。
+
+**修正**：
+
+```python
+prev_valid = (c is not None and c > 0)
+blocked = (prev_close is not None and prev_close <= 0) or not prev_valid
+if blocked:
+    issues["blocked_by_invalid_previous_close"].append({...})
+# change / change_pct / extreme_jump 均加 not blocked 守卫
+```
+
+**同时**：当日 `close <= 0` 时跳变源于该日坏值本身，
+已由 `close_non_positive` 记录，**不重复计入 `extreme_jump`**。
+
+**结果**：`H20184` 有 **1** 条阻断记录（`20130701`，前值 `0.0`），
+其余 11 个候选为 0。**原始 `0.0` 原样保留。**
+
+**四、修复4：明确疑似数据的研究使用限制**
+
+每个候选新增 `data_usage_restrictions`：
+
+| 字段 | 含义 |
+| --- | --- |
+| `must_exclude_before_return_calc` | 收益计算前必须排除的记录 |
+| `excluded_count` / `usable_after_exclusion` | 排除/可用条数 |
+| `quality_audit_only` | 只能用于质量审计的记录 |
+| `allow_descriptive_after_exclusion` | 排除后是否允许描述性研究 |
+| `residual_continuity_gap` | 排除后是否仍存在连续性缺口 |
+
+**排除明细**：
+
+| 类型 | 条数 |
+| --- | ---: |
+| `suspected_synthetic` | **12** |
+| `suspected_market_closed_placeholder` | **8** |
+| `invalid_value` | **1** |
+| **合计排除** | **21** |
+| 排除后可用 | **55,921** |
+
+> **任何收益计算必须显式按 `row_quality_status` 筛选，
+> 不得默认使用全部 55,942 条原始记录。**
+
+> **排除异常行后仍存在连续性缺口，不得描述为官方完整历史序列。**
+
+**五、修复5：非交易日诊断真实执行**
+
+**缺陷**：`non_trading_date` 检查项存在但永远为 0，从未填充。
+
+**修正**：
+
+| 市场 | 诊断 | 说明 |
+| --- | --- | --- |
+| **stock** | **启用** | 用 A 股代理日历诊断 |
+| **bond** | **不适用** | **不得借用 A 股日历** |
+| **hk** | **不适用** | **不得借用 A 股日历** |
+
+**输出 `calendar_diagnostic` 字段**，代理日历发现的非交易日只能标记为
+「**代理异常，非官方休市认定**」。
+
+**结果**：8 个股票候选 `non_trading_date = 1`（`2018-06-18`），
+`399997CNY02` 为 0，债券/港股不适用。
+
+**六、数据保护核验**
+
+| 项 | 结果 |
+| --- | --- |
+| `tr_index_daily_raw` 行数 | **55,942**（不变） |
+| `index_daily` 行数 | **50,603** |
+| `index_daily` 内容指纹 | **`dbbd07c1339e99f27b0aeadb43eb56848776dbbad97f3fb7b9748bbd2f1e61f6`** |
+| `raw_record_json` / sha256 | **不变** |
+| 12 条疑似合成行 | **保留** |
+| 8 条疑似休市占位 | **保留** |
+| `H20184` 零值 | **保留（`0.0`）** |
+| 证据文件 | **34 份，SHA256 全通过** |
+| `integrity_check` | **ok** |
+| `foreign_key_check` | **0** |
+| 六张 `tr_` 表隔离 | **True** |
+
+**七、门禁（不变）**
+
+| 门禁 | 值 |
+| --- | --- |
+| `ready_for_research_analysis` | **true** |
+| `ready_for_backtest` | **false** |
+| `ready_for_formal_ranking` | **false** |
+| `ready_for_3b6_2_3_1_series_build` | **false** |
+
+准入：`raw_data_layer_ingest_candidate=12`、
+`validated_series_candidate=0`、`proxy_qualified_series_candidate=0`、
+`formal_series_admitted=0`。
+
+**八、修改文件**
+
+- `scripts/audit_3b6_2_3_1_2_quality.py`：五项修复
+  （连续性判定、判级优先级、无效前值阻断、用途限制、非交易日诊断）
+- `tests/test_3b6_2_3_1_2_1_boundary.py`：**52 项**新增专项测试
+- `tests/test_3b6_2_3_1_2_quality.py`：适配修复后的规则（未弱化断言）
+- 重新生成 5 份审计产物
+
+**九、测试**
+
+| 项目 | 结果 |
+| --- | --- |
+| 专项测试（本轮新增） | **52 passed / 0 failed / 0 skipped** |
+| 专项测试（1.2 原始 + 1.2.1 新增） | **93 passed** |
+| 全量测试 | 3014 → **3066**（**+52**） |
+
+**十、边界**
+
+未重新下载、未修改 55,942 条原始行情、未修改 `raw_record_json`/`sha256`/
+`row_fingerprint`、未修改 `index_daily`、未删除 12 条疑似合成记录、
+未删除 8 条疑似休市记录、未修正 `H20184` 零值、未开放回测或正式排名。
+
+**本轮只修改审计逻辑、报告和测试，未修改任何原始数据表。**
+
+---
+
 ## 2026-11-28 — 阶段3B-6.2.3.1.2 全收益指数历史序列质量验证与可用性分级
 
 **只读审计。不重建数据层，不重新下载，不改任何原始行情。**

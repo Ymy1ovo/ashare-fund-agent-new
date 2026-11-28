@@ -226,11 +226,29 @@ def audit_calendar(cand: dict, rows: list[dict],
     # 日历外日期分类
     closed_detail = classify_closed_days(rows, outside)
     unexplained = [x for x in closed_detail
-                   if x["classification"] != "suspected_market_closed"]
-    cont = ("verified_against_proxy_calendar"
-            if (not missing and not unexplained)
-            else "has_unresolved_suspicion" if not missing
-            else "has_issues")
+                   if x["classification"] == "unexplained"]
+    suspected = [x for x in closed_detail
+                 if x["classification"] == "suspected_market_closed"]
+
+    # **连续性判定（修复：疑似休市不得视为通过）**
+    #   有缺失交易日            → has_issues
+    #   有无法解释的日历外日期  → has_unresolved_suspicion
+    #   有疑似休市占位          → has_unresolved_suspicion
+    #   三者皆无                → verified_against_proxy_calendar
+    if missing:
+        cont = "has_issues"
+        cont_reason = f"相对代理日历缺 {len(missing)} 个交易日"
+    elif unexplained:
+        cont = "has_unresolved_suspicion"
+        cont_reason = (f"存在 {len(unexplained)} 个无法解释的日历外日期，"
+                       f"连续性未解决")
+    elif suspected:
+        cont = "has_unresolved_suspicion"
+        cont_reason = (f"存在 {len(suspected)} 条疑似休市占位记录，"
+                       f"**无官方日历证据，不得判为代理验证通过**")
+    else:
+        cont = "verified_against_proxy_calendar"
+        cont_reason = "相对 A 股日历代理无缺失且无日历外异常（非官方日历）"
     return {
         "market_group": group,
         "market_label": cfg["market_label"],
@@ -244,8 +262,12 @@ def audit_calendar(cand: dict, rows: list[dict],
         "dates_outside_calendar": len(outside),
         "outside_detail": closed_detail,
         "unexplained_count": len(unexplained),
-        "reason": ("相对 A 股日历**代理**无缺失（非官方发布日历）"
-                   if not missing else f"相对代理日历缺 {len(missing)} 天"),
+        "suspected_market_closed_count": len(suspected),
+        "reason": cont_reason,
+        "continuity_rule": (
+            "缺失→has_issues；无法解释→has_unresolved_suspicion；"
+            "疑似休市→has_unresolved_suspicion；"
+            "全无→verified_against_proxy_calendar"),
         "calendar_evidence": cfg["evidence"],
         "proxy_not_official": True,
     }
@@ -282,8 +304,13 @@ def classify_closed_days(rows: list[dict], outside: list[str]) -> list[dict]:
 
 
 # ---------------------------------------------------------------- 逐行质量
-def audit_row_quality(cand: dict, rows: list[dict]) -> dict:
-    """12 项逐行质量检查（只读，不修改任何值）。"""
+def audit_row_quality(cand: dict, rows: list[dict],
+                      a_cal: set[str] | None = None) -> dict:
+    """逐行质量检查（只读，不修改任何值）。
+
+    ``a_cal`` 为 A 股代理日历；**仅对 stock 市场用于 non_trading_date 诊断**。
+    债券/港股不得借用 A 股日历（该检查记 not_applicable）。
+    """
     dates = [r["trade_date"] for r in rows]
     n = len(rows)
     issues: dict[str, list] = {k: [] for k in (
@@ -291,7 +318,8 @@ def audit_row_quality(cand: dict, rows: list[dict]) -> dict:
         "close_non_numeric", "high_lt_low", "ohlc_inconsistent",
         "volume_negative", "amount_negative", "change_inconsistent",
         "change_pct_inconsistent", "extreme_jump",
-        "repeated_price_run", "non_trading_date")}
+        "repeated_price_run", "non_trading_date",
+        "blocked_by_invalid_previous_close")}
 
     # 1) 日期合法性
     for d in dates:
@@ -310,6 +338,7 @@ def audit_row_quality(cand: dict, rows: list[dict]) -> dict:
     prev_close = None
     prev_date = None
     run_len = 1
+    prev_valid = False        # 前一交易日 close 是否可用于收益计算
     for r in rows:
         d = r["trade_date"]
         c = to_num(r.get("close"))
@@ -348,8 +377,18 @@ def audit_row_quality(cand: dict, rows: list[dict]) -> dict:
         if a is not None and a < 0:
             issues["amount_negative"].append({"date": d, "amount": a})
 
+        # **无效前值阻断**：前收盘 <=0 / None 时不得计算相邻收益
+        blocked = (prev_close is not None and prev_close <= 0) or (
+            prev_date is not None and not prev_valid)
+        if blocked:
+            issues["blocked_by_invalid_previous_close"].append(
+                {"date": d, "prev_close": prev_close,
+                 "reason": "前一交易日收盘价无效（<=0 或缺失），"
+                           "不计算相邻收益"})
+
         # 7) change 与相邻价差一致性
-        if prev_close is not None and c is not None and chg is not None:
+        if (not blocked and prev_close is not None and c is not None
+                and chg is not None):
             expect = c - prev_close
             if abs(expect - chg) > max(0.02, abs(expect) * 0.02):
                 issues["change_inconsistent"].append(
@@ -357,15 +396,19 @@ def audit_row_quality(cand: dict, rows: list[dict]) -> dict:
                      "change_field": chg, "expected": round(expect, 6)})
 
         # 8) change_pct 与实际变化一致性
-        if prev_close and c is not None and pct is not None and prev_close > 0:
+        if (not blocked and prev_close and c is not None and pct is not None
+                and prev_close > 0):
             expect_pct = (c / prev_close - 1.0) * 100.0
             if abs(expect_pct - pct) > max(0.1, abs(expect_pct) * 0.05):
                 issues["change_pct_inconsistent"].append(
                     {"date": d, "expect_pct": round(expect_pct, 6),
                      "field_pct": pct})
 
-        # 9) 异常跳变（>30% 单日）
-        if prev_close and c is not None and prev_close > 0:
+        # 9) 异常跳变（>30% 单日）——无效前值不产生虚假跳变
+        #    当**当日 close 本身无效**（<=0）时，跳变源于该日坏值，
+        #    已由 close_non_positive 记录，不再重复计入 extreme_jump。
+        if (not blocked and prev_close and c is not None
+                and prev_close > 0 and c > 0):
             jump = abs(c / prev_close - 1.0)
             if jump > 0.30:
                 issues["extreme_jump"].append(
@@ -383,6 +426,30 @@ def audit_row_quality(cand: dict, rows: list[dict]) -> dict:
 
         prev_close = c
         prev_date = d
+        prev_valid = (c is not None and c > 0)
+
+    # 11) 非交易日诊断（**仅 stock 用 A 股代理日历**）
+    group = cand.get("market_group")
+    cal_diag = {"applicable": False, "reason": "", "count": 0}
+    if a_cal is not None and group == "stock":
+        cal_diag["applicable"] = True
+        cal_diag["calendar"] = "A股交易日历（项目代理）"
+        cal_diag["official"] = False
+        synth = cand.get("_synthetic_row")
+        for d in dates:
+            iso_d = iso(d)
+            if synth and iso_d == iso(synth):
+                continue          # 合成行单独标记，不计入
+            if iso_d not in a_cal:
+                issues["non_trading_date"].append(
+                    {"date": iso_d, "note": "不在 A 股代理日历内；"
+                                            "**代理异常，非官方休市认定**"})
+        cal_diag["count"] = len(issues["non_trading_date"])
+    elif group in ("bond", "hk"):
+        cal_diag["reason"] = (f"{group} 市场日历 unknown，"
+                              f"**不得借用 A 股日历做非交易日诊断**")
+    else:
+        cal_diag["reason"] = "未提供 A 股日历"
 
     # 统计（保留有限样本）
     summary = {}
@@ -395,6 +462,7 @@ def audit_row_quality(cand: dict, rows: list[dict]) -> dict:
     return {
         "row_count": n,
         "checks": summary,
+        "calendar_diagnostic": cal_diag,
         "fatal_issue_count": fatal,
         "data_quality_status": "pass" if fatal == 0 else "has_fatal",
         "note": ("**不修改任何原始值**；异常只记录不修正；"
@@ -445,7 +513,12 @@ def audit_point_in_time(conn, cand: dict) -> dict:
 
 # ---------------------------------------------------------------- 分级
 def grade_candidate(c: dict) -> dict:
-    """按统一标准分级，不得为凑数降标准。"""
+    """按统一标准分级。
+
+    **判级优先级（修复）**：A → D → B → C → UNKNOWN
+
+    致命质量问题必须优先判为 D，不得被 C 级分支提前截获。
+    """
     dims = {
         "official_identity": c["identity_evidence_level"],
         "return_basis": c["return_basis_evidence_level"],
@@ -460,28 +533,38 @@ def grade_candidate(c: dict) -> dict:
         return v in ("verified", "pass", "official", "confirmed",
                      "verified_against_proxy_calendar")
 
-    # A：六项全部有充分证据（含官方日历 + 真实起点 + 时点可用）
-    if (ok("official_identity") and ok("return_basis")
+    fatal = c["row_quality"]["fatal_issue_count"] > 0
+    identity_ok = ok("official_identity")
+    basis_ok = ok("return_basis")
+    quality_ok = ok("data_quality")
+
+    # 1) A：六项全部有充分证据
+    if (identity_ok and basis_ok
             and dims["historical_start"] == "confirmed"
             and dims["calendar"] == "verified_official_calendar"
-            and ok("data_quality") and ok("point_in_time")):
+            and quality_ok and ok("point_in_time")):
         grade = "A"
-    # B：身份+口径+质量通过，且日历至少代理验证
-    elif (ok("official_identity") and ok("return_basis")
-          and ok("data_quality")
-          and dims["calendar"] in ("verified_official_calendar",
-                                   "verified_against_proxy_calendar")):
-        grade = "B"
-    # C：身份+口径通过，但日历或质量有未解决限制
-    elif ok("official_identity") and ok("return_basis"):
-        grade = "C"
-    # D：存在致命质量问题
-    elif c["row_quality"]["fatal_issue_count"] > 0:
+        reason = "六项关键证据全部满足"
+    # 2) D：存在致命数据质量问题（优先级高于 B/C）
+    elif fatal:
         grade = "D"
-    else:
+        reason = (f"存在 {c['row_quality']['fatal_issue_count']} 处致命数据质量问题，"
+                  f"不能作为可靠收益序列")
+    # 3) 身份或口径不足 → UNKNOWN
+    elif not identity_ok or not basis_ok:
         grade = "UNKNOWN"
+        reason = "官方身份或收益口径证据不足"
+    # 4) B：身份+口径+质量通过，且日历至少代理验证
+    elif dims["calendar"] in ("verified_official_calendar",
+                              "verified_against_proxy_calendar"):
+        grade = "B"
+        reason = "身份、口径、质量通过，日历达代理验证等级"
+    # 5) C：身份+口径成立，但存在未解决限制（无致命问题）
+    else:
+        grade = "C"
+        reason = (f"身份与口径成立，但存在未解决限制"
+                  f"（日历={dims['calendar']}）")
 
-    # 时点可用性 unknown 必须反映在用途限制中
     allowed, forbidden = [], []
     if grade in ("A", "B"):
         allowed = ["描述性统计（收益分布、波动率、相关性）",
@@ -492,6 +575,7 @@ def grade_candidate(c: dict) -> dict:
                    "作为代理序列做探索性分析（须明确标注证据缺口）"]
     else:
         allowed = ["仅供数据质量研究，不作为收益来源"]
+
     forbidden = ["任何声称无未来数据偏差的回测",
                  "正式业绩归因与排名",
                  "对外发布的基金评价"]
@@ -505,14 +589,17 @@ def grade_candidate(c: dict) -> dict:
         blockers.append("真实历史起点 unknown")
     if dims["calendar"] != "verified_official_calendar":
         blockers.append(f"日历等级={dims['calendar']}")
-    if not ok("data_quality"):
-        blockers.append("数据质量存在致命问题")
+    if fatal:
+        blockers.append(
+            f"致命数据质量问题 {c['row_quality']['fatal_issue_count']} 处")
     if dims["point_in_time"] != "verified":
         blockers.append("历史时点可用性 unknown")
 
     return {
         "dimensions": dims,
         "final_grade": grade,
+        "grade_reason": reason,
+        "grade_priority_rule": "A → D → B → C → UNKNOWN",
         "grade_definition": GRADE_DEFINITIONS[grade]["label"],
         "allowed_uses": allowed,
         "forbidden_uses": forbidden,
@@ -561,7 +648,9 @@ def main() -> None:
             hs = audit_historical_start(cand, rows, basic, synth)
             cal = audit_calendar({**cand, "_synthetic_row":
                                   synth["synthetic_row"]}, rows, a_cal)
-            rq = audit_row_quality(cand, rows)
+            rq = audit_row_quality(
+                {**cand, "_synthetic_row": synth["synthetic_row"]},
+                rows, a_cal)
             pit = audit_point_in_time(conn, cand)
 
             identity_level = ("official" if cand["official_full_name"]
@@ -590,6 +679,37 @@ def main() -> None:
                         "select row_quality_status, count(*) "
                         "from tr_index_daily_raw where tr_code=? "
                         "group by 1", (code,))},
+            }
+            # 修复4：显式质量筛选规则（不得默认使用全部原始记录）
+            excl = [x for x in rows
+                    if x["row_quality_status"] != "normal_unverified"]
+            usable = [x for x in rows
+                      if x["row_quality_status"] == "normal_unverified"]
+            c["data_usage_restrictions"] = {
+                "must_exclude_before_return_calc": [
+                    {"trade_date": x["trade_date"],
+                     "row_quality_status": x["row_quality_status"],
+                     "close": x["close"]}
+                    for x in excl],
+                "excluded_count": len(excl),
+                "usable_after_exclusion": len(usable),
+                "quality_audit_only": [
+                    {"trade_date": x["trade_date"],
+                     "row_quality_status": x["row_quality_status"]}
+                    for x in excl],
+                "allow_descriptive_after_exclusion": len(usable) > 0,
+                "residual_continuity_gap": (
+                    c["calendar"]["continuity_status"] !=
+                    "verified_against_proxy_calendar"),
+                "residual_note": (
+                    "排除异常行后**仍存在连续性缺口**，"
+                    "不得描述为官方完整历史序列"
+                    if c["calendar"]["continuity_status"] !=
+                    "verified_against_proxy_calendar"
+                    else "排除异常行后相对代理日历无缺失，"
+                         "但**仍非官方日历验证**"),
+                "rule": ("任何收益计算必须显式按 row_quality_status 筛选，"
+                         "**不得默认使用全部 55,942 条原始记录**"),
             }
             c["grading"] = grade_candidate(c)
             results.append(c)
@@ -639,7 +759,7 @@ def main() -> None:
         "phase": "3B-6.2.3.1.2",
         "task": "全收益指数历史序列质量验证与可用性分级",
         "generated_at": datetime.now().isoformat(timespec="seconds"),
-        "baseline_head": "6a76d2890ddd5ec21d97d90ed1ab4b07d3ea168a",
+        "baseline_head": "aaa41cca487a90758ab17f24051fc2e93f52830c",
         "read_only": True,
         "no_redownload": True,
         "task_candidate_table_errors": {
@@ -654,6 +774,9 @@ def main() -> None:
             "total_candidates": len(results),
             "grade_distribution": grades,
             "continuity_distribution": continuity,
+            "continuity_rule_note": (
+                "疑似休市占位 → has_unresolved_suspicion（不得判代理验证通过）；"
+                "缺失交易日 → has_issues；无日历 → unknown"),
             "historical_start_confirmed": sum(
                 1 for r in results
                 if r["historical_start"]["historical_start_status"]
@@ -720,6 +843,20 @@ def main() -> None:
             "synthetic_rows_preserved": all(
                 r["row_quality_distribution"].get(
                     "suspected_synthetic", 0) == 1 for r in results),
+            "suspected_closed_not_verified": all(
+                r["calendar"]["continuity_status"] !=
+                "verified_against_proxy_calendar"
+                for r in results
+                if (r["calendar"].get(
+                    "suspected_market_closed_count", 0) > 0)),
+            "fatal_quality_graded_d": all(
+                r["grading"]["final_grade"] == "D"
+                for r in results
+                if r["row_quality"]["fatal_issue_count"] > 0),
+            "no_grade_a_unchanged": grades.get("A", 0) == 0,
+            "invalid_prev_close_blocked": all(
+                "blocked_by_invalid_previous_close"
+                in r["row_quality"]["checks"] for r in results),
         },
     }
     (REPORTS / "phase3B6_2_3_1_2_audit.json").write_text(

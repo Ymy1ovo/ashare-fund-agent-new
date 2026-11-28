@@ -243,7 +243,8 @@ def test_row_quality_checks_all_present(audit):
         "close_non_positive", "close_non_numeric", "high_lt_low",
         "ohlc_inconsistent", "volume_negative", "amount_negative",
         "change_inconsistent", "change_pct_inconsistent",
-        "extreme_jump", "repeated_price_run", "non_trading_date"}
+        "extreme_jump", "repeated_price_run", "non_trading_date",
+        "blocked_by_invalid_previous_close"}   # 3B-6.2.3.1.2.1 新增
     for c in audit["candidates"]:
         assert set(c["row_quality"]["checks"]) == expected
 
@@ -291,10 +292,22 @@ def test_no_grade_a(audit):
 
 
 def test_grade_counts_match(audit):
+    """分级数量必须与逐候选明细一致（不硬编码预期数量）。
+
+    3B-6.2.3.1.2.1 修复判级优先级后，数量由真实数据决定。
+    """
     g = audit["summary"]["grade_distribution"]
-    assert g.get("B", 0) == 8
-    assert g.get("C", 0) == 4
     assert sum(g.values()) == 12
+    # 从逐候选明细重算，必须与汇总一致
+    recomputed = {}
+    for c in audit["candidates"]:
+        k = c["grading"]["final_grade"]
+        recomputed[k] = recomputed.get(k, 0) + 1
+    assert g == recomputed
+    # 致命质量候选必须全部为 D
+    fatal_n = sum(1 for c in audit["candidates"]
+                  if c["row_quality"]["fatal_issue_count"] > 0)
+    assert g.get("D", 0) == fatal_n
 
 
 def test_grade_rules_consistent():
@@ -314,12 +327,12 @@ def test_grade_rules_consistent():
     g2 = grade_candidate(dict(base))["final_grade"]
     assert g1 == g2 == "B"
 
-    # 质量致命 → C
+    # 质量致命 → D（3B-6.2.3.1.2.1 修复：D 优先于 C）
     bad = {**base, "row_quality": {"data_quality_status": "has_fatal",
                                    "fatal_issue_count": 1}}
-    assert grade_candidate(bad)["final_grade"] == "C"
+    assert grade_candidate(bad)["final_grade"] == "D"
 
-    # 日历 unknown → C
+    # 日历 unknown（无致命） → C
     no_cal = {**base, "calendar": {"continuity_status": "unknown"}}
     assert grade_candidate(no_cal)["final_grade"] == "C"
 
@@ -439,7 +452,13 @@ def test_no_admission_upgrade(audit):
 
 
 def test_baseline_recorded(audit):
-    assert audit["baseline_head"] == TASK_BASELINE
+    """审计 JSON 的 baseline_head 必须是当前有效基线。
+
+    3B-6.2.3.1.2.1 重新生成审计后，基线更新为 aaa41cc。
+    """
+    assert audit["baseline_head"] in (
+        TASK_BASELINE,
+        "aaa41cca487a90758ab17f24051fc2e93f52830c")
 
 
 def test_self_check_all_pass(audit):
