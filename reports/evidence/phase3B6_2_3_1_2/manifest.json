@@ -1,0 +1,153 @@
+{
+ "phase": "3B-6.2.3.1.2",
+ "generated_at": "2026-11-28T16:38:46",
+ "no_new_download": true,
+ "note": "本轮不下载新数据；登记审计所引用的原始官方证据",
+ "file_count": 24,
+ "files": {
+  "reports/evidence/phase3B6_2_3_1_0/basic_399997CNY02.json": {
+   "bytes": 812,
+   "sha256": "900d51e827626ec68aef7ff06b839c6f57eb5982e0049b5c527adf03092a1b5a",
+   "subject": "399997CNY02",
+   "kind": "basic"
+  },
+  "reports/evidence/phase3B6_2_3_1_0/hist_399997CNY02_20040101_20261127.json": {
+   "bytes": 1653318,
+   "sha256": "c7d1323cbb21d5f7973de65f97ab2b1fc398ee095786b31c3c3cabf16559f319",
+   "subject": "399997CNY02",
+   "kind": "hist"
+  },
+  "reports/evidence/phase3B6_2_3_1_0/basic_H00012.json": {
+   "bytes": 824,
+   "sha256": "7db12d476e572bf6e89219f31fe8b79d4aded423f1cbe4c7940f782fa74f769a",
+   "subject": "H00012",
+   "kind": "basic"
+  },
+  "reports/evidence/phase3B6_2_3_1_0/hist_H00012_20040101_20261127.json": {
+   "bytes": 1285757,
+   "sha256": "cc23ff824f58067ae5a5aaec2d3e63b52eac6d9c075ed321945f68efe106b92a",
+   "subject": "H00012",
+   "kind": "hist"
+  },
+  "reports/evidence/phase3B6_2_3_1_0/basic_H00016.json": {
+   "bytes": 793,
+   "sha256": "e2052cd2fab60c0f5362b47b273aea0bed566bcb6dde5c8b6f298f2d73572914",
+   "subject": "H00016",
+   "kind": "basic"
+  },
+  "reports/evidence/phase3B6_2_3_1_0/hist_H00016_20040101_20261127.json": {
+   "bytes": 1912959,
+   "sha256": "625ba341082a844819f3eb5c1408a069b420d6b325bba145229b0bb6a1c5f898",
+   "subject": "H00016",
+   "kind": "hist"
+  },
+  "reports/evidence/phase3B6_2_3_1_0/basic_H00300.json": {
+   "bytes": 779,
+   "sha256": "4a2c782da6c6465f7896c164e384135669c4a98c1f80ad0e8b4e11d4878099b7",
+   "subject": "H00300",
+   "kind": "basic"
+  },
+  "reports/evidence/phase3B6_2_3_1_0/hist_H00300_20040101_20261127.json": {
+   "bytes": 1868404,
+   "sha256": "f545659bc59e97a84b596dbe93eea2d4aa3871c5ba11d1a0c6bdaae4983d15ef",
+   "subject": "H00300",
+   "kind": "hist"
+  },
+  "reports/evidence/phase3B6_2_3_1_0/basic_H00905.json": {
+   "bytes": 812,
+   "sha256": "b1ac3733e668f0bb3c88f70f79ba66f0862703ce0fcad0438451220295a27395",
+   "subject": "H00905",
+   "kind": "basic"
+  },
+  "reports/evidence/phase3B6_2_3_1_0/hist_H00905_20040101_20261127.json": {
+   "bytes": 1959475,
+   "sha256": "4a60d94d8e29bca27b8fcbb719989fa62d358416660724f5ce3c6ad076e8ebb3",
+   "subject": "H00905",
+   "kind": "hist"
+  },
+  "reports/evidence/phase3B6_2_3_1_0/basic_H00906.json": {
+   "bytes": 797,
+   "sha256": "9d61703e8d54941ef27c5805bece09c5665623462d69893d8d30a5038c834b3d",
+   "subject": "H00906",
+   "kind": "basic"
+  },
+  "reports/evidence/phase3B6_2_3_1_0/hist_H00906_20040101_20261127.json": {
+   "bytes": 1885540,
+   "sha256": "c7049c15e7be9f9497049be2b748182126b0a0c2ae397b715241c7c3e4b04b57",
+   "subject": "H00906",
+   "kind": "hist"
+  },
+  "reports/evidence/phase3B6_2_3_1_0/basic_H00922.json": {
+   "bytes": 804,
+   "sha256": "9698705a87b45a1a5aa6e50cd7f3dc9517f5e302e79b59aa7755bb0303dbe25e",
+   "subject": "H00922",
+   "kind": "basic"
+  },
+  "reports/evidence/phase3B6_2_3_1_0/hist_H00922_20040101_20261127.json": {
+   "bytes": 1941092,
+   "sha256": "374baf3e0a60380d4131cb1f684dd15ca422f2e377bca67f6a2c7801f607bbba",
+   "subject": "H00922",
+   "kind": "hist"
+  },
+  "reports/evidence/phase3B6_2_3_1_0/basic_H00942.json": {
+   "bytes": 837,
+   "sha256": "7498475b391917e6eb53377958a716f89b3f2380138a8213fdb7ae112fde3f47",
+   "subject": "H00942",
+   "kind": "basic"
+  },
+  "reports/evidence/phase3B6_2_3_1_0/hist_H00942_20040101_20261127.json": {
+   "bytes": 2078941,
+   "sha256": "ea0497aa06442ec527c697b7d90c852533c212173cf92fa6e25ddee661c9ebe0",
+   "subject": "H00942",
+   "kind": "hist"
+  },
+  "reports/evidence/phase3B6_2_3_1_0/basic_H20184.json": {
+   "bytes": 891,
+   "sha256": "dc3f32265597505e22374f63e2ca889958e70efde052ea7f7bfdff1d5a1331cc",
+   "subject": "H20184",
+   "kind": "basic"
+  },
+  "reports/evidence/phase3B6_2_3_1_0/hist_H20184_20040101_20261127.json": {
+   "bytes": 2382392,
+   "sha256": "52ce7738e06362b6cfc841153dd3b53cd0a95b016a969b23329cd18914b9e84d",
+   "subject": "H20184",
+   "kind": "hist"
+  },
+  "reports/evidence/phase3B6_2_3_1_0/basic_H20539.json": {
+   "bytes": 810,
+   "sha256": "18907a63f4b6ab209e517727a19948b14649e1c378c309d77a1e214a6d985bb5",
+   "subject": "H20539",
+   "kind": "basic"
+  },
+  "reports/evidence/phase3B6_2_3_1_0/hist_H20539_20040101_20261127.json": {
+   "bytes": 1615193,
+   "sha256": "9235ba8d6754f27535480e252ad060c129ca6e0fa49540e1bf1f26f431bc6e66",
+   "subject": "H20539",
+   "kind": "hist"
+  },
+  "reports/evidence/phase3B6_2_3_1_0/basic_H20930.json": {
+   "bytes": 836,
+   "sha256": "faffba0d41b7dbb450edd6f72137e63950a907136739b3e76c138744517a28a0",
+   "subject": "H20930",
+   "kind": "basic"
+  },
+  "reports/evidence/phase3B6_2_3_1_0/hist_H20930_20040101_20261127.json": {
+   "bytes": 1210831,
+   "sha256": "188c05599881baafeb151d9108b30a4e4b2d2ae9f0220da27f51e7703bd82bcf",
+   "subject": "H20930",
+   "kind": "hist"
+  },
+  "reports/evidence/phase3B6_2_3_1_0/basic_N00012.json": {
+   "bytes": 850,
+   "sha256": "12625ae7ce88ceba8dc5cdb6d5308083d25ecbc19313a553e4d4b2fc601a325d",
+   "subject": "N00012",
+   "kind": "basic"
+  },
+  "reports/evidence/phase3B6_2_3_1_0/hist_N00012_20040101_20261127.json": {
+   "bytes": 1368377,
+   "sha256": "d4b0aaf3885df93946f1597e50a43dcee0507fa1c7bce33148ab7bd61015badb",
+   "subject": "N00012",
+   "kind": "hist"
+  }
+ }
+}

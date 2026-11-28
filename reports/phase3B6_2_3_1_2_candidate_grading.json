@@ -1,0 +1,439 @@
+{
+ "phase": "3B-6.2.3.1.2",
+ "generated_at": "2026-11-28T16:38:46",
+ "grade_definitions": {
+  "A": {
+   "requires": [
+    "official_identity",
+    "return_basis",
+    "historical_start_confirmed",
+    "official_calendar",
+    "data_quality",
+    "point_in_time"
+   ],
+   "label": "全部关键条件均有充分证据"
+  },
+  "B": {
+   "requires": [
+    "official_identity",
+    "return_basis",
+    "data_quality"
+   ],
+   "label": "关键质量条件通过，存在明确有限缺口"
+  },
+  "C": {
+   "requires": [
+    "official_identity",
+    "return_basis"
+   ],
+   "label": "可用于有限描述性/代理研究，存在未解决关键限制"
+  },
+  "D": {
+   "requires": [],
+   "label": "存在严重质量问题，不可作为可靠历史收益序列"
+  },
+  "UNKNOWN": {
+   "requires": [],
+   "label": "关键证据不足，无法合理分级"
+  }
+ },
+ "candidates": [
+  {
+   "tr_code": "399997CNY02",
+   "market_group": "stock",
+   "official_full_name": "中证白酒净收益指数",
+   "row_count": 4349,
+   "dimensions": {
+    "official_identity": "official",
+    "return_basis": "official",
+    "historical_start": "unknown",
+    "calendar": "verified_against_proxy_calendar",
+    "data_quality": "pass",
+    "point_in_time": "unknown"
+   },
+   "final_grade": "B",
+   "grade_definition": "关键质量条件通过，存在明确有限缺口",
+   "allowed_uses": [
+    "描述性统计（收益分布、波动率、相关性）",
+    "基准结构分析（成分、权重研究）",
+    "代理收益序列的敏感性分析（须标注限制）"
+   ],
+   "forbidden_uses": [
+    "任何声称无未来数据偏差的回测",
+    "正式业绩归因与排名",
+    "对外发布的基金评价",
+    "历史时点严格回测（point-in-time unknown）",
+    "依赖官方交易日历的严格交易日对齐"
+   ],
+   "blockers": [
+    "真实历史起点 unknown",
+    "日历等级=verified_against_proxy_calendar",
+    "历史时点可用性 unknown"
+   ]
+  },
+  {
+   "tr_code": "H00012",
+   "market_group": "bond",
+   "official_full_name": "上证国债指数(净价)",
+   "row_count": 3376,
+   "dimensions": {
+    "official_identity": "official",
+    "return_basis": "official",
+    "historical_start": "unknown",
+    "calendar": "unknown",
+    "data_quality": "pass",
+    "point_in_time": "unknown"
+   },
+   "final_grade": "C",
+   "grade_definition": "可用于有限描述性/代理研究，存在未解决关键限制",
+   "allowed_uses": [
+    "有限描述性研究",
+    "作为代理序列做探索性分析（须明确标注证据缺口）"
+   ],
+   "forbidden_uses": [
+    "任何声称无未来数据偏差的回测",
+    "正式业绩归因与排名",
+    "对外发布的基金评价",
+    "历史时点严格回测（point-in-time unknown）",
+    "依赖官方交易日历的严格交易日对齐"
+   ],
+   "blockers": [
+    "真实历史起点 unknown",
+    "日历等级=unknown",
+    "历史时点可用性 unknown"
+   ]
+  },
+  {
+   "tr_code": "H00016",
+   "market_group": "stock",
+   "official_full_name": "上证50全收益指数",
+   "row_count": 5563,
+   "dimensions": {
+    "official_identity": "official",
+    "return_basis": "official",
+    "historical_start": "unknown",
+    "calendar": "verified_against_proxy_calendar",
+    "data_quality": "pass",
+    "point_in_time": "unknown"
+   },
+   "final_grade": "B",
+   "grade_definition": "关键质量条件通过，存在明确有限缺口",
+   "allowed_uses": [
+    "描述性统计（收益分布、波动率、相关性）",
+    "基准结构分析（成分、权重研究）",
+    "代理收益序列的敏感性分析（须标注限制）"
+   ],
+   "forbidden_uses": [
+    "任何声称无未来数据偏差的回测",
+    "正式业绩归因与排名",
+    "对外发布的基金评价",
+    "历史时点严格回测（point-in-time unknown）",
+    "依赖官方交易日历的严格交易日对齐"
+   ],
+   "blockers": [
+    "真实历史起点 unknown",
+    "日历等级=verified_against_proxy_calendar",
+    "历史时点可用性 unknown"
+   ]
+  },
+  {
+   "tr_code": "H00300",
+   "market_group": "stock",
+   "official_full_name": "沪深300全收益指数",
+   "row_count": 5321,
+   "dimensions": {
+    "official_identity": "official",
+    "return_basis": "official",
+    "historical_start": "unknown",
+    "calendar": "verified_against_proxy_calendar",
+    "data_quality": "pass",
+    "point_in_time": "unknown"
+   },
+   "final_grade": "B",
+   "grade_definition": "关键质量条件通过，存在明确有限缺口",
+   "allowed_uses": [
+    "描述性统计（收益分布、波动率、相关性）",
+    "基准结构分析（成分、权重研究）",
+    "代理收益序列的敏感性分析（须标注限制）"
+   ],
+   "forbidden_uses": [
+    "任何声称无未来数据偏差的回测",
+    "正式业绩归因与排名",
+    "对外发布的基金评价",
+    "历史时点严格回测（point-in-time unknown）",
+    "依赖官方交易日历的严格交易日对齐"
+   ],
+   "blockers": [
+    "真实历史起点 unknown",
+    "日历等级=verified_against_proxy_calendar",
+    "历史时点可用性 unknown"
+   ]
+  },
+  {
+   "tr_code": "H00905",
+   "market_group": "stock",
+   "official_full_name": "中证小盘500全收益指数",
+   "row_count": 5321,
+   "dimensions": {
+    "official_identity": "official",
+    "return_basis": "official",
+    "historical_start": "unknown",
+    "calendar": "verified_against_proxy_calendar",
+    "data_quality": "pass",
+    "point_in_time": "unknown"
+   },
+   "final_grade": "B",
+   "grade_definition": "关键质量条件通过，存在明确有限缺口",
+   "allowed_uses": [
+    "描述性统计（收益分布、波动率、相关性）",
+    "基准结构分析（成分、权重研究）",
+    "代理收益序列的敏感性分析（须标注限制）"
+   ],
+   "forbidden_uses": [
+    "任何声称无未来数据偏差的回测",
+    "正式业绩归因与排名",
+    "对外发布的基金评价",
+    "历史时点严格回测（point-in-time unknown）",
+    "依赖官方交易日历的严格交易日对齐"
+   ],
+   "blockers": [
+    "真实历史起点 unknown",
+    "日历等级=verified_against_proxy_calendar",
+    "历史时点可用性 unknown"
+   ]
+  },
+  {
+   "tr_code": "H00906",
+   "market_group": "stock",
+   "official_full_name": "中证800全收益指数",
+   "row_count": 5321,
+   "dimensions": {
+    "official_identity": "official",
+    "return_basis": "official",
+    "historical_start": "unknown",
+    "calendar": "verified_against_proxy_calendar",
+    "data_quality": "pass",
+    "point_in_time": "unknown"
+   },
+   "final_grade": "B",
+   "grade_definition": "关键质量条件通过，存在明确有限缺口",
+   "allowed_uses": [
+    "描述性统计（收益分布、波动率、相关性）",
+    "基准结构分析（成分、权重研究）",
+    "代理收益序列的敏感性分析（须标注限制）"
+   ],
+   "forbidden_uses": [
+    "任何声称无未来数据偏差的回测",
+    "正式业绩归因与排名",
+    "对外发布的基金评价",
+    "历史时点严格回测（point-in-time unknown）",
+    "依赖官方交易日历的严格交易日对齐"
+   ],
+   "blockers": [
+    "真实历史起点 unknown",
+    "日历等级=verified_against_proxy_calendar",
+    "历史时点可用性 unknown"
+   ]
+  },
+  {
+   "tr_code": "H00922",
+   "market_group": "stock",
+   "official_full_name": "中证红利全收益指数",
+   "row_count": 5321,
+   "dimensions": {
+    "official_identity": "official",
+    "return_basis": "official",
+    "historical_start": "unknown",
+    "calendar": "verified_against_proxy_calendar",
+    "data_quality": "pass",
+    "point_in_time": "unknown"
+   },
+   "final_grade": "B",
+   "grade_definition": "关键质量条件通过，存在明确有限缺口",
+   "allowed_uses": [
+    "描述性统计（收益分布、波动率、相关性）",
+    "基准结构分析（成分、权重研究）",
+    "代理收益序列的敏感性分析（须标注限制）"
+   ],
+   "forbidden_uses": [
+    "任何声称无未来数据偏差的回测",
+    "正式业绩归因与排名",
+    "对外发布的基金评价",
+    "历史时点严格回测（point-in-time unknown）",
+    "依赖官方交易日历的严格交易日对齐"
+   ],
+   "blockers": [
+    "真实历史起点 unknown",
+    "日历等级=verified_against_proxy_calendar",
+    "历史时点可用性 unknown"
+   ]
+  },
+  {
+   "tr_code": "H00942",
+   "market_group": "stock",
+   "official_full_name": "中证内地消费主题全收益指数",
+   "row_count": 5321,
+   "dimensions": {
+    "official_identity": "official",
+    "return_basis": "official",
+    "historical_start": "unknown",
+    "calendar": "verified_against_proxy_calendar",
+    "data_quality": "pass",
+    "point_in_time": "unknown"
+   },
+   "final_grade": "B",
+   "grade_definition": "关键质量条件通过，存在明确有限缺口",
+   "allowed_uses": [
+    "描述性统计（收益分布、波动率、相关性）",
+    "基准结构分析（成分、权重研究）",
+    "代理收益序列的敏感性分析（须标注限制）"
+   ],
+   "forbidden_uses": [
+    "任何声称无未来数据偏差的回测",
+    "正式业绩归因与排名",
+    "对外发布的基金评价",
+    "历史时点严格回测（point-in-time unknown）",
+    "依赖官方交易日历的严格交易日对齐"
+   ],
+   "blockers": [
+    "真实历史起点 unknown",
+    "日历等级=verified_against_proxy_calendar",
+    "历史时点可用性 unknown"
+   ]
+  },
+  {
+   "tr_code": "H20184",
+   "market_group": "stock",
+   "official_full_name": "中证全指半导体产品与设备全收益指数",
+   "row_count": 5320,
+   "dimensions": {
+    "official_identity": "official",
+    "return_basis": "official",
+    "historical_start": "unknown",
+    "calendar": "verified_against_proxy_calendar",
+    "data_quality": "has_fatal",
+    "point_in_time": "unknown"
+   },
+   "final_grade": "C",
+   "grade_definition": "可用于有限描述性/代理研究，存在未解决关键限制",
+   "allowed_uses": [
+    "有限描述性研究",
+    "作为代理序列做探索性分析（须明确标注证据缺口）"
+   ],
+   "forbidden_uses": [
+    "任何声称无未来数据偏差的回测",
+    "正式业绩归因与排名",
+    "对外发布的基金评价",
+    "历史时点严格回测（point-in-time unknown）",
+    "依赖官方交易日历的严格交易日对齐"
+   ],
+   "blockers": [
+    "真实历史起点 unknown",
+    "日历等级=verified_against_proxy_calendar",
+    "数据质量存在致命问题",
+    "历史时点可用性 unknown"
+   ]
+  },
+  {
+   "tr_code": "H20539",
+   "market_group": "stock",
+   "official_full_name": "中证白酒全收益指数",
+   "row_count": 4350,
+   "dimensions": {
+    "official_identity": "official",
+    "return_basis": "official",
+    "historical_start": "unknown",
+    "calendar": "verified_against_proxy_calendar",
+    "data_quality": "pass",
+    "point_in_time": "unknown"
+   },
+   "final_grade": "B",
+   "grade_definition": "关键质量条件通过，存在明确有限缺口",
+   "allowed_uses": [
+    "描述性统计（收益分布、波动率、相关性）",
+    "基准结构分析（成分、权重研究）",
+    "代理收益序列的敏感性分析（须标注限制）"
+   ],
+   "forbidden_uses": [
+    "任何声称无未来数据偏差的回测",
+    "正式业绩归因与排名",
+    "对外发布的基金评价",
+    "历史时点严格回测（point-in-time unknown）",
+    "依赖官方交易日历的严格交易日对齐"
+   ],
+   "blockers": [
+    "真实历史起点 unknown",
+    "日历等级=verified_against_proxy_calendar",
+    "历史时点可用性 unknown"
+   ]
+  },
+  {
+   "tr_code": "H20930",
+   "market_group": "hk",
+   "official_full_name": "中证港股通综合全收益指数",
+   "row_count": 3003,
+   "dimensions": {
+    "official_identity": "official",
+    "return_basis": "official",
+    "historical_start": "unknown",
+    "calendar": "unknown",
+    "data_quality": "pass",
+    "point_in_time": "unknown"
+   },
+   "final_grade": "C",
+   "grade_definition": "可用于有限描述性/代理研究，存在未解决关键限制",
+   "allowed_uses": [
+    "有限描述性研究",
+    "作为代理序列做探索性分析（须明确标注证据缺口）"
+   ],
+   "forbidden_uses": [
+    "任何声称无未来数据偏差的回测",
+    "正式业绩归因与排名",
+    "对外发布的基金评价",
+    "历史时点严格回测（point-in-time unknown）",
+    "依赖官方交易日历的严格交易日对齐"
+   ],
+   "blockers": [
+    "真实历史起点 unknown",
+    "日历等级=unknown",
+    "历史时点可用性 unknown"
+   ]
+  },
+  {
+   "tr_code": "N00012",
+   "market_group": "bond",
+   "official_full_name": "上证国债指数(利息及再投资)",
+   "row_count": 3376,
+   "dimensions": {
+    "official_identity": "official",
+    "return_basis": "official",
+    "historical_start": "unknown",
+    "calendar": "unknown",
+    "data_quality": "pass",
+    "point_in_time": "unknown"
+   },
+   "final_grade": "C",
+   "grade_definition": "可用于有限描述性/代理研究，存在未解决关键限制",
+   "allowed_uses": [
+    "有限描述性研究",
+    "作为代理序列做探索性分析（须明确标注证据缺口）"
+   ],
+   "forbidden_uses": [
+    "任何声称无未来数据偏差的回测",
+    "正式业绩归因与排名",
+    "对外发布的基金评价",
+    "历史时点严格回测（point-in-time unknown）",
+    "依赖官方交易日历的严格交易日对齐"
+   ],
+   "blockers": [
+    "真实历史起点 unknown",
+    "日历等级=unknown",
+    "历史时点可用性 unknown"
+   ]
+  }
+ ],
+ "grade_distribution": {
+  "B": 8,
+  "C": 4
+ }
+}

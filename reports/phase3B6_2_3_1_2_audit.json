@@ -1,0 +1,2402 @@
+{
+ "phase": "3B-6.2.3.1.2",
+ "task": "全收益指数历史序列质量验证与可用性分级",
+ "generated_at": "2026-11-28T16:38:46",
+ "baseline_head": "6a76d2890ddd5ec21d97d90ed1ab4b07d3ea168a",
+ "read_only": true,
+ "no_redownload": true,
+ "task_candidate_table_errors": {
+  "note": "任务书候选表的市场标注与数据库/官方证据不一致；**已记录证据，未覆盖原始记录**",
+  "mismatches": [
+   {
+    "tr_code": "H00012",
+    "task_claimed": "stock",
+    "db_actual": "bond",
+    "official_name": "上证国债指数(净价)",
+    "official_index_type": "bond",
+    "evidence_file": "reports/evidence/phase3B6_2_3_1_0/basic_H00012.json",
+    "action": "**记录证据，不覆盖原始记录**；后续阶段需人工确认市场归属"
+   },
+   {
+    "tr_code": "H20930",
+    "task_claimed": "bond",
+    "db_actual": "hk",
+    "official_name": "中证港股通综合全收益指数",
+    "official_index_type": "stock",
+    "evidence_file": "reports/evidence/phase3B6_2_3_1_0/basic_H20930.json",
+    "action": "**记录证据，不覆盖原始记录**；后续阶段需人工确认市场归属"
+   }
+  ]
+ },
+ "market_calendar_config": {
+  "stock": {
+   "market_label": "沪深A股",
+   "calendar_name": "A股交易日历（项目代理）",
+   "calendar_available": true,
+   "calendar_is_official": false,
+   "evidence": "项目 trade_calendar 表 8,797 天（1990-12-19 ~ 2026-12-31）；**非官方指数发布日历**"
+  },
+  "bond": {
+   "market_label": "上交所债券市场",
+   "calendar_name": "债券市场交易日历",
+   "calendar_available": false,
+   "calendar_is_official": false,
+   "evidence": "尝试 sse.com.cn 交易日历页（HTTP 200 但为 JS 渲染，无可解析结构化数据）；**未取得官方债券日历**"
+  },
+  "hk": {
+   "market_label": "香港市场（港股通）",
+   "calendar_name": "港股交易日历",
+   "calendar_available": false,
+   "calendar_is_official": false,
+   "evidence": "尝试 hkex.com.hk 交易日历页（HTTP 200 但为 JS 渲染）；**未取得官方港股日历**"
+  }
+ },
+ "grade_definitions": {
+  "A": {
+   "requires": [
+    "official_identity",
+    "return_basis",
+    "historical_start_confirmed",
+    "official_calendar",
+    "data_quality",
+    "point_in_time"
+   ],
+   "label": "全部关键条件均有充分证据"
+  },
+  "B": {
+   "requires": [
+    "official_identity",
+    "return_basis",
+    "data_quality"
+   ],
+   "label": "关键质量条件通过，存在明确有限缺口"
+  },
+  "C": {
+   "requires": [
+    "official_identity",
+    "return_basis"
+   ],
+   "label": "可用于有限描述性/代理研究，存在未解决关键限制"
+  },
+  "D": {
+   "requires": [],
+   "label": "存在严重质量问题，不可作为可靠历史收益序列"
+  },
+  "UNKNOWN": {
+   "requires": [],
+   "label": "关键证据不足，无法合理分级"
+  }
+ },
+ "candidates": [
+  {
+   "tr_code": "399997CNY02",
+   "price_index_code": "399997",
+   "market_group": "stock",
+   "market_label": "沪深A股",
+   "official_full_name": "中证白酒净收益指数",
+   "return_basis": "net_total_return",
+   "row_count": 4349,
+   "raw_rows_in_db": 4349,
+   "identity_evidence_level": "official",
+   "return_basis_evidence_level": "official",
+   "historical_start": {
+    "official_basic_date": "2008-12-31",
+    "official_publish_date": "2015-01-21",
+    "request_start_date": "20040101",
+    "api_earliest_returned_date": "20040101",
+    "api_second_row_date": "20081231",
+    "actual_earliest_historical_quote_date": "unknown",
+    "historical_start_evidence_level": "request_start_artifact",
+    "historical_start_status": "unknown",
+    "historical_start_blockers": [
+     "未取得官方编制方案/发布公告以证明真实历史起点",
+     "接口返回最早日期 20040101 等于请求起始日，不能作为真实历史起点",
+     "第二行 20081231 无独立对照证据，不能确认为真实起点"
+    ],
+    "synthetic_row_preserved": "20040101",
+    "date_concepts_distinct": {
+     "1_basic_date": "2008-12-31",
+     "2_publish_date": "2015-01-21",
+     "3_request_start": "20040101",
+     "4_api_earliest": "20040101",
+     "5_confirmed_real_start": "unknown",
+     "6_first_publicly_available": "unknown"
+    },
+    "note": "六类日期严格分开；**不得因有官方发布日期就认为接口最早日期是真实起点**"
+   },
+   "calendar": {
+    "market_group": "stock",
+    "market_label": "沪深A股",
+    "calendar_used": "A股交易日历（项目代理）",
+    "calendar_available": true,
+    "calendar_is_official": false,
+    "continuity_status": "verified_against_proxy_calendar",
+    "coverage_status": "verified",
+    "missing_trading_days": 0,
+    "missing_sample": [],
+    "dates_outside_calendar": 0,
+    "outside_detail": [],
+    "unexplained_count": 0,
+    "reason": "相对 A 股日历**代理**无缺失（非官方发布日历）",
+    "calendar_evidence": "项目 trade_calendar 表 8,797 天（1990-12-19 ~ 2026-12-31）；**非官方指数发布日历**",
+    "proxy_not_official": true
+   },
+   "row_quality": {
+    "row_count": 4349,
+    "checks": {
+     "illegal_date": {
+      "count": 0,
+      "sample": []
+     },
+     "duplicate_date": {
+      "count": 0,
+      "sample": []
+     },
+     "close_null": {
+      "count": 0,
+      "sample": []
+     },
+     "close_non_positive": {
+      "count": 0,
+      "sample": []
+     },
+     "close_non_numeric": {
+      "count": 0,
+      "sample": []
+     },
+     "high_lt_low": {
+      "count": 0,
+      "sample": []
+     },
+     "ohlc_inconsistent": {
+      "count": 0,
+      "sample": []
+     },
+     "volume_negative": {
+      "count": 0,
+      "sample": []
+     },
+     "amount_negative": {
+      "count": 0,
+      "sample": []
+     },
+     "change_inconsistent": {
+      "count": 0,
+      "sample": []
+     },
+     "change_pct_inconsistent": {
+      "count": 0,
+      "sample": []
+     },
+     "extreme_jump": {
+      "count": 0,
+      "sample": []
+     },
+     "repeated_price_run": {
+      "count": 0,
+      "sample": []
+     },
+     "non_trading_date": {
+      "count": 0,
+      "sample": []
+     }
+    },
+    "fatal_issue_count": 0,
+    "data_quality_status": "pass",
+    "note": "**不修改任何原始值**；异常只记录不修正；正常大幅涨跌不计入 fatal"
+   },
+   "point_in_time": {
+    "historical_point_in_time_status": "unknown",
+    "historical_publication_evidence": null,
+    "historical_revision_evidence": null,
+    "first_available_date": "unknown",
+    "point_in_time_blockers": [
+     "同 (code,date) 仅 1 版本，无修订记录",
+     "仅单批次采集（['2026-11-27']），无法区分历史发布值与当前值",
+     "未取得官方历史发布时间证明",
+     "无法排除事后回溯计算"
+    ],
+    "snapshot_tables_found": [
+     "etf_adjustment_snapshots"
+    ],
+    "multi_version_rows": 0,
+    "ingest_batches": [
+     "2026-11-27"
+    ],
+    "note": "**不能因历史行情完整就认为具备历史时点可用性**；无快照/发布证据的序列不得用于声称无未来数据偏差的回测"
+   },
+   "row_quality_distribution": {
+    "normal_unverified": 4348,
+    "suspected_synthetic": 1
+   },
+   "grading": {
+    "dimensions": {
+     "official_identity": "official",
+     "return_basis": "official",
+     "historical_start": "unknown",
+     "calendar": "verified_against_proxy_calendar",
+     "data_quality": "pass",
+     "point_in_time": "unknown"
+    },
+    "final_grade": "B",
+    "grade_definition": "关键质量条件通过，存在明确有限缺口",
+    "allowed_uses": [
+     "描述性统计（收益分布、波动率、相关性）",
+     "基准结构分析（成分、权重研究）",
+     "代理收益序列的敏感性分析（须标注限制）"
+    ],
+    "forbidden_uses": [
+     "任何声称无未来数据偏差的回测",
+     "正式业绩归因与排名",
+     "对外发布的基金评价",
+     "历史时点严格回测（point-in-time unknown）",
+     "依赖官方交易日历的严格交易日对齐"
+    ],
+    "blockers": [
+     "真实历史起点 unknown",
+     "日历等级=verified_against_proxy_calendar",
+     "历史时点可用性 unknown"
+    ]
+   }
+  },
+  {
+   "tr_code": "H00012",
+   "price_index_code": "000012",
+   "market_group": "bond",
+   "market_label": "上交所债券市场",
+   "official_full_name": "上证国债指数(净价)",
+   "return_basis": "bond_clean_price",
+   "row_count": 3376,
+   "raw_rows_in_db": 3376,
+   "identity_evidence_level": "official",
+   "return_basis_evidence_level": "official",
+   "historical_start": {
+    "official_basic_date": "2012-12-31",
+    "official_publish_date": "2018-01-02",
+    "request_start_date": "20040101",
+    "api_earliest_returned_date": "20040101",
+    "api_second_row_date": "20121231",
+    "actual_earliest_historical_quote_date": "unknown",
+    "historical_start_evidence_level": "request_start_artifact",
+    "historical_start_status": "unknown",
+    "historical_start_blockers": [
+     "未取得官方编制方案/发布公告以证明真实历史起点",
+     "接口返回最早日期 20040101 等于请求起始日，不能作为真实历史起点",
+     "第二行 20121231 无独立对照证据，不能确认为真实起点"
+    ],
+    "synthetic_row_preserved": "20040101",
+    "date_concepts_distinct": {
+     "1_basic_date": "2012-12-31",
+     "2_publish_date": "2018-01-02",
+     "3_request_start": "20040101",
+     "4_api_earliest": "20040101",
+     "5_confirmed_real_start": "unknown",
+     "6_first_publicly_available": "unknown"
+    },
+    "note": "六类日期严格分开；**不得因有官方发布日期就认为接口最早日期是真实起点**"
+   },
+   "calendar": {
+    "market_group": "bond",
+    "market_label": "上交所债券市场",
+    "calendar_used": "债券市场交易日历",
+    "calendar_available": false,
+    "calendar_is_official": false,
+    "continuity_status": "unknown",
+    "coverage_status": "unknown",
+    "missing_trading_days": null,
+    "dates_outside_calendar": null,
+    "reason": "债券市场交易日历未取得，**不得用 A 股日历替代**；覆盖与连续性记 unknown",
+    "calendar_evidence": "尝试 sse.com.cn 交易日历页（HTTP 200 但为 JS 渲染，无可解析结构化数据）；**未取得官方债券日历**",
+    "reference_only_a_share_diff": {
+     "note": "仅供参考，**不用于连续性判定**",
+     "outside_a_share_count": 1,
+     "outside_a_share_sample": [
+      "2004-01-01"
+     ]
+    }
+   },
+   "row_quality": {
+    "row_count": 3376,
+    "checks": {
+     "illegal_date": {
+      "count": 0,
+      "sample": []
+     },
+     "duplicate_date": {
+      "count": 0,
+      "sample": []
+     },
+     "close_null": {
+      "count": 0,
+      "sample": []
+     },
+     "close_non_positive": {
+      "count": 0,
+      "sample": []
+     },
+     "close_non_numeric": {
+      "count": 0,
+      "sample": []
+     },
+     "high_lt_low": {
+      "count": 0,
+      "sample": []
+     },
+     "ohlc_inconsistent": {
+      "count": 0,
+      "sample": []
+     },
+     "volume_negative": {
+      "count": 0,
+      "sample": []
+     },
+     "amount_negative": {
+      "count": 0,
+      "sample": []
+     },
+     "change_inconsistent": {
+      "count": 0,
+      "sample": []
+     },
+     "change_pct_inconsistent": {
+      "count": 0,
+      "sample": []
+     },
+     "extreme_jump": {
+      "count": 0,
+      "sample": []
+     },
+     "repeated_price_run": {
+      "count": 7,
+      "sample": [
+       {
+        "date": "20130313",
+        "close": 100.03,
+        "run_len": 5
+       },
+       {
+        "date": "20130603",
+        "close": 99.9,
+        "run_len": 5
+       },
+       {
+        "date": "20130614",
+        "close": 100.04,
+        "run_len": 5
+       },
+       {
+        "date": "20130617",
+        "close": 100.04,
+        "run_len": 6
+       },
+       {
+        "date": "20180209",
+        "close": 99.2,
+        "run_len": 5
+       },
+       {
+        "date": "20180212",
+        "close": 99.2,
+        "run_len": 6
+       },
+       {
+        "date": "20190726",
+        "close": 101.63,
+        "run_len": 5
+       }
+      ]
+     },
+     "non_trading_date": {
+      "count": 0,
+      "sample": []
+     }
+    },
+    "fatal_issue_count": 0,
+    "data_quality_status": "pass",
+    "note": "**不修改任何原始值**；异常只记录不修正；正常大幅涨跌不计入 fatal"
+   },
+   "point_in_time": {
+    "historical_point_in_time_status": "unknown",
+    "historical_publication_evidence": null,
+    "historical_revision_evidence": null,
+    "first_available_date": "unknown",
+    "point_in_time_blockers": [
+     "同 (code,date) 仅 1 版本，无修订记录",
+     "仅单批次采集（['2026-11-27']），无法区分历史发布值与当前值",
+     "未取得官方历史发布时间证明",
+     "无法排除事后回溯计算"
+    ],
+    "snapshot_tables_found": [
+     "etf_adjustment_snapshots"
+    ],
+    "multi_version_rows": 0,
+    "ingest_batches": [
+     "2026-11-27"
+    ],
+    "note": "**不能因历史行情完整就认为具备历史时点可用性**；无快照/发布证据的序列不得用于声称无未来数据偏差的回测"
+   },
+   "row_quality_distribution": {
+    "normal_unverified": 3375,
+    "suspected_synthetic": 1
+   },
+   "grading": {
+    "dimensions": {
+     "official_identity": "official",
+     "return_basis": "official",
+     "historical_start": "unknown",
+     "calendar": "unknown",
+     "data_quality": "pass",
+     "point_in_time": "unknown"
+    },
+    "final_grade": "C",
+    "grade_definition": "可用于有限描述性/代理研究，存在未解决关键限制",
+    "allowed_uses": [
+     "有限描述性研究",
+     "作为代理序列做探索性分析（须明确标注证据缺口）"
+    ],
+    "forbidden_uses": [
+     "任何声称无未来数据偏差的回测",
+     "正式业绩归因与排名",
+     "对外发布的基金评价",
+     "历史时点严格回测（point-in-time unknown）",
+     "依赖官方交易日历的严格交易日对齐"
+    ],
+    "blockers": [
+     "真实历史起点 unknown",
+     "日历等级=unknown",
+     "历史时点可用性 unknown"
+    ]
+   }
+  },
+  {
+   "tr_code": "H00016",
+   "price_index_code": "000016",
+   "market_group": "stock",
+   "market_label": "沪深A股",
+   "official_full_name": "上证50全收益指数",
+   "return_basis": "gross_total_return",
+   "row_count": 5563,
+   "raw_rows_in_db": 5563,
+   "identity_evidence_level": "official",
+   "return_basis_evidence_level": "official",
+   "historical_start": {
+    "official_basic_date": "2003-12-31",
+    "official_publish_date": "2004-01-02",
+    "request_start_date": "20040101",
+    "api_earliest_returned_date": "20040101",
+    "api_second_row_date": "20040102",
+    "actual_earliest_historical_quote_date": "unknown",
+    "historical_start_evidence_level": "request_start_artifact",
+    "historical_start_status": "unknown",
+    "historical_start_blockers": [
+     "未取得官方编制方案/发布公告以证明真实历史起点",
+     "接口返回最早日期 20040101 等于请求起始日，不能作为真实历史起点",
+     "第二行 20040102 无独立对照证据，不能确认为真实起点"
+    ],
+    "synthetic_row_preserved": "20040101",
+    "date_concepts_distinct": {
+     "1_basic_date": "2003-12-31",
+     "2_publish_date": "2004-01-02",
+     "3_request_start": "20040101",
+     "4_api_earliest": "20040101",
+     "5_confirmed_real_start": "unknown",
+     "6_first_publicly_available": "unknown"
+    },
+    "note": "六类日期严格分开；**不得因有官方发布日期就认为接口最早日期是真实起点**"
+   },
+   "calendar": {
+    "market_group": "stock",
+    "market_label": "沪深A股",
+    "calendar_used": "A股交易日历（项目代理）",
+    "calendar_available": true,
+    "calendar_is_official": false,
+    "continuity_status": "verified_against_proxy_calendar",
+    "coverage_status": "verified",
+    "missing_trading_days": 0,
+    "missing_sample": [],
+    "dates_outside_calendar": 1,
+    "outside_detail": [
+     {
+      "date": "2018-06-18",
+      "classification": "suspected_market_closed",
+      "close": 3616.55,
+      "prev_close": 3615.76,
+      "volume": 0.0,
+      "change_pct": 0.02,
+      "same_as_prev": false,
+      "zero_volume": true,
+      "official_calendar_evidence": false,
+      "note": "有零成交/数值重复特征但无官方日历证据，仅疑似"
+     }
+    ],
+    "unexplained_count": 0,
+    "reason": "相对 A 股日历**代理**无缺失（非官方发布日历）",
+    "calendar_evidence": "项目 trade_calendar 表 8,797 天（1990-12-19 ~ 2026-12-31）；**非官方指数发布日历**",
+    "proxy_not_official": true
+   },
+   "row_quality": {
+    "row_count": 5563,
+    "checks": {
+     "illegal_date": {
+      "count": 0,
+      "sample": []
+     },
+     "duplicate_date": {
+      "count": 0,
+      "sample": []
+     },
+     "close_null": {
+      "count": 0,
+      "sample": []
+     },
+     "close_non_positive": {
+      "count": 0,
+      "sample": []
+     },
+     "close_non_numeric": {
+      "count": 0,
+      "sample": []
+     },
+     "high_lt_low": {
+      "count": 0,
+      "sample": []
+     },
+     "ohlc_inconsistent": {
+      "count": 0,
+      "sample": []
+     },
+     "volume_negative": {
+      "count": 0,
+      "sample": []
+     },
+     "amount_negative": {
+      "count": 0,
+      "sample": []
+     },
+     "change_inconsistent": {
+      "count": 0,
+      "sample": []
+     },
+     "change_pct_inconsistent": {
+      "count": 0,
+      "sample": []
+     },
+     "extreme_jump": {
+      "count": 0,
+      "sample": []
+     },
+     "repeated_price_run": {
+      "count": 0,
+      "sample": []
+     },
+     "non_trading_date": {
+      "count": 0,
+      "sample": []
+     }
+    },
+    "fatal_issue_count": 0,
+    "data_quality_status": "pass",
+    "note": "**不修改任何原始值**；异常只记录不修正；正常大幅涨跌不计入 fatal"
+   },
+   "point_in_time": {
+    "historical_point_in_time_status": "unknown",
+    "historical_publication_evidence": null,
+    "historical_revision_evidence": null,
+    "first_available_date": "unknown",
+    "point_in_time_blockers": [
+     "同 (code,date) 仅 1 版本，无修订记录",
+     "仅单批次采集（['2026-11-27']），无法区分历史发布值与当前值",
+     "未取得官方历史发布时间证明",
+     "无法排除事后回溯计算"
+    ],
+    "snapshot_tables_found": [
+     "etf_adjustment_snapshots"
+    ],
+    "multi_version_rows": 0,
+    "ingest_batches": [
+     "2026-11-27"
+    ],
+    "note": "**不能因历史行情完整就认为具备历史时点可用性**；无快照/发布证据的序列不得用于声称无未来数据偏差的回测"
+   },
+   "row_quality_distribution": {
+    "normal_unverified": 5561,
+    "suspected_market_closed_placeholder": 1,
+    "suspected_synthetic": 1
+   },
+   "grading": {
+    "dimensions": {
+     "official_identity": "official",
+     "return_basis": "official",
+     "historical_start": "unknown",
+     "calendar": "verified_against_proxy_calendar",
+     "data_quality": "pass",
+     "point_in_time": "unknown"
+    },
+    "final_grade": "B",
+    "grade_definition": "关键质量条件通过，存在明确有限缺口",
+    "allowed_uses": [
+     "描述性统计（收益分布、波动率、相关性）",
+     "基准结构分析（成分、权重研究）",
+     "代理收益序列的敏感性分析（须标注限制）"
+    ],
+    "forbidden_uses": [
+     "任何声称无未来数据偏差的回测",
+     "正式业绩归因与排名",
+     "对外发布的基金评价",
+     "历史时点严格回测（point-in-time unknown）",
+     "依赖官方交易日历的严格交易日对齐"
+    ],
+    "blockers": [
+     "真实历史起点 unknown",
+     "日历等级=verified_against_proxy_calendar",
+     "历史时点可用性 unknown"
+    ]
+   }
+  },
+  {
+   "tr_code": "H00300",
+   "price_index_code": "000300",
+   "market_group": "stock",
+   "market_label": "沪深A股",
+   "official_full_name": "沪深300全收益指数",
+   "return_basis": "gross_total_return",
+   "row_count": 5321,
+   "raw_rows_in_db": 5321,
+   "identity_evidence_level": "official",
+   "return_basis_evidence_level": "official",
+   "historical_start": {
+    "official_basic_date": "2004-12-31",
+    "official_publish_date": "2005-04-08",
+    "request_start_date": "20040101",
+    "api_earliest_returned_date": "20040101",
+    "api_second_row_date": "20041231",
+    "actual_earliest_historical_quote_date": "unknown",
+    "historical_start_evidence_level": "request_start_artifact",
+    "historical_start_status": "unknown",
+    "historical_start_blockers": [
+     "未取得官方编制方案/发布公告以证明真实历史起点",
+     "接口返回最早日期 20040101 等于请求起始日，不能作为真实历史起点",
+     "第二行 20041231 无独立对照证据，不能确认为真实起点"
+    ],
+    "synthetic_row_preserved": "20040101",
+    "date_concepts_distinct": {
+     "1_basic_date": "2004-12-31",
+     "2_publish_date": "2005-04-08",
+     "3_request_start": "20040101",
+     "4_api_earliest": "20040101",
+     "5_confirmed_real_start": "unknown",
+     "6_first_publicly_available": "unknown"
+    },
+    "note": "六类日期严格分开；**不得因有官方发布日期就认为接口最早日期是真实起点**"
+   },
+   "calendar": {
+    "market_group": "stock",
+    "market_label": "沪深A股",
+    "calendar_used": "A股交易日历（项目代理）",
+    "calendar_available": true,
+    "calendar_is_official": false,
+    "continuity_status": "verified_against_proxy_calendar",
+    "coverage_status": "verified",
+    "missing_trading_days": 0,
+    "missing_sample": [],
+    "dates_outside_calendar": 1,
+    "outside_detail": [
+     {
+      "date": "2018-06-18",
+      "classification": "suspected_market_closed",
+      "close": 4614.35,
+      "prev_close": 4613.77,
+      "volume": 0.0,
+      "change_pct": 0.01,
+      "same_as_prev": false,
+      "zero_volume": true,
+      "official_calendar_evidence": false,
+      "note": "有零成交/数值重复特征但无官方日历证据，仅疑似"
+     }
+    ],
+    "unexplained_count": 0,
+    "reason": "相对 A 股日历**代理**无缺失（非官方发布日历）",
+    "calendar_evidence": "项目 trade_calendar 表 8,797 天（1990-12-19 ~ 2026-12-31）；**非官方指数发布日历**",
+    "proxy_not_official": true
+   },
+   "row_quality": {
+    "row_count": 5321,
+    "checks": {
+     "illegal_date": {
+      "count": 0,
+      "sample": []
+     },
+     "duplicate_date": {
+      "count": 0,
+      "sample": []
+     },
+     "close_null": {
+      "count": 0,
+      "sample": []
+     },
+     "close_non_positive": {
+      "count": 0,
+      "sample": []
+     },
+     "close_non_numeric": {
+      "count": 0,
+      "sample": []
+     },
+     "high_lt_low": {
+      "count": 0,
+      "sample": []
+     },
+     "ohlc_inconsistent": {
+      "count": 0,
+      "sample": []
+     },
+     "volume_negative": {
+      "count": 0,
+      "sample": []
+     },
+     "amount_negative": {
+      "count": 0,
+      "sample": []
+     },
+     "change_inconsistent": {
+      "count": 0,
+      "sample": []
+     },
+     "change_pct_inconsistent": {
+      "count": 0,
+      "sample": []
+     },
+     "extreme_jump": {
+      "count": 0,
+      "sample": []
+     },
+     "repeated_price_run": {
+      "count": 0,
+      "sample": []
+     },
+     "non_trading_date": {
+      "count": 0,
+      "sample": []
+     }
+    },
+    "fatal_issue_count": 0,
+    "data_quality_status": "pass",
+    "note": "**不修改任何原始值**；异常只记录不修正；正常大幅涨跌不计入 fatal"
+   },
+   "point_in_time": {
+    "historical_point_in_time_status": "unknown",
+    "historical_publication_evidence": null,
+    "historical_revision_evidence": null,
+    "first_available_date": "unknown",
+    "point_in_time_blockers": [
+     "同 (code,date) 仅 1 版本，无修订记录",
+     "仅单批次采集（['2026-11-27']），无法区分历史发布值与当前值",
+     "未取得官方历史发布时间证明",
+     "无法排除事后回溯计算"
+    ],
+    "snapshot_tables_found": [
+     "etf_adjustment_snapshots"
+    ],
+    "multi_version_rows": 0,
+    "ingest_batches": [
+     "2026-11-27"
+    ],
+    "note": "**不能因历史行情完整就认为具备历史时点可用性**；无快照/发布证据的序列不得用于声称无未来数据偏差的回测"
+   },
+   "row_quality_distribution": {
+    "normal_unverified": 5319,
+    "suspected_market_closed_placeholder": 1,
+    "suspected_synthetic": 1
+   },
+   "grading": {
+    "dimensions": {
+     "official_identity": "official",
+     "return_basis": "official",
+     "historical_start": "unknown",
+     "calendar": "verified_against_proxy_calendar",
+     "data_quality": "pass",
+     "point_in_time": "unknown"
+    },
+    "final_grade": "B",
+    "grade_definition": "关键质量条件通过，存在明确有限缺口",
+    "allowed_uses": [
+     "描述性统计（收益分布、波动率、相关性）",
+     "基准结构分析（成分、权重研究）",
+     "代理收益序列的敏感性分析（须标注限制）"
+    ],
+    "forbidden_uses": [
+     "任何声称无未来数据偏差的回测",
+     "正式业绩归因与排名",
+     "对外发布的基金评价",
+     "历史时点严格回测（point-in-time unknown）",
+     "依赖官方交易日历的严格交易日对齐"
+    ],
+    "blockers": [
+     "真实历史起点 unknown",
+     "日历等级=verified_against_proxy_calendar",
+     "历史时点可用性 unknown"
+    ]
+   }
+  },
+  {
+   "tr_code": "H00905",
+   "price_index_code": "000905",
+   "market_group": "stock",
+   "market_label": "沪深A股",
+   "official_full_name": "中证小盘500全收益指数",
+   "return_basis": "gross_total_return",
+   "row_count": 5321,
+   "raw_rows_in_db": 5321,
+   "identity_evidence_level": "official",
+   "return_basis_evidence_level": "official",
+   "historical_start": {
+    "official_basic_date": "2004-12-31",
+    "official_publish_date": "2007-01-15",
+    "request_start_date": "20040101",
+    "api_earliest_returned_date": "20040101",
+    "api_second_row_date": "20041231",
+    "actual_earliest_historical_quote_date": "unknown",
+    "historical_start_evidence_level": "request_start_artifact",
+    "historical_start_status": "unknown",
+    "historical_start_blockers": [
+     "未取得官方编制方案/发布公告以证明真实历史起点",
+     "接口返回最早日期 20040101 等于请求起始日，不能作为真实历史起点",
+     "第二行 20041231 无独立对照证据，不能确认为真实起点"
+    ],
+    "synthetic_row_preserved": "20040101",
+    "date_concepts_distinct": {
+     "1_basic_date": "2004-12-31",
+     "2_publish_date": "2007-01-15",
+     "3_request_start": "20040101",
+     "4_api_earliest": "20040101",
+     "5_confirmed_real_start": "unknown",
+     "6_first_publicly_available": "unknown"
+    },
+    "note": "六类日期严格分开；**不得因有官方发布日期就认为接口最早日期是真实起点**"
+   },
+   "calendar": {
+    "market_group": "stock",
+    "market_label": "沪深A股",
+    "calendar_used": "A股交易日历（项目代理）",
+    "calendar_available": true,
+    "calendar_is_official": false,
+    "continuity_status": "verified_against_proxy_calendar",
+    "coverage_status": "verified",
+    "missing_trading_days": 0,
+    "missing_sample": [],
+    "dates_outside_calendar": 1,
+    "outside_detail": [
+     {
+      "date": "2018-06-18",
+      "classification": "suspected_market_closed",
+      "close": 6060.55,
+      "prev_close": 6059.92,
+      "volume": 0.0,
+      "change_pct": 0.01,
+      "same_as_prev": false,
+      "zero_volume": true,
+      "official_calendar_evidence": false,
+      "note": "有零成交/数值重复特征但无官方日历证据，仅疑似"
+     }
+    ],
+    "unexplained_count": 0,
+    "reason": "相对 A 股日历**代理**无缺失（非官方发布日历）",
+    "calendar_evidence": "项目 trade_calendar 表 8,797 天（1990-12-19 ~ 2026-12-31）；**非官方指数发布日历**",
+    "proxy_not_official": true
+   },
+   "row_quality": {
+    "row_count": 5321,
+    "checks": {
+     "illegal_date": {
+      "count": 0,
+      "sample": []
+     },
+     "duplicate_date": {
+      "count": 0,
+      "sample": []
+     },
+     "close_null": {
+      "count": 0,
+      "sample": []
+     },
+     "close_non_positive": {
+      "count": 0,
+      "sample": []
+     },
+     "close_non_numeric": {
+      "count": 0,
+      "sample": []
+     },
+     "high_lt_low": {
+      "count": 0,
+      "sample": []
+     },
+     "ohlc_inconsistent": {
+      "count": 0,
+      "sample": []
+     },
+     "volume_negative": {
+      "count": 0,
+      "sample": []
+     },
+     "amount_negative": {
+      "count": 0,
+      "sample": []
+     },
+     "change_inconsistent": {
+      "count": 0,
+      "sample": []
+     },
+     "change_pct_inconsistent": {
+      "count": 0,
+      "sample": []
+     },
+     "extreme_jump": {
+      "count": 0,
+      "sample": []
+     },
+     "repeated_price_run": {
+      "count": 0,
+      "sample": []
+     },
+     "non_trading_date": {
+      "count": 0,
+      "sample": []
+     }
+    },
+    "fatal_issue_count": 0,
+    "data_quality_status": "pass",
+    "note": "**不修改任何原始值**；异常只记录不修正；正常大幅涨跌不计入 fatal"
+   },
+   "point_in_time": {
+    "historical_point_in_time_status": "unknown",
+    "historical_publication_evidence": null,
+    "historical_revision_evidence": null,
+    "first_available_date": "unknown",
+    "point_in_time_blockers": [
+     "同 (code,date) 仅 1 版本，无修订记录",
+     "仅单批次采集（['2026-11-27']），无法区分历史发布值与当前值",
+     "未取得官方历史发布时间证明",
+     "无法排除事后回溯计算"
+    ],
+    "snapshot_tables_found": [
+     "etf_adjustment_snapshots"
+    ],
+    "multi_version_rows": 0,
+    "ingest_batches": [
+     "2026-11-27"
+    ],
+    "note": "**不能因历史行情完整就认为具备历史时点可用性**；无快照/发布证据的序列不得用于声称无未来数据偏差的回测"
+   },
+   "row_quality_distribution": {
+    "normal_unverified": 5319,
+    "suspected_market_closed_placeholder": 1,
+    "suspected_synthetic": 1
+   },
+   "grading": {
+    "dimensions": {
+     "official_identity": "official",
+     "return_basis": "official",
+     "historical_start": "unknown",
+     "calendar": "verified_against_proxy_calendar",
+     "data_quality": "pass",
+     "point_in_time": "unknown"
+    },
+    "final_grade": "B",
+    "grade_definition": "关键质量条件通过，存在明确有限缺口",
+    "allowed_uses": [
+     "描述性统计（收益分布、波动率、相关性）",
+     "基准结构分析（成分、权重研究）",
+     "代理收益序列的敏感性分析（须标注限制）"
+    ],
+    "forbidden_uses": [
+     "任何声称无未来数据偏差的回测",
+     "正式业绩归因与排名",
+     "对外发布的基金评价",
+     "历史时点严格回测（point-in-time unknown）",
+     "依赖官方交易日历的严格交易日对齐"
+    ],
+    "blockers": [
+     "真实历史起点 unknown",
+     "日历等级=verified_against_proxy_calendar",
+     "历史时点可用性 unknown"
+    ]
+   }
+  },
+  {
+   "tr_code": "H00906",
+   "price_index_code": "000906",
+   "market_group": "stock",
+   "market_label": "沪深A股",
+   "official_full_name": "中证800全收益指数",
+   "return_basis": "gross_total_return",
+   "row_count": 5321,
+   "raw_rows_in_db": 5321,
+   "identity_evidence_level": "official",
+   "return_basis_evidence_level": "official",
+   "historical_start": {
+    "official_basic_date": "2004-12-31",
+    "official_publish_date": "2007-01-15",
+    "request_start_date": "20040101",
+    "api_earliest_returned_date": "20040101",
+    "api_second_row_date": "20041231",
+    "actual_earliest_historical_quote_date": "unknown",
+    "historical_start_evidence_level": "request_start_artifact",
+    "historical_start_status": "unknown",
+    "historical_start_blockers": [
+     "未取得官方编制方案/发布公告以证明真实历史起点",
+     "接口返回最早日期 20040101 等于请求起始日，不能作为真实历史起点",
+     "第二行 20041231 无独立对照证据，不能确认为真实起点"
+    ],
+    "synthetic_row_preserved": "20040101",
+    "date_concepts_distinct": {
+     "1_basic_date": "2004-12-31",
+     "2_publish_date": "2007-01-15",
+     "3_request_start": "20040101",
+     "4_api_earliest": "20040101",
+     "5_confirmed_real_start": "unknown",
+     "6_first_publicly_available": "unknown"
+    },
+    "note": "六类日期严格分开；**不得因有官方发布日期就认为接口最早日期是真实起点**"
+   },
+   "calendar": {
+    "market_group": "stock",
+    "market_label": "沪深A股",
+    "calendar_used": "A股交易日历（项目代理）",
+    "calendar_available": true,
+    "calendar_is_official": false,
+    "continuity_status": "verified_against_proxy_calendar",
+    "coverage_status": "verified",
+    "missing_trading_days": 0,
+    "missing_sample": [],
+    "dates_outside_calendar": 1,
+    "outside_detail": [
+     {
+      "date": "2018-06-18",
+      "classification": "suspected_market_closed",
+      "close": 4906.05,
+      "prev_close": 4905.46,
+      "volume": 0.0,
+      "change_pct": 0.01,
+      "same_as_prev": false,
+      "zero_volume": true,
+      "official_calendar_evidence": false,
+      "note": "有零成交/数值重复特征但无官方日历证据，仅疑似"
+     }
+    ],
+    "unexplained_count": 0,
+    "reason": "相对 A 股日历**代理**无缺失（非官方发布日历）",
+    "calendar_evidence": "项目 trade_calendar 表 8,797 天（1990-12-19 ~ 2026-12-31）；**非官方指数发布日历**",
+    "proxy_not_official": true
+   },
+   "row_quality": {
+    "row_count": 5321,
+    "checks": {
+     "illegal_date": {
+      "count": 0,
+      "sample": []
+     },
+     "duplicate_date": {
+      "count": 0,
+      "sample": []
+     },
+     "close_null": {
+      "count": 0,
+      "sample": []
+     },
+     "close_non_positive": {
+      "count": 0,
+      "sample": []
+     },
+     "close_non_numeric": {
+      "count": 0,
+      "sample": []
+     },
+     "high_lt_low": {
+      "count": 0,
+      "sample": []
+     },
+     "ohlc_inconsistent": {
+      "count": 0,
+      "sample": []
+     },
+     "volume_negative": {
+      "count": 0,
+      "sample": []
+     },
+     "amount_negative": {
+      "count": 0,
+      "sample": []
+     },
+     "change_inconsistent": {
+      "count": 0,
+      "sample": []
+     },
+     "change_pct_inconsistent": {
+      "count": 0,
+      "sample": []
+     },
+     "extreme_jump": {
+      "count": 0,
+      "sample": []
+     },
+     "repeated_price_run": {
+      "count": 0,
+      "sample": []
+     },
+     "non_trading_date": {
+      "count": 0,
+      "sample": []
+     }
+    },
+    "fatal_issue_count": 0,
+    "data_quality_status": "pass",
+    "note": "**不修改任何原始值**；异常只记录不修正；正常大幅涨跌不计入 fatal"
+   },
+   "point_in_time": {
+    "historical_point_in_time_status": "unknown",
+    "historical_publication_evidence": null,
+    "historical_revision_evidence": null,
+    "first_available_date": "unknown",
+    "point_in_time_blockers": [
+     "同 (code,date) 仅 1 版本，无修订记录",
+     "仅单批次采集（['2026-11-27']），无法区分历史发布值与当前值",
+     "未取得官方历史发布时间证明",
+     "无法排除事后回溯计算"
+    ],
+    "snapshot_tables_found": [
+     "etf_adjustment_snapshots"
+    ],
+    "multi_version_rows": 0,
+    "ingest_batches": [
+     "2026-11-27"
+    ],
+    "note": "**不能因历史行情完整就认为具备历史时点可用性**；无快照/发布证据的序列不得用于声称无未来数据偏差的回测"
+   },
+   "row_quality_distribution": {
+    "normal_unverified": 5319,
+    "suspected_market_closed_placeholder": 1,
+    "suspected_synthetic": 1
+   },
+   "grading": {
+    "dimensions": {
+     "official_identity": "official",
+     "return_basis": "official",
+     "historical_start": "unknown",
+     "calendar": "verified_against_proxy_calendar",
+     "data_quality": "pass",
+     "point_in_time": "unknown"
+    },
+    "final_grade": "B",
+    "grade_definition": "关键质量条件通过，存在明确有限缺口",
+    "allowed_uses": [
+     "描述性统计（收益分布、波动率、相关性）",
+     "基准结构分析（成分、权重研究）",
+     "代理收益序列的敏感性分析（须标注限制）"
+    ],
+    "forbidden_uses": [
+     "任何声称无未来数据偏差的回测",
+     "正式业绩归因与排名",
+     "对外发布的基金评价",
+     "历史时点严格回测（point-in-time unknown）",
+     "依赖官方交易日历的严格交易日对齐"
+    ],
+    "blockers": [
+     "真实历史起点 unknown",
+     "日历等级=verified_against_proxy_calendar",
+     "历史时点可用性 unknown"
+    ]
+   }
+  },
+  {
+   "tr_code": "H00922",
+   "price_index_code": "000922",
+   "market_group": "stock",
+   "market_label": "沪深A股",
+   "official_full_name": "中证红利全收益指数",
+   "return_basis": "gross_total_return",
+   "row_count": 5321,
+   "raw_rows_in_db": 5321,
+   "identity_evidence_level": "official",
+   "return_basis_evidence_level": "official",
+   "historical_start": {
+    "official_basic_date": "2004-12-31",
+    "official_publish_date": "2008-05-26",
+    "request_start_date": "20040101",
+    "api_earliest_returned_date": "20040101",
+    "api_second_row_date": "20041231",
+    "actual_earliest_historical_quote_date": "unknown",
+    "historical_start_evidence_level": "request_start_artifact",
+    "historical_start_status": "unknown",
+    "historical_start_blockers": [
+     "未取得官方编制方案/发布公告以证明真实历史起点",
+     "接口返回最早日期 20040101 等于请求起始日，不能作为真实历史起点",
+     "第二行 20041231 无独立对照证据，不能确认为真实起点"
+    ],
+    "synthetic_row_preserved": "20040101",
+    "date_concepts_distinct": {
+     "1_basic_date": "2004-12-31",
+     "2_publish_date": "2008-05-26",
+     "3_request_start": "20040101",
+     "4_api_earliest": "20040101",
+     "5_confirmed_real_start": "unknown",
+     "6_first_publicly_available": "unknown"
+    },
+    "note": "六类日期严格分开；**不得因有官方发布日期就认为接口最早日期是真实起点**"
+   },
+   "calendar": {
+    "market_group": "stock",
+    "market_label": "沪深A股",
+    "calendar_used": "A股交易日历（项目代理）",
+    "calendar_available": true,
+    "calendar_is_official": false,
+    "continuity_status": "verified_against_proxy_calendar",
+    "coverage_status": "verified",
+    "missing_trading_days": 0,
+    "missing_sample": [],
+    "dates_outside_calendar": 1,
+    "outside_detail": [
+     {
+      "date": "2018-06-18",
+      "classification": "suspected_market_closed",
+      "close": 6475.67,
+      "prev_close": 6475.67,
+      "volume": 0.0,
+      "change_pct": 0.0,
+      "same_as_prev": true,
+      "zero_volume": true,
+      "official_calendar_evidence": false,
+      "note": "有零成交/数值重复特征但无官方日历证据，仅疑似"
+     }
+    ],
+    "unexplained_count": 0,
+    "reason": "相对 A 股日历**代理**无缺失（非官方发布日历）",
+    "calendar_evidence": "项目 trade_calendar 表 8,797 天（1990-12-19 ~ 2026-12-31）；**非官方指数发布日历**",
+    "proxy_not_official": true
+   },
+   "row_quality": {
+    "row_count": 5321,
+    "checks": {
+     "illegal_date": {
+      "count": 0,
+      "sample": []
+     },
+     "duplicate_date": {
+      "count": 0,
+      "sample": []
+     },
+     "close_null": {
+      "count": 0,
+      "sample": []
+     },
+     "close_non_positive": {
+      "count": 0,
+      "sample": []
+     },
+     "close_non_numeric": {
+      "count": 0,
+      "sample": []
+     },
+     "high_lt_low": {
+      "count": 0,
+      "sample": []
+     },
+     "ohlc_inconsistent": {
+      "count": 0,
+      "sample": []
+     },
+     "volume_negative": {
+      "count": 0,
+      "sample": []
+     },
+     "amount_negative": {
+      "count": 0,
+      "sample": []
+     },
+     "change_inconsistent": {
+      "count": 0,
+      "sample": []
+     },
+     "change_pct_inconsistent": {
+      "count": 0,
+      "sample": []
+     },
+     "extreme_jump": {
+      "count": 0,
+      "sample": []
+     },
+     "repeated_price_run": {
+      "count": 0,
+      "sample": []
+     },
+     "non_trading_date": {
+      "count": 0,
+      "sample": []
+     }
+    },
+    "fatal_issue_count": 0,
+    "data_quality_status": "pass",
+    "note": "**不修改任何原始值**；异常只记录不修正；正常大幅涨跌不计入 fatal"
+   },
+   "point_in_time": {
+    "historical_point_in_time_status": "unknown",
+    "historical_publication_evidence": null,
+    "historical_revision_evidence": null,
+    "first_available_date": "unknown",
+    "point_in_time_blockers": [
+     "同 (code,date) 仅 1 版本，无修订记录",
+     "仅单批次采集（['2026-11-27']），无法区分历史发布值与当前值",
+     "未取得官方历史发布时间证明",
+     "无法排除事后回溯计算"
+    ],
+    "snapshot_tables_found": [
+     "etf_adjustment_snapshots"
+    ],
+    "multi_version_rows": 0,
+    "ingest_batches": [
+     "2026-11-27"
+    ],
+    "note": "**不能因历史行情完整就认为具备历史时点可用性**；无快照/发布证据的序列不得用于声称无未来数据偏差的回测"
+   },
+   "row_quality_distribution": {
+    "normal_unverified": 5319,
+    "suspected_market_closed_placeholder": 1,
+    "suspected_synthetic": 1
+   },
+   "grading": {
+    "dimensions": {
+     "official_identity": "official",
+     "return_basis": "official",
+     "historical_start": "unknown",
+     "calendar": "verified_against_proxy_calendar",
+     "data_quality": "pass",
+     "point_in_time": "unknown"
+    },
+    "final_grade": "B",
+    "grade_definition": "关键质量条件通过，存在明确有限缺口",
+    "allowed_uses": [
+     "描述性统计（收益分布、波动率、相关性）",
+     "基准结构分析（成分、权重研究）",
+     "代理收益序列的敏感性分析（须标注限制）"
+    ],
+    "forbidden_uses": [
+     "任何声称无未来数据偏差的回测",
+     "正式业绩归因与排名",
+     "对外发布的基金评价",
+     "历史时点严格回测（point-in-time unknown）",
+     "依赖官方交易日历的严格交易日对齐"
+    ],
+    "blockers": [
+     "真实历史起点 unknown",
+     "日历等级=verified_against_proxy_calendar",
+     "历史时点可用性 unknown"
+    ]
+   }
+  },
+  {
+   "tr_code": "H00942",
+   "price_index_code": "000942",
+   "market_group": "stock",
+   "market_label": "沪深A股",
+   "official_full_name": "中证内地消费主题全收益指数",
+   "return_basis": "gross_total_return",
+   "row_count": 5321,
+   "raw_rows_in_db": 5321,
+   "identity_evidence_level": "official",
+   "return_basis_evidence_level": "official",
+   "historical_start": {
+    "official_basic_date": "2004-12-31",
+    "official_publish_date": "2009-10-28",
+    "request_start_date": "20040101",
+    "api_earliest_returned_date": "20040101",
+    "api_second_row_date": "20041231",
+    "actual_earliest_historical_quote_date": "unknown",
+    "historical_start_evidence_level": "request_start_artifact",
+    "historical_start_status": "unknown",
+    "historical_start_blockers": [
+     "未取得官方编制方案/发布公告以证明真实历史起点",
+     "接口返回最早日期 20040101 等于请求起始日，不能作为真实历史起点",
+     "第二行 20041231 无独立对照证据，不能确认为真实起点"
+    ],
+    "synthetic_row_preserved": "20040101",
+    "date_concepts_distinct": {
+     "1_basic_date": "2004-12-31",
+     "2_publish_date": "2009-10-28",
+     "3_request_start": "20040101",
+     "4_api_earliest": "20040101",
+     "5_confirmed_real_start": "unknown",
+     "6_first_publicly_available": "unknown"
+    },
+    "note": "六类日期严格分开；**不得因有官方发布日期就认为接口最早日期是真实起点**"
+   },
+   "calendar": {
+    "market_group": "stock",
+    "market_label": "沪深A股",
+    "calendar_used": "A股交易日历（项目代理）",
+    "calendar_available": true,
+    "calendar_is_official": false,
+    "continuity_status": "verified_against_proxy_calendar",
+    "coverage_status": "verified",
+    "missing_trading_days": 0,
+    "missing_sample": [],
+    "dates_outside_calendar": 1,
+    "outside_detail": [
+     {
+      "date": "2018-06-18",
+      "classification": "suspected_market_closed",
+      "close": 10721.51,
+      "prev_close": 10721.51,
+      "volume": 0.0,
+      "change_pct": 0.0,
+      "same_as_prev": true,
+      "zero_volume": true,
+      "official_calendar_evidence": false,
+      "note": "有零成交/数值重复特征但无官方日历证据，仅疑似"
+     }
+    ],
+    "unexplained_count": 0,
+    "reason": "相对 A 股日历**代理**无缺失（非官方发布日历）",
+    "calendar_evidence": "项目 trade_calendar 表 8,797 天（1990-12-19 ~ 2026-12-31）；**非官方指数发布日历**",
+    "proxy_not_official": true
+   },
+   "row_quality": {
+    "row_count": 5321,
+    "checks": {
+     "illegal_date": {
+      "count": 0,
+      "sample": []
+     },
+     "duplicate_date": {
+      "count": 0,
+      "sample": []
+     },
+     "close_null": {
+      "count": 0,
+      "sample": []
+     },
+     "close_non_positive": {
+      "count": 0,
+      "sample": []
+     },
+     "close_non_numeric": {
+      "count": 0,
+      "sample": []
+     },
+     "high_lt_low": {
+      "count": 0,
+      "sample": []
+     },
+     "ohlc_inconsistent": {
+      "count": 0,
+      "sample": []
+     },
+     "volume_negative": {
+      "count": 0,
+      "sample": []
+     },
+     "amount_negative": {
+      "count": 0,
+      "sample": []
+     },
+     "change_inconsistent": {
+      "count": 0,
+      "sample": []
+     },
+     "change_pct_inconsistent": {
+      "count": 0,
+      "sample": []
+     },
+     "extreme_jump": {
+      "count": 0,
+      "sample": []
+     },
+     "repeated_price_run": {
+      "count": 0,
+      "sample": []
+     },
+     "non_trading_date": {
+      "count": 0,
+      "sample": []
+     }
+    },
+    "fatal_issue_count": 0,
+    "data_quality_status": "pass",
+    "note": "**不修改任何原始值**；异常只记录不修正；正常大幅涨跌不计入 fatal"
+   },
+   "point_in_time": {
+    "historical_point_in_time_status": "unknown",
+    "historical_publication_evidence": null,
+    "historical_revision_evidence": null,
+    "first_available_date": "unknown",
+    "point_in_time_blockers": [
+     "同 (code,date) 仅 1 版本，无修订记录",
+     "仅单批次采集（['2026-11-27']），无法区分历史发布值与当前值",
+     "未取得官方历史发布时间证明",
+     "无法排除事后回溯计算"
+    ],
+    "snapshot_tables_found": [
+     "etf_adjustment_snapshots"
+    ],
+    "multi_version_rows": 0,
+    "ingest_batches": [
+     "2026-11-27"
+    ],
+    "note": "**不能因历史行情完整就认为具备历史时点可用性**；无快照/发布证据的序列不得用于声称无未来数据偏差的回测"
+   },
+   "row_quality_distribution": {
+    "normal_unverified": 5319,
+    "suspected_market_closed_placeholder": 1,
+    "suspected_synthetic": 1
+   },
+   "grading": {
+    "dimensions": {
+     "official_identity": "official",
+     "return_basis": "official",
+     "historical_start": "unknown",
+     "calendar": "verified_against_proxy_calendar",
+     "data_quality": "pass",
+     "point_in_time": "unknown"
+    },
+    "final_grade": "B",
+    "grade_definition": "关键质量条件通过，存在明确有限缺口",
+    "allowed_uses": [
+     "描述性统计（收益分布、波动率、相关性）",
+     "基准结构分析（成分、权重研究）",
+     "代理收益序列的敏感性分析（须标注限制）"
+    ],
+    "forbidden_uses": [
+     "任何声称无未来数据偏差的回测",
+     "正式业绩归因与排名",
+     "对外发布的基金评价",
+     "历史时点严格回测（point-in-time unknown）",
+     "依赖官方交易日历的严格交易日对齐"
+    ],
+    "blockers": [
+     "真实历史起点 unknown",
+     "日历等级=verified_against_proxy_calendar",
+     "历史时点可用性 unknown"
+    ]
+   }
+  },
+  {
+   "tr_code": "H20184",
+   "price_index_code": "H30184",
+   "market_group": "stock",
+   "market_label": "沪深A股",
+   "official_full_name": "中证全指半导体产品与设备全收益指数",
+   "return_basis": "gross_total_return",
+   "row_count": 5320,
+   "raw_rows_in_db": 5320,
+   "identity_evidence_level": "official",
+   "return_basis_evidence_level": "official",
+   "historical_start": {
+    "official_basic_date": "2004-12-31",
+    "official_publish_date": "2013-07-15",
+    "request_start_date": "20040101",
+    "api_earliest_returned_date": "20040101",
+    "api_second_row_date": "20050104",
+    "actual_earliest_historical_quote_date": "unknown",
+    "historical_start_evidence_level": "request_start_artifact",
+    "historical_start_status": "unknown",
+    "historical_start_blockers": [
+     "未取得官方编制方案/发布公告以证明真实历史起点",
+     "接口返回最早日期 20040101 等于请求起始日，不能作为真实历史起点",
+     "第二行 20050104 无独立对照证据，不能确认为真实起点"
+    ],
+    "synthetic_row_preserved": "20040101",
+    "date_concepts_distinct": {
+     "1_basic_date": "2004-12-31",
+     "2_publish_date": "2013-07-15",
+     "3_request_start": "20040101",
+     "4_api_earliest": "20040101",
+     "5_confirmed_real_start": "unknown",
+     "6_first_publicly_available": "unknown"
+    },
+    "note": "六类日期严格分开；**不得因有官方发布日期就认为接口最早日期是真实起点**"
+   },
+   "calendar": {
+    "market_group": "stock",
+    "market_label": "沪深A股",
+    "calendar_used": "A股交易日历（项目代理）",
+    "calendar_available": true,
+    "calendar_is_official": false,
+    "continuity_status": "verified_against_proxy_calendar",
+    "coverage_status": "verified",
+    "missing_trading_days": 0,
+    "missing_sample": [],
+    "dates_outside_calendar": 1,
+    "outside_detail": [
+     {
+      "date": "2018-06-18",
+      "classification": "suspected_market_closed",
+      "close": 3422.74,
+      "prev_close": 3422.74,
+      "volume": 0.0,
+      "change_pct": 0.0,
+      "same_as_prev": true,
+      "zero_volume": true,
+      "official_calendar_evidence": false,
+      "note": "有零成交/数值重复特征但无官方日历证据，仅疑似"
+     }
+    ],
+    "unexplained_count": 0,
+    "reason": "相对 A 股日历**代理**无缺失（非官方发布日历）",
+    "calendar_evidence": "项目 trade_calendar 表 8,797 天（1990-12-19 ~ 2026-12-31）；**非官方指数发布日历**",
+    "proxy_not_official": true
+   },
+   "row_quality": {
+    "row_count": 5320,
+    "checks": {
+     "illegal_date": {
+      "count": 0,
+      "sample": []
+     },
+     "duplicate_date": {
+      "count": 0,
+      "sample": []
+     },
+     "close_null": {
+      "count": 0,
+      "sample": []
+     },
+     "close_non_positive": {
+      "count": 1,
+      "sample": [
+       {
+        "date": "20130628",
+        "close": 0.0
+       }
+      ]
+     },
+     "close_non_numeric": {
+      "count": 0,
+      "sample": []
+     },
+     "high_lt_low": {
+      "count": 0,
+      "sample": []
+     },
+     "ohlc_inconsistent": {
+      "count": 0,
+      "sample": []
+     },
+     "volume_negative": {
+      "count": 0,
+      "sample": []
+     },
+     "amount_negative": {
+      "count": 0,
+      "sample": []
+     },
+     "change_inconsistent": {
+      "count": 2,
+      "sample": [
+       {
+        "date": "20130628",
+        "prev": 1547.19,
+        "close": 0.0,
+        "change_field": 0.0,
+        "expected": -1547.19
+       },
+       {
+        "date": "20130701",
+        "prev": 0.0,
+        "close": 1579.13,
+        "change_field": 38.23,
+        "expected": 1579.13
+       }
+      ]
+     },
+     "change_pct_inconsistent": {
+      "count": 1,
+      "sample": [
+       {
+        "date": "20130628",
+        "expect_pct": -100.0,
+        "field_pct": 0.0
+       }
+      ]
+     },
+     "extreme_jump": {
+      "count": 1,
+      "sample": [
+       {
+        "date": "20130628",
+        "prev": 1547.19,
+        "close": 0.0,
+        "jump": 1.0
+       }
+      ]
+     },
+     "repeated_price_run": {
+      "count": 0,
+      "sample": []
+     },
+     "non_trading_date": {
+      "count": 0,
+      "sample": []
+     }
+    },
+    "fatal_issue_count": 1,
+    "data_quality_status": "has_fatal",
+    "note": "**不修改任何原始值**；异常只记录不修正；正常大幅涨跌不计入 fatal"
+   },
+   "point_in_time": {
+    "historical_point_in_time_status": "unknown",
+    "historical_publication_evidence": null,
+    "historical_revision_evidence": null,
+    "first_available_date": "unknown",
+    "point_in_time_blockers": [
+     "同 (code,date) 仅 1 版本，无修订记录",
+     "仅单批次采集（['2026-11-27']），无法区分历史发布值与当前值",
+     "未取得官方历史发布时间证明",
+     "无法排除事后回溯计算"
+    ],
+    "snapshot_tables_found": [
+     "etf_adjustment_snapshots"
+    ],
+    "multi_version_rows": 0,
+    "ingest_batches": [
+     "2026-11-27"
+    ],
+    "note": "**不能因历史行情完整就认为具备历史时点可用性**；无快照/发布证据的序列不得用于声称无未来数据偏差的回测"
+   },
+   "row_quality_distribution": {
+    "invalid_value": 1,
+    "normal_unverified": 5317,
+    "suspected_market_closed_placeholder": 1,
+    "suspected_synthetic": 1
+   },
+   "grading": {
+    "dimensions": {
+     "official_identity": "official",
+     "return_basis": "official",
+     "historical_start": "unknown",
+     "calendar": "verified_against_proxy_calendar",
+     "data_quality": "has_fatal",
+     "point_in_time": "unknown"
+    },
+    "final_grade": "C",
+    "grade_definition": "可用于有限描述性/代理研究，存在未解决关键限制",
+    "allowed_uses": [
+     "有限描述性研究",
+     "作为代理序列做探索性分析（须明确标注证据缺口）"
+    ],
+    "forbidden_uses": [
+     "任何声称无未来数据偏差的回测",
+     "正式业绩归因与排名",
+     "对外发布的基金评价",
+     "历史时点严格回测（point-in-time unknown）",
+     "依赖官方交易日历的严格交易日对齐"
+    ],
+    "blockers": [
+     "真实历史起点 unknown",
+     "日历等级=verified_against_proxy_calendar",
+     "数据质量存在致命问题",
+     "历史时点可用性 unknown"
+    ]
+   }
+  },
+  {
+   "tr_code": "H20539",
+   "price_index_code": "399997",
+   "market_group": "stock",
+   "market_label": "沪深A股",
+   "official_full_name": "中证白酒全收益指数",
+   "return_basis": "gross_total_return",
+   "row_count": 4350,
+   "raw_rows_in_db": 4350,
+   "identity_evidence_level": "official",
+   "return_basis_evidence_level": "official",
+   "historical_start": {
+    "official_basic_date": "2008-12-31",
+    "official_publish_date": "2015-01-21",
+    "request_start_date": "20040101",
+    "api_earliest_returned_date": "20040101",
+    "api_second_row_date": "20081231",
+    "actual_earliest_historical_quote_date": "unknown",
+    "historical_start_evidence_level": "request_start_artifact",
+    "historical_start_status": "unknown",
+    "historical_start_blockers": [
+     "未取得官方编制方案/发布公告以证明真实历史起点",
+     "接口返回最早日期 20040101 等于请求起始日，不能作为真实历史起点",
+     "第二行 20081231 无独立对照证据，不能确认为真实起点"
+    ],
+    "synthetic_row_preserved": "20040101",
+    "date_concepts_distinct": {
+     "1_basic_date": "2008-12-31",
+     "2_publish_date": "2015-01-21",
+     "3_request_start": "20040101",
+     "4_api_earliest": "20040101",
+     "5_confirmed_real_start": "unknown",
+     "6_first_publicly_available": "unknown"
+    },
+    "note": "六类日期严格分开；**不得因有官方发布日期就认为接口最早日期是真实起点**"
+   },
+   "calendar": {
+    "market_group": "stock",
+    "market_label": "沪深A股",
+    "calendar_used": "A股交易日历（项目代理）",
+    "calendar_available": true,
+    "calendar_is_official": false,
+    "continuity_status": "verified_against_proxy_calendar",
+    "coverage_status": "verified",
+    "missing_trading_days": 0,
+    "missing_sample": [],
+    "dates_outside_calendar": 1,
+    "outside_detail": [
+     {
+      "date": "2018-06-18",
+      "classification": "suspected_market_closed",
+      "close": 8059.48,
+      "prev_close": 8059.48,
+      "volume": 0.0,
+      "change_pct": 0.0,
+      "same_as_prev": true,
+      "zero_volume": true,
+      "official_calendar_evidence": false,
+      "note": "有零成交/数值重复特征但无官方日历证据，仅疑似"
+     }
+    ],
+    "unexplained_count": 0,
+    "reason": "相对 A 股日历**代理**无缺失（非官方发布日历）",
+    "calendar_evidence": "项目 trade_calendar 表 8,797 天（1990-12-19 ~ 2026-12-31）；**非官方指数发布日历**",
+    "proxy_not_official": true
+   },
+   "row_quality": {
+    "row_count": 4350,
+    "checks": {
+     "illegal_date": {
+      "count": 0,
+      "sample": []
+     },
+     "duplicate_date": {
+      "count": 0,
+      "sample": []
+     },
+     "close_null": {
+      "count": 0,
+      "sample": []
+     },
+     "close_non_positive": {
+      "count": 0,
+      "sample": []
+     },
+     "close_non_numeric": {
+      "count": 0,
+      "sample": []
+     },
+     "high_lt_low": {
+      "count": 0,
+      "sample": []
+     },
+     "ohlc_inconsistent": {
+      "count": 0,
+      "sample": []
+     },
+     "volume_negative": {
+      "count": 0,
+      "sample": []
+     },
+     "amount_negative": {
+      "count": 0,
+      "sample": []
+     },
+     "change_inconsistent": {
+      "count": 0,
+      "sample": []
+     },
+     "change_pct_inconsistent": {
+      "count": 0,
+      "sample": []
+     },
+     "extreme_jump": {
+      "count": 0,
+      "sample": []
+     },
+     "repeated_price_run": {
+      "count": 0,
+      "sample": []
+     },
+     "non_trading_date": {
+      "count": 0,
+      "sample": []
+     }
+    },
+    "fatal_issue_count": 0,
+    "data_quality_status": "pass",
+    "note": "**不修改任何原始值**；异常只记录不修正；正常大幅涨跌不计入 fatal"
+   },
+   "point_in_time": {
+    "historical_point_in_time_status": "unknown",
+    "historical_publication_evidence": null,
+    "historical_revision_evidence": null,
+    "first_available_date": "unknown",
+    "point_in_time_blockers": [
+     "同 (code,date) 仅 1 版本，无修订记录",
+     "仅单批次采集（['2026-11-27']），无法区分历史发布值与当前值",
+     "未取得官方历史发布时间证明",
+     "无法排除事后回溯计算"
+    ],
+    "snapshot_tables_found": [
+     "etf_adjustment_snapshots"
+    ],
+    "multi_version_rows": 0,
+    "ingest_batches": [
+     "2026-11-27"
+    ],
+    "note": "**不能因历史行情完整就认为具备历史时点可用性**；无快照/发布证据的序列不得用于声称无未来数据偏差的回测"
+   },
+   "row_quality_distribution": {
+    "normal_unverified": 4348,
+    "suspected_market_closed_placeholder": 1,
+    "suspected_synthetic": 1
+   },
+   "grading": {
+    "dimensions": {
+     "official_identity": "official",
+     "return_basis": "official",
+     "historical_start": "unknown",
+     "calendar": "verified_against_proxy_calendar",
+     "data_quality": "pass",
+     "point_in_time": "unknown"
+    },
+    "final_grade": "B",
+    "grade_definition": "关键质量条件通过，存在明确有限缺口",
+    "allowed_uses": [
+     "描述性统计（收益分布、波动率、相关性）",
+     "基准结构分析（成分、权重研究）",
+     "代理收益序列的敏感性分析（须标注限制）"
+    ],
+    "forbidden_uses": [
+     "任何声称无未来数据偏差的回测",
+     "正式业绩归因与排名",
+     "对外发布的基金评价",
+     "历史时点严格回测（point-in-time unknown）",
+     "依赖官方交易日历的严格交易日对齐"
+    ],
+    "blockers": [
+     "真实历史起点 unknown",
+     "日历等级=verified_against_proxy_calendar",
+     "历史时点可用性 unknown"
+    ]
+   }
+  },
+  {
+   "tr_code": "H20930",
+   "price_index_code": "930930",
+   "market_group": "hk",
+   "market_label": "香港市场（港股通）",
+   "official_full_name": "中证港股通综合全收益指数",
+   "return_basis": "gross_total_return",
+   "row_count": 3003,
+   "raw_rows_in_db": 3003,
+   "identity_evidence_level": "official",
+   "return_basis_evidence_level": "official",
+   "historical_start": {
+    "official_basic_date": "2014-11-14",
+    "official_publish_date": "2017-01-16",
+    "request_start_date": "20040101",
+    "api_earliest_returned_date": "20040101",
+    "api_second_row_date": "20141114",
+    "actual_earliest_historical_quote_date": "unknown",
+    "historical_start_evidence_level": "request_start_artifact",
+    "historical_start_status": "unknown",
+    "historical_start_blockers": [
+     "未取得官方编制方案/发布公告以证明真实历史起点",
+     "接口返回最早日期 20040101 等于请求起始日，不能作为真实历史起点",
+     "第二行 20141114 无独立对照证据，不能确认为真实起点"
+    ],
+    "synthetic_row_preserved": "20040101",
+    "date_concepts_distinct": {
+     "1_basic_date": "2014-11-14",
+     "2_publish_date": "2017-01-16",
+     "3_request_start": "20040101",
+     "4_api_earliest": "20040101",
+     "5_confirmed_real_start": "unknown",
+     "6_first_publicly_available": "unknown"
+    },
+    "note": "六类日期严格分开；**不得因有官方发布日期就认为接口最早日期是真实起点**"
+   },
+   "calendar": {
+    "market_group": "hk",
+    "market_label": "香港市场（港股通）",
+    "calendar_used": "港股交易日历",
+    "calendar_available": false,
+    "calendar_is_official": false,
+    "continuity_status": "unknown",
+    "coverage_status": "unknown",
+    "missing_trading_days": null,
+    "dates_outside_calendar": null,
+    "reason": "港股交易日历未取得，**不得用 A 股日历替代**；覆盖与连续性记 unknown",
+    "calendar_evidence": "尝试 hkex.com.hk 交易日历页（HTTP 200 但为 JS 渲染）；**未取得官方港股日历**",
+    "reference_only_a_share_diff": {
+     "note": "仅供参考，**不用于连续性判定**",
+     "outside_a_share_count": 140,
+     "outside_a_share_sample": [
+      "2004-01-01",
+      "2015-01-01",
+      "2015-01-02",
+      "2015-02-18",
+      "2015-02-19",
+      "2015-02-20",
+      "2015-02-23",
+      "2015-02-24",
+      "2015-04-06",
+      "2015-05-01"
+     ]
+    }
+   },
+   "row_quality": {
+    "row_count": 3003,
+    "checks": {
+     "illegal_date": {
+      "count": 0,
+      "sample": []
+     },
+     "duplicate_date": {
+      "count": 0,
+      "sample": []
+     },
+     "close_null": {
+      "count": 0,
+      "sample": []
+     },
+     "close_non_positive": {
+      "count": 0,
+      "sample": []
+     },
+     "close_non_numeric": {
+      "count": 0,
+      "sample": []
+     },
+     "high_lt_low": {
+      "count": 0,
+      "sample": []
+     },
+     "ohlc_inconsistent": {
+      "count": 0,
+      "sample": []
+     },
+     "volume_negative": {
+      "count": 0,
+      "sample": []
+     },
+     "amount_negative": {
+      "count": 0,
+      "sample": []
+     },
+     "change_inconsistent": {
+      "count": 0,
+      "sample": []
+     },
+     "change_pct_inconsistent": {
+      "count": 0,
+      "sample": []
+     },
+     "extreme_jump": {
+      "count": 0,
+      "sample": []
+     },
+     "repeated_price_run": {
+      "count": 0,
+      "sample": []
+     },
+     "non_trading_date": {
+      "count": 0,
+      "sample": []
+     }
+    },
+    "fatal_issue_count": 0,
+    "data_quality_status": "pass",
+    "note": "**不修改任何原始值**；异常只记录不修正；正常大幅涨跌不计入 fatal"
+   },
+   "point_in_time": {
+    "historical_point_in_time_status": "unknown",
+    "historical_publication_evidence": null,
+    "historical_revision_evidence": null,
+    "first_available_date": "unknown",
+    "point_in_time_blockers": [
+     "同 (code,date) 仅 1 版本，无修订记录",
+     "仅单批次采集（['2026-11-27']），无法区分历史发布值与当前值",
+     "未取得官方历史发布时间证明",
+     "无法排除事后回溯计算"
+    ],
+    "snapshot_tables_found": [
+     "etf_adjustment_snapshots"
+    ],
+    "multi_version_rows": 0,
+    "ingest_batches": [
+     "2026-11-27"
+    ],
+    "note": "**不能因历史行情完整就认为具备历史时点可用性**；无快照/发布证据的序列不得用于声称无未来数据偏差的回测"
+   },
+   "row_quality_distribution": {
+    "normal_unverified": 3002,
+    "suspected_synthetic": 1
+   },
+   "grading": {
+    "dimensions": {
+     "official_identity": "official",
+     "return_basis": "official",
+     "historical_start": "unknown",
+     "calendar": "unknown",
+     "data_quality": "pass",
+     "point_in_time": "unknown"
+    },
+    "final_grade": "C",
+    "grade_definition": "可用于有限描述性/代理研究，存在未解决关键限制",
+    "allowed_uses": [
+     "有限描述性研究",
+     "作为代理序列做探索性分析（须明确标注证据缺口）"
+    ],
+    "forbidden_uses": [
+     "任何声称无未来数据偏差的回测",
+     "正式业绩归因与排名",
+     "对外发布的基金评价",
+     "历史时点严格回测（point-in-time unknown）",
+     "依赖官方交易日历的严格交易日对齐"
+    ],
+    "blockers": [
+     "真实历史起点 unknown",
+     "日历等级=unknown",
+     "历史时点可用性 unknown"
+    ]
+   }
+  },
+  {
+   "tr_code": "N00012",
+   "price_index_code": "000012",
+   "market_group": "bond",
+   "market_label": "上交所债券市场",
+   "official_full_name": "上证国债指数(利息及再投资)",
+   "return_basis": "bond_interest_reinvestment",
+   "row_count": 3376,
+   "raw_rows_in_db": 3376,
+   "identity_evidence_level": "official",
+   "return_basis_evidence_level": "official",
+   "historical_start": {
+    "official_basic_date": "2012-12-31",
+    "official_publish_date": "2018-01-02",
+    "request_start_date": "20040101",
+    "api_earliest_returned_date": "20040101",
+    "api_second_row_date": "20121231",
+    "actual_earliest_historical_quote_date": "unknown",
+    "historical_start_evidence_level": "request_start_artifact",
+    "historical_start_status": "unknown",
+    "historical_start_blockers": [
+     "未取得官方编制方案/发布公告以证明真实历史起点",
+     "接口返回最早日期 20040101 等于请求起始日，不能作为真实历史起点",
+     "第二行 20121231 无独立对照证据，不能确认为真实起点"
+    ],
+    "synthetic_row_preserved": "20040101",
+    "date_concepts_distinct": {
+     "1_basic_date": "2012-12-31",
+     "2_publish_date": "2018-01-02",
+     "3_request_start": "20040101",
+     "4_api_earliest": "20040101",
+     "5_confirmed_real_start": "unknown",
+     "6_first_publicly_available": "unknown"
+    },
+    "note": "六类日期严格分开；**不得因有官方发布日期就认为接口最早日期是真实起点**"
+   },
+   "calendar": {
+    "market_group": "bond",
+    "market_label": "上交所债券市场",
+    "calendar_used": "债券市场交易日历",
+    "calendar_available": false,
+    "calendar_is_official": false,
+    "continuity_status": "unknown",
+    "coverage_status": "unknown",
+    "missing_trading_days": null,
+    "dates_outside_calendar": null,
+    "reason": "债券市场交易日历未取得，**不得用 A 股日历替代**；覆盖与连续性记 unknown",
+    "calendar_evidence": "尝试 sse.com.cn 交易日历页（HTTP 200 但为 JS 渲染，无可解析结构化数据）；**未取得官方债券日历**",
+    "reference_only_a_share_diff": {
+     "note": "仅供参考，**不用于连续性判定**",
+     "outside_a_share_count": 1,
+     "outside_a_share_sample": [
+      "2004-01-01"
+     ]
+    }
+   },
+   "row_quality": {
+    "row_count": 3376,
+    "checks": {
+     "illegal_date": {
+      "count": 0,
+      "sample": []
+     },
+     "duplicate_date": {
+      "count": 0,
+      "sample": []
+     },
+     "close_null": {
+      "count": 0,
+      "sample": []
+     },
+     "close_non_positive": {
+      "count": 0,
+      "sample": []
+     },
+     "close_non_numeric": {
+      "count": 0,
+      "sample": []
+     },
+     "high_lt_low": {
+      "count": 0,
+      "sample": []
+     },
+     "ohlc_inconsistent": {
+      "count": 0,
+      "sample": []
+     },
+     "volume_negative": {
+      "count": 0,
+      "sample": []
+     },
+     "amount_negative": {
+      "count": 0,
+      "sample": []
+     },
+     "change_inconsistent": {
+      "count": 0,
+      "sample": []
+     },
+     "change_pct_inconsistent": {
+      "count": 0,
+      "sample": []
+     },
+     "extreme_jump": {
+      "count": 0,
+      "sample": []
+     },
+     "repeated_price_run": {
+      "count": 0,
+      "sample": []
+     },
+     "non_trading_date": {
+      "count": 0,
+      "sample": []
+     }
+    },
+    "fatal_issue_count": 0,
+    "data_quality_status": "pass",
+    "note": "**不修改任何原始值**；异常只记录不修正；正常大幅涨跌不计入 fatal"
+   },
+   "point_in_time": {
+    "historical_point_in_time_status": "unknown",
+    "historical_publication_evidence": null,
+    "historical_revision_evidence": null,
+    "first_available_date": "unknown",
+    "point_in_time_blockers": [
+     "同 (code,date) 仅 1 版本，无修订记录",
+     "仅单批次采集（['2026-11-27']），无法区分历史发布值与当前值",
+     "未取得官方历史发布时间证明",
+     "无法排除事后回溯计算"
+    ],
+    "snapshot_tables_found": [
+     "etf_adjustment_snapshots"
+    ],
+    "multi_version_rows": 0,
+    "ingest_batches": [
+     "2026-11-27"
+    ],
+    "note": "**不能因历史行情完整就认为具备历史时点可用性**；无快照/发布证据的序列不得用于声称无未来数据偏差的回测"
+   },
+   "row_quality_distribution": {
+    "normal_unverified": 3375,
+    "suspected_synthetic": 1
+   },
+   "grading": {
+    "dimensions": {
+     "official_identity": "official",
+     "return_basis": "official",
+     "historical_start": "unknown",
+     "calendar": "unknown",
+     "data_quality": "pass",
+     "point_in_time": "unknown"
+    },
+    "final_grade": "C",
+    "grade_definition": "可用于有限描述性/代理研究，存在未解决关键限制",
+    "allowed_uses": [
+     "有限描述性研究",
+     "作为代理序列做探索性分析（须明确标注证据缺口）"
+    ],
+    "forbidden_uses": [
+     "任何声称无未来数据偏差的回测",
+     "正式业绩归因与排名",
+     "对外发布的基金评价",
+     "历史时点严格回测（point-in-time unknown）",
+     "依赖官方交易日历的严格交易日对齐"
+    ],
+    "blockers": [
+     "真实历史起点 unknown",
+     "日历等级=unknown",
+     "历史时点可用性 unknown"
+    ]
+   }
+  }
+ ],
+ "summary": {
+  "total_candidates": 12,
+  "grade_distribution": {
+   "B": 8,
+   "C": 4
+  },
+  "continuity_distribution": {
+   "verified_against_proxy_calendar": 9,
+   "unknown": 3
+  },
+  "historical_start_confirmed": 0,
+  "point_in_time_verified": 0,
+  "calendar_official": 0,
+  "admission": {
+   "raw_data_layer_ingest_candidate": 12,
+   "validated_series_candidate": 0,
+   "proxy_qualified_series_candidate": 0,
+   "formal_series_admitted": 0
+  },
+  "gates": {
+   "ready_for_research_analysis": true,
+   "ready_for_backtest": false,
+   "ready_for_formal_ranking": false,
+   "ready_for_3b6_2_3_1_series_build": false
+  }
+ },
+ "data_protection": {
+  "tr_index_daily_raw_rows": 55942,
+  "raw_rows_expected": 55942,
+  "rows_unchanged": true,
+  "evidence_files": 34,
+  "index_daily_rows": 50603,
+  "index_daily_fingerprint": "dbbd07c1339e99f27b0aeadb43eb56848776dbbad97f3fb7b9748bbd2f1e61f6",
+  "index_daily_fingerprint_expected": "dbbd07c1339e99f27b0aeadb43eb56848776dbbad97f3fb7b9748bbd2f1e61f6",
+  "index_daily_unchanged": true,
+  "table_counts": {
+   "tr_candidate_master": 12,
+   "tr_evidence_files": 34,
+   "tr_ingest_runs": 1,
+   "tr_index_daily_raw": 55942,
+   "tr_candidate_quality": 12,
+   "tr_price_index_mapping": 12
+  },
+  "integrity_check": "ok",
+  "foreign_key_check": 0,
+  "isolated": true
+ },
+ "_self_check": {
+  "twelve_candidates": true,
+  "all_graded": true,
+  "no_grade_a": true,
+  "no_historical_start_confirmed": true,
+  "point_in_time_all_unknown": true,
+  "no_official_calendar": true,
+  "bond_hk_calendar_unknown": true,
+  "rows_unchanged": true,
+  "index_daily_unchanged": true,
+  "no_validated": true,
+  "no_formal_admitted": true,
+  "synthetic_rows_preserved": true
+ }
+}
